@@ -38,6 +38,7 @@ export const IconEnum = {
   close: "mdi:close",
   check: "ph:check",
   check_circle: "ph:check-circle",
+  info_circle: "ph:info",
   link: "ph:link",
   loading: "ph:circle-notch",
   edit: "ph:pencil-simple",

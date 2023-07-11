@@ -8,6 +8,11 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Dispatch, useState } from "react";
+import { Link } from "react-router-dom";
+import { tv } from "tailwind-variants";
+
+import { useHandleChange } from "../../hooks";
 import {
   InputOnChangeValue,
   MetaType,
@@ -33,15 +38,11 @@ import {
   removeColumnFilter,
   SetStateAction,
 } from "../../utils";
-import { Dispatch, useState } from "react";
-import { Link } from "react-router-dom";
-import { tv } from "tailwind-variants";
-
 import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
+import Alert from "../Misc/Alert";
 import { Tooltip } from "../Overlay";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
-import { useHandleChange } from "../../hooks";
 
 export { createColumnHelper } from "@tanstack/react-table";
 
@@ -321,10 +322,10 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
   return (
     <div className="w-min">
       <Button
-        onClick={onClick}
-        icon={orderBy?.sort === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc}
-        variant={orderBy?.sort && orderBy?.field === id ? "primary" : "secondary"}
         hasNoBackground
+        icon={orderBy?.sort === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc}
+        onClick={onClick}
+        variant={orderBy?.sort && orderBy?.field === id ? "primary" : "secondary"}
       />
     </div>
   );
@@ -381,6 +382,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     getExpandedRowModel: getExpandedRowModel(),
   });
   if (isLoading) return <Skeleton type="table" />;
+  if (data.length === 0) return <Alert label="There's no content." variant="info" />;
   return (
     <div className={container()}>
       <div className={tableClasses()}>
