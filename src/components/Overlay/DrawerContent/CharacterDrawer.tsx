@@ -58,7 +58,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   >(
     data?.id,
     "characters",
-    { data: {}, fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id"] },
+    { data: {}, fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"] },
     {
       enabled: !!data?.id,
     },
@@ -178,6 +178,12 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               />
             </div>
           </div>
+          <ul className="flex w-full flex-col gap-y-2">
+            <li className="flex items-center justify-between">
+              <span>Favorite:</span>
+              <Checkbox name="is_favorite" onChange={handleChange} value={character?.is_favorite} />
+            </li>
+          </ul>
         </>
       ) : null}
       {selectedTab === 1 ? (

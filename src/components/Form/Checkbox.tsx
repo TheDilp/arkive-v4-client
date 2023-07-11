@@ -62,7 +62,7 @@ const CheckboxClasses = tv({
   },
 });
 
-export function Checkbox({ label, value = true, name, helperText, onChange, variant }: CheckboxType) {
+export function Checkbox({ label, value = false, name, helperText, onChange, variant }: CheckboxType) {
   const { base, label: labelClasses, checkbox, helperText: helperTextClasses } = CheckboxClasses({ variant, checked: value });
   return (
     <div className={base()}>

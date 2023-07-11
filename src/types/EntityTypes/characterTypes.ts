@@ -9,6 +9,7 @@ export interface CharacterFieldValues {
 export interface CharacterType {
   id: string;
   project_id: string;
+  is_favorite?: boolean;
   first_name: string;
   last_name?: string;
   nickname?: string;
