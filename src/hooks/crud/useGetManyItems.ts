@@ -6,7 +6,7 @@ import { baseURLS, FetchFunction } from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
-    ["allItems", "project"],
+    ["allEntities", "project"],
     async () =>
       FetchFunction({
         method: "POST",
@@ -25,8 +25,7 @@ export function useGetAllEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allItems", request.data.project_id, type, request?.orderBy, request?.filters];
-
+  const baseQueryKey = ["allEntities", request.data.project_id, type, request?.orderBy, request?.filters];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
@@ -68,7 +67,7 @@ export function useGetAllEntities<ReturnType>(
   return useQuery<{ data: ReturnType[] }, unknown>(
     typeof request?.pagination?.page === "number" ? baseQueryKey.concat(request?.pagination) : baseQueryKey,
     async () => queryFn(request),
-    configuredOptions,
+    { ...configuredOptions, ...options },
   );
 }
 export function useGetSubEntities<ReturnType>(

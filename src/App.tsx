@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Route, Routes } from "react-router-dom";
 
-import { Drawer, NotificationContainer, ProjectLayout } from "./components";
+import { NotificationContainer, ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import ProjectsView from "./pages/Projects/ProjectsView";
 import { SettingsView } from "./pages/Settings";
@@ -21,7 +21,6 @@ export default function App() {
         overflow: "hidden",
       }}>
       <QueryClientProvider client={queryClient}>
-        <Drawer />
         <NotificationContainer />
         <Routes>
           <Route path="/projects/*">

@@ -16,8 +16,8 @@ import {
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { Avatar, Icon, Spinner } from "../Misc";
 import { SelectOptionType, SelectType } from "../../types";
+import { Avatar, Icon, Spinner } from "../Misc";
 
 const SelectClasses = tv({
   slots: {
@@ -283,7 +283,7 @@ export function Select({
         ) : (
           <div className={placeholderClasses()}>{options.length === 0 ? "No options available." : placeholder || "Select"}</div>
         )}
-        <RightIcon optionsLength={options.length} isOpen={isOpen} isLoading={isLoading} />
+        <RightIcon isLoading={isLoading} isOpen={isOpen} optionsLength={options.length} />
       </div>
       {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}
       {isOpen && options.length ? (

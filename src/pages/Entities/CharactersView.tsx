@@ -30,7 +30,7 @@ function createColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(row.original.project_id, "images", row.original?.image?.title || "")}
+            image={getImageURL(row.original.project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
             isBordered
             isTooltipDisabled
@@ -145,6 +145,9 @@ export function CharactersView() {
   const { data, isLoading } = useGetAllEntities<CharacterType>(
     {
       data: { project_id: project_id as string },
+      relations: {
+        portrait: true,
+      },
       orderBy,
       filters,
       pagination,
@@ -191,7 +194,7 @@ export function CharactersView() {
           />
         </div>
       </div>
-      <div className="h-full max-h-full w-full overflow-hidden">
+      <div className="h-full max-h-[85%] w-full overflow-hidden">
         <Table
           columns={createColumns(setDrawer, setDialog)}
           config={{

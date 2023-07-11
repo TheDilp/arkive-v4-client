@@ -1,13 +1,7 @@
-import { QueryErrorResetBoundary, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  FetchFunction,
-  IconEnum,
-  ResponseErrorMessageEnum,
-  baseURLS,
-  getEntityCRUDNotification,
-  useNotifications,
-} from "../../utils";
-import { AvailableEntityType, ResponseErrorType } from "../../types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { AvailableEntityType } from "../../types";
+import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useCreateProject<InsertType>() {
   const queryClient = useQueryClient();
@@ -15,7 +9,7 @@ export function useCreateProject<InsertType>() {
   return useMutation(
     async (newItemValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}projects/create`,
+        url: `${baseURLS.baseServer}/projects/create`,
         body: JSON.stringify({
           data: newItemValues,
         }),
@@ -34,7 +28,7 @@ export function useCreateProject<InsertType>() {
 
       // "error", "There was an error creating this project."),
       onSuccess: () => {
-        queryClient.invalidateQueries(["allItems", "project"]);
+        queryClient.invalidateQueries(["allEntities", "project"]);
         createNotification({
           id: crypto.randomUUID(),
           title: "Project successfully created!",
@@ -55,31 +49,33 @@ export function useCreateEntity<InsertType extends { data: { project_id: string 
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newItemValues: InsertType) => {
-      return FetchFunction({
-        url: isTemplate ? `${baseURLS.baseServer}createfromtemplate` : `${baseURLS.baseServer}${type}/create`,
+    async (newItemValues: InsertType) =>
+      FetchFunction({
+        url: isTemplate ? `${baseURLS.baseServer}/createfromtemplate` : `${baseURLS.baseServer}/${type}/create`,
         body: JSON.stringify(newItemValues),
         method: "POST",
-      });
-    },
+      }),
+
     {
-      onError: () =>
+      onSuccess: (data, vars) => {
+        queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
+        if (data?.ok) {
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || getEntityCRUDNotification(type, "create"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        }
+      },
+      onError: (error: { message: string }) => {
         createNotification({
           id: crypto.randomUUID(),
-          title: "There was an error creating this item.",
+          title: error?.message || "There was an error creating this entity.",
           variant: "error",
           icon: IconEnum.error,
           timer: 5,
-        }),
-      onSuccess: (_, vars) => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", vars.data.project_id, type] });
-
-        createNotification({
-          id: crypto.randomUUID(),
-          title: getEntityCRUDNotification(type, "create"),
-          variant: "success",
-          icon: IconEnum.check,
-          timer: 2,
         });
       },
     },
@@ -96,31 +92,33 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
   return useMutation(
     async (newItemValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}${type}/create`,
+        url: `${baseURLS.baseServer}/${type}/create`,
         body: JSON.stringify(newItemValues),
         method: "POST",
       });
     },
     {
-      onError: (error: string) => {
-        createNotification({
-          id: crypto.randomUUID(),
-          title: "There was an error creating these items.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", project_id, type] });
+      onError: () => {},
+      onSettled: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
 
-        createNotification({
-          id: crypto.randomUUID(),
-          title: getEntityCRUDNotification(type, "create"),
-          variant: "success",
-          icon: IconEnum.check,
-          timer: 2,
-        });
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || getEntityCRUDNotification(type, "create"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else {
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || "There was an error creating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+        }
       },
     },
   );
@@ -133,7 +131,7 @@ export function useCreateAdditionalFieldTemplate<InsertType extends { project_id
   return useMutation(
     async (newItemValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}characterfieldstemplates/create`,
+        url: `${baseURLS.baseServer}/character_fields_templates/create`,
         body: JSON.stringify({
           data: newItemValues,
         }),
@@ -150,10 +148,10 @@ export function useCreateAdditionalFieldTemplate<InsertType extends { project_id
           timer: 5,
         }),
       onSuccess: async (_, vars) => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", vars.project_id, "characterFieldsTemplates"] });
+        queryClient.invalidateQueries({ queryKey: ["allEntities", vars.project_id, "character_fields_templates"] });
         createNotification({
           id: crypto.randomUUID(),
-          title: getEntityCRUDNotification("characterFieldsTemplates", "create"),
+          title: getEntityCRUDNotification("character_fields_templates", "create"),
           variant: "success",
           icon: IconEnum.check,
           timer: 2,

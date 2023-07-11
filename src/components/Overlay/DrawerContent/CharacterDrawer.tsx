@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  useCreateEntity,
-  useGetAllEntities,
-  useGetImages,
-  useGetItem,
-  useGetSubEntities,
-  useHandleChange,
-  useUpdateEntity,
-} from "../../../hooks";
+import { useCreateEntity, useGetAllEntities, useGetImages, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, SelectOptionType } from "../../../types";
-import { IconEnum, getImageURL } from "../../../utils";
+import { getImageURL, IconEnum } from "../../../utils";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
@@ -23,7 +15,7 @@ function CharacterFieldInputs({
   title,
   fieldType,
   options,
-  value,
+  value: currentValue,
   parentId,
   handleChange,
 }: FieldType & {
@@ -32,24 +24,24 @@ function CharacterFieldInputs({
 }) {
   const name = `${parentId}.${id}`;
   if (fieldType === "text" || fieldType === "number") {
-    return <Input name={name} label={title} onChange={handleChange} value={value as string} />;
+    return <Input label={title} name={name} onChange={handleChange} value={currentValue as string} />;
   }
   if (fieldType === "select" || fieldType === "select_multiple") {
     return (
       <Select
         isMultiple={fieldType === "select_multiple"}
-        options={options?.map((opt) => ({ label: opt, value: opt })) || []}
-        name={name}
         label={title}
+        name={name}
         onChange={handleChange}
-        value={value}
+        options={options?.map((opt) => ({ label: opt, value: opt })) || []}
+        value={currentValue}
       />
     );
   }
   if (fieldType === "textarea") {
     return (
       <div className="h-[10rem] max-h-full min-h-[10rem]">
-        <Textarea name={name} label={title} onChange={handleChange} value={value as string} />
+        <Textarea label={title} name={name} onChange={handleChange} value={currentValue as string} />
       </div>
     );
   }
@@ -69,6 +61,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
     existingCharacter?.data || { project_id: project_id as string },
   );
+  const [image, setImage] = useState<{ id: string | null }>({ id: null });
 
   const [fields, setFields] = useState<{ [key: string]: { [key: string]: string } }>(
     existingCharacter?.data?.characterFieldTemplates || {},
@@ -76,7 +69,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const { mutateAsync: create } = useCreateEntity<{
     data: insertCharacterType;
-    relations?: { characterFieldTemplates?: { [key: string]: { [key: string]: string } } };
+    relations?: { characterFieldTemplates?: { [key: string]: { [key: string]: string } }; image?: { id: string | null } };
   }>("characters");
 
   const { mutateAsync: update } = useUpdateEntity<{
@@ -87,11 +80,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
     select: (res): SelectOptionType[] => {
       if (res?.data && res?.data?.length) {
-        return res.data.map((image) => ({
-          label: image.title,
-          value: image.id,
+        return res.data.map((img) => ({
+          label: img.title,
+          value: img.id,
           image: {
-            link: getImageURL(project_id as string, "images", image.title),
+            link: getImageURL(project_id as string, "images", img.id),
           },
         }));
       }
@@ -100,7 +93,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   });
   const { data: templates } = useGetAllEntities<FieldTemplate>(
     { data: { project_id: project_id as string }, relations: { characterFields: true } },
-    "characterFieldsTemplates",
+    "character_fields_templates",
     {
       enabled: selectedTab === 1,
     },
@@ -142,13 +135,13 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             </div>
           </div>
           <ImageSelect
-            label="Select character avatar (optional)"
-            name="image.id"
-            onChange={handleChange}
-            options={images}
             isLoading={isFetchingImages}
+            label="Select character avatar (optional)"
+            name="id"
+            onChange={({ value }) => setImage({ id: value as string })}
+            options={images}
             type="images"
-            value={character?.image?.id ?? ""}
+            value={image?.id ?? ""}
           />
           <Input label="Age (optional)" name="age" onChange={handleChange} type="number" value={character?.age || ""} />
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
@@ -185,10 +178,9 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       {selectedTab === 1 ? (
         <ul className="flex flex-col gap-y-2">
           {templates?.data?.map((t) => (
-            <li className="flex flex-col gap-y-2" key={t.id}>
+            <li key={t.id} className="flex flex-col gap-y-2">
               <div className="flex items-center gap-x-2">
                 <Checkbox
-                  value={Object.keys(fields).includes(t.id)}
                   name={t.id}
                   onChange={() => {
                     const temp = { ...fields };
@@ -196,6 +188,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                     else temp[t.id] = {};
                     setFields(temp);
                   }}
+                  value={Object.keys(fields).includes(t.id)}
                 />
                 <span className="select-none text-xl">{t.title}</span>
               </div>
@@ -223,7 +216,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           if (character) {
             if (character?.id)
               await update({ data: { ...character, id: character.id }, relations: { characterFieldTemplates: fields } });
-            else await create({ data: character, relations: { characterFieldTemplates: fields } });
+            else await create({ data: character, relations: { characterFieldTemplates: fields, image } });
           }
           resetDrawerAtom();
         }}

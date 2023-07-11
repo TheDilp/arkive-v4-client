@@ -1,11 +1,12 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
-import { AssetType, Size } from "../../../types";
+
 import { useUploadAsset } from "../../../hooks";
-import { useState } from "react";
-import { IconEnum, getPreviewImageURLs } from "../../../utils";
-import { Button, ImageUpload } from "../../Form";
+import { AssetType, Size } from "../../../types";
+import { getPreviewImageURLs, IconEnum } from "../../../utils";
 import ImagePreview from "../../DataDisplay/ImagePreview";
+import { Button, ImageUpload } from "../../Form";
 
 const ImageUploadClasses = tv({
   slots: {

@@ -1,4 +1,4 @@
-import { Button, Navbar, ProjectCard } from "../../components";
+import { Button, Drawer, Navbar, ProjectCard } from "../../components";
 import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { drawerAtom, IconEnum, useSetAtom } from "../../utils";
@@ -10,6 +10,7 @@ export default function ProjectsView() {
   useChangeNavbarTitle("The Arkive");
   return (
     <div className="flex h-screen w-screen">
+      <Drawer />
       <div className="h-full w-16 bg-zinc-900">
         <div className="flex h-16 w-full items-center justify-center">
           <img alt="Arkive Logo" className="h-12" src="/Logo.webp" />
@@ -34,14 +35,7 @@ export default function ProjectsView() {
         </div>
         <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
           {data?.data
-            ? data.data.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  id={project.id}
-                  image=""
-                  title={project.title}
-                />
-              ))
+            ? data.data.map((project) => <ProjectCard key={project.id} id={project.id} image="" title={project.title} />)
             : null}
         </div>
       </div>

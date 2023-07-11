@@ -25,7 +25,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
       },
       onSuccess: async (res: ResponseType) => {
         if (res.ok) {
-          queryClient.invalidateQueries({ queryKey: ["allItems", project_id, type] });
+          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
           createNotification({
             id: crypto.randomUUID(),
             title: getEntityCRUDNotification(type, archive ? "archive" : "delete"),

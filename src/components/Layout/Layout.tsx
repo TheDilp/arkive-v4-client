@@ -1,9 +1,9 @@
 import { Outlet } from "react-router-dom";
 
+import { useBreakpoint } from "../../hooks";
 import { Dialog, Drawer } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-import { useBreakpoint } from "../../hooks";
 
 export function ProjectLayout() {
   const { isLg } = useBreakpoint();

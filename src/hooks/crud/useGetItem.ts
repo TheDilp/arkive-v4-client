@@ -22,7 +22,7 @@ export function useGetItem<EntityType>(id: string | undefined, type: AvailableEn
 //   options?: UseQueryOptions<ReturnType>,
 // ) {
 //   return useQuery<ReturnType[]>(
-//     ["allItems", data.project_id, type],
+//     ["allEntities", data.project_id, type],
 //     async () => FetchFunction({ method: "POST", body: JSON.stringify(data), url: `${baseURLS.baseServer}api/v4/${type}/` }),
 //     {
 //       enabled: !!data.project_id && (options?.enabled ?? true),

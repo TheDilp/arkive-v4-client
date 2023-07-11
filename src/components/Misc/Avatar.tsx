@@ -1,8 +1,8 @@
 import { tv } from "tailwind-variants";
 
-import { Tooltip } from "../Overlay/Tooltip";
 import { AvatarType } from "../../types";
 import { getFirstLetters } from "../../utils";
+import { Tooltip } from "../Overlay/Tooltip";
 
 const AvatarClasses = tv({
   slots: {

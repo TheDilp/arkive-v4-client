@@ -1,5 +1,4 @@
 import { AssetType } from "../../types";
-
 import { baseURLS } from "../enums/ServerEnum";
 
 export function createURL(type: string): string {
@@ -23,7 +22,7 @@ export function getPreviewImageURLs(files: File[] | undefined): { name: string; 
   return [];
 }
 
-export function getImageURL(project_id: string, type: AssetType, image_name?: string): string {
-  if (!image_name) return "";
-  return `${baseURLS.baseServer}assets/${project_id}/${type}/${image_name}`;
+export function getImageURL(project_id: string, type: AssetType, image_id?: string): string {
+  if (!image_id) return "";
+  return `${baseURLS.baseServer}/assets/${project_id}/${type}/${image_id}`;
 }

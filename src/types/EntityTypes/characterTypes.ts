@@ -12,7 +12,9 @@ export interface CharacterType {
   first_name: string;
   last_name?: string;
   nickname?: string;
-  imageId?: string;
+  images?: ImageType[];
+  portrait_id?: string;
+  portrait?: ImageType;
   image?: ImageType;
   age?: number;
   dayOfBirth?: number;
