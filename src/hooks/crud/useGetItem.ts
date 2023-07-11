@@ -1,11 +1,17 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { AvailableEntityType } from "../../types";
+
+import { AvailableEntityType, RequestBodyType } from "../../types";
 import { baseURLS, FetchFunction } from "../../utils";
 
-export function useGetItem<EntityType>(id: string | undefined, type: AvailableEntityType, options?: UseQueryOptions) {
+export function useGetItem<EntityType>(
+  id: string | undefined,
+  type: AvailableEntityType,
+  body: RequestBodyType,
+  options?: UseQueryOptions,
+) {
   return useQuery<{ data: EntityType }>(
     [type, id],
-    async () => FetchFunction({ method: "GET", url: `${baseURLS.baseServer}${type.toLowerCase()}/${id}` }),
+    async () => FetchFunction({ method: "POST", url: `${baseURLS.baseServer}/${type.toLowerCase()}/${id}` }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,

@@ -54,9 +54,14 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const { data: existingCharacter } = useGetItem<
     CharacterType & { characterFieldTemplates: { [key: string]: { [key: string]: string } } }
-  >(data?.id, "characters", {
-    enabled: !!data?.id,
-  });
+  >(
+    data?.id,
+    "characters",
+    { data: {} },
+    {
+      enabled: !!data?.id,
+    },
+  );
 
   const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
     existingCharacter?.data || { project_id: project_id as string },
@@ -114,7 +119,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         onChange={(_, index) => setSelectedTab(index)}
         selectedTab={selectedTab}
         tabs={[
-          { id: "1", label: "Basic info" },
+          { id: "1", label: "Basic info", icon: IconEnum.info_circle },
           { id: "2", label: "Additional fields", icon: IconEnum.additional_fields },
           { id: "3", label: "Realations", icon: IconEnum.link },
           { id: "4", label: "Tags", icon: IconEnum.tags },
@@ -178,7 +183,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         <ul className="flex flex-col gap-y-2">
           {templates?.data?.map((t) => (
             <li key={t.id} className="flex flex-col gap-y-2">
-              <div className="flex items-center gap-x-2">
+              <div className="items -center  flex gap-x-2">
                 <Checkbox
                   name={t.id}
                   onChange={() => {
