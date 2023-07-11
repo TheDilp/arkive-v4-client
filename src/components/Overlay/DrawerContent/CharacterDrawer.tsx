@@ -8,6 +8,7 @@ import { getImageURL, IconEnum } from "../../../utils";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
+import Alert from "../../Misc/Alert";
 
 type insertCharacterType = Partial<CharacterType> & { project_id: string };
 
@@ -188,35 +189,39 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       ) : null}
       {selectedTab === 1 ? (
         <ul className="flex flex-col gap-y-2">
-          {templates?.data?.map((t) => (
-            <li key={t.id} className="flex flex-col gap-y-2">
-              <div className="items -center  flex gap-x-2">
-                <Checkbox
-                  name={t.id}
-                  onChange={() => {
-                    const temp = { ...fields };
-                    if (Object.keys(fields).includes(t.id)) delete temp[t.id];
-                    else temp[t.id] = {};
-                    setFields(temp);
-                  }}
-                  value={Object.keys(fields).includes(t.id)}
-                />
-                <span className="select-none text-xl">{t.title}</span>
-              </div>
-              {Object.keys(fields).includes(t.id) ? (
-                <div className="flex flex-col gap-y-2">
-                  {t.fields.map((f) => (
-                    <CharacterFieldInputs
-                      key={f.id}
-                      {...f}
-                      handleChange={handleChangeFields}
-                      value={fields?.[f.parentId]?.[f.id] || ""}
-                    />
-                  ))}
+          {templates?.data?.length ? (
+            templates?.data?.map((t) => (
+              <li key={t.id} className="flex flex-col gap-y-2">
+                <div className="items -center  flex gap-x-2">
+                  <Checkbox
+                    name={t.id}
+                    onChange={() => {
+                      const temp = { ...fields };
+                      if (Object.keys(fields).includes(t.id)) delete temp[t.id];
+                      else temp[t.id] = {};
+                      setFields(temp);
+                    }}
+                    value={Object.keys(fields).includes(t.id)}
+                  />
+                  <span className="select-none text-xl">{t.title}</span>
                 </div>
-              ) : null}
-            </li>
-          ))}
+                {Object.keys(fields).includes(t.id) ? (
+                  <div className="flex flex-col gap-y-2">
+                    {t.fields.map((f) => (
+                      <CharacterFieldInputs
+                        key={f.id}
+                        {...f}
+                        handleChange={handleChangeFields}
+                        value={fields?.[f.parentId]?.[f.id] || ""}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </li>
+            ))
+          ) : (
+            <Alert label="There are no templates available." variant="info" />
+          )}
         </ul>
       ) : null}
       <Button
