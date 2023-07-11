@@ -7,6 +7,10 @@ export default {
         lato: ["Lato"],
         merriweather: ["Merriweather"],
       },
+      screens: {
+        xxs: "320px",
+        xs: "480px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
