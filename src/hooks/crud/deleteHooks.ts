@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvailableEntityType, ResponseType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useDeleteEntity(type: AvailableEntityType, projectId: string, archive: boolean) {
+export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -25,7 +25,7 @@ export function useDeleteEntity(type: AvailableEntityType, projectId: string, ar
       },
       onSuccess: async (res: ResponseType) => {
         if (res.ok) {
-          queryClient.invalidateQueries({ queryKey: ["allItems", projectId, type] });
+          queryClient.invalidateQueries({ queryKey: ["allItems", project_id, type] });
           createNotification({
             id: crypto.randomUUID(),
             title: getEntityCRUDNotification(type, archive ? "archive" : "delete"),

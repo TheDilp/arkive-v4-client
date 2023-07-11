@@ -8,9 +8,9 @@ export interface CharacterFieldValues {
 
 export interface CharacterType {
   id: string;
-  projectId: string;
-  firstName: string;
-  lastName?: string;
+  project_id: string;
+  first_name: string;
+  last_name?: string;
   nickname?: string;
   imageId?: string;
   image?: ImageType;

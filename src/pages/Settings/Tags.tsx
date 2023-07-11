@@ -75,8 +75,8 @@ function createColumns(
 }
 
 export function Tags({}: Props) {
-  const { projectId } = useParams();
-  const { data } = useGetAllEntities({ data: { projectId } }, "tags");
+  const { project_id } = useParams();
+  const { data } = useGetAllEntities({ data: { project_id } }, "tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
@@ -91,7 +91,7 @@ export function Tags({}: Props) {
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
-                data: { projectId },
+                data: { project_id },
                 title: "Create new tags",
                 type: "tags",
                 size: "lg",

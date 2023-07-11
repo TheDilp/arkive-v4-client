@@ -1,5 +1,5 @@
 export interface TagType {
   id: string;
   title: string;
-  projectId: string;
+  project_id: string;
 }

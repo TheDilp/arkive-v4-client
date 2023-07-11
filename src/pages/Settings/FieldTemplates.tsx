@@ -82,7 +82,7 @@ function createColumns(
 }
 
 export function FieldTemplates() {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   useChangeNavbarTitle("The Arkive | Field templates");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -101,7 +101,7 @@ export function FieldTemplates() {
       archived: false,
       pagination,
       data: {
-        projectId,
+        project_id,
       },
     },
     "characterFieldsTemplates",
@@ -116,7 +116,7 @@ export function FieldTemplates() {
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
-                data: { projectId },
+                data: { project_id },
                 title: "Create new field template",
                 type: "characterFieldsTemplates",
                 size: "lg",

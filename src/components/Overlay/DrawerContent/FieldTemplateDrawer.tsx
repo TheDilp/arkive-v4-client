@@ -115,18 +115,18 @@ function FieldRow({
 }
 
 export default function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create } = useCreateFieldTemplate<{
     title: string;
-    projectId: string;
+    project_id: string;
     fields: (Omit<FieldType, "options" | "parentId" | "id"> & { options?: string[] })[];
   }>();
 
   const { mutateAsync: update } = useUpdateEntity<{
     data: Partial<Omit<FieldTemplate, "id" | "fields">>;
     relations?: { fields?: FieldType[] };
-  }>("characterFieldsTemplates", projectId as string, data?.id);
+  }>("characterFieldsTemplates", project_id as string, data?.id);
 
   const { data: existingTemplate } = useGetItem<FieldTemplate & { fields: FieldType[] }>(data?.id, "characterFieldsTemplates", {
     enabled: !!data?.id,
@@ -187,7 +187,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
             await create(
               {
                 title,
-                projectId: projectId as string,
+                project_id: project_id as string,
                 fields: fields.map((field) => ({
                   title: field.title,
                   fieldType: field.fieldType,

@@ -14,12 +14,12 @@ function isDisabled(tags: { id: string; title: string }[]) {
 }
 
 export function TagsDrawer({ data }: { data: { id?: string } }) {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const [tags, setTags] = useState<{ id: string; title: string }[]>([]);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateEntities<{ data: { projectId: string; title: string }[] }>(
+  const { mutateAsync: create } = useCreateEntities<{ data: { project_id: string; title: string }[] }>(
     "tags",
-    projectId as string,
+    project_id as string,
   );
 
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });
@@ -49,7 +49,7 @@ export function TagsDrawer({ data }: { data: { id?: string } }) {
       <Button
         icon={IconEnum.add}
         onClick={async () => {
-          if (!data?.id) await create({ data: tags.map((tag) => ({ title: tag.title, projectId: projectId as string })) });
+          if (!data?.id) await create({ data: tags.map((tag) => ({ title: tag.title, project_id: project_id as string })) });
 
           resetDrawerAtom();
         }}

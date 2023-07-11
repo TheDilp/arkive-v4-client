@@ -26,7 +26,7 @@ const SidebarClasses = tv({
 });
 
 export function Sidebar() {
-  const { projectId, type } = useParams();
+  const { project_id, type } = useParams();
   const {
     base,
     nav,
@@ -51,7 +51,7 @@ export function Sidebar() {
               <Link
                 key={item.icon}
                 className={`${listItemLink()} ${item.navigate === type ? "bg-blue-400" : ""}`}
-                to={item.navigate === "/projects" ? item.navigate : `/projects/${projectId}/${item.navigate}`}>
+                to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
                 <Tooltip allowedPlacements={["right"]} content={item.tooltip}>
                   <li className={listItem()}>
                     <Icon className={navIcon()} fontSize={32} icon={item.icon} />
@@ -71,7 +71,7 @@ export function Sidebar() {
                     <li key={subItem.tooltip} className="p-2">
                       <Link
                         className={`${settingsSubitem()} ${subItem.navigate === type ? activeSettingsSubItem() : ""}`}
-                        to={`/projects/${projectId}/settings/${subItem.navigate}`}>
+                        to={`/projects/${project_id}/settings/${subItem.navigate}`}>
                         <Icon icon={subItem.icon} />
                         {subItem.tooltip}
                       </Link>

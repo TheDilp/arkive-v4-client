@@ -1,3 +1,6 @@
+import { Dispatch, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import { Avatar, Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetAllEntities, useTable } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
@@ -13,8 +16,6 @@ import {
   SetStateAction,
   useSetAtom,
 } from "../../utils";
-import { Dispatch, useState } from "react";
-import { useParams } from "react-router-dom";
 
 const columnHelper = createColumnHelper<CharacterType>();
 
@@ -30,11 +31,11 @@ function createColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(row.original.projectId, "images", row.original?.image?.title || "")}
-            initials={getAvatarInitials(row.original.firstName, row.original?.lastName || "")}
+            image={getImageURL(row.original.project_id, "images", row.original?.image?.title || "")}
+            initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
             isBordered
             isTooltipDisabled
-            label={getCharacterFullName(row.original.firstName, row.original?.lastName || "")}
+            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
             size="sm"
           />
         </div>
@@ -42,8 +43,8 @@ function createColumns(
       minSize: 5,
       maxSize: 5,
     }),
-    columnHelper.accessor("firstName", {
-      id: "firstName",
+    columnHelper.accessor("first_name", {
+      id: "first_name",
       header: "First name",
       cell: (info) => info.getValue(),
       meta: {
@@ -51,8 +52,8 @@ function createColumns(
         filterOptions: NameFilters,
       },
     }),
-    columnHelper.accessor("lastName", {
-      id: "lastName",
+    columnHelper.accessor("last_name", {
+      id: "last_name",
       header: "Last name",
       cell: (info) => info.getValue(),
       meta: {
@@ -176,15 +177,15 @@ export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
   const [view, setView] = useState<"card" | "list">("list");
   const [archived, setArchived] = useState<"active" | "archived">("active");
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
-    orderBy: { field: "firstName", sort: "asc" },
+    orderBy: { field: "first_name", sort: "asc" },
     filters: {},
     pagination: { limit: 10, page: 0 },
   });
   const { data, isLoading } = useGetAllEntities<CharacterType>(
     {
-      data: { projectId: projectId as string },
+      data: { project_id: project_id as string },
       orderBy,
       filters,
       pagination,
@@ -234,7 +235,7 @@ export function CharactersView() {
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
-                data: { projectId },
+                data: { project_id },
                 title: "Create new character",
                 type: "characters",
                 size: "lg",
@@ -250,7 +251,7 @@ export function CharactersView() {
             hasSelect: true,
             orderBy,
             filters,
-            getLink: (rowData: any) => `/project/${projectId}/characters/${rowData.id}`,
+            getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
           }}
           data={data?.data || []}
           dispatch={dispatch}

@@ -47,7 +47,7 @@ export function useCreateProject<InsertType>() {
   );
 }
 
-export function useCreateEntity<InsertType extends { data: { projectId: string }; relations?: { [key: string]: any } }>(
+export function useCreateEntity<InsertType extends { data: { project_id: string }; relations?: { [key: string]: any } }>(
   type: AvailableEntityType,
   isTemplate?: boolean,
 ) {
@@ -72,7 +72,7 @@ export function useCreateEntity<InsertType extends { data: { projectId: string }
           timer: 5,
         }),
       onSuccess: (_, vars) => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", vars.data.projectId, type] });
+        queryClient.invalidateQueries({ queryKey: ["allItems", vars.data.project_id, type] });
 
         createNotification({
           id: crypto.randomUUID(),
@@ -88,7 +88,7 @@ export function useCreateEntity<InsertType extends { data: { projectId: string }
 
 export function useCreateEntities<InsertType extends { data: { [key: string]: any }[]; relations?: { [key: string]: any } }>(
   type: AvailableEntityType,
-  projectId: string,
+  project_id: string,
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -112,7 +112,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
         });
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", projectId, type] });
+        queryClient.invalidateQueries({ queryKey: ["allItems", project_id, type] });
 
         createNotification({
           id: crypto.randomUUID(),
@@ -126,7 +126,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
   );
 }
 
-export function useCreateAdditionalFieldTemplate<InsertType extends { projectId: string }>() {
+export function useCreateAdditionalFieldTemplate<InsertType extends { project_id: string }>() {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -150,7 +150,7 @@ export function useCreateAdditionalFieldTemplate<InsertType extends { projectId:
           timer: 5,
         }),
       onSuccess: async (_, vars) => {
-        queryClient.invalidateQueries({ queryKey: ["allItems", vars.projectId, "characterFieldsTemplates"] });
+        queryClient.invalidateQueries({ queryKey: ["allItems", vars.project_id, "characterFieldsTemplates"] });
         createNotification({
           id: crypto.randomUUID(),
           title: getEntityCRUDNotification("characterFieldsTemplates", "create"),

@@ -16,15 +16,15 @@ import { useDeleteEntity } from "../../../hooks";
 
 export function ArchiveDeleteEntityDialog({ data, type }: { data: { [key: string]: any }; type: DialogContentType }) {
   const action = type?.replace("_entity", "");
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const { mutate } = useDeleteEntity(data?.entity_title as AvailableEntityType, projectId as string, action === "archive");
+  const { mutate } = useDeleteEntity(data?.entity_title as AvailableEntityType, project_id as string, action === "archive");
   const createNotification = useNotifications();
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {data?.entity_title || "entity"} - {getCharacterFullName(data?.firstName || "", data?.lastName || "")}?
+        {data?.entity_title || "entity"} - {getCharacterFullName(data?.first_name || "", data?.last_name || "")}?
         <p className="text-center text-sm text-zinc-300">
           {type === "archive_entity"
             ? " You can restore it or delete it permanently in the archived section."
@@ -32,16 +32,16 @@ export function ArchiveDeleteEntityDialog({ data, type }: { data: { [key: string
         </p>
       </div>
       <div className="mx-auto my-2 flex items-center gap-x-4">
-        {data?.image && data?.projectId ? (
+        {data?.image && data?.project_id ? (
           <>
             <Avatar
-              image={getImageURL(data?.projectId, "images", data?.image || "")}
+              image={getImageURL(data?.project_id, "images", data?.image || "")}
               isBordered
               isTooltipDisabled
               label=""
               size="2xl"
             />
-            <span className="text-lg">{getCharacterFullName(data?.firstName || "", data?.lastName || "")}</span>
+            <span className="text-lg">{getCharacterFullName(data?.first_name || "", data?.last_name || "")}</span>
           </>
         ) : null}
       </div>
@@ -52,7 +52,7 @@ export function ArchiveDeleteEntityDialog({ data, type }: { data: { [key: string
           icon={action === "archive" ? IconEnum.archive : IconEnum.trash}
           label={capitalizeFirstLetter(action || "")}
           onClick={() => {
-            if (data?.id && projectId && data?.entity_title) {
+            if (data?.id && project_id && data?.entity_title) {
               mutate({ id: data?.id });
               resetDialogAtom();
             } else {

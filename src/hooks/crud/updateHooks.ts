@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvailableEntityType, ResponseType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useUpdateEntity<InsertType>(type: AvailableEntityType, projectId: string, id: string | undefined) {
+export function useUpdateEntity<InsertType>(type: AvailableEntityType, project_id: string, id: string | undefined) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -26,7 +26,7 @@ export function useUpdateEntity<InsertType>(type: AvailableEntityType, projectId
       },
       onSuccess: async (res: ResponseType) => {
         if (res.ok) {
-          queryClient.invalidateQueries({ queryKey: ["allItems", projectId, type] });
+          queryClient.invalidateQueries({ queryKey: ["allItems", project_id, type] });
 
           createNotification({
             id: crypto.randomUUID(),

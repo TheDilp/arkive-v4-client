@@ -16,7 +16,7 @@ import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
 
-type insertCharacterType = Partial<CharacterType> & { projectId: string };
+type insertCharacterType = Partial<CharacterType> & { project_id: string };
 
 function CharacterFieldInputs({
   id,
@@ -57,7 +57,7 @@ function CharacterFieldInputs({
 }
 
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
 
   const { data: existingCharacter } = useGetItem<
@@ -66,8 +66,8 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     enabled: !!data?.id,
   });
 
-  const [character, setCharacter] = useState<Partial<CharacterType> & { projectId: string }>(
-    existingCharacter?.data || { projectId: projectId as string },
+  const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
+    existingCharacter?.data || { project_id: project_id as string },
   );
 
   const [fields, setFields] = useState<{ [key: string]: { [key: string]: string } }>(
@@ -82,16 +82,16 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const { mutateAsync: update } = useUpdateEntity<{
     data: insertCharacterType & { id: string };
     relations?: { characterFieldTemplates?: { [key: string]: { [key: string]: string } } };
-  }>("characters", projectId as string, data?.id);
+  }>("characters", project_id as string, data?.id);
 
-  const { data: images = [], isFetching: isFetchingImages } = useGetImages(projectId as string, "images", {
+  const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
     select: (res): SelectOptionType[] => {
       if (res?.data && res?.data?.length) {
         return res.data.map((image) => ({
           label: image.title,
           value: image.id,
           image: {
-            link: getImageURL(projectId as string, "images", image.title),
+            link: getImageURL(project_id as string, "images", image.title),
           },
         }));
       }
@@ -99,7 +99,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     },
   });
   const { data: templates } = useGetAllEntities<FieldTemplate>(
-    { data: { projectId: projectId as string }, relations: { characterFields: true } },
+    { data: { project_id: project_id as string }, relations: { characterFields: true } },
     "characterFieldsTemplates",
     {
       enabled: selectedTab === 1,
@@ -132,13 +132,13 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
             <div className="w-full lg:w-1/2">
-              <Input label="First name" name="firstName" onChange={handleChange} value={character?.firstName || ""} />
+              <Input label="First name" name="first_name" onChange={handleChange} value={character?.first_name || ""} />
             </div>
             <div className="w-full lg:w-1/2">
               <Input label="Nickname (optional)" name="nickname" onChange={handleChange} value={character?.nickname || ""} />
             </div>
             <div className="w-full lg:w-1/2">
-              <Input label="Last name (optional)" name="lastName" onChange={handleChange} value={character?.lastName || ""} />
+              <Input label="Last name (optional)" name="last_name" onChange={handleChange} value={character?.last_name || ""} />
             </div>
           </div>
           <ImageSelect
@@ -217,7 +217,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       ) : null}
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={!character?.firstName}
+        isDisabled={!character?.first_name}
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (character) {

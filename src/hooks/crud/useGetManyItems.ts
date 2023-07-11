@@ -1,21 +1,10 @@
-import {
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-} from "@tanstack/react-query";
+import { useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
-import {
-  AvailableEntityType,
-  AvailableSubEntityType,
-  RequestBodyType,
-} from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, RequestBodyType } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction } from "../../utils";
 
-export function useGetAllProjects(
-  request: RequestBodyType,
-  options?: UseQueryOptions
-) {
+export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
     ["allItems", "project"],
     async () =>
@@ -27,35 +16,26 @@ export function useGetAllProjects(
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
-    }
+    },
   );
 }
 
 export function useGetAllEntities<ReturnType>(
   request: RequestBodyType,
   type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean }
+  options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = [
-    "allItems",
-    request.data.projectId,
-    type,
-    request?.archived,
-    request?.orderBy,
-    request?.filters,
-  ];
+  const baseQueryKey = ["allItems", request.data.project_id, type, request?.archived, request?.orderBy, request?.filters];
 
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}/${
-        request.data.projectId
-      }${request.archived ? "" : ""}`,
+      url: `${baseURLS.baseServer}/${type.toLowerCase()}${request.archived ? "" : ""}`,
     });
   }
   const configuredOptions = {
-    enabled: !!request.data.projectId && (options?.enabled ?? true),
+    enabled: !!request.data.project_id && (options?.enabled ?? true),
     staleTime: options?.staleTime,
     select: options?.select,
   };
@@ -79,34 +59,27 @@ export function useGetAllEntities<ReturnType>(
                   page: request.pagination.page + 1,
                 },
               }
-            : request
+            : request,
         ),
       ...configuredOptions,
     });
   }
 
   return useQuery<{ data: ReturnType[] }, unknown>(
-    typeof request?.pagination?.page === "number"
-      ? baseQueryKey.concat(request?.pagination)
-      : baseQueryKey,
+    typeof request?.pagination?.page === "number" ? baseQueryKey.concat(request?.pagination) : baseQueryKey,
     async () => queryFn(request),
-    configuredOptions
+    configuredOptions,
   );
 }
 export function useGetSubEntities<ReturnType>(
-  request: { data: { projectId: string; parentId: string } },
+  request: { data: { project_id: string; parentId: string } },
   type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean }
+  options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = [
-    "allSubEntities",
-    request.data.projectId,
-    type,
-    request.data.parentId,
-  ];
+  const baseQueryKey = ["allSubEntities", request.data.project_id, type, request.data.parentId];
 
   const configuredOptions = {
-    enabled: !!request.data.projectId && (options?.enabled ?? true),
+    enabled: !!request.data.project_id && (options?.enabled ?? true),
     staleTime: options?.staleTime,
     select: options?.select,
   };
@@ -115,11 +88,9 @@ export function useGetSubEntities<ReturnType>(
     baseQueryKey,
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/${
-          request.data.projectId
-        }/${request.data.parentId}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/${request.data.project_id}/${request.data.parentId}`,
         method: "GET",
       }),
-    configuredOptions
+    configuredOptions,
   );
 }

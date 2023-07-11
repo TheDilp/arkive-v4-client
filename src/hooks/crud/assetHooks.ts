@@ -3,7 +3,7 @@ import { AssetType, ResponseType, SelectOptionType } from "../../types";
 import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications, useResetAtom } from "../../utils";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
 
-export function useUploadAsset(type: AssetType, projectId: string) {
+export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   const resetDialogAtom = useResetAtom(dialogAtom);
@@ -16,7 +16,7 @@ export function useUploadAsset(type: AssetType, projectId: string) {
       }
 
       return FetchFunction({
-        url: `${baseURLS.baseServer}assets/upload/${projectId}/${type}`,
+        url: `${baseURLS.baseServer}assets/upload/${project_id}/${type}`,
         body: formData,
         method: "POST",
       });
@@ -39,13 +39,13 @@ export function useUploadAsset(type: AssetType, projectId: string) {
 }
 
 export function useGetImages(
-  projectId: string,
+  project_id: string,
   type: AssetType,
   options?: UseQueryOptions<{ data: ImageType[] }, any, SelectOptionType[]>,
 ) {
   return useQuery<{ data: ImageType[] }, any, SelectOptionType[]>(
-    [projectId, type],
-    async () => FetchFunction({ method: "GET", url: `${baseURLS.baseServer}assets/${projectId}/${type}` }),
+    [project_id, type],
+    async () => FetchFunction({ method: "GET", url: `${baseURLS.baseServer}assets/${project_id}/${type}` }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,

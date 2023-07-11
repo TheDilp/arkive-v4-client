@@ -11,12 +11,12 @@ const ExpandedTableRowClasses = tv({
 });
 
 function ExpandedTemplateFields({ templateId }: { templateId: string }) {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
   const { data } = useGetSubEntities<FieldType>(
     {
       data: {
         parentId: templateId,
-        projectId: projectId as string,
+        project_id: project_id as string,
       },
     },
     "characterFields",

@@ -24,10 +24,10 @@ const ImageUploadClasses = tv({
 });
 
 export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType }) {
-  const { projectId } = useParams();
+  const { project_id } = useParams();
 
   const { imageUploadContainer, imagesList } = ImageUploadClasses({ size });
-  const { mutateAsync, isLoading: isMutating } = useUploadAsset(type, projectId as string);
+  const { mutateAsync, isLoading: isMutating } = useUploadAsset(type, project_id as string);
   const [files, setFiles] = useState<File[]>([]);
   const imageUrls = getPreviewImageURLs(files);
   return (

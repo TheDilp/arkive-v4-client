@@ -26,7 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/projects/*">
             <Route element={<ProjectsView />} path="" />
-            <Route element={<ProjectLayout />} path=":projectId/*">
+            <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<SettingsView />} path="settings/:type/*" />
               <Route element={<EntitiesView />} path=":type/*" />
             </Route>

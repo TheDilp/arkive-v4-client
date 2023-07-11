@@ -5,8 +5,8 @@ export function getFirstLetters(sentence: string): string {
     .map((word) => word.charAt(0))
     .join("");
 }
-export function getAvatarInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+export function getAvatarInitials(first_name: string, last_name: string): string {
+  return `${first_name.charAt(0)}${last_name.charAt(0)}`;
 }
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
@@ -16,8 +16,8 @@ export function capitalizeSentence(sentence: string): string {
   return sentence.toUpperCase();
 }
 
-export function getCharacterFullName(firstName: string, lastName: string): string {
-  return `${firstName} ${lastName || ""}`;
+export function getCharacterFullName(first_name: string, last_name: string): string {
+  return `${first_name} ${last_name || ""}`;
 }
 
 export function getSentenceCase(field: string) {
