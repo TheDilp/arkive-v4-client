@@ -22,7 +22,6 @@ const columnHelper = createColumnHelper<CharacterType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
-  archived: boolean,
 ) {
   return [
     columnHelper.display({
@@ -108,62 +107,23 @@ function createColumns(
                   }));
                 },
               },
-              ...(archived
-                ? [
-                    {
-                      id: "2",
-                      label: "Restore character",
-                      icon: IconEnum.export,
-                      onClick: () => {
-                        setDialog((prev) => ({
-                          ...prev,
-                          data: {
-                            ...row.original,
-                            entity_title: "characters",
-                          },
-                          title: "Restore character",
-                          size: "sm",
-                          type: "archive_entity",
-                        }));
-                      },
+              {
+                id: "2",
+                label: "Delete character",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "characters",
                     },
-                    {
-                      id: "3",
-                      label: "Delete character",
-                      icon: IconEnum.trash,
-                      onClick: () => {
-                        setDialog((prev) => ({
-                          ...prev,
-                          data: {
-                            ...row.original,
-                            entity_title: "characters",
-                          },
-                          title: "Delete character",
-                          size: "sm",
-                          type: "delete_entity",
-                        }));
-                      },
-                    },
-                  ]
-                : [
-                    {
-                      id: "2",
-                      label: "Archive character",
-                      icon: IconEnum.archive,
-                      onClick: () => {
-                        setDialog((prev) => ({
-                          ...prev,
-                          data: {
-                            ...row.original,
-                            entity_title: "characters",
-                          },
-                          title: "Archive character",
-                          size: "sm",
-                          type: "archive_entity",
-                        }));
-                      },
-                    },
-                  ]),
+                    title: "Delete character",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
@@ -176,7 +136,6 @@ function createColumns(
 export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
   const [view, setView] = useState<"card" | "list">("list");
-  const [archived, setArchived] = useState<"active" | "archived">("active");
   const { project_id } = useParams();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
     orderBy: { field: "first_name", sort: "asc" },
@@ -189,7 +148,6 @@ export function CharactersView() {
       orderBy,
       filters,
       pagination,
-      archived: archived === "archived",
     },
     "characters",
     {
@@ -216,18 +174,7 @@ export function CharactersView() {
             value={view}
           />
         </div>
-        <div className="w-32">
-          <Select
-            name="archived"
-            onChange={({ value }) => setArchived(value as "active" | "archived")}
-            options={[
-              { label: "Active", value: "active", icon: IconEnum.active },
-              { label: "Archived", value: "archived", icon: IconEnum.archive },
-            ]}
-            placeholder="Active"
-            value={archived}
-          />
-        </div>
+
         <div className="w-fit">
           <Button
             icon={IconEnum.add}
@@ -246,7 +193,7 @@ export function CharactersView() {
       </div>
       <div className="h-full max-h-full w-full overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog, archived === "archived")}
+          columns={createColumns(setDrawer, setDialog)}
           config={{
             hasSelect: true,
             hasFavorite: true,

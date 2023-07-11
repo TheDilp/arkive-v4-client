@@ -1,7 +1,8 @@
-import { UseQueryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AssetType, ResponseType, SelectOptionType } from "../../types";
-import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications, useResetAtom } from "../../utils";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+
+import { AssetType, SelectOptionType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
+import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications, useResetAtom } from "../../utils";
 
 export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();
@@ -22,15 +23,15 @@ export function useUploadAsset(type: AssetType, project_id: string) {
       });
     },
     {
-      onSuccess: (res: ResponseType<ImageType>) => {
-        const { data } = res;
-        createNotification({
-          id: crypto.randomUUID(),
-          title: `${type === "images" ? "Images" : "Maps"} uploaded successfully.`,
-          variant: "success",
-          icon: IconEnum.check_circle,
-          timer: 5,
-        });
+      onSettled: (data) => {
+        if (data?.ok)
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || `${type === "images" ? "Images" : "Maps"} uploaded successfully.`,
+            variant: "success",
+            icon: IconEnum.check_circle,
+            timer: 5,
+          });
         queryClient.invalidateQueries([]);
         resetDialogAtom();
       },

@@ -25,13 +25,13 @@ export function useGetAllEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allItems", request.data.project_id, type, request?.archived, request?.orderBy, request?.filters];
+  const baseQueryKey = ["allItems", request.data.project_id, type, request?.orderBy, request?.filters];
 
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}${request.archived ? "" : ""}`,
+      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
     });
   }
   const configuredOptions = {

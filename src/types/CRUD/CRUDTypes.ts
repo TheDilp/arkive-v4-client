@@ -42,7 +42,6 @@ export interface RequestBodyType {
   pagination?: RequestPaginationType;
   relations?: RequestRelationsType;
   columns?: RequestColumnsType;
-  archived?: boolean;
 }
 
 export interface ResponseErrorType {

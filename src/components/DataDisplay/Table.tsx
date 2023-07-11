@@ -350,7 +350,6 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     getExpandedRowModel: getExpandedRowModel(),
   });
   if (isLoading) return <Skeleton type="table" />;
-  if (data.length === 0) return <Alert label="There's no content." variant="info" />;
   return (
     <div className={container()}>
       <div className={tableClasses()}>
@@ -456,39 +455,43 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
         </div>
         <div className={bodyContainer()}>
           <div className={body()}>
-            {table.getRowModel().rows.map((row) => (
-              <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
-                <div className={`${rowClasses()} ${row.getIsSelected() ? selectedRow() : ""}`}>
-                  {row.getVisibleCells().map((cell) => (
-                    <div
-                      key={cell.id}
-                      className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                        (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                      }`}
-                      onClick={(e) => {
-                        if (
-                          cell.column.id === "select" ||
-                          cell.column.id === "action" ||
-                          cell.column.id === "favorite" ||
-                          (cell.column.columnDef.meta as MetaType)?.noLink
-                        ) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }
-                      }}
-                      style={{
-                        ...getTableColumnWidths(cell.column.id, {
-                          minSize: cell.column.columnDef.minSize,
-                          maxSize: cell.column.columnDef.maxSize,
-                        }),
-                      }}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </div>
-                  ))}
-                </div>
-                {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
-              </Link>
-            ))}
+            {data?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
+                  <div className={`${rowClasses()} ${row.getIsSelected() ? selectedRow() : ""}`}>
+                    {row.getVisibleCells().map((cell) => (
+                      <div
+                        key={cell.id}
+                        className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                          (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
+                        }`}
+                        onClick={(e) => {
+                          if (
+                            cell.column.id === "select" ||
+                            cell.column.id === "action" ||
+                            cell.column.id === "favorite" ||
+                            (cell.column.columnDef.meta as MetaType)?.noLink
+                          ) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }
+                        }}
+                        style={{
+                          ...getTableColumnWidths(cell.column.id, {
+                            minSize: cell.column.columnDef.minSize,
+                            maxSize: cell.column.columnDef.maxSize,
+                          }),
+                        }}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                    ))}
+                  </div>
+                  {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
+                </Link>
+              ))
+            ) : (
+              <Alert label="There's no content." variant="info" />
+            )}
           </div>
           {pagination ? (
             <div className={paginationContainer()}>
