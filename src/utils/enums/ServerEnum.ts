@@ -1,0 +1,13 @@
+export const baseURLS = {
+  baseServer: `http://localhost:${import.meta.env.VITE_SERVER_PORT}/api/v1`,
+};
+
+export const ResponseMessageEnum = {
+  entity_create: "Entity successfully created",
+  entity_update: "Entity successfully updated.",
+  no_entity: "This entity does not exist.",
+};
+
+export const ResponseErrorMessageEnum: { [key: string]: any } = {
+  "23505": "Creating duplicates for this entity is not allowed.",
+};

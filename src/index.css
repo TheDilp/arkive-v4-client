@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: Lato;
+    src: url("/Lato-Regular.ttf");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Lato;
+    src: url("/Lato-Bold.ttf");
+    font-weight: 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Merriweather;
+    src: url("/Merriweather-Regular.ttf");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Merriweather;
+    src: url("/Merriweather-Bold.ttf");
+    font-weight: 700;
+    font-display: swap;
+  }
+}
+
+body {
+  @apply bg-black text-white;
+}
+
+::-webkit-scrollbar {
+  @apply h-1 w-1;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply z-0 bg-zinc-700;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply z-0 bg-zinc-700;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-400;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  @apply hidden;
+}
