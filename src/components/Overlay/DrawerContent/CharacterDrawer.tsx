@@ -61,7 +61,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
     existingCharacter?.data || { project_id: project_id as string },
   );
-  const [image, setImage] = useState<{ id: string | null }>({ id: null });
 
   const [fields, setFields] = useState<{ [key: string]: { [key: string]: string } }>(
     existingCharacter?.data?.characterFieldTemplates || {},
@@ -137,11 +136,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           <ImageSelect
             isLoading={isFetchingImages}
             label="Select character avatar (optional)"
-            name="id"
-            onChange={({ value }) => setImage({ id: value as string })}
+            name="portrait_id"
+            onChange={handleChange}
             options={images}
             type="images"
-            value={image?.id ?? ""}
+            value={character?.portrait_id ?? ""}
           />
           <Input label="Age (optional)" name="age" onChange={handleChange} type="number" value={character?.age || ""} />
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
@@ -216,7 +215,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           if (character) {
             if (character?.id)
               await update({ data: { ...character, id: character.id }, relations: { characterFieldTemplates: fields } });
-            else await create({ data: character, relations: { characterFieldTemplates: fields, image } });
+            else await create({ data: character, relations: { characterFieldTemplates: fields } });
           }
           resetDrawerAtom();
         }}
