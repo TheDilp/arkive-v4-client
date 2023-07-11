@@ -3,7 +3,7 @@ export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in
 export interface RequestFilterType {
   field: string;
   value: string | number | string[] | number[];
-  type: RequestFilterTypes;
+  operator: RequestFilterTypes;
 }
 export type SortType = "asc" | "desc" | null;
 export interface RequestOrderByType {

@@ -59,13 +59,13 @@ export function removeColumnFilter(
   }));
 }
 
-export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "type" | "value">) {
-  return `${FilterNamesEnum[filter.type]}: "${filter.value}"`;
+export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "value">) {
+  return `${FilterNamesEnum[filter.operator]}: "${filter.value}"`;
 }
 
 export function groupFiltersByField(
   items: TableColumnFilterType[],
-): Record<string, Pick<TableColumnFilterType, "id" | "type" | "value">[]> {
+): Record<string, Pick<TableColumnFilterType, "id" | "operator" | "value">[]> {
   return items.reduce((accumulator: Record<any, any>, item) => {
     const { field, ...rest } = item;
     if (!accumulator[field]) {
@@ -102,8 +102,8 @@ export function getFilterTooltip({
   and,
   or,
 }: {
-  and?: Pick<TableColumnFilterType, "id" | "value" | "type">[];
-  or?: Pick<TableColumnFilterType, "id" | "value" | "type">[];
+  and?: Pick<TableColumnFilterType, "id" | "value" | "operator">[];
+  or?: Pick<TableColumnFilterType, "id" | "value" | "operator">[];
 }) {
   let base = "";
   if (and?.length) {

@@ -116,16 +116,16 @@ function TableColumnFilterList({
           <div className="flex w-full flex-nowrap items-center gap-x-2">
             <div className="w-1/3">
               <Select
-                name={`${type}[${index}].type`}
+                name={`${type}[${index}].operator`}
                 onChange={handleChange}
                 options={filterOptions}
                 placeholder="Filter type"
                 size="sm"
-                value={filt.type}
+                value={filt.operator}
               />
             </div>
             <div className="flex-1">
-              {filt.type && !Array.isArray(filt.value) ? (
+              {filt.operator && !Array.isArray(filt.value) ? (
                 <Input
                   name={`${type}[${index}].value`}
                   onChange={handleChange}
@@ -194,7 +194,7 @@ function TableColumnFilter({ columnId, filters, filterOptions, dispatch }: Table
                     id: crypto.randomUUID(),
                     field: columnId,
                     value: "",
-                    type: filterOptions[0].value as RequestFilterTypes,
+                    operator: filterOptions[0].value as RequestFilterTypes,
                   }),
                 }));
             }}
@@ -224,7 +224,7 @@ function TableColumnFilter({ columnId, filters, filterOptions, dispatch }: Table
                     id: crypto.randomUUID(),
                     field: columnId,
                     value: "",
-                    type: filterOptions[0].value as RequestFilterTypes,
+                    operator: filterOptions[0].value as RequestFilterTypes,
                   }),
                 }));
             }}
