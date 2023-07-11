@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AvailableEntityType, ResponseType } from "../../types";
+
+import { AvailableEntityType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useUpdateEntity<InsertType>(type: AvailableEntityType, project_id: string, id: string | undefined) {
@@ -9,23 +10,14 @@ export function useUpdateEntity<InsertType>(type: AvailableEntityType, project_i
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}${type.toLowerCase()}/update/${id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
     },
     {
-      onError: () => {
-        createNotification({
-          id: crypto.randomUUID(),
-          title: "There was an error updating this item.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
-      },
-      onSuccess: async (res: ResponseType) => {
-        if (res.ok) {
+      onSettled: (data) => {
+        if (data.ok) {
           queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
 
           createNotification({
@@ -35,7 +27,14 @@ export function useUpdateEntity<InsertType>(type: AvailableEntityType, project_i
             icon: IconEnum.check,
             timer: 2,
           });
-        }
+        } else
+          createNotification({
+            id: crypto.randomUUID(),
+            title: "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
       },
     },
   );

@@ -1,3 +1,4 @@
+import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -57,7 +58,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   >(
     data?.id,
     "characters",
-    { data: {} },
+    { data: {}, fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id"] },
     {
       enabled: !!data?.id,
     },
@@ -77,7 +78,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   }>("characters");
 
   const { mutateAsync: update } = useUpdateEntity<{
-    data: insertCharacterType & { id: string };
+    data: insertCharacterType;
     relations?: { characterFieldTemplates?: { [key: string]: { [key: string]: string } } };
   }>("characters", project_id as string, data?.id);
 
@@ -218,8 +219,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (character) {
-            if (character?.id)
-              await update({ data: { ...character, id: character.id }, relations: { characterFieldTemplates: fields } });
+            if (character?.id) await update({ data: omit(character, ["id"]), relations: { characterFieldTemplates: fields } });
             else await create({ data: character, relations: { characterFieldTemplates: fields } });
           }
           resetDrawerAtom();

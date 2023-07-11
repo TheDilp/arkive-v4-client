@@ -4,6 +4,23 @@ import { AvailableEntityType, AvailableSubEntityType, RequestBodyType } from "..
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction } from "../../utils";
 
+export function useGetItem<EntityType>(
+  id: string | undefined,
+  type: AvailableEntityType,
+  body: RequestBodyType,
+  options?: UseQueryOptions,
+) {
+  return useQuery<{ data: EntityType }>(
+    [type, id],
+    async () =>
+      FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type.toLowerCase()}/${id}` }),
+    {
+      enabled: options?.enabled,
+      staleTime: options?.staleTime,
+    },
+  );
+}
+
 export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
     ["allEntities", "project"],

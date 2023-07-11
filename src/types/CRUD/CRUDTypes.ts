@@ -34,6 +34,7 @@ export interface RequestBodyType {
   data: {
     [key: string]: any;
   };
+  fields?: string[];
   orderBy?: RequestOrderByType;
   filters?: {
     and?: RequestFilterType[];
