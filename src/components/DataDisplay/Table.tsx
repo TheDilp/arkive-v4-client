@@ -1,13 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import {
-  ColumnDef,
-  ExpandedState,
-  flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { Dispatch, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -32,43 +25,20 @@ import {
   getFilterTooltip,
   getIsApplyColumnFiltersDisabled,
   getSentenceCase,
+  getTableColumns,
   getTableColumnWidths,
   groupFiltersByField,
   IconEnum,
   removeColumnFilter,
   SetStateAction,
 } from "../../utils";
-import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
+import { Button, ButtonGroup, Input, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
 import Alert from "../Misc/Alert";
 import { Tooltip } from "../Overlay";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
 
 export { createColumnHelper } from "@tanstack/react-table";
-
-const SelectColumn: ColumnDef<any> = {
-  id: "select",
-  header: ({ table }) => (
-    <Checkbox
-      name="selectAll"
-      onChange={(_, e) => {
-        const t = table.getToggleAllRowsSelectedHandler();
-        t(e);
-      }}
-      value={table.getIsAllRowsSelected()}
-    />
-  ),
-  cell: ({ row }) => (
-    <Checkbox
-      name={row.id}
-      onChange={(_, e) => {
-        const t = row.getToggleSelectedHandler();
-        t(e);
-      }}
-      value={row.getIsSelected()}
-    />
-  ),
-};
 
 const TableClasses = tv({
   slots: {
@@ -332,8 +302,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
 }
 
 export function Table({ columns, data, config, isLoading, pagination, dispatch, type }: TableType) {
-  const { hasSelect, filters, orderBy, expandable, getLink } = config || {};
-  const finalColumns = [...(hasSelect ? [SelectColumn] : []), ...columns];
+  const { filters, orderBy, expandable, getLink } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length;
   const isSubheaderEnabled = areFiltersActive;
@@ -376,7 +345,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     },
     onExpandedChange: setExpanded,
     manualSorting: true,
-    columns: finalColumns,
+    columns: getTableColumns(columns, { hasSelect: config?.hasSelect, hasFavorite: config?.hasFavorite }),
     getCoreRowModel: getCoreRowModel(),
     getRowCanExpand: () => !!expandable,
     getExpandedRowModel: getExpandedRowModel(),

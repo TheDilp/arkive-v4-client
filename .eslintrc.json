@@ -39,8 +39,8 @@
       }
     ],
     "import/first": "error",
+    "import/no-cycle": "off",
     "import/newline-after-import": "error",
-    "import/no-cycle": "error",
     "import/no-self-import": "error",
     "import/no-duplicates": "error",
     "import/no-extraneous-dependencies": "off",

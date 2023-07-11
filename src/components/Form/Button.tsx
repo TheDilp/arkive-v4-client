@@ -1,8 +1,8 @@
 import { tv } from "tailwind-variants";
+
 import { ButtonType } from "../../types/ComponentTypes/FormTypes";
-import { Icon } from "../Misc/Icon";
-import { Tooltip } from "../Overlay/Tooltip";
-import { IconEnum } from "../../utils";
+import { IconEnum } from "../../utils/enums/IconEnum";
+import { Icon, Tooltip } from "..";
 
 const ButtonClasses = tv({
   slots: {
@@ -73,6 +73,7 @@ export function Button({
   icon,
   iconPos = "right",
   iconSize = 20,
+  iconThickness = "regular",
   isDisabled,
   isLoading,
   variant = "primary",
@@ -85,9 +86,11 @@ export function Button({
   return (
     <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
       <button className={base()} disabled={isDisabled} onClick={onClick} type="button">
-        {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} /> : null}
+        {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} thickness={iconThickness} /> : null}
         {label ? <span className={labelClasses()}>{label}</span> : null}
-        {(iconPos === "right" && icon) || isLoading ? <Icon fontSize={iconSize} icon={icon || IconEnum.error} /> : null}
+        {(iconPos === "right" && icon) || isLoading ? (
+          <Icon fontSize={iconSize} icon={icon || IconEnum.error} thickness={iconThickness} />
+        ) : null}
       </button>
     </Tooltip>
   );

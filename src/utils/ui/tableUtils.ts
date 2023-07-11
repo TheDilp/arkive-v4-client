@@ -1,8 +1,26 @@
-import { TableColumnFilterType, TableDispatch } from "@thearkive/types";
+import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 
+import { FavoriteColumn, SelectColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
+import { TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
+
+export function getTableColumns(
+  columns: ColumnDef<any>[],
+  { hasSelect, hasFavorite }: { hasSelect?: boolean; hasFavorite?: boolean },
+) {
+  const finalColumns = [...columns];
+
+  if (hasFavorite) {
+    finalColumns.unshift(FavoriteColumn);
+  }
+  if (hasSelect) {
+    finalColumns.unshift(SelectColumn);
+  }
+
+  return finalColumns;
+}
 
 export function getTableColumnWidths(
   id: string,
@@ -11,7 +29,7 @@ export function getTableColumnWidths(
   minWidth: string;
   maxWidth?: string;
 } {
-  if (id === "select") {
+  if (id === "select" || id === "favorite") {
     return { minWidth: "2.5rem", maxWidth: "2.5rem" };
   }
   if (id === "action") {

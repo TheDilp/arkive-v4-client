@@ -45,6 +45,7 @@ export const IconEnum = {
   export: "ph:export",
   trash: "ph:trash",
   save: "ph:floppy-disk",
+  star: "ph:star",
   drag: "ph:dots-six-vertical",
   chevron_up: "mdi:chevron-up",
   chevron_down: "mdi:chevron-down",

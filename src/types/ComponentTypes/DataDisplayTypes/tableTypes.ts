@@ -43,6 +43,7 @@ export interface TableType {
   pagination?: RequestPaginationType;
   isLoading?: boolean;
   config?: {
+    hasFavorite?: boolean;
     hasSelect?: boolean;
     orderBy?: RequestOrderByType;
     expandable?: boolean;

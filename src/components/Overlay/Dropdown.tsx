@@ -26,21 +26,22 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { Icon } from "../Misc";
 import { DropdownItemType, DropdownType } from "../../types";
 import { IconEnum } from "../../utils";
+import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "overflow-y-auto rounded divide-y [&:not(:has(button))]:border border-zinc-600 h-fit",
+    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600",
+    floatingBase: "overflow-y-auto rounded divide-y [&:not(:has(button))]:border border-zinc-600 h-fit",
     baseItem: "h-10 items-center gap-x-2 text-white border-zinc-600",
     dropdownItem:
-      "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left p-2 m-0 outline-0 text-white hover:bg-zinc-700",
+      "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
   },
 });
 
 export function DropdownComponent({ allowedPlacements = [], children, items }: DropdownType) {
-  const { base, baseItem } = DropdownClasses();
+  const { base, floatingBase, baseItem } = DropdownClasses();
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -127,7 +128,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
         {isOpen ? (
           <FloatingPortal>
             <FloatingFocusManager context={context} initialFocus={isNested ? -1 : 0} modal={false} returnFocus={!isNested}>
-              <div ref={refs.setFloating} className={base()} style={floatingStyles} {...getFloatingProps()}>
+              <div ref={refs.setFloating} className={floatingBase()} style={floatingStyles} {...getFloatingProps()}>
                 {items && isOpen
                   ? items.map((dropdownItem) => (
                       <DropdownItem

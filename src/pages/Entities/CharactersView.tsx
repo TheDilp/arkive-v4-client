@@ -249,6 +249,7 @@ export function CharactersView() {
           columns={createColumns(setDrawer, setDialog, archived === "archived")}
           config={{
             hasSelect: true,
+            hasFavorite: true,
             orderBy,
             filters,
             getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
