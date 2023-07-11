@@ -300,7 +300,6 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
     </div>
   );
 }
-
 export function Table({ columns, data, config, isLoading, pagination, dispatch, type }: TableType) {
   const { filters, orderBy, expandable, getLink } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -470,6 +469,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                         if (
                           cell.column.id === "select" ||
                           cell.column.id === "action" ||
+                          cell.column.id === "favorite" ||
                           (cell.column.columnDef.meta as MetaType)?.noLink
                         ) {
                           e.preventDefault();
