@@ -1,10 +1,10 @@
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-
-import { useChangeNavbarTitle, useGetAllEntities, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, FieldTemplate, FieldType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters, SetStateAction, useSetAtom } from "../../utils";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
+
+import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { useChangeNavbarTitle, useGetAllEntities, useTable } from "../../hooks";
+import { DialogAtomType, DrawerAtomType, FieldTemplate } from "../../types";
+import { dialogAtom, drawerAtom, IconEnum, NameFilters, SetStateAction, useSetAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<FieldTemplate>();
 
@@ -39,13 +39,12 @@ function createColumns(
                 label: "Edit field template",
                 icon: IconEnum.edit,
                 onClick: () => {
-                  console.log(row.original);
                   setDrawer((prev) => ({
                     ...prev,
                     data: row.original,
                     title: "Edit field template",
                     size: "lg",
-                    type: "characterFieldsTemplates",
+                    type: "character_fields_templates",
                   }));
                 },
               },
@@ -64,7 +63,7 @@ function createColumns(
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "characterFieldsTemplates",
+                      entity_title: "character_fields_templates",
                     },
                     title: "Delete field template",
                     size: "sm",
@@ -98,13 +97,12 @@ export function FieldTemplates() {
     {
       filters,
       orderBy,
-      archived: false,
       pagination,
       data: {
         project_id,
       },
     },
-    "characterFieldsTemplates",
+    "character_fields_templates",
   );
   return (
     <TablePageLayout>
@@ -118,7 +116,7 @@ export function FieldTemplates() {
                 ...prev,
                 data: { project_id },
                 title: "Create new field template",
-                type: "characterFieldsTemplates",
+                type: "character_fields_templates",
                 size: "lg",
               }))
             }
@@ -137,7 +135,7 @@ export function FieldTemplates() {
           data={data?.data || []}
           dispatch={dispatch}
           pagination={pagination}
-          type="characterFieldsTemplates"
+          type="character_fields_templates"
         />
       </div>
     </TablePageLayout>

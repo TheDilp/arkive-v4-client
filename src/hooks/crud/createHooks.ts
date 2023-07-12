@@ -57,9 +57,10 @@ export function useCreateEntity<InsertType extends { data: { project_id: string 
       }),
 
     {
-      onSuccess: (data, vars) => {
-        queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
+      onSettled: (data, _, vars) => {
+        console.log(data);
         if (data?.ok) {
+          queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           createNotification({
             id: crypto.randomUUID(),
             title: data?.message || getEntityCRUDNotification(type, "create"),
@@ -67,16 +68,15 @@ export function useCreateEntity<InsertType extends { data: { project_id: string 
             icon: IconEnum.check,
             timer: 2,
           });
+        } else {
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || "There was an error creating this entity.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
         }
-      },
-      onError: (error: { message: string }) => {
-        createNotification({
-          id: crypto.randomUUID(),
-          title: error?.message || "There was an error creating this entity.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
       },
     },
   );

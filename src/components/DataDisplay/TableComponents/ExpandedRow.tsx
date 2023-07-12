@@ -1,6 +1,6 @@
+import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useParams } from "react-router-dom";
 import { useGetSubEntities } from "../../../hooks";
 import { AvailableEntityType, FieldType } from "../../../types";
 import { getSentenceCase } from "../../../utils";
@@ -19,7 +19,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
         project_id: project_id as string,
       },
     },
-    "characterFields",
+    "character_fields",
     { enabled: !!templateId },
   );
   return (
@@ -30,10 +30,10 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
             <span>{field.title}</span>
             <span>-</span>
             <span>
-              <Badge label={getSentenceCase(field.fieldType || "")} variant="info" />
+              <Badge label={getSentenceCase(field.field_type || "")} variant="info" />
             </span>
           </div>
-          {(field.fieldType === "select" || field.fieldType === "select_multiple") && field.options?.length ? (
+          {(field.field_type === "select" || field.field_type === "select_multiple") && field.options?.length ? (
             <div className="flex flex-col pl-4 text-sm">
               <h5 className="mt-2 w-max border-b">Available options</h5>
               <ul>
@@ -52,7 +52,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
 export function ExpandedTableRow({ data, type }: { data: any; type: AvailableEntityType }) {
   return (
     <div className={ExpandedTableRowClasses()}>
-      {type === "characterFieldsTemplates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
+      {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
     </div>
   );
 }

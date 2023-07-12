@@ -1,14 +1,13 @@
-export interface FieldTemplate {
-  id: string;
-  title: string;
-  fields: FieldType[];
-}
-
 export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple";
 export interface FieldType {
   id: string;
-  parentId: string;
+  project_id: string;
   title: string;
-  fieldType: FieldTypes;
+  field_type: FieldTypes;
   options?: string[];
+}
+export interface FieldTemplate {
+  id: string;
+  title: string;
+  character_fields: FieldType[];
 }

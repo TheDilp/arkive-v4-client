@@ -21,4 +21,5 @@ export interface CharacterType {
   dayOfBirth?: number;
   monthOfBirth?: number;
   yearOfBirth?: number;
+  character_fields?: { id: string; value: string | string[]; template_id: string }[];
 }

@@ -30,7 +30,7 @@ export function getEntityCRUDNotification(type: AllAvailableEntities, action_typ
     action = "deleted";
   }
   if (type === "alterNames") return `Alter name successfully ${action}.`;
-  if (type === "characterFieldsTemplates") return `Template successfully ${action}.`;
+  if (type === "character_fields_templates") return `Template successfully ${action}.`;
   const entityTitle = capitalizeFirstLetter(type);
   return `${entityTitle} successfully ${action}.`;
 }

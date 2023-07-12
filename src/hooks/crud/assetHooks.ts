@@ -32,35 +32,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
             icon: IconEnum.check_circle,
             timer: 5,
           });
-        queryClient.invalidateQueries([]);
-        resetDialogAtom();
-      },
-    },
-  );
-}
-
-export function useSetCharacterPortrait(type: AssetType, project_id: string) {
-  const queryClient = useQueryClient();
-  const createNotification = useNotifications();
-  const resetDialogAtom = useResetAtom(dialogAtom);
-  return useMutation(
-    async (character_id: string) => {
-      return FetchFunction({
-        url: `${baseURLS.baseServer}/assets/portrait/${project_id}/${character_id}`,
-        method: "POST",
-      });
-    },
-    {
-      onSettled: (data) => {
-        if (data?.ok)
-          createNotification({
-            id: crypto.randomUUID(),
-            title: data?.message || "Character portrait successfully set.",
-            variant: "success",
-            icon: IconEnum.check_circle,
-            timer: 5,
-          });
-        queryClient.invalidateQueries([]);
+        queryClient.invalidateQueries([project_id, type]);
         resetDialogAtom();
       },
     },

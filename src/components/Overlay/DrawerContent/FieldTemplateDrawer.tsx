@@ -1,15 +1,12 @@
-import {
-  useCreateAdditionalFieldTemplate as useCreateFieldTemplate,
-  useGetItem,
-  useHandleChange,
-  useUpdateEntity,
-} from "../../../hooks";
-import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
-import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, SetStateAction, useResetAtom } from "../../../utils";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
+import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, SetStateAction, useResetAtom } from "../../../utils";
 import { Button, Input, Select } from "../../Form";
+
+type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
 
 function removeField(
   index: number,
@@ -30,7 +27,7 @@ function isSaveDisabled(
   if (!fields.length) return true;
   if (
     fields.some(
-      (field) => !field.title || !field.fieldType || (field.fieldType === "select_multiple" && !field?.options?.length),
+      (field) => !field.title || !field.field_type || (field.field_type === "select_multiple" && !field?.options?.length),
     )
   )
     return true;
@@ -39,7 +36,7 @@ function isSaveDisabled(
 
 function FieldRow({
   title,
-  fieldType,
+  field_type,
   options,
   index,
   changeField,
@@ -67,14 +64,14 @@ function FieldRow({
         <div className="h-full flex-1">
           <Select
             label="Field type"
-            name={`[${index}].fieldType`}
+            name={`[${index}].field_type`}
             onChange={changeField}
             options={FieldTypesEnum.map((t) => ({ label: getSentenceCase(t), value: t }))}
             placeholder="Field type"
-            value={fieldType}
+            value={field_type}
           />
         </div>
-        {fieldType === "select" || fieldType === "select_multiple" ? (
+        {field_type === "select" || field_type === "select_multiple" ? (
           <div className="h-10 w-8 self-end">
             <Button
               hasNoBackground
@@ -94,7 +91,7 @@ function FieldRow({
           <Button hasNoBackground icon={IconEnum.trash} onClick={() => deleteField(index)} variant="error" />
         </div>
       </div>
-      {fieldType === "select" || fieldType === "select_multiple" ? (
+      {field_type === "select" || field_type === "select_multiple" ? (
         <div className="flex flex-col gap-y-2 pl-8">
           {options?.map((opt, optIndex) => (
             <div key={opt.id} className="flex w-full flex-nowrap">
@@ -117,20 +114,28 @@ function FieldRow({
 export default function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateFieldTemplate<{
-    title: string;
-    project_id: string;
-    fields: (Omit<FieldType, "options" | "parentId" | "id"> & { options?: string[] })[];
-  }>();
+  const { mutateAsync: create } = useCreateEntity<{
+    data: insertTemplateType;
+    relations?: { character_fields: Omit<FieldType, "id">[] };
+  }>("character_fields_templates");
 
   const { mutateAsync: update } = useUpdateEntity<{
-    data: Partial<Omit<FieldTemplate, "id" | "fields">>;
+    data: Partial<Omit<FieldTemplate, "fields">>;
     relations?: { fields?: FieldType[] };
-  }>("characterFieldsTemplates", project_id as string, data?.id);
+  }>("character_fields_templates", project_id as string, data?.id);
 
-  const { data: existingTemplate } = useGetItem<FieldTemplate & { fields: FieldType[] }>(data?.id, "characterFieldsTemplates", {
-    enabled: !!data?.id,
-  });
+  const { data: existingTemplate } = useGetItem<FieldTemplate & { fields: FieldType[] }>(
+    data?.id,
+    "character_fields_templates",
+    {
+      data: {
+        id: data?.id,
+      },
+    },
+    {
+      enabled: !!data?.id,
+    },
+  );
 
   const [title, setTitle] = useState("");
   const [fields, setFields] = useState<(Omit<FieldType, "options"> & { options?: { id: string; title: string }[] })[]>([]);
@@ -140,7 +145,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
     if (existingTemplate?.data) {
       setTitle(existingTemplate.data.title);
       setFields(
-        existingTemplate?.data?.fields.map((f) => ({
+        existingTemplate?.data?.character_fields.map((f) => ({
           ...f,
           options: (f.options || [])?.map((opt) => ({ title: opt, id: crypto.randomUUID() })),
         })) || [],
@@ -157,10 +162,13 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
         <div className="h-8 w-8">
           <Button
             icon={IconEnum.add}
-            variant="info"
             onClick={() =>
-              setFields((prev) => [...prev, { id: crypto.randomUUID(), title: "", parentId: "", fieldType: "text" }])
+              setFields((prev) => [
+                ...prev,
+                { id: crypto.randomUUID(), title: "", project_id: project_id as string, field_type: "text" },
+              ])
             }
+            variant="info"
           />
         </div>
       </div>
@@ -170,10 +178,11 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
             key={field.id}
             changeField={handleChange}
             deleteField={(i: number) => removeField(i, setFields)}
-            fieldType={field.fieldType}
+            field_type={field.field_type}
             id={field.id}
             index={index}
             options={field?.options}
+            project_id={field?.project_id}
             title={field.title}
           />
         ))}
@@ -186,13 +195,18 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
           if (!data?.id)
             await create(
               {
-                title,
-                project_id: project_id as string,
-                fields: fields.map((field) => ({
-                  title: field.title,
-                  fieldType: field.fieldType,
-                  options: field?.options?.map((opt) => opt.title),
-                })),
+                data: {
+                  title,
+                  project_id: project_id as string,
+                },
+                relations: {
+                  character_fields: fields.map((field) => ({
+                    project_id: project_id as string,
+                    title: field.title,
+                    field_type: field.field_type,
+                    options: field?.options?.map((opt) => opt.title),
+                  })),
+                },
               },
               {
                 onSuccess: resetDrawerAtom,

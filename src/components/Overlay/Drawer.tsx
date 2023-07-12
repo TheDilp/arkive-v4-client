@@ -1,13 +1,13 @@
+import { useAtomValue } from "jotai";
 import { MutableRefObject, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
+import { drawerAtom, IconEnum, useResetAtom } from "../../utils";
 import { Button } from "../Form";
 import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
-import { useAtom, useAtomValue } from "jotai";
-import { IconEnum, drawerAtom, useResetAtom } from "../../utils";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
 
 const DrawerClasses = tv({
@@ -107,7 +107,7 @@ export function Drawer() {
       <div className="flex w-full flex-col gap-y-4">
         {drawer.type === "project" ? <ProjectDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
-        {drawer.type === "characterFieldsTemplates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
+        {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
       </div>
     </div>
