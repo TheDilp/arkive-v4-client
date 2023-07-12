@@ -16,30 +16,35 @@ export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
 };
 
 export const NameFilters = [
-  { label: FilterNamesEnum.eq, value: "eq" },
-  { label: FilterNamesEnum.ilike, value: "ilike" },
+  { label: FilterNamesEnum.eq, value: "eq", type: "text" },
+  { label: FilterNamesEnum.ilike, value: "ilike", type: "text" },
 ];
 
 export const NumberFilters = [
   {
     label: FilterNamesEnum.eq,
     value: "eq",
+    type: "text",
   },
   {
     label: FilterNamesEnum.gt,
     value: "gt",
+    type: "number",
   },
   {
     label: FilterNamesEnum.gte,
     value: "gte",
+    type: "number",
   },
   {
     label: FilterNamesEnum.lt,
     value: "lt",
+    type: "number",
   },
   {
     label: FilterNamesEnum.lte,
     value: "lte",
+    type: "number",
   },
 ];
 

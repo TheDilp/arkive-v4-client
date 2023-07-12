@@ -63,6 +63,8 @@ export interface TableColumnFilterComponentType {
   filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   filterOptions: FilterEnumType[];
   dispatch: TableDispatch;
+  isAndDisabled?: boolean;
+  isOrDisabled?: boolean;
 }
 
 export type SetFavoriteType = (data: { is_favorite: boolean; id: string }) => Promise<void>;

@@ -31,7 +31,7 @@ export const SelectColumn: ColumnDef<any> = {
 export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<void>) => ColumnDef<any> = (
   setFavorite: (data: SetFavoriteType) => Promise<void>,
 ) => ({
-  id: "favorite",
+  id: "is_favorite",
   cell: ({ row }) => (
     <Button
       hasNoBackground

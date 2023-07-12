@@ -172,9 +172,9 @@ function onClick({
       });
     }
   } else {
-    const selectedValue = options.find((opt) => opt?.value === options[index].value)?.value;
-    if (selectedValue) {
-      onChange({ name, value: selectedValue });
+    const selectedItem = options.find((opt) => opt?.value === options[index].value);
+    if (selectedItem) {
+      onChange({ name, value: selectedItem?.value });
       setIsOpen(false);
     }
   }

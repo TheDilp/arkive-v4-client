@@ -8,9 +8,7 @@ import { tv } from "tailwind-variants";
 import { useHandleChange } from "../../hooks";
 import {
   FilterEnumType,
-  InputOnChangeValue,
   MetaType,
-  onChangeValue,
   RequestFilterTypes,
   RequestOrderByType,
   TableColumnFilterComponentType,
@@ -32,7 +30,7 @@ import {
   removeColumnFilter,
   SetStateAction,
 } from "../../utils";
-import { Button, ButtonGroup, Input, Select } from "../Form";
+import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
 import Alert from "../Misc/Alert";
 import { Tooltip } from "../Overlay";
@@ -100,7 +98,7 @@ function TableColumnFilterList({
   applyFilter: () => void;
   filters: TableColumnFilterType[];
   type: "and" | "or";
-  handleChange: ({ name, value }: onChangeValue | InputOnChangeValue) => void;
+  handleChange: ({ name, value }: { name: string; value: any }) => void;
   filterOptions: FilterEnumType[];
   setColumnFilters: Dispatch<
     SetStateAction<{
@@ -128,17 +126,14 @@ function TableColumnFilterList({
               </div>
               <div className="flex-1">
                 {filt.operator && !Array.isArray(filt.value) && filterType?.type === "boolean" ? (
-                  <Input
+                  <Checkbox
                     name={`${type}[${index}].value`}
-                    onChange={handleChange}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !!filt.value) applyFilterFn();
-                    }}
-                    size="sm"
-                    value={filt.value}
+                    onChange={({ name, value }) => handleChange({ name, value: value as boolean })}
+                    size="lg"
+                    value={filt.value as boolean}
                   />
                 ) : null}
-                {filt.operator && !Array.isArray(filt.value) ? (
+                {filt.operator && !Array.isArray(filt.value) && filterType?.type === "text" ? (
                   <Input
                     name={`${type}[${index}].value`}
                     onChange={handleChange}
@@ -146,7 +141,7 @@ function TableColumnFilterList({
                       if (e.key === "Enter" && !!filt.value) applyFilterFn();
                     }}
                     size="sm"
-                    value={filt.value}
+                    value={filt.value as string}
                   />
                 ) : null}
               </div>
@@ -176,7 +171,14 @@ function TableColumnFilterList({
   );
 }
 
-function TableColumnFilter({ columnId, filters, filterOptions, dispatch }: TableColumnFilterComponentType) {
+function TableColumnFilter({
+  columnId,
+  filters,
+  filterOptions,
+  isAndDisabled,
+  isOrDisabled,
+  dispatch,
+}: TableColumnFilterComponentType) {
   const {
     columnFilterContainer,
     columnFilterTitle,
@@ -195,57 +197,64 @@ function TableColumnFilter({ columnId, filters, filterOptions, dispatch }: Table
   return (
     <div className={columnFilterContainer()}>
       <h4 className={columnFilterTitle()}>{getSentenceCase(columnId || "")} filters</h4>
-      <div className={columnFilterCategory()}>
-        <div className={columnFilterCategoryTitle()}>AND FILTERS</div>
-        <div className={columnFilterButtonContainer()}>
-          <Button
-            icon={IconEnum.add}
-            onClick={() => {
-              if (columnId)
-                setColumnFilters((prev) => ({
-                  ...prev,
-                  and: [...(prev.and || [])].concat({
-                    id: crypto.randomUUID(),
-                    field: columnId,
-                    value: "",
-                    operator: filterOptions[0].value as RequestFilterTypes,
-                  }),
-                }));
-            }}
-            variant="info"
+      {isAndDisabled ? null : (
+        <>
+          <div className={columnFilterCategory()}>
+            <div className={columnFilterCategoryTitle()}>AND FILTERS</div>
+            <div className={columnFilterButtonContainer()}>
+              <Button
+                icon={IconEnum.add}
+                onClick={() => {
+                  if (columnId)
+                    setColumnFilters((prev) => ({
+                      ...prev,
+                      and: [...(prev.and || [])].concat({
+                        id: crypto.randomUUID(),
+                        field: columnId,
+                        value: "",
+                        operator: filterOptions[0].value as RequestFilterTypes,
+                      }),
+                    }));
+                }}
+                variant="info"
+              />
+            </div>
+          </div>
+          <TableColumnFilterList
+            applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch)}
+            filterOptions={filterOptions}
+            filters={columnFilters?.and || []}
+            handleChange={handleChange}
+            setColumnFilters={setColumnFilters}
+            type="and"
           />
+          <hr className={columnFilterDivider()} />
+        </>
+      )}
+
+      {isOrDisabled ? null : (
+        <div className={columnFilterCategory()}>
+          <div className={columnFilterCategoryTitle()}>OR FILTERS</div>
+          <div className={columnFilterButtonContainer()}>
+            <Button
+              icon={IconEnum.add}
+              onClick={() => {
+                if (columnId)
+                  setColumnFilters((prev) => ({
+                    ...prev,
+                    or: [...(prev.or || [])].concat({
+                      id: crypto.randomUUID(),
+                      field: columnId,
+                      value: "",
+                      operator: filterOptions[0].value as RequestFilterTypes,
+                    }),
+                  }));
+              }}
+              variant="info"
+            />
+          </div>
         </div>
-      </div>
-      <TableColumnFilterList
-        applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch)}
-        filterOptions={filterOptions}
-        filters={columnFilters?.and || []}
-        handleChange={handleChange}
-        setColumnFilters={setColumnFilters}
-        type="and"
-      />
-      <hr className={columnFilterDivider()} />
-      <div className={columnFilterCategory()}>
-        <div className={columnFilterCategoryTitle()}>OR FILTERS</div>
-        <div className={columnFilterButtonContainer()}>
-          <Button
-            icon={IconEnum.add}
-            onClick={() => {
-              if (columnId)
-                setColumnFilters((prev) => ({
-                  ...prev,
-                  or: [...(prev.or || [])].concat({
-                    id: crypto.randomUUID(),
-                    field: columnId,
-                    value: "",
-                    operator: filterOptions[0].value as RequestFilterTypes,
-                  }),
-                }));
-            }}
-            variant="info"
-          />
-        </div>
-      </div>
+      )}
       <TableColumnFilterList
         applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch)}
         filterOptions={filterOptions}
@@ -411,12 +420,14 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                               dispatch={dispatch}
                               filterOptions={(meta as MetaType)?.filterOptions || []}
                               filters={activeColumnFilters}
+                              isOrDisabled={["is_favorite"].includes(hdr.column.id)}
                             />
                           </div>
                         }
                         customOffset={{ mainAxis: 8 }}
                         isClickable>
                         <div
+                          className="flex w-min justify-center pl-0.5"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -488,7 +499,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                           if (
                             cell.column.id === "select" ||
                             cell.column.id === "action" ||
-                            cell.column.id === "favorite" ||
+                            cell.column.id === "is_favorite" ||
                             (cell.column.columnDef.meta as MetaType)?.noLink
                           ) {
                             e.preventDefault();

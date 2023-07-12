@@ -8,7 +8,11 @@ import { FilterNamesEnum } from "../enums";
 
 export function getTableColumns(
   columns: ColumnDef<any>[],
-  { hasSelect, hasFavorite, setFavorite }: { hasSelect?: boolean; hasFavorite?: boolean; setFavorite?: SetFavoriteType },
+  {
+    hasSelect,
+    hasFavorite,
+    setFavorite,
+  }: { hasSelect?: boolean; hasFavorite?: boolean; setFavorite?: (data: SetFavoriteType) => Promise<void> },
 ) {
   const finalColumns = [...columns];
 
@@ -29,7 +33,7 @@ export function getTableColumnWidths(
   minWidth: string;
   maxWidth?: string;
 } {
-  if (id === "select" || id === "favorite") {
+  if (id === "select" || id === "is_favorite") {
     return { minWidth: "2.5rem", maxWidth: "2.5rem" };
   }
   if (id === "action") {
@@ -91,10 +95,10 @@ export function getAreColumnFiltersActive(
 export function getIsApplyColumnFiltersDisabled(filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] }) {
   if (!filters?.and?.length && !filters?.or?.length) return true;
   if (filters?.and) {
-    if (filters.and.some((filt) => !filt.value)) return true;
+    if (filters.and.some((filt) => filt.value === undefined || filt.value === null)) return true;
   }
   if (filters?.or) {
-    if (filters.or.some((filt) => !filt.value)) return true;
+    if (filters.or.some((filt) => filt.value === undefined || filt.value === null)) return true;
   }
   return false;
 }
