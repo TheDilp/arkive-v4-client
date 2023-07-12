@@ -2,6 +2,7 @@ export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_mul
 export interface FieldType {
   id: string;
   project_id: string;
+  sort: number;
   title: string;
   field_type: FieldTypes;
   options?: string[];

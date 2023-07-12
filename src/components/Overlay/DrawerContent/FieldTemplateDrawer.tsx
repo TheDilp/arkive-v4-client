@@ -3,7 +3,15 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
-import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, SetStateAction, useResetAtom } from "../../../utils";
+import {
+  drawerAtom,
+  FieldTypesEnum,
+  getSentenceCase,
+  IconEnum,
+  SetStateAction,
+  sortEntities,
+  useResetAtom,
+} from "../../../utils";
 import { Button, Input, Select } from "../../Form";
 
 type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
@@ -36,6 +44,7 @@ function isSaveDisabled(
 
 function FieldRow({
   title,
+  sort,
   field_type,
   options,
   index,
@@ -70,6 +79,9 @@ function FieldRow({
             placeholder="Field type"
             value={field_type}
           />
+        </div>
+        <div className="h-full w-20">
+          <Input label="Sort weight" name={`[${index}].sort`} onChange={changeField} placeholder="Eg. 10" value={sort} />
         </div>
         {field_type === "select" || field_type === "select_multiple" ? (
           <div className="h-10 w-8 self-end">
@@ -183,7 +195,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
             onClick={() =>
               setFields((prev) => [
                 ...prev,
-                { id: crypto.randomUUID(), title: "", project_id: project_id as string, field_type: "text" },
+                { id: crypto.randomUUID(), title: "", project_id: project_id as string, field_type: "text", sort: 0 },
               ])
             }
             variant="info"
@@ -191,7 +203,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
         </div>
       </div>
       <div className="flex max-h-[30rem] flex-col gap-y-4 overflow-y-auto">
-        {fields.map((field, index) => (
+        {fields.sort(sortEntities).map((field, index) => (
           <FieldRow
             key={field.id}
             changeField={handleChangeFields}
@@ -201,6 +213,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
             index={index}
             options={field?.options}
             project_id={field?.project_id}
+            sort={field.sort}
             title={field.title}
           />
         ))}
@@ -222,6 +235,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
                     project_id: project_id as string,
                     title: field.title,
                     field_type: field.field_type,
+                    sort: field.sort,
                     options: field?.options?.map((opt) => opt.title),
                   })),
                 },
