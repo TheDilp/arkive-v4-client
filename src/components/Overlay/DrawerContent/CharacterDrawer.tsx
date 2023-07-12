@@ -138,7 +138,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       }
     }
   }, [existingCharacter?.data]);
-  console.log(templates?.data);
   return (
     <>
       <Tabs
@@ -230,7 +229,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                 </div>
                 {selectedTemplates.includes(t.id) ? (
                   <div className="flex select-none flex-col gap-y-2">
-                    {t.character_fields.map((f) => {
+                    {t.character_fields.sort(sortEntities).map((f) => {
                       const fieldIndex = fields?.findIndex((field) => f.id === field.id);
                       return (
                         <CharacterFieldInputs
