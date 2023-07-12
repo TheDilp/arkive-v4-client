@@ -2,7 +2,7 @@ import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useGetAllEntities, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useGetAllEntities, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import {
   dialogAtom,
@@ -159,6 +159,8 @@ export function CharactersView() {
     },
   );
 
+  const { mutateAsync } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string, undefined);
+
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
 
@@ -203,6 +205,9 @@ export function CharactersView() {
             orderBy,
             filters,
             getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
+            setFavorite: async (rowData: any) => {
+              await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
+            },
           }}
           data={data?.data || []}
           dispatch={dispatch}

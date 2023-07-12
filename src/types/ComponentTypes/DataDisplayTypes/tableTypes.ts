@@ -49,6 +49,7 @@ export interface TableType {
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     getLink?: (rowData: any) => string;
+    setFavorite?: (rowData: any) => Promise<void>;
   };
   type: AvailableEntityType;
 }
@@ -59,3 +60,5 @@ export interface TableColumnFilterComponentType {
   filterOptions: SelectOptionType[];
   dispatch: TableDispatch;
 }
+
+export type SetFavoriteType = (data: { is_favorite: boolean; id: string }) => Promise<void>;

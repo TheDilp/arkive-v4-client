@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 
+import { SetFavoriteType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { Button, Checkbox } from "../..";
 
@@ -27,14 +28,16 @@ export const SelectColumn: ColumnDef<any> = {
   ),
 };
 
-export const FavoriteColumn: ColumnDef<any> = {
+export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<void>) => ColumnDef<any> = (
+  setFavorite: (data: SetFavoriteType) => Promise<void>,
+) => ({
   id: "favorite",
   cell: ({ row }) => (
     <Button
       hasNoBackground
       icon={IconEnum.star}
       iconThickness={row.original?.is_favorite ? "fill" : "regular"}
-      onClick={undefined}
+      onClick={async () => setFavorite(row.original)}
     />
   ),
-};
+});

@@ -339,12 +339,17 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     defaultColumn: {
       minSize: 10,
     },
+    meta: config,
     state: {
       expanded,
     },
     onExpandedChange: setExpanded,
     manualSorting: true,
-    columns: getTableColumns(columns, { hasSelect: config?.hasSelect, hasFavorite: config?.hasFavorite }),
+    columns: getTableColumns(columns, {
+      hasSelect: config?.hasSelect,
+      hasFavorite: config?.hasFavorite,
+      setFavorite: config?.setFavorite,
+    }),
     getCoreRowModel: getCoreRowModel(),
     getRowCanExpand: () => !!expandable,
     getExpandedRowModel: getExpandedRowModel(),

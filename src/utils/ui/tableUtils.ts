@@ -3,17 +3,17 @@ import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 
 import { FavoriteColumn, SelectColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
-import { TableColumnFilterType, TableDispatch } from "../../types";
+import { SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
 export function getTableColumns(
   columns: ColumnDef<any>[],
-  { hasSelect, hasFavorite }: { hasSelect?: boolean; hasFavorite?: boolean },
+  { hasSelect, hasFavorite, setFavorite }: { hasSelect?: boolean; hasFavorite?: boolean; setFavorite?: SetFavoriteType },
 ) {
   const finalColumns = [...columns];
 
-  if (hasFavorite) {
-    finalColumns.unshift(FavoriteColumn);
+  if (hasFavorite && setFavorite) {
+    finalColumns.unshift(FavoriteColumn(setFavorite));
   }
   if (hasSelect) {
     finalColumns.unshift(SelectColumn);
