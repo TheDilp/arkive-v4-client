@@ -1,20 +1,20 @@
 import { useParams } from "react-router-dom";
 
-import { Button } from "../../Form";
-import { Avatar } from "../../Misc";
+import { useDeleteEntity } from "../../../hooks";
 import { AvailableEntityType, DialogContentType } from "../../../types";
 import {
-  IconEnum,
   capitalizeFirstLetter,
   dialogAtom,
   getCharacterFullName,
   getImageURL,
+  IconEnum,
   useNotifications,
   useResetAtom,
 } from "../../../utils";
-import { useDeleteEntity } from "../../../hooks";
+import { Button } from "../../Form";
+import { Avatar } from "../../Misc";
 
-export function ArchiveDeleteEntityDialog({ data, type }: { data: { [key: string]: any }; type: DialogContentType }) {
+export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any }; type: DialogContentType }) {
   const action = type?.replace("_entity", "");
   const { project_id } = useParams();
   const resetDialogAtom = useResetAtom(dialogAtom);

@@ -15,7 +15,7 @@ import { tv } from "tailwind-variants";
 import ImagePreview from "../DataDisplay/ImagePreview";
 import { ImageUpload } from "../Form";
 import { Button } from "../Form/Button";
-import { ArchiveDeleteEntityDialog } from "./DialogContent";
+import { DeleteEntityDialog } from "./DialogContent";
 import { AssetType, Size } from "../../types";
 import { useUploadAsset } from "../../hooks";
 import { IconEnum, dialogAtom, getPreviewImageURLs, useAtomValue, useResetAtom } from "../../utils";
@@ -107,7 +107,7 @@ export function Dialog() {
                 <ImageUploadDialog size={dialog.size || "md"} type={dialog?.data?.type} />
               ) : null}
               {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
-                <ArchiveDeleteEntityDialog data={dialog.data} type={dialog.type} />
+                <DeleteEntityDialog data={dialog.data} type={dialog.type} />
               ) : null}
             </div>
           </div>

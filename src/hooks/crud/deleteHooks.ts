@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AvailableEntityType, ResponseType } from "../../types";
+
+import { AvailableEntityType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
@@ -9,22 +10,13 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   return useMutation(
     async (data: { id: string }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}${type.toLowerCase()}${archive ? "/archive" : ""}/${data.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/archive" : ""}/${data.id}`,
         method: "DELETE",
       });
     },
     {
-      onError: (error: { message: string; ok: boolean }, __, context) => {
-        createNotification({
-          id: crypto.randomUUID(),
-          title: error?.message || "There was an error updating this item.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
-      },
-      onSuccess: async (res: ResponseType) => {
-        if (res.ok) {
+      onSettled: (data) => {
+        if (data?.ok) {
           queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
           createNotification({
             id: crypto.randomUUID(),
@@ -33,7 +25,14 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
             icon: IconEnum.check,
             timer: 5,
           });
-        }
+        } else
+          createNotification({
+            id: crypto.randomUUID(),
+            title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
       },
     },
   );
