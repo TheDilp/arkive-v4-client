@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
@@ -10,7 +11,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
     },
   },
 });
@@ -23,6 +23,7 @@ export default function App() {
       }}>
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
+        <ReactQueryDevtools />
         <Routes>
           <Route path="/projects/*">
             <Route element={<ProjectsView />} path="" />

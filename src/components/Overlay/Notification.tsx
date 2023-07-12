@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { Button } from "../Form";
-import { Icon } from "../Misc";
 import { NotificationType } from "../../types";
 import { IconEnum, notificationsAtom, removeNotification, useAtomValue, useSetAtom } from "../../utils";
+import { Button } from "../Form";
+import { Icon } from "../Misc";
 
 const ToastClasses = tv({
   slots: {
