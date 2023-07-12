@@ -216,7 +216,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   <div className="flex select-none flex-col gap-y-2">
                     {t.character_fields.map((f) => {
                       const fieldIndex = fields?.findIndex((field) => f.id === field.id);
-                      console.log(fields, fieldIndex, f.id);
                       return (
                         <CharacterFieldInputs
                           key={f.id}
@@ -244,10 +243,10 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           if (character) {
             if (character?.id)
               await update({
-                data: omit(character, ["id"]),
+                data: omit(character, ["id", "character_fields"]),
                 relations: { character_fields: fields },
               });
-            else await create({ data: character, relations: { character_fields: fields } });
+            else await create({ data: omit(character, ["character_fields"]), relations: { character_fields: fields } });
           }
           resetDrawerAtom();
         }}
