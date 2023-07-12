@@ -484,9 +484,9 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
           ) : null}
         </div>
         <div className={bodyContainer()}>
-          <div className={body()}>
-            {data?.length ? (
-              table.getRowModel().rows.map((row) => (
+          {data?.length ? (
+            <div className={body()}>
+              {table.getRowModel().rows.map((row) => (
                 <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
                   <div className={`${rowClasses()} ${row.getIsSelected() ? selectedRow() : ""}`}>
                     {row.getVisibleCells().map((cell) => (
@@ -518,11 +518,11 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                   </div>
                   {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
                 </Link>
-              ))
-            ) : (
-              <Alert label="There's no content." variant="info" />
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <Alert label="There's no content." variant="info" />
+          )}
           {pagination ? (
             <div className={paginationContainer()}>
               <div className={pageCountContainer()}>
