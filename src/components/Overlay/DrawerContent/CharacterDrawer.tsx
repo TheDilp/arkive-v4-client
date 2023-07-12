@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetAllEntities, useGetImages, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, SelectOptionType } from "../../../types";
-import { getImageURL, IconEnum } from "../../../utils";
+import { getImageURL, IconEnum, sortEntities } from "../../../utils";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
@@ -138,7 +138,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       }
     }
   }, [existingCharacter?.data]);
-
+  console.log(templates?.data);
   return (
     <>
       <Tabs
@@ -214,7 +214,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       {selectedTab === 2 ? (
         <ul className="flex flex-col gap-y-2">
           {templates?.data?.length ? (
-            templates?.data?.map((t) => (
+            templates?.data?.sort(sortEntities)?.map((t) => (
               <li key={t.id} className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-2">
                   <Checkbox

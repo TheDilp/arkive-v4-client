@@ -23,7 +23,7 @@ export default function App() {
       }}>
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
-        <ReactQueryDevtools />
+        <ReactQueryDevtools position="top-left" />
         <Routes>
           <Route path="/projects/*">
             <Route element={<ProjectsView />} path="" />

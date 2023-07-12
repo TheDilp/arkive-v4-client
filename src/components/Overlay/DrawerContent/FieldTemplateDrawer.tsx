@@ -147,13 +147,14 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
     },
   );
 
-  const [title, setTitle] = useState("");
+  const [template, setTemplate] = useState<{ title: string; sort: number }>({ title: "", sort: 0 });
   const [fields, setFields] = useState<(Omit<FieldType, "options"> & { options?: { id: string; title: string }[] })[]>([]);
-  const { handleChange } = useHandleChange({ data: fields, setData: setFields });
+  const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
+  const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
   useEffect(() => {
     if (existingTemplate?.data) {
-      setTitle(existingTemplate.data.title);
+      setTemplate(existingTemplate.data);
       setFields(
         existingTemplate?.data?.character_fields?.map((f) => ({
           ...f,
@@ -165,7 +166,14 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
 
   return (
     <div className="flex flex-col gap-y-4 text-white">
-      <Input label="Template title (required)" name="title" onChange={({ value }) => setTitle(value as string)} value={title} />
+      <div className="flex flex-nowrap items-center gap-x-2">
+        <div className="flex-1">
+          <Input label="Template title (required)" name="title" onChange={handleChange} value={template?.title || ""} />
+        </div>
+        <div className="w-20">
+          <Input label="Sort weight" name="sort" onChange={handleChange} type="number" value={template?.sort || 0} />
+        </div>
+      </div>
       <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
       <div className="flex items-center justify-between">
         <span>Insert new field:</span>
@@ -186,7 +194,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
         {fields.map((field, index) => (
           <FieldRow
             key={field.id}
-            changeField={handleChange}
+            changeField={handleChangeFields}
             deleteField={(i: number) => removeField(i, setFields)}
             field_type={field.field_type}
             id={field.id}
@@ -199,14 +207,14 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
       </div>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(title, fields)}
+        isDisabled={isSaveDisabled(template?.title, fields)}
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (!data?.id)
             await create(
               {
                 data: {
-                  title,
+                  ...template,
                   project_id: project_id as string,
                 },
                 relations: {
@@ -226,7 +234,8 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
             await update({
               data: {
                 id: data?.id,
-                title,
+                title: template.title,
+                sort: template.sort,
               },
               relations: {
                 character_fields: fields.map((field) => ({

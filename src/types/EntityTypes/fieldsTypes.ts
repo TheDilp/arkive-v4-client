@@ -10,4 +10,5 @@ export interface FieldTemplate {
   id: string;
   title: string;
   character_fields: FieldType[];
+  sort: number;
 }
