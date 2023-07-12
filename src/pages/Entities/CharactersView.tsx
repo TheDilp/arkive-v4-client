@@ -109,6 +109,12 @@ function createColumns(
               },
               {
                 id: "2",
+                label: "View family tree",
+                icon: IconEnum.family_tree,
+                onClick: () => {},
+              },
+              {
+                id: "delete_character",
                 label: "Delete character",
                 icon: IconEnum.trash,
                 onClick: () => {

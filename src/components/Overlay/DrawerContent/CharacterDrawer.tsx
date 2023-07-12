@@ -210,6 +210,26 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           </ul>
         </>
       ) : null}
+      {selectedTab === 1 ? (
+        <>
+          <div className="flex items-center justify-between">
+            <span>Insert new relation:</span>
+            <div className="h-8 w-8">
+              <Button icon={IconEnum.add} onClick={undefined} variant="info" />
+            </div>
+          </div>
+          {/* <ul className="flex flex-col gap-y-2">
+            <li className="flex items-center gap-x-2">
+              <div className="flex-1">
+                <Input placeholder="Search character" value="Miss Jives" />
+              </div>
+              <div className="max-w-[10rem] flex-1">
+                <Select options={BaseCharacterRelationshipOptionsEnum} value={"mother"} />
+              </div>
+            </li>
+          </ul> */}
+        </>
+      ) : null}
       {selectedTab === 2 ? (
         <ul className="flex flex-col gap-y-2">
           {templates?.data?.length ? (
