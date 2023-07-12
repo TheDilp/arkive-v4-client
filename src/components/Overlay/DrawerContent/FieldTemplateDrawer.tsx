@@ -100,7 +100,14 @@ function FieldRow({
               </div>
               <div className="flex flex-1 justify-end">
                 <div className="h-10 w-8">
-                  <Button hasNoBackground icon={IconEnum.trash} onClick={() => deleteField(index)} variant="error" />
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.trash}
+                    onClick={() =>
+                      changeField({ name: `[${index}].options`, value: (options || []).filter((o) => o.id !== opt.id) })
+                    }
+                    variant="error"
+                  />
                 </div>
               </div>
             </div>
@@ -121,8 +128,8 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
 
   const { mutateAsync: update } = useUpdateEntity<{
     data: Partial<Omit<FieldTemplate, "fields">>;
-    relations?: { fields?: FieldType[] };
-  }>("character_fields_templates", project_id as string, data?.id);
+    relations?: { character_fields?: FieldType[] };
+  }>("character_fields_templates", project_id as string);
 
   const { data: existingTemplate } = useGetItem<FieldTemplate & { fields: FieldType[] }>(
     data?.id,
@@ -130,6 +137,9 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
     {
       data: {
         id: data?.id,
+      },
+      relations: {
+        character_fields: true,
       },
     },
     {
@@ -145,7 +155,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
     if (existingTemplate?.data) {
       setTitle(existingTemplate.data.title);
       setFields(
-        existingTemplate?.data?.character_fields.map((f) => ({
+        existingTemplate?.data?.character_fields?.map((f) => ({
           ...f,
           options: (f.options || [])?.map((opt) => ({ title: opt, id: crypto.randomUUID() })),
         })) || [],
@@ -215,9 +225,16 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
           else
             await update({
               data: {
+                id: data?.id,
                 title,
               },
-              relations: { fields: fields.map((field) => ({ ...field, options: field.options?.map((opt) => opt.title) })) },
+              relations: {
+                character_fields: fields.map((field) => ({
+                  ...field,
+                  project_id: project_id as string,
+                  options: field.options?.map((opt) => opt.title),
+                })),
+              },
             });
 
           resetDrawerAtom();

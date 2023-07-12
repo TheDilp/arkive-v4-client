@@ -3,19 +3,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvailableEntityType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useUpdateEntity<InsertType extends { data: { id?: string } }>(
-  type: AvailableEntityType,
-  project_id: string,
-  id: string | undefined,
-) {
+export function useUpdateEntity<InsertType extends { data: { id?: string } }>(type: AvailableEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${id || updateValues?.data?.id}`,
-        body: JSON.stringify({ id: id || updateValues?.data?.id, ...updateValues }),
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
+        body: JSON.stringify(updateValues),
         method: "POST",
       });
     },
