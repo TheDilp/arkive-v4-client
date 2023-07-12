@@ -145,7 +145,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         selectedTab={selectedTab}
         tabs={[
           { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-          { id: "2", label: "Realations", icon: IconEnum.link },
+          { id: "2", label: "Realations", icon: IconEnum.family_tree },
           { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
           { id: "4", label: "Tags", icon: IconEnum.tags },
         ]}

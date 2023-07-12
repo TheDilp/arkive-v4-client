@@ -3,9 +3,9 @@
 import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
+import { IconEnum, navItems, settingsSubnavItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
-import { IconEnum, navItems, settingsSubnavItems } from "../../utils";
 
 const sidebarItems = [...navItems];
 sidebarItems.unshift({ icon: IconEnum.home, tooltip: "Projects", navigate: "/projects" });
