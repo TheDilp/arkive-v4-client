@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { SetFavoriteType } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { FavoritesFilters, IconEnum } from "../../../utils";
 import { Button, Checkbox } from "../..";
 
 export const SelectColumn: ColumnDef<any> = {
@@ -40,4 +40,7 @@ export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<vo
       onClick={async () => setFavorite(row.original)}
     />
   ),
+  meta: {
+    filterOptions: FavoritesFilters,
+  },
 });

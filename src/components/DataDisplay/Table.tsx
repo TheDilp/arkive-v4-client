@@ -7,12 +7,12 @@ import { tv } from "tailwind-variants";
 
 import { useHandleChange } from "../../hooks";
 import {
+  FilterEnumType,
   InputOnChangeValue,
   MetaType,
   onChangeValue,
   RequestFilterTypes,
   RequestOrderByType,
-  SelectOptionType,
   TableColumnFilterComponentType,
   TableColumnFilterType,
   TableDispatch,
@@ -101,7 +101,7 @@ function TableColumnFilterList({
   filters: TableColumnFilterType[];
   type: "and" | "or";
   handleChange: ({ name, value }: onChangeValue | InputOnChangeValue) => void;
-  filterOptions: SelectOptionType[];
+  filterOptions: FilterEnumType[];
   setColumnFilters: Dispatch<
     SetStateAction<{
       and?: TableColumnFilterType[] | undefined;
@@ -111,53 +111,67 @@ function TableColumnFilterList({
 }) {
   return (
     <>
-      {filters.map((filt, index) => (
-        <div key={filt.id} className="flex flex-col gap-y-2">
-          <div className="flex w-full flex-nowrap items-center gap-x-2">
-            <div className="w-1/3">
-              <Select
-                name={`${type}[${index}].operator`}
-                onChange={handleChange}
-                options={filterOptions}
-                placeholder="Filter type"
-                size="sm"
-                value={filt.operator}
-              />
-            </div>
-            <div className="flex-1">
-              {filt.operator && !Array.isArray(filt.value) ? (
-                <Input
-                  name={`${type}[${index}].value`}
+      {filters.map((filt, index) => {
+        const filterType = filterOptions?.find((opt) => opt.value === filt.operator);
+        return (
+          <div key={filt.id} className="flex flex-col gap-y-2">
+            <div className="flex w-full flex-nowrap items-center gap-x-2">
+              <div className="w-1/3">
+                <Select
+                  name={`${type}[${index}].operator`}
                   onChange={handleChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !!filt.value) applyFilterFn();
+                  options={filterOptions}
+                  placeholder="Filter type"
+                  size="sm"
+                  value={filt.operator}
+                />
+              </div>
+              <div className="flex-1">
+                {filt.operator && !Array.isArray(filt.value) && filterType?.type === "boolean" ? (
+                  <Input
+                    name={`${type}[${index}].value`}
+                    onChange={handleChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !!filt.value) applyFilterFn();
+                    }}
+                    size="sm"
+                    value={filt.value}
+                  />
+                ) : null}
+                {filt.operator && !Array.isArray(filt.value) ? (
+                  <Input
+                    name={`${type}[${index}].value`}
+                    onChange={handleChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !!filt.value) applyFilterFn();
+                    }}
+                    size="sm"
+                    value={filt.value}
+                  />
+                ) : null}
+              </div>
+              <div className="[&>button]:w-8">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.close}
+                  iconSize={20}
+                  onClick={() => {
+                    removeColumnFilter(filt.id, type, setColumnFilters);
                   }}
                   size="sm"
-                  value={filt.value}
                 />
-              ) : null}
-            </div>
-            <div className="[&>button]:w-8">
-              <Button
-                hasNoBackground
-                icon={IconEnum.close}
-                iconSize={20}
-                onClick={() => {
-                  removeColumnFilter(filt.id, type, setColumnFilters);
-                }}
-                size="sm"
-              />
-            </div>
-          </div>
-          {index !== filters.length - 1 ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="w-16">
-                <Badge label={capitalizeSentence(type)} variant="info" />
               </div>
             </div>
-          ) : null}
-        </div>
-      ))}
+            {index !== filters.length - 1 ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="w-16">
+                  <Badge label={capitalizeSentence(type)} variant="info" />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
     </>
   );
 }

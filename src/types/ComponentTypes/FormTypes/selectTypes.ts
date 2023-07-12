@@ -1,12 +1,12 @@
 import { BaseFormComponentType, onChangeValue } from "../../baseTypes";
 import { AvatarShape } from "../MiscTypes";
 
-export type SelectOptionType = {
+export interface SelectOptionType {
   label: string;
   value: string;
   image?: { link: string; shape?: AvatarShape };
   icon?: string;
-};
+}
 export interface SelectType extends BaseFormComponentType {
   name: string;
   placeholder?: string;

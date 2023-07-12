@@ -4,11 +4,15 @@ import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType 
 import { AvailableEntityType } from "../../EntityTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
+export interface FilterEnumType extends SelectOptionType {
+  type: "boolean" | "text" | "number";
+  options?: SelectOptionType[];
+}
 export interface MetaType {
   sortable?: boolean;
   centered?: boolean;
   noLink?: boolean;
-  filterOptions?: SelectOptionType[];
+  filterOptions?: FilterEnumType[];
 }
 
 export type TableColumnFilterType = RequestFilterType & { id: string };
@@ -57,7 +61,7 @@ export interface TableType {
 export interface TableColumnFilterComponentType {
   columnId: string | undefined;
   filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-  filterOptions: SelectOptionType[];
+  filterOptions: FilterEnumType[];
   dispatch: TableDispatch;
 }
 
