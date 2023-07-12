@@ -1,7 +1,7 @@
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetAllEntities, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import {
@@ -136,6 +136,7 @@ function createColumns(
 export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
   const [view, setView] = useState<"card" | "list">("list");
+  const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
     orderBy: { field: "first_name", sort: "asc" },
@@ -159,14 +160,42 @@ export function CharactersView() {
     },
   );
 
-  const { mutateAsync } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string, undefined);
+  const { mutateAsync } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
 
+  useEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    const timeout = setTimeout(() => {
+      if (filter) {
+        dispatch({
+          type: "setFilter",
+          payload: { and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }] },
+        });
+      }
+    }, 750);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [filter]);
+
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">
+        <div className="w-56">
+          <Input
+            name="quick_filter"
+            onChange={({ value }) => setFilter(value as string)}
+            placeholder="Quick search by first name"
+            value={filter}
+          />
+        </div>
         <div className="w-32">
           <Select
             name="view"

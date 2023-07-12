@@ -1,6 +1,7 @@
+import { useReducer } from "react";
+
 import { TableActionType, TableDispatch, TableParams } from "../../types";
 import { deleteObjectProps } from "../../utils";
-import { useReducer } from "react";
 
 const tableReducerFn = (state: TableParams, action: TableActionType): TableParams => {
   switch (action.type) {
@@ -82,22 +83,11 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
       return state;
     }
 
-    // case "clearFilters": {
-    //   const newState: Partial<typeof state> = {
-    //     ...state,
-    //     filters: {
-    //       ...state.filters,
-    //       and: (state.filters?.and || []).filter((filt) => filt.field !== action.payload.filters?.and?.[0]?.field),
-    //     },
-    //   };
-    //   if (newState?.filters?.and?.length === 0) {
-    //     newState.filters = deleteObjectProps(newState.filters, ["and"]);
-    //   }
-    //   if (newState?.filters?.or?.length === 0) {
-    //     newState.filters = deleteObjectProps(newState.filters, ["or"]);
-    //   }
-    //   return newState;
-    // }
+    case "clearAllFilters": {
+      const newState = deleteObjectProps({ ...state }, ["filters"]);
+
+      return newState;
+    }
 
     // case "setSelected":
     //   if (state?.selection?.[action?.payload?.page] && includes(state?.selection?.[action?.payload?.page], action.payload.id)) {
