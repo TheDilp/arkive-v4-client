@@ -6,7 +6,7 @@ const TextareaClasses = tv({
   slots: {
     base: "relative flex h-full min-h-full flex-col font-lato",
     textarea:
-      "flex h-full w-full items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-md border p-2 text-base outline-none placeholder:text-sm placeholder:italic",
+      "flex h-full w-full resize-none items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-md border p-2 text-base outline-none placeholder:text-sm placeholder:italic",
     label: "text-sm font-medium truncate block pl-1 min-h-[20px]",
     helperText: "text-xs truncate block",
   },
@@ -52,6 +52,9 @@ const TextareaClasses = tv({
     isDisabled: {
       true: "bg-zinc-300 text-zinc-100 cursor-not-allowed pointer-events-none",
     },
+    isResizable: {
+      true: "resize-y",
+    },
   },
   compoundVariants: [
     {
@@ -75,8 +78,14 @@ export function Textarea({
   helperText,
   size = "md",
   variant = "primary",
+  isResizable = false,
 }: TextareaType) {
-  const { base, textarea, label: labelClasses, helperText: helperTextClasses } = TextareaClasses({ size, variant });
+  const {
+    base,
+    textarea,
+    label: labelClasses,
+    helperText: helperTextClasses,
+  } = TextareaClasses({ size, variant, isResizable });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}

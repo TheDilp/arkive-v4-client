@@ -9,4 +9,5 @@ export interface TextareaType extends BaseComponentType, BaseFormComponentType {
   onKeyDown?: (e: KeyboardEvent) => void;
   value: string | number | undefined;
   helperText?: string;
+  isResizable?: boolean;
 }

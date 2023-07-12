@@ -44,7 +44,7 @@ body {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  @apply z-0 bg-zinc-700;
+  @apply z-0 bg-zinc-600;
 }
 
 /* Handle on hover */

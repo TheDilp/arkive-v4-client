@@ -27,7 +27,16 @@ function CharacterFieldInputs({
 }) {
   const name = `[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
-    return <Input label={title} name={name} onChange={handleChange} value={currentValue as string} />;
+    return (
+      <Input
+        label={title}
+        name={name}
+        onChange={({ value }) => {
+          handleChange({ name, value: { id, value } });
+        }}
+        value={currentValue as string}
+      />
+    );
   }
   if (fieldType === "select" || fieldType === "select_multiple") {
     return (
@@ -44,7 +53,14 @@ function CharacterFieldInputs({
   if (fieldType === "textarea") {
     return (
       <div className="h-[10rem] max-h-full min-h-[10rem]">
-        <Textarea label={title} name={name} onChange={handleChange} value={currentValue as string} />
+        <Textarea
+          label={title}
+          name={name}
+          onChange={({ value }) => {
+            handleChange({ name, value: { id, value } });
+          }}
+          value={currentValue as string}
+        />
       </div>
     );
   }
@@ -83,7 +99,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const { mutateAsync: update } = useUpdateEntity<{
     data: insertCharacterType;
     relations?: { character_fields?: { id: string; value: string | string[] }[] };
-  }>("characters", project_id as string, data?.id);
+  }>("characters", project_id as string);
 
   const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
     select: (res): SelectOptionType[] => {
@@ -243,7 +259,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           if (character) {
             if (character?.id)
               await update({
-                data: omit(character, ["id", "character_fields"]),
+                data: omit(character, ["character_fields"]),
                 relations: { character_fields: fields },
               });
             else await create({ data: omit(character, ["character_fields"]), relations: { character_fields: fields } });
