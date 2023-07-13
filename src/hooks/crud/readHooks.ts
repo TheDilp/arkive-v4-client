@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType, RequestBodyType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction } from "../../utils";
 
@@ -108,5 +108,23 @@ export function useGetSubEntities<ReturnType>(
         method: "GET",
       }),
     configuredOptions,
+  );
+}
+
+export function useSearch<ReturnType>(
+  request: { data: { search_term: string } },
+  type: SearchableEntities,
+  project_id: string,
+  options?: UseQueryOptions<any>,
+) {
+  return useQuery<{ data: ReturnType[] }, unknown>(
+    ["search"],
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/search/${project_id}/${type}`,
+        method: "POST",
+        body: JSON.stringify(request),
+      }),
+    options,
   );
 }

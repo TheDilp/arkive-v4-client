@@ -5,7 +5,7 @@ export interface RelationshipType {
   character_a_id: string;
   character_b_id: string;
   relation_type: string;
-  related_to?: Pick<CharacterType, "first_name">;
+  character_b_name: string;
 }
 export interface CharacterFieldValues {
   fieldId: string;

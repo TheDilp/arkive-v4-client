@@ -12,9 +12,9 @@ import {
   RelationshipType,
   SelectOptionType,
 } from "../../../types";
-import { BaseCharacterRelationshipOptionsEnum, getImageURL, IconEnum, sortEntities } from "../../../utils";
+import { BaseCharacterRelationshipOptionsEnum, getImageURL, IconEnum, sortEntities, useNotifications } from "../../../utils";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
+import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
 
@@ -77,18 +77,27 @@ function CharacterFieldInputs({
 
 function RelationshipRow({
   relation_type,
-  related_to,
+  character_b_name,
+  character_b_id,
   handleChange,
+  handleRemove,
   index,
-}: RelationshipType & { index: number; handleChange: ({ name, value }: InputOnChangeValue | onChangeValue) => void }) {
+}: RelationshipType & {
+  index: number;
+  handleChange: ({ name, value }: InputOnChangeValue | onChangeValue) => void;
+  handleRemove: (id: string) => void;
+}) {
   return (
     <li className="flex items-center gap-x-2">
       <div className="flex-1">
         <Input
-          name={`relationships[${index}].first_name`}
-          onChange={handleChange}
+          isDisabled
+          name="character_b_name"
+          onChange={({ value }) => {
+            handleChange({ name: `relationships[${index}].character_b_id`, value });
+          }}
           placeholder="Search character"
-          value={related_to?.first_name}
+          value={character_b_name}
         />
       </div>
       <div className="max-w-[10rem] flex-1">
@@ -99,6 +108,16 @@ function RelationshipRow({
           value={relation_type}
         />
       </div>
+      <div className="max-w-fit flex-1">
+        <Button
+          hasNoBackground
+          icon={IconEnum.trash}
+          onClick={() => {
+            handleRemove(character_b_id);
+          }}
+          variant="error"
+        />
+      </div>
     </li>
   );
 }
@@ -106,7 +125,7 @@ function RelationshipRow({
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const createNotifications = useNotifications();
   const { data: existingCharacter } = useGetItem<CharacterType>(
     data?.id,
     "characters",
@@ -249,23 +268,30 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       {selectedTab === 1 ? (
         <>
           <div className="flex items-center justify-between">
-            <span>Insert new relation:</span>
-            <div className="h-8 w-8">
-              <Button
-                icon={IconEnum.add}
-                onClick={() =>
-                  handleChange({
-                    name: "relationships",
-                    value: (character?.relationships || []).concat({
-                      character_a_id: data?.id || "",
-                      character_b_id: "",
-                      relation_type: "",
-                    }),
-                  })
+            <Search
+              onChange={({ label, value }) => {
+                if (character?.relationships?.some((relationship) => relationship?.character_b_id === value)) {
+                  createNotifications({
+                    id: crypto.randomUUID(),
+                    title: "Cannot add same character more than once as a relationship.",
+                    variant: "warning",
+                    timer: 2,
+                    icon: IconEnum.info_circle,
+                  });
+                  return;
                 }
-                variant="info"
-              />
-            </div>
+                handleChange({
+                  name: "relationships",
+                  value: (character?.relationships || []).concat({
+                    character_a_id: data?.id || "",
+                    character_b_id: value,
+                    relation_type: "",
+                    character_b_name: label,
+                  }),
+                });
+              }}
+              placeholder="Search character"
+            />
           </div>
           <ul className="flex flex-col gap-y-2">
             {character?.relationships?.length
@@ -273,6 +299,12 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   <RelationshipRow
                     key={`${relationship.character_a_id}-${relationship.character_b_id}`}
                     handleChange={handleChange}
+                    handleRemove={(character_b_id: string) =>
+                      handleChange({
+                        name: "relationships",
+                        value: (character?.relationships || []).filter((r) => r.character_b_id !== character_b_id),
+                      })
+                    }
                     index={index}
                     {...relationship}
                   />

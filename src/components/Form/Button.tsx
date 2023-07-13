@@ -89,7 +89,12 @@ export function Button({
         {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} thickness={iconThickness} /> : null}
         {label ? <span className={labelClasses()}>{label}</span> : null}
         {(iconPos === "right" && icon) || isLoading ? (
-          <Icon fontSize={iconSize} icon={icon || IconEnum.error} thickness={iconThickness} />
+          <Icon
+            className={isLoading ? "animate-spin" : ""}
+            fontSize={iconSize}
+            icon={icon || IconEnum.error}
+            thickness={iconThickness}
+          />
         ) : null}
       </button>
     </Tooltip>
