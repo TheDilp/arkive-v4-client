@@ -3,8 +3,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetAllEntities, useGetImages, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterType, FieldTemplate, FieldType, SelectOptionType } from "../../../types";
-import { getImageURL, IconEnum, sortEntities } from "../../../utils";
+import {
+  CharacterType,
+  FieldTemplate,
+  FieldType,
+  InputOnChangeValue,
+  onChangeValue,
+  RelationshipType,
+  SelectOptionType,
+} from "../../../types";
+import { BaseCharacterRelationshipOptionsEnum, getImageURL, IconEnum, sortEntities } from "../../../utils";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
@@ -65,6 +73,34 @@ function CharacterFieldInputs({
     );
   }
   return null;
+}
+
+function RelationshipRow({
+  relation_type,
+  related_to,
+  handleChange,
+  index,
+}: RelationshipType & { index: number; handleChange: ({ name, value }: InputOnChangeValue | onChangeValue) => void }) {
+  return (
+    <li className="flex items-center gap-x-2">
+      <div className="flex-1">
+        <Input
+          name={`relationships[${index}].first_name`}
+          onChange={handleChange}
+          placeholder="Search character"
+          value={related_to?.first_name}
+        />
+      </div>
+      <div className="max-w-[10rem] flex-1">
+        <Select
+          name={`relationships[${index}].relation_type`}
+          onChange={handleChange}
+          options={BaseCharacterRelationshipOptionsEnum}
+          value={relation_type}
+        />
+      </div>
+    </li>
+  );
 }
 
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
@@ -215,19 +251,34 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           <div className="flex items-center justify-between">
             <span>Insert new relation:</span>
             <div className="h-8 w-8">
-              <Button icon={IconEnum.add} onClick={undefined} variant="info" />
+              <Button
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: "relationships",
+                    value: (character?.relationships || []).concat({
+                      character_a_id: data?.id || "",
+                      character_b_id: "",
+                      relation_type: "",
+                    }),
+                  })
+                }
+                variant="info"
+              />
             </div>
           </div>
-          {/* <ul className="flex flex-col gap-y-2">
-            <li className="flex items-center gap-x-2">
-              <div className="flex-1">
-                <Input placeholder="Search character" value="Miss Jives" />
-              </div>
-              <div className="max-w-[10rem] flex-1">
-                <Select options={BaseCharacterRelationshipOptionsEnum} value={"mother"} />
-              </div>
-            </li>
-          </ul> */}
+          <ul className="flex flex-col gap-y-2">
+            {character?.relationships?.length
+              ? character?.relationships?.map((relationship, index) => (
+                  <RelationshipRow
+                    key={`${relationship.character_a_id}-${relationship.character_b_id}`}
+                    handleChange={handleChange}
+                    index={index}
+                    {...relationship}
+                  />
+                ))
+              : null}
+          </ul>
         </>
       ) : null}
       {selectedTab === 2 ? (
