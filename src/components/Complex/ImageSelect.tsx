@@ -19,7 +19,7 @@ export function ImageSelect({ name, onChange, options, label, value, isLoading, 
       <div className="truncate pl-1 text-sm font-medium text-white">{label || "Select image"}</div>
       <div className="grid grid-cols-6 gap-x-2">
         <div className="col-span-4">
-          <Select isLoading={isLoading} name={name} onChange={onChange} options={images} value={value} />
+          <Select hasSearch isLoading={isLoading} name={name} onChange={onChange} options={images} value={value} />
         </div>
 
         <div className="col-span-2">

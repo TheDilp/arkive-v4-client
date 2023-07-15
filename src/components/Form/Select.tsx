@@ -81,7 +81,7 @@ const SelectClasses = tv({
     {
       slots: ["select"],
       isOpen: true,
-      class: "rounded-b-none",
+      class: "rounded-b-none bg-zinc-800",
     },
     {
       slots: ["helperText"],
@@ -187,6 +187,7 @@ export function Select({
   helperText,
   isLoading,
   value,
+  hasSearch,
   name,
   isDisabled,
   options = [],
@@ -198,6 +199,7 @@ export function Select({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const [displayText, setDisplayText] = useState("");
+  const [filteredItems, setFilteredItems] = useState(options);
   const [selectedItem, setSelectedItem] = useState<SelectOptionType | null>();
   const {
     base,
@@ -291,7 +293,20 @@ export function Select({
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
             <div ref={refs.setFloating} className={optionsContainer()} style={floatingStyles} {...getFloatingProps()}>
-              {options.map((opt, i) => {
+              {hasSearch ? (
+                <input
+                  className="sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none"
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setFilteredItems(options.filter((opt) => opt.label.toLowerCase().includes(e.target.value)));
+                    } else {
+                      setFilteredItems(options);
+                    }
+                  }}
+                  placeholder="Search"
+                />
+              ) : null}
+              {filteredItems.map((opt, i) => {
                 return (
                   <div
                     key={`${opt}-${i.toFixed()}`}
@@ -313,7 +328,7 @@ export function Select({
                           name,
                           index: i,
                           onChange,
-                          options,
+                          options: filteredItems,
                           value,
                           setIsOpen,
                         }),
@@ -324,7 +339,7 @@ export function Select({
                             name,
                             index: i,
                             onChange,
-                            options,
+                            options: filteredItems,
                             value,
                             setIsOpen,
                           });

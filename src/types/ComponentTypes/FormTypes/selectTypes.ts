@@ -13,6 +13,7 @@ export interface SelectType extends BaseFormComponentType {
   label?: string;
   helperText?: string;
   isMultiple?: boolean;
+  hasSearch?: boolean;
   value: string | string[] | null | undefined;
   options: SelectOptionType[];
   onChange: ({ name, value }: onChangeValue) => void;
