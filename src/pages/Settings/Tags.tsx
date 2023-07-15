@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { ColorPicker } from "../../components/Overlay/ColorPicker";
 import { useGetAllEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters, useSetAtom } from "../../utils";
@@ -24,12 +25,18 @@ function createColumns(
     }),
     columnHelper.accessor("color", {
       id: "color",
-      header: "Title",
-      cell: (info) => info.getValue(),
+      header: "Color",
+      cell: (info) => (
+        <div className="flex w-full justify-center">
+          <div className="h-6 w-6 rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
+        </div>
+      ),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        noLink: true,
       },
+      maxSize: 4,
+      minSize: 4,
     }),
 
     columnHelper.display({
