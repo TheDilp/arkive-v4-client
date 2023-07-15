@@ -160,7 +160,7 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
-  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; image?: string }>(
+  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string }>(
     { data: { search_term: inputValue } },
     searchEntity,
     project_id as string,
@@ -241,7 +241,7 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
               } else if (!value && typeof activeIndex === "number") {
                 const item = data?.data?.[activeIndex];
                 if (item) {
-                  onChange({ name, value: item.value, label: item.label });
+                  onChange({ name, value: item.value, label: item.label, color: item?.color });
                   if (!isAutocomplete) {
                     setInputValue("");
                   } else {
@@ -307,7 +307,7 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
                       listRef.current[index] = node;
                     },
                     onClick() {
-                      onChange({ name, value: item.value, label: item.label });
+                      onChange({ name, value: item.value, label: item.label, color: item?.color });
                       if (!isAutocomplete) {
                         setInputValue("");
                       } else {

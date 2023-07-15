@@ -9,5 +9,5 @@ export interface SearchType extends BaseFormComponentType {
   placeholder?: string;
   buttonIcon?: IconOptions;
   isAutocomplete?: boolean;
-  onChange: ({ name, value, label }: { name: string; value: string; label?: string }) => void;
+  onChange: ({ name, value, label }: { name: string; value: string; label?: string; color?: string }) => void;
 }
