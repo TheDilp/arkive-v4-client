@@ -47,6 +47,7 @@ const ButtonClasses = tv({
       isDisabled: true,
       class: "bg-zinc-300 text-zinc-100 cursor-not-allowed shadow-none active:opacity-100",
     },
+
     {
       variant: ["secondary"],
       hasNoBackground: true,

@@ -39,7 +39,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
 import { getImageURL, IconEnum } from "../../utils";
-import { Avatar } from "..";
+import { Avatar, Icon } from "..";
 import { Button } from ".";
 
 interface ItemProps {
@@ -204,6 +204,19 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
     if (data?.data?.length) setOpen(true);
   }, [data?.data]);
 
+  useEffect(() => {
+    if (isAutocomplete && inputValue) {
+      const timeout = setTimeout(() => {
+        refetch();
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [isAutocomplete, inputValue, refetch]);
+
   return (
     <>
       <div
@@ -278,8 +291,17 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
           value={inputValue}
         />
 
-        {isAutocomplete ? null : (
-          <div className={buttonContainer()}>
+        <div className={buttonContainer()}>
+          {isAutocomplete ? (
+            <div className="flex h-full items-center justify-center">
+              <Icon
+                className={isFetching ? "animate-spin" : ""}
+                color="#71717a"
+                fontSize={20}
+                icon={isFetching ? IconEnum.loading : IconEnum.search}
+              />
+            </div>
+          ) : (
             <Button
               icon={isFetching ? IconEnum.loading : IconEnum.search}
               isDisabled={!inputValue}
@@ -287,8 +309,8 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
               onClick={() => refetch()}
               variant="info"
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <FloatingPortal>
         {open && (

@@ -158,7 +158,7 @@ function RelationshipRow({
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-  const createNotifications = useNotifications();
+  const createNotification = useNotifications();
   const { data: existingCharacter } = useGetItem<CharacterType>(
     data?.id,
     "characters",
@@ -278,7 +278,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               name="portrait_id"
               onChange={({ label, value }) => {
                 if (character?.related_to?.some((relationship) => relationship?.id === value)) {
-                  createNotifications({
+                  createNotification({
                     id: crypto.randomUUID(),
                     title: "Cannot add same character more than once as a relationship.",
                     variant: "warning",
@@ -298,7 +298,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   }),
                 });
               }}
-              placeholder="Search character"
+              placeholder="Press enter to search characters"
               searchEntity="characters"
               value={character?.portrait_id}
             />
@@ -381,7 +381,18 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         <div className="flex flex-col gap-y-2">
           <Search
             name="tags"
-            onChange={({ name, label, value, color }) =>
+            onChange={({ name, label, value, color }) => {
+              if ((character?.tags || [])?.some((tag) => tag.id === value)) {
+                createNotification({
+                  id: crypto.randomUUID(),
+                  title: "Cannot add the same tag twice.",
+                  variant: "warning",
+                  icon: IconEnum.info_circle,
+                  timer: 3,
+                });
+                return;
+              }
+
               handleChange({
                 name,
                 value: (character?.tags || []).concat({
@@ -390,9 +401,9 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   project_id: project_id as string,
                   color: color as string,
                 }),
-              })
-            }
-            placeholder="Search tags"
+              });
+            }}
+            placeholder="Press enter to search tags"
             searchEntity="tags"
           />
 
