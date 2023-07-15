@@ -7,7 +7,7 @@ import { Icon, Tooltip } from "..";
 const ButtonClasses = tv({
   slots: {
     base: "font-lato font-medium h-10 rounded active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate",
-    label: "hidden xs:block",
+    label: "hidden xs:block select-none",
   },
   variants: {
     variant: {

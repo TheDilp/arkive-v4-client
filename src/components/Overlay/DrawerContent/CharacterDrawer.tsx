@@ -12,9 +12,10 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { CharacterPreview } from "../..";
+import { CharacterPreview, Icon } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
+import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
 
@@ -26,6 +27,7 @@ type characterRelationsType = {
   related_from?: { id: string; relation_type: string }[];
   image?: { id: string | null };
 };
+
 function isSaveDisabled(character: Partial<CharacterType> & characterRelationsType) {
   if (!character?.first_name) return true;
   if (character?.related_from?.length) {
@@ -53,7 +55,7 @@ function CharacterFieldInputs({
   value: string | string[] | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `[${index}]`;
+  const name = `character_fields[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -174,10 +176,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     existingCharacter?.data || { project_id: project_id as string },
   );
 
-  const [selectedTemplates, setSelectedTemplates] = useState<string[]>([]);
-
-  const [fields, setFields] = useState<{ id: string; value: string | string[] }[]>([]);
-
   const { mutateAsync: create } = useCreateEntity<{
     data: insertCharacterType;
     relations?: characterRelationsType;
@@ -208,22 +206,16 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       enabled: selectedTab === 2,
     },
   );
+
+  const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
-  const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
   useEffect(() => {
     if (existingCharacter?.data) {
-      const { ...char } = existingCharacter.data;
-      setCharacter(char);
-
-      if (char.character_fields) {
-        setSelectedTemplates([
-          ...new Set(char?.character_fields?.length ? char?.character_fields?.map((f) => f.template_id) : []),
-        ]);
-        setFields(char?.character_fields.map((f) => omit(f, ["template_id"])));
-      }
+      setCharacter(existingCharacter?.data);
     }
   }, [existingCharacter?.data]);
+
   return (
     <>
       <Tabs
@@ -376,38 +368,28 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         </>
       ) : null}
       {selectedTab === 2 ? (
-        <ul className="flex flex-col gap-y-2">
+        <ul className="flex flex-col gap-y-2 overflow-y-auto">
           {templates?.data?.length ? (
             templates?.data?.sort(sortEntities)?.map((t) => (
-              <li key={t.id} className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-2">
-                  <Checkbox
-                    name={t.id}
-                    onChange={() => {
-                      if (selectedTemplates.includes(t.id))
-                        setSelectedTemplates((prev) => prev.filter((selectTag) => selectTag !== t.id));
-                      else setSelectedTemplates((prev) => [...prev, t.id]);
-                    }}
-                    value={selectedTemplates.includes(t.id)}
-                  />
-                  <span className="select-none text-xl">{t.title}</span>
-                </div>
-                {selectedTemplates.includes(t.id) ? (
-                  <div className="flex select-none flex-col gap-y-2">
+              <li key={t.id} className="mt-4 flex flex-col gap-y-2 first:mt-0">
+                <Collapsible initialOpen={selectedTemplates.includes(t.id)} label={t.title}>
+                  <div className="flex select-none flex-col gap-y-2 pt-2">
                     {t.character_fields.sort(sortEntities).map((f) => {
-                      const fieldIndex = fields?.findIndex((field) => f.id === field.id);
-                      return (
-                        <CharacterFieldInputs
-                          key={f.id}
-                          {...f}
-                          handleChange={handleChangeFields}
-                          index={fieldIndex === -1 ? fields.length : fieldIndex}
-                          value={fields?.[fieldIndex]?.value || ""}
-                        />
-                      );
+                      const fieldIndex = (character?.character_fields || [])?.findIndex((field) => f.id === field.id);
+                      if (fieldIndex !== undefined)
+                        return (
+                          <CharacterFieldInputs
+                            key={f.id}
+                            {...f}
+                            handleChange={handleChange}
+                            index={fieldIndex === -1 ? character?.character_fields?.length || 0 : fieldIndex}
+                            value={character?.character_fields?.[fieldIndex]?.value || ""}
+                          />
+                        );
+                      return null;
                     })}
                   </div>
-                ) : null}
+                </Collapsible>
               </li>
             ))
           ) : (
@@ -426,7 +408,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                 {
                   data: omit(character, ["character_fields", "relationships", "related_to", "related_from"]),
                   relations: {
-                    character_fields: fields,
+                    character_fields: character?.character_fields,
                     related_to: character?.related_to,
                     related_from: character?.related_from,
                   },

@@ -12,7 +12,7 @@ import { TagsDrawer } from "./DrawerContent/TagsDrawer";
 
 const DrawerClasses = tv({
   slots: {
-    base: "bg-zinc-800 absolute right-0 h-screen transition-transform px-4 pb-4 z-50 duration-300 ease-in-out max-h-screen",
+    base: "bg-zinc-800 absolute right-0 h-screen transition-transform px-4 pb-4 z-50 duration-300 ease-in-out max-h-screen h-screen",
     title:
       "font-merriweather text-white h-16 max-h-[4rem] text-2xl text-center border-b items-center border-zinc-700 mb-4 flex justify-between flex-nowrap",
   },
@@ -104,7 +104,7 @@ export function Drawer() {
           <Button hasNoBackground icon={IconEnum.close} iconSize={22} onClick={resetDrawerAtom} />
         </div>
       </h3>
-      <div className="flex w-full flex-col gap-y-4">
+      <div className="flex h-[calc(100%-4rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
         {drawer.type === "project" ? <ProjectDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}

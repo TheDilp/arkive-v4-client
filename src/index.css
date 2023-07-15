@@ -54,3 +54,14 @@ body {
 .scrollbar-hidden::-webkit-scrollbar {
   @apply hidden;
 }
+
+summary::-webkit-details-marker {
+  display: none;
+}
+details {
+  cursor: pointer;
+}
+details[open] summary svg {
+  cursor: pointer;
+  transform: rotate(180deg);
+}
