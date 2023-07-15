@@ -49,7 +49,7 @@ interface ItemProps {
 
 const SearchClasses = tv({
   slots: {
-    base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center px-2 h-10",
+    base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center pl-2 h-10",
     input: "flex h-10 w-full items-center justify-center bg-zinc-900 p-2 text-base outline-none placeholder:italic",
     label: "text-sm font-medium truncate block pl-1 min-h-[20px]",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
