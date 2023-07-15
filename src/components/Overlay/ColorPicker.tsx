@@ -6,9 +6,10 @@ import { Tooltip } from ".";
 
 function ColorPalette({ name, onChange }: ColorPaletteType) {
   return (
-    <div className="flex max-h-96 max-w-xs flex-wrap gap-4 overflow-auto rounded-md bg-zinc-900 p-4 shadow">
+    <div className="flex max-h-96 max-w-xs flex-wrap justify-center gap-4 overflow-auto rounded-md bg-zinc-900 p-4 shadow">
       {TagColors.map((color) => (
         <div
+          key={color}
           className="h-6 w-6 cursor-pointer rounded-full"
           onClick={() => onChange({ name, value: color })}
           style={{ backgroundColor: color }}

@@ -1,61 +1,102 @@
+import omit from "lodash.omit";
 import { useState } from "react";
-import { IconEnum, drawerAtom, useResetAtom } from "../../../utils";
-import { Button, Input } from "../../Form";
-import { useCreateEntities, useHandleChange } from "../../../hooks";
 import { useParams } from "react-router-dom";
 
-function isDisabled(tags: { id: string; title: string }[]) {
-  if (!tags.length) return true;
-  if (tags.some((tag) => !tag.title)) return true;
-  const tagTitles = tags.map((tag) => tag.title.toLowerCase());
-  if (new Set(tagTitles).size !== tagTitles.length) return true;
+import { useCreateEntities, useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { TagType } from "../../../types";
+import { drawerAtom, IconEnum, useResetAtom } from "../../../utils";
+import { DefaultTagColor } from "../../../utils/enums/ColorEnums";
+import { Button, Input } from "../../Form";
+import { ColorPicker } from "../ColorPicker";
+
+function isDisabled(tags: TagType | TagType[]) {
+  if (Array.isArray(tags)) {
+    if (!tags.length) return true;
+    if (tags.some((tag) => !tag.title)) return true;
+    const tagTitles = tags.map((tag) => tag.title.toLowerCase());
+    if (new Set(tagTitles).size !== tagTitles.length) return true;
+  } else {
+    if (!tags.title) return true;
+    if (!tags.color) return true;
+  }
 
   return false;
 }
 
-export function TagsDrawer({ data }: { data: { id?: string } }) {
+export function TagsDrawer({ data }: { data: TagType }) {
   const { project_id } = useParams();
-  const [tags, setTags] = useState<{ id: string; title: string }[]>([]);
+  const [tags, setTags] = useState<TagType | TagType[]>(data?.id ? data : []);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateEntities<{ data: { project_id: string; title: string }[] }>(
-    "tags",
-    project_id as string,
-  );
+  const { mutateAsync: createMany } = useCreateEntities<{ data: Omit<TagType, "id">[] }>("tags", project_id as string);
+  const { mutateAsync: create } = useCreateEntity<{ data: Omit<TagType, "id"> }>("tags");
 
+  const { mutateAsync: update } = useUpdateEntity<{ data: Omit<TagType, "project_id"> }>("tags", project_id as string);
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });
 
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex h-8 w-full justify-between">
-        <span>Insert new tag:</span>
-        <div className="h-8 w-8">
-          <Button
-            variant="info"
-            tooltip="Add new tag"
-            icon={IconEnum.add}
-            onClick={() => setTags((prev) => [...(prev || []), { id: crypto.randomUUID(), title: "" }])}
-          />
+      {data?.id ? null : (
+        <div className="flex h-8 w-full justify-between">
+          <span>Insert new tag:</span>
+          <div className="h-8 w-8">
+            <Button
+              icon={IconEnum.add}
+              onClick={() => {
+                setTags((prev) => {
+                  if (Array.isArray(prev))
+                    return [
+                      ...(prev || []),
+                      { id: crypto.randomUUID(), title: "", color: "", project_id: project_id as string },
+                    ];
+                  return prev;
+                });
+              }}
+              tooltip="Add new tag"
+              variant="info"
+            />
+          </div>
         </div>
-      </div>
-      {tags.map((tag, index) => (
-        <Input
-          label="Tag name (required, must be unique)"
-          key={tag.id}
-          value={tag.title}
-          name={`[${index}].title`}
-          onChange={handleChange}
-        />
-      ))}
+      )}
+      {Array.isArray(tags) ? (
+        tags.map((tag, index) => (
+          <div key={tag.id} className="flex items-end gap-x-2">
+            <Input
+              label="Tag name (required, must be unique)"
+              name={`[${index}].title`}
+              onChange={handleChange}
+              value={tag.title}
+            />
+            <div className="self-end pb-2">
+              <ColorPicker name={`[${index}].color`} onChange={handleChange} value={tag.color} />
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="flex gap-x-2">
+          <Input label="Tag name (required, must be unique)" name="title" onChange={handleChange} value={tags?.title} />
+          <div className="self-end pb-2">
+            <ColorPicker name="color" onChange={handleChange} value={tags?.color || DefaultTagColor} />
+          </div>
+        </div>
+      )}
       <Button
-        icon={IconEnum.add}
+        icon={data?.id ? IconEnum.save : IconEnum.add}
+        isDisabled={isDisabled(tags)}
+        label={data?.id ? "Save" : "Create"}
         onClick={async () => {
-          if (!data?.id) await create({ data: tags.map((tag) => ({ title: tag.title, project_id: project_id as string })) });
+          if (!data?.id) {
+            if (Array.isArray(tags)) {
+              await createMany({ data: tags.map((tag) => omit(tag, ["id"])) });
+            } else {
+              await create({ data: tags });
+            }
+          } else if (!Array.isArray(tags)) {
+            await update({ data: omit(tags, ["project_id"]) });
+          }
 
           resetDrawerAtom();
         }}
-        label={"Create"}
         variant="success"
-        isDisabled={isDisabled(tags)}
       />
     </div>
   );

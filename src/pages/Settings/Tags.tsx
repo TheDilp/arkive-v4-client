@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { ColorPicker } from "../../components/Overlay/ColorPicker";
 import { useGetAllEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters, useSetAtom } from "../../utils";
@@ -92,11 +91,11 @@ function createColumns(
 
 export function Tags() {
   const { project_id } = useParams();
-  const { data } = useGetAllEntities({ data: { project_id } }, "tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
-  const [, dispatch] = useTable({});
+  const [{ orderBy }, dispatch] = useTable({ orderBy: { field: "title", sort: "asc" } });
+  const { data } = useGetAllEntities({ data: { project_id }, orderBy }, "tags");
 
   return (
     <TablePageLayout>
@@ -123,6 +122,7 @@ export function Tags() {
           config={{
             hasSelect: true,
             expandable: true,
+            orderBy,
             filters: {},
           }}
           data={data?.data || []}
