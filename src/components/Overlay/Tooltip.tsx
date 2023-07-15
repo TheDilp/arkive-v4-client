@@ -7,6 +7,7 @@ import {
   inline,
   offset,
   safePolygon,
+  shift,
   useClick,
   useDismiss,
   useFloating,
@@ -16,6 +17,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { cloneElement, useRef, useState } from "react";
+
 import { DefaultTooltipType, TooltipType } from "../../types";
 
 function DefaultTooltip({ children }: DefaultTooltipType) {
@@ -42,6 +44,7 @@ export function Tooltip({
       inline(),
       autoPlacement({ allowedPlacements }),
       offset(customOffset),
+      shift(),
       arrow({
         element: arrowRef,
       }),
