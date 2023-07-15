@@ -5,7 +5,7 @@ import { IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 
 const BadgeClasses = tv({
-  base: "rounded-md px-2.5 py-0.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
+  base: "rounded-md h-7 px-2.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
   variants: {
     variant: {
       primary: "bg-zinc-950 text-white",
@@ -16,8 +16,8 @@ const BadgeClasses = tv({
       error: "bg-red-600 text-white",
     },
     size: {
-      md: "text-sm",
-      lg: "text-base",
+      md: "text-sm h-7 ",
+      lg: "text-base [&>button>*]:text-base",
     },
     hasClearAction: {
       true: "pr-1.5 gap-x-0.5",
@@ -36,8 +36,8 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
         backgroundColor: customColor,
       }}
       tabIndex={0}>
-      <span>{label}</span>
-      {clearAction ? <Button hasNoBackground icon={IconEnum.close} iconSize={14} onClick={clearAction} /> : null}
+      <span className="h-full">{label}</span>
+      {clearAction ? <Button hasNoBackground icon={IconEnum.close} onClick={clearAction} /> : null}
     </span>
   );
 }
