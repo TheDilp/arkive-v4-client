@@ -11,7 +11,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { CharacterPreview } from "../..";
+import { Badge, CharacterPreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -24,6 +24,7 @@ type characterRelationsType = {
   character_fields?: { id: string; value: string | string[] }[];
   related_to?: { id: string; relation_type: string }[];
   related_from?: { id: string; relation_type: string }[];
+  tags?: { id: string }[];
   image?: { id: string | null };
 };
 
@@ -163,7 +164,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     "characters",
     {
       data: {},
-      relations: { character_fields: true, relationships: true },
+      relations: { character_fields: true, relationships: true, tags: true },
       fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
     },
     {
@@ -376,6 +377,36 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           )}
         </ul>
       ) : null}
+      {selectedTab === 3 ? (
+        <div className="flex flex-col gap-y-2">
+          <Search
+            name="tags"
+            onChange={({ name, label, value, color }) =>
+              handleChange({
+                name,
+                value: (character?.tags || []).concat({
+                  title: label as string,
+                  id: value,
+                  project_id: project_id as string,
+                  color: color as string,
+                }),
+              })
+            }
+            placeholder="Search tags"
+            searchEntity="tags"
+          />
+
+          <div className="flex flex-wrap gap-2">
+            {character?.tags?.length
+              ? character.tags.map((tag) => (
+                  <div key={tag.id} className="w-fit">
+                    <Badge customColor={tag.color} label={tag.title} size="lg" />
+                  </div>
+                ))
+              : null}
+          </div>
+        </div>
+      ) : null}
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled(character)}
@@ -402,10 +433,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             } else
               await create(
                 {
-                  data: omit(character, ["character_fields", "related_to", "related_from"]),
+                  data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
                   relations: {
                     character_fields: character?.character_fields,
                     related_to: character?.related_to,
+                    tags: character?.tags,
                   },
                 },
                 {

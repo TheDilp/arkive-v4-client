@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+import { TagType } from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationshipType {
@@ -29,6 +30,7 @@ export interface CharacterType {
   monthOfBirth?: number;
   yearOfBirth?: number;
   character_fields?: { id: string; value: string | string[]; template_id: string }[];
+  tags?: TagType[];
   related_to?: {
     id: string;
     first_name: string;

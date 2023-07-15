@@ -2,7 +2,7 @@ import { IconOptions } from "../../../utils";
 import { BaseFormComponentType, SearchableEntities } from "../..";
 
 export interface SearchType extends BaseFormComponentType {
-  value: string | string[] | undefined | null;
+  value?: string | string[] | undefined | null;
   searchEntity: SearchableEntities;
   name: string;
   label?: string;
