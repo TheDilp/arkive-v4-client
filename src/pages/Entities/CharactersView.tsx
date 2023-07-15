@@ -101,7 +101,7 @@ function createColumns(
                   setDrawer((prev) => ({
                     ...prev,
                     data: row.original,
-                    title: "Edit character",
+                    title: `Edit character - ${getCharacterFullName(row.original.first_name, "", row.original?.last_name)}`,
                     size: "lg",
                     type: "characters",
                   }));

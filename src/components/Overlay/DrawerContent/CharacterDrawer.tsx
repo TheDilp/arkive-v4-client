@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetAllEntities, useGetImages, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue, SelectOptionType } from "../../../types";
 import {
-  CharacterType,
-  FieldTemplate,
-  FieldType,
-  InputOnChangeValue,
-  onChangeValue,
-  RelationshipType,
-  SelectOptionType,
-} from "../../../types";
-import { BaseCharacterRelationshipOptionsEnum, getImageURL, IconEnum, sortEntities, useNotifications } from "../../../utils";
+  BaseCharacterRelationshipOptionsEnum,
+  getCharacterFullName,
+  getImageURL,
+  IconEnum,
+  sortEntities,
+  useNotifications,
+} from "../../../utils";
+import { CharacterPreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout/Tabs";
@@ -76,36 +76,47 @@ function CharacterFieldInputs({
 }
 
 function RelationshipRow({
+  current_character_first_name,
   relation_type,
-  character_b_name,
-  character_b_id,
+  character_name,
+  portrait_id,
+  id,
   handleChange,
   handleRemove,
   index,
-}: RelationshipType & {
+  relationship_row_type,
+}: {
+  id: string;
+  current_character_first_name?: string;
+  character_name: string;
+  relation_type: string;
+  portrait_id?: string;
   index: number;
+  relationship_row_type: "related_to" | "related_from";
   handleChange: ({ name, value }: InputOnChangeValue | onChangeValue) => void;
-  handleRemove: (id: string) => void;
+  handleRemove: (char_id: string) => void;
 }) {
   return (
     <li className="flex items-center gap-x-2">
-      <div className="flex-1">
-        <Input
-          isDisabled
-          name="character_b_name"
-          onChange={({ value }) => {
-            handleChange({ name: `relationships[${index}].character_b_id`, value });
-          }}
-          placeholder="Search character"
-          value={character_b_name}
-        />
+      <div className="flex flex-1 items-center">
+        <CharacterPreview character_name={character_name} image_id={portrait_id} />
+        <span className="font-light">is {current_character_first_name || "this character"}&apos;s </span>
       </div>
       <div className="max-w-[10rem] flex-1">
         <Select
-          name={`relationships[${index}].relation_type`}
+          isDisabled={relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")}
+          name={`${relationship_row_type}[${index}].relation_type`}
           onChange={handleChange}
-          options={BaseCharacterRelationshipOptionsEnum}
-          value={relation_type}
+          options={
+            relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")
+              ? [{ label: "Child", value: "child" }]
+              : BaseCharacterRelationshipOptionsEnum
+          }
+          value={
+            relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")
+              ? "child"
+              : relation_type
+          }
         />
       </div>
       <div className="max-w-fit flex-1">
@@ -113,7 +124,7 @@ function RelationshipRow({
           hasNoBackground
           icon={IconEnum.trash}
           onClick={() => {
-            handleRemove(character_b_id);
+            handleRemove(id);
           }}
           variant="error"
         />
@@ -131,7 +142,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     "characters",
     {
       data: {},
-      relations: { character_fields: true },
+      relations: { character_fields: true, relationships: true },
       fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
     },
     {
@@ -149,11 +160,20 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const { mutateAsync: create } = useCreateEntity<{
     data: insertCharacterType;
-    relations?: { character_fields?: { id: string; value: string | string[] }[]; image?: { id: string | null } };
+    relations?: {
+      character_fields?: { id: string; value: string | string[] }[];
+      relationships: { id: string; relation_type: string }[];
+      image?: { id: string | null };
+    };
   }>("characters");
   const { mutateAsync: update } = useUpdateEntity<{
     data: insertCharacterType;
-    relations?: { character_fields?: { id: string; value: string | string[] }[] };
+    relations?: {
+      character_fields?: { id: string; value: string | string[] }[];
+      related_to?: { id: string; relation_type: string }[];
+      related_from?: { id: string; relation_type: string }[];
+      image?: { id: string | null };
+    };
   }>("characters", project_id as string);
 
   const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
@@ -270,7 +290,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           <div className="flex items-center justify-between">
             <Search
               onChange={({ label, value }) => {
-                if (character?.relationships?.some((relationship) => relationship?.character_b_id === value)) {
+                if (character?.related_to?.some((relationship) => relationship?.id === value)) {
                   createNotifications({
                     id: crypto.randomUUID(),
                     title: "Cannot add same character more than once as a relationship.",
@@ -281,12 +301,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   return;
                 }
                 handleChange({
-                  name: "relationships",
-                  value: (character?.relationships || []).concat({
-                    character_a_id: data?.id || "",
-                    character_b_id: value,
+                  name: "related_to",
+                  value: (character?.related_to || []).concat({
+                    id: value,
+                    first_name: label,
                     relation_type: "",
-                    character_b_name: label,
                   }),
                 });
               }}
@@ -294,18 +313,50 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             />
           </div>
           <ul className="flex flex-col gap-y-2">
-            {character?.relationships?.length
-              ? character?.relationships?.map((relationship, index) => (
+            {character?.related_to?.length
+              ? character?.related_to?.map((relationship, index) => (
                   <RelationshipRow
-                    key={`${relationship.character_a_id}-${relationship.character_b_id}`}
+                    key={`${relationship.id}-${relationship.id}`}
+                    character_name={getCharacterFullName(
+                      relationship.first_name,
+                      relationship?.nickname,
+                      relationship?.last_name,
+                    )}
+                    current_character_first_name={character.first_name}
                     handleChange={handleChange}
                     handleRemove={(character_b_id: string) =>
                       handleChange({
-                        name: "relationships",
-                        value: (character?.relationships || []).filter((r) => r.character_b_id !== character_b_id),
+                        name: "related_to",
+                        value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
                       })
                     }
                     index={index}
+                    relationship_row_type="related_to"
+                    {...relationship}
+                  />
+                ))
+              : null}
+          </ul>
+          <ul className="flex flex-col gap-y-2">
+            {character?.related_from?.length
+              ? character?.related_from?.map((relationship, index) => (
+                  <RelationshipRow
+                    key={`${relationship.id}-${relationship.id}`}
+                    character_name={getCharacterFullName(
+                      relationship.first_name,
+                      relationship?.nickname,
+                      relationship?.last_name,
+                    )}
+                    current_character_first_name={character.first_name}
+                    handleChange={handleChange}
+                    handleRemove={(character_b_id: string) =>
+                      handleChange({
+                        name: "related_from",
+                        value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
+                      })
+                    }
+                    index={index}
+                    relationship_row_type="related_from"
                     {...relationship}
                   />
                 ))
@@ -359,14 +410,43 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (character) {
-            if (character?.id)
-              await update({
-                data: omit(character, ["character_fields"]),
-                relations: { character_fields: fields },
-              });
-            else await create({ data: omit(character, ["character_fields"]), relations: { character_fields: fields } });
+            if (character?.id) {
+              await update(
+                {
+                  data: {
+                    ...omit(character, ["character_fields", "relationships", "related_to", "related_from"]),
+                    project_id: project_id as string,
+                  },
+                  relations: {
+                    character_fields: fields,
+                    related_to: character?.related_to,
+                    related_from: character?.related_from,
+                  },
+                },
+                {
+                  onSettled: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                },
+              );
+            }
+            //  else
+            // await create(
+            //   {
+            //     data: omit(character, ["character_fields", "relationships"]),
+            //     relations: {
+            //       character_fields: fields,
+            //       relationships:
+            //         character?.relationships?.map((r) => ({ id: r.character_b_id, relation_type: r.relation_type })) || [],
+            //     },
+            //   },
+            //   {
+            //     onSettled: (res) => {
+            //       if (res?.ok) resetDrawerAtom();
+            //     },
+            //   },
+            // );
           }
-          resetDrawerAtom();
         }}
         variant="success"
       />

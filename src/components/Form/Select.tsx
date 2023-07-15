@@ -76,7 +76,7 @@ const SelectClasses = tv({
     {
       slots: ["select"],
       isDisabled: true,
-      class: "bg-zinc-900 text-zinc-100 cursor-not-allowed border-zinc-700",
+      class: "bg-zinc-700 text-zinc-400 cursor-not-allowed select-none border-zinc-700",
     },
     {
       slots: ["select"],
@@ -188,6 +188,7 @@ export function Select({
   isLoading,
   value,
   name,
+  isDisabled,
   options = [],
   isMultiple,
   onChange,
@@ -205,11 +206,11 @@ export function Select({
     optionsContainer,
     helperText: helperTextClasses,
     placeholder: placeholderClasses,
-  } = SelectClasses({ variant, isDisabled: !options.length, size, isOpen });
+  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen });
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
     open: isOpen,
-    onOpenChange: options.length !== 0 ? setIsOpen : () => {},
+    onOpenChange: options.length !== 0 && !isDisabled ? setIsOpen : () => {},
     whileElementsMounted: autoUpdate,
     middleware: [
       offset({ mainAxis: -3 }),

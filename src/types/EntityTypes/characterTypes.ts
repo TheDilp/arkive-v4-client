@@ -29,5 +29,20 @@ export interface CharacterType {
   monthOfBirth?: number;
   yearOfBirth?: number;
   character_fields?: { id: string; value: string | string[]; template_id: string }[];
-  relationships?: RelationshipType[];
+  related_to?: {
+    id: string;
+    first_name: string;
+    nickname?: string;
+    last_name?: string;
+    relation_type: string;
+    portrait_id?: string;
+  }[];
+  related_from?: {
+    id: string;
+    first_name: string;
+    nickname?: string;
+    last_name?: string;
+    relation_type: string;
+    portrait_id?: string;
+  }[];
 }

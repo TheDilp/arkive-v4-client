@@ -5,7 +5,7 @@ import { tv } from "tailwind-variants";
 import { useUploadAsset } from "../../../hooks";
 import { AssetType, Size } from "../../../types";
 import { getPreviewImageURLs, IconEnum } from "../../../utils";
-import ImagePreview from "../../DataDisplay/ImagePreview";
+import { ImagePreview } from "../../DataDisplay/ImagePreview";
 import { Button, ImageUpload } from "../../Form";
 
 const ImageUploadClasses = tv({

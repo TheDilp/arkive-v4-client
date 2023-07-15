@@ -16,8 +16,8 @@ export function capitalizeSentence(sentence: string): string {
   return sentence.toUpperCase();
 }
 
-export function getCharacterFullName(first_name: string, last_name: string): string {
-  return `${first_name} ${last_name || ""}`;
+export function getCharacterFullName(first_name: string, nickname?: string, last_name?: string): string {
+  return `${first_name} ${nickname || ""} ${last_name || ""}`;
 }
 
 export function getSentenceCase(field: string) {

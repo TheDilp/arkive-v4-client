@@ -99,7 +99,7 @@ export function Drawer() {
   return (
     <div ref={drawerRef} className={base()}>
       <h3 className={title()}>
-        <span>{drawer.title}</span>
+        <span className="truncate">{drawer.title}</span>
         <div className="w-min">
           <Button hasNoBackground icon={IconEnum.close} iconSize={22} onClick={resetDrawerAtom} />
         </div>
