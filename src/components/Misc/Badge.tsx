@@ -16,7 +16,7 @@ const BadgeClasses = tv({
       error: "bg-red-600 text-white",
     },
     size: {
-      md: "text-sm h-7 ",
+      md: "text-sm h-full",
       lg: "text-base [&>button>*]:text-base",
     },
     hasClearAction: {

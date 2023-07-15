@@ -180,8 +180,14 @@ export function CharactersView() {
     const timeout = setTimeout(() => {
       if (filter) {
         dispatch({
+          type: "clearAllFilters",
+        });
+        dispatch({
           type: "setFilter",
-          payload: { and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }] },
+          payload: {
+            and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
+            field: "first_name",
+          },
         });
       }
     }, 750);
