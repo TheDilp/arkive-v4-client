@@ -1,8 +1,8 @@
 import { tv } from "tailwind-variants";
 
-import { Button } from "../Form/Button";
 import { BadgeType } from "../../types";
 import { IconEnum } from "../../utils";
+import { Button } from "../Form/Button";
 
 const BadgeClasses = tv({
   base: "rounded-md px-2.5 py-0.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
@@ -15,19 +15,26 @@ const BadgeClasses = tv({
       warning: "bg-orange-600 text-white",
       error: "bg-red-600 text-white",
     },
+    size: {
+      md: "text-sm",
+      lg: "text-base",
+    },
     hasClearAction: {
       true: "pr-1.5 gap-x-0.5",
     },
   },
 });
 
-export function Badge({ label, variant = "primary", clearAction }: BadgeType) {
+export function Badge({ label, size = "md", variant = "primary", clearAction, customColor }: BadgeType) {
   return (
     <span
-      className={BadgeClasses({ variant, hasClearAction: !!clearAction })}
+      className={BadgeClasses({ variant, hasClearAction: !!clearAction, size })}
       onClick={clearAction}
       onKeyDown={() => {}}
       role="button"
+      style={{
+        backgroundColor: customColor,
+      }}
       tabIndex={0}>
       <span>{label}</span>
       {clearAction ? <Button hasNoBackground icon={IconEnum.close} iconSize={14} onClick={clearAction} /> : null}
