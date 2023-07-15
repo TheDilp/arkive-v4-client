@@ -411,7 +411,14 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             {character?.tags?.length
               ? character.tags.map((tag) => (
                   <div key={tag.id} className="w-fit">
-                    <Badge customColor={tag.color} label={tag.title} size="lg" />
+                    <Badge
+                      clearAction={() => {
+                        handleChange({ name: "tags", value: (character?.tags || []).filter((t) => t.id !== tag.id) });
+                      }}
+                      customColor={tag.color}
+                      label={tag.title}
+                      size="lg"
+                    />
                   </div>
                 ))
               : null}
@@ -428,11 +435,12 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             if (character?.id) {
               await update(
                 {
-                  data: omit(character, ["character_fields", "related_to", "related_from"]),
+                  data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
                   relations: {
                     character_fields: character?.character_fields,
                     related_to: character?.related_to,
                     related_from: character?.related_from,
+                    tags: character?.tags,
                   },
                 },
                 {
