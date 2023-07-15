@@ -20,6 +20,25 @@ import Alert from "../../Misc/Alert";
 
 type insertCharacterType = Partial<CharacterType> & { project_id: string };
 type updateCharacterType = Partial<CharacterType>;
+type characterRelationsType = {
+  character_fields?: { id: string; value: string | string[] }[];
+  related_to?: { id: string; relation_type: string }[];
+  related_from?: { id: string; relation_type: string }[];
+  image?: { id: string | null };
+};
+function isSaveDisabled(character: Partial<CharacterType> & characterRelationsType) {
+  if (!character?.first_name) return true;
+  if (character?.related_from?.length) {
+    if (character?.related_from?.some((rel) => !rel?.relation_type)) return true;
+  }
+  if (character?.related_to?.length) {
+    if (character?.related_to?.some((rel) => !rel?.relation_type)) return true;
+  }
+  if (character?.character_fields?.length) {
+    if (character?.character_fields?.some((field) => !field?.value)) return true;
+  }
+  return false;
+}
 
 function CharacterFieldInputs({
   id,
@@ -161,20 +180,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const { mutateAsync: create } = useCreateEntity<{
     data: insertCharacterType;
-    relations?: {
-      character_fields?: { id: string; value: string | string[] }[];
-      relationships: { id: string; relation_type: string }[];
-      image?: { id: string | null };
-    };
+    relations?: characterRelationsType;
   }>("characters");
   const { mutateAsync: update } = useUpdateEntity<{
     data: updateCharacterType;
-    relations?: {
-      character_fields?: { id: string; value: string | string[] }[];
-      related_to?: { id: string; relation_type: string }[];
-      related_from?: { id: string; relation_type: string }[];
-      image?: { id: string | null };
-    };
+    relations?: characterRelationsType;
   }>("characters", project_id as string);
 
   const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
@@ -407,7 +417,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       ) : null}
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={!character?.first_name}
+        isDisabled={isSaveDisabled(character)}
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (character) {
