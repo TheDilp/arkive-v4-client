@@ -19,6 +19,7 @@ import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
 
 type insertCharacterType = Partial<CharacterType> & { project_id: string };
+type updateCharacterType = Partial<CharacterType>;
 
 function CharacterFieldInputs({
   id,
@@ -167,7 +168,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     };
   }>("characters");
   const { mutateAsync: update } = useUpdateEntity<{
-    data: insertCharacterType;
+    data: updateCharacterType;
     relations?: {
       character_fields?: { id: string; value: string | string[] }[];
       related_to?: { id: string; relation_type: string }[];
@@ -413,10 +414,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             if (character?.id) {
               await update(
                 {
-                  data: {
-                    ...omit(character, ["character_fields", "relationships", "related_to", "related_from"]),
-                    project_id: project_id as string,
-                  },
+                  data: omit(character, ["character_fields", "relationships", "related_to", "related_from"]),
                   relations: {
                     character_fields: fields,
                     related_to: character?.related_to,
