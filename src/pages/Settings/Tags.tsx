@@ -1,11 +1,11 @@
-import { useParams } from "react-router-dom";
-import { useGetAllEntities, useTable } from "../../hooks";
-import { Button, Dropdown, Table, TablePageLayout, createColumnHelper } from "../../components";
-import { IconEnum, NameFilters, dialogAtom, drawerAtom, useSetAtom } from "../../utils";
 import { Dispatch, SetStateAction } from "react";
-import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
+import { useParams } from "react-router-dom";
 
-type Props = {};
+import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { useGetAllEntities, useTable } from "../../hooks";
+import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
+import { dialogAtom, drawerAtom, IconEnum, NameFilters, useSetAtom } from "../../utils";
+
 const columnHelper = createColumnHelper<TagType>();
 
 function createColumns(
@@ -15,6 +15,15 @@ function createColumns(
   return [
     columnHelper.accessor("title", {
       id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+    }),
+    columnHelper.accessor("color", {
+      id: "color",
       header: "Title",
       cell: (info) => info.getValue(),
       meta: {
@@ -74,13 +83,14 @@ function createColumns(
   ];
 }
 
-export function Tags({}: Props) {
+export function Tags() {
   const { project_id } = useParams();
   const { data } = useGetAllEntities({ data: { project_id } }, "tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
   const [, dispatch] = useTable({});
+
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">
