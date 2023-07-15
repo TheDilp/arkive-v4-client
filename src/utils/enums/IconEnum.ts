@@ -1,5 +1,3 @@
-import { ValueOf } from "../../types/utilTypes";
-
 export const IconEnum = {
   // Item icons
   home: "ph:house" as const,
@@ -69,5 +67,3 @@ export const IconEnum = {
   menu_open: "mdi:menu-open" as const,
   error: "ph:warning-circle" as const,
 };
-
-export type IconOptions = ValueOf<typeof IconEnum>; // string | number;

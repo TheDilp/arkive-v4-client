@@ -1,6 +1,6 @@
 import { IconEnum } from "./IconEnum";
 
-export const navItems = [
+export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
   { icon: IconEnum.document, navigate: "documents", tooltip: "Documents" },
   { icon: IconEnum.map, navigate: "maps", tooltip: "Maps" },

@@ -64,6 +64,7 @@ export function Sidebar() {
           <Tooltip
             allowedPlacements={["top", "top-start", "top-end", "right", "right-start", "right-end"]}
             arrowColor="#27272A"
+            closeOnClick
             content={
               <div className="w-fit rounded border border-zinc-700 bg-zinc-800 py-2 shadow">
                 <ul className="w-max gap-y-4 font-lato text-lg text-white">
