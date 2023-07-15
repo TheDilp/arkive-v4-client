@@ -38,7 +38,8 @@ import { tv } from "tailwind-variants";
 
 import { useSearch } from "../../hooks";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { IconEnum } from "../../utils";
+import { getImageURL, IconEnum } from "../../utils";
+import { Avatar } from "..";
 import { Button } from ".";
 
 interface ItemProps {
@@ -48,11 +49,12 @@ interface ItemProps {
 
 const SearchClasses = tv({
   slots: {
-    base: "flex w-full",
-    input:
-      "flex h-10 w-full items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-l-md p-2 text-base outline-none placeholder:italic",
+    base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center px-2 h-10",
+    input: "flex h-10 w-full items-center justify-center bg-zinc-900 p-2 text-base outline-none placeholder:italic",
     label: "text-sm font-medium truncate block pl-1 min-h-[20px]",
-    buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none",
+    buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
+    optionsContainer:
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
   },
   variants: {
     variant: {
@@ -99,6 +101,11 @@ const SearchClasses = tv({
         input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
+    isAutocomplete: {
+      true: {
+        base: "rounded-r-md",
+      },
+    },
   },
 });
 
@@ -137,24 +144,25 @@ const SearchItem = tv({
 const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(({ children, active, ...rest }, ref) => {
   const id = useId();
   return (
-    <div ref={ref} aria-selected={active} className={SearchItem()} id={id} role="option" {...rest}>
+    <div ref={ref} aria-selected={active} className={SearchItem({ isActive: active })} id={id} role="option" {...rest}>
       {children}
     </div>
   );
 });
 
-export function Search({ placeholder, label, onChange }: SearchType) {
+export function Search({ placeholder, label, isAutocomplete, searchEntity, name, value, onChange }: SearchType) {
   const { project_id } = useParams();
-  const { base, input, label: labelClasses, buttonContainer } = SearchClasses();
+  const { base, input, label: labelClasses, buttonContainer, optionsContainer } = SearchClasses({ isAutocomplete });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
-  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string }>(
+
+  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; image?: string }>(
     { data: { search_term: inputValue } },
-    "characters",
+    searchEntity,
     project_id as string,
     {
       enabled: false,
@@ -198,33 +206,89 @@ export function Search({ placeholder, label, onChange }: SearchType) {
 
   return (
     <>
-      <div className={base()}>
+      <div
+        className={base()}
+        {...getReferenceProps({
+          ref: refs.setReference,
+        })}>
         {label ? <div className={labelClasses()}>{label}</div> : null}
+        {searchEntity === "images" && value ? (
+          <Avatar
+            image={getImageURL(project_id as string, "images", value as string)}
+            imageLoading="lazy"
+            isTooltipDisabled
+            label={label || ""}
+            size="xs"
+          />
+        ) : null}
         <input
           ref={inputRef}
+          autoComplete="one-time-code"
           className={input()}
           name="search"
           onChange={(e) => {
+            if (value) {
+              e.preventDefault();
+              return;
+            }
             setInputValue(e.target.value);
           }}
-          {...getReferenceProps({
-            ref: refs.setReference,
-          })}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && inputValue) refetch();
+            if (e.key === "Enter" && inputValue) {
+              e.preventDefault();
+              if (!value && activeIndex === null) {
+                refetch();
+              } else if (!value && typeof activeIndex === "number") {
+                const item = data?.data?.[activeIndex];
+                if (item) {
+                  onChange({ name, value: item.value, label: item.label });
+                  if (!isAutocomplete) {
+                    setInputValue("");
+                  } else {
+                    setInputValue(item.label);
+                  }
+                  setOpen(false);
+                  remove();
+                  inputRef.current?.focus();
+                }
+              }
+            }
+            if (e.key === "Backspace" && inputValue) {
+              if (value) {
+                e.preventDefault();
+                onChange({ name, value: "", label: "" });
+                setInputValue("");
+              }
+              remove();
+            }
+            if (e.key === "ArrowUp") {
+              if (activeIndex === 0 && data?.data) {
+                setActiveIndex(data.data.length - 1);
+              } else {
+                setActiveIndex((prev) => (prev ? prev - 1 : 0));
+              }
+            }
+            if (e.key === "ArrowDown") {
+              if (activeIndex === data?.data?.length) {
+                setActiveIndex(0);
+              } else setActiveIndex((prev) => prev ?? 0 + 1);
+            }
           }}
           placeholder={placeholder}
           value={inputValue}
         />
-        <div className={buttonContainer()}>
-          <Button
-            icon={isFetching ? IconEnum.loading : IconEnum.search}
-            isDisabled={!inputValue}
-            isLoading={isFetching}
-            onClick={() => refetch()}
-            variant="info"
-          />
-        </div>
+
+        {isAutocomplete ? null : (
+          <div className={buttonContainer()}>
+            <Button
+              icon={isFetching ? IconEnum.loading : IconEnum.search}
+              isDisabled={!inputValue}
+              isLoading={isFetching}
+              onClick={() => refetch()}
+              variant="info"
+            />
+          </div>
+        )}
       </div>
       <FloatingPortal>
         {open && (
@@ -234,7 +298,7 @@ export function Search({ placeholder, label, onChange }: SearchType) {
                 ref: refs.setFloating,
                 style: floatingStyles,
               })}
-              className="z-[999999] max-w-full bg-zinc-900">
+              className={optionsContainer()}>
               {data?.data?.map((item, index) => (
                 <Item
                   {...getItemProps({
@@ -243,15 +307,28 @@ export function Search({ placeholder, label, onChange }: SearchType) {
                       listRef.current[index] = node;
                     },
                     onClick() {
-                      setInputValue("");
+                      onChange({ name, value: item.value, label: item.label });
+                      if (!isAutocomplete) {
+                        setInputValue("");
+                      } else {
+                        setInputValue(item.label);
+                      }
                       setOpen(false);
                       remove();
-                      onChange(item);
-                      refs.domReference.current?.focus();
+                      inputRef.current?.focus();
                     },
                   })}
                   active={activeIndex === index}>
-                  <span className="w-full max-w-full truncate">{item.label}</span>
+                  {searchEntity === "images" ? (
+                    <Avatar
+                      image={getImageURL(project_id as string, "images", item?.value)}
+                      imageLoading="lazy"
+                      isTooltipDisabled
+                      label={label || ""}
+                      size="xs"
+                    />
+                  ) : null}
+                  <span className="truncate">{item.label}</span>
                 </Item>
               ))}
             </div>

@@ -25,6 +25,6 @@ export type AvailableSubEntityType =
   | "random_table_options"
   | "character_fields";
 
-export type SearchableEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "edges";
+export type SearchableEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "edges" | "images";
 
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;

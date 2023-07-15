@@ -17,7 +17,7 @@ export function capitalizeSentence(sentence: string): string {
 }
 
 export function getCharacterFullName(first_name: string, nickname?: string, last_name?: string): string {
-  return `${first_name} ${nickname || ""} ${last_name || ""}`;
+  return `${first_name.trim()}${nickname ? ` ${nickname} ` : " "}${last_name || ""}`;
 }
 
 export function getSentenceCase(field: string) {

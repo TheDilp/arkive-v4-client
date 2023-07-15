@@ -2,12 +2,11 @@ import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetAllEntities, useGetImages, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue, SelectOptionType } from "../../../types";
+import { useCreateEntity, useGetAllEntities, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
   getCharacterFullName,
-  getImageURL,
   IconEnum,
   sortEntities,
   useNotifications,
@@ -185,20 +184,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     relations?: characterRelationsType;
   }>("characters", project_id as string);
 
-  const { data: images = [], isFetching: isFetchingImages } = useGetImages(project_id as string, "images", {
-    select: (res): SelectOptionType[] => {
-      if (res?.data && res?.data?.length) {
-        return res.data.map((img) => ({
-          label: img.title,
-          value: img.id,
-          image: {
-            link: getImageURL(project_id as string, "images", img.id),
-          },
-        }));
-      }
-      return [];
-    },
-  });
   const { data: templates } = useGetAllEntities<FieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
@@ -241,11 +226,9 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             </div>
           </div>
           <ImageSelect
-            isLoading={isFetchingImages}
             label="Select character avatar (optional)"
             name="portrait_id"
             onChange={handleChange}
-            options={images}
             type="images"
             value={character?.portrait_id ?? ""}
           />
@@ -291,6 +274,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         <>
           <div className="flex items-center justify-between">
             <Search
+              name="portrait_id"
               onChange={({ label, value }) => {
                 if (character?.related_to?.some((relationship) => relationship?.id === value)) {
                   createNotifications({
@@ -302,16 +286,20 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   });
                   return;
                 }
+                const [first_name, last_name] = (label || "").split(" ");
                 handleChange({
                   name: "related_to",
                   value: (character?.related_to || []).concat({
                     id: value,
-                    first_name: label,
+                    first_name,
+                    last_name,
                     relation_type: "",
                   }),
                 });
               }}
               placeholder="Search character"
+              searchEntity="characters"
+              value={character?.portrait_id}
             />
           </div>
           <ul className="flex flex-col gap-y-2">
@@ -319,11 +307,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               ? character?.related_to?.map((relationship, index) => (
                   <RelationshipRow
                     key={`${relationship.id}}`}
-                    character_name={getCharacterFullName(
-                      relationship.first_name,
-                      relationship?.nickname,
-                      relationship?.last_name,
-                    )}
+                    character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
                     current_character_first_name={character.first_name}
                     handleChange={handleChange}
                     handleRemove={(character_b_id: string) =>
@@ -344,11 +328,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               ? character?.related_from?.map((relationship, index) => (
                   <RelationshipRow
                     key={`${relationship.id}`}
-                    character_name={getCharacterFullName(
-                      relationship.first_name,
-                      relationship?.nickname,
-                      relationship?.last_name,
-                    )}
+                    character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
                     current_character_first_name={character.first_name}
                     handleChange={handleChange}
                     handleRemove={(character_b_id: string) =>

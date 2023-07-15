@@ -1,25 +1,25 @@
 import { useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
 
 import { DialogAtomType, ImageSelectType } from "../../types";
 import { dialogAtom, IconEnum } from "../../utils";
-import { Button, Select } from "../Form";
+import { Button, Search } from "../Form";
 
-export function ImageSelect({ name, onChange, options, label, value, isLoading, type }: ImageSelectType) {
+export function ImageSelect({ name, onChange, label, value, type }: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
-
-  const [images, setImages] = useState(options);
-
-  useEffect(() => {
-    if (options?.length) setImages(options);
-  }, [options]);
 
   return (
     <div className="flex w-full flex-col">
       <div className="truncate pl-1 text-sm font-medium text-white">{label || "Select image"}</div>
       <div className="grid grid-cols-6 gap-x-2">
         <div className="col-span-4">
-          <Select hasSearch isLoading={isLoading} name={name} onChange={onChange} options={images} value={value} />
+          <Search
+            isAutocomplete
+            name={name}
+            onChange={onChange}
+            placeholder="Search images"
+            searchEntity="images"
+            value={value}
+          />
         </div>
 
         <div className="col-span-2">

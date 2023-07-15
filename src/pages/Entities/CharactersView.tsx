@@ -95,7 +95,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Quick edit character",
+                label: "Edit character",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -189,7 +189,7 @@ export function CharactersView() {
     return () => {
       clearTimeout(timeout);
     };
-  }, [filter]);
+  }, [filter, dispatch]);
 
   return (
     <TablePageLayout>
