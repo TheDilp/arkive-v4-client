@@ -59,7 +59,7 @@ const TableClasses = tv({
     content: "flex flex-1 items-center h-full truncate max-w-full px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex lg:h-10 h-10 max-h-8 lg:max-h-10 items-center justify-between border-zinc-600 pl-2 pt-0.5 sticky max-w-full",
+      "flex lg:h-10 h-10 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky max-w-full",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
