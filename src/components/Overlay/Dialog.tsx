@@ -8,22 +8,16 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import ImagePreview from "../DataDisplay/ImagePreview";
-import { ImageUpload } from "../Form";
+import { dialogAtom, IconEnum, useAtomValue, useResetAtom } from "../../utils";
 import { Button } from "../Form/Button";
 import { DeleteEntityDialog } from "./DialogContent";
-import { AssetType, Size } from "../../types";
-import { useUploadAsset } from "../../hooks";
-import { IconEnum, dialogAtom, getPreviewImageURLs, useAtomValue, useResetAtom } from "../../utils";
 import { ImageUploadDialog } from "./DialogContent/ImageUploadDialog";
 
 const DialogClasses = tv({
   slots: {
-    container: "pointer-events-none flex h-full w-full",
+    container: "pointer-events-none flex h-full w-full animate-in fade-in",
     base: "flex flex-col pointer-events-auto rounded bg-zinc-700 text-white mx-4 border-zinc-600 border-b shadow-lg p-4",
     titleContainer: "flex items-center",
     title: "w-full flex justify-center truncate font-merriweather text-3xl select-none",
