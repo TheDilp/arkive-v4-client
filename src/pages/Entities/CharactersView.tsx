@@ -95,7 +95,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit character",
+                label: "Quick edit character",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({

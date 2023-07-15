@@ -291,33 +291,23 @@ export function Select({
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
             <div ref={refs.setFloating} className={optionsContainer()} style={floatingStyles} {...getFloatingProps()}>
-              {options.map((opt, i) => (
-                <div
-                  key={opt.value}
-                  ref={(node) => {
-                    listRef.current[i] = node;
-                  }}
-                  aria-selected={i === activeIndex}
-                  className={SelectOption({
-                    isActive: activeIndex === i,
-                    isSelected: Array.isArray(value) ? value.includes(options[i].value) : value === options[i].value,
-                    size,
-                  })}
-                  role="option"
-                  tabIndex={i === activeIndex ? 0 : -1}
-                  {...getItemProps({
-                    onClick: () =>
-                      onClick({
-                        isMultiple,
-                        name,
-                        index: i,
-                        onChange,
-                        options,
-                        value,
-                        setIsOpen,
-                      }),
-                    onKeyDown: (e) => {
-                      if (e.key === "Enter") {
+              {options.map((opt, i) => {
+                return (
+                  <div
+                    key={`${opt}-${i.toFixed()}`}
+                    ref={(node) => {
+                      listRef.current[i] = node;
+                    }}
+                    aria-selected={i === activeIndex}
+                    className={SelectOption({
+                      isActive: activeIndex === i,
+                      isSelected: Array.isArray(value) ? value.includes(options[i].value) : value === options[i].value,
+                      size,
+                    })}
+                    role="option"
+                    tabIndex={i === activeIndex ? 0 : -1}
+                    {...getItemProps({
+                      onClick: () =>
                         onClick({
                           isMultiple,
                           name,
@@ -326,24 +316,36 @@ export function Select({
                           options,
                           value,
                           setIsOpen,
-                        });
-                      }
-                    },
-                  })}>
-                  {opt?.image ? (
-                    <Avatar
-                      image={opt?.image?.link}
-                      imageLoading="lazy"
-                      isTooltipDisabled
-                      label={label || ""}
-                      shape={opt?.image?.shape}
-                      size="xs"
-                    />
-                  ) : null}
-                  {opt?.icon && !opt?.image ? <Icon fontSize={20} icon={opt.icon} /> : null}
-                  <span className="truncate">{opt.label}</span>
-                </div>
-              ))}
+                        }),
+                      onKeyDown: (e) => {
+                        if (e.key === "Enter") {
+                          onClick({
+                            isMultiple,
+                            name,
+                            index: i,
+                            onChange,
+                            options,
+                            value,
+                            setIsOpen,
+                          });
+                        }
+                      },
+                    })}>
+                    {opt?.image ? (
+                      <Avatar
+                        image={opt?.image?.link}
+                        imageLoading="lazy"
+                        isTooltipDisabled
+                        label={label || ""}
+                        shape={opt?.image?.shape}
+                        size="xs"
+                      />
+                    ) : null}
+                    {opt?.icon && !opt?.image ? <Icon fontSize={20} icon={opt.icon} /> : null}
+                    <span className="truncate">{opt.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </FloatingFocusManager>
         </FloatingPortal>

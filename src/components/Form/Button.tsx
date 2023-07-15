@@ -92,7 +92,7 @@ export function Button({
           <Icon
             className={isLoading ? "animate-spin" : ""}
             fontSize={iconSize}
-            icon={icon || IconEnum.error}
+            icon={isLoading ? IconEnum.loading : icon || IconEnum.error}
             thickness={iconThickness}
           />
         ) : null}

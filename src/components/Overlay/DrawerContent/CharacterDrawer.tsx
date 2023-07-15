@@ -12,7 +12,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { CharacterPreview, Icon } from "../..";
+import { CharacterPreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -176,11 +176,11 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     existingCharacter?.data || { project_id: project_id as string },
   );
 
-  const { mutateAsync: create } = useCreateEntity<{
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
     data: insertCharacterType;
     relations?: characterRelationsType;
   }>("characters");
-  const { mutateAsync: update } = useUpdateEntity<{
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: updateCharacterType;
     relations?: characterRelationsType;
   }>("characters", project_id as string);
@@ -209,7 +209,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
-
   useEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
@@ -319,7 +318,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             {character?.related_to?.length
               ? character?.related_to?.map((relationship, index) => (
                   <RelationshipRow
-                    key={`${relationship.id}-${relationship.id}`}
+                    key={`${relationship.id}}`}
                     character_name={getCharacterFullName(
                       relationship.first_name,
                       relationship?.nickname,
@@ -344,7 +343,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             {character?.related_from?.length
               ? character?.related_from?.map((relationship, index) => (
                   <RelationshipRow
-                    key={`${relationship.id}-${relationship.id}`}
+                    key={`${relationship.id}`}
                     character_name={getCharacterFullName(
                       relationship.first_name,
                       relationship?.nickname,
@@ -400,13 +399,14 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled(character)}
+        isLoading={isCreating || isUpdating}
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (character) {
             if (character?.id) {
               await update(
                 {
-                  data: omit(character, ["character_fields", "relationships", "related_to", "related_from"]),
+                  data: omit(character, ["character_fields", "related_to", "related_from"]),
                   relations: {
                     character_fields: character?.character_fields,
                     related_to: character?.related_to,
@@ -419,23 +419,21 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   },
                 },
               );
-            }
-            //  else
-            // await create(
-            //   {
-            //     data: omit(character, ["character_fields", "relationships"]),
-            //     relations: {
-            //       character_fields: fields,
-            //       relationships:
-            //         character?.relationships?.map((r) => ({ id: r.character_b_id, relation_type: r.relation_type })) || [],
-            //     },
-            //   },
-            //   {
-            //     onSettled: (res) => {
-            //       if (res?.ok) resetDrawerAtom();
-            //     },
-            //   },
-            // );
+            } else
+              await create(
+                {
+                  data: omit(character, ["character_fields", "related_to", "related_from"]),
+                  relations: {
+                    character_fields: character?.character_fields,
+                    related_to: character?.related_to,
+                  },
+                },
+                {
+                  onSettled: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                },
+              );
           }
         }}
         variant="success"
