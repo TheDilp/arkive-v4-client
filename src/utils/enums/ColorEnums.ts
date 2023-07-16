@@ -1,5 +1,12 @@
 export const DefaultTagColor = "#1d4ed8";
 export const TagColors = [
+  "#ffffff",
+  "#000000",
+  "#121212",
+  "#3f3f46",
+  "#374151",
+  "#212121",
+  "#595959",
   "#f87171",
   "#ef4444",
   "#dc2626",
