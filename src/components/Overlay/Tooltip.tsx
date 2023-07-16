@@ -61,7 +61,7 @@ export function Tooltip({
       },
     }),
     useClick(context, {
-      enabled: isClickable || false,
+      enabled: isClickable ?? false,
     }),
     useFocus(context),
     useRole(context, { role: "tooltip" }),

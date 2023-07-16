@@ -1,15 +1,17 @@
+/* eslint-disable react/prop-types */
 import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { Button, FolderView } from "../../components";
-import { drawerAtom, IconEnum } from "../../utils";
 import { useGetAllEntities } from "../../hooks";
+import { GraphType } from "../../types";
+import { drawerAtom, IconEnum } from "../../utils";
 
 export function GraphsView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { data } = useGetAllEntities(
+  const { data } = useGetAllEntities<GraphType>(
     {
       pagination: {
         limit: 10,
@@ -17,6 +19,11 @@ export function GraphsView() {
       },
       data: {
         project_id,
+      },
+      fields: ["id", "title", "icon", "is_folder"],
+      orderBy: {
+        field: "is_folder",
+        sort: "asc",
       },
     },
     "graphs",
@@ -42,7 +49,25 @@ export function GraphsView() {
         </div>
       </div>
       <div className="flex-1">
-        <FolderView items={data?.data || []} type="graphs" />
+        <FolderView
+          contextMenuItems={[
+            {
+              title: "Edit graph",
+              icon: IconEnum.edit,
+              onClick: (props) => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  position: "right",
+                  type: "graphs",
+                  title: `Edit graph - ${props?.contextTitle}`,
+                  data: { id: props?.contextId },
+                }));
+              },
+            },
+          ]}
+          items={data?.data || []}
+          type="graphs"
+        />
       </div>
     </div>
   );
