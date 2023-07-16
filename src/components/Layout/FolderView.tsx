@@ -1,5 +1,6 @@
 import { AvailableEntityType } from "../../types";
 import { IconEnum } from "../../utils";
+import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
 import { Icon } from "..";
 
 type EntityItemType = {
@@ -15,22 +16,19 @@ function ItemDisplay({ id, type, is_folder, title, icon, image }: EntityItemType
   return (
     <div className="col-span-1 flex h-36 flex-col items-center justify-center">
       <div>
-        <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || "ph:files"} />
+        <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
       </div>
-      <span className="max-w-full truncate">ajksdjaksjdklasjdklajsdklajsdklajsdklajsdkljs</span>
+      <span className="max-w-full truncate">{title}</span>
     </div>
   );
 }
 
-export function FolderView({ items }: { items: EntityItemType[] }) {
+export function FolderView({ items, type }: { items: EntityItemType[]; type: AvailableEntityType }) {
   return (
     <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
-      <div className="col-span-1 flex h-36 flex-col items-center justify-center">
-        <div>
-          <Icon fontSize={100} icon={IconEnum.folder} />
-        </div>
-        <span className="max-w-full truncate">ajksdjaksjdklasjdklajsdklajsdklajsdklajsdkljs</span>
-      </div>
+      {items.map((item) => (
+        <ItemDisplay key={item.id} icon={item.icon} image={item?.image} title={item.title} type={type} />
+      ))}
     </div>
   );
 }

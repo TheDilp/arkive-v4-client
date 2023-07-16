@@ -3,10 +3,25 @@ import { useParams } from "react-router-dom";
 
 import { Button, FolderView } from "../../components";
 import { drawerAtom, IconEnum } from "../../utils";
+import { useGetAllEntities } from "../../hooks";
 
 export function GraphsView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
+
+  const { data } = useGetAllEntities(
+    {
+      pagination: {
+        limit: 10,
+        page: 0,
+      },
+      data: {
+        project_id,
+      },
+    },
+    "graphs",
+  );
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex w-full items-center justify-end gap-x-2">
@@ -27,7 +42,7 @@ export function GraphsView() {
         </div>
       </div>
       <div className="flex-1">
-        <FolderView />
+        <FolderView items={data?.data || []} type="graphs" />
       </div>
     </div>
   );

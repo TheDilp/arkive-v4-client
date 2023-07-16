@@ -1,17 +1,37 @@
+import { useResetAtom } from "jotai/utils";
+import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useHandleChange } from "../../../hooks";
+import { useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
-import { AvailableNodeShapes, DefaultBoardColor, IconEnum, useNotifications } from "../../../utils";
+import { AvailableNodeShapes, DefaultBoardColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
 import { ColorPicker } from "../ColorPicker";
+
+type insertGraphType = Partial<GraphType> & { project_id: string };
+type updateGraphType = Partial<GraphType>;
+
+type graphRelationsType = {
+  tags?: { id: string }[];
+};
 
 export function GraphDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>({ project_id: project_id as string });
   const { handleChange } = useHandleChange({ data: graph, setData: setGraph });
+  const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
+
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
+    data: insertGraphType;
+    relations?: graphRelationsType;
+  }>("graphs");
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
+    data: updateGraphType;
+    relations?: graphRelationsType;
+  }>("graphs", project_id as string);
+
   return (
     <div className="flex flex-col gap-y-2">
       <div className="w-full">
@@ -109,43 +129,41 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
         // isDisabled={isSaveDisabled(character)}
         // isLoading={isCreating || isUpdating}
         label="Create"
-        // onClick={async () => {
-        //   if (character) {
-        //     if (character?.id) {
-        //       await update(
-        //         {
-        //           data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
-        //           relations: {
-        //             character_fields: character?.character_fields,
-        //             related_to: character?.related_to,
-        //             related_from: character?.related_from,
-        //             tags: character?.tags,
-        //           },
-        //         },
-        //         {
-        //           onSettled: (res) => {
-        //             if (res?.ok) resetDrawerAtom();
-        //           },
-        //         },
-        //       );
-        //     } else
-        //       await create(
-        //         {
-        //           data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
-        //           relations: {
-        //             character_fields: character?.character_fields,
-        //             related_to: character?.related_to,
-        //             tags: character?.tags,
-        //           },
-        //         },
-        //         {
-        //           onSettled: (res) => {
-        //             if (res?.ok) resetDrawerAtom();
-        //           },
-        //         },
-        //       );
-        //   }
-        // }}
+        onClick={async () => {
+          if (graph) {
+            if (graph?.id) {
+              //   await update(
+              //     {
+              //       data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
+              //       relations: {
+              //         character_fields: character?.character_fields,
+              //         related_to: character?.related_to,
+              //         related_from: character?.related_from,
+              //         tags: character?.tags,
+              //       },
+              //     },
+              //     {
+              //       onSettled: (res) => {
+              //         if (res?.ok) resetDrawerAtom();
+              //       },
+              //     },
+              //   );
+            } else
+              await create(
+                {
+                  data: omit(graph, ["tags"]),
+                  relations: {
+                    tags: graph?.tags,
+                  },
+                },
+                {
+                  onSettled: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                },
+              );
+          }
+        }}
         variant="success"
       />
     </div>
