@@ -1,4 +1,4 @@
-export * from "./BoardEnums";
+export * from "./GraphEnums";
 export * from "./ColorEnums";
 export * from "./EntityEnums";
 export * from "./FilterEnum";
