@@ -8,7 +8,7 @@ import { GraphType } from "../../types";
 import { drawerAtom, IconEnum } from "../../utils";
 
 export function GraphsView() {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
 
   const { data } = useGetAllEntities<GraphType>(
@@ -19,11 +19,12 @@ export function GraphsView() {
       },
       data: {
         project_id,
+        item_id,
       },
       fields: ["id", "title", "icon", "is_folder"],
       orderBy: {
         field: "is_folder",
-        sort: "asc",
+        sort: "desc",
       },
     },
     "graphs",

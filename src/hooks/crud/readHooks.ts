@@ -42,7 +42,14 @@ export function useGetAllEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allEntities", request.data.project_id, type, request?.orderBy, request?.filters];
+  const baseQueryKey = [
+    "allEntities",
+    request.data.project_id,
+    type,
+    request.data?.item_id,
+    request?.orderBy,
+    request?.filters,
+  ];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",

@@ -30,6 +30,7 @@ export default function App() {
             <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<SettingsView />} path="settings/:type/*" />
               <Route element={<EntitiesView />} path=":type/*" />
+              <Route element={<EntitiesView />} path=":type/:item_id/*" />
             </Route>
           </Route>
         </Routes>

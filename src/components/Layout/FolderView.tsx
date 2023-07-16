@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { AvailableEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { IconEnum } from "../../utils";
@@ -15,16 +17,18 @@ type EntityItemType = {
 
 function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { type: AvailableEntityType }) {
   return (
-    <div
-      className="col-span-1 flex h-36 cursor-pointer flex-col items-center justify-center hover:text-blue-400"
-      data-context-id={id}
-      data-context-title={title}
-      data-context-type="graphs">
-      <div className="pointer-events-none">
-        <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
+    <Link to={id}>
+      <div
+        className="col-span-1 flex h-36 cursor-pointer flex-col items-center justify-center hover:text-blue-400"
+        data-context-id={id}
+        data-context-title={title}
+        data-context-type="graphs">
+        <div className="pointer-events-none">
+          <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
+        </div>
+        <span className="max-w-full truncate text-white hover:text-white">{title}</span>
       </div>
-      <span className="max-w-full truncate text-white hover:text-white">{title}</span>
-    </div>
+    </Link>
   );
 }
 
