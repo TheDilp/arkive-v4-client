@@ -6,7 +6,7 @@ import { Icon } from "../Misc/Icon";
 
 const CheckboxClasses = tv({
   slots: {
-    base: "relative flex flex-col",
+    base: "relative flex flex-col select-none",
     checkbox: "flex h-6 w-6 items-center justify-center bg-zinc-900 text-white cursor-pointer rounded-md border outline-none",
     label: "text-sm font-medium truncate block",
     helperText: "text-xs truncate block",
