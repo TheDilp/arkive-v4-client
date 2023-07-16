@@ -1,5 +1,7 @@
-import { navbarTitleAtom, useSetAtom } from "../../utils";
+import { useSetAtom } from "jotai";
 import { useEffect } from "react";
+
+import { navbarTitleAtom } from "../../utils";
 
 export function useChangeNavbarTitle(title: string) {
   const setNavbarTitleAtom = useSetAtom(navbarTitleAtom);

@@ -1,9 +1,10 @@
 import { useAtomValue } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { MutableRefObject, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { drawerAtom, IconEnum, useResetAtom } from "../../utils";
+import { drawerAtom, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";

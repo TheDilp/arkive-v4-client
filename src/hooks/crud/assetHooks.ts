@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useResetAtom } from "jotai/utils";
 
 import { AssetType, SelectOptionType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
-import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications, useResetAtom } from "../../utils";
+import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications } from "../../utils";
 
 export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();

@@ -1,10 +1,11 @@
+import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntities, useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { TagType } from "../../../types";
-import { drawerAtom, IconEnum, useResetAtom } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { DefaultTagColor } from "../../../utils/enums/ColorEnums";
 import { Button, Input } from "../../Form";
 import { ColorPicker } from "../ColorPicker";

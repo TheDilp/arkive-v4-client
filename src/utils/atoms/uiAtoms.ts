@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
+
 import { DialogAtomType, DrawerAtomType, NotificationType } from "../../types";
 
 export const navbarTitleAtom = atom<string>("");

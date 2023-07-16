@@ -1,3 +1,4 @@
+import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
 import { useDeleteEntity } from "../../../hooks";
@@ -9,7 +10,6 @@ import {
   getImageURL,
   IconEnum,
   useNotifications,
-  useResetAtom,
 } from "../../../utils";
 import { Button } from "../../Form";
 import { Avatar } from "../../Misc";

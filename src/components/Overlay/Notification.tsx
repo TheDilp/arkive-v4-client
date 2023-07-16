@@ -1,8 +1,9 @@
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { NotificationType } from "../../types";
-import { IconEnum, notificationsAtom, removeNotification, useAtomValue, useSetAtom } from "../../utils";
+import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { Button } from "../Form";
 import { Icon } from "../Misc";
 

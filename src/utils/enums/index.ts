@@ -1,3 +1,5 @@
+export * from "./BoardEnums";
+export * from "./ColorEnums";
 export * from "./EntityEnums";
 export * from "./FilterEnum";
 export * from "./IconEnum";

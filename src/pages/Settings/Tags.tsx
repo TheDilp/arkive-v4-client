@@ -1,10 +1,11 @@
+import { useSetAtom } from "jotai";
 import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useGetAllEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters, useSetAtom } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
 

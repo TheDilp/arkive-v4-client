@@ -1,17 +1,11 @@
+import { SetStateAction } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
-import {
-  drawerAtom,
-  FieldTypesEnum,
-  getSentenceCase,
-  IconEnum,
-  SetStateAction,
-  sortEntities,
-  useResetAtom,
-} from "../../../utils";
+import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, sortEntities } from "../../../utils";
 import { Button, Input, Select } from "../../Form";
 
 type insertTemplateType = Partial<FieldTemplate> & { project_id: string };

@@ -8,9 +8,11 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
+import { useAtomValue } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { tv } from "tailwind-variants";
 
-import { dialogAtom, IconEnum, useAtomValue, useResetAtom } from "../../utils";
+import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 import { DeleteEntityDialog } from "./DialogContent";
 import { ImageUploadDialog } from "./DialogContent/ImageUploadDialog";

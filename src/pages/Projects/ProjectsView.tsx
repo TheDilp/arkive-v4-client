@@ -1,7 +1,9 @@
+import { useSetAtom } from "jotai";
+
 import { Button, Drawer, Navbar, ProjectCard } from "../../components";
 import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { drawerAtom, IconEnum, useSetAtom } from "../../utils";
+import { drawerAtom, IconEnum } from "../../utils";
 
 export default function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);

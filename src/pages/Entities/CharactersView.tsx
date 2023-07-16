@@ -1,3 +1,4 @@
+import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -13,8 +14,6 @@ import {
   IconEnum,
   NameFilters,
   NumberFilters,
-  SetStateAction,
-  useSetAtom,
 } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterType>();
