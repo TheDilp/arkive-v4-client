@@ -116,7 +116,7 @@ export const BoardFontFamilies = [
     value: "Verdana",
   },
 ];
-export const text_h_alignOptions = [
+export const textHAlignOptions = [
   {
     label: "Left",
     value: "left",
@@ -130,7 +130,7 @@ export const text_h_alignOptions = [
     value: "right",
   },
 ];
-export const text_v_alignOptions = [
+export const textVAlignOptions = [
   {
     label: "Top",
     value: "top",
@@ -228,7 +228,7 @@ export const boardNodeShapes = [
     value: "round-octagon",
   },
 ];
-export const boardEdgecurve_styles = [
+export const boardEdgeCurveStyles = [
   {
     label: "Straight",
     value: "straight",
@@ -242,7 +242,7 @@ export const boardEdgecurve_styles = [
     value: "taxi",
   },
 ];
-export const boardEdgeline_styles = [
+export const boardEdgeLineStyles = [
   {
     label: "Solid",
     value: "solid",
@@ -256,7 +256,7 @@ export const boardEdgeline_styles = [
     value: "dotted",
   },
 ];
-export const boardEdgetaxi_directions = [
+export const boardEdgeTaxiDirections = [
   {
     label: "Auto",
     value: "auto",

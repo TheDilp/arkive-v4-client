@@ -51,7 +51,7 @@ const SearchClasses = tv({
   slots: {
     base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center pl-2 h-10",
     input: "flex h-10 w-full items-center justify-center bg-zinc-900 p-2 text-base outline-none placeholder:italic",
-    label: "text-sm font-medium truncate block pl-1 min-h-[20px]",
+    label: "text-sm truncate block pl-1 min-h-[20px]",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
@@ -150,9 +150,18 @@ const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>((
   );
 });
 
-export function Search({ placeholder, label, isAutocomplete, searchEntity, name, value, onChange }: SearchType) {
+export function Search({
+  placeholder,
+  label,
+  isAutocomplete,
+  variant = "primary",
+  searchEntity,
+  name,
+  value,
+  onChange,
+}: SearchType) {
   const { project_id } = useParams();
-  const { base, input, label: labelClasses, buttonContainer, optionsContainer } = SearchClasses({ isAutocomplete });
+  const { base, input, label: labelClasses, buttonContainer, optionsContainer } = SearchClasses({ variant, isAutocomplete });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -219,12 +228,12 @@ export function Search({ placeholder, label, isAutocomplete, searchEntity, name,
 
   return (
     <>
+      {label ? <div className={labelClasses()}>{label}</div> : null}
       <div
         className={base()}
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
-        {label ? <div className={labelClasses()}>{label}</div> : null}
         {searchEntity === "images" && value ? (
           <Avatar
             image={getImageURL(project_id as string, "images", value as string)}

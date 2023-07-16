@@ -1,14 +1,14 @@
 import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
-import { Button } from "../../components";
+import { Button, FolderView } from "../../components";
 import { drawerAtom, IconEnum } from "../../utils";
 
 export function GraphsView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <div className="flex w-full items-center justify-end gap-x-2">
         <div className="w-fit">
           <Button
@@ -25,6 +25,9 @@ export function GraphsView() {
             }
           />
         </div>
+      </div>
+      <div className="flex-1">
+        <FolderView />
       </div>
     </div>
   );

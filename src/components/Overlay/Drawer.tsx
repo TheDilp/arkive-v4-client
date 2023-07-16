@@ -10,6 +10,7 @@ import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
+import { GraphDrawer } from "..";
 
 const DrawerClasses = tv({
   slots: {
@@ -109,6 +110,7 @@ export function Drawer() {
         {drawer.type === "project" ? <ProjectDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
+        {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
       </div>
     </div>
