@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
@@ -63,7 +63,7 @@ export function useGetAllEntities<ReturnType>(
     select: options?.select,
   };
   const queryClient = useQueryClient();
-  if (options?.prefetch) {
+  if (options?.prefetch && configuredOptions?.enabled) {
     queryClient.prefetchQuery({
       queryKey:
         typeof request?.pagination?.page === "number"
@@ -115,6 +115,39 @@ export function useGetSubEntities<ReturnType>(
         method: "GET",
       }),
     configuredOptions,
+  );
+}
+
+export function useGetInfiniteEntities<ReturnType>(
+  request: RequestBodyType,
+  type: AvailableEntityType | AvailableSubEntityType,
+  options?: UseQueryOptions<any> & { prefetch?: boolean },
+) {
+  const baseQueryKey = ["allEntities", "infinite", request.data.project_id, type, request.data?.item_id];
+  async function queryFn(finalRequest: RequestBodyType) {
+    return FetchFunction({
+      method: "POST",
+      body: JSON.stringify(finalRequest),
+      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
+    });
+  }
+  const configuredOptions = {
+    enabled: !!request.data.project_id && (options?.enabled ?? true),
+    staleTime: options?.staleTime,
+    select: options?.select,
+    keepPreviousData: options?.keepPreviousData,
+  };
+
+  return useInfiniteQuery<{ data: ReturnType[] }, unknown>(
+    baseQueryKey,
+    async ({ pageParam = 0 }) => {
+      const formattedRequest = { ...request, pagination: { limit: 10, page: pageParam } };
+      return queryFn(formattedRequest);
+    },
+    {
+      ...configuredOptions,
+      ...options,
+    },
   );
 }
 

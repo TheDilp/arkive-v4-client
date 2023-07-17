@@ -13,7 +13,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useChangeNavbarTitle, useGetAllEntities, useTable, useUpdateEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetAllEntities, useGetInfiniteEntities, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import {
   dialogAtom,
@@ -150,12 +150,11 @@ function createColumns(
 
 export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
-  const [view, setView] = useState<"card" | "list">("list");
+  const [view, setView] = useState<"card" | "list">("card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
     orderBy: { field: "first_name", sort: "asc" },
-    filters: {},
     pagination: { limit: 10, page: 0 },
   });
   const { data, isLoading } = useGetAllEntities<CharacterType>(
@@ -172,14 +171,41 @@ export function CharactersView() {
     {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
+      enabled: view === "list",
     },
   );
 
+  const {
+    data: cardData,
+    isFetching,
+    fetchNextPage,
+  } = useGetInfiniteEntities<CharacterType>(
+    {
+      data: {
+        project_id,
+      },
+      relations: {
+        portrait: true,
+      },
+      orderBy: {
+        field: "first_name",
+        sort: "asc",
+      },
+    },
+    "characters",
+    {
+      enabled: view === "card",
+      keepPreviousData: true,
+      getNextPageParam: (lastPage, allPages) => {
+        if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
+        return allPages.length;
+      },
+    },
+  );
   const { mutateAsync } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-
   useEffect(() => {
     if (!filter) {
       dispatch({
@@ -205,7 +231,6 @@ export function CharactersView() {
       clearTimeout(timeout);
     };
   }, [filter, dispatch]);
-
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
@@ -246,18 +271,31 @@ export function CharactersView() {
         </div>
       </div>
       {view === "card" ? (
-        <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4">
-          {(data?.data || [])?.map((char) => (
-            <CharacterCard
-              key={char.id}
-              first_name={char?.first_name}
-              id={char?.id}
-              is_favorite={char?.is_favorite}
-              last_name={char?.last_name}
-              portrait={char?.portrait}
-              project_id={char?.project_id}
-            />
-          ))}
+        <div
+          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
+          onScroll={(e) => {
+            const { target } = e;
+            if (target) {
+              // @ts-ignore
+              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 400;
+              if (scrollFetchMarker && !isFetching) {
+                fetchNextPage();
+              }
+            }
+          }}>
+          {(cardData?.pages || [])?.map((page) =>
+            page.data.map((char: CharacterType) => (
+              <CharacterCard
+                key={char.id}
+                first_name={char?.first_name}
+                id={char?.id}
+                is_favorite={char?.is_favorite}
+                last_name={char?.last_name}
+                portrait={char?.portrait}
+                project_id={char?.project_id}
+              />
+            )),
+          )}
         </div>
       ) : (
         <div className="h-full max-h-[85%] w-full overflow-hidden">
