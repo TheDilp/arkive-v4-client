@@ -187,6 +187,7 @@ export function CharactersView() {
       relations: {
         portrait: true,
       },
+      filters,
       orderBy: {
         field: "first_name",
         sort: "asc",
@@ -196,7 +197,7 @@ export function CharactersView() {
     {
       enabled: view === "card",
       keepPreviousData: true,
-      getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (_, allPages) => {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
         return allPages.length;
       },

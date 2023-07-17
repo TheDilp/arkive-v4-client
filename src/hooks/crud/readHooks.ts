@@ -47,8 +47,8 @@ export function useGetAllEntities<ReturnType>(
     request.data.project_id,
     type,
     request.data?.item_id,
-    request?.orderBy,
     request?.filters,
+    request?.orderBy,
   ];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
@@ -123,7 +123,7 @@ export function useGetInfiniteEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allEntities", "infinite", request.data.project_id, type, request.data?.item_id];
+  const baseQueryKey = ["allEntities", "infinite", request.data.project_id, type, request.data?.item_id, request?.filters];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
