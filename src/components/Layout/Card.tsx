@@ -39,10 +39,7 @@ export function ProjectCard({ id, title, image }: ProjectCardType) {
       <div
         className="absolute z-0 flex  h-full w-full flex-col items-center justify-end transition-all group-hover:brightness-75"
         style={{
-          backgroundImage: `url(${
-            image ||
-            "https://images.unsplash.com/photo-1687259564825-1050611d715c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1742&q=80"
-          })`,
+          backgroundImage: `url(${image})`,
         }}
       />
     </Link>
@@ -93,16 +90,13 @@ export function CharacterCard({ id, first_name, last_name, portrait, is_favorite
           <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />
         </div>
       ) : null}
-      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all ">
+      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
         {getCharacterFullName(first_name, "", last_name)}
       </h2>
       <div
-        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center transition-all duration-300 group-hover:scale-125 group-hover:brightness-75"
+        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-center transition-all duration-300 group-hover:scale-125 group-hover:brightness-75"
         style={{
-          backgroundImage: `url(${
-            getImageURL(project_id as string, "images", portrait?.id) ||
-            "https://images.unsplash.com/photo-1687259564825-1050611d715c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1742&q=80"
-          })`,
+          backgroundImage: `url(${getImageURL(project_id as string, "images", portrait?.id)})`,
         }}
       />
     </Link>
