@@ -188,6 +188,9 @@ export function CharactersView() {
         portrait: true,
       },
       filters,
+      pagination: {
+        limit: 12,
+      },
       orderBy: {
         field: "first_name",
         sort: "asc",

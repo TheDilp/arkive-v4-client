@@ -141,7 +141,7 @@ export function useGetInfiniteEntities<ReturnType>(
   return useInfiniteQuery<{ data: ReturnType[] }, unknown>(
     baseQueryKey,
     async ({ pageParam = 0 }) => {
-      const formattedRequest = { ...request, pagination: { limit: 10, page: pageParam } };
+      const formattedRequest = { ...request, pagination: { limit: request?.pagination?.limit || 10, page: pageParam } };
       return queryFn(formattedRequest);
     },
     {
