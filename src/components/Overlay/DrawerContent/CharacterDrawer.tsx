@@ -427,7 +427,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       ) : null}
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(character)}
+        isDisabled={isSaveDisabled(character) || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {

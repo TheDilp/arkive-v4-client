@@ -2,7 +2,17 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import {
+  Avatar,
+  Button,
+  CharacterCard,
+  createColumnHelper,
+  Dropdown,
+  Input,
+  Select,
+  Table,
+  TablePageLayout,
+} from "../../components";
 import { useChangeNavbarTitle, useGetAllEntities, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import {
@@ -198,7 +208,7 @@ export function CharactersView() {
 
   return (
     <TablePageLayout>
-      <div className="flex w-full items-center justify-end gap-x-2">
+      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
         <div className="w-56">
           <Input
             name="quick_filter"
@@ -219,7 +229,6 @@ export function CharactersView() {
             value={view}
           />
         </div>
-
         <div className="w-fit">
           <Button
             icon={IconEnum.add}
@@ -236,26 +245,42 @@ export function CharactersView() {
           />
         </div>
       </div>
-      <div className="h-full max-h-[85%] w-full overflow-hidden">
-        <Table
-          columns={createColumns(setDrawer, setDialog)}
-          config={{
-            hasSelect: true,
-            hasFavorite: true,
-            orderBy,
-            filters,
-            getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
-            setFavorite: async (rowData: any) => {
-              await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
-            },
-          }}
-          data={data?.data || []}
-          dispatch={dispatch}
-          isLoading={isLoading}
-          pagination={pagination}
-          type="characters"
-        />
-      </div>
+      {view === "card" ? (
+        <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4">
+          {(data?.data || [])?.map((char) => (
+            <CharacterCard
+              key={char.id}
+              first_name={char?.first_name}
+              id={char?.id}
+              is_favorite={char?.is_favorite}
+              last_name={char?.last_name}
+              portrait={char?.portrait}
+              project_id={char?.project_id}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="h-full max-h-[85%] w-full overflow-hidden">
+          <Table
+            columns={createColumns(setDrawer, setDialog)}
+            config={{
+              hasSelect: true,
+              hasFavorite: true,
+              orderBy,
+              filters,
+              getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
+              setFavorite: async (rowData: any) => {
+                await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
+              },
+            }}
+            data={data?.data || []}
+            dispatch={dispatch}
+            isLoading={isLoading}
+            pagination={pagination}
+            type="characters"
+          />
+        </div>
+      )}
     </TablePageLayout>
   );
 }

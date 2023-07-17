@@ -1,7 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { BaseCardType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
-import { navItems } from "../../utils";
+import { BaseCardType, CharacterType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
+import { getCharacterFullName, getImageURL, IconEnum, navItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -79,6 +79,33 @@ export function ProjectDashboardInfoCard({ title, count, icon, latestItems }: Pr
         </ul>
       </div>
     </div>
+  );
+}
+
+export function CharacterCard({ id, first_name, last_name, portrait, is_favorite }: CharacterType) {
+  const { project_id } = useParams();
+  return (
+    <Link
+      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover bg-center bg-no-repeat shadow transition-all animate-in fade-in duration-500"
+      to={id}>
+      {is_favorite ? (
+        <div className="absolute right-0 top-0 z-10 m-4">
+          <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />
+        </div>
+      ) : null}
+      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all ">
+        {getCharacterFullName(first_name, "", last_name)}
+      </h2>
+      <div
+        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center transition-all duration-300 group-hover:scale-125 group-hover:brightness-75"
+        style={{
+          backgroundImage: `url(${
+            getImageURL(project_id as string, "images", portrait?.id) ||
+            "https://images.unsplash.com/photo-1687259564825-1050611d715c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1742&q=80"
+          })`,
+        }}
+      />
+    </Link>
   );
 }
 
