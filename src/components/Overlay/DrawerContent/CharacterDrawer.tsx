@@ -287,20 +287,21 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   });
                   return;
                 }
-                const [first_name, last_name] = (label || "").split(" ");
-                handleChange({
-                  name: "related_to",
-                  value: (character?.related_to || []).concat({
-                    id: value,
-                    first_name,
-                    last_name,
-                    relation_type: "",
-                  }),
-                });
+                if (value) {
+                  const [first_name, last_name] = (label || "").split(" ");
+                  handleChange({
+                    name: "related_to",
+                    value: (character?.related_to || []).concat({
+                      id: value,
+                      first_name,
+                      last_name,
+                      relation_type: "",
+                    }),
+                  });
+                }
               }}
               placeholder="Press enter to search characters"
               searchEntity="characters"
-              value={character?.portrait_id}
             />
           </div>
           <ul className="flex flex-col gap-y-2">
