@@ -249,7 +249,6 @@ export function Search({
             setInputValue(e.target.value);
           }}
           onKeyDown={(e) => {
-            console.log(value);
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
               if (!value && activeIndex === null) {
