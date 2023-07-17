@@ -83,7 +83,7 @@ export function CharacterCard({ id, first_name, last_name, portrait, is_favorite
   const { project_id } = useParams();
   return (
     <Link
-      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover bg-center bg-no-repeat shadow transition-all animate-in fade-in duration-500"
+      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all animate-in fade-in duration-500"
       to={id}>
       {is_favorite ? (
         <div className="absolute right-0 top-0 z-10 m-4">
@@ -94,7 +94,7 @@ export function CharacterCard({ id, first_name, last_name, portrait, is_favorite
         {getCharacterFullName(first_name, "", last_name)}
       </h2>
       <div
-        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-center transition-all duration-300 group-hover:scale-125 group-hover:brightness-75"
+        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-top transition-all duration-300 group-hover:scale-125 group-hover:brightness-75 lg:bg-center"
         style={{
           backgroundImage: `url(${getImageURL(project_id as string, "images", portrait?.id)})`,
         }}

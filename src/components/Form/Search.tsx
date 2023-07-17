@@ -165,7 +165,6 @@ export function Search({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
@@ -177,7 +176,6 @@ export function Search({
       enabled: false,
     },
   );
-
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
     whileElementsMounted: autoUpdate,
     open,
@@ -208,13 +206,12 @@ export function Search({
   });
 
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([role, dismiss, listNav]);
-
   useEffect(() => {
     if (data?.data?.length) setOpen(true);
   }, [data?.data]);
 
   useEffect(() => {
-    if (isAutocomplete && inputValue) {
+    if (isAutocomplete && inputValue && document.activeElement === inputRef.current) {
       const timeout = setTimeout(() => {
         refetch();
       }, 1000);
@@ -249,10 +246,6 @@ export function Search({
           className={input()}
           name="search"
           onChange={(e) => {
-            if (value) {
-              e.preventDefault();
-              return;
-            }
             setInputValue(e.target.value);
           }}
           onKeyDown={(e) => {
@@ -339,11 +332,7 @@ export function Search({
                     },
                     onClick() {
                       onChange({ name, value: item.value, label: item.label, color: item?.color });
-                      if (!isAutocomplete) {
-                        setInputValue("");
-                      } else {
-                        setInputValue(item.label);
-                      }
+                      setInputValue("");
                       setOpen(false);
                       remove();
                       inputRef.current?.focus();

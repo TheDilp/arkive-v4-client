@@ -275,7 +275,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         <>
           <div className="flex items-center justify-between">
             <Search
-              name="portrait_id"
+              name="related_to"
               onChange={({ label, value }) => {
                 if (character?.related_to?.some((relationship) => relationship?.id === value)) {
                   createNotification({
