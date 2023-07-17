@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useState } from "react";
@@ -5,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntities, useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { TagType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { drawerAtom, EntitiesWithTags, IconEnum } from "../../../utils";
 import { DefaultTagColor } from "../../../utils/enums/ColorEnums";
 import { Button, Input } from "../../Form";
 import { ColorPicker } from "../ColorPicker";
@@ -25,6 +26,7 @@ function isDisabled(tags: TagType | TagType[]) {
 }
 
 export function TagsDrawer({ data }: { data: TagType }) {
+  const queryClient = useQueryClient();
   const { project_id } = useParams();
   const [tags, setTags] = useState<TagType | TagType[]>(data?.id ? data : []);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -93,6 +95,11 @@ export function TagsDrawer({ data }: { data: TagType }) {
             }
           } else if (!Array.isArray(tags)) {
             await update({ data: omit(tags, ["project_id"]) });
+            queryClient.invalidateQueries({
+              predicate: (query) =>
+                EntitiesWithTags.includes(query.queryKey[2] as string) ||
+                EntitiesWithTags.includes(query.queryKey[3] as string),
+            });
           }
 
           resetDrawerAtom();

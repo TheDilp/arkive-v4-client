@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { Dispatch, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
@@ -28,7 +28,6 @@ import {
   groupFiltersByField,
   IconEnum,
   removeColumnFilter,
-  SetStateAction,
 } from "../../utils";
 import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
@@ -371,6 +370,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     columns: getTableColumns(columns, {
       hasSelect: config?.hasSelect,
       hasFavorite: config?.hasFavorite,
+      hasTags: config?.hasTags,
       setFavorite: config?.setFavorite,
     }),
     getCoreRowModel: getCoreRowModel(),

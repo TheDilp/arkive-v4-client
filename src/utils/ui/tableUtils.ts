@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 
-import { FavoriteColumn, SelectColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
+import { FavoriteColumn, SelectColumn, TagColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
 import { SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
@@ -11,8 +11,9 @@ export function getTableColumns(
   {
     hasSelect,
     hasFavorite,
+    hasTags,
     setFavorite,
-  }: { hasSelect?: boolean; hasFavorite?: boolean; setFavorite?: (data: SetFavoriteType) => Promise<void> },
+  }: { hasSelect?: boolean; hasFavorite?: boolean; hasTags?: boolean; setFavorite?: (data: SetFavoriteType) => Promise<void> },
 ) {
   const finalColumns = [...columns];
 
@@ -21,6 +22,9 @@ export function getTableColumns(
   }
   if (hasSelect) {
     finalColumns.unshift(SelectColumn);
+  }
+  if (hasTags) {
+    finalColumns.splice(finalColumns.length - 1, 0, TagColumn);
   }
 
   return finalColumns;

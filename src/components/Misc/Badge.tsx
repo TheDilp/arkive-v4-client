@@ -5,7 +5,7 @@ import { IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 
 const BadgeClasses = tv({
-  base: "rounded-md h-7 px-2.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
+  base: "rounded-md h-7 px-1.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
   variants: {
     variant: {
       primary: "bg-zinc-950 text-white",
@@ -16,6 +16,7 @@ const BadgeClasses = tv({
       error: "bg-red-600 text-white",
     },
     size: {
+      sm: "text-xs h-full",
       md: "text-sm h-full",
       lg: "text-base [&>button>*]:text-base",
     },

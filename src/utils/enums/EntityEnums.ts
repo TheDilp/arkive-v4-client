@@ -4,3 +4,5 @@ export const BaseCharacterRelationshipOptionsEnum = [
   { label: "Mother", value: "mother" },
   { label: "Partner", value: "partner" },
 ];
+
+export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", "graphs", "nodes", "edges"];

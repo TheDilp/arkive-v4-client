@@ -162,6 +162,7 @@ export function CharactersView() {
       data: { project_id: project_id as string },
       relations: {
         portrait: true,
+        tags: true,
       },
       orderBy,
       filters,
@@ -308,6 +309,7 @@ export function CharactersView() {
             config={{
               hasSelect: true,
               hasFavorite: true,
+              hasTags: true,
               orderBy,
               filters,
               getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,

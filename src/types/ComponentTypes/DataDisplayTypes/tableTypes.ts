@@ -12,6 +12,7 @@ export interface MetaType {
   sortable?: boolean;
   centered?: boolean;
   noLink?: boolean;
+
   filterOptions?: FilterEnumType[];
 }
 
@@ -49,6 +50,7 @@ export interface TableType {
   config?: {
     hasFavorite?: boolean;
     hasSelect?: boolean;
+    hasTags?: boolean;
     orderBy?: RequestOrderByType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
