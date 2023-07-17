@@ -21,13 +21,16 @@ export function GraphsView() {
         project_id,
         item_id,
       },
-      fields: ["id", "title", "icon", "is_folder"],
+      fields: ["id", "title", "icon", "is_folder", "parent_id"],
       orderBy: {
         field: "is_folder",
         sort: "desc",
       },
     },
     "graphs",
+    {
+      enabled: !item_id,
+    },
   );
 
   return (
@@ -67,7 +70,6 @@ export function GraphsView() {
             },
           ]}
           items={data?.data || []}
-          type="graphs"
         />
       </div>
     </div>

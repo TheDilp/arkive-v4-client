@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
+import { useGetItem } from "../../hooks";
 import { AvailableEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { IconEnum } from "../../utils";
@@ -17,7 +18,7 @@ type EntityItemType = {
 
 function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { type: AvailableEntityType }) {
   return (
-    <Link to={id}>
+    <Link to={`../graphs/${id}`}>
       <div
         className="col-span-1 flex h-36 cursor-pointer flex-col items-center justify-center hover:text-blue-400"
         data-context-id={id}
@@ -26,25 +27,36 @@ function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { ty
         <div className="pointer-events-none">
           <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
         </div>
-        <span className="max-w-full truncate text-white hover:text-white">{title}</span>
+        <span className="max-w-full truncate font-lato text-white hover:text-white">{title}</span>
       </div>
     </Link>
   );
 }
 
-export function FolderView({
-  items,
-  contextMenuItems,
-  type,
-}: {
-  items: EntityItemType[];
-  contextMenuItems: ContextMenuItemType[];
-  type: AvailableEntityType;
-}) {
+export function FolderView({ items, contextMenuItems }: { items: EntityItemType[]; contextMenuItems: ContextMenuItemType[] }) {
+  const { project_id, type, item_id } = useParams();
+
+  const { data } = useGetItem<{ id: string; title: string; is_folder: string; icon?: string; children: any[] }>(
+    item_id,
+    type as AvailableEntityType,
+    {
+      data: {
+        project_id,
+      },
+
+      relations: {
+        children: true,
+      },
+    },
+    {
+      enabled: !!item_id,
+    },
+  );
+
   return (
     <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
       {contextMenuItems?.length ? <ContextMenu items={contextMenuItems} /> : null}
-      {items.map((item) => (
+      {(items?.length ? items : data?.data?.children || []).map((item) => (
         <ItemDisplay
           key={item.id}
           icon={item.icon}
@@ -52,7 +64,7 @@ export function FolderView({
           // image={item?.image}
           is_folder={item?.is_folder ?? false}
           title={item.title}
-          type={type}
+          type={type as AvailableEntityType}
         />
       ))}
     </div>
