@@ -54,7 +54,7 @@ export const TagColumn: ColumnDef<any & { tags: TagType[] }> = {
   minSize: 12,
   maxSize: 12,
   cell: ({ row }) => (
-    <div className="flex w-full max-w-full items-center gap-x-2">
+    <div className="flex w-full max-w-full items-center justify-center gap-x-2">
       {row.original?.tags?.length ? (
         <div className="w-fit">
           <Badge customColor={row.original.tags[0].color} label={row.original.tags[0].title} />
