@@ -1,6 +1,6 @@
 import cytoscape, { EdgeCollection, NodeCollection } from "cytoscape";
 
-import { CharacterType, EventType, ImageType, MapPinType, MapType, TagType } from ".";
+import { BaseEntityType, CharacterType, EventType, ImageType, MapPinType, MapType, TagType } from ".";
 import { DocumentType } from "./documentTypes";
 
 type ArrowShape =
@@ -110,17 +110,10 @@ export type EdgeType = {
   parent_id: string;
   tags: TagType[];
 };
-export interface GraphType {
-  id: string;
-  title: string;
-  is_folder: boolean | null;
-  is_public: boolean | null;
-  icon: string | null;
+export interface GraphType extends BaseEntityType {
   default_node_shape: string;
   default_node_color: string;
   default_edge_color: string;
-  project_id: string;
-  parent_id: string | null;
   nodes: NodeType[];
   edges: EdgeType[];
   tags: TagType[];

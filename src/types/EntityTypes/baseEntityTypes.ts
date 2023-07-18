@@ -1,3 +1,14 @@
+export interface BaseEntityType {
+  id: string;
+  title: string;
+  project_id: string;
+  parent_id: string | null;
+  parents?: { id: string; title: string; parent_id: string | null }[];
+  children?: BaseEntityType[];
+  is_folder: boolean | null;
+  is_public: boolean | null;
+  icon: string | null;
+}
 export type AvailableEntityType =
   | "project"
   | "characters"

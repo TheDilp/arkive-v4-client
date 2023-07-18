@@ -1,11 +1,12 @@
+import { useSetAtom } from "jotai";
 import { Link, useParams } from "react-router-dom";
 
-import { useGetItem } from "../../hooks";
-import { AvailableEntityType } from "../../types";
+import { useGetAllEntities, useGetItem } from "../../hooks";
+import { AvailableEntityType, BaseEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
-import { IconEnum } from "../../utils";
+import { drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
-import { Icon } from "..";
+import { Breadcrumbs, Button, Icon } from "..";
 import { ContextMenu } from "../Overlay/ContextMenu";
 
 type EntityItemType = {
@@ -33,10 +34,34 @@ function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { ty
   );
 }
 
-export function FolderView({ items, contextMenuItems }: { items: EntityItemType[]; contextMenuItems: ContextMenuItemType[] }) {
+export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenuItemType[] }) {
   const { project_id, type, item_id } = useParams();
 
-  const { data } = useGetItem<{ id: string; title: string; is_folder: string; icon?: string; children: any[] }>(
+  const setDrawer = useSetAtom(drawerAtom);
+
+  const { data: base } = useGetAllEntities<BaseEntityType>(
+    {
+      pagination: {
+        limit: 10,
+        page: 0,
+      },
+      data: {
+        project_id,
+        item_id,
+      },
+      fields: ["id", "title", "icon", "is_folder", "parent_id"],
+      orderBy: {
+        field: "is_folder",
+        sort: "desc",
+      },
+    },
+    "graphs",
+    {
+      enabled: !item_id,
+    },
+  );
+
+  const { data } = useGetItem<BaseEntityType>(
     item_id,
     type as AvailableEntityType,
     {
@@ -46,6 +71,7 @@ export function FolderView({ items, contextMenuItems }: { items: EntityItemType[
 
       relations: {
         children: true,
+        parents: true,
       },
     },
     {
@@ -54,19 +80,39 @@ export function FolderView({ items, contextMenuItems }: { items: EntityItemType[
   );
 
   return (
-    <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
-      {contextMenuItems?.length ? <ContextMenu items={contextMenuItems} /> : null}
-      {(items?.length ? items : data?.data?.children || []).map((item) => (
-        <ItemDisplay
-          key={item.id}
-          icon={item.icon}
-          id={item.id}
-          // image={item?.image}
-          is_folder={item?.is_folder ?? false}
-          title={item.title}
-          type={type as AvailableEntityType}
-        />
-      ))}
-    </div>
+    <>
+      <div className="flex items-center justify-between">
+        <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} />
+        <div className="w-fit">
+          <Button
+            icon={IconEnum.add}
+            label="Create new graph"
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: { project_id },
+                title: "Create new graph",
+                type: "graphs",
+                size: "lg",
+              }))
+            }
+          />
+        </div>
+      </div>
+      <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
+        {contextMenuItems?.length ? <ContextMenu items={contextMenuItems} /> : null}
+        {(base?.data?.length ? base.data : data?.data?.children || []).map((item) => (
+          <ItemDisplay
+            key={item.id}
+            icon={item.icon}
+            id={item.id}
+            // image={item?.image}
+            is_folder={item?.is_folder ?? false}
+            title={item.title}
+            type={type as AvailableEntityType}
+          />
+        ))}
+      </div>
+    </>
   );
 }
