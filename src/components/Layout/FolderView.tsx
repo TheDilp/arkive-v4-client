@@ -88,25 +88,27 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
     <>
       <div className="flex items-center justify-between">
         <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} />
-        <div className="w-fit">
-          <Button
-            icon={IconEnum.add}
-            label="Create new graph"
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: { project_id },
-                title: "Create new graph",
-                type: "graphs",
-                size: "lg",
-              }))
-            }
-          />
-        </div>
+        {!!item_id && data?.data?.is_folder ? (
+          <div className="w-fit">
+            <Button
+              icon={IconEnum.add}
+              label="Create new graph"
+              onClick={() =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { project_id },
+                  title: "Create new graph",
+                  type: "graphs",
+                  size: "lg",
+                }))
+              }
+            />
+          </div>
+        ) : null}
       </div>
       <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
-        {contextMenuItems?.length ? <ContextMenu items={contextMenuItems} /> : null}
-        {(base?.data?.length ? base.data : data?.data?.children || []).map((item) => (
+        {contextMenuItems?.length && !item_id ? <ContextMenu items={contextMenuItems} /> : null}
+        {(base?.data?.length ? base.data : []).map((item) => (
           <ItemDisplay
             key={item.id}
             icon={item.icon}
@@ -117,7 +119,18 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
             type={type as AvailableEntityType}
           />
         ))}
-        {!base?.data?.length && !data?.data?.children?.length ? (
+        {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => (
+          <ItemDisplay
+            key={item.id}
+            icon={item.icon}
+            id={item.id}
+            // image={item?.image}
+            is_folder={item?.is_folder ?? false}
+            title={item.title}
+            type={type as AvailableEntityType}
+          />
+        ))}
+        {!base?.data?.length && !data?.data?.children?.length && data?.data?.is_folder ? (
           <div className="col-span-1 mt-2 md:col-span-4 lg:col-span-10">
             <Alert label="There is no content." variant="info" />
           </div>

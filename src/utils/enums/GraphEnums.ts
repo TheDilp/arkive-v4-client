@@ -1,6 +1,6 @@
-import { CurveStyleType } from "../../types/EntityTypes/graphTypes";
+import { curve_styleType } from "../../types/EntityTypes/graphTypes";
 
-export const getCytoscapeStylesheet = (curveStyle: CurveStyleType) => {
+export const getCytoscapeStylesheet = (curve_style: curve_styleType) => {
   return [
     // Nodes in general
     {
@@ -9,24 +9,24 @@ export const getCytoscapeStylesheet = (curveStyle: CurveStyleType) => {
         shape: "data(type)",
         width: "data(width)",
         height: "data(height)",
-        "font-size": "data(fontSize)",
-        "font-family": "data(fontFamily)",
+        "font-size": "data(font_size)",
+        "font-family": "data(font_family)",
         label: "data(label)",
-        color: "data(fontColor)",
+        color: "data(font_color)",
         "text-outline-color": "black",
         "text-outline-width": "2px",
-        "background-image": "data(backgroundImage)",
+        // "background-image": "data(backgroundImage)",
         "background-fit": "cover",
         "background-clip": "node",
-        "background-color": "data(backgroundColor)",
-        "background-opacity": "data(backgroundOpacity)",
+        "background-color": "data(background_color)",
+        "background-opacity": "data(background_opacity)",
         "background-image-crossorigin": "anonymous",
-        "text-halign": "data(textHAlign)",
-        "text-valign": "data(textVAlign)",
+        "text-halign": "data(text_h_align)",
+        "text-valign": "data(text_v_align)",
         "text-wrap": "wrap",
         "text-max-width": "data(width)",
-        "z-index": "data(zIndex)",
-        "z-index-compare": "data(zIndexCompare)",
+        "z-index": "data(z_index)",
+        "z-index-compare": "data(z_index_compare)",
       },
     },
     {
@@ -64,43 +64,43 @@ export const getCytoscapeStylesheet = (curveStyle: CurveStyleType) => {
       selector: "edge[classes]",
       style: {
         label: "data(label)",
-        color: "data(fontColor)",
-        "font-family": "data(fontFamily)",
-        "font-size": "data(fontSize)",
+        color: "data(font_color)",
+        "font-family": "data(font_family)",
+        "font-size": "data(font_size)",
         "text-outline-color": "black",
         "text-outline-width": "2px",
         "source-endpoint": "outside-to-node-or-label",
         "target-endpoint": "outside-to-node-or-label",
         width: "data(width)",
-        "line-opacity": "data(lineOpacity)",
+        "line-opacity": "data(line_opacity)",
         "line-fill": "data(lineFill)",
-        "source-arrow-shape": "data(sourceArrowShape)",
-        "source-arrow-fill": "data(sourceArrowFill)",
-        "source-arrow-color": "data(sourceArrowColor)",
+        "source-arrow-shape": "data(source_arrow_shape)",
+        "source-arrow-fill": "data(source_arrow_fill)",
+        "source-arrow-color": "data(source_arrow_color)",
 
-        "target-arrow-shape": "data(targetArrowShape)",
-        "target-arrow-fill": "data(targetArrowFill)",
-        "target-arrow-color": "data(targetArrowColor)",
+        "target-arrow-shape": "data(target_arrow_shape)",
+        "target-arrow-fill": "data(target_arrow_fill)",
+        "target-arrow-color": "data(target_arrow_color)",
 
-        "mid-source-arrow-shape": "data(midSourceArrowShape)",
-        "mid-source-arrow-fill": "data(midSourceArrowFill)",
-        "mid-source-arrow-color": "data(midSourceArrowColor)",
+        "mid-source-arrow-shape": "data(midsource_arrow_shape)",
+        "mid-source-arrow-fill": "data(midsource_arrow_fill)",
+        "mid-source-arrow-color": "data(midsource_arrow_color)",
 
-        "mid-target-arrow-shape": "data(midTargetArrowShape)",
-        "mid-target-arrow-fill": "data(midTargetArrowFill)",
-        "mid-target-arrow-color": "data(midTargetArrowColor)",
+        "mid-target-arrow-shape": "data(midtarget_arrow_shape)",
+        "mid-target-arrow-fill": "data(midtarget_arrow_fill)",
+        "mid-target-arrow-color": "data(midtarget_arrow_color)",
 
-        "arrow-scale": "data(arrowScale)",
-        "line-color": "data(lineColor)",
-        "line-style": "data(lineStyle)",
+        "arrow-scale": "data(arrow_scale)",
+        "line-color": "data(line_color)",
+        "line-style": "data(line_style)",
         "line-dash-pattern": [5, 10],
-        "taxi-turn": "data(taxiTurn)",
-        "taxi-direction": "data(taxiDirection)",
-        "curve-style": "data(curveStyle)",
+        "taxi-turn": "data(taxi_turn)",
+        "taxi-direction": "data(taxi_direction)",
+        "curve-style": "data(curve_style)",
         "text-rotation": "autorotate",
-        "control-point-distances": "data(controlPointDistances)",
-        "control-point-weights": "data(controlPointWeights)",
-        "z-index": "data(zIndex)",
+        "control-point-distances": "data(control_point_distances)",
+        "control-point-weights": "data(control_point_weights)",
+        "z-index": "data(z_index)",
         "z-index-compare": "manual",
       },
     },
@@ -112,7 +112,7 @@ export const getCytoscapeStylesheet = (curveStyle: CurveStyleType) => {
         "line-color": "cyan",
         "line-style": "solid",
         "line-dash-pattern": [5, 10],
-        "curve-style": curveStyle,
+        "curve-style": curve_style,
         "taxi-turn": "100",
         "taxi-direction": "auto",
         label: "",
@@ -128,7 +128,7 @@ export const getCytoscapeStylesheet = (curveStyle: CurveStyleType) => {
         "line-color": "cyan",
         "line-style": "solid",
         "line-dash-pattern": [5, 10],
-        "curve-style": curveStyle,
+        "curve-style": curve_style,
         "taxi-turn": "100",
         "taxi-direction": "auto",
         label: "",
@@ -349,7 +349,7 @@ export const BoardFontFamilies = [
     value: "Verdana",
   },
 ];
-export const textHAlignOptions = [
+export const text_h_alignOptions = [
   {
     label: "Left",
     value: "left",
@@ -363,7 +363,7 @@ export const textHAlignOptions = [
     value: "right",
   },
 ];
-export const textVAlignOptions = [
+export const text_v_alignOptions = [
   {
     label: "Top",
     value: "top",
@@ -461,7 +461,7 @@ export const AvailableNodeShapes = [
     value: "round-octagon",
   },
 ];
-export const boardEdgeCurveStyles = [
+export const boardEdgecurve_styles = [
   {
     label: "Straight",
     value: "straight",
@@ -475,7 +475,7 @@ export const boardEdgeCurveStyles = [
     value: "taxi",
   },
 ];
-export const boardEdgeLineStyles = [
+export const boardEdgeline_styles = [
   {
     label: "Solid",
     value: "solid",
@@ -489,7 +489,7 @@ export const boardEdgeLineStyles = [
     value: "dotted",
   },
 ];
-export const boardEdgeTaxiDirections = [
+export const boardEdgetaxi_directions = [
   {
     label: "Auto",
     value: "auto",

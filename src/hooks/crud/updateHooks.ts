@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AvailableEntityType } from "../../types";
+import { AvailableEntityType, GraphType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useUpdateEntity<InsertType extends { data: { id?: string } }>(type: AvailableEntityType, project_id: string) {
@@ -35,6 +35,47 @@ export function useUpdateEntity<InsertType extends { data: { id?: string } }>(ty
             icon: IconEnum.error,
             timer: 5,
           });
+      },
+    },
+  );
+}
+
+export function useUpdateManyNodesPosition(item_id: string) {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (updateItemValues: { id: string; x: number; y: number }[]) => {
+      if (updateItemValues.length) {
+        return FetchFunction({
+          url: `${baseURLS.baseServer}/nodes/update/many/position`,
+          body: JSON.stringify({ data: { nodes: updateItemValues } }),
+          method: "POST",
+        });
+      }
+      return null;
+    },
+    {
+      onMutate: async (variables) => {
+        const old = queryClient.getQueryData(["allEntities", "graphs", item_id]);
+        queryClient.setQueryData(["allEntities", "graphs", item_id], (oldData: GraphType | undefined) => {
+          if (oldData) {
+            return {
+              ...oldData,
+              nodes: oldData.nodes.map((subItem) => {
+                const idx = variables.findIndex((varNode) => varNode.id === subItem.id);
+                if (idx > -1) {
+                  return { ...subItem, ...variables[idx] };
+                }
+                return subItem;
+              }),
+            };
+          }
+          return oldData;
+        });
+        return { old };
+      },
+      onError: (_, __, context) => {
+        // toaster("error", "There was an error updating these items.");
+        queryClient.setQueryData(["allEntities", "graphs", item_id], context?.old);
       },
     },
   );

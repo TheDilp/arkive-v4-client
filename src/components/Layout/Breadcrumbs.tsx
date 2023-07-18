@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 
 import { IconEnum } from "../../utils";
@@ -18,14 +19,14 @@ export function Breadcrumbs({
       </Link>
       {items?.length > 0 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}
       {items.map((item, index) => (
-        <>
-          <div key={item.id} className="flex w-fit max-w-[10rem] items-center text-lg">
+        <Fragment key={item.id}>
+          <div className="flex w-fit max-w-[10rem] items-center text-lg">
             <Link to={`../graphs/${item.id}`}>
               <span className="truncate font-semibold">{item.title}</span>
             </Link>
           </div>
           {index !== items.length - 1 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}
-        </>
+        </Fragment>
       ))}
     </div>
   );

@@ -3,15 +3,15 @@ import { atom } from "jotai";
 
 export const BoardReferenceAtom = atom<null | cytoscape.Core>(null);
 export const BoardStateAtom = atom<{
-  addNodes: boolean;
+  add_nodes: boolean;
   grid: boolean;
-  drawMode: boolean;
-  curveStyle: "straight" | "taxi" | "unbundled-bezier";
+  draw_mode: boolean;
+  curve_style: "straight" | "taxi" | "unbundled-bezier";
 }>({
-  addNodes: false,
+  add_nodes: false,
   grid: false,
-  drawMode: false,
-  curveStyle: "straight",
+  draw_mode: false,
+  curve_style: "straight",
 });
 
 export const NodesAtom = atom<NodeDefinition[]>([]);

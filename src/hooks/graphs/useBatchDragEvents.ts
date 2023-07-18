@@ -1,12 +1,12 @@
 import { MutableRefObject, useRef } from "react";
 
-// import { useUpdateManyNodesPosition } from "../CRUD/ItemsCRUD";
+import { useUpdateManyNodesPosition } from "..";
 
 type NodePositionUpdateType = { id: string; x: number; y: number };
 const useBatchUpdateNodePositions = (item_id: string) => {
   const batchedData = useRef() as MutableRefObject<NodePositionUpdateType[]>;
   const timer = useRef([]) as MutableRefObject<any>;
-  //   const updateManyNodePositions = useUpdateManyNodesPosition(item_id);
+  const updateManyNodePositions = useUpdateManyNodesPosition(item_id);
 
   const addOrUpdateNode = (newNode: NodePositionUpdateType) => {
     batchedData.current = [...(batchedData.current || [])];
@@ -21,9 +21,9 @@ const useBatchUpdateNodePositions = (item_id: string) => {
 
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      //   updateManyNodePositions.mutate(batchedData.current);
+      updateManyNodePositions.mutate(batchedData.current);
       batchedData.current = [];
-    }, 400);
+    }, 800);
   };
 
   return { addOrUpdateNode };

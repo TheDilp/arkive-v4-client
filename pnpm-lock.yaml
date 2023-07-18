@@ -20,6 +20,12 @@ dependencies:
   cytoscape:
     specifier: ^3.25.0
     version: 3.25.0
+  cytoscape-edgehandles:
+    specifier: ^4.0.1
+    version: 4.0.1(cytoscape@3.25.0)
+  cytoscape-grid-guide:
+    specifier: ^2.3.3
+    version: 2.3.3(cytoscape@3.25.0)
   file-saver:
     specifier: ^2.0.5
     version: 2.0.5
@@ -1379,6 +1385,25 @@ packages:
       dagre: 0.8.5
     dev: false
 
+  /cytoscape-edgehandles@4.0.1(cytoscape@3.25.0):
+    resolution: {integrity: sha512-uSYshkqRZ4luCxK295bEVTg46q4ZW+fwJhcIzMrtfNR7zeAnJ38Z48kUGeu5ibtXkgLbcZAg0YE4ED2dRuaePg==}
+    peerDependencies:
+      cytoscape: ^3.2.0
+    dependencies:
+      cytoscape: 3.25.0
+      lodash.memoize: 4.1.2
+      lodash.throttle: 4.1.1
+    dev: false
+
+  /cytoscape-grid-guide@2.3.3(cytoscape@3.25.0):
+    resolution: {integrity: sha512-7EuqZgOYJY+8K9a9Tm1aFydzyA0dvZ3OLQ8ACEEuE1VgxuGala82bHfyR7B5e8kLeOloX/r4YAPoK8mYkPYcFg==}
+    peerDependencies:
+      cytoscape: ^3.3.0
+    dependencies:
+      cytoscape: 3.25.0
+      functional-red-black-tree: 1.0.1
+    dev: false
+
   /cytoscape@3.25.0:
     resolution: {integrity: sha512-7MW3Iz57mCUo6JQCho6CmPBCbTlJr7LzyEtIkutG255HLVd4XuBg2I9BkTZLI/e4HoaOB/BiAzXuQybQ95+r9Q==}
     engines: {node: '>=0.10'}
@@ -2113,6 +2138,10 @@ packages:
       functions-have-names: 1.2.3
     dev: true
 
+  /functional-red-black-tree@1.0.1:
+    resolution: {integrity: sha512-dsKNQNdj6xA3T+QlADDA7mOSlX0qiMINjn0cgr+eGHGsbSHzTabcIogz2+p/iqP1Xs6EP/sS2SbqH+brGTbq0g==}
+    dev: false
+
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
@@ -2604,6 +2633,10 @@ packages:
     resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
     dev: false
 
+  /lodash.memoize@4.1.2:
+    resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
+    dev: false
+
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
@@ -2618,6 +2651,10 @@ packages:
 
   /lodash.set@4.3.2:
     resolution: {integrity: sha512-4hNPN5jlm/N/HLMCO43v8BXKq9Z7QdAGc/VGrRD61w8gN9g/6jF9A4L1pbUgBLCffi0w9VsXfTOij5x8iTyFvg==}
+    dev: false
+
+  /lodash.throttle@4.1.1:
+    resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
     dev: false
 
   /lodash@4.17.21:

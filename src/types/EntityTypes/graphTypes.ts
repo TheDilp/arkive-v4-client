@@ -46,8 +46,8 @@ export type NodeType = {
   type: string | null;
   width: number | null;
   height: number | null;
-  x: number | null;
-  y: number | null;
+  x: number;
+  y: number;
   font_size: number | null;
   font_color: string | null;
   font_family: string | null;

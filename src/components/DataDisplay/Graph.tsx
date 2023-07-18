@@ -4,19 +4,21 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useGetItem } from "../../hooks";
+import { useChangeNavbarTitle } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { BoardContext, GraphType } from "../../types/EntityTypes/graphTypes";
 import { BoardReferenceAtom, BoardStateAtom, drawerAtom, EdgesAtom, NodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
+import { ContextMenu } from "../Overlay/ContextMenu";
 
 type Props = {
   isReadOnly?: boolean;
   isViewOnly?: boolean;
+  data: GraphType;
 };
 
-export function Graph({ isReadOnly, isViewOnly }: Props) {
+export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs");
 
   const cm = useRef() as MutableRefObject<any>;
@@ -38,17 +40,12 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
   const [nodes, setNodes] = useAtom(NodesAtom);
   const [edges, setEdges] = useAtom(EdgesAtom);
 
-  const { data: graph } = useGetItem<GraphType>(item_id as string, "graphs", {
-    data: {
-      project_id,
-    },
-  });
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
 
   const styleSheet = useMemo(
-    () => getCytoscapeStylesheet(boardState.curveStyle),
+    () => getCytoscapeStylesheet(boardState.curve_style),
 
-    [boardState.curveStyle],
+    [boardState.curve_style],
   );
 
   // const contextItems = useBoardContextMenuItems({
@@ -73,9 +70,9 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
             source_id: source,
 
             target_id: target,
-            lineColor: color || "#595959",
-            curveStyle: boardState.curveStyle,
-            targetArrowColor: color,
+            line_color: color || "#595959",
+            curve_style: boardState.curve_style,
+            target_arrow_color: color as string,
           },
         ],
         false,
@@ -87,20 +84,20 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
     //   parentId: item_id as string,
     //   source_id: source,
     //   target_id: target,
-    //   lineColor: color,
-    //   curveStyle: boardState.curveStyle,
-    //   targetArrowColor: color,
+    //   line_color: color,
+    //   curve_style: boardState.curve_style,
+    //   target_arrow_color: color,
     // });
   };
 
   useEffect(() => {
-    if (graph?.data?.nodes && graph?.data?.nodes.length > 0 && !nodes.length) {
-      setNodes(mapNodes(graph?.data?.nodes, isReadOnly || isViewOnly));
+    if (graph?.nodes && graph?.nodes.length > 0 && !nodes.length) {
+      setNodes(mapNodes(graph?.nodes, project_id as string));
     }
-    if (graph?.data?.edges && graph?.data?.edges.length > 0 && !edges.length) {
-      setEdges(mapEdges(graph?.data?.edges, isReadOnly || isViewOnly));
+    if (graph?.edges && graph?.edges.length > 0 && !edges.length) {
+      setEdges(mapEdges(graph?.edges));
     }
-  }, [graph?.data?.nodes, graph?.data?.edges]);
+  }, [graph?.nodes, graph?.edges]);
 
   useEffect(() => {
     if (!cyRef || !ehRef) return () => {};
@@ -117,7 +114,7 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
       }
       if (refVariable?._cy) {
         refVariable?._cy.removeListener("click mousedown cxttap dbltap free");
-        setBoardState((prev) => ({ ...prev, drawMode: false }));
+        setBoardState((prev) => ({ ...prev, draw_mode: false }));
       }
       setNodes([]);
       setEdges([]);
@@ -239,7 +236,7 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
       } catch (error) {
         //! CRITICAL toaster("warning", "Cytoedge couldn't be removed, there was an error.");
       }
-      makeEdgeCallback(sourceData.id, targetData.id, graph?.data?.default_edge_color);
+      makeEdgeCallback(sourceData.id, targetData.id, graph?.default_edge_color);
     });
 
     return () => {
@@ -247,14 +244,14 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
         cyRef?.current?._cy.removeListener("ehcomplete");
       }
     };
-  }, [cyRef?.current?._cy, item_id, boardState.curveStyle]);
+  }, [cyRef?.current?._cy, item_id, boardState.curve_style]);
 
   useEffect(() => {
     // Creating edges
     // @ts-ignore
     cyRef?.current?._cy.on("click", function (evt: any) {
       // If the target is the background of the canvas
-      if (evt.target === cyRef?.current?._cy && boardState.addNodes) {
+      if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
         const { x, y } = evt.position;
         const id = crypto.randomUUID();
         setNodes((prev) => [
@@ -264,8 +261,8 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
               label: "",
               id,
               classes: "boardNode",
-              type: graph?.data?.default_node_shape || "rectangle",
-              backgroundColor: graph?.data?.default_node_color || "#595959",
+              type: graph?.default_node_shape || "rectangle",
+              backgroundColor: graph?.default_node_color || "#595959",
               backgroundImage: [],
               zIndexCompare: "auto",
             },
@@ -280,8 +277,8 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
         //   x,
         //   y,
         //   parentId: item_id,
-        //   type: graph?.data?.default_node_shape,
-        //   backgroundColor: graph?.data?.default_node_color,
+        //   type: graph?.default_node_shape,
+        //   backgroundColor: graph?.default_node_color,
         //   id,
         // });
       }
@@ -292,7 +289,7 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
         cyRef?.current?._cy.removeListener("click");
       }
     };
-  }, [cyRef?.current?._cy, item_id, boardState.addNodes]);
+  }, [cyRef?.current?._cy, item_id, boardState.add_nodes]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -321,7 +318,7 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
   useEffect(() => {
     if (cyRef?.current?._cy) {
       if (ehRef?.current) {
-        if (!boardState.drawMode) {
+        if (!boardState.draw_mode) {
           ehRef?.current.disable();
           ehRef?.current.disableDrawMode();
           cyRef?.current?._cy.autoungrabify(false);
@@ -335,13 +332,13 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
           ehRef?.current.enableDrawMode();
         }
       } else {
-        ehRef.current = cyRef?.current?._cy.edgehandles(edgehandlesSettings);
+        ehRef.current = cyRef?.current?._cy?.edgehandles?.(edgehandlesSettings);
       }
     }
-  }, [boardState.drawMode, cyRef?.current?._cy, ehRef?.current]);
+  }, [boardState.draw_mode, cyRef?.current?._cy, ehRef?.current]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
-      cyRef.current._cy.gridGuide({
+      cyRef?.current?._cy?.gridGuide?.({
         ...cytoscapeGridOptions,
         snapToGridDuringDrag: boardState.grid,
         drawGrid: boardState.grid,
@@ -465,7 +462,7 @@ export function Graph({ isReadOnly, isViewOnly }: Props) {
       //   }
       // }}
     >
-      {/* <ContextMenu cm={cm} items={contextItems} /> */}
+      <ContextMenu items={[{ title: "test" }]} />
       <CytoscapeComponent
         ref={cyRef}
         className="h-[94%] w-full"

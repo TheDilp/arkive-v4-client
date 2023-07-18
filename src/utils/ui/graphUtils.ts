@@ -474,7 +474,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         y: node?.y || 0,
 
         font_size: node?.font_size || 16,
-        font_color: node?.font_color || "#ffffff",
+        font_color: node?.font_color ?? "#ffffff",
         font_family: node?.font_family || "Lato",
         text_v_align: node?.text_v_align || "top",
         text_h_align: node?.text_h_align || "center",
@@ -487,7 +487,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         background_opacity: node?.background_opacity || 1,
 
         classes: `${isReadOnly ? "publicBoardNode" : "boardNode"}`,
-        z_indexCompare: node.z_index === 0 ? "manual" : "auto",
+        z_index_compare: node.z_index === 0 ? "manual" : "auto",
 
         // Used for displaying in drawer
         image: node?.image,
@@ -553,7 +553,7 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
     },
   }));
 }
-export const edgeArrowTypes = ["source", "target", "midSource", "midTarget"];
+export const edgeArrowTypes = ["source", "target", "midsource", "mid_target"];
 export const curve_styles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
 export function getcurve_styleIcon(curve_style: CurveStyleType): string {
   if (curve_style === "straight") return "cil:graph";
