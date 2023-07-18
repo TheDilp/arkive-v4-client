@@ -6,7 +6,8 @@ import { AvailableEntityType, BaseEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
-import { Breadcrumbs, Button, Icon } from "..";
+import { Breadcrumbs, Button, Icon, Skeleton } from "..";
+import Alert from "../Misc/Alert";
 import { ContextMenu } from "../Overlay/ContextMenu";
 
 type EntityItemType = {
@@ -21,7 +22,7 @@ function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { ty
   return (
     <Link to={`../graphs/${id}`}>
       <div
-        className="col-span-1 flex h-36 cursor-pointer flex-col items-center justify-center hover:text-blue-400"
+        className="col-span-1 flex cursor-pointer flex-col items-center justify-center hover:text-blue-400"
         data-context-id={id}
         data-context-title={title}
         data-context-type="graphs">
@@ -39,7 +40,7 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
 
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { data: base } = useGetAllEntities<BaseEntityType>(
+  const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType>(
     {
       pagination: {
         limit: 10,
@@ -58,10 +59,11 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
     "graphs",
     {
       enabled: !item_id,
+      staleTime: 5 * 60 * 1000,
     },
   );
 
-  const { data } = useGetItem<BaseEntityType>(
+  const { data, isFetching } = useGetItem<BaseEntityType>(
     item_id,
     type as AvailableEntityType,
     {
@@ -76,8 +78,11 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
     },
     {
       enabled: !!item_id,
+      staleTime: 5 * 60 * 1000,
     },
   );
+
+  if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
 
   return (
     <>
@@ -112,6 +117,11 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
             type={type as AvailableEntityType}
           />
         ))}
+        {!base?.data?.length && !data?.data?.children?.length ? (
+          <div className="col-span-1 mt-2 md:col-span-4 lg:col-span-10">
+            <Alert label="There is no content." variant="info" />
+          </div>
+        ) : null}
       </div>
     </>
   );

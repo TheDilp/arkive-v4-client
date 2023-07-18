@@ -12,7 +12,7 @@ export function Breadcrumbs({
   ],
 }: Props) {
   return (
-    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2">
+    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2 truncate">
       <Link to="../graphs">
         <Icon fontSize={22} icon={IconEnum.home} />
       </Link>
