@@ -1,4 +1,6 @@
 import { SkeletonType } from "../../types";
+import { IconEnum } from "../../utils";
+import { Icon } from ".";
 
 function TableSkeleton() {
   return (
@@ -83,7 +85,36 @@ function TableSkeleton() {
   );
 }
 
+function ButtonSkeleton() {
+  return <div className="h-10 w-40 animate-pulse rounded bg-zinc-700 shadow" />;
+}
+
+function BreadcrumbsSkeleton() {
+  return (
+    <div className="flex animate-pulse items-center justify-between">
+      <div className="flex h-8 items-center gap-x-2">
+        <Icon fontSize={22} icon={IconEnum.home} />
+        <Icon fontSize={22} icon={IconEnum.chevron_right} />
+        <div className="flex h-8 items-center">
+          <div className="h-4 w-24 animate-pulse rounded-full bg-zinc-700" />
+          <Icon fontSize={22} icon={IconEnum.chevron_right} />
+        </div>
+        <div className="flex h-8 items-center">
+          <div className="h-4 w-24 animate-pulse rounded-full bg-zinc-700" />
+          <Icon fontSize={22} icon={IconEnum.chevron_right} />
+        </div>
+        <div className="flex h-8 items-center">
+          <div className="h-4 w-24 animate-pulse rounded-full bg-zinc-700" />
+        </div>
+      </div>
+
+      <ButtonSkeleton />
+    </div>
+  );
+}
+
 export function Skeleton({ type }: SkeletonType) {
   if (type === "table") return <TableSkeleton />;
+  if (type === "breadcrumbs") return <BreadcrumbsSkeleton />;
   return null;
 }

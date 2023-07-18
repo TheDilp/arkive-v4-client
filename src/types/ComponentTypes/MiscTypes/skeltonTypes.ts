@@ -1,1 +1,1 @@
-export type SkeletonType = { type: "table" };
+export type SkeletonType = { type: "table" | "breadcrumbs" };
