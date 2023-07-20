@@ -56,12 +56,22 @@ body {
 }
 
 summary::-webkit-details-marker {
-  display: none;
+  @apply hidden;
 }
 details {
-  cursor: pointer;
+  @apply cursor-pointer;
 }
 details[open] summary svg {
-  cursor: pointer;
-  transform: rotate(180deg);
+  @apply rotate-180 cursor-pointer;
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  @apply h-6 w-6 appearance-none rounded-full border-none bg-transparent;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  @apply border-none p-0;
+}
+input[type="color"]::-webkit-color-swatch {
+  @apply rounded-full border-none;
 }
