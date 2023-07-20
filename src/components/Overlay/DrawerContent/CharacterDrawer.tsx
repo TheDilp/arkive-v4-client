@@ -157,7 +157,7 @@ function RelationshipRow({
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Realations", icon: IconEnum.family_tree },
+  { id: "2", label: "Realationships", icon: IconEnum.family_tree },
   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
   { id: "4", label: "Tags", icon: IconEnum.tags },
 ];
