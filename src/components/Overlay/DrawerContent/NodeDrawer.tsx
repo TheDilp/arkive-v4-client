@@ -63,6 +63,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
           <div className="flex w-full items-end justify-between">
             <div className="flex w-full items-end gap-x-2">
               <Select
+                hasSearch
                 label="Node shape"
                 name="type"
                 onChange={handleChange}
@@ -84,7 +85,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
               <Input label="Width" name="width" onChange={handleChange} type="number" value={node?.width || 50} />
             </div>
             <div className="w-full">
-              <Input label="Height" name="height" onChange={handleChange} type="number" value={node?.width || 50} />
+              <Input label="Height" name="height" onChange={handleChange} type="number" value={node?.height || 50} />
             </div>
           </div>
           <div className="flex-1">
