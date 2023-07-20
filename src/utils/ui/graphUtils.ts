@@ -198,7 +198,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         y: node?.y || 0,
 
         font_size: node?.font_size || 16,
-        font_color: node?.font_color ?? "#ffffff",
+        font_color: node?.font_color || "#ffffff",
         font_family: node?.font_family || "Lato",
         text_v_align: node?.text_v_align || "top",
         text_h_align: node?.text_h_align || "center",
