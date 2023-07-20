@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
 import Alert from "../../components/Misc/Alert";
 import { ContextMenu } from "../../components/Overlay/ContextMenu";
-import { useGetAllEntities, useGetItem } from "../../hooks";
+import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { drawerAtom, IconEnum } from "../../utils";
@@ -64,7 +64,7 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
     },
   );
 
-  const { data, isFetching } = useGetItem<BaseEntityType>(
+  const { data, isFetching } = useGetEntity<BaseEntityType>(
     item_id,
     type as AvailableEntityType,
     {
@@ -90,9 +90,9 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex h-10 items-center justify-between">
         <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} />
-        {!!item_id && data?.data?.is_folder ? (
+        {!item_id || data?.data?.is_folder ? (
           <div className="w-fit">
             <Button
               icon={IconEnum.add}

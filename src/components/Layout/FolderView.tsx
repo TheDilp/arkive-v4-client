@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { Link, useParams } from "react-router-dom";
 
-import { useGetAllEntities, useGetItem } from "../../hooks";
+import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { drawerAtom, IconEnum } from "../../utils";
@@ -63,7 +63,7 @@ export function FolderView({ contextMenuItems }: { contextMenuItems: ContextMenu
     },
   );
 
-  const { data, isFetching } = useGetItem<BaseEntityType>(
+  const { data, isFetching } = useGetEntity<BaseEntityType>(
     item_id,
     type as AvailableEntityType,
     {
