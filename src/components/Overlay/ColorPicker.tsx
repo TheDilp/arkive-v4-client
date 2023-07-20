@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { useState } from "react";
 
 import { ColorPaletteType, ColorPickerType } from "../../types";
 import { validateHexCode } from "../../utils";
@@ -8,8 +7,7 @@ import { DefaultTagColor, TagColors } from "../../utils/enums/ColorEnums";
 import { Input } from "..";
 import { Tooltip } from ".";
 
-function ColorPalette({ name, hasCustom, onChange, closeTooltip }: ColorPaletteType) {
-  const [customColor, setCustomColor] = useState(DefaultTagColor);
+function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorPaletteType) {
   return (
     <div className="flex max-h-96 max-w-xs flex-col overflow-hidden rounded-md border border-zinc-700 bg-zinc-900">
       {hasCustom ? (
@@ -21,27 +19,27 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip }: ColorPaletteT
               e.stopPropagation();
             }}>
             <Input
-              helperText={validateHexCode(customColor) ? "" : "This is not a valid hex code."}
+              helperText={validateHexCode(value) ? "" : "This is not a valid hex code."}
               label="Custom color"
               name="customColor"
               onChange={(e) => {
                 const newHex = (e.value as string).replace("#", "");
                 if (newHex.length > 6) return;
-                setCustomColor(`#${newHex}`);
+                onChange({ name, value: `#${newHex}` });
               }}
               placeholder="Custom hex code (Eg. #fffccc)"
-              value={customColor}
-              variant={validateHexCode(customColor) ? "primary" : "error"}
+              value={value}
+              variant={validateHexCode(value) ? "primary" : "error"}
             />
           </div>
           <input
             className="mt-7 self-start"
             color="hex"
             onChange={(e) => {
-              setCustomColor(e.target.value);
+              onChange({ name, value: e.target.value });
             }}
             type="color"
-            value={customColor}
+            value={value}
           />
         </div>
       ) : null}
@@ -63,7 +61,10 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip }: ColorPaletteT
 }
 export function ColorPicker({ name, value, hasCustom, onChange }: ColorPickerType) {
   return (
-    <Tooltip arrowColor="#18181B" content={<ColorPalette hasCustom={hasCustom} name={name} onChange={onChange} />} isClickable>
+    <Tooltip
+      arrowColor="#18181B"
+      content={<ColorPalette hasCustom={hasCustom} name={name} onChange={onChange} value={value} />}
+      isClickable>
       <div
         className="h-6 w-6 cursor-pointer rounded-full"
         style={{

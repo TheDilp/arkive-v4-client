@@ -8,6 +8,7 @@ export interface ColorPickerType {
 
 export interface ColorPaletteType {
   name: string;
+  value: string;
   hasCustom?: boolean;
   closeTooltip?: () => void;
   onChange: ({ name, value }: { name: string; value: string }) => void;
