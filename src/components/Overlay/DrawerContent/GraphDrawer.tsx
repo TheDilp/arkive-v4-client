@@ -3,7 +3,7 @@ import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotifications } from "../../../utils";
 import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
@@ -26,7 +26,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
 
-  const { data: existingGraph } = useGetItem<GraphType>(
+  const { data: existingGraph } = useGetEntity<GraphType>(
     data?.id,
     "graphs",
     {

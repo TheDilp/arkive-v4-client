@@ -40,6 +40,66 @@ export function useUpdateEntity<InsertType extends { data: { id?: string } }>(ty
   );
 }
 
+export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string } }>(
+  subtype: "nodes" | "edges",
+  parent_id: string,
+) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${subtype.toLowerCase()}/update/${updateValues?.data?.id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onMutate: (vars) => {
+        const old = queryClient.getQueryData(["graphs", parent_id]);
+        queryClient.setQueryData<{ data: GraphType }>(["graphs", parent_id], (oldData) => {
+          if (oldData?.data)
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                [subtype]: oldData.data[subtype].map((subitem) => {
+                  if (subitem.id === vars.data.id) return { ...subitem, ...vars.data };
+                  return subitem;
+                }),
+              },
+            };
+          return oldData;
+        });
+
+        return { old };
+      },
+
+      onError: (_, __, context) => {
+        queryClient.setQueryData(["graphs", parent_id], context?.old);
+
+        createNotification({
+          id: crypto.randomUUID(),
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: () => {
+        createNotification({
+          id: crypto.randomUUID(),
+          title: getEntityCRUDNotification(subtype, "update"),
+          variant: "success",
+          icon: IconEnum.check,
+          timer: 2,
+        });
+      },
+    },
+  );
+}
+
 export function useUpdateManyNodesPosition(item_id: string) {
   const queryClient = useQueryClient();
   return useMutation(

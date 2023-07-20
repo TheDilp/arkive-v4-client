@@ -5,7 +5,7 @@ import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
 import Alert from "../../components/Misc/Alert";
 import { ContextMenu } from "../../components/Overlay/ContextMenu";
 import { useGetAllEntities, useGetEntity } from "../../hooks";
-import { AvailableEntityType, BaseEntityType } from "../../types";
+import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
 import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
 import { drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
@@ -142,7 +142,7 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
           ) : null}
         </div>
       ) : null}
-      {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph data={data?.data} /> : null}
+      {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph data={data?.data as GraphType} /> : null}
     </>
   );
 }

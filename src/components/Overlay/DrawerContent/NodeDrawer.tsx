@@ -1,8 +1,20 @@
+import { useSetAtom } from "jotai";
+import omit from "lodash.omit";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { IconEnum } from "../../../utils";
-import { GraphFontSizesEnum, NodeShapesEnum, TextHAlignEnum, TextVAlignEnum } from "../../../utils/enums/GraphEnums";
-import { Input, Search, Select, Tabs, Title } from "../..";
+import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
+import { NodeType } from "../../../types";
+import { IconEnum, nodesAtom, useNotifications } from "../../../utils";
+import {
+  DefaultBoardColor,
+  GraphFontSizesEnum,
+  NodeShapesEnum,
+  TextHAlignEnum,
+  TextVAlignEnum,
+} from "../../../utils/enums/GraphEnums";
+import { getNodeImage } from "../../../utils/ui/graphUtils";
+import { Badge, Button, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 const tabs = [
@@ -11,8 +23,30 @@ const tabs = [
   { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 
-export function NodeDrawer({ data }: { data: { id?: string } }) {
+export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } }) {
+  const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const createNotification = useNotifications();
+  const { data: existingNode } = useGetSubEntity<NodeType>(
+    data?.id,
+    "nodes",
+    {
+      data: {},
+      // relations: { character_fields: true, relationships: true, tags: true },
+      // fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
+    },
+    {
+      enabled: !!data?.id,
+    },
+  );
+  const setNodes = useSetAtom(nodesAtom);
+
+  const { mutateAsync: update } = useUpdateGraphSubEntity("nodes", data.parent_id);
+
+  const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
+
+  const { handleChange } = useHandleChange({ data: node, setData: setNode });
+
   return (
     <div className="flex flex-col gap-y-2 font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -24,59 +58,95 @@ export function NodeDrawer({ data }: { data: { id?: string } }) {
             <div className="flex w-full items-end gap-x-2">
               <Select
                 label="Node shape"
-                //   name={`[${index}].title`}
-                //   onChange={handleChange}
-                //   value={tag.title}
+                name="type"
+                onChange={handleChange}
                 options={NodeShapesEnum}
+                value={node?.type || "rectangle"}
               />
               <div className="self-end pb-2">
-                <ColorPicker hasCustom />
+                <ColorPicker
+                  hasCustom
+                  name="background_color"
+                  onChange={handleChange}
+                  value={node?.background_color || DefaultBoardColor}
+                />
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-x-2">
-            <div className="flex-1">
-              <Input label="Width" type="number" />
+          <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
+            <div className="w-full">
+              <Input label="Width" name="width" onChange={handleChange} type="number" value={node?.width || 50} />
             </div>
-            <div className="flex-1">
-              <Input label="Height" type="number" />
+            <div className="w-full">
+              <Input label="Height" name="height" onChange={handleChange} type="number" value={node?.width || 50} />
             </div>
           </div>
           <div className="flex-1">
-            <Input label="Image (optional)" />
+            <ImageSelect
+              isIconOnly
+              label="Select image (optional)"
+              name="image_id"
+              onChange={handleChange}
+              type="images"
+              value={node?.image_id ?? ""}
+            />
           </div>
           <div className="flex-1">
-            <Input label="Node opacity" type="number" />
+            <Input
+              label="Node opacity"
+              name="background_opacity"
+              onChange={handleChange}
+              type="number"
+              value={node?.background_opacity || 1}
+            />
           </div>
           <div className="flex-1">
-            <Input label="Node level" type="number" />
+            <Input label="Node level" name="z_index" onChange={handleChange} type="number" value={node?.z_index || 1} />
           </div>
           <Title isDrawerTitle label="Label" size="xl" />
           <div className="flex items-center gap-x-2">
-            <div className="flex w-full items-end gap-x-2">
-              <div className="flex-1">
-                <Input label="Label (optional)" />
+            <div className="flex w-full flex-col items-end gap-2 lg:flex-row">
+              <div className="w-full">
+                <Input
+                  label="Label (optional)"
+                  name="label"
+                  onChange={handleChange}
+                  placeholder="Eg. Node label"
+                  value={node?.label || ""}
+                />
               </div>
-              <div className="flex flex-1 items-center gap-x-2">
+              <div className="flex w-full items-center gap-x-2">
                 <Select
                   label="Label font size"
-                  //   name={`[${index}].title`}
-                  //   onChange={handleChange}
-                  //   value={tag.title}
+                  name="font_size"
+                  onChange={handleChange}
                   options={GraphFontSizesEnum}
+                  value={node?.font_size || "16"}
                 />
                 <div className="self-end pb-2">
-                  <ColorPicker hasCustom />
+                  <ColorPicker hasCustom name="font_color" onChange={handleChange} value={node?.font_color || "#ffffff"} />
                 </div>
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-x-2">
-            <div className="flex-1">
-              <Select label="Vertical alignment" options={TextVAlignEnum} />
+          <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
+            <div className="w-full">
+              <Select
+                label="Vertical alignment"
+                name="text_v_align"
+                onChange={handleChange}
+                options={TextVAlignEnum}
+                value={node?.text_v_align || "center"}
+              />
             </div>
-            <div className="flex-1">
-              <Select label="Horizontal alignment" options={TextHAlignEnum} />
+            <div className="w-full">
+              <Select
+                label="Horizontal alignment"
+                name="text_h_align"
+                onChange={handleChange}
+                options={TextHAlignEnum}
+                value={node?.text_h_align || "center"}
+              />
             </div>
           </div>
         </>
@@ -86,37 +156,37 @@ export function NodeDrawer({ data }: { data: { id?: string } }) {
           <Search
             name="tags"
             onChange={({ name, label, value, color }) => {
-              // if ((character?.tags || [])?.some((tag) => tag.id === value)) {
-              //   createNotification({
-              //     id: crypto.randomUUID(),
-              //     title: "Cannot add the same tag twice.",
-              //     variant: "warning",
-              //     icon: IconEnum.info_circle,
-              //     timer: 3,
-              //   });
-              //   return;
-              // }
-              // handleChange({
-              //   name,
-              //   value: (character?.tags || []).concat({
-              //     title: label as string,
-              //     id: value,
-              //     project_id: project_id as string,
-              //     color: color as string,
-              //   }),
-              // });
+              if ((node?.tags || [])?.some((tag) => tag.id === value)) {
+                createNotification({
+                  id: crypto.randomUUID(),
+                  title: "Cannot add the same tag twice.",
+                  variant: "warning",
+                  icon: IconEnum.info_circle,
+                  timer: 3,
+                });
+                return;
+              }
+              handleChange({
+                name,
+                value: (node?.tags || []).concat({
+                  title: label as string,
+                  id: value,
+                  project_id: project_id as string,
+                  color: color as string,
+                }),
+              });
             }}
             placeholder="Press enter to search tags"
             searchEntity="tags"
           />
 
           <div className="flex flex-wrap gap-2">
-            {/* {character?.tags?.length
-              ? character.tags.map((tag) => (
+            {node?.tags?.length
+              ? node.tags.map((tag) => (
                   <div key={tag.id} className="w-fit">
                     <Badge
                       clearAction={() => {
-                        handleChange({ name: "tags", value: (character?.tags || []).filter((t) => t.id !== tag.id) });
+                        handleChange({ name: "tags", value: (node?.tags || []).filter((t) => t.id !== tag.id) });
                       }}
                       customColor={tag.color}
                       label={tag.title}
@@ -124,10 +194,45 @@ export function NodeDrawer({ data }: { data: { id?: string } }) {
                     />
                   </div>
                 ))
-              : null} */}
+              : null}
           </div>
         </div>
       ) : null}
+      <Button
+        icon={IconEnum.save}
+        label="Save"
+        onClick={async () => {
+          if (node && node?.id) {
+            await update({ data: omit(node, ["parent_id"]) });
+            setNodes((oldNodes) => {
+              if (oldNodes) {
+                const newNodes = [...oldNodes];
+                const idx = newNodes.findIndex((n) => n.data.id === node.id);
+                if (idx > -1) {
+                  newNodes[idx] = {
+                    ...newNodes[idx],
+                    data: {
+                      ...newNodes[idx].data,
+                      ...node,
+                      backgroundImage: getNodeImage(
+                        {
+                          ...newNodes[idx].data,
+                          ...node,
+                        } as NodeType,
+                        project_id as string,
+                      ),
+                    },
+                  };
+                  return newNodes;
+                }
+                return newNodes;
+              }
+              return oldNodes;
+            });
+          }
+        }}
+        variant="success"
+      />
     </div>
   );
 }

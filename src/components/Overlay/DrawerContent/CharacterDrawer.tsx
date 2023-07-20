@@ -2,7 +2,7 @@ import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetAllEntities, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
@@ -166,7 +166,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
-  const { data: existingCharacter } = useGetItem<CharacterType>(
+  const { data: existingCharacter } = useGetEntity<CharacterType>(
     data?.id,
     "characters",
     {

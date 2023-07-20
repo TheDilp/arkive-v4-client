@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { useChangeNavbarTitle } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { BoardContext, GraphType } from "../../types/EntityTypes/graphTypes";
-import { BoardReferenceAtom, BoardStateAtom, drawerAtom, EdgesAtom, NodesAtom } from "../../utils/atoms";
+import { BoardReferenceAtom, BoardStateAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { ContextMenu } from "../Overlay/ContextMenu";
@@ -37,8 +37,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
     edges: null,
   });
 
-  const [nodes, setNodes] = useAtom(NodesAtom);
-  const [edges, setEdges] = useAtom(EdgesAtom);
+  const [nodes, setNodes] = useAtom(nodesAtom);
+  const [edges, setEdges] = useAtom(edgesAtom);
 
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
 
@@ -200,11 +200,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
         setDrawer((prev) => ({
           ...prev,
-          data: { id: rest.id },
+          data: { id: rest.id, parent_id: item_id },
           position: "right",
+          title: `Edit node - ${rest.label}`,
           show: true,
           type: "nodes",
-          drawerSize: "sm",
+          size: "md",
         }));
       });
       cyRef?.current?._cy.on("dbltap", "edge", function (evt: any) {
@@ -372,7 +373,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
 
   return (
     <div
-      className="relative flex h-full w-full justify-center"
+      className="relative flex h-[calc(100%-6rem)] w-full flex-1 justify-center"
       // onDrop={(e) => {
       //   const stringData = e.dataTransfer.getData("item_id");
       //   if (!stringData) return;
@@ -465,7 +466,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
       <ContextMenu items={[{ title: "test" }]} />
       <CytoscapeComponent
         ref={cyRef}
-        className="h-[94%] w-full"
+        className="h-full w-full"
         cy={(cy: Core) => {
           setBoardRef(cy);
         }}

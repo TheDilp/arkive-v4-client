@@ -3,42 +3,7 @@ import cytoscape, { EdgeCollection, NodeCollection } from "cytoscape";
 import { BaseEntityType, CharacterType, EventType, ImageType, MapPinType, MapType, TagType } from ".";
 import { DocumentType } from "./documentTypes";
 
-type ArrowShape =
-  | "none"
-  | "triangle"
-  | "triangle-tee"
-  | "triangle-cross"
-  | "triangle-backcurve"
-  | "circle-triangle"
-  | "vee"
-  | "tee"
-  | "circle"
-  | "diamond"
-  | "chevron";
-
-type ArrowFill = "filled" | "hollow";
 export type CurveStyleType = "straight" | "taxi" | "unbundled-bezier";
-type NodeShape =
-  | "rectangle"
-  | "ellipse"
-  | "triangle"
-  | "barrel"
-  | "rhomboid"
-  | "diamond"
-  | "pentagon"
-  | "hexagon"
-  | "heptagon"
-  | "octagon"
-  | "star"
-  | "cut-rectangle"
-  | "round-triangle"
-  | "round-rectangle"
-  | "bottom-round-rectangle"
-  | "round-diamond"
-  | "round-pentagon"
-  | "round-hexagon"
-  | "round-heptagon"
-  | "round-octagon";
 
 export type NodeType = {
   id: string;

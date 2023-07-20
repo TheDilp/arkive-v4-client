@@ -14,5 +14,5 @@ export const BoardStateAtom = atom<{
   curve_style: "straight",
 });
 
-export const NodesAtom = atom<NodeDefinition[]>([]);
-export const EdgesAtom = atom<EdgeDefinition[]>([]);
+export const nodesAtom = atom<NodeDefinition[]>([]);
+export const edgesAtom = atom<EdgeDefinition[]>([]);

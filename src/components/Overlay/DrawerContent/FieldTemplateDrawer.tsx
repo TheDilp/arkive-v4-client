@@ -3,7 +3,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, sortEntities } from "../../../utils";
 import { Button, Input, Select } from "../../Form";
@@ -137,7 +137,7 @@ export default function FieldTemplateDrawer({ data }: { data: { id?: string } })
     relations?: { character_fields?: FieldType[] };
   }>("character_fields_templates", project_id as string);
 
-  const { data: existingTemplate } = useGetItem<FieldTemplate & { fields: FieldType[] }>(
+  const { data: existingTemplate } = useGetEntity<FieldTemplate & { fields: FieldType[] }>(
     data?.id,
     "character_fields_templates",
     {
