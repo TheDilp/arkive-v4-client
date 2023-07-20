@@ -8,6 +8,9 @@ dependencies:
   '@floating-ui/react':
     specifier: ^0.24.8
     version: 0.24.8(react-dom@18.2.0)(react@18.2.0)
+  '@tailwindcss/container-queries':
+    specifier: ^0.1.1
+    version: 0.1.1(tailwindcss@3.3.2)
   '@tanstack/react-query':
     specifier: ^4.29.19
     version: 4.29.19(react-dom@18.2.0)(react@18.2.0)
@@ -780,6 +783,14 @@ packages:
   /@remix-run/router@1.7.1:
     resolution: {integrity: sha512-bgVQM4ZJ2u2CM8k1ey70o1ePFXsEzYVZoWghh6WjM8p59jQ7HxzbHW4SbnWFG7V9ig9chLawQxDTZ3xzOF8MkQ==}
     engines: {node: '>=14'}
+    dev: false
+
+  /@tailwindcss/container-queries@0.1.1(tailwindcss@3.3.2):
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
+    dependencies:
+      tailwindcss: 3.3.2
     dev: false
 
   /@tanstack/match-sorter-utils@8.8.4:
