@@ -8,7 +8,7 @@ import { DefaultTagColor, TagColors } from "../../utils/enums/ColorEnums";
 import { Input } from "..";
 import { Tooltip } from ".";
 
-function ColorPalette({ name, hasCustom, onChange }: ColorPaletteType) {
+function ColorPalette({ name, hasCustom, onChange, closeTooltip }: ColorPaletteType) {
   const [customColor, setCustomColor] = useState(DefaultTagColor);
   return (
     <div className="flex max-h-96 max-w-xs flex-col overflow-hidden rounded-md border border-zinc-700 bg-zinc-900">
@@ -50,7 +50,10 @@ function ColorPalette({ name, hasCustom, onChange }: ColorPaletteType) {
           <div
             key={color}
             className="h-6 w-6 cursor-pointer rounded-full"
-            onClick={() => onChange({ name, value: color })}
+            onClick={() => {
+              onChange({ name, value: color });
+              if (closeTooltip) closeTooltip();
+            }}
             style={{ backgroundColor: color }}
           />
         ))}
