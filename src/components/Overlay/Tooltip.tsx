@@ -76,7 +76,7 @@ export function Tooltip({
         getReferenceProps({
           ref: refs.setReference,
           ...children.props,
-          ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
+          // ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
         }),
       )}
       {!isDisabled && open && (
