@@ -142,7 +142,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                 name="text_v_align"
                 onChange={handleChange}
                 options={TextVAlignEnum}
-                value={node?.text_v_align || "center"}
+                value={node?.text_v_align || "top"}
               />
             </div>
             <div className="w-full">

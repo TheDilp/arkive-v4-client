@@ -15,7 +15,7 @@ export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
         color: "data(font_color)",
         "text-outline-color": "black",
         "text-outline-width": "2px",
-        // "background-image": "data(backgroundImage)",
+        "background-image": "data(background_image)",
         "background-fit": "cover",
         "background-clip": "node",
         "background-color": "data(background_color)",

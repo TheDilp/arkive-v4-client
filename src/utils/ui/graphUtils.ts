@@ -177,8 +177,8 @@ export function getNodeImage(node: NodeType, project_id: string) {
   if (node.document?.image) {
     image = node.document.image.id;
   }
-  if (node.image) {
-    image = node.image.id;
+  if (node.image_id) {
+    image = node.image_id;
   }
   if (image !== "") return getImageURL(project_id as string, "images", image);
   return [];
@@ -219,7 +219,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
 
         tags: node.tags,
 
-        backgroundImage: getNodeImage(node, project_id) || [],
+        background_image: getNodeImage(node, project_id) || [],
         doc_id: node?.doc_id,
       },
       is_locked: isReadOnly || node.is_locked,
