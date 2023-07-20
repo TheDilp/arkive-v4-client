@@ -155,6 +155,13 @@ function RelationshipRow({
   );
 }
 
+const tabs = [
+  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+  { id: "2", label: "Realations", icon: IconEnum.family_tree },
+  { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "4", label: "Tags", icon: IconEnum.tags },
+];
+
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -203,16 +210,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   return (
     <>
-      <Tabs
-        onChange={(_, index) => setSelectedTab(index)}
-        selectedTab={selectedTab}
-        tabs={[
-          { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-          { id: "2", label: "Realations", icon: IconEnum.family_tree },
-          { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
-          { id: "4", label: "Tags", icon: IconEnum.tags },
-        ]}
-      />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
