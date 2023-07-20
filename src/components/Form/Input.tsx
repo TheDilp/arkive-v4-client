@@ -13,7 +13,7 @@ const InputClasses = tv({
   variants: {
     variant: {
       primary: {
-        input: "border-zinc-700",
+        input: "border-zinc-700 focus:border-zinc-500",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },

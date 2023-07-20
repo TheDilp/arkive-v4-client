@@ -6,7 +6,7 @@ import { Icon, Tooltip } from "..";
 
 const ButtonClasses = tv({
   slots: {
-    base: "font-lato font-medium h-10 rounded active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate",
+    base: "font-lato font-medium h-10 rounded border border-transparent active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate",
     label: "hidden xs:block select-none",
   },
   variants: {
@@ -18,10 +18,10 @@ const ButtonClasses = tv({
         base: "bg-zinc-600 text-white",
       },
       info: {
-        base: "bg-blue-600 text-white",
+        base: "bg-blue-600 text-white focus:border-blue-400",
       },
       success: {
-        base: "bg-green-600 text-white",
+        base: "bg-green-600 text-white focus:border-green-400",
       },
       warning: { base: "bg-orange-600 text-white" },
       error: {
