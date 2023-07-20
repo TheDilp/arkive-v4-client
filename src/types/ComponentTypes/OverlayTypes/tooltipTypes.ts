@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 import { PositionType } from "../../baseTypes";
 
 export type TooltipContentType = string | JSX.Element | null;
@@ -14,5 +16,5 @@ export interface TooltipType {
 }
 
 export type DefaultTooltipType = {
-  children: JSX.Element | JSX.Element[] | string | null;
+  children: ReactElement | string | null;
 };

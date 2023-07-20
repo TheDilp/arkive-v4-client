@@ -16,7 +16,7 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import { cloneElement, useRef, useState } from "react";
+import { cloneElement, ReactElement, useRef, useState } from "react";
 
 import { DefaultTooltipType, TooltipType } from "../../types";
 
@@ -70,7 +70,10 @@ export function Tooltip({
 
   return (
     <>
-      {cloneElement(children, getReferenceProps({ ref: refs.setReference, ...children.props }))}
+      {cloneElement(
+        children,
+        getReferenceProps({ ref: refs.setReference, ...children.props, closeTooltip: () => setOpen(false) }),
+      )}
       {!isDisabled && open && (
         <div
           onClick={() => {
@@ -85,7 +88,11 @@ export function Tooltip({
             ref: refs.setFloating,
             style: { ...floatingStyles, zIndex: 99999 },
           })}>
-          {typeof content === "string" ? <DefaultTooltip>{content}</DefaultTooltip> : content}
+          {typeof content === "string" ? (
+            <DefaultTooltip>{content}</DefaultTooltip>
+          ) : (
+            cloneElement(content as ReactElement, { closeTooltip: () => setOpen(false) })
+          )}
           <FloatingArrow
             ref={arrowRef}
             className="z-[9999] [&>path:first-of-type]:stroke-none"
