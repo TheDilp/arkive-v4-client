@@ -4,7 +4,7 @@ import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, Searchabl
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction } from "../../utils";
 
-export function useGetItem<EntityType>(
+export function useGetEntity<EntityType>(
   id: string | undefined,
   type: AvailableEntityType,
   body: RequestBodyType,
@@ -14,6 +14,21 @@ export function useGetItem<EntityType>(
     [type, id],
     async () =>
       FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type.toLowerCase()}/${id}` }),
+    {
+      enabled: options?.enabled,
+      staleTime: options?.staleTime,
+    },
+  );
+}
+export function useGetSubEntity<EntityType>(
+  id: string | undefined,
+  type: AvailableSubEntityType,
+  body: RequestBodyType,
+  options?: UseQueryOptions,
+) {
+  return useQuery<{ data: EntityType }>(
+    [type, id],
+    async () => FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type}/${id}` }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
