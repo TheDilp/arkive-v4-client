@@ -1,7 +1,7 @@
 import { AssetType } from "../../baseTypes";
-import { SearchType } from "../FormTypes/searchTypes";
+import { ButtonType, SearchType } from "..";
 
-export interface ImageSelectType extends Pick<SearchType, "value" | "onChange" | "name"> {
+export interface ImageSelectType extends Pick<SearchType, "value" | "onChange" | "name">, Pick<ButtonType, "isIconOnly"> {
   label?: string;
   type: AssetType;
 }

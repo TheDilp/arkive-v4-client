@@ -79,16 +79,17 @@ export function Button({
   isLoading,
   variant = "primary",
   hasNoBackground,
+  isIconOnly,
   onClick,
   tooltip,
   size,
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({ variant, size, isDisabled, hasNoBackground, hasNoLabel: !label });
   return (
-    <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
+    <Tooltip content={tooltip || ""} isDisabled={!tooltip || isIconOnly} isIgnoringHover>
       <button className={base()} disabled={isDisabled} onClick={onClick} type="button">
         {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} thickness={iconThickness} /> : null}
-        {label ? <span className={labelClasses()}>{label}</span> : null}
+        {label && !isIconOnly ? <span className={labelClasses()}>{label}</span> : null}
         {(iconPos === "right" && icon) || isLoading ? (
           <Icon
             className={isLoading ? "animate-spin" : ""}

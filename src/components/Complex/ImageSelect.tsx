@@ -4,7 +4,7 @@ import { DialogAtomType, ImageSelectType } from "../../types";
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button, Search } from "../Form";
 
-export function ImageSelect({ name, onChange, label, value, type }: ImageSelectType) {
+export function ImageSelect({ name, onChange, label, value, type, isIconOnly }: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
 
   return (
@@ -25,6 +25,7 @@ export function ImageSelect({ name, onChange, label, value, type }: ImageSelectT
         <div className="col-span-2">
           <Button
             icon={IconEnum.upload}
+            isIconOnly={isIconOnly}
             label="Upload new"
             onClick={() =>
               setDialogAtom((prev: DialogAtomType) => ({
