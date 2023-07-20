@@ -24,7 +24,7 @@ const SelectClasses = tv({
     base: "relative flex select-none flex-col w-full cursor-pointer z-0 max-w-full font-lato",
     select:
       "flex h-10 truncate w-full max-w-full items-center justify-between bg-zinc-900 text-white rounded-md border p-2 outline-none placeholder:select-none placeholder:font-lato",
-    label: "text-sm font-medium truncate block w-full pl-1 font-lato",
+    label: "text-sm font-medium truncate block w-full font-lato",
     helperText: "text-xs truncate block px-2",
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
