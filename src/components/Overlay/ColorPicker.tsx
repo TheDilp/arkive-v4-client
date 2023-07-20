@@ -64,7 +64,8 @@ export function ColorPicker({ name, value, hasCustom, onChange }: ColorPickerTyp
     <Tooltip
       arrowColor="#18181B"
       content={<ColorPalette hasCustom={hasCustom} name={name} onChange={onChange} value={value} />}
-      isClickable>
+      isClickable
+      passCloseTooltip>
       <div
         className="h-6 w-6 cursor-pointer rounded-full"
         style={{

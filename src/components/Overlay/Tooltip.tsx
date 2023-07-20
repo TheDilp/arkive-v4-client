@@ -34,6 +34,7 @@ export function Tooltip({
   customOffset,
   isIgnoringHover,
   arrowColor,
+  passCloseTooltip,
 }: TooltipType) {
   const [open, setOpen] = useState(false);
   const arrowRef = useRef(null);
@@ -72,7 +73,11 @@ export function Tooltip({
     <>
       {cloneElement(
         children,
-        getReferenceProps({ ref: refs.setReference, ...children.props, closeTooltip: () => setOpen(false) }),
+        getReferenceProps({
+          ref: refs.setReference,
+          ...children.props,
+          ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
+        }),
       )}
       {!isDisabled && open && (
         <div
@@ -91,7 +96,7 @@ export function Tooltip({
           {typeof content === "string" ? (
             <DefaultTooltip>{content}</DefaultTooltip>
           ) : (
-            cloneElement(content as ReactElement, { closeTooltip: () => setOpen(false) })
+            cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
           )}
           <FloatingArrow
             ref={arrowRef}

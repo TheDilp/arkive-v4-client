@@ -12,6 +12,7 @@ export interface TooltipType {
   isDisabled?: boolean;
   isClickable?: boolean;
   closeOnClick?: boolean;
+  passCloseTooltip?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };
 }
 
