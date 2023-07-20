@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetItem, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
-import { AvailableNodeShapes, DefaultBoardColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotifications } from "../../../utils";
 import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
@@ -75,7 +75,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
           label="Default node shape"
           name="default_node_shape"
           onChange={handleChange}
-          options={AvailableNodeShapes}
+          options={NodeShapesEnum}
           value={graph?.default_node_shape || ""}
         />
       </div>

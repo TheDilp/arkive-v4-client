@@ -6,3 +6,4 @@ export * from "./Input";
 export * from "./Search";
 export * from "./Select";
 export * from "./Textarea";
+export * from "./Title";

@@ -5,12 +5,13 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { drawerAtom, IconEnum } from "../../utils";
+import { GraphDrawer } from "..";
 import { Button } from "../Form";
 import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
+import { NodeDrawer } from "./DrawerContent/NodeDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
-import { GraphDrawer } from "..";
 
 const DrawerClasses = tv({
   slots: {
@@ -111,6 +112,7 @@ export function Drawer() {
         {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
+        {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
       </div>
     </div>

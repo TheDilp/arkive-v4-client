@@ -1,6 +1,6 @@
-import { curve_styleType } from "../../types/EntityTypes/graphTypes";
+import { CurveStyleType } from "../../types/EntityTypes/graphTypes";
 
-export const getCytoscapeStylesheet = (curve_style: curve_styleType) => {
+export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
   return [
     // Nodes in general
     {
@@ -293,13 +293,393 @@ export const cytoscapeGridOptions = {
 
 export const DefaultBoardColor = "#595959";
 
-export const BoardFonSizes = [
-  10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70,
-  72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126,
-  128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176,
-  178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200,
+export const GraphFontSizesEnum = [
+  {
+    label: 10,
+    value: 10,
+  },
+  {
+    label: 12,
+    value: 12,
+  },
+  {
+    label: 14,
+    value: 14,
+  },
+  {
+    label: 16,
+    value: 16,
+  },
+  {
+    label: 18,
+    value: 18,
+  },
+  {
+    label: 20,
+    value: 20,
+  },
+  {
+    label: 22,
+    value: 22,
+  },
+  {
+    label: 24,
+    value: 24,
+  },
+  {
+    label: 26,
+    value: 26,
+  },
+  {
+    label: 28,
+    value: 28,
+  },
+  {
+    label: 30,
+    value: 30,
+  },
+  {
+    label: 32,
+    value: 32,
+  },
+  {
+    label: 34,
+    value: 34,
+  },
+  {
+    label: 36,
+    value: 36,
+  },
+  {
+    label: 38,
+    value: 38,
+  },
+  {
+    label: 40,
+    value: 40,
+  },
+  {
+    label: 42,
+    value: 42,
+  },
+  {
+    label: 44,
+    value: 44,
+  },
+  {
+    label: 46,
+    value: 46,
+  },
+  {
+    label: 48,
+    value: 48,
+  },
+  {
+    label: 50,
+    value: 50,
+  },
+  {
+    label: 52,
+    value: 52,
+  },
+  {
+    label: 54,
+    value: 54,
+  },
+  {
+    label: 56,
+    value: 56,
+  },
+  {
+    label: 58,
+    value: 58,
+  },
+  {
+    label: 60,
+    value: 60,
+  },
+  {
+    label: 62,
+    value: 62,
+  },
+  {
+    label: 64,
+    value: 64,
+  },
+  {
+    label: 66,
+    value: 66,
+  },
+  {
+    label: 68,
+    value: 68,
+  },
+  {
+    label: 70,
+    value: 70,
+  },
+  {
+    label: 72,
+    value: 72,
+  },
+  {
+    label: 74,
+    value: 74,
+  },
+  {
+    label: 76,
+    value: 76,
+  },
+  {
+    label: 78,
+    value: 78,
+  },
+  {
+    label: 80,
+    value: 80,
+  },
+  {
+    label: 82,
+    value: 82,
+  },
+  {
+    label: 84,
+    value: 84,
+  },
+  {
+    label: 86,
+    value: 86,
+  },
+  {
+    label: 88,
+    value: 88,
+  },
+  {
+    label: 90,
+    value: 90,
+  },
+  {
+    label: 92,
+    value: 92,
+  },
+  {
+    label: 94,
+    value: 94,
+  },
+  {
+    label: 96,
+    value: 96,
+  },
+  {
+    label: 98,
+    value: 98,
+  },
+  {
+    label: 100,
+    value: 100,
+  },
+  {
+    label: 102,
+    value: 102,
+  },
+  {
+    label: 104,
+    value: 104,
+  },
+  {
+    label: 106,
+    value: 106,
+  },
+  {
+    label: 108,
+    value: 108,
+  },
+  {
+    label: 110,
+    value: 110,
+  },
+  {
+    label: 112,
+    value: 112,
+  },
+  {
+    label: 114,
+    value: 114,
+  },
+  {
+    label: 116,
+    value: 116,
+  },
+  {
+    label: 118,
+    value: 118,
+  },
+  {
+    label: 120,
+    value: 120,
+  },
+  {
+    label: 122,
+    value: 122,
+  },
+  {
+    label: 124,
+    value: 124,
+  },
+  {
+    label: 126,
+    value: 126,
+  },
+  {
+    label: 128,
+    value: 128,
+  },
+  {
+    label: 130,
+    value: 130,
+  },
+  {
+    label: 132,
+    value: 132,
+  },
+  {
+    label: 134,
+    value: 134,
+  },
+  {
+    label: 136,
+    value: 136,
+  },
+  {
+    label: 138,
+    value: 138,
+  },
+  {
+    label: 140,
+    value: 140,
+  },
+  {
+    label: 142,
+    value: 142,
+  },
+  {
+    label: 144,
+    value: 144,
+  },
+  {
+    label: 146,
+    value: 146,
+  },
+  {
+    label: 148,
+    value: 148,
+  },
+  {
+    label: 150,
+    value: 150,
+  },
+  {
+    label: 152,
+    value: 152,
+  },
+  {
+    label: 154,
+    value: 154,
+  },
+  {
+    label: 156,
+    value: 156,
+  },
+  {
+    label: 158,
+    value: 158,
+  },
+  {
+    label: 160,
+    value: 160,
+  },
+  {
+    label: 162,
+    value: 162,
+  },
+  {
+    label: 164,
+    value: 164,
+  },
+  {
+    label: 166,
+    value: 166,
+  },
+  {
+    label: 168,
+    value: 168,
+  },
+  {
+    label: 170,
+    value: 170,
+  },
+  {
+    label: 172,
+    value: 172,
+  },
+  {
+    label: 174,
+    value: 174,
+  },
+  {
+    label: 176,
+    value: 176,
+  },
+  {
+    label: 178,
+    value: 178,
+  },
+  {
+    label: 180,
+    value: 180,
+  },
+  {
+    label: 182,
+    value: 182,
+  },
+  {
+    label: 184,
+    value: 184,
+  },
+  {
+    label: 186,
+    value: 186,
+  },
+  {
+    label: 188,
+    value: 188,
+  },
+  {
+    label: 190,
+    value: 190,
+  },
+  {
+    label: 192,
+    value: 192,
+  },
+  {
+    label: 194,
+    value: 194,
+  },
+  {
+    label: 196,
+    value: 196,
+  },
+  {
+    label: 198,
+    value: 198,
+  },
+  {
+    label: 200,
+    value: 200,
+  },
 ];
-export const BoardFontFamilies = [
+export const GraphFontFamiliesEnum = [
   {
     label: "Arial",
     value: "Arial",
@@ -349,7 +729,7 @@ export const BoardFontFamilies = [
     value: "Verdana",
   },
 ];
-export const text_h_alignOptions = [
+export const TextHAlignEnum = [
   {
     label: "Left",
     value: "left",
@@ -363,7 +743,7 @@ export const text_h_alignOptions = [
     value: "right",
   },
 ];
-export const text_v_alignOptions = [
+export const TextVAlignEnum = [
   {
     label: "Top",
     value: "top",
@@ -377,7 +757,7 @@ export const text_v_alignOptions = [
     value: "bottom",
   },
 ];
-export const AvailableNodeShapes = [
+export const NodeShapesEnum = [
   {
     label: "Rectangle",
     value: "rectangle",
@@ -461,7 +841,7 @@ export const AvailableNodeShapes = [
     value: "round-octagon",
   },
 ];
-export const boardEdgecurve_styles = [
+export const EdgeCurveStylesEnum = [
   {
     label: "Straight",
     value: "straight",
@@ -475,7 +855,7 @@ export const boardEdgecurve_styles = [
     value: "taxi",
   },
 ];
-export const boardEdgeline_styles = [
+export const EdgeLineStylesEnum = [
   {
     label: "Solid",
     value: "solid",
@@ -489,7 +869,7 @@ export const boardEdgeline_styles = [
     value: "dotted",
   },
 ];
-export const boardEdgetaxi_directions = [
+export const EdgeTaxiDirectionsEnum = [
   {
     label: "Auto",
     value: "auto",
@@ -519,7 +899,7 @@ export const boardEdgetaxi_directions = [
     value: "rightward",
   },
 ];
-export const boardEdgeArrowShapes = [
+export const EdgeArrowShapesEnum = [
   {
     label: "None",
     value: "none",
@@ -565,7 +945,7 @@ export const boardEdgeArrowShapes = [
     value: "chevron",
   },
 ];
-export const boardEdgeCaps = [
+export const EdgeCapsEnum = [
   { label: "Round", value: "round" },
   { label: "Butt", value: "butt" },
   { label: "Square", value: "square" },
