@@ -1,11 +1,11 @@
 import { useSetAtom } from "jotai";
 import omit from "lodash.omit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { IconEnum, nodesAtom, useNotifications } from "../../../utils";
+import { IconEnum, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontSizesEnum,
@@ -46,6 +46,12 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
 
   const { handleChange } = useHandleChange({ data: node, setData: setNode });
+
+  useEffect(() => {
+    if (existingNode?.data) {
+      setNode(existingNode?.data);
+    }
+  }, [existingNode?.data]);
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">
@@ -209,18 +215,15 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                 const newNodes = [...oldNodes];
                 const idx = newNodes.findIndex((n) => n.data.id === node.id);
                 if (idx > -1) {
+                  const newNodeData = removeFalsy({
+                    ...newNodes[idx].data,
+                    ...node,
+                  });
                   newNodes[idx] = {
                     ...newNodes[idx],
                     data: {
-                      ...newNodes[idx].data,
-                      ...node,
-                      backgroundImage: getNodeImage(
-                        {
-                          ...newNodes[idx].data,
-                          ...node,
-                        } as NodeType,
-                        project_id as string,
-                      ),
+                      ...newNodeData,
+                      background_image: getNodeImage(newNodeData as NodeType, project_id as string),
                     },
                   };
                   return newNodes;
