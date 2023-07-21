@@ -22,7 +22,9 @@ export default function Alert({ label, variant = "primary" }: AlertType) {
   const { base, label: labelClasses } = AlertClasses({ variant });
   return (
     <div className={base()} role="alert">
-      <Icon icon={IconEnum.info_circle} />
+      <div>
+        <Icon icon={IconEnum.info_circle} />
+      </div>
       <div className={labelClasses()}>{label}</div>
     </div>
   );
