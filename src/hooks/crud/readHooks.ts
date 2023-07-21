@@ -173,7 +173,7 @@ export function useSearch<ReturnType>(
   options?: UseQueryOptions<any>,
 ) {
   return useQuery<{ data: ReturnType[] }, unknown>(
-    ["search"],
+    ["search", type],
     async () =>
       FetchFunction({
         url: `${baseURLS.baseServer}/search/${project_id}/${type}`,

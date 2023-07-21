@@ -6,6 +6,7 @@ export interface SearchType extends BaseFormComponentType {
   searchEntity: SearchableEntities;
   name: string;
   label?: string;
+  helperText?: string;
   placeholder?: string;
   buttonIcon?: string;
   isAutocomplete?: boolean;

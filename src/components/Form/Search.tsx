@@ -52,6 +52,7 @@ const SearchClasses = tv({
     base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center pl-2 h-10 border border-zinc-700",
     input: "flex h-10 w-full items-center justify-center bg-zinc-900 pr-2 text-base outline-none placeholder:italic border-y",
     label: "text-sm truncate block pl-1 min-h-[20px]",
+    helperText: "text-xs truncate block",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
@@ -162,6 +163,7 @@ export function Search({
   variant = "primary",
   searchEntity,
   name,
+  helperText,
   value,
   onChange,
 }: SearchType) {
@@ -170,6 +172,7 @@ export function Search({
     base,
     input,
     label: labelClasses,
+    helperText: helperTextClasses,
     buttonContainer,
     optionsContainer,
   } = SearchClasses({ variant, isAutocomplete, hasValue: !!value });
@@ -179,7 +182,7 @@ export function Search({
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
-  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string }>(
+  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string; image?: string }>(
     { data: { search_term: inputValue } },
     searchEntity,
     project_id as string,
@@ -235,7 +238,7 @@ export function Search({
   }, [isAutocomplete, inputValue, refetch]);
 
   return (
-    <>
+    <div>
       {label ? <div className={labelClasses()}>{label}</div> : null}
       <div
         className={base()}
@@ -325,6 +328,7 @@ export function Search({
           )}
         </div>
       </div>
+      {helperText ? <span className={helperTextClasses}>{helperText}</span> : null}
       <FloatingPortal>
         {open && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
@@ -350,9 +354,9 @@ export function Search({
                     },
                   })}
                   active={activeIndex === index}>
-                  {searchEntity === "images" ? (
+                  {searchEntity === "images" || searchEntity === "characters" ? (
                     <Avatar
-                      image={getImageURL(project_id as string, "images", item?.value)}
+                      image={getImageURL(project_id as string, "images", searchEntity === "images" ? item?.value : item?.image)}
                       imageLoading="lazy"
                       isTooltipDisabled
                       label={label || ""}
@@ -366,6 +370,6 @@ export function Search({
           </FloatingFocusManager>
         )}
       </FloatingPortal>
-    </>
+    </div>
   );
 }

@@ -41,10 +41,9 @@ export function useCreateProject<InsertType>() {
   );
 }
 
-export function useCreateEntity<InsertType extends { data: { project_id: string }; relations?: { [key: string]: any } }>(
-  type: AvailableEntityType,
-  isTemplate?: boolean,
-) {
+export function useCreateEntity<
+  InsertType extends { data: { parent_id?: string; project_id: string }; relations?: { [key: string]: any } },
+>(type: AvailableEntityType, isTemplate?: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -58,9 +57,12 @@ export function useCreateEntity<InsertType extends { data: { project_id: string 
 
     {
       onSettled: (data, _, vars) => {
-        console.log(data);
         if (data?.ok) {
-          queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
+          if (vars?.data?.parent_id) {
+            queryClient.invalidateQueries([type, vars.data.parent_id]);
+          } else {
+            queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
+          }
           createNotification({
             id: crypto.randomUUID(),
             title: data?.message || getEntityCRUDNotification(type, "create"),
