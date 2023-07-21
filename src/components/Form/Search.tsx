@@ -238,7 +238,7 @@ export function Search({
   }, [isAutocomplete, inputValue, refetch]);
 
   return (
-    <div>
+    <div className="w-full">
       {label ? <div className={labelClasses()}>{label}</div> : null}
       <div
         className={base()}
