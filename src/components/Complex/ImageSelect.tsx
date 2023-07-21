@@ -4,7 +4,7 @@ import { DialogAtomType, ImageSelectType } from "../../types";
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button, Search } from "../Form";
 
-export function ImageSelect({ name, onChange, label, value, type, isIconOnly }: ImageSelectType) {
+export function ImageSelect({ name, onChange, label, value, type, isIconOnly, helperText }: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
 
   return (
@@ -13,6 +13,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly }: 
       <div className="grid grid-cols-6 gap-x-2">
         <div className="col-span-4">
           <Search
+            helperText={helperText}
             isAutocomplete
             name={name}
             onChange={onChange}
