@@ -470,8 +470,10 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           setBoardRef(cy);
         }}
         elements={[...nodes, ...edges]}
-        // @ts-ignore
+        maxZoom={2}
+        minZoom={0.1}
         stylesheet={styleSheet}
+        wheelSensitivity={0.1}
       />
       {/* {isReadOnly ? null : <BoardQuickBar isViewOnly={isViewOnly} />} */}
     </div>

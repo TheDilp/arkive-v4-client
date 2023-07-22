@@ -177,6 +177,9 @@ export function getNodeImage(node: NodeType, project_id: string) {
   if (node?.document?.image) {
     image = node.document.image.id;
   }
+  if (node?.character?.portrait_id) {
+    image = node.character.portrait_id;
+  }
   if (node?.image_id) {
     image = node.image_id;
   }

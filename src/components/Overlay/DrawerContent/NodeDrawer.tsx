@@ -67,6 +67,62 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
+          <Title isDrawerTitle label="Label" size="xl" />
+          <div className="flex w-full items-center gap-x-2">
+            <Input
+              label="Label (optional)"
+              name="label"
+              onChange={handleChange}
+              placeholder="Eg. Node label"
+              value={node?.label || ""}
+            />
+            <div className="self-end pb-2">
+              <ColorPicker hasCustom name="font_color" onChange={handleChange} value={node?.font_color || "#ffffff"} />
+            </div>
+          </div>
+          <div className="flex items-center gap-x-2">
+            <div className="flex w-full flex-col items-end gap-2 lg:flex-row">
+              <div className="w-full">
+                <Select
+                  hasSearch
+                  label="Label font family"
+                  name="font_family"
+                  onChange={handleChange}
+                  options={GraphFontFamiliesEnum}
+                  value={node?.font_family || "Lato"}
+                />
+              </div>
+              <div className="w-full">
+                <Select
+                  label="Label font size"
+                  name="font_size"
+                  onChange={({ name, value }) => handleChange({ name, value: parseInt(value as string, 10) })}
+                  options={GraphFontSizesEnum}
+                  value={node?.font_size?.toFixed() || "16"}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
+            <div className="w-full">
+              <Select
+                label="Vertical alignment"
+                name="text_v_align"
+                onChange={handleChange}
+                options={TextVAlignEnum}
+                value={node?.text_v_align || "top"}
+              />
+            </div>
+            <div className="w-full">
+              <Select
+                label="Horizontal alignment"
+                name="text_h_align"
+                onChange={handleChange}
+                options={TextHAlignEnum}
+                value={node?.text_h_align || "center"}
+              />
+            </div>
+          </div>
           <Title isDrawerTitle label="Shape" size="xl" />
           <div className="flex-1">
             <span className="text-sm text-zinc-300">Node image (optional)</span>
@@ -127,62 +183,6 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
           </div>
           <div className="flex-1">
             <Input label="Node level" name="z_index" onChange={handleChange} type="number" value={node?.z_index || 1} />
-          </div>
-          <Title isDrawerTitle label="Label" size="xl" />
-          <div className="flex w-full items-center gap-x-2">
-            <Input
-              label="Label (optional)"
-              name="label"
-              onChange={handleChange}
-              placeholder="Eg. Node label"
-              value={node?.label || ""}
-            />
-            <div className="self-end pb-2">
-              <ColorPicker hasCustom name="font_color" onChange={handleChange} value={node?.font_color || "#ffffff"} />
-            </div>
-          </div>
-          <div className="flex items-center gap-x-2">
-            <div className="flex w-full flex-col items-end gap-2 lg:flex-row">
-              <div className="w-full">
-                <Select
-                  hasSearch
-                  label="Label font family"
-                  name="font_family"
-                  onChange={handleChange}
-                  options={GraphFontFamiliesEnum}
-                  value={node?.font_family || "Lato"}
-                />
-              </div>
-              <div className="w-full">
-                <Select
-                  label="Label font size"
-                  name="font_size"
-                  onChange={handleChange}
-                  options={GraphFontSizesEnum}
-                  value={node?.font_size || "16"}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
-            <div className="w-full">
-              <Select
-                label="Vertical alignment"
-                name="text_v_align"
-                onChange={handleChange}
-                options={TextVAlignEnum}
-                value={node?.text_v_align || "top"}
-              />
-            </div>
-            <div className="w-full">
-              <Select
-                label="Horizontal alignment"
-                name="text_h_align"
-                onChange={handleChange}
-                options={TextHAlignEnum}
-                value={node?.text_h_align || "center"}
-              />
-            </div>
           </div>
         </>
       ) : null}
@@ -277,12 +277,8 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
         onClick={async () => {
           if (changedData && node?.id) {
             const nodeToUpdate = { ...(changedData || {}), id: node.id };
-            if (nodeToUpdate?.character) {
-              set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-            }
-            if (nodeToUpdate?.image) {
-              set(nodeToUpdate, "image_id", node?.image?.id ?? null);
-            }
+            set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+            set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
             const { tags, ...rest } = nodeToUpdate;
             const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
@@ -294,15 +290,13 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                 if (idx > -1) {
                   const newNodeData = removeFalsy({
                     ...newNodes[idx].data,
-                    ...node,
+                    ...changedData,
                   });
                   newNodes[idx] = {
                     ...newNodes[idx],
                     data: {
                       ...newNodeData,
-                      background_image: rest?.image
-                        ? getNodeImage(rest as NodeType, project_id as string)
-                        : newNodes[idx].data?.background_image,
+                      background_image: getNodeImage({ ...node, ...rest } as NodeType, project_id as string),
                     },
                   };
                   return newNodes;
