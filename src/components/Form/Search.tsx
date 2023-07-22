@@ -224,7 +224,6 @@ export function Search({
     virtual: true,
     loop: true,
   });
-
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([role, dismiss, listNav]);
   useEffect(() => {
     if (data?.data?.length) setOpen(true);
