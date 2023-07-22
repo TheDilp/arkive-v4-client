@@ -27,7 +27,7 @@ const tabs = [
 
 type UpdateNodeType = { data: Partial<NodeType> };
 
-export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } }) {
+export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
@@ -275,7 +275,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
         icon={IconEnum.save}
         label="Save"
         onClick={async () => {
-          if (changedData && node?.id) {
+          if (changedData) {
             const nodeToUpdate = { ...(changedData || {}), id: node.id };
             set(nodeToUpdate, "character_id", node?.character?.id ?? null);
             set(nodeToUpdate, "image_id", node?.image?.id ?? null);

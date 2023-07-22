@@ -6,8 +6,8 @@ import { Icon } from "../Misc";
 const TabsClasses = tv({
   slots: {
     base: "border-b border-zinc-200",
-    tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden flex-nowrap overflow-auto text-lg -mb-px ",
-    tab: "px-4 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
+    tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden flex-nowrap overflow-auto text-lg -mb-px",
+    tab: "px-2 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
     tabSelected: "inline-block border-blue-500 border-b-2",
   },
 });
