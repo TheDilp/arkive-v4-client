@@ -5,7 +5,7 @@ import { getImageURL, IconEnum } from "../../utils";
 import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
-export function ImagePreview({ id, title, url }: ImagePreviewType) {
+export function ImagePreview({ id, title, url, clearAction }: ImagePreviewType) {
   const { project_id } = useParams();
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] items-center gap-x-2">
@@ -18,9 +18,11 @@ export function ImagePreview({ id, title, url }: ImagePreviewType) {
           hasNoBackground
           icon={IconEnum.close}
           iconSize={28}
-          onClick={undefined}
+          onClick={() => {
+            if (id) clearAction(id);
+            else if (url) clearAction(url);
+          }}
           tooltip="Remove image"
-          variant="error"
         />
       </div>
     </div>

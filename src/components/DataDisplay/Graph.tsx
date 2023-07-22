@@ -39,7 +39,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
-
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
 
   const styleSheet = useMemo(

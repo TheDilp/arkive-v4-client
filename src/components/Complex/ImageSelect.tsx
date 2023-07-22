@@ -9,7 +9,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
 
   return (
     <div className="flex w-full flex-col">
-      <div className="truncate pl-1 text-sm font-medium text-white">{label || "Select image"}</div>
+      <div className="truncate pl-1 text-sm font-medium text-zinc-300">{label || "Select image"}</div>
       <div className="grid grid-cols-6 gap-x-2">
         <div className="col-span-4">
           <Search

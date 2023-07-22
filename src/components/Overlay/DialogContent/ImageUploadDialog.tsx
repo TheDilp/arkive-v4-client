@@ -38,7 +38,14 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
       </div>
       <div className={imagesList()}>
         {imageUrls?.length && !isMutating
-          ? imageUrls.map((img) => <ImagePreview key={`${img.name}${img.url}`} title={img.name} url={img.url} />)
+          ? imageUrls.map((img) => (
+              <ImagePreview
+                key={`${img.name}${img.url}`}
+                clearAction={(name) => setFiles((prev) => prev.filter((f) => f.name !== name))}
+                title={img.name}
+                url={img.url}
+              />
+            ))
           : null}
       </div>
       <Button

@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { IconEnum, getCharacterFullName, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
+import { getCharacterFullName, IconEnum, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontFamiliesEnum,
@@ -16,8 +16,9 @@ import {
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage } from "../../../utils/ui/graphUtils";
-import { Badge, Button, CharacterPreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
+import { Badge, Button, CharacterPreview, ImagePreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
+import { updateNodeSchema } from "../../../validation";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -36,7 +37,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
     "nodes",
     {
       data: {},
-      relations: { character: true, document: true, map_pin: true, event: true, tags: true },
+      relations: { image: true, character: true, document: true, map_pin: true, event: true, tags: true },
     },
     {
       enabled: !!data?.id,
@@ -68,7 +69,25 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
       {selectedTab === 0 ? (
         <>
           <Title isDrawerTitle label="Shape" size="xl" />
-
+          <div className="flex-1">
+            <span className="text-sm text-zinc-300">Node image (optional)</span>
+            {!node?.image ? (
+              <ImageSelect
+                isIconOnly
+                name="image"
+                onChange={({ name, label, value }) => handleChange({ name, value: { id: value, title: label } })}
+                type="images"
+                value={node?.image?.id ?? ""}
+              />
+            ) : (
+              <ImagePreview
+                clearAction={() => handleChange({ name: "image", value: null })}
+                id={node?.image?.id}
+                title={node?.image?.title}
+              />
+            )}
+            <span className="text-xs text-zinc-400">Setting an image manually overwrites images from relations.</span>
+          </div>
           <div className="flex w-full items-end justify-between">
             <div className="flex w-full items-end gap-x-2">
               <Select
@@ -97,17 +116,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
               <Input label="Height" name="height" onChange={handleChange} type="number" value={node?.height || 50} />
             </div>
           </div>
-          <div className="flex-1">
-            <ImageSelect
-              isIconOnly
-              label="Select image (optional)"
-              name="image_id"
-              onChange={handleChange}
-              type="images"
-              value={node?.image_id ?? ""}
-            />
-            <span className="text-xs text-zinc-400">Setting an image manually overwrites images from relations.</span>
-          </div>
+
           <div className="flex-1">
             <Input
               label="Node opacity"
@@ -181,7 +190,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
       {selectedTab === 1 ? (
         <div className="flex flex-col gap-y-4">
           <div className="flex flex-col gap-y-2">
-            <span className="text-sm">Represents character (optional)</span>
+            <span className="text-sm text-zinc-300">Represents character (optional)</span>
             {!node?.character ? (
               <Search
                 isAutocomplete
@@ -269,8 +278,12 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
         onClick={async () => {
           if (node && node?.id) {
             const nodeToUpdate = { ...node };
-            set(nodeToUpdate, "character_id", node?.character?.id);
-            await update({ data: omit(nodeToUpdate, ["parent_id", "tags", "character"]), relations: { tags: node?.tags } });
+            set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+            set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+
+            const { tags, ...rest } = nodeToUpdate;
+            const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
+            await update(parsedData);
             setNodes((oldNodes) => {
               if (oldNodes) {
                 const newNodes = [...oldNodes];
@@ -284,7 +297,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                     ...newNodes[idx],
                     data: {
                       ...newNodeData,
-                      background_image: getNodeImage(newNodeData as NodeType, project_id as string),
+                      background_image: getNodeImage(rest as NodeType, project_id as string),
                     },
                   };
                   return newNodes;

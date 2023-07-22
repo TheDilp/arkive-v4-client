@@ -174,12 +174,14 @@ export function toModelPosition(boardRef: Core, pos: { x: number; y: number }) {
 }
 export function getNodeImage(node: NodeType, project_id: string) {
   let image = "";
-  if (node.document?.image) {
+  if (node?.document?.image) {
     image = node.document.image.id;
   }
-  if (node.image_id) {
+  if (node?.image_id) {
     image = node.image_id;
   }
+  if (image === null) return [];
+  console.log(image);
   if (image !== "") return getImageURL(project_id as string, "images", image);
   return [];
 }

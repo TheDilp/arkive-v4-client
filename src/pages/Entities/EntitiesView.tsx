@@ -111,7 +111,7 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
         ) : null}
       </div>
       {!item_id || data?.data?.is_folder ? (
-        <div className="grid h-full w-full grid-cols-1 content-start md:grid-cols-4 lg:grid-cols-10">
+        <div className="grid h-full w-full grid-cols-2 content-start md:grid-cols-4 lg:grid-cols-10">
           {contextMenuItems?.length && !item_id ? <ContextMenu items={contextMenuItems} /> : null}
           {(base?.data?.length ? base.data : []).map((item) => (
             <ItemDisplay
