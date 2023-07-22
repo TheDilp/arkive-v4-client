@@ -1,5 +1,4 @@
 import { useSetAtom } from "jotai";
-import omit from "lodash.omit";
 import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -16,9 +15,9 @@ import {
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage } from "../../../utils/ui/graphUtils";
+import { updateNodeSchema } from "../../../validation";
 import { Badge, Button, CharacterPreview, ImagePreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
-import { updateNodeSchema } from "../../../validation";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -55,7 +54,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
 
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
 
-  const { handleChange } = useHandleChange({ data: node, setData: setNode });
+  const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
 
   useEffect(() => {
     if (existingNode?.data) {
@@ -276,14 +275,18 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
         icon={IconEnum.save}
         label="Save"
         onClick={async () => {
-          if (node && node?.id) {
-            const nodeToUpdate = { ...node };
-            set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-            set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+          if (changedData && node?.id) {
+            const nodeToUpdate = { ...(changedData || {}), id: node.id };
+            if (nodeToUpdate?.character) {
+              set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+            }
+            if (nodeToUpdate?.image) {
+              set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+            }
 
             const { tags, ...rest } = nodeToUpdate;
             const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
-            await update(parsedData);
+            await update(parsedData, { onSuccess: resetChanges });
             setNodes((oldNodes) => {
               if (oldNodes) {
                 const newNodes = [...oldNodes];
@@ -297,7 +300,9 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                     ...newNodes[idx],
                     data: {
                       ...newNodeData,
-                      background_image: getNodeImage(rest as NodeType, project_id as string),
+                      background_image: rest?.image
+                        ? getNodeImage(rest as NodeType, project_id as string)
+                        : newNodes[idx].data?.background_image,
                     },
                   };
                   return newNodes;
