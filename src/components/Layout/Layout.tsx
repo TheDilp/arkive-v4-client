@@ -8,14 +8,15 @@ import { Sidebar } from "./Sidebar";
 export function ProjectLayout() {
   const { isLg } = useBreakpoint();
   return (
-    <div className="flex h-full w-full flex-1 flex-col lg:flex-row">
-      <Drawer />
+    <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
       {isLg ? <Sidebar /> : null}
 
       <div className="flex h-full w-full flex-col">
         <Navbar />
         <div className="h-full p-4">
+          <Drawer />
+
           <Outlet />
         </div>
         {!isLg ? <Sidebar /> : null}

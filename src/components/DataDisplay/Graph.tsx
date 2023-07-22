@@ -372,7 +372,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
 
   return (
     <div
-      className="relative flex h-[calc(100%-2rem)] w-full flex-1 justify-center"
+      className="relative flex h-[calc(100%)] w-full flex-1 justify-center"
       // onDrop={(e) => {
       //   const stringData = e.dataTransfer.getData("item_id");
       //   if (!stringData) return;
