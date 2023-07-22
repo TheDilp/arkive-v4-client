@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { getCharacterFullName, IconEnum, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
+import { getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontFamiliesEnum,
@@ -14,7 +14,7 @@ import {
   TextHAlignEnum,
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
-import { getNodeImage } from "../../../utils/ui/graphUtils";
+import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { updateNodeSchema } from "../../../validation";
 import { Badge, Button, CharacterPreview, ImagePreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
@@ -288,15 +288,17 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
                 const newNodes = [...oldNodes];
                 const idx = newNodes.findIndex((n) => n.data.id === node.id);
                 if (idx > -1) {
-                  const newNodeData = removeFalsy({
+                  const newNodeData = {
                     ...newNodes[idx].data,
                     ...changedData,
-                  });
+                  };
+                  const alteredNodeData = { ...node, ...rest };
                   newNodes[idx] = {
                     ...newNodes[idx],
                     data: {
                       ...newNodeData,
-                      background_image: getNodeImage({ ...node, ...rest } as NodeType, project_id as string),
+                      label: getNodeLabel(alteredNodeData),
+                      background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
                     },
                   };
                   return newNodes;

@@ -841,6 +841,12 @@ export const NodeShapesEnum = [
     value: "round-octagon",
   },
 ];
+export const NodeRelationLabelEnum = [
+  { label: "Character", value: "character" },
+  // { label: "Document", value: "document" },
+  // { label: "Location", value: "location" },
+  // { label: "Event", value: "event" },
+];
 export const EdgeCurveStylesEnum = [
   {
     label: "Straight",

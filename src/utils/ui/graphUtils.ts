@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 
 import { AvailableSubEntityType } from "../../types";
 import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { getImageURL } from "..";
+import { getCharacterFullName, getImageURL } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -172,6 +172,13 @@ export function toModelPosition(boardRef: Core, pos: { x: number; y: number }) {
     y: (pos.y - pan.y) / zoom,
   };
 }
+
+export function getNodeLabel(node: NodeType): string {
+  if (node?.label) return node.label;
+  if (node?.character?.first_name) return getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name);
+  return "";
+}
+
 export function getNodeImage(node: NodeType, project_id: string) {
   let image = "";
   if (node?.document?.image) {
@@ -193,7 +200,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
     .map((node: NodeType) => ({
       data: {
         id: node.id,
-        label: node?.label || "",
+        label: getNodeLabel(node),
 
         type: node?.type || "rectangle",
         width: node?.width || 50,
