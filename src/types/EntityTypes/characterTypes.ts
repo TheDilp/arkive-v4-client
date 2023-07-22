@@ -17,18 +17,18 @@ export interface CharacterFieldValues {
 export interface CharacterType {
   id: string;
   project_id: string;
-  is_favorite?: boolean;
+  is_favorite?: boolean | null;
   first_name: string;
-  last_name?: string;
-  nickname?: string;
+  last_name?: string | null;
+  nickname?: string | null;
   images?: ImageType[];
-  portrait_id?: string;
+  portrait_id?: string | null;
   portrait?: ImageType;
   image?: ImageType;
-  age?: number;
-  dayOfBirth?: number;
-  monthOfBirth?: number;
-  yearOfBirth?: number;
+  age?: number | null;
+  dayOfBirth?: number | null;
+  monthOfBirth?: number | null;
+  yearOfBirth?: number | null;
   character_fields?: { id: string; value: string | string[]; template_id: string }[];
   tags?: TagType[];
   related_to?: {

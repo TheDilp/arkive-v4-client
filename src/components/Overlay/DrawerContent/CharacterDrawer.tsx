@@ -11,7 +11,8 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { Badge, CharacterPreview } from "../..";
+import { UpdateCharacterSchema } from "../../../validation";
+import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -121,7 +122,7 @@ function RelationshipRow({
   return (
     <li className="flex items-center gap-x-2">
       <div className="flex flex-1 items-center">
-        <CharacterPreview character_name={character_name} image_id={portrait_id} />
+        <CharacterPreview character_name={character_name} id={id} image_id={portrait_id} />
         <span className="font-light">is {current_character_first_name || "this character"}&apos;s </span>
       </div>
       <div className="max-w-[10rem] flex-1">
@@ -171,7 +172,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
     "characters",
     {
       data: {},
-      relations: { character_fields: true, relationships: true, tags: true },
+      relations: { character_fields: true, relationships: true, portrait: true, tags: true },
       fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
     },
     {
@@ -201,7 +202,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
   );
 
   const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
-  const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
+  const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
   useEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
@@ -224,13 +225,24 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               <Input label="Last name (optional)" name="last_name" onChange={handleChange} value={character?.last_name || ""} />
             </div>
           </div>
-          <ImageSelect
-            label="Select character avatar (optional)"
-            name="portrait_id"
-            onChange={handleChange}
-            type="images"
-            value={character?.portrait_id ?? ""}
-          />
+          <div>
+            <span className="text-sm text-zinc-300">Character image (optional)</span>
+            {!character?.portrait ? (
+              <ImageSelect
+                isIconOnly
+                name="portrait"
+                onChange={({ name, label, value }) => handleChange({ name, value: { id: value, title: label } })}
+                type="images"
+                value={character?.portrait?.id ?? ""}
+              />
+            ) : (
+              <ImagePreview
+                clearAction={() => handleChange({ name: "portrait", value: null })}
+                id={character?.portrait?.id}
+                title={character?.portrait?.title}
+              />
+            )}
+          </div>
           <Input label="Age (optional)" name="age" onChange={handleChange} type="number" value={character?.age || ""} />
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
             <div className="w-full lg:w-1/3">
@@ -264,7 +276,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           <ul className="flex w-full flex-col gap-y-2">
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
-              <Checkbox name="is_favorite" onChange={handleChange} value={character?.is_favorite} />
+              <Checkbox name="is_favorite" onChange={handleChange} value={character?.is_favorite ?? false} />
             </li>
           </ul>
         </>
@@ -430,24 +442,20 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
         isLoading={isCreating || isUpdating}
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
-          if (character) {
+          if (changedData) {
             if (character?.id) {
-              await update(
-                {
-                  data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
-                  relations: {
-                    character_fields: character?.character_fields,
-                    related_to: character?.related_to,
-                    related_from: character?.related_from,
-                    tags: character?.tags,
-                  },
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const characterToUpdate = { ...(changedData || {}), id: character.id };
+              const { character_fields, related_to, related_from, tags, ...rest } = characterToUpdate;
+              const parsedData = UpdateCharacterSchema.parse({
+                data: rest,
+                relations: { character_fields, related_from, related_to, tags },
+              });
+              await update(parsedData, {
+                onSettled: (res) => {
+                  if (res?.ok) resetDrawerAtom();
                 },
-                {
-                  onSettled: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
-                },
-              );
+              });
             } else
               await create(
                 {
@@ -464,6 +472,14 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                   },
                 },
               );
+          } else {
+            createNotification({
+              id: crypto.randomUUID(),
+              variant: "info",
+              icon: IconEnum.info_circle,
+              title: "No data was changed.",
+              timer: 3,
+            });
           }
         }}
         variant="success"
