@@ -1,11 +1,12 @@
 import { useSetAtom } from "jotai";
 import omit from "lodash.omit";
+import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { IconEnum, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
+import { IconEnum, getCharacterFullName, nodesAtom, removeFalsy, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontFamiliesEnum,
@@ -15,7 +16,7 @@ import {
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage } from "../../../utils/ui/graphUtils";
-import { Badge, Button, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
+import { Badge, Button, CharacterPreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 const tabs = [
@@ -35,8 +36,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
     "nodes",
     {
       data: {},
-      relations: { tags: true },
-      // fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
+      relations: { character: true, document: true, map_pin: true, event: true, tags: true },
     },
     {
       enabled: !!data?.id,
@@ -106,6 +106,7 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
               type="images"
               value={node?.image_id ?? ""}
             />
+            <span className="text-xs text-zinc-400">Setting an image manually overwrites images from relations.</span>
           </div>
           <div className="flex-1">
             <Input
@@ -177,6 +178,44 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
           </div>
         </>
       ) : null}
+      {selectedTab === 1 ? (
+        <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-2">
+            <span className="text-sm">Represents character (optional)</span>
+            {!node?.character ? (
+              <Search
+                isAutocomplete
+                name="character.id"
+                onChange={({ value, label, image }) => {
+                  const [first_name, last_name] = (label || "").split(" ");
+                  handleChange({ name: "character", value: { id: value, first_name, last_name, portrait_id: image } });
+                }}
+                placeholder="Press enter to search characters"
+                searchEntity="characters"
+                value={node?.character?.id || ""}
+              />
+            ) : null}
+            {node?.character ? (
+              <CharacterPreview
+                character_name={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name)}
+                clearAction={() => {
+                  handleChange({ name: "character", value: "" });
+                }}
+                id={node?.character?.id}
+                image_id={node?.character?.portrait_id}
+              />
+            ) : null}
+          </div>
+          <Search
+            isDisabled
+            label="Document (optional)"
+            placeholder="Press enter to search documents"
+            searchEntity="documents"
+          />
+          <Search isDisabled label="Location (optional)" placeholder="Press enter to search map pins" searchEntity="map_pins" />
+          <Search isDisabled label="Event (optional)" placeholder="Press enter to search events" searchEntity="events" />
+        </div>
+      ) : null}
       {selectedTab === 2 ? (
         <div className="flex flex-col gap-y-2">
           <Search
@@ -229,7 +268,9 @@ export function NodeDrawer({ data }: { data: { id?: string; parent_id: string } 
         label="Save"
         onClick={async () => {
           if (node && node?.id) {
-            await update({ data: omit(node, ["parent_id", "tags"]), relations: { tags: node?.tags } });
+            const nodeToUpdate = { ...node };
+            set(nodeToUpdate, "character_id", node?.character?.id);
+            await update({ data: omit(nodeToUpdate, ["parent_id", "tags", "character"]), relations: { tags: node?.tags } });
             setNodes((oldNodes) => {
               if (oldNodes) {
                 const newNodes = [...oldNodes];

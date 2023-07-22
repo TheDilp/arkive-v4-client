@@ -9,7 +9,7 @@ import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotificatio
 import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
-type insertGraphType = Partial<GraphType> & { project_id: string };
+type insertGraphType = Partial<GraphType> & { parent_id?: string; project_id: string };
 type updateGraphType = Partial<GraphType>;
 
 type graphRelationsType = {
@@ -22,7 +22,7 @@ function isSaveDisabled(graph: Partial<GraphType>) {
 }
 
 export function GraphDrawer({ data }: { data: { id?: string } }) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
 
@@ -40,7 +40,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
   );
 
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>(
-    existingGraph?.data || { project_id: project_id as string },
+    existingGraph?.data || { project_id: project_id as string, parent_id: item_id, default_node_shape: "rectangle" },
   );
   const { handleChange } = useHandleChange({ data: graph, setData: setGraph });
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
