@@ -98,7 +98,7 @@ const SearchClasses = tv({
     },
     isDisabled: {
       true: {
-        base: "cursor-not-allowed select-none",
+        base: "cursor-not-allowed select-none bg-zinc-700",
         input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
@@ -107,7 +107,7 @@ const SearchClasses = tv({
         base: "rounded-r-md",
       },
     },
-    hasValue: {
+    hasValueWithImage: {
       true: {
         input: "pl-2",
       },
@@ -162,6 +162,7 @@ export function Search({
   isAutocomplete,
   variant = "primary",
   searchEntity,
+  isDisabled,
   name,
   helperText,
   value,
@@ -175,7 +176,12 @@ export function Search({
     helperText: helperTextClasses,
     buttonContainer,
     optionsContainer,
-  } = SearchClasses({ variant, isAutocomplete, hasValue: !!value });
+  } = SearchClasses({
+    variant,
+    isAutocomplete,
+    hasValueWithImage: !!value && searchEntity === "images",
+    isDisabled,
+  });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -258,6 +264,7 @@ export function Search({
           ref={inputRef}
           autoComplete="one-time-code"
           className={input()}
+          disabled={isDisabled}
           name="search"
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -346,7 +353,7 @@ export function Search({
                       listRef.current[index] = node;
                     },
                     onClick() {
-                      onChange({ name, value: item.value, label: item.label, color: item?.color });
+                      onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
                       setInputValue("");
                       setOpen(false);
                       remove();
