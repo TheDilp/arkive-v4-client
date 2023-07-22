@@ -474,6 +474,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         minZoom={0.1}
         stylesheet={styleSheet}
         wheelSensitivity={0.1}
+        zoom={0.6}
       />
       {/* {isReadOnly ? null : <BoardQuickBar isViewOnly={isViewOnly} />} */}
     </div>
