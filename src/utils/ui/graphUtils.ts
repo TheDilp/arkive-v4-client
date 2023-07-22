@@ -181,7 +181,6 @@ export function getNodeImage(node: NodeType, project_id: string) {
     image = node.image_id;
   }
   if (image === null) return [];
-  console.log(image);
   if (image !== "") return getImageURL(project_id as string, "images", image);
   return [];
 }
