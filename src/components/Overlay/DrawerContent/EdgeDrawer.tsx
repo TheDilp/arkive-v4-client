@@ -16,7 +16,7 @@ import {
   IconEnum,
   useNotifications,
 } from "../../../utils";
-import { Badge, Button, Collapsible, Input, Range, Search, Select, Tabs, Title } from "../..";
+import { Badge, Button, Collapsible, Input, Range, Search, Select, Skeleton, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type Props = { id: string; parent_id: string };
@@ -65,6 +65,9 @@ export function EdgeDrawer({ id, parent_id }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, changedData } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
+
+  if (false) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col gap-y-2 font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />

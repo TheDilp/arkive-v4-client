@@ -16,7 +16,19 @@ import {
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { updateNodeSchema } from "../../../validation";
-import { Badge, Button, CharacterPreview, ImagePreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
+import {
+  Badge,
+  Button,
+  CharacterPreview,
+  ImagePreview,
+  ImageSelect,
+  Input,
+  Search,
+  Select,
+  Skeleton,
+  Tabs,
+  Title,
+} from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 const tabs = [
@@ -31,7 +43,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
-  const { data: existingNode } = useGetSubEntity<NodeType>(
+  const { data: existingNode, isLoading } = useGetSubEntity<NodeType>(
     data?.id,
     "nodes",
     {
@@ -61,6 +73,8 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
       setNode(existingNode?.data);
     }
   }, [existingNode?.data]);
+
+  if (isLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">
@@ -205,12 +219,12 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             ) : null}
             {node?.character ? (
               <CharacterPreview
-                character_name={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name)}
+                character_name={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name || "")}
                 clearAction={() => {
                   handleChange({ name: "character", value: "" });
                 }}
                 id={node?.character?.id}
-                image_id={node?.character?.portrait_id}
+                image_id={node?.character?.portrait_id ?? undefined}
               />
             ) : null}
           </div>
