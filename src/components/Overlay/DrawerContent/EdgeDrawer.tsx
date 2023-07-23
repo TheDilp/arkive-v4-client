@@ -352,31 +352,33 @@ export function EdgeDrawer({ data }: Props) {
           icon={IconEnum.close}
           label="Cancel"
           onClick={() => {
-            setDialogAtom({
-              position: "center",
-              isOverlay: true,
-              data: null,
-              title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
-              type: null,
-              size: "md",
-              confirm: {
-                action: () => {
-                  if (originalEdge) {
-                    UpdateGraphEdges({
-                      setEdges,
-                      changedData: originalEdge,
-                      edge,
-                    });
-                  }
-                  resetChanges();
-                  resetDrawerAtom();
-                  resetDialogAtom();
+            if (changedData)
+              setDialogAtom({
+                position: "center",
+                isOverlay: true,
+                data: null,
+                title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
+                type: null,
+                size: "md",
+                confirm: {
+                  action: () => {
+                    if (originalEdge) {
+                      UpdateGraphEdges({
+                        setEdges,
+                        changedData: originalEdge,
+                        edge,
+                      });
+                    }
+                    resetChanges();
+                    resetDrawerAtom();
+                    resetDialogAtom();
+                  },
                 },
-              },
-              cancel: {
-                action: () => resetDialogAtom(),
-              },
-            });
+                cancel: {
+                  action: () => resetDialogAtom(),
+                },
+              });
+            else resetDrawerAtom();
           }}
           variant="secondary"
         />

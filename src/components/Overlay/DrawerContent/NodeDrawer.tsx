@@ -360,33 +360,37 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           icon={IconEnum.close}
           label="Cancel"
           onClick={() => {
-            setDialogAtom({
-              position: "center",
-              isOverlay: true,
-              data: null,
-              title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
-              type: null,
-              size: "md",
-              confirm: {
-                action: () => {
-                  if (originalNode) {
-                    UpdateGraphNodes({
-                      setNodes,
-                      changedData: {},
-                      node,
-                      project_id: project_id as string,
-                      rest: originalNode,
-                    });
-                  }
-                  resetChanges();
-                  resetDrawerAtom();
-                  resetDialogAtom();
+            if (changedData)
+              setDialogAtom({
+                position: "center",
+                isOverlay: true,
+                data: null,
+                title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
+                type: null,
+                size: "md",
+                confirm: {
+                  action: () => {
+                    if (originalNode) {
+                      UpdateGraphNodes({
+                        setNodes,
+                        changedData: {},
+                        node,
+                        project_id: project_id as string,
+                        rest: originalNode,
+                      });
+                    }
+                    resetChanges();
+                    resetDrawerAtom();
+                    resetDialogAtom();
+                  },
                 },
-              },
-              cancel: {
-                action: () => resetDialogAtom(),
-              },
-            });
+                cancel: {
+                  action: () => resetDialogAtom(),
+                },
+              });
+            else {
+              resetDrawerAtom();
+            }
           }}
           variant="secondary"
         />
