@@ -2,8 +2,12 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useHandleChange } from "../../../hooks";
-import { EdgeType } from "../../../types";
+import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
 import {
+  capitalizeFirstLetter,
+  DefaultBoardColor,
+  EdgeArrowFillEnum,
+  EdgeArrowShapesEnum,
   EdgeCurveStylesEnum,
   EdgeLineStylesEnum,
   EdgeTaxiDirectionsEnum,
@@ -12,7 +16,7 @@ import {
   IconEnum,
   useNotifications,
 } from "../../../utils";
-import { Badge, Input, Range, Search, Select, Tabs, Title } from "../..";
+import { Badge, Button, Collapsible, Input, Range, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type Props = { id: string; parent_id: string };
@@ -22,6 +26,38 @@ const tabs = [
   { id: "2", label: "Arrows", icon: IconEnum.flow_arrow },
   { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
+const edgeArrows = ["target", "source", "mid_target", "mid_source"] as const;
+
+function ArrowForm({
+  label,
+  shape,
+  color,
+  fill,
+  onChange,
+}: {
+  label: string;
+  shape: ArrowShape;
+  color: string;
+  fill: ArrowFill;
+} & Pick<SelectType, "onChange">) {
+  return (
+    <Collapsible initialOpen={false} label={capitalizeFirstLetter(label).replace("_", "-")}>
+      <div className="mt-2 flex flex-nowrap items-center gap-2">
+        <Select
+          label="Arrow shape"
+          name={`${label}_arrow_shape`}
+          onChange={onChange}
+          options={EdgeArrowShapesEnum}
+          value={shape}
+        />
+        <Select label="Arrow fill" name={`${label}_arrow_fill`} onChange={onChange} options={EdgeArrowFillEnum} value={fill} />
+        <div className="w-fit self-end">
+          <ColorPicker name={`${label}_arrow_color`} onChange={onChange} value={color} />
+        </div>
+      </div>
+    </Collapsible>
+  );
+}
 
 export function EdgeDrawer({ id, parent_id }: Props) {
   const { project_id } = useParams();
@@ -178,6 +214,19 @@ export function EdgeDrawer({ id, parent_id }: Props) {
           </div>
         </>
       ) : null}
+      {selectedTab === 1 ? (
+        <div className="flex flex-col gap-y-2">
+          {edgeArrows.map((a) => (
+            <ArrowForm
+              color={edge?.[`${a}_arrow_color`] || DefaultBoardColor}
+              fill={edge?.[`${a}_arrow_fill`] || "filled"}
+              label={a}
+              onChange={handleChange}
+              shape={edge?.[`${a}_arrow_shape`] || "none"}
+            />
+          ))}
+        </div>
+      ) : null}
       {selectedTab === 2 ? (
         <div className="flex flex-col gap-y-2">
           <Search
@@ -224,6 +273,45 @@ export function EdgeDrawer({ id, parent_id }: Props) {
           </div>
         </div>
       ) : null}
+      <Button
+        icon={IconEnum.save}
+        label="Save"
+        onClick={async () => {
+          if (changedData) {
+            // const nodeToUpdate = { ...(changedData || {}), id: node.id };
+            // set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+            // set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+            // const { tags, ...rest } = nodeToUpdate;
+            // const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
+            // await update(parsedData, { onSuccess: resetChanges });
+            // setNodes((oldNodes) => {
+            //   if (oldNodes) {
+            //     const newNodes = [...oldNodes];
+            //     const idx = newNodes.findIndex((n) => n.data.id === node.id);
+            //     if (idx > -1) {
+            //       const newNodeData = {
+            //         ...newNodes[idx].data,
+            //         ...changedData,
+            //       };
+            //       const alteredNodeData = { ...node, ...rest };
+            //       newNodes[idx] = {
+            //         ...newNodes[idx],
+            //         data: {
+            //           ...newNodeData,
+            //           label: getNodeLabel(alteredNodeData),
+            //           background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+            //         },
+            //       };
+            //       return newNodes;
+            //     }
+            //     return newNodes;
+            //   }
+            //   return oldNodes;
+            // });
+          }
+        }}
+        variant="success"
+      />
     </div>
   );
 }

@@ -5,10 +5,46 @@ import { DocumentType } from "./documentTypes";
 
 export type CurveStyleType = "straight" | "taxi" | "unbundled-bezier";
 
+export type ArrowShape =
+  | "none"
+  | "triangle"
+  | "triangle-tee"
+  | "triangle-cross"
+  | "triangle-backcurve"
+  | "circle-triangle"
+  | "vee"
+  | "tee"
+  | "circle"
+  | "diamond"
+  | "chevron";
+
+export type ArrowFill = "filled" | "hollow";
+export type NodeShape =
+  | "rectangle"
+  | "ellipse"
+  | "triangle"
+  | "barrel"
+  | "rhomboid"
+  | "diamond"
+  | "pentagon"
+  | "hexagon"
+  | "heptagon"
+  | "octagon"
+  | "star"
+  | "cut-rectangle"
+  | "round-triangle"
+  | "round-rectangle"
+  | "bottom-round-rectangle"
+  | "round-diamond"
+  | "round-pentagon"
+  | "round-hexagon"
+  | "round-heptagon"
+  | "round-octagon";
+
 export type NodeType = {
   id: string;
   label: string | null;
-  type: string | null;
+  type: NodeShape | null;
   width: number | null;
   height: number | null;
   x: number;
@@ -54,17 +90,17 @@ export type EdgeType = {
   taxi_direction: string | null;
   taxi_turn: number | null;
   arrow_scale: number | null;
-  target_arrow_shape: string | null;
-  target_arrow_fill: string | null;
+  target_arrow_shape: ArrowShape | null;
+  target_arrow_fill: ArrowFill | null;
   target_arrow_color: string | null;
-  source_arrow_shape: string | null;
-  source_arrow_fill: string | null;
+  source_arrow_shape: ArrowShape | null;
+  source_arrow_fill: ArrowFill | null;
   source_arrow_color: string | null;
-  mid_target_arrow_shape: string | null;
-  mid_target_arrow_fill: string | null;
+  mid_target_arrow_shape: ArrowShape | null;
+  mid_target_arrow_fill: ArrowFill | null;
   mid_target_arrow_color: string | null;
-  mid_source_arrow_shape: string | null;
-  mid_source_arrow_fill: string | null;
+  mid_source_arrow_shape: ArrowShape | null;
+  mid_source_arrow_fill: ArrowFill | null;
   mid_source_arrow_color: string | null;
   font_size: number | null;
   font_color: string | null;

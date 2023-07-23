@@ -289,7 +289,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               onChange={({ label, value }) => {
                 if (character?.related_to?.some((relationship) => relationship?.id === value)) {
                   createNotification({
-                    id: crypto.randomUUID(),
                     title: "Cannot add same character more than once as a relationship.",
                     variant: "warning",
                     timer: 2,
@@ -395,7 +394,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             onChange={({ name, label, value, color }) => {
               if ((character?.tags || [])?.some((tag) => tag.id === value)) {
                 createNotification({
-                  id: crypto.randomUUID(),
                   title: "Cannot add the same tag twice.",
                   variant: "warning",
                   icon: IconEnum.info_circle,
@@ -474,7 +472,6 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               );
           } else {
             createNotification({
-              id: crypto.randomUUID(),
               variant: "info",
               icon: IconEnum.info_circle,
               title: "No data was changed.",

@@ -951,6 +951,11 @@ export const EdgeArrowShapesEnum = [
     value: "chevron",
   },
 ];
+export const EdgeArrowFillEnum = [
+  { label: "Filled", value: "filled" },
+  { label: "Hollow", value: "hollow" },
+];
+
 export const EdgeCapsEnum = [
   { label: "Round", value: "round" },
   { label: "Butt", value: "butt" },
