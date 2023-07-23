@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { useHandleChange } from "../../../hooks";
 import { EdgeType } from "../../../types";
@@ -9,8 +10,9 @@ import {
   GraphFontFamiliesEnum,
   GraphFontSizesEnum,
   IconEnum,
+  useNotifications,
 } from "../../../utils";
-import { Input, Range, Select, Tabs, Title } from "../..";
+import { Badge, Input, Range, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type Props = { id: string; parent_id: string };
@@ -22,9 +24,11 @@ const tabs = [
 ];
 
 export function EdgeDrawer({ id, parent_id }: Props) {
+  const { project_id } = useParams();
   const [edge, setEdge] = useState<Partial<EdgeType>>({});
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, changedData } = useHandleChange({ data: edge, setData: setEdge });
+  const createNotification = useNotifications();
   return (
     <div className="flex flex-col gap-y-2 font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -103,10 +107,13 @@ export function EdgeDrawer({ id, parent_id }: Props) {
                 <div className="w-full">
                   <Input
                     label="Break distance"
+                    max={1000}
+                    min={0}
                     name="taxi_turn"
                     onChange={({ name, value }) => handleChange({ name, value: parseInt(value as string, 10) })}
+                    step={5}
                     type="number"
-                    value={edge?.taxi_turn?.toFixed()}
+                    value={(edge?.taxi_turn ?? 50)?.toFixed()}
                   />
                 </div>
               </div>
@@ -115,24 +122,24 @@ export function EdgeDrawer({ id, parent_id }: Props) {
               <div className="flex w-full flex-col items-end gap-2 lg:flex-row">
                 <div className="w-full">
                   <Range
-                    label={`Curve strength: ${edge?.control_point_weights || 0}`}
+                    label={`Curve strength: ${edge?.control_point_distances || 0}`}
                     max={1000}
                     min={-1000}
-                    name="control_point_weights"
+                    name="control_point_distances"
                     onChange={({ name, value }) => handleChange({ name, value: parseInt(value as string, 10) })}
                     step={10}
-                    value={(edge?.control_point_weights || 0)?.toFixed()}
+                    value={(edge?.control_point_distances || -100)?.toString()}
                   />
                 </div>
                 <div className="w-full">
                   <Range
-                    label={`Curve center: ${edge?.control_point_distances}`}
+                    label={`Curve center: ${edge?.control_point_weights}`}
                     max={1}
                     min={0}
-                    name="control_point_distances"
+                    name="control_point_weights"
                     onChange={({ name, value }) => handleChange({ name, value: parseFloat(value as string) })}
                     step={0.1}
-                    value={edge?.control_point_distances?.toString() || "0.5"}
+                    value={edge?.control_point_weights?.toString() || "0.5"}
                   />
                 </div>
               </div>
@@ -163,13 +170,59 @@ export function EdgeDrawer({ id, parent_id }: Props) {
               name="width"
               onChange={({ name, value }) => handleChange({ name, value: parseFloat(value as string) })}
               type="number"
-              value={edge?.width?.toFixed() || ""}
+              value={edge?.width?.toString() || "1"}
             />
             <div className="self-end pb-2">
               <ColorPicker hasCustom name="font_color" onChange={handleChange} value={edge?.font_color || "#ffffff"} />
             </div>
           </div>
         </>
+      ) : null}
+      {selectedTab === 2 ? (
+        <div className="flex flex-col gap-y-2">
+          <Search
+            name="tags"
+            onChange={({ name, label, value, color }) => {
+              if ((edge?.tags || [])?.some((tag) => tag.id === value)) {
+                createNotification({
+                  title: "Cannot add the same tag twice.",
+                  variant: "warning",
+                  icon: IconEnum.info_circle,
+                  timer: 3,
+                });
+                return;
+              }
+              handleChange({
+                name,
+                value: (edge?.tags || []).concat({
+                  title: label as string,
+                  id: value,
+                  project_id: project_id as string,
+                  color: color as string,
+                }),
+              });
+            }}
+            placeholder="Press enter to search tags"
+            searchEntity="tags"
+          />
+
+          <div className="flex flex-wrap gap-2">
+            {edge?.tags?.length
+              ? edge.tags.map((tag) => (
+                  <div key={tag.id} className="w-fit">
+                    <Badge
+                      clearAction={() => {
+                        handleChange({ name: "tags", value: (edge?.tags || []).filter((t) => t.id !== tag.id) });
+                      }}
+                      customColor={tag.color}
+                      label={tag.title}
+                      size="lg"
+                    />
+                  </div>
+                ))
+              : null}
+          </div>
+        </div>
       ) : null}
     </div>
   );

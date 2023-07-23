@@ -231,7 +231,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             onChange={({ name, label, value, color }) => {
               if ((node?.tags || [])?.some((tag) => tag.id === value)) {
                 createNotification({
-                  id: crypto.randomUUID(),
                   title: "Cannot add the same tag twice.",
                   variant: "warning",
                   icon: IconEnum.info_circle,
