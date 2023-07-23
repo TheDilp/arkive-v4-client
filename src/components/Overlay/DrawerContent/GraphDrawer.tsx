@@ -10,7 +10,7 @@ import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type insertGraphType = Partial<GraphType> & { parent_id?: string; project_id: string };
-type updateGraphType = Partial<GraphType>;
+type updateGraphType = Partial<GraphType> & { parent_id?: string };
 
 type graphRelationsType = {
   tags?: { id: string }[];

@@ -7,7 +7,7 @@ import Alert from "../../components/Misc/Alert";
 import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
 import { contextMenuAtom, drawerAtom, IconEnum } from "../../utils";
-import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
+import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
 type EntityItemType = {
@@ -101,6 +101,8 @@ export function EntitiesView() {
 
   if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
 
+  const entityName = getEntityNameFromType(type as AvailableEntityType);
+
   return (
     <>
       <div className="flex h-10 items-center justify-between">
@@ -136,12 +138,18 @@ export function EntitiesView() {
                   event,
                   items: [
                     {
-                      title: "Edit graph",
+                      title: `Edit ${entityName}`,
                       icon: IconEnum.edit,
                       onClick: () =>
-                        setDrawer((prev) => ({ ...prev, size: "md", title: "Edit graph", type: "graphs", data: { id } })),
+                        setDrawer((prev) => ({
+                          ...prev,
+                          size: "md",
+                          title: `Edit ${entityName} - ${item.title}`,
+                          type: type as AvailableEntityType,
+                          data: { id },
+                        })),
                     },
-                    { title: "Delete graph", icon: IconEnum.trash },
+                    { title: `Delete ${entityName}`, icon: IconEnum.trash },
                   ],
                 })
               }
@@ -160,18 +168,18 @@ export function EntitiesView() {
                   event,
                   items: [
                     {
-                      title: "Edit graph",
+                      title: `Edit ${entityName}`,
                       icon: IconEnum.edit,
                       onClick: () =>
                         setDrawer((prev) => ({
                           ...prev,
                           size: "md",
-                          title: `Edit graph - ${item.title}`,
-                          type: "graphs",
+                          title: `Edit ${entityName} - ${item.title}`,
+                          type: type as AvailableEntityType,
                           data: { id, parent_id: item_id },
                         })),
                     },
-                    { title: "Delete graph", icon: IconEnum.trash },
+                    { title: `Delete ${entityName}`, icon: IconEnum.trash },
                   ],
                 })
               }
