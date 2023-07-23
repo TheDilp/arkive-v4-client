@@ -162,7 +162,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
               locked,
             } = evt.target._private;
 
-            console.log(evt.target._private);
             setContextMenu({
               event: evt.originalEvent,
               items: [
