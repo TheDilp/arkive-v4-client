@@ -229,20 +229,41 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           </div>
           <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
             <div className="w-full">
-              <Input label="Width" name="width" onChange={handleChange} type="number" value={node?.width || 50} />
+              <Input
+                label="Width"
+                max={5000}
+                min={10}
+                name="width"
+                onChange={handleChange}
+                step={5}
+                type="number"
+                value={node?.width || 50}
+              />
             </div>
             <div className="w-full">
-              <Input label="Height" name="height" onChange={handleChange} type="number" value={node?.height || 50} />
+              <Input
+                label="Height"
+                max={5000}
+                min={10}
+                name="height"
+                onChange={handleChange}
+                step={5}
+                type="number"
+                value={node?.height || 50}
+              />
             </div>
           </div>
 
           <div className="flex-1">
             <Input
               label="Node opacity"
+              max={1}
+              min={0}
               name="background_opacity"
-              onChange={handleChange}
+              onChange={({ name, value }) => handleChange({ name, value: parseFloat(value as string) })}
+              step={0.01}
               type="number"
-              value={node?.background_opacity || 1}
+              value={node?.background_opacity ?? 1}
             />
           </div>
           <div className="flex-1">

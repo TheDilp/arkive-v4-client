@@ -20,6 +20,7 @@ export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
         "background-clip": "node",
         "background-color": "data(background_color)",
         "background-opacity": "data(background_opacity)",
+        "background-image-opacity": "data(background_opacity)",
         "background-image-crossorigin": "anonymous",
         "text-halign": "data(text_h_align)",
         "text-valign": "data(text_v_align)",

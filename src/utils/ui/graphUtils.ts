@@ -205,8 +205,8 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         type: node?.type || "rectangle",
         width: node?.width || 50,
         height: node?.height || 50,
-        x: node?.x || 0,
-        y: node?.y || 0,
+        x: node?.x ?? 0,
+        y: node?.y ?? 0,
 
         font_size: node?.font_size || 16,
         font_color: node?.font_color || "#ffffff",
@@ -216,10 +216,10 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
 
         is_locked: node?.is_locked || false,
         is_template: node?.is_template || false,
-        z_index: node?.z_index || 1,
+        z_index: node?.z_index ?? 1,
 
         background_color: node?.background_color || "#595959",
-        background_opacity: node?.background_opacity || 1,
+        background_opacity: node?.background_opacity ?? 1,
 
         classes: `${isReadOnly ? "publicBoardNode" : "boardNode"}`,
         z_index_compare: node.z_index === 0 ? "manual" : "auto",
