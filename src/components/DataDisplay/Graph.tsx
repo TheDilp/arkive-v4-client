@@ -1,5 +1,6 @@
-import { Collection, Core, EventObject } from "cytoscape";
+import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
+import set from "lodash.set";
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
@@ -91,10 +92,10 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
 
   useEffect(() => {
     if (graph?.nodes && graph?.nodes.length > 0 && !nodes.length) {
-      setNodes(mapNodes(graph?.nodes, project_id as string));
+      setNodes(graph?.nodes);
     }
     if (graph?.edges && graph?.edges.length > 0 && !edges.length) {
-      setEdges(mapEdges(graph?.edges));
+      setEdges(graph?.edges);
     }
   }, [graph?.nodes, graph?.edges]);
 
@@ -123,6 +124,13 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   // Board Events
   useEffect(() => {
     if (cyRef?.current?._cy && !isReadOnly && !isViewOnly) {
+      cyRef?.current?._cy.on("grabon", function (evt: any) {
+        const selected = cyRef?.current?._cy.elements(":selected");
+        if (selected?.length === 1) {
+          cyRef?.current?._cy.elements(":selected").unselect();
+          evt.target.select();
+        }
+      });
       // Right click
       cyRef?.current?._cy.on("cxttap", function (evt: any) {
         // If the target is the background of the canvas
@@ -176,17 +184,20 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
 
         if (target.position.x !== target?.data.x || target.position.y !== target.data?.y) {
           setNodes((prev) => {
-            const idx = prev.findIndex((n) => n.data.id === target.data.id);
+            const idx = prev.findIndex((n) => n.id === target.data.id);
 
             if (idx !== -1) {
               const newNodes = [...prev];
               const foundNode = newNodes[idx];
-              if (foundNode.data.x !== target.position.x || foundNode.data.y !== target.position.y) {
-                addOrUpdateNode({ id: target.data.id, ...target.position });
-                newNodes[idx] = { ...newNodes[idx], data: { ...foundNode.data, ...target.position } };
-                return newNodes;
+              if (foundNode.x !== target.position.x) {
+                set(foundNode, "x", target.position.x);
               }
-              return prev;
+              if (foundNode.y !== target.position.y) {
+                set(foundNode, "y", target.position.y);
+              }
+              addOrUpdateNode({ id: target.data.id, ...target.position });
+              newNodes[idx] = foundNode;
+              return newNodes;
             }
             return prev;
           });
@@ -468,7 +479,9 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         cy={(cy: Core) => {
           setBoardRef(cy);
         }}
-        elements={[...nodes, ...edges]}
+        elements={
+          [...mapNodes(nodes || [], project_id as string), ...mapEdges(edges || [])] as (NodeDefinition | EdgeDefinition)[]
+        }
         maxZoom={5}
         minZoom={0.1}
         stylesheet={styleSheet}
