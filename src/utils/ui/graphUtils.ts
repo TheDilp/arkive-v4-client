@@ -172,6 +172,14 @@ export function toModelPosition(boardRef: Core, pos: { x: number; y: number }) {
     y: (pos.y - pan.y) / zoom,
   };
 }
+export function toScreenPosition(boardRef: Core, pos: { x: number; y: number }) {
+  const pan = boardRef.pan();
+  const zoom = boardRef.zoom();
+  return {
+    x: pos.x * zoom + pan.x,
+    y: pos.y * zoom + pan.y,
+  };
+}
 
 export function getNodeLabel(node: NodeType): string {
   if (node?.label) return node.label;
@@ -290,7 +298,7 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
 }
 export const edgeArrowTypes = ["source", "target", "midsource", "mid_target"];
 export const curve_styles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
-export function getcurve_styleIcon(curve_style: CurveStyleType): string {
+export function getCurveStyleIcon(curve_style: CurveStyleType): string {
   if (curve_style === "straight") return "cil:graph";
   if (curve_style === "taxi") return "icon-park-outline:chart-graph";
   if (curve_style === "unbundled-bezier") return "ph:bezier-curve";

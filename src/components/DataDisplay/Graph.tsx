@@ -8,10 +8,10 @@ import { useParams } from "react-router-dom";
 import { useChangeNavbarTitle } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { BoardContext, GraphType } from "../../types/EntityTypes/graphTypes";
-import { BoardReferenceAtom, BoardStateAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
+import { IconEnum } from "../../utils";
+import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
-import { ContextMenu } from "../Overlay/ContextMenu";
 
 type Props = {
   isReadOnly?: boolean;
@@ -37,6 +37,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
     nodes: null,
     edges: null,
   });
+
+  const setContextMenu = useSetAtom(contextMenuAtom);
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
@@ -152,19 +154,36 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
             cyRef?.current?._cy.elements(":selected").unselect();
             evt.target.select();
           }
+
           if (group === "nodes") {
-            cm.current.show(evt.originalEvent);
-            setBoardContext({
-              ...evt.position,
-              nodes: group,
-              type: "nodes",
+            const { id, label } = evt.target._private.data;
+            setContextMenu({
+              event: evt.originalEvent,
+              items: [
+                {
+                  title: "Edit node",
+                  icon: IconEnum.edit,
+                  onClick: () =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: `Edit node ${label ? " - ".concat(label) : ""}`,
+                      type: "nodes",
+                      data: {
+                        id,
+                        parent_id: item_id,
+                      },
+                    })),
+                },
+                { title: "Highlight connected nodes", icon: IconEnum.board },
+                { title: "Un/lock node", icon: IconEnum.unlock, subItems: [{ title: "Lock node" }, { title: "Unlock node" }] },
+                // { title: "Template from node" },
+                { title: "Delete selected node", icon: IconEnum.trash },
+              ],
             });
           } else if (group === "edges") {
-            cm.current.show(evt.originalEvent);
-            setBoardContext({
-              ...evt.position,
-              edges: group,
-              type: "edges",
+            setContextMenu({
+              event: evt.originalEvent,
+              items: [{ title: "Test" }],
             });
           }
         }
@@ -472,7 +491,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
       //   }
       // }}
     >
-      <ContextMenu items={[{ title: "test" }]} />
       <CytoscapeComponent
         ref={cyRef}
         className="h-full w-full"
