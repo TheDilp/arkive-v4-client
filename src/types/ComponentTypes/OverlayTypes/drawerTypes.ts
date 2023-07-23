@@ -1,4 +1,7 @@
+import { MouseEvent } from "react";
+
 import { AllAvailableEntities } from "../../EntityTypes";
+import { ContextMenuItemType } from "./contextMenuTypes";
 
 export type DrawerContentType =
   | null
@@ -27,4 +30,9 @@ export interface DrawerAtomType {
   size?: DrawerSize;
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
+}
+
+export interface ContextMenuAtomType {
+  event: MouseEvent<HTMLDivElement, MouseEvent> | null;
+  items: ContextMenuItemType[] | null;
 }

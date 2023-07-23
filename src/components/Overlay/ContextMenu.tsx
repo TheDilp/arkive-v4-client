@@ -12,18 +12,19 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
+import { useAtomValue } from "jotai";
 import { useEffect, useRef, useState } from "react";
 
-import { ContextMenuType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
+import { contextMenuAtom } from "../../utils";
 import { Icon } from "..";
 
-export function ContextMenu({ items }: ContextMenuType) {
+export function ContextMenu() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [contextData, setContextData] = useState<any>();
-  const listItemsRef = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const allowMouseUpCloseRef = useRef(false);
+  const contextMenuAtomValue = useAtomValue(contextMenuAtom);
+
+  const listItemsRef = useRef<Array<HTMLButtonElement | null>>([]);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -51,53 +52,26 @@ export function ContextMenu({ items }: ContextMenuType) {
   const { getFloatingProps, getItemProps } = useInteractions([role, dismiss, listNavigation]);
 
   useEffect(() => {
-    let timeout: number;
-
-    function onContextMenu(e: MouseEvent) {
-      e.preventDefault();
+    if (contextMenuAtomValue?.items?.length && contextMenuAtomValue?.event) {
+      const { event } = contextMenuAtomValue;
+      refs.setPositionReference({
+        getBoundingClientRect() {
+          return {
+            width: 0,
+            height: 0,
+            x: event.clientX,
+            y: event.clientY,
+            top: event.clientY,
+            right: event.clientX,
+            bottom: event.clientY,
+            left: event.clientX,
+          };
+        },
+      });
       //   @ts-ignore
-      const contextType = e.target.dataset?.contextType;
-      if (typeof contextType === "string") {
-        refs.setPositionReference({
-          getBoundingClientRect() {
-            return {
-              width: 0,
-              height: 0,
-              x: e.clientX,
-              y: e.clientY,
-              top: e.clientY,
-              right: e.clientX,
-              bottom: e.clientY,
-              left: e.clientX,
-            };
-          },
-        });
-        //   @ts-ignore
-        setContextData(e.target.dataset);
-        setIsOpen(true);
-        clearTimeout(timeout);
-
-        allowMouseUpCloseRef.current = false;
-        timeout = window.setTimeout(() => {
-          allowMouseUpCloseRef.current = true;
-        }, 300);
-      }
+      setIsOpen(true);
     }
-
-    function onMouseUp() {
-      if (allowMouseUpCloseRef.current) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("contextmenu", onContextMenu);
-    document.addEventListener("mouseup", onMouseUp);
-    return () => {
-      document.removeEventListener("contextmenu", onContextMenu);
-      document.removeEventListener("mouseup", onMouseUp);
-      clearTimeout(timeout);
-    };
-  }, [refs]);
+  }, [contextMenuAtomValue?.items]);
 
   return (
     <FloatingPortal>
@@ -106,31 +80,33 @@ export function ContextMenu({ items }: ContextMenuType) {
           <FloatingFocusManager context={context} initialFocus={refs.floating}>
             <div
               ref={refs.setFloating}
-              className="max-w-xs rounded-md border border-zinc-700 bg-zinc-800 p-2 shadow focus-visible:outline-none"
+              className="max-w-xs gap-y-2 rounded-md border border-zinc-700 bg-zinc-800 shadow focus-visible:outline-none"
               style={floatingStyles}
               {...getFloatingProps()}>
-              {items.map((item, index) => (
-                <div
-                  className="flex cursor-pointer items-center gap-x-2 outline-none hover:text-sky-400 focus-visible:outline-none"
-                  {...getItemProps({
-                    tabIndex: activeIndex === index ? 0 : -1,
-                    ref(node: HTMLButtonElement) {
-                      listItemsRef.current[index] = node;
-                    },
-                    onClick() {
-                      item?.onClick?.(contextData);
-                      setIsOpen(false);
-                    },
-                    onMouseUp() {
-                      item?.onClick?.(contextData);
-                      setIsOpen(false);
-                    },
-                  })}
-                  key={item.title}>
-                  {item?.icon ? <Icon icon={item.icon} /> : null}
-                  {item.title}
-                </div>
-              ))}
+              {contextMenuAtomValue?.items
+                ? contextMenuAtomValue.items.map((item, index) => (
+                    <div
+                      className="flex h-10 cursor-pointer items-center border-b border-zinc-700 px-2 outline-none last:border-none hover:text-sky-400 focus-visible:outline-none"
+                      {...getItemProps({
+                        tabIndex: activeIndex === index ? 0 : -1,
+                        ref(node: HTMLButtonElement) {
+                          listItemsRef.current[index] = node;
+                        },
+                        onClick() {
+                          item?.onClick?.();
+                          setIsOpen(false);
+                        },
+                        onMouseUp() {
+                          item?.onClick?.();
+                          setIsOpen(false);
+                        },
+                      })}
+                      key={item.title}>
+                      {item?.icon ? <Icon icon={item.icon} /> : null}
+                      {item.title}
+                    </div>
+                  ))
+                : null}
             </div>
           </FloatingFocusManager>
         </FloatingOverlay>

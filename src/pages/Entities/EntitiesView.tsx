@@ -1,13 +1,12 @@
 import { useSetAtom } from "jotai";
+import { MouseEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
 import Alert from "../../components/Misc/Alert";
-import { ContextMenu } from "../../components/Overlay/ContextMenu";
 import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
-import { ContextMenuItemType } from "../../types/ComponentTypes/OverlayTypes/contextMenuTypes";
-import { drawerAtom, IconEnum } from "../../utils";
+import { contextMenuAtom, drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
@@ -19,14 +18,26 @@ type EntityItemType = {
   // image?: string;
 };
 
-function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { type: AvailableEntityType }) {
+function ItemDisplay({
+  id,
+  is_folder,
+  title,
+  type,
+  icon,
+  showContextMenu,
+}: EntityItemType & {
+  type: AvailableEntityType;
+
+  showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
+}) {
   return (
     <Link to={`../graphs/${id}`}>
       <div
         className="col-span-1 flex cursor-pointer flex-col items-center justify-center hover:text-blue-400"
-        data-context-id={id}
-        data-context-title={title}
-        data-context-type="graphs">
+        onContextMenu={(e) => {
+          e.preventDefault();
+          showContextMenu(e as any, id);
+        }}>
         <div className="pointer-events-none">
           <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
         </div>
@@ -36,7 +47,7 @@ function ItemDisplay({ id, is_folder, title, type, icon }: EntityItemType & { ty
   );
 }
 
-export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMenuItemType[] }) {
+export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -84,6 +95,8 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
     },
   );
 
+  const setContextMenuAtom = useSetAtom(contextMenuAtom);
+
   if (!item_id && type === "characters") return <CharactersView />;
 
   if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
@@ -112,14 +125,26 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
       </div>
       {!item_id || data?.data?.is_folder ? (
         <div className="grid h-full w-full grid-cols-2 content-start md:grid-cols-4 lg:grid-cols-10">
-          {contextMenuItems?.length && !item_id ? <ContextMenu items={contextMenuItems} /> : null}
           {(base?.data?.length ? base.data : []).map((item) => (
             <ItemDisplay
               key={item.id}
               icon={item.icon}
               id={item.id}
-              // image={item?.image}
               is_folder={item?.is_folder ?? false}
+              showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
+                setContextMenuAtom({
+                  event,
+                  items: [
+                    {
+                      title: "Edit graph",
+                      icon: IconEnum.edit,
+                      onClick: () =>
+                        setDrawer((prev) => ({ ...prev, size: "md", title: "Edit graph", type: "graphs", data: { id } })),
+                    },
+                    { title: "Delete graph", icon: IconEnum.trash },
+                  ],
+                })
+              }
               title={item.title}
               type={type as AvailableEntityType}
             />
@@ -129,8 +154,27 @@ export function EntitiesView({ contextMenuItems }: { contextMenuItems: ContextMe
               key={item.id}
               icon={item.icon}
               id={item.id}
-              // image={item?.image}
               is_folder={item?.is_folder ?? false}
+              showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
+                setContextMenuAtom({
+                  event,
+                  items: [
+                    {
+                      title: "Edit graph",
+                      icon: IconEnum.edit,
+                      onClick: () =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          size: "md",
+                          title: `Edit graph - ${item.title}`,
+                          type: "graphs",
+                          data: { id, parent_id: item_id },
+                        })),
+                    },
+                    { title: "Delete graph", icon: IconEnum.trash },
+                  ],
+                })
+              }
               title={item.title}
               type={type as AvailableEntityType}
             />

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import { useBreakpoint } from "../../hooks";
 import { Dialog, Drawer } from "../Overlay";
+import { ContextMenu } from "../Overlay/ContextMenu";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
@@ -10,6 +11,7 @@ export function ProjectLayout() {
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
+      <ContextMenu />
       {isLg ? <Sidebar /> : null}
 
       <div className="flex h-full w-full flex-col">
