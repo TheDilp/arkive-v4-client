@@ -401,8 +401,12 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
 
               const { tags, ...rest } = nodeToUpdate;
               const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
-              await update(parsedData, { onSuccess: resetChanges });
-              UpdateGraphNodes({ setNodes, changedData, node, project_id: project_id as string, rest });
+              await update(parsedData, {
+                onSuccess: () => {
+                  resetDrawerAtom();
+                  resetChanges();
+                },
+              });
             } else {
               createNotification({
                 variant: "info",

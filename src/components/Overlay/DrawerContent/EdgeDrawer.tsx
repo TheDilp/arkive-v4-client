@@ -274,8 +274,11 @@ export function EdgeDrawer({ data }: Props) {
           <div className="flex w-full items-center gap-x-2">
             <Input
               label="Thickness"
+              max={100}
+              min={1}
               name="width"
               onChange={({ name, value }) => handleChange({ name, value: parseFloat(value as string) })}
+              step={1}
               type="number"
               value={edge?.width?.toString() || "1"}
             />
@@ -385,9 +388,13 @@ export function EdgeDrawer({ data }: Props) {
               const edgeToUpdate = { ...(changedData || {}), id: edge.id };
               const { tags, ...rest } = edgeToUpdate;
               const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
-              await update(parsedData, { onSuccess: resetChanges });
 
-              UpdateGraphEdges({ setEdges, edge, changedData });
+              await update(parsedData, {
+                onSuccess: () => {
+                  resetDrawerAtom();
+                  resetChanges();
+                },
+              });
             } else {
               createNotification({
                 variant: "info",
