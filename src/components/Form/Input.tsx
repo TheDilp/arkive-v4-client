@@ -70,6 +70,9 @@ export function Input({
   size = "md",
   label,
   helperText,
+  min,
+  max,
+  step,
 }: InputType) {
   const { base, input, label: labelClasses, helperText: helperTextClasses } = InputClasses({ variant, size, isDisabled });
   return (
@@ -79,10 +82,13 @@ export function Input({
       <input
         className={input()}
         disabled={isDisabled}
+        max={max}
+        min={min}
         name={name}
         onChange={(e) => (type === "number" ? onChange({ name, value: e.target.valueAsNumber }) : onChange(e.target))}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
+        step={step}
         type={type}
         value={value}
       />
