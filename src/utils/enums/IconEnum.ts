@@ -39,6 +39,7 @@ export const IconEnum = {
   check: "ph:check" as const,
   check_circle: "ph:check-circle" as const,
   family_tree: "ph:tree-structure" as const,
+  flow_arrow: "ph:flow-arrow" as const,
   info_circle: "ph:info" as const,
   link: "ph:link" as const,
   loading: "ph:circle-notch" as const,

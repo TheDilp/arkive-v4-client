@@ -853,7 +853,7 @@ export const EdgeCurveStylesEnum = [
     value: "straight",
   },
   {
-    label: "Bezier",
+    label: "Curved",
     value: "unbundled-bezier",
   },
   {
