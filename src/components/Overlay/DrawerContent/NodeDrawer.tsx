@@ -1,11 +1,12 @@
-import { useSetAtom } from "jotai";
+import { SetStateAction, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
+import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontFamiliesEnum,
@@ -14,7 +15,7 @@ import {
   TextHAlignEnum,
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
-import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
+import { getNodeImage, getNodeLabel, mapNodes } from "../../../utils/ui/graphUtils";
 import { updateNodeSchema } from "../../../validation";
 import {
   Badge,
@@ -39,6 +40,39 @@ const tabs = [
 
 type UpdateNodeType = { data: Partial<NodeType> };
 
+function UpdateGraphNodes({
+  setNodes,
+  changedData,
+  node,
+  project_id,
+  rest,
+}: {
+  setNodes: (arg: SetStateAction<NodeType[]>) => void;
+  changedData: Partial<NodeType>;
+  node: Partial<NodeType> & { parent_id: string };
+  project_id: string;
+  rest: Partial<NodeType>;
+}) {
+  setNodes((oldNodes) => {
+    if (oldNodes) {
+      const newNodes = [...oldNodes];
+      const idx = newNodes.findIndex((n) => n.id === node.id);
+      if (idx > -1) {
+        const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData };
+
+        set(newNodes, `[${idx}]`, {
+          ...alteredNodeData,
+          label: getNodeLabel(alteredNodeData as NodeType),
+          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+        });
+        return newNodes;
+      }
+      return newNodes;
+    }
+    return oldNodes;
+  });
+}
+
 export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -55,6 +89,9 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     },
   );
   const setNodes = useSetAtom(nodesAtom);
+  const setDialogAtom = useSetAtom(dialogAtom);
+  const resetDialogAtom = useResetAtom(dialogAtom);
+  const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const { mutateAsync: update } = useUpdateGraphSubEntity<
     UpdateNodeType & {
@@ -64,6 +101,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     }
   >("nodes", data.parent_id);
 
+  const originalNode = existingNode?.data;
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
 
   const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
@@ -73,6 +111,18 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
       setNode(existingNode?.data);
     }
   }, [existingNode?.data]);
+
+  useEffect(() => {
+    if (changedData) {
+      const nodeToUpdate = { ...(changedData || {}), id: node.id };
+      set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+      set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { tags, ...rest } = nodeToUpdate;
+      UpdateGraphNodes({ project_id: project_id as string, rest, node, changedData, setNodes });
+    }
+  }, [changedData]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
 
@@ -284,53 +334,67 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           </div>
         </div>
       ) : null}
-      <Button
-        icon={IconEnum.save}
-        label="Save"
-        onClick={async () => {
-          if (changedData) {
-            const nodeToUpdate = { ...(changedData || {}), id: node.id };
-            set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-            set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+      <div className="flex flex-nowrap items-center gap-x-2">
+        <Button
+          icon={IconEnum.close}
+          label="Cancel"
+          onClick={() => {
+            setDialogAtom({
+              position: "center",
+              isOverlay: true,
+              data: null,
+              title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
+              type: null,
+              size: "md",
+              confirm: {
+                action: () => {
+                  if (originalNode) {
+                    const formattedOriginalNode = mapNodes([originalNode], project_id as string);
+                    UpdateGraphNodes({
+                      setNodes,
+                      changedData: {},
+                      node,
+                      project_id: project_id as string,
+                      rest: formattedOriginalNode[0]?.data,
+                    });
+                  }
+                  resetChanges();
+                  resetDrawerAtom();
+                  resetDialogAtom();
+                },
+              },
+              cancel: {
+                action: () => resetDialogAtom(),
+              },
+            });
+          }}
+          variant="secondary"
+        />
+        <Button
+          icon={IconEnum.save}
+          label="Save"
+          onClick={async () => {
+            if (changedData) {
+              const nodeToUpdate = { ...(changedData || {}), id: node.id };
+              set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+              set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
-            const { tags, ...rest } = nodeToUpdate;
-            const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
-            await update(parsedData, { onSuccess: resetChanges });
-            setNodes((oldNodes) => {
-              if (oldNodes) {
-                const newNodes = [...oldNodes];
-                const idx = newNodes.findIndex((n) => n.data.id === node.id);
-                if (idx > -1) {
-                  const newNodeData = {
-                    ...newNodes[idx].data,
-                    ...changedData,
-                  };
-                  const alteredNodeData = { ...node, ...rest };
-                  newNodes[idx] = {
-                    ...newNodes[idx],
-                    data: {
-                      ...newNodeData,
-                      label: getNodeLabel(alteredNodeData),
-                      background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
-                    },
-                  };
-                  return newNodes;
-                }
-                return newNodes;
-              }
-              return oldNodes;
-            });
-          } else {
-            createNotification({
-              variant: "info",
-              icon: IconEnum.info_circle,
-              title: "No data was changed.",
-              timer: 3,
-            });
-          }
-        }}
-        variant="success"
-      />
+              const { tags, ...rest } = nodeToUpdate;
+              const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
+              await update(parsedData, { onSuccess: resetChanges });
+              UpdateGraphNodes({ setNodes, changedData, node, project_id: project_id as string, rest });
+            } else {
+              createNotification({
+                variant: "info",
+                icon: IconEnum.info_circle,
+                title: "No data was changed.",
+                timer: 3,
+              });
+            }
+          }}
+          variant="success"
+        />
+      </div>
     </div>
   );
 }
