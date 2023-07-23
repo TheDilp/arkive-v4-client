@@ -90,7 +90,7 @@ export function ContextMenu() {
               {contextMenuAtomValue?.items
                 ? contextMenuAtomValue.items.map((item, index) => (
                     <div
-                      className="flex h-10 cursor-pointer items-center border-b border-zinc-700 px-2 outline-none last:border-none hover:text-sky-400 focus-visible:outline-none"
+                      className="flex h-10 cursor-pointer items-center gap-x-2 border-b border-zinc-700 px-2 outline-none last:border-none hover:text-sky-400 focus-visible:outline-none"
                       {...getItemProps({
                         tabIndex: activeIndex === index ? 0 : -1,
                         ref(node: HTMLButtonElement) {
@@ -106,8 +106,8 @@ export function ContextMenu() {
                         },
                       })}
                       key={item.title}>
-                      {item?.icon ? <Icon icon={item.icon} /> : null}
-                      {item.title}
+                      {item?.icon ? <Icon fontSize={22} icon={item.icon} /> : null}
+                      <span>{item.title}</span>
                     </div>
                   ))
                 : null}
