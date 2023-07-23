@@ -3,7 +3,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvailableEntityType, GraphType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useUpdateEntity<InsertType extends { data: { id?: string } }>(type: AvailableEntityType, project_id: string) {
+export function useUpdateEntity<InsertType extends { data: { id?: string; parent_id?: string } }>(
+  type: AvailableEntityType,
+  project_id: string,
+) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -16,12 +19,15 @@ export function useUpdateEntity<InsertType extends { data: { id?: string } }>(ty
       });
     },
     {
-      onSettled: (data) => {
+      onSettled: (data, _, vars) => {
         if (data.ok) {
-          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
+          if (vars?.data?.parent_id) {
+            queryClient.invalidateQueries([type, vars.data.parent_id]);
+          } else {
+            queryClient.invalidateQueries(["allEntities", project_id, type]);
+          }
 
           createNotification({
-            id: crypto.randomUUID(),
             title: getEntityCRUDNotification(type, "update"),
             variant: "success",
             icon: IconEnum.check,
@@ -29,7 +35,6 @@ export function useUpdateEntity<InsertType extends { data: { id?: string } }>(ty
           });
         } else
           createNotification({
-            id: crypto.randomUUID(),
             title: "There was an error updating this item.",
             variant: "error",
             icon: IconEnum.error,
@@ -80,7 +85,6 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
         queryClient.setQueryData(["graphs", parent_id], context?.old);
 
         createNotification({
-          id: crypto.randomUUID(),
           title: "There was an error updating this item.",
           variant: "error",
           icon: IconEnum.error,
@@ -89,7 +93,6 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
       },
       onSuccess: () => {
         createNotification({
-          id: crypto.randomUUID(),
           title: getEntityCRUDNotification(subtype, "update"),
           variant: "success",
           icon: IconEnum.check,

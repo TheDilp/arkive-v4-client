@@ -19,7 +19,6 @@ export function useCreateProject<InsertType>() {
     {
       onError: () =>
         createNotification({
-          id: crypto.randomUUID(),
           title: "There was an error creating this project.",
           variant: "error",
           icon: IconEnum.error,
@@ -30,7 +29,6 @@ export function useCreateProject<InsertType>() {
       onSuccess: () => {
         queryClient.invalidateQueries(["allEntities", "project"]);
         createNotification({
-          id: crypto.randomUUID(),
           title: "Project successfully created!",
           variant: "success",
           icon: IconEnum.check,
@@ -64,7 +62,6 @@ export function useCreateEntity<
             queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           }
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || getEntityCRUDNotification(type, "create"),
             variant: "success",
             icon: IconEnum.check,
@@ -72,7 +69,6 @@ export function useCreateEntity<
           });
         } else {
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || "There was an error creating this entity.",
             variant: "error",
             icon: IconEnum.error,
@@ -106,7 +102,6 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
           queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
 
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || getEntityCRUDNotification(type, "create"),
             variant: "success",
             icon: IconEnum.check,
@@ -114,7 +109,6 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
           });
         } else {
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || "There was an error creating these items.",
             variant: "error",
             icon: IconEnum.error,
@@ -143,7 +137,6 @@ export function useCreateAdditionalFieldTemplate<InsertType extends { project_id
     {
       onError: () =>
         createNotification({
-          id: crypto.randomUUID(),
           title: "There was an error creating this template.",
           variant: "error",
           icon: IconEnum.error,
@@ -152,7 +145,6 @@ export function useCreateAdditionalFieldTemplate<InsertType extends { project_id
       onSuccess: async (_, vars) => {
         queryClient.invalidateQueries({ queryKey: ["allEntities", vars.project_id, "character_fields_templates"] });
         createNotification({
-          id: crypto.randomUUID(),
           title: getEntityCRUDNotification("character_fields_templates", "create"),
           variant: "success",
           icon: IconEnum.check,
