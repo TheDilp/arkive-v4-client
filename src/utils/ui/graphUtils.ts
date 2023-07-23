@@ -1,4 +1,4 @@
-import { UseMutationResult } from "@tanstack/react-query";
+import { UseMutateFunction, UseMutationResult } from "@tanstack/react-query";
 import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
@@ -9,13 +9,13 @@ import { getCharacterFullName, getImageURL } from "..";
 export function changeLockState(
   boardContext: cytoscape.Core,
   locked: boolean,
-  updateManyNodesLockState: UseMutationResult<
-    Response | null,
+  updateManyNodesLockState: UseMutateFunction<
+    any,
     unknown,
     {
-      ids: string[];
-      data: Partial<AvailableSubEntityType>;
-    },
+      id: string;
+      is_locked: boolean;
+    }[],
     {
       old: unknown;
     }
@@ -27,8 +27,8 @@ export function changeLockState(
   } else {
     selected.unlock();
   }
-  const ids = selected.map((node: any) => node.data().id);
-  // updateManyNodesLockState.mutate({ ids, data: { is_loced:locked } });
+  const data = selected.map((node: any) => ({ id: node.data().id, is_locked: locked }));
+  updateManyNodesLockState(data);
 }
 
 export const edgehandlesSettings = {
@@ -222,7 +222,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         text_v_align: node?.text_v_align || "top",
         text_h_align: node?.text_h_align || "center",
 
-        is_locked: node?.is_locked || false,
+        is_locked: node?.is_locked ?? false,
         is_template: node?.is_template || false,
         z_index: node?.z_index ?? 1,
 
@@ -241,7 +241,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
         background_image: getNodeImage(node, project_id) || [],
         doc_id: node?.doc_id,
       },
-      is_locked: isReadOnly || node.is_locked,
+      locked: isReadOnly ?? node.is_locked,
       position: { x: node.x, y: node.y },
     }));
 }
