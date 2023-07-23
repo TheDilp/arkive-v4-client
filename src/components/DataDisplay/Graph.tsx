@@ -174,7 +174,18 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                       },
                     })),
                 },
-                { title: "Highlight connected nodes", icon: IconEnum.board },
+                {
+                  title: "Highlight connected nodes",
+                  icon: IconEnum.board,
+                  onClick: () => {
+                    const incomers = evt.target.incomers();
+                    const outgoers = evt.target.outgoers();
+                    incomers.nodes().flashClass("incomingNodeHighlight", 1500);
+                    incomers.edges().flashClass("incomingEdgeHighlight", 1500);
+                    outgoers.nodes().flashClass("outgoingNodeHighlight", 1500);
+                    outgoers.edges().flashClass("outgoingEdgeHighlight", 1500);
+                  },
+                },
                 { title: "Un/lock node", icon: IconEnum.unlock, subItems: [{ title: "Lock node" }, { title: "Unlock node" }] },
                 // { title: "Template from node" },
                 { title: "Delete selected node", icon: IconEnum.trash },
