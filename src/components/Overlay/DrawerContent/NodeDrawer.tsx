@@ -15,7 +15,7 @@ import {
   TextHAlignEnum,
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
-import { getNodeImage, getNodeLabel, mapNodes } from "../../../utils/ui/graphUtils";
+import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { updateNodeSchema } from "../../../validation";
 import {
   Badge,
@@ -349,13 +349,12 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               confirm: {
                 action: () => {
                   if (originalNode) {
-                    const formattedOriginalNode = mapNodes([originalNode], project_id as string);
                     UpdateGraphNodes({
                       setNodes,
                       changedData: {},
                       node,
                       project_id: project_id as string,
-                      rest: formattedOriginalNode[0]?.data,
+                      rest: originalNode,
                     });
                   }
                   resetChanges();

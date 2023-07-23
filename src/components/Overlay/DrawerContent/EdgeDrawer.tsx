@@ -1,4 +1,6 @@
-import { useSetAtom } from "jotai";
+import { SetStateAction, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
+import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -7,6 +9,8 @@ import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
 import {
   capitalizeFirstLetter,
   DefaultBoardColor,
+  dialogAtom,
+  drawerAtom,
   EdgeArrowFillEnum,
   EdgeArrowShapesEnum,
   EdgeCurveStylesEnum,
@@ -31,6 +35,30 @@ const tabs = [
   { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 const edgeArrows = ["target", "source", "mid_target", "mid_source"] as const;
+
+function UpdateGraphEdges({
+  setEdges,
+  edge,
+  changedData,
+}: {
+  setEdges: (arg: SetStateAction<EdgeType[]>) => void;
+  edge: Partial<EdgeType>;
+  changedData: Partial<EdgeType>;
+}) {
+  setEdges((oldEdges) => {
+    const idx = oldEdges?.findIndex((e) => e.id === edge.id);
+    if (oldEdges) {
+      const newData = { ...edge, ...changedData };
+      const newEdges = [...oldEdges];
+      set(newEdges, `[${idx}]`, {
+        ...newEdges[idx],
+        ...newData,
+      });
+      return newEdges;
+    }
+    return oldEdges;
+  });
+}
 
 function ArrowForm({
   label,
@@ -67,7 +95,11 @@ export function EdgeDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [edge, setEdge] = useState<Partial<EdgeType>>({});
   const [selectedTab, setSelectedTab] = useState(0);
+
   const setEdges = useSetAtom(edgesAtom);
+  const setDialogAtom = useSetAtom(dialogAtom);
+  const resetDialogAtom = useResetAtom(dialogAtom);
+  const resetDrawerAtom = useResetAtom(drawerAtom);
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
 
@@ -82,6 +114,7 @@ export function EdgeDrawer({ data }: Props) {
       enabled: !!data?.id,
     },
   );
+  const originalEdge = existingEdge?.data;
 
   const { mutateAsync: update } = useUpdateGraphSubEntity<
     UpdateEdgeType & {
@@ -94,6 +127,12 @@ export function EdgeDrawer({ data }: Props) {
   useEffect(() => {
     if (existingEdge?.data) setEdge(existingEdge?.data);
   }, [existingEdge]);
+
+  useEffect(() => {
+    if (changedData) {
+      UpdateGraphEdges({ edge, changedData, setEdges });
+    }
+  }, [changedData]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
 
@@ -186,7 +225,7 @@ export function EdgeDrawer({ data }: Props) {
                 </div>
               </div>
             ) : null}
-            {edge?.curve_style === "unbundled_bezier" ? (
+            {edge?.curve_style === "unbundled-bezier" ? (
               <div className="flex w-full flex-col items-end gap-2 lg:flex-row">
                 <div className="w-full">
                   <Range
@@ -201,7 +240,7 @@ export function EdgeDrawer({ data }: Props) {
                 </div>
                 <div className="w-full">
                   <Range
-                    label={`Curve center: ${edge?.control_point_weights}`}
+                    label={`Curve center: ${edge?.control_point_weights || 0.5}`}
                     max={1}
                     min={0}
                     name="control_point_weights"
@@ -305,40 +344,62 @@ export function EdgeDrawer({ data }: Props) {
           </div>
         </div>
       ) : null}
-      <Button
-        icon={IconEnum.save}
-        label="Save"
-        onClick={async () => {
-          if (changedData) {
-            const edgeToUpdate = { ...(changedData || {}), id: edge.id };
-            const { tags, ...rest } = edgeToUpdate;
-            const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
-            await update(parsedData, { onSuccess: resetChanges });
+      <div className="flex flex-nowrap items-center gap-x-2">
+        <Button
+          icon={IconEnum.close}
+          label="Cancel"
+          onClick={() => {
+            setDialogAtom({
+              position: "center",
+              isOverlay: true,
+              data: null,
+              title: "Are you sure you want to close the drawer? You will lose all unsaved changes.",
+              type: null,
+              size: "md",
+              confirm: {
+                action: () => {
+                  if (originalEdge) {
+                    UpdateGraphEdges({
+                      setEdges,
+                      changedData: originalEdge,
+                      edge,
+                    });
+                  }
+                  resetChanges();
+                  resetDrawerAtom();
+                  resetDialogAtom();
+                },
+              },
+              cancel: {
+                action: () => resetDialogAtom(),
+              },
+            });
+          }}
+          variant="secondary"
+        />
+        <Button
+          icon={IconEnum.save}
+          label="Save"
+          onClick={async () => {
+            if (changedData) {
+              const edgeToUpdate = { ...(changedData || {}), id: edge.id };
+              const { tags, ...rest } = edgeToUpdate;
+              const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
+              await update(parsedData, { onSuccess: resetChanges });
 
-            setEdges((oldEdges) => {
-              const idx = oldEdges?.findIndex((e) => e.data.id === edge.id);
-              if (oldEdges) {
-                const newData = { ...edge, ...changedData };
-                const newEdges = [...oldEdges];
-                newEdges[idx] = {
-                  ...newEdges[idx],
-                  data: { ...newEdges[idx].data, ...newData },
-                };
-                return newEdges;
-              }
-              return oldEdges;
-            });
-          } else {
-            createNotification({
-              variant: "info",
-              icon: IconEnum.info_circle,
-              title: "No data was changed.",
-              timer: 3,
-            });
-          }
-        }}
-        variant="success"
-      />
+              UpdateGraphEdges({ setEdges, edge, changedData });
+            } else {
+              createNotification({
+                variant: "info",
+                icon: IconEnum.info_circle,
+                title: "No data was changed.",
+                timer: 3,
+              });
+            }
+          }}
+          variant="success"
+        />
+      </div>
     </div>
   );
 }
