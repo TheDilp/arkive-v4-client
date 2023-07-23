@@ -1,5 +1,7 @@
-import cytoscape, { EdgeDefinition, NodeDefinition } from "cytoscape";
+import cytoscape from "cytoscape";
 import { atom } from "jotai";
+
+import { EdgeType, NodeType } from "../../types";
 
 export const BoardReferenceAtom = atom<null | cytoscape.Core>(null);
 export const BoardStateAtom = atom<{
@@ -14,5 +16,5 @@ export const BoardStateAtom = atom<{
   curve_style: "straight",
 });
 
-export const nodesAtom = atom<NodeDefinition[]>([]);
-export const edgesAtom = atom<EdgeDefinition[]>([]);
+export const nodesAtom = atom<NodeType[]>([]);
+export const edgesAtom = atom<EdgeType[]>([]);
