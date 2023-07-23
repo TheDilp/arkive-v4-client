@@ -470,7 +470,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           setBoardRef(cy);
         }}
         elements={[...nodes, ...edges]}
-        maxZoom={2}
+        maxZoom={5}
         minZoom={0.1}
         stylesheet={styleSheet}
         wheelSensitivity={0.1}
