@@ -12,7 +12,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 
 import { contextMenuAtom } from "../../utils";
@@ -22,7 +22,7 @@ export function ContextMenu() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const contextMenuAtomValue = useAtomValue(contextMenuAtom);
+  const [contextMenuAtomValue, setContextMenuAtom] = useAtom(contextMenuAtom);
 
   const listItemsRef = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -72,6 +72,10 @@ export function ContextMenu() {
       setIsOpen(true);
     }
   }, [contextMenuAtomValue?.items]);
+
+  useEffect(() => {
+    if (!isOpen) setContextMenuAtom({ items: null, event: null });
+  }, [isOpen]);
 
   return (
     <FloatingPortal>

@@ -6,7 +6,7 @@ import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
 import Alert from "../../components/Misc/Alert";
 import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
-import { contextMenuAtom, drawerAtom, IconEnum } from "../../utils";
+import { contextMenuAtom, dialogAtom, drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
@@ -51,6 +51,7 @@ export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
 
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
 
   const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType>(
     {
@@ -149,7 +150,21 @@ export function EntitiesView() {
                           data: { id },
                         })),
                     },
-                    { title: `Delete ${entityName}`, icon: IconEnum.trash },
+                    {
+                      title: `Delete ${entityName}`,
+                      icon: IconEnum.trash,
+                      onClick: () =>
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...item,
+                            entity_title: type,
+                          },
+                          title: `Delete ${entityName}`,
+                          size: "sm",
+                          type: "delete_entity",
+                        })),
+                    },
                   ],
                 })
               }
@@ -179,7 +194,22 @@ export function EntitiesView() {
                           data: { id, parent_id: item_id },
                         })),
                     },
-                    { title: `Delete ${entityName}`, icon: IconEnum.trash },
+                    {
+                      title: `Delete ${entityName}`,
+                      icon: IconEnum.trash,
+                      onClick: () =>
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...item,
+                            parent_id: item_id,
+                            entity_title: type,
+                          },
+                          title: `Delete ${entityName}`,
+                          size: "sm",
+                          type: "delete_entity",
+                        })),
+                    },
                   ],
                 })
               }

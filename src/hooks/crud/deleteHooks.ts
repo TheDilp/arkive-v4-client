@@ -8,18 +8,22 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   const createNotification = useNotifications();
 
   return useMutation(
-    async (data: { id: string }) => {
+    async (vars: { data: { id: string; parent_id?: string } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/archive" : ""}/${data.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/archive" : ""}/${vars.data.id}`,
         method: "DELETE",
       });
     },
     {
-      onSettled: (data) => {
+      onSettled: (data, _, vars) => {
         if (data?.ok) {
-          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
+          if (vars?.data?.parent_id) {
+            queryClient.invalidateQueries([type, vars.data.parent_id]);
+          } else {
+            queryClient.invalidateQueries(["allEntities", project_id, type]);
+          }
+
           createNotification({
-            id: crypto.randomUUID(),
             title: getEntityCRUDNotification(type, archive ? "archive" : "delete"),
             variant: "success",
             icon: IconEnum.check,
@@ -27,7 +31,6 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
           });
         } else
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || "There was an error updating this item.",
             variant: "error",
             icon: IconEnum.error,

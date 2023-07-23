@@ -11,6 +11,7 @@ import {
   IconEnum,
   useNotifications,
 } from "../../../utils";
+import { getEntityNameFromType } from "../../../utils/ui/entityUtils";
 import { Button } from "../../Form";
 import { Avatar } from "../../Misc";
 
@@ -24,12 +25,11 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {data?.entity_title || "entity"} - {getCharacterFullName(data?.first_name || "", data?.last_name || "")}?
-        <p className="text-center text-sm text-zinc-300">
-          {type === "archive_entity"
-            ? " You can restore it or delete it permanently in the archived section."
-            : "This action cannot be undone."}
-        </p>
+        {getEntityNameFromType(data?.entity_title) || "entity"} -{" "}
+        {data?.entity_title === "characters"
+          ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
+          : data?.title}
+        ?<p className="text-center text-sm text-red-400">This action cannot be undone.</p>
       </div>
       <div className="mx-auto my-2 flex items-center gap-x-4">
         {data?.image && data?.project_id ? (
@@ -53,11 +53,10 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
           label={capitalizeFirstLetter(action || "")}
           onClick={() => {
             if (data?.id && project_id && data?.entity_title) {
-              mutate({ id: data?.id });
+              mutate({ data: { id: data?.id, parent_id: data?.parent_id as string } });
               resetDialogAtom();
             } else {
               createNotification({
-                id: crypto.randomUUID(),
                 title: `Could not ${action} entity.`,
                 timer: 5,
                 variant: "error",
