@@ -201,8 +201,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           ...prev,
           data: { id: rest.id, parent_id: item_id },
           position: "right",
-          title: `Edit node - ${rest.label}`,
-          show: true,
+          title: `Edit node ${rest?.label ? "-".concat(rest.label) : ""}`,
           type: "nodes",
           size: "md",
         }));
@@ -211,11 +210,11 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         const targetEdge = evt.target._private;
         setDrawer((prev) => ({
           ...prev,
-          data: { id: targetEdge.id },
+          data: { id: targetEdge.id, parent_id: item_id },
           position: "right",
-          show: true,
+          title: `Edit edge ${targetEdge?.label ? "-".concat(targetEdge.label) : ""}`,
           type: "edges",
-          drawerSize: "sm",
+          size: "md",
         }));
       });
     }
