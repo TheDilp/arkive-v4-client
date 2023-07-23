@@ -43,7 +43,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
-  const { data: existingNode, isLoading } = useGetSubEntity<NodeType>(
+  const { data: existingNode, isFetching } = useGetSubEntity<NodeType>(
     data?.id,
     "nodes",
     {
@@ -74,7 +74,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     }
   }, [existingNode?.data]);
 
-  if (isLoading) return <Skeleton type="drawer_form" />;
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">
@@ -319,6 +319,13 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 return newNodes;
               }
               return oldNodes;
+            });
+          } else {
+            createNotification({
+              variant: "info",
+              icon: IconEnum.info_circle,
+              title: "No data was changed.",
+              timer: 3,
             });
           }
         }}

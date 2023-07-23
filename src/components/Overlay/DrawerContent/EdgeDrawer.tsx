@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useSetAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useHandleChange } from "../../../hooks";
+import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
 import {
   capitalizeFirstLetter,
@@ -10,16 +11,19 @@ import {
   EdgeArrowShapesEnum,
   EdgeCurveStylesEnum,
   EdgeLineStylesEnum,
+  edgesAtom,
   EdgeTaxiDirectionsEnum,
   GraphFontFamiliesEnum,
   GraphFontSizesEnum,
   IconEnum,
   useNotifications,
 } from "../../../utils";
+import { UpdateEdgeSchema } from "../../../validation";
 import { Badge, Button, Collapsible, Input, Range, Search, Select, Skeleton, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
-type Props = { id: string; parent_id: string };
+type Props = { data: { id: string; parent_id: string } };
+type UpdateEdgeType = { data: Partial<EdgeType> };
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -59,14 +63,39 @@ function ArrowForm({
   );
 }
 
-export function EdgeDrawer({ id, parent_id }: Props) {
+export function EdgeDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [edge, setEdge] = useState<Partial<EdgeType>>({});
   const [selectedTab, setSelectedTab] = useState(0);
-  const { handleChange, changedData } = useHandleChange({ data: edge, setData: setEdge });
+  const setEdges = useSetAtom(edgesAtom);
+  const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
 
-  if (false) return <Skeleton type="drawer_form" />;
+  const { data: existingEdge, isFetching } = useGetSubEntity<EdgeType>(
+    data?.id,
+    "edges",
+    {
+      data: {},
+      relations: { tags: true },
+    },
+    {
+      enabled: !!data?.id,
+    },
+  );
+
+  const { mutateAsync: update } = useUpdateGraphSubEntity<
+    UpdateEdgeType & {
+      relations?: {
+        tags?: { id: string }[];
+      };
+    }
+  >("edges", data.parent_id);
+
+  useEffect(() => {
+    if (existingEdge?.data) setEdge(existingEdge?.data);
+  }, [existingEdge]);
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">
@@ -281,36 +310,31 @@ export function EdgeDrawer({ id, parent_id }: Props) {
         label="Save"
         onClick={async () => {
           if (changedData) {
-            // const nodeToUpdate = { ...(changedData || {}), id: node.id };
-            // set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-            // set(nodeToUpdate, "image_id", node?.image?.id ?? null);
-            // const { tags, ...rest } = nodeToUpdate;
-            // const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
-            // await update(parsedData, { onSuccess: resetChanges });
-            // setNodes((oldNodes) => {
-            //   if (oldNodes) {
-            //     const newNodes = [...oldNodes];
-            //     const idx = newNodes.findIndex((n) => n.data.id === node.id);
-            //     if (idx > -1) {
-            //       const newNodeData = {
-            //         ...newNodes[idx].data,
-            //         ...changedData,
-            //       };
-            //       const alteredNodeData = { ...node, ...rest };
-            //       newNodes[idx] = {
-            //         ...newNodes[idx],
-            //         data: {
-            //           ...newNodeData,
-            //           label: getNodeLabel(alteredNodeData),
-            //           background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
-            //         },
-            //       };
-            //       return newNodes;
-            //     }
-            //     return newNodes;
-            //   }
-            //   return oldNodes;
-            // });
+            const edgeToUpdate = { ...(changedData || {}), id: edge.id };
+            const { tags, ...rest } = edgeToUpdate;
+            const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
+            await update(parsedData, { onSuccess: resetChanges });
+
+            setEdges((oldEdges) => {
+              const idx = oldEdges?.findIndex((e) => e.data.id === edge.id);
+              if (oldEdges) {
+                const newData = { ...edge, ...changedData };
+                const newEdges = [...oldEdges];
+                newEdges[idx] = {
+                  ...newEdges[idx],
+                  data: { ...newEdges[idx].data, ...newData },
+                };
+                return newEdges;
+              }
+              return oldEdges;
+            });
+          } else {
+            createNotification({
+              variant: "info",
+              icon: IconEnum.info_circle,
+              title: "No data was changed.",
+              timer: 3,
+            });
           }
         }}
         variant="success"

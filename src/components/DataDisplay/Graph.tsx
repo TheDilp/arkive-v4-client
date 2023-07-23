@@ -210,9 +210,9 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         const targetEdge = evt.target._private;
         setDrawer((prev) => ({
           ...prev,
-          data: { id: targetEdge.id, parent_id: item_id },
+          data: { id: targetEdge.data.id, parent_id: item_id },
           position: "right",
-          title: `Edit edge ${targetEdge?.label ? "-".concat(targetEdge.label) : ""}`,
+          title: `Edit edge ${targetEdge?.data?.label ? "-".concat(targetEdge.data.label) : ""}`,
           type: "edges",
           size: "md",
         }));

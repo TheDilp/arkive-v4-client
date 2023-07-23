@@ -268,7 +268,7 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
       source_arrow_color: edge?.source_arrow_color || "#595959",
       source_arrow_fill: edge?.source_arrow_fill || "filled",
 
-      target_arrow_shape: edge?.target_arrow_shape || "none",
+      target_arrow_shape: edge?.target_arrow_shape || "triangle",
       target_arrow_color: edge?.target_arrow_color || "#595959",
       target_arrow_fill: edge?.target_arrow_fill || "filled",
 
