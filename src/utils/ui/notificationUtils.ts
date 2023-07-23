@@ -7,8 +7,8 @@ import { capitalizeFirstLetter } from "./textUtils";
 export function useNotifications() {
   const setNotificationAtom = useSetAtom(notificationsAtom);
 
-  return function createNotification(notification: NotificationType) {
-    setNotificationAtom((prev) => [...prev, notification]);
+  return function createNotification(notification: Omit<NotificationType, "id">) {
+    setNotificationAtom((prev) => [...prev, { ...notification, id: crypto.randomUUID() }]);
   };
 }
 
