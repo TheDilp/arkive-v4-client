@@ -5,13 +5,13 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle } from "../../hooks";
+import { useChangeNavbarTitle, useUpdateManyNodesLockState } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { BoardContext, GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum } from "../../utils";
 import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
-import { edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
+import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 
 type Props = {
   isReadOnly?: boolean;
@@ -43,6 +43,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
+  const { mutate } = useUpdateManyNodesLockState(item_id as string);
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
@@ -156,7 +157,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           }
 
           if (group === "nodes") {
-            const { id, label } = evt.target._private.data;
+            const {
+              data: { id, label },
+              locked,
+            } = evt.target._private;
+
+            console.log(evt.target._private);
             setContextMenu({
               event: evt.originalEvent,
               items: [
@@ -186,7 +192,11 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                     outgoers.edges().flashClass("outgoingEdgeHighlight", 1500);
                   },
                 },
-                { title: "Un/lock node", icon: IconEnum.unlock, subItems: [{ title: "Lock node" }, { title: "Unlock node" }] },
+                {
+                  title: locked ? "Unlock node" : "Lock node",
+                  icon: locked ? IconEnum.unlock : IconEnum.lock,
+                  onClick: () => changeLockState(cyRef?.current?._cy, !locked, mutate),
+                },
                 // { title: "Template from node" },
                 { title: "Delete selected node", icon: IconEnum.trash },
               ],
