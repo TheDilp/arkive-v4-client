@@ -185,6 +185,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                   onClick: () => {
                     const incomers = evt.target.incomers();
                     const outgoers = evt.target.outgoers();
+
                     incomers.nodes().flashClass("incomingNodeHighlight", 1500);
                     incomers.edges().flashClass("incomingEdgeHighlight", 1500);
                     outgoers.nodes().flashClass("outgoingNodeHighlight", 1500);
@@ -203,7 +204,29 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           } else if (group === "edges") {
             setContextMenu({
               event: evt.originalEvent,
-              items: [{ title: "Test" }],
+              items: [
+                {
+                  title: "Highlight connected nodes",
+                  icon: IconEnum.board,
+                  onClick: () => {
+                    if (edges) {
+                      evt.target.sources().flashClass("incomingNodeHighlight", 2000);
+                      evt.target.targets().flashClass("outgoingNodeHighlight", 2000);
+                    }
+                  },
+                },
+                {
+                  title: "Delete selected edge",
+                  icon: IconEnum.trash,
+                  onClick: () => {
+                    if (edges) {
+                      // const ids = edges.map((edge: any) => edge.id());
+                      // deleteManyEdges.mutate(ids);
+                      // setEdges((prev) => prev.filter((e) => !ids.includes(e.data.id)));
+                    }
+                  },
+                },
+              ],
             });
           }
         }

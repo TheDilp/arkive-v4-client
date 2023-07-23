@@ -236,6 +236,14 @@ export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
       },
     },
     {
+      selector: ".siblingNodeHighlight",
+      style: {
+        "border-width": 4,
+        "border-color": "purple",
+        padding: "15px",
+      },
+    },
+    {
       selector: ".selectedHighlight",
       style: {
         "background-image-opacity": 0,
