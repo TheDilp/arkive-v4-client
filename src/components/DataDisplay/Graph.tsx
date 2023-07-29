@@ -1,7 +1,7 @@
 import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
@@ -10,7 +10,7 @@ import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEven
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum } from "../../utils";
 import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
-import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
+import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 
 type Props = {
@@ -138,7 +138,24 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                 title: "New node",
                 icon: IconEnum.add,
                 onClick: () => {
-                  createNode({ parent_id: item_id, x: 100, y: 100 });
+                  createNode(
+                    { parent_id: item_id, x: evt.position.x, y: evt.position.y },
+                    {
+                      onSuccess: (data: { id: string }) => {
+                        setNodes((prev) => [
+                          ...prev,
+                          {
+                            ...DefaultNode,
+                            id: data.id,
+                            x: evt.position.x,
+                            y: evt.position.y,
+                            label: "",
+                            parent_id: item_id as string,
+                          },
+                        ]);
+                      },
+                    },
+                  );
                 },
               },
             ],

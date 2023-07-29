@@ -1,4 +1,4 @@
-import { CurveStyleType } from "../../types/EntityTypes/graphTypes";
+import { CurveStyleType, NodeShape } from "../../types/EntityTypes/graphTypes";
 
 export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
   return [
@@ -965,9 +965,28 @@ export const EdgeArrowFillEnum = [
   { label: "Filled", value: "filled" },
   { label: "Hollow", value: "hollow" },
 ];
-
 export const EdgeCapsEnum = [
   { label: "Round", value: "round" },
   { label: "Butt", value: "butt" },
   { label: "Square", value: "square" },
 ];
+
+// Defaults
+
+export const DefaultNode = {
+  type: "rectangle" as NodeShape,
+  background_color: DefaultBoardColor,
+  width: 50,
+  height: 50,
+  text_v_align: "top",
+  text_h_align: "center",
+  font_size: 16,
+  font_color: "#ffffff",
+  background_image: null,
+  font_family: "Lato",
+  background_opacity: 1,
+  is_locked: false,
+  is_template: false,
+  z_index: 1,
+  tags: [],
+};
