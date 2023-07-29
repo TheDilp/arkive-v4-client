@@ -16,6 +16,7 @@ import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 import { DeleteEntityDialog } from "./DialogContent";
 import { ImageUploadDialog } from "./DialogContent/ImageUploadDialog";
+import FamilyTreeDialog from "./DialogContent/FamilyTreeDialog";
 
 const DialogClasses = tv({
   slots: {
@@ -105,6 +106,7 @@ export function Dialog() {
               {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
                 <DeleteEntityDialog data={dialog.data} type={dialog.type} />
               ) : null}
+              {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} type={dialog.type} /> : null}
               {dialog?.cancel || dialog?.confirm ? (
                 <div className="mt-auto flex items-center justify-center gap-x-2">
                   {dialog?.cancel ? (

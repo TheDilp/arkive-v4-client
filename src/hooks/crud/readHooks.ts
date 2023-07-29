@@ -183,3 +183,14 @@ export function useSearch<ReturnType>(
     options,
   );
 }
+
+export function useGetCharacterFamily(character_id: string | undefined, options?: UseQueryOptions) {
+  return useQuery(
+    ["family", character_id],
+    async () => FetchFunction({ method: "GET", url: `${baseURLS.baseServer}/characters/family/${character_id}` }),
+    {
+      enabled: options?.enabled && !!character_id,
+      staleTime: options?.staleTime,
+    },
+  );
+}

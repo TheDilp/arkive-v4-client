@@ -1,18 +1,20 @@
+import { useSetAtom } from "jotai";
 import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
-  getCharacterFullName,
   IconEnum,
+  dialogAtom,
+  getCharacterFullName,
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { UpdateCharacterSchema } from "../../../validation";
-import { Badge, CharacterPreview, ImagePreview } from "../..";
+import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -166,6 +168,7 @@ const tabs = [
 export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const setDialog = useSetAtom(dialogAtom);
   const createNotification = useNotifications();
   const { data: existingCharacter } = useGetEntity<CharacterType>(
     data?.id,
@@ -231,7 +234,9 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               <ImageSelect
                 isIconOnly
                 name="portrait"
-                onChange={({ name, label, value }) => handleChange({ name, value: { id: value, title: label } })}
+                onChange={({ name, label, value }) => {
+                  handleChange({ name, value: { id: value, title: label } });
+                }}
                 type="images"
                 value={character?.portrait?.id ?? ""}
               />
@@ -283,7 +288,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
       ) : null}
       {selectedTab === 1 ? (
         <>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-x-2">
             <Search
               name="related_to"
               onChange={({ label, value }) => {
@@ -312,6 +317,18 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               placeholder="Press enter to search characters"
               searchEntity="characters"
             />
+            {data?.id ? (
+              <div className="h-full w-10">
+                <Button
+                  icon={IconEnum.family_tree}
+                  onClick={() => {
+                    setDialog({ type: "family_tree", title: "Family tree", data, size: "lg" });
+                  }}
+                  tooltip="Show family tree"
+                  variant="info"
+                />
+              </div>
+            ) : null}
           </div>
           <ul className="flex flex-col gap-y-2">
             {character?.related_to?.length
@@ -446,30 +463,30 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
               const characterToUpdate = { ...(changedData || {}), id: character.id };
               const { character_fields, related_to, related_from, tags, ...rest } = characterToUpdate;
               const parsedData = UpdateCharacterSchema.parse({
-                data: rest,
+                data: { ...rest, portrait_id: rest?.portrait?.id },
                 relations: { character_fields, related_from, related_to, tags },
               });
               await update(parsedData, {
-                onSettled: (res) => {
+                onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
                 },
               });
-            } else
-              await create(
-                {
-                  data: omit(character, ["character_fields", "related_to", "related_from", "tags"]),
-                  relations: {
-                    character_fields: character?.character_fields,
-                    related_to: character?.related_to,
-                    tags: character?.tags,
-                  },
+            } else {
+              const dataToParse = {
+                data: { ...character, portrait_id: character?.portrait?.id },
+                relations: {
+                  character_fields: character?.character_fields,
+                  related_to: character?.related_to,
+                  tags: character?.tags,
                 },
-                {
-                  onSettled: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
+              };
+              const parsedData = InsertCharacterSchema.parse(dataToParse);
+              await create(parsedData, {
+                onSuccess: (res) => {
+                  if (res?.ok) resetDrawerAtom();
                 },
-              );
+              });
+            }
           } else {
             createNotification({
               variant: "info",

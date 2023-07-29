@@ -120,7 +120,14 @@ function createColumns(
                 id: "2",
                 label: "View family tree",
                 icon: IconEnum.family_tree,
-                onClick: () => {},
+                onClick: () => {
+                  setDialog({
+                    type: "family_tree",
+                    title: `Family tree of ${getCharacterFullName(row.original.first_name, "", row.original?.last_name || "")}`,
+                    data: { id: row.original.id },
+                    size: "lg",
+                  });
+                },
               },
               {
                 id: "delete_character",
