@@ -40,7 +40,7 @@ export { createColumnHelper } from "@tanstack/react-table";
 const TableClasses = tv({
   slots: {
     container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
-    table: "flex flex-col h-full min-h-full w-full overflow-y-auto relative",
+    table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
     head: "border-x border-t border-zinc-600 bg-zinc-950 flex min-w-full flex-col mb-4 w-max flex-1 max-h-10 border-b",
     headerGroup: "flex w-full h-10",
     select: "select-none",
@@ -48,9 +48,9 @@ const TableClasses = tv({
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "px-2",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
-    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-auto",
+    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
-    bodyContainer: "min-w-full content-start overflow-hidden max-h-full w-max flex flex-col justify-start",
+    bodyContainer: "min-w-full content-start overflow-x-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col w-full max-h-full lg:max-h-full bg-zinc-950 border-x border-t overflow-y-auto border-zinc-600",
     rowContainer: "flex flex-col",
     row: "flex flex-1 min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato",
