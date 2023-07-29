@@ -16,11 +16,11 @@ import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../
 type Props = {
   isReadOnly?: boolean;
   isViewOnly?: boolean;
-  data: GraphType;
+  data: Omit<GraphType, "tags" | "project_id" | "parent_id" | "id" | "is_folder" | "is_public" | "icon">;
 };
 
 export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
-  useChangeNavbarTitle("The Arkive | Graphs");
+  useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
 
   const cm = useRef() as MutableRefObject<any>;
   const cyRef = useRef() as any;

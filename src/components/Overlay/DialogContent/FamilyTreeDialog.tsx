@@ -20,6 +20,7 @@ export default function FamilyTreeDialog({ data }: { data: { id: string } }) {
         nodes,
         edges,
       }}
+      isViewOnly
     />
   );
 }
