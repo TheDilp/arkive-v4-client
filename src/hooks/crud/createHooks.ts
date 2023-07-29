@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AvailableEntityType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useCreateProject<InsertType>() {
@@ -80,6 +80,16 @@ export function useCreateEntity<
   );
 }
 
+export function useCreateNode() {
+  return useMutation(async (updateItemValues: { [key: string]: any }) => {
+    return FetchFunction({
+      url: `${baseURLS.baseServer}/nodes/create`,
+      body: JSON.stringify({ data: updateItemValues }),
+      method: "POST",
+    });
+  });
+}
+
 export function useCreateEntities<InsertType extends { data: { [key: string]: any }[]; relations?: { [key: string]: any } }>(
   type: AvailableEntityType,
   project_id: string,
@@ -115,41 +125,6 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
             timer: 5,
           });
         }
-      },
-    },
-  );
-}
-
-export function useCreateAdditionalFieldTemplate<InsertType extends { project_id: string }>() {
-  const queryClient = useQueryClient();
-  const createNotification = useNotifications();
-
-  return useMutation(
-    async (newItemValues: InsertType) => {
-      return FetchFunction({
-        url: `${baseURLS.baseServer}/character_fields_templates/create`,
-        body: JSON.stringify({
-          data: newItemValues,
-        }),
-        method: "POST",
-      });
-    },
-    {
-      onError: () =>
-        createNotification({
-          title: "There was an error creating this template.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        }),
-      onSuccess: async (_, vars) => {
-        queryClient.invalidateQueries({ queryKey: ["allEntities", vars.project_id, "character_fields_templates"] });
-        createNotification({
-          title: getEntityCRUDNotification("character_fields_templates", "create"),
-          variant: "success",
-          icon: IconEnum.check,
-          timer: 2,
-        });
       },
     },
   );

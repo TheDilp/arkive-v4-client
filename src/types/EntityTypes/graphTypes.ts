@@ -1,4 +1,4 @@
-import cytoscape, { EdgeCollection, NodeCollection } from "cytoscape";
+import cytoscape from "cytoscape";
 
 import { BaseEntityType, CharacterType, EventType, ImageType, MapPinType, MapType, TagType } from ".";
 import { DocumentType } from "./documentTypes";
@@ -124,14 +124,6 @@ export type CytoscapeNodeType = cytoscape.NodeDefinition;
 export type CytoscapeEdgeType = cytoscape.EdgeDefinition;
 
 export type BoardContextType = null | "board" | "nodes" | "edges";
-
-export type BoardContext = {
-  x: null | number;
-  y: null | number;
-  type: BoardContextType;
-  nodes: NodeCollection | null;
-  edges: EdgeCollection | null;
-};
 
 export type BoardExportType = {
   view: "Graph" | "View";

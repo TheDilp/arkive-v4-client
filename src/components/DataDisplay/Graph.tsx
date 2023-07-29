@@ -5,9 +5,9 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useUpdateManyNodesLockState } from "../../hooks";
+import { useChangeNavbarTitle, useCreateNode, useUpdateManyNodesLockState } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { BoardContext, GraphType } from "../../types/EntityTypes/graphTypes";
+import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum } from "../../utils";
 import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
@@ -22,7 +22,7 @@ type Props = {
 export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
 
-  const cm = useRef() as MutableRefObject<any>;
+  const { mutate: createNode } = useCreateNode();
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
@@ -30,13 +30,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const [drawer, setDrawer] = useAtom(drawerAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
   const setBoardRef = useSetAtom(BoardReferenceAtom);
-  const [, setBoardContext] = useState<BoardContext>({
-    x: null,
-    y: null,
-    type: null,
-    nodes: null,
-    edges: null,
-  });
 
   const setContextMenu = useSetAtom(contextMenuAtom);
 
@@ -138,10 +131,17 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
       cyRef?.current?._cy.on("cxttap", function (evt: any) {
         // If the target is the background of the canvas
         if (evt.target === cyRef?.current?._cy) {
-          cm.current.show(evt.originalEvent);
-          setBoardContext({
-            ...evt.position,
-            type: "board",
+          setContextMenu({
+            event: evt.originalEvent,
+            items: [
+              {
+                title: "New node",
+                icon: IconEnum.add,
+                onClick: () => {
+                  createNode({ parent_id: item_id, x: 100, y: 100 });
+                },
+              },
+            ],
           });
         }
         // Else - the target is a node or an edge

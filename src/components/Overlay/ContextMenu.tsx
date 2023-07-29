@@ -106,8 +106,8 @@ export function ContextMenu() {
                         },
                       })}
                       key={item.title}>
-                      {item?.icon ? <Icon fontSize={22} icon={item.icon} /> : null}
                       <span>{item.title}</span>
+                      {item?.icon ? <Icon fontSize={22} icon={item.icon} /> : null}
                     </div>
                   ))
                 : null}
