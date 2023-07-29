@@ -1,20 +1,19 @@
 import { useSetAtom } from "jotai";
-import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
-  IconEnum,
   dialogAtom,
   getCharacterFullName,
+  IconEnum,
   sortEntities,
   useNotifications,
 } from "../../../utils";
 import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
+import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
@@ -291,7 +290,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
           <div className="flex items-center justify-between gap-x-2">
             <Search
               name="related_to"
-              onChange={({ label, value }) => {
+              onChange={({ label, value, image }) => {
                 if (character?.related_to?.some((relationship) => relationship?.id === value)) {
                   createNotification({
                     title: "Cannot add same character more than once as a relationship.",
@@ -303,12 +302,14 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
                 }
                 if (value) {
                   const [first_name, last_name] = (label || "").split(" ");
+
                   handleChange({
                     name: "related_to",
                     value: (character?.related_to || []).concat({
                       id: value,
                       first_name,
                       last_name,
+                      portrait_id: image,
                       relation_type: "",
                     }),
                   });
