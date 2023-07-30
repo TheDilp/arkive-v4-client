@@ -1,7 +1,7 @@
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import ls from "localstorage-slim";
 import {
   Avatar,
   Button,
@@ -157,7 +157,7 @@ function createColumns(
 
 export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
-  const [view, setView] = useState<"card" | "list">("card");
+  const [view, setView] = useState<"card" | "list">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
@@ -257,7 +257,10 @@ export function CharactersView() {
         <div className="w-32">
           <Select
             name="view"
-            onChange={({ value }) => setView(value as "card" | "list")}
+            onChange={({ value }) => {
+              setView(value as "card" | "list");
+              ls.set("characters_view", value);
+            }}
             options={[
               { label: "Card", value: "card", icon: IconEnum.card },
               { label: "List", value: "list", icon: IconEnum.table },
