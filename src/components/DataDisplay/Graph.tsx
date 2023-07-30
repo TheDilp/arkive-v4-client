@@ -1,5 +1,5 @@
 import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
-import { SetStateAction, useAtom, useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useMemo, useRef } from "react";
@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodes } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
+import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
 import {
   BoardReferenceAtom,
@@ -20,14 +20,7 @@ import {
   nodesAtom,
 } from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
-import {
-  changeLockState,
-  edgehandlesSettings,
-  getNodeImage,
-  getNodeLabel,
-  mapEdges,
-  mapNodes,
-} from "../../utils/ui/graphUtils";
+import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { Quickbar } from "..";
 
 type Props = {
