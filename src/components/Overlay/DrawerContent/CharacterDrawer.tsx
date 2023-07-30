@@ -462,10 +462,10 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
             if (character?.id) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const characterToUpdate = { ...(changedData || {}), id: character.id };
-              const { character_fields, related_to, related_from, tags, ...rest } = characterToUpdate;
+              const { related_to, related_from, tags, ...rest } = characterToUpdate;
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
-                relations: { character_fields, related_from, related_to, tags },
+                relations: { character_fields: character?.character_fields || [], related_from, related_to, tags },
               });
               await update(parsedData, {
                 onSuccess: (res) => {
