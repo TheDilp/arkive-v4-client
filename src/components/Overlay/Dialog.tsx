@@ -4,9 +4,7 @@ import { tv } from "tailwind-variants";
 
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
-import { DeleteEntityDialog } from "./DialogContent";
-import FamilyTreeDialog from "./DialogContent/FamilyTreeDialog";
-import { ImageUploadDialog } from "./DialogContent/ImageUploadDialog";
+import { DeleteEntityDialog, ExportGraphDialog, FamilyTreeDialog, ImageUploadDialog } from "./DialogContent";
 
 const DialogClasses = tv({
   slots: {
@@ -86,6 +84,7 @@ export function Dialog() {
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
         ) : null}
         {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} /> : null}
+        {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
         {dialog?.cancel || dialog?.confirm ? (
           <div className="mt-auto flex items-center justify-center gap-x-2">
             {dialog?.cancel ? (

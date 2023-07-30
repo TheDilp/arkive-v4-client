@@ -126,7 +126,7 @@ export type CytoscapeEdgeType = cytoscape.EdgeDefinition;
 export type BoardContextType = null | "board" | "nodes" | "edges";
 
 export type BoardExportType = {
-  view: "Graph" | "View";
-  background: "Color" | "Transparent";
+  view: "entire_graph" | "current_view";
+  background: "color" | "transparent";
   type: "PNG" | "JPEG" | "JSON";
 };

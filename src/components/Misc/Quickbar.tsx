@@ -48,7 +48,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
   const setNodes = useSetAtom(nodesAtom);
   const setEdges = useSetAtom(edgesAtom);
 
-  const setExportDialog = useSetAtom(dialogAtom);
+  const setDialog = useSetAtom(dialogAtom);
 
   const { mutate: updateManyNodes } = useUpdateManyNodes(item_id as string);
   const { mutate: deleteManyNodes } = useDeleteMany("nodes");
@@ -147,7 +147,6 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
                 onClick={() => {
                   changeCurveStyle(curveStyle, setBoardState);
                   changeDrawMode(true, setBoardState);
-                  console.log(boardState.curve_style, curveStyle);
                 }}
                 variant={boardState.curve_style === curveStyle ? "info" : "primary"}
               />
@@ -170,19 +169,17 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
           />
         </span>
       </Tooltip>
-      {/* Export button */}
       <Button
         hasNoBackground
         icon={IconEnum.download}
         onClick={() => {
-          //   setExportDialog((prev) => ({
-          //     ...prev,
-          //     data: { title: board.title },
-          //     position: "center",
-          //     modal: true,
-          //     type: "export_board",
-          //     show: true,
-          //   }));
+          setDialog((prev) => ({
+            ...prev,
+            title: "Export graph",
+            position: "center",
+            modal: true,
+            type: "export_graph",
+          }));
         }}
       />
 

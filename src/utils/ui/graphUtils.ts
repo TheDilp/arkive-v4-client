@@ -61,8 +61,8 @@ export const edgehandlesSettings = {
 
 export function exportBoardFunction(
   boardRef: cytoscape.Core,
-  view: "Graph" | "View",
-  background: "Color" | "Transparent",
+  view: "entire_graph" | "current_view",
+  background: "color" | "transparent",
   type: "PNG" | "JPEG" | "JSON",
   boardTitle?: string,
 ) {
@@ -73,8 +73,8 @@ export function exportBoardFunction(
         [
           boardRef.png({
             output: "blob",
-            bg: background === "Color" ? "#121212" : "transparent",
-            full: view === "Graph",
+            bg: background === "color" ? "#121212" : "transparent",
+            full: view === "entire_graph",
           }),
         ],
         {
@@ -89,8 +89,8 @@ export function exportBoardFunction(
         [
           boardRef.jpg({
             output: "blob",
-            bg: background === "Color" ? "#121212" : "transparent",
-            full: view === "Graph",
+            bg: background === "color" ? "#121212" : "transparent",
+            full: view === "entire_graph",
           }),
         ],
         {
