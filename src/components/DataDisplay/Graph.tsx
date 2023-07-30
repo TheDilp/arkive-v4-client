@@ -5,7 +5,7 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodes } from "../../hooks";
+import { useChangeNavbarTitle, useCreateSubEntity, useDeleteSubEntity, useUpdateManyNodes } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
@@ -23,7 +23,8 @@ type Props = {
 export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
 
-  const { mutate: createNode } = useCreateNode();
+  const { mutate: createNode } = useCreateSubEntity("nodes");
+  const { mutate: createEdges } = useCreateSubEntity("edges");
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
@@ -47,46 +48,24 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
     [boardState.curve_style],
   );
 
-  // const contextItems = useBoardContextMenuItems({
-  //   type: boardContext.type,
-  //   item_id: item_id as string,
-  //   board: graph as BoardType,
-  //   boardContext,
-  // });
-  // const createNodeMutation = useCreateSubItem<NodeType>(item_id as string, "nodes", "boards");
-  // const createEdgeMutation = useCreateSubItem<EdgeType>(item_id as string, "edges", "boards");
   const makeEdgeCallback = (source: string, target: string, color?: string) => {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
-    const id = crypto.randomUUID();
 
-    setEdges((prev) => {
-      const newEdges = [...prev];
-      const newEdge = mapEdges(
-        [
-          // @ts-ignore
-          {
-            id,
-            source_id: source,
-            target_id: target,
-            line_color: color || "#595959",
-            curve_style: boardState.curve_style,
-            target_arrow_color: color as string,
-          },
-        ],
-        false,
-      );
-      // @ts-ignore
-      return newEdges.concat(newEdge);
+    const newEdge = {
+      parentId: item_id as string,
+      source_id: source,
+      target_id: target,
+      line_color: color,
+      curve_style: boardState.curve_style,
+      target_arrow_color: color,
+      parent_id: item_id as string,
+    };
+
+    createEdges(newEdge, {
+      onSuccess: (data) => {
+        setEdges((prev) => [...prev, { ...newEdge, ...data.data }]);
+      },
     });
-    // createEdgeMutation.mutate({
-    //   id,
-    //   parentId: item_id as string,
-    //   source_id: source,
-    //   target_id: target,
-    //   line_color: color,
-    //   curve_style: boardState.curve_style,
-    //   target_arrow_color: color,
-    // });
   };
 
   useEffect(() => {
@@ -604,9 +583,10 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         cy={(cy: Core) => {
           setBoardRef(cy);
         }}
-        elements={
-          [...mapNodes(nodes || [], project_id as string), ...mapEdges(edges || [])] as (NodeDefinition | EdgeDefinition)[]
-        }
+        elements={CytoscapeComponent.normalizeElements({
+          nodes: mapNodes(nodes || [], project_id as string),
+          edges: mapEdges(edges || []),
+        })}
         maxZoom={5}
         minZoom={0.1}
         stylesheet={styleSheet}

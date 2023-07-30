@@ -80,10 +80,10 @@ export function useCreateEntity<
   );
 }
 
-export function useCreateNode() {
+export function useCreateSubEntity(type: AvailableSubEntityType) {
   return useMutation(async (updateItemValues: { [key: string]: any }) => {
     return FetchFunction({
-      url: `${baseURLS.baseServer}/nodes/create`,
+      url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
       body: JSON.stringify({ data: updateItemValues }),
       method: "POST",
     });

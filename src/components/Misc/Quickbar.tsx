@@ -10,7 +10,7 @@ import { Button, Tooltip } from "..";
 import { ColorPicker } from "../Overlay/ColorPicker";
 
 function changeDrawMode(
-  drawMode: boolean,
+  draw_mode: boolean,
   setBoardState: (
     args: SetStateAction<{
       add_nodes: boolean;
@@ -20,11 +20,11 @@ function changeDrawMode(
     }>,
   ) => void,
 ) {
-  setBoardState((prev) => ({ ...prev, drawMode }));
+  setBoardState((prev) => ({ ...prev, draw_mode }));
 }
 
 function changeCurveStyle(
-  curveStyle: CurveStyleType,
+  curve_style: CurveStyleType,
   setBoardState: (
     args: SetStateAction<{
       add_nodes: boolean;
@@ -34,7 +34,7 @@ function changeCurveStyle(
     }>,
   ) => void,
 ) {
-  setBoardState((prev) => ({ ...prev, curveStyle }));
+  setBoardState((prev) => ({ ...prev, curve_style }));
 }
 
 export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
@@ -147,7 +147,9 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
                 onClick={() => {
                   changeCurveStyle(curveStyle, setBoardState);
                   changeDrawMode(true, setBoardState);
+                  console.log(boardState.curve_style, curveStyle);
                 }}
+                variant={boardState.curve_style === curveStyle ? "info" : "primary"}
               />
             ))}
           </div>
@@ -164,6 +166,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
                 setBoardState((prev) => ({ ...prev, addNodes: false }));
               }
             }}
+            variant={boardState.draw_mode ? "info" : "primary"}
           />
         </span>
       </Tooltip>
