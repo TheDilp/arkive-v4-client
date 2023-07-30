@@ -65,7 +65,12 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
       {/* Toggle grid visibility */}
 
-      <Button hasNoBackground icon={IconEnum.grid} onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })} />
+      <Button
+        hasNoBackground
+        icon={IconEnum.grid}
+        onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })}
+        variant={boardState.grid ? "info" : "primary"}
+      />
       {/* Lock selected elements button */}
       <Button
         hasNoBackground
