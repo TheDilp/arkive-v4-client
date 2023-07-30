@@ -1,4 +1,4 @@
-import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
+import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useMemo, useRef } from "react";
@@ -40,7 +40,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
-  const { mutate } = useUpdateManySubEntities(item_id as string);
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
@@ -219,7 +219,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                 {
                   title: locked ? "Unlock node" : "Lock node",
                   icon: locked ? IconEnum.unlock : IconEnum.lock,
-                  onClick: () => changeLockState(cyRef?.current?._cy, !locked, mutate),
+                  onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
                 },
                 {
                   title: "Center on node",
