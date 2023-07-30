@@ -144,12 +144,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                   createNode(
                     { parent_id: item_id, x: evt.position.x, y: evt.position.y },
                     {
-                      onSuccess: (data: { id: string }) => {
+                      onSuccess: (data: { data: { id: string } }) => {
                         setNodes((prev) => [
                           ...prev,
                           {
                             ...DefaultNode,
-                            id: data.id,
+                            id: data.data.id,
                             x: evt.position.x,
                             y: evt.position.y,
                             label: "",
@@ -391,12 +391,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         createNode(
           { parent_id: item_id, x: evt.position.x, y: evt.position.y },
           {
-            onSuccess: (data: { id: string }) => {
+            onSuccess: (data: { data: { id: string } }) => {
               setNodes((prev) => [
                 ...prev,
                 {
                   ...DefaultNode,
-                  id: data.id,
+                  id: data.data.id,
                   x: evt.position.x,
                   y: evt.position.y,
                   label: "",

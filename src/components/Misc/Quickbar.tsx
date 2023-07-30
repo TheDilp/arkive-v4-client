@@ -2,13 +2,12 @@ import { SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useUpdateManyNodesLockState } from "../../hooks";
+import { useDeleteMany, useUpdateManyNodesLockState } from "../../hooks";
 import { CurveStyleType } from "../../types";
-import { BoardReferenceAtom, BoardStateAtom, dialogAtom, drawerAtom, IconEnum } from "../../utils";
+import { BoardReferenceAtom, BoardStateAtom, dialogAtom, drawerAtom, edgesAtom, IconEnum, nodesAtom } from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
 import { Button, Tooltip } from "..";
 import { ColorPicker } from "../Overlay/ColorPicker";
-import { Icon } from ".";
 
 function changeDrawMode(
   drawMode: boolean,
@@ -46,10 +45,14 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
   const boardRef = useAtomValue(BoardReferenceAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
   const setDrawer = useSetAtom(drawerAtom);
+  const setNodes = useSetAtom(nodesAtom);
+  const setEdges = useSetAtom(edgesAtom);
 
   const setExportDialog = useSetAtom(dialogAtom);
 
   const { mutate: updateLockState } = useUpdateManyNodesLockState(item_id as string);
+  const { mutate: deleteManyNodes } = useDeleteMany("nodes");
+  const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   return (
     <div className="absolute bottom-40 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-24">
@@ -96,9 +99,37 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
             // toaster("warning", "No elements are selected.");
           } else {
             const nodes = selected.nodes();
+            const node_ids = nodes.map((n) => n.id());
             const edges = selected.edges();
-            if (nodes.length) deleteManyNodesMutation.mutate(nodes.map((node) => node.id()));
-            if (edges.length) deleteManyEdgesMutation.mutate(edges.map((edge) => edge.id()));
+            const edge_ids = edges.map((e) => e.id());
+
+            if (nodes.length)
+              deleteManyNodes(
+                {
+                  data: nodes.map((node) => ({
+                    id: node.id(),
+                  })),
+                },
+                {
+                  onSuccess: () => {
+                    setEdges((prev) => prev.filter((e) => !node_ids.includes(e.source_id) && !node_ids.includes(e.target_id)));
+                    setNodes((prev) => prev.filter((n) => !node_ids.includes(n.id)));
+                  },
+                },
+              );
+            if (edges.length)
+              deleteManyEdges(
+                {
+                  data: edges.map((edge) => ({
+                    id: edge.id(),
+                  })),
+                },
+                {
+                  onSuccess: () => {
+                    setEdges((prev) => prev.filter((e) => !edge_ids.includes(e.id)));
+                  },
+                },
+              );
           }
         }}
       />
@@ -109,12 +140,9 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         content={
           <div className="flex items-center gap-x-1 rounded bg-zinc-700 p-2">
             {curveStyles.map((curveStyle: CurveStyleType) => (
-              <Icon
+              <Button
                 key={curveStyle}
-                className={`cursor-pointer hover:text-sky-400 ${
-                  curveStyle === boardState.curve_style && boardState.draw_mode ? "text-sky-400" : ""
-                }`}
-                fontSize={24}
+                hasNoBackground
                 icon={getCurveStyleIcon(curveStyle)}
                 onClick={() => {
                   changeCurveStyle(curveStyle, setBoardState);

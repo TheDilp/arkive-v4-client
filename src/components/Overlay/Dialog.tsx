@@ -50,7 +50,9 @@ const DialogClasses = tv({
     },
     isOverlay: {
       true: {
-        container: "bg-zinc-950 bg-opacity-60 w-full h-full",
+        container: "bg-zinc-950 bg-opacity-60 w-full h-full flex justify-center items-center",
+        base: "max-w-[80%] h-max",
+        titleContainer: "mb-4",
       },
       false: {
         container: "",

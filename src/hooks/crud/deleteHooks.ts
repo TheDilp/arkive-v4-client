@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
@@ -45,6 +45,15 @@ export function useDeleteSubEntity(type: AvailableSubEntityType) {
   return useMutation(async (vars: { data: { id: string; parent_id?: string } }) => {
     return FetchFunction({
       url: `${baseURLS.baseServer}/${type.toLowerCase()}/${vars.data.id}`,
+      method: "DELETE",
+    });
+  });
+}
+export function useDeleteMany(type: AllAvailableEntities) {
+  return useMutation(async (vars: { data: { id: string }[] }) => {
+    return FetchFunction({
+      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
+      body: JSON.stringify(vars),
       method: "DELETE",
     });
   });
