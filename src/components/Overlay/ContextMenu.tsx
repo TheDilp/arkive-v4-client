@@ -107,7 +107,11 @@ export function ContextMenu() {
                       })}
                       key={item.title}>
                       <span>{item.title}</span>
-                      {item?.icon ? <Icon fontSize={22} icon={item.icon} /> : null}
+                      {item?.icon ? (
+                        <span className="ml-auto">
+                          <Icon fontSize={22} icon={item.icon} />
+                        </span>
+                      ) : null}
                     </div>
                   ))
                 : null}

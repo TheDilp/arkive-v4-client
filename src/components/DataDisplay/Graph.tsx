@@ -181,8 +181,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                     );
                 },
               },
-              { title: "Quick create from document" },
-              { title: "Quick create from image" },
+              { title: "Quick create from document", icon: IconEnum.document_template },
+              { title: "Quick create from image", icon: IconEnum.image_template },
             ],
           });
         }
