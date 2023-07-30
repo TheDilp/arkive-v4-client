@@ -9,7 +9,7 @@ import { DeleteEntityDialog, ExportGraphDialog, FamilyTreeDialog, ImageUploadDia
 const DialogClasses = tv({
   slots: {
     container: "absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
-    base: "flex flex-col pointer-events-auto rounded bg-zinc-700 text-white mx-4 border-zinc-600 border-b shadow-lg p-4 h-full",
+    base: "flex flex-col pointer-events-auto rounded bg-zinc-700 text-white mx-4 border-zinc-600 border-b shadow-lg p-4 h-full w-full",
     titleContainer: "flex items-center",
     title: "w-full flex justify-center font-merriweather text-2xl select-none text-center",
     imageUploadContainer: "sticky top-0 bg-zinc-700",
@@ -48,7 +48,7 @@ const DialogClasses = tv({
     },
     isOverlay: {
       true: {
-        container: "bg-zinc-950 bg-opacity-60 w-full h-full flex justify-center items-center",
+        container: "w-full h-full flex justify-center items-center",
         base: "max-w-[80%] h-max",
         titleContainer: "mb-4",
       },

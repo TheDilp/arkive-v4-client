@@ -32,7 +32,10 @@ export const UpdateCharacterSchema = z.object({
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),
-    character_fields: z.object({ id: z.string(), value: z.string() }).array().optional(),
+    character_fields: z
+      .object({ id: z.string(), value: z.string().or(z.string().array()) })
+      .array()
+      .optional(),
     related_to: z.object({ id: z.string(), relation_type: z.string() }).array().optional(),
     related_from: z.object({ id: z.string(), relation_type: z.string() }).array().optional(),
   }),
