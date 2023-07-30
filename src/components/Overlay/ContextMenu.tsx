@@ -84,7 +84,7 @@ export function ContextMenu() {
           <FloatingFocusManager context={context} initialFocus={refs.floating}>
             <div
               ref={refs.setFloating}
-              className="max-w-xs gap-y-2 rounded-md border border-zinc-700 bg-zinc-800 shadow focus-visible:outline-none"
+              className="pointer-events-auto max-w-xs gap-y-2 rounded-md border border-zinc-700 bg-zinc-800 shadow focus-visible:outline-none"
               style={floatingStyles}
               {...getFloatingProps()}>
               {contextMenuAtomValue?.items

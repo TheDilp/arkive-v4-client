@@ -5,7 +5,13 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useCreateNode, useUpdateManyNodesLockState } from "../../hooks";
+import {
+  useChangeNavbarTitle,
+  useCreateNode,
+  useDeleteEntity,
+  useDeleteSubEntity,
+  useUpdateManyNodesLockState,
+} from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum } from "../../utils";
@@ -32,6 +38,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const setBoardRef = useSetAtom(BoardReferenceAtom);
 
   const setContextMenu = useSetAtom(contextMenuAtom);
+
+  const { mutate: deleteNode } = useDeleteSubEntity("nodes");
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
@@ -240,7 +248,21 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                   onClick: () => changeLockState(cyRef?.current?._cy, !locked, mutate),
                 },
                 // { title: "Template from node" },
-                { title: "Delete selected node", icon: IconEnum.trash },
+                {
+                  title: "Delete selected node",
+                  icon: IconEnum.trash,
+                  onClick: () =>
+                    deleteNode(
+                      { data: { id } },
+                      {
+                        onSuccess: () => {
+                          setEdges((prev) => prev.filter((e) => e.source_id !== id && e.target_id !== id));
+
+                          setNodes((prev) => prev.filter((n) => n.id !== id));
+                        },
+                      },
+                    ),
+                },
               ],
             });
           } else if (group === "edges") {
