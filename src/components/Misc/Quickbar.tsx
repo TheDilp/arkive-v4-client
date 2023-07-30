@@ -45,7 +45,6 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
   const boardRef = useAtomValue(BoardReferenceAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
-  const setDialog = useSetAtom(dialogAtom);
   const setDrawer = useSetAtom(drawerAtom);
 
   const setExportDialog = useSetAtom(dialogAtom);
@@ -60,6 +59,8 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         onClick={() => {
           if (!isViewOnly) setBoardState({ ...boardState, draw_mode: false, add_nodes: !boardState.add_nodes });
         }}
+        tooltip="Create nodes"
+        variant={boardState.add_nodes ? "info" : "primary"}
       />
 
       {/* Toggle grid visibility */}

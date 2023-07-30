@@ -385,33 +385,24 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
         const { x, y } = evt.position;
         const id = crypto.randomUUID();
-        setNodes((prev) => [
-          ...prev,
+        createNode(
+          { parent_id: item_id, x: evt.position.x, y: evt.position.y },
           {
-            data: {
-              label: "",
-              id,
-              classes: "boardNode",
-              type: graph?.default_node_shape || "rectangle",
-              backgroundColor: graph?.default_node_color || "#595959",
-              backgroundImage: [],
-              zIndexCompare: "auto",
-            },
-            locked: false,
-            position: {
-              x,
-              y,
+            onSuccess: (data: { id: string }) => {
+              setNodes((prev) => [
+                ...prev,
+                {
+                  ...DefaultNode,
+                  id: data.id,
+                  x: evt.position.x,
+                  y: evt.position.y,
+                  label: "",
+                  parent_id: item_id as string,
+                },
+              ]);
             },
           },
-        ]);
-        // createNodeMutation.mutate({
-        //   x,
-        //   y,
-        //   parentId: item_id,
-        //   type: graph?.default_node_shape,
-        //   backgroundColor: graph?.default_node_color,
-        //   id,
-        // });
+        );
       }
     });
 
