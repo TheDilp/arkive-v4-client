@@ -17,10 +17,11 @@ import { Quickbar } from "..";
 type Props = {
   isReadOnly?: boolean;
   isViewOnly?: boolean;
+  center_on?: string;
   data: Omit<GraphType, "tags" | "project_id" | "parent_id" | "id" | "is_folder" | "is_public" | "icon">;
 };
 
-export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
+export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
 
   const { mutate: createNode } = useCreateSubEntity("nodes");
@@ -409,8 +410,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useEffect(() => {
     const timeout = setTimeout(() => {
       // If there is a node id in the URL navigate to that node
-      if (subitem_id && cyRef?.current?._cy) {
-        const node = cyRef?.current?._cy.getElementById(subitem_id);
+      if ((subitem_id || center_on) && cyRef?.current?._cy) {
+        const node = cyRef?.current?._cy.getElementById(subitem_id || center_on);
 
         if (node)
           cyRef?.current?._cy?.animate({

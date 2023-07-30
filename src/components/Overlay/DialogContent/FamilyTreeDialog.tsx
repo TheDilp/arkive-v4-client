@@ -12,6 +12,7 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
 
   return (
     <Graph
+      center_on={data.id}
       data={{
         title: "Family tree",
         default_edge_color: "#595959",
