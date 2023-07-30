@@ -8,11 +8,11 @@ import { drawerAtom, IconEnum } from "../../utils";
 import { GraphDrawer } from "..";
 import { Button } from "../Form";
 import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
+import { EdgeDrawer } from "./DrawerContent/EdgeDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
 import { NodeDrawer } from "./DrawerContent/NodeDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
-import { EdgeDrawer } from "./DrawerContent/EdgeDrawer";
 
 const DrawerClasses = tv({
   slots: {

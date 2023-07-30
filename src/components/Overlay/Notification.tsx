@@ -10,7 +10,7 @@ import { Icon } from "../Misc";
 const ToastClasses = tv({
   slots: {
     base: "flex w-full overflow-hidden relative items-center  border-zinc-800 justify-between box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
-    title: "text-sm truncate font-normal",
+    title: "text-sm font-normal",
     iconContainer: "mr-2 flex h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1  transition-all",
   },

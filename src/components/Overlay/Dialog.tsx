@@ -10,10 +10,10 @@ import { ImageUploadDialog } from "./DialogContent/ImageUploadDialog";
 
 const DialogClasses = tv({
   slots: {
-    container: "animate-in fade-in absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
+    container: " absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
     base: "flex flex-col pointer-events-auto rounded bg-zinc-700 text-white mx-4 border-zinc-600 border-b shadow-lg p-4",
     titleContainer: "flex items-center",
-    title: "w-full flex justify-center font-merriweather text-3xl select-none text-center",
+    title: "w-full flex justify-center font-merriweather text-2xl select-none text-center",
     imageUploadContainer: "sticky top-0 bg-zinc-700",
     imagesList: "grid grid-cols-2 gap-2 overflow-y-auto",
   },

@@ -12,7 +12,13 @@ const AlertClasses = tv({
   variants: {
     variant: {
       info: {
-        base: "border-blue-600 text-blue-400",
+        base: "text-blue-400",
+      },
+      warning: {
+        base: "text-orange-400",
+      },
+      error: {
+        base: "text-red-600",
       },
     },
   },

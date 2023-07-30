@@ -18,6 +18,7 @@ import {
 import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { updateNodeSchema } from "../../../validation";
 import {
+  Alert,
   Badge,
   Button,
   CharacterPreview,
@@ -412,6 +413,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 },
               });
             } else {
+              resetDrawerAtom();
               createNotification({
                 variant: "info",
                 icon: IconEnum.info_circle,
@@ -423,6 +425,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           variant="success"
         />
       </div>
+      {changedData ? <Alert label="You have unsaved changes." variant="warning" /> : null}
     </div>
   );
 }

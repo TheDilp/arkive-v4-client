@@ -1,5 +1,6 @@
 import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
-import { useAtom, useSetAtom } from "jotai";
+import { SetStateAction, useAtom, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -7,11 +8,26 @@ import { useParams } from "react-router-dom";
 
 import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodesLockState } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { GraphType } from "../../types/EntityTypes/graphTypes";
-import { IconEnum } from "../../utils";
-import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
+import { GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
+import { IconEnum, useNotifications } from "../../utils";
+import {
+  BoardReferenceAtom,
+  BoardStateAtom,
+  contextMenuAtom,
+  dialogAtom,
+  drawerAtom,
+  edgesAtom,
+  nodesAtom,
+} from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
-import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
+import {
+  changeLockState,
+  edgehandlesSettings,
+  getNodeImage,
+  getNodeLabel,
+  mapEdges,
+  mapNodes,
+} from "../../utils/ui/graphUtils";
 import { Quickbar } from "..";
 
 type Props = {
@@ -19,6 +35,39 @@ type Props = {
   isViewOnly?: boolean;
   data: Omit<GraphType, "tags" | "project_id" | "parent_id" | "id" | "is_folder" | "is_public" | "icon">;
 };
+
+function UpdateGraphNodes({
+  setNodes,
+  changedData,
+  node,
+  project_id,
+  rest,
+}: {
+  setNodes: (arg: SetStateAction<NodeType[]>) => void;
+  changedData: Partial<NodeType>;
+  node: Partial<NodeType> & { parent_id: string };
+  project_id: string;
+  rest: Partial<NodeType>;
+}) {
+  setNodes((oldNodes) => {
+    if (oldNodes) {
+      const newNodes = [...oldNodes];
+      const idx = newNodes.findIndex((n) => n.id === node.id);
+      if (idx > -1) {
+        const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData };
+
+        set(newNodes, `[${idx}]`, {
+          ...alteredNodeData,
+          label: getNodeLabel(alteredNodeData as NodeType),
+          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+        });
+        return newNodes;
+      }
+      return newNodes;
+    }
+    return oldNodes;
+  });
+}
 
 export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
@@ -29,9 +78,11 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const firstRender = useRef(true) as MutableRefObject<boolean>;
   const { project_id, item_id, subitem_id } = useParams();
   const [drawer, setDrawer] = useAtom(drawerAtom);
+  const createNotification = useNotifications();
+  const setDialogAtom = useSetAtom(dialogAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
   const setBoardRef = useSetAtom(BoardReferenceAtom);
-
+  const resetDialogAtom = useResetAtom(dialogAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes");
@@ -334,14 +385,25 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         const target = evt.target._private;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
-        setDrawer((prev) => ({
-          ...prev,
-          data: { id: rest.id, parent_id: item_id },
-          position: "right",
-          title: `Edit node ${rest?.label ? "-".concat(rest.label) : ""}`,
-          type: "nodes",
-          size: "md",
-        }));
+
+        setDrawer((prev) => {
+          if (prev?.data?.id) {
+            createNotification({
+              title: "Please close the drawer for the current node before editing another.",
+              variant: "info",
+              timer: 5,
+            });
+            return prev;
+          }
+          return {
+            ...prev,
+            data: { id: rest.id, parent_id: item_id },
+            position: "right",
+            title: `Edit node ${rest?.label ? "-".concat(rest.label) : ""}`,
+            type: "nodes",
+            size: "md",
+          };
+        });
       });
       cyRef?.current?._cy.on("dbltap", "edge", function (evt: any) {
         const targetEdge = evt.target._private;
