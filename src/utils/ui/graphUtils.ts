@@ -297,7 +297,7 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
   }));
 }
 export const edgeArrowTypes = ["source", "target", "midsource", "mid_target"];
-export const curve_styles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
+export const curveStyles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
 export function getCurveStyleIcon(curve_style: CurveStyleType): string {
   if (curve_style === "straight") return "cil:graph";
   if (curve_style === "taxi") return "icon-park-outline:chart-graph";

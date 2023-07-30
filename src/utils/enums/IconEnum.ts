@@ -44,6 +44,8 @@ export const IconEnum = {
   close: "mdi:close",
   check: "ph:check",
   document_template: "fluent-mdl2:save-template",
+  download: "ph:download",
+  edit_many_nodes_edges: "mdi:vector-polyline-edit",
   family_tree: "ph:tree-structure",
   fit: "icon-park-outline:off-screen-one",
   flow_arrow: "ph:flow-arrow",

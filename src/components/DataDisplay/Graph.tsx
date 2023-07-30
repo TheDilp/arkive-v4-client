@@ -5,19 +5,14 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import {
-  useChangeNavbarTitle,
-  useCreateNode,
-  useDeleteEntity,
-  useDeleteSubEntity,
-  useUpdateManyNodesLockState,
-} from "../../hooks";
+import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodesLockState } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum } from "../../utils";
 import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
+import { Quickbar } from "..";
 
 type Props = {
   isReadOnly?: boolean;
@@ -72,7 +67,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
           {
             id,
             source_id: source,
-
             target_id: target,
             line_color: color || "#595959",
             curve_style: boardState.curve_style,
@@ -81,6 +75,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         ],
         false,
       );
+      // @ts-ignore
       return newEdges.concat(newEdge);
     });
     // createEdgeMutation.mutate({
@@ -249,7 +244,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                 },
                 // { title: "Template from node" },
                 {
-                  title: "Delete selected node",
+                  title: "Delete node",
                   icon: IconEnum.trash,
                   onClick: () =>
                     deleteNode(
@@ -613,7 +608,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         wheelSensitivity={0.1}
         zoom={0.6}
       />
-      {/* {isReadOnly ? null : <BoardQuickBar isViewOnly={isViewOnly} />} */}
+      <Quickbar isViewOnly={isViewOnly ?? false} />
     </div>
   );
 }

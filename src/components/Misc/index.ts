@@ -1,6 +1,8 @@
+export { default as Alert } from "./Alert";
 export * from "./Avatar";
 export * from "./Badge";
 export * from "./Divider";
 export * from "./Icon";
+export * from "./Quickbar";
 export * from "./Skeleton";
 export * from "./Spinner";
