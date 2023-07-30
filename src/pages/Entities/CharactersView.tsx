@@ -1,7 +1,8 @@
 import { SetStateAction, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ls from "localstorage-slim";
+
 import {
   Avatar,
   Button,

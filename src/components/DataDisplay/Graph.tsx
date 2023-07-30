@@ -593,7 +593,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
         wheelSensitivity={0.1}
         zoom={0.6}
       />
-      <Quickbar isViewOnly={isViewOnly ?? false} />
+      {isViewOnly || isReadOnly ? null : <Quickbar isViewOnly={isViewOnly ?? false} />}
     </div>
   );
 }
