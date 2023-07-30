@@ -242,6 +242,11 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                   icon: locked ? IconEnum.unlock : IconEnum.lock,
                   onClick: () => changeLockState(cyRef?.current?._cy, !locked, mutate),
                 },
+                {
+                  title: "Center on node",
+                  icon: IconEnum.center,
+                  onClick: () => cyRef?.current?._cy.center(evt.target),
+                },
                 // { title: "Template from node" },
                 {
                   title: "Delete node",
@@ -383,8 +388,6 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
     cyRef?.current?._cy.on("click", function (evt: any) {
       // If the target is the background of the canvas
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
-        const { x, y } = evt.position;
-        const id = crypto.randomUUID();
         createNode(
           { parent_id: item_id, x: evt.position.x, y: evt.position.y },
           {
