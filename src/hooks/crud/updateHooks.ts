@@ -143,14 +143,14 @@ export function useUpdateManyNodesPosition(item_id: string) {
     },
   );
 }
-export function useUpdateManyNodesLockState(item_id: string) {
+export function useUpdateManyNodes(item_id: string) {
   const queryClient = useQueryClient();
   return useMutation(
-    async (updateItemValues: { id: string; is_locked: boolean }[]) => {
+    async (updateItemValues: { [key: string]: any }[]) => {
       if (updateItemValues.length) {
         return FetchFunction({
-          url: `${baseURLS.baseServer}/nodes/update/many/lock`,
-          body: JSON.stringify({ data: { nodes: updateItemValues } }),
+          url: `${baseURLS.baseServer}/nodes/update`,
+          body: JSON.stringify({ data: updateItemValues }),
           method: "POST",
         });
       }

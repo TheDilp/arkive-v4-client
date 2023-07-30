@@ -2,7 +2,7 @@ import { SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useDeleteMany, useUpdateManyNodesLockState } from "../../hooks";
+import { useDeleteMany, useUpdateManyNodes } from "../../hooks";
 import { CurveStyleType } from "../../types";
 import { BoardReferenceAtom, BoardStateAtom, dialogAtom, drawerAtom, edgesAtom, IconEnum, nodesAtom } from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
@@ -50,7 +50,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
   const setExportDialog = useSetAtom(dialogAtom);
 
-  const { mutate: updateLockState } = useUpdateManyNodesLockState(item_id as string);
+  const { mutate: updateManyNodes } = useUpdateManyNodes(item_id as string);
   const { mutate: deleteManyNodes } = useDeleteMany("nodes");
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
@@ -79,14 +79,14 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         hasNoBackground
         icon={IconEnum.lock}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateLockState);
+          if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateManyNodes);
         }}
       />
       <Button
         hasNoBackground
         icon={IconEnum.unlock}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateLockState);
+          if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateManyNodes);
         }}
       />
       <Button
@@ -201,8 +201,28 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         <ColorPicker
           name="pickerColor"
           onChange={({ value }) => {
-            setPickerColor(value);
-            // debouncedColorPick(value);
+            if (boardRef) {
+              const selected = boardRef.elements(":selected");
+
+              const nodes = selected.nodes();
+              const nodeUpdateData = nodes.map((n) => ({ id: n.id(), background_color: value }));
+              const edges = selected.edges();
+              const edge_ids = edges.map((e) => e.id());
+
+              updateManyNodes(nodeUpdateData, {
+                onSuccess: () => {
+                  const node_ids = nodes.map((n) => n.id());
+                  setNodes((prev) =>
+                    prev.map((node) => {
+                      if (node_ids.includes(node.id)) return { ...node, background_color: value };
+                      return node;
+                    }),
+                  );
+                },
+              });
+
+              setPickerColor(value);
+            }
           }}
           value={pickerColor}
         />

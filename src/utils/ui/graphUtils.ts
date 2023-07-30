@@ -1,8 +1,7 @@
-import { UseMutateFunction, UseMutationResult } from "@tanstack/react-query";
+import { UseMutateFunction } from "@tanstack/react-query";
 import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
-import { AvailableSubEntityType } from "../../types";
 import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
 import { getCharacterFullName, getImageURL } from "..";
 
@@ -13,8 +12,7 @@ export function changeLockState(
     any,
     unknown,
     {
-      id: string;
-      is_locked: boolean;
+      [key: string]: any;
     }[],
     {
       old: unknown;
@@ -61,60 +59,6 @@ export const edgehandlesSettings = {
   disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
 };
 
-export function updateColor(
-  boardRef: cytoscape.Core,
-  color: string | { nodeColor: string; edgeColor: string },
-  updateManyNodes: UseMutationResult<
-    Response | null,
-    unknown,
-    {
-      ids: string[];
-      data: Partial<AvailableSubEntityType>;
-    },
-    {
-      old: unknown;
-    }
-  >,
-  updateManyEdges: UseMutationResult<
-    Response | null,
-    unknown,
-    {
-      ids: string[];
-      data: Partial<AvailableSubEntityType>;
-    },
-    {
-      old: unknown;
-    }
-  >,
-) {
-  if (boardRef.elements(":selected")?.length > 0) {
-    const nodes = boardRef.elements(":selected").nodes();
-    const edges = boardRef.elements(":selected").edges();
-    if (nodes.length) {
-      // updateManyNodes.mutate({
-      //   ids: nodes.map((node) => node.id()),
-      //   data: { background_color: typeof color === "object" ? color.nodeColor : color },
-      // });
-    }
-    // if (edges.length)
-    // updateManyEdges.mutate(
-    //   {
-    //     ids: edges.map((edge) => edge.id()),
-    //     data: {
-    //       line_color: typeof color === "object" ? color.edgeColor : color,
-    //       target_arrow_color: typeof color === "object" ? color.edgeColor : color,
-    //       source_arrow_color: typeof color === "object" ? color.edgeColor : color,
-    //       midtarget_arrow_color: typeof color === "object" ? color.edgeColor : color,
-    //       midsource_arrow_color: typeof color === "object" ? color.edgeColor : color,
-    //     },
-    //   },
-    //   {
-    //     onSuccess: () => toaster("success", "Edge colors successfully updated."),
-    //   },
-    // );
-    // }
-  }
-}
 export function exportBoardFunction(
   boardRef: cytoscape.Core,
   view: "Graph" | "View",

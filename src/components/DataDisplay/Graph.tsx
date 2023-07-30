@@ -6,7 +6,7 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodesLockState } from "../../hooks";
+import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyNodes } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
@@ -36,39 +36,6 @@ type Props = {
   data: Omit<GraphType, "tags" | "project_id" | "parent_id" | "id" | "is_folder" | "is_public" | "icon">;
 };
 
-function UpdateGraphNodes({
-  setNodes,
-  changedData,
-  node,
-  project_id,
-  rest,
-}: {
-  setNodes: (arg: SetStateAction<NodeType[]>) => void;
-  changedData: Partial<NodeType>;
-  node: Partial<NodeType> & { parent_id: string };
-  project_id: string;
-  rest: Partial<NodeType>;
-}) {
-  setNodes((oldNodes) => {
-    if (oldNodes) {
-      const newNodes = [...oldNodes];
-      const idx = newNodes.findIndex((n) => n.id === node.id);
-      if (idx > -1) {
-        const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData };
-
-        set(newNodes, `[${idx}]`, {
-          ...alteredNodeData,
-          label: getNodeLabel(alteredNodeData as NodeType),
-          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
-        });
-        return newNodes;
-      }
-      return newNodes;
-    }
-    return oldNodes;
-  });
-}
-
 export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
 
@@ -90,7 +57,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
-  const { mutate } = useUpdateManyNodesLockState(item_id as string);
+  const { mutate } = useUpdateManyNodes(item_id as string);
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
