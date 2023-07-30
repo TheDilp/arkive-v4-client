@@ -1,6 +1,5 @@
 import { Collection, Core, EdgeDefinition, EventObject, NodeDefinition } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -10,15 +9,7 @@ import { useChangeNavbarTitle, useCreateNode, useDeleteSubEntity, useUpdateManyN
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
-import {
-  BoardReferenceAtom,
-  BoardStateAtom,
-  contextMenuAtom,
-  dialogAtom,
-  drawerAtom,
-  edgesAtom,
-  nodesAtom,
-} from "../../utils/atoms";
+import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { Quickbar } from "..";
@@ -39,10 +30,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const [drawer, setDrawer] = useAtom(drawerAtom);
   const createNotification = useNotifications();
-  const setDialogAtom = useSetAtom(dialogAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
   const setBoardRef = useSetAtom(BoardReferenceAtom);
-  const resetDialogAtom = useResetAtom(dialogAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes");
