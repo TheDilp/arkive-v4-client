@@ -1,8 +1,7 @@
 import { SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 
-import { useDeleteMany, useUpdateManyNodes } from "../../hooks";
+import { useDeleteMany, useUpdateManySubEntities } from "../../hooks";
 import { CurveStyleType } from "../../types";
 import { BoardReferenceAtom, BoardStateAtom, dialogAtom, drawerAtom, edgesAtom, IconEnum, nodesAtom } from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
@@ -38,8 +37,6 @@ function changeCurveStyle(
 }
 
 export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
-  const { item_id } = useParams();
-
   const [pickerColor, setPickerColor] = useState("#595959");
 
   const boardRef = useAtomValue(BoardReferenceAtom);
@@ -50,7 +47,8 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
   const setDialog = useSetAtom(dialogAtom);
 
-  const { mutate: updateManyNodes } = useUpdateManyNodes(item_id as string);
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
+  const { mutate: updateManyEdges } = useUpdateManySubEntities("edges");
   const { mutate: deleteManyNodes } = useDeleteMany("nodes");
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
@@ -205,21 +203,36 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
               const selected = boardRef.elements(":selected");
 
               const nodes = selected.nodes();
-              const nodeUpdateData = nodes.map((n) => ({ id: n.id(), background_color: value }));
               const edges = selected.edges();
-              const edge_ids = edges.map((e) => e.id());
 
-              updateManyNodes(nodeUpdateData, {
-                onSuccess: () => {
-                  const node_ids = nodes.map((n) => n.id());
-                  setNodes((prev) =>
-                    prev.map((node) => {
-                      if (node_ids.includes(node.id)) return { ...node, background_color: value };
-                      return node;
-                    }),
-                  );
-                },
-              });
+              if (nodes?.length) {
+                const nodeUpdateData = nodes.map((n) => ({ id: n.id(), background_color: value }));
+                updateManyNodes(nodeUpdateData, {
+                  onSuccess: () => {
+                    const node_ids = nodes.map((n) => n.id());
+                    setNodes((prev) =>
+                      prev.map((node) => {
+                        if (node_ids.includes(node.id)) return { ...node, background_color: value };
+                        return node;
+                      }),
+                    );
+                  },
+                });
+              }
+              if (edges?.length) {
+                const edgeUpdateData = edges.map((n) => ({ id: n.id(), background_color: value }));
+                updateManyEdges(edgeUpdateData, {
+                  onSuccess: () => {
+                    const edge_ids = edges.map((n) => n.id());
+                    setEdges((prev) =>
+                      prev.map((node) => {
+                        if (edge_ids.includes(node.id)) return { ...node, line_color: value };
+                        return node;
+                      }),
+                    );
+                  },
+                });
+              }
 
               setPickerColor(value);
             }

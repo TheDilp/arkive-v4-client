@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AvailableEntityType, GraphType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, GraphType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useUpdateEntity<InsertType extends { data: { id?: string; parent_id?: string } }>(
@@ -103,43 +103,15 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
   );
 }
 
-export function useUpdateManyNodes(item_id: string) {
-  const queryClient = useQueryClient();
-  return useMutation(
-    async (updateItemValues: { [key: string]: any }[]) => {
-      if (updateItemValues.length) {
-        return FetchFunction({
-          url: `${baseURLS.baseServer}/nodes/update`,
-          body: JSON.stringify({ data: updateItemValues }),
-          method: "POST",
-        });
-      }
-      return null;
-    },
-    {
-      onMutate: async (variables) => {
-        const old = queryClient.getQueryData(["allEntities", "graphs", item_id]);
-        queryClient.setQueryData(["allEntities", "graphs", item_id], (oldData: GraphType | undefined) => {
-          if (oldData) {
-            return {
-              ...oldData,
-              nodes: oldData.nodes.map((subItem) => {
-                const idx = variables.findIndex((varNode) => varNode.id === subItem.id);
-                if (idx > -1) {
-                  return { ...subItem, ...variables[idx] };
-                }
-                return subItem;
-              }),
-            };
-          }
-          return oldData;
-        });
-        return { old };
-      },
-      onError: (_, __, context) => {
-        // toaster("error", "There was an error updating these items.");
-        queryClient.setQueryData(["allEntities", "graphs", item_id], context?.old);
-      },
-    },
-  );
+export function useUpdateManySubEntities(type: AvailableSubEntityType) {
+  return useMutation(async (updateItemValues: { [key: string]: any }[]) => {
+    if (updateItemValues.length) {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type}/update`,
+        body: JSON.stringify({ data: updateItemValues }),
+        method: "POST",
+      });
+    }
+    return null;
+  });
 }

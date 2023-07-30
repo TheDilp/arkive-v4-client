@@ -14,9 +14,7 @@ export function changeLockState(
     {
       [key: string]: any;
     }[],
-    {
-      old: unknown;
-    }
+    unknown
   >,
 ) {
   const selected = boardContext.nodes(":selected");

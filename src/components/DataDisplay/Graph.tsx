@@ -5,7 +5,7 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useCreateSubEntity, useDeleteSubEntity, useUpdateManyNodes } from "../../hooks";
+import { useChangeNavbarTitle, useCreateSubEntity, useDeleteSubEntity, useUpdateManySubEntities } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
@@ -40,7 +40,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
-  const { mutate } = useUpdateManyNodes(item_id as string);
+  const { mutate } = useUpdateManySubEntities(item_id as string);
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
