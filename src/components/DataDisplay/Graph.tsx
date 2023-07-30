@@ -158,6 +158,31 @@ export function Graph({ data: graph, isReadOnly, isViewOnly }: Props) {
                   );
                 },
               },
+              {
+                title: "Go to center of graph",
+                onClick: () => cyRef?.current?._cy?.center(),
+                icon: IconEnum.center,
+              },
+              {
+                title: "Fit view to nodes",
+                icon: IconEnum.fit,
+                onClick: () => {
+                  if (cyRef?.current?._cy)
+                    cyRef?.current?._cy.animate(
+                      {
+                        fit: {
+                          padding: 0,
+                          eles: cyRef?.current?._cy.nodes(),
+                        },
+                      },
+                      {
+                        duration: 1250,
+                      },
+                    );
+                },
+              },
+              { title: "Quick create from document" },
+              { title: "Quick create from image" },
             ],
           });
         }
