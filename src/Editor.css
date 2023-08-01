@@ -5,12 +5,9 @@
   @apply h-full overflow-y-auto !important;
 }
 
-.remirror-editor.ProseMirror .ProseMirror-yjs-cursor div {
-  @apply rounded-sm p-1 font-lato !important;
-}
 .remirror-editor,
 .staticRendererContainer {
-  @apply p-4 font-lato;
+  @apply p-4 font-lato focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;
@@ -251,4 +248,10 @@
 }
 .remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered {
   @apply cursor-pointer bg-blue-200;
+}
+
+.secret-icon {
+  @apply inline-block h-6 w-6 bg-no-repeat fill-white text-white;
+  background-image: url("https://api.iconify.design/ph/eye-slash.svg?color=white");
+  background-size: 100% 100%;
 }
