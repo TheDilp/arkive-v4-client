@@ -1,16 +1,19 @@
-import { ImageType } from ".";
+import { RemirrorJSON } from "remirror";
 
-export interface DocumentType {
+import { BaseEntityType, ImageType } from ".";
+
+export interface AlterNameType {
   id: string;
   title: string;
-  content: string | null;
-  icon: string | null;
-  is_folder: boolean | null;
-  is_public: boolean | null;
+}
+
+export interface DocumentType extends BaseEntityType {
+  content: RemirrorJSON | null;
   is_template: boolean | null;
   properties: string | null;
-  project_id: string;
-  parent_id: string | null;
   image_id?: string | null;
+  alter_names: AlterNameType[];
   image: ImageType;
 }
+
+export type StaticRendererType = { content: RemirrorJSON };

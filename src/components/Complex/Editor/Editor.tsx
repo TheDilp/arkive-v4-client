@@ -1,0 +1,78 @@
+import "remirror/styles/all.css";
+
+import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
+import { useCallback } from "react";
+import { Navigate, useParams } from "react-router-dom";
+import { InvalidContentHandler } from "remirror";
+
+import { useGetEntity } from "../../../hooks";
+import { DocumentType } from "../../../types";
+import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
+
+export function Editor({ editable }: { editable: boolean }) {
+  const { item_id } = useParams();
+
+  const { data: currentDocument, isLoading } = useGetEntity<DocumentType>(
+    item_id as string,
+    "documents",
+    {
+      data: {},
+    },
+    {
+      enabled: !!editable && !!item_id,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const onError: InvalidContentHandler = useCallback(({ json, invalidContent, transformers }) => {
+    // Automatically remove all invalid nodes and marks.
+    return transformers.remove(json, invalidContent);
+  }, []);
+
+  const { manager, state, setState, getContext } = useRemirror({
+    content: !currentDocument?.data?.content ? undefined : (document && currentDocument?.data?.content) || undefined,
+    extensions: () => DefaultEditorExtensions,
+    selection: "start",
+    onError,
+  });
+  if (!currentDocument && !isLoading) {
+    return <Navigate to="../" />;
+  }
+
+  return (
+    <Remirror
+      classNames={["editor", "w-full", "flex-1", "font-Lato", "h-[calc(100vh-10rem)] overflow-y-auto"]}
+      hooks={editorHooks}
+      manager={manager}
+      onChange={(params) => {
+        if (params.firstRender) {
+          return;
+        }
+        setState(params.state);
+      }}
+      state={state}>
+      {/* <MenuBar /> */}
+
+      <div className="flex h-[calc(100%-12rem)] w-full flex-1">
+        {/* <ContextMenu cm={cm} items={items} /> */}
+        <div
+          className="relative flex h-full w-full flex-col content-start"
+          onDrop={(e) => {
+            const stringData = e.dataTransfer.getData("Text");
+            if (!stringData) return;
+            if (stringData) {
+              const data: { index: number; title: string; description?: string } = JSON.parse(e.dataTransfer.getData("Text"));
+              if (!data) return;
+              getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
+            }
+          }}>
+          <EditorComponent />
+          {/* <> */}
+          {/* <MentionDropdownComponent /> */}
+          {/* <CommandMenu /> */}
+          {/* </> */}
+        </div>
+      </div>
+    </Remirror>
+  );
+}

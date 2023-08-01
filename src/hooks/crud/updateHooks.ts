@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvailableEntityType, AvailableSubEntityType, GraphType } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useUpdateEntity<InsertType extends { data: { id?: string; parent_id?: string } }>(
+export function useUpdateEntity<InsertType extends { data: { id?: string; parent_id?: string | null } }>(
   type: AvailableEntityType,
   project_id: string,
 ) {

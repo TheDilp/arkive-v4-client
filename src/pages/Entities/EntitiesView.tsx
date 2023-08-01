@@ -3,6 +3,7 @@ import { MouseEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
+import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
@@ -31,7 +32,7 @@ function ItemDisplay({
   showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
 }) {
   return (
-    <Link to={`../graphs/${id}`}>
+    <Link to={`../${type}/${id}`}>
       <div
         className="col-span-1 flex cursor-pointer flex-col items-center justify-center hover:text-blue-400"
         onContextMenu={(e) => {
@@ -69,7 +70,7 @@ export function EntitiesView() {
         sort: "desc",
       },
     },
-    "graphs",
+    type as AvailableEntityType,
     {
       enabled: !item_id,
       staleTime: 5 * 60 * 1000,
@@ -103,6 +104,8 @@ export function EntitiesView() {
   if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
 
   const entityName = getEntityNameFromType(type as AvailableEntityType);
+
+  console.log(type);
 
   return (
     <>
@@ -224,6 +227,7 @@ export function EntitiesView() {
           ) : null}
         </div>
       ) : null}
+      {!!item_id && !data?.data?.is_folder && type === "documents" ? <Editor editable /> : null}
       {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph data={data?.data as GraphType} /> : null}
     </>
   );
