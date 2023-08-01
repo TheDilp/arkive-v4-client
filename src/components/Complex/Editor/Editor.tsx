@@ -1,4 +1,5 @@
 import "remirror/styles/all.css";
+import "../../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useCallback } from "react";
@@ -31,7 +32,7 @@ export function Editor({ editable }: { editable: boolean }) {
 
   const { manager, state, setState, getContext } = useRemirror({
     content: !currentDocument?.data?.content ? undefined : (document && currentDocument?.data?.content) || undefined,
-    extensions: () => DefaultEditorExtensions,
+    extensions: () => DefaultEditorExtensions(),
     selection: "start",
     onError,
   });
@@ -41,7 +42,7 @@ export function Editor({ editable }: { editable: boolean }) {
 
   return (
     <Remirror
-      classNames={["editor", "w-full", "flex-1", "font-Lato", "h-[calc(100vh-10rem)] overflow-y-auto"]}
+      editable={editable}
       hooks={editorHooks}
       manager={manager}
       onChange={(params) => {
@@ -53,10 +54,9 @@ export function Editor({ editable }: { editable: boolean }) {
       state={state}>
       {/* <MenuBar /> */}
 
-      <div className="flex h-[calc(100%-12rem)] w-full flex-1">
-        {/* <ContextMenu cm={cm} items={items} /> */}
+      <div className="flex h-[calc(100%-6rem)] w-full flex-1 rounded border border-zinc-800">
         <div
-          className="relative flex h-full w-full flex-col content-start"
+          className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {
             const stringData = e.dataTransfer.getData("Text");
             if (!stringData) return;
@@ -67,10 +67,9 @@ export function Editor({ editable }: { editable: boolean }) {
             }
           }}>
           <EditorComponent />
-          {/* <> */}
+
           {/* <MentionDropdownComponent /> */}
           {/* <CommandMenu /> */}
-          {/* </> */}
         </div>
       </div>
     </Remirror>

@@ -68,7 +68,8 @@ const CustomMentionExtension = new MentionAtomExtension({
 });
 CustomMentionExtension.ReactComponent = MentionReactComponent;
 
-export const DefaultEditorExtensions: AnyExtension[] = [
+export const DefaultEditorExtensions: () => AnyExtension[] = () => [
+  new MarkdownExtension({}),
   new SecretExtension({
     secret: true,
   }),
@@ -98,7 +99,6 @@ export const DefaultEditorExtensions: AnyExtension[] = [
   new CalloutExtension({}),
   new NodeFormattingExtension({}),
   new HardBreakExtension({}),
-  new MarkdownExtension({}),
   CustomMentionExtension,
   new GapCursorExtension({}),
   new DropCursorExtension({}),
