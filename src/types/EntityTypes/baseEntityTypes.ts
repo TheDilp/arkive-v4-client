@@ -48,4 +48,6 @@ export type SearchableEntities =
   | "images"
   | "tags";
 
+export type SearchableMentionEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "words";
+
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;

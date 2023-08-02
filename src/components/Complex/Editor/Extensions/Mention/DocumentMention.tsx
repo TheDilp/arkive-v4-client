@@ -50,7 +50,7 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
     <Tooltip content={<DocumentMentionTooltip id={id} title={title || label} />} isDisabled={isDisabledTooltip ?? false}>
       <Link
         className="font-Lato text-sm font-bold text-white underline hover:text-sky-400"
-        to={!project_id ? `/view/documents/${id}` : `/project/${project_id}/documents/${id}`}>
+        to={!project_id ? `/view/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
         {finalName || title || label}
       </Link>
     </Tooltip>

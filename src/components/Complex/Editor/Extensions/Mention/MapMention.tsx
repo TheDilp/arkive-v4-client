@@ -13,7 +13,7 @@ export function MapMention({ title, nodeId, nodeLabel, project_id }: Props) {
   return nodeId ? (
     <Link
       className="font-Lato inline-flex text-sm font-bold text-white underline transition-colors hover:text-sky-400"
-      to={!project_id ? `/view/maps/${nodeId}` : `/project/${project_id}/maps/${nodeId}`}>
+      to={!project_id ? `/view/maps/${nodeId}` : `/projects/${project_id}/maps/${nodeId}`}>
       <Icon fontSize={15} icon={IconEnum.map_pin} />
       {title || nodeLabel}
     </Link>

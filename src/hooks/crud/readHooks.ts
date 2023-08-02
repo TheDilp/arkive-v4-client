@@ -1,6 +1,12 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  RequestBodyType,
+  SearchableEntities,
+  SearchableMentionEntities,
+} from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction } from "../../utils";
 
@@ -177,6 +183,24 @@ export function useSearch<ReturnType extends { value: string; label: string; col
     async () =>
       FetchFunction({
         url: `${baseURLS.baseServer}/search/${project_id}/${type}`,
+        method: "POST",
+        body: JSON.stringify(request),
+      }),
+    options,
+  );
+}
+
+export function useMentionsSearch<ReturnType extends { id: string; title: string; alterId?: string; parent_id?: string }>(
+  request: { data: { search_term: string }; limit: number },
+  type: SearchableMentionEntities,
+  project_id: string,
+  options?: UseQueryOptions<any>,
+) {
+  return useQuery<{ data: ReturnType[] }, unknown>(
+    ["search", type, "mentions"],
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/search/${project_id}/${type}/mentions`,
         method: "POST",
         body: JSON.stringify(request),
       }),

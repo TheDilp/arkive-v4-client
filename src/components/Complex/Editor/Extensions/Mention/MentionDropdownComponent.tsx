@@ -2,8 +2,8 @@ import { FloatingWrapper, useMentionAtom } from "@remirror/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useSearch } from "../../../../../hooks";
-import { SearchableEntities } from "../../../../../types";
+import { useMentionsSearch } from "../../../../../hooks";
+import { SearchableMentionEntities } from "../../../../../types";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
@@ -14,13 +14,11 @@ export function MentionDropdownComponent() {
     items: options,
   });
 
-  const { data, isFetching } = useSearch<{
-    value: string;
-    label: string;
-    color?: string;
-    image?: string;
+  const { data, isFetching } = useMentionsSearch<{
+    id: string;
+    title: string;
+    alterId?: string;
     parent_id?: string;
-    translation: string;
   }>(
     {
       data: {
@@ -28,7 +26,7 @@ export function MentionDropdownComponent() {
       },
       limit: 10,
     },
-    state?.name as SearchableEntities,
+    state?.name as SearchableMentionEntities,
     project_id as string,
     {
       enabled: !!state?.name && state?.query?.full?.length >= 2 && !!filter && filter?.length > 2,
@@ -52,20 +50,11 @@ export function MentionDropdownComponent() {
   useEffect(() => {
     if (data?.data && !isFetching) {
       setOptions(
-        data?.data.sort().map((item) => {
-          if (item?.translation)
-            return {
-              key: item.value,
-              id: item.value,
-              searchItem: item.translation,
-              label: item.title,
-              displayLabel: `${item.title} (${item.translation})`,
-              projectId: project_id,
-            };
+        data?.data.map((item) => {
           return {
             key: item.id,
-            id: item?.parentId || item.id,
-            alterId: item?.parentId ? item.id : null,
+            id: item.id,
+            alterId: item?.alterId ? item.alterId : null,
             label: item.title,
             projectId: project_id,
           };

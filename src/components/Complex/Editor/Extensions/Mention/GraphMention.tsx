@@ -29,7 +29,7 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
       <Link
         className="font-Lato inline-flex text-sm font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
-        to={!project_id ? `/view/boards/${nodeId}` : `/project/${project_id}/boards/${nodeId}`}>
+        to={!project_id ? `/view/boards/${nodeId}` : `/projects/${project_id}/boards/${nodeId}`}>
         <Icon fontSize={15} icon={IconEnum.edit} />
         {title || nodeLabel}
       </Link>
