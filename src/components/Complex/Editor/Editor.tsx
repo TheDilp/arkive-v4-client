@@ -27,7 +27,6 @@ export function Editor({ editable }: { editable: boolean }) {
     },
   );
 
-  console.log(currentDocument);
   useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const onError: InvalidContentHandler = useCallback(({ json, invalidContent, transformers }) => {

@@ -5,9 +5,9 @@ import { Link, useParams } from "react-router-dom";
 import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
 import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
-import { useGetAllEntities, useGetEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
-import { contextMenuAtom, dialogAtom, drawerAtom, IconEnum } from "../../utils";
+import { capitalizeFirstLetter, contextMenuAtom, dialogAtom, drawerAtom, IconEnum } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
@@ -98,14 +98,13 @@ export function EntitiesView() {
   );
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
+  const entityName = getEntityNameFromType(type as AvailableEntityType);
+
+  useChangeNavbarTitle(`The Arkive | ${capitalizeFirstLetter(type || "")}`);
 
   if (!item_id && type === "characters") return <CharactersView />;
 
   if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
-
-  const entityName = getEntityNameFromType(type as AvailableEntityType);
-
-  console.log(type);
 
   return (
     <>
