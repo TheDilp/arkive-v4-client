@@ -22,7 +22,7 @@ type Props = {
 };
 
 export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props) {
-  useChangeNavbarTitle("The Arkive | Graphs", !(!isReadOnly && !isViewOnly));
+  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
 
   const { mutate: createNode } = useCreateSubEntity("nodes");
   const { mutate: createEdges } = useCreateSubEntity("edges");

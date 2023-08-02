@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { InvalidContentHandler } from "remirror";
 
-import { useGetEntity } from "../../../hooks";
+import { useChangeNavbarTitle, useGetEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
 import { MentionDropdownComponent } from "./Extensions/Mention";
@@ -19,12 +19,16 @@ export function Editor({ editable }: { editable: boolean }) {
     "documents",
     {
       data: {},
+      fields: ["id", "title", "content"],
     },
     {
       enabled: !!editable && !!item_id,
       staleTime: 5 * 60 * 1000,
     },
   );
+
+  console.log(currentDocument);
+  useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const onError: InvalidContentHandler = useCallback(({ json, invalidContent, transformers }) => {
     // Automatically remove all invalid nodes and marks.
