@@ -13,7 +13,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   const { data, isLoading } = useQuery<WordType>({
     queryKey: ["words", id],
     queryFn: async () => {
-      return FetchFunction({ url: `${baseURLS.baseServer}getsingleword`, method: "POST", body: JSON.stringify({ id }) });
+      // return FetchFunction({ url: `${baseURLS.baseServer}getsingleword`, method: "POST", body: JSON.stringify({ id }) });
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -27,7 +27,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
     </div>
   );
 }
-export default function WordMention({ title, id, label, isDisabledTooltip }: Props) {
+export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
   return (
     <Tooltip content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
       <span className="cursor-pointer font-light italic">

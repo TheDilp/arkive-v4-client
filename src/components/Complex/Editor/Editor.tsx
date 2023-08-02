@@ -9,6 +9,7 @@ import { InvalidContentHandler } from "remirror";
 import { useGetEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
+import { MentionDropdownComponent } from "./Extensions/Mention";
 
 export function Editor({ editable }: { editable: boolean }) {
   const { item_id } = useParams();
@@ -68,7 +69,7 @@ export function Editor({ editable }: { editable: boolean }) {
           }}>
           <EditorComponent />
 
-          {/* <MentionDropdownComponent /> */}
+          <MentionDropdownComponent />
           {/* <CommandMenu /> */}
         </div>
       </div>

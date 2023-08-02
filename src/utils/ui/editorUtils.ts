@@ -30,80 +30,69 @@ import { SecretExtension } from "../../components/Complex/Editor/Extensions/Secr
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType } from "../../types";
 
-const CustomMentionExtension = new MentionAtomExtension({
-  extraAttributes: {
-    alterId: {
-      default: null,
-      parseDOM: (dom) => dom.getAttribute("data-alterId"),
-      toDOM: () => ["data-alterId"],
-    },
-    projectId: {
-      default: null,
-      parseDOM: (dom) => dom.getAttribute("data-projectId"),
-      toDOM: () => ["data-projectId"],
-    },
-  },
-  matchers: [
-    {
-      char: "@",
-      name: "documents",
-      supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
-    },
-    {
-      char: "#",
-      name: "maps",
-      supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
-    },
-    {
-      char: "$",
-      name: "boards",
-      supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
-    },
-    {
-      char: "%",
-      name: "words",
-      supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
-    },
-  ],
-});
-CustomMentionExtension.ReactComponent = MentionReactComponent;
+export const DefaultEditorExtensions: () => AnyExtension[] = () => {
+  const CustomMentionExtension = new MentionAtomExtension({
+    matchers: [
+      {
+        char: "@",
+        name: "documents",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+      },
+      {
+        char: "#",
+        name: "maps",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+      },
+      {
+        char: "$",
+        name: "boards",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+      },
+      {
+        char: "%",
+        name: "words",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+      },
+    ],
+  });
+  CustomMentionExtension.ReactComponent = MentionReactComponent;
 
-export const DefaultEditorExtensions: () => AnyExtension[] = () => [
-  new MarkdownExtension({}),
-  new SecretExtension({
-    secret: true,
-  }),
-  new PlaceholderExtension({
-    placeholder: "Write something awesome! 📜",
-  }),
-  CustomMentionExtension,
-  new BoldExtension({}),
-  new ItalicExtension({}),
-  new HeadingExtension({}),
-  new UnderlineExtension({}),
-  new BlockquoteExtension({}),
-  new BulletListExtension({
-    enableSpine: false,
-  }),
-  new TaskListExtension({}),
-  new OrderedListExtension({}),
-  new LinkExtension({
-    autoLink: true,
-    defaultTarget: "_blank",
-    selectTextOnClick: true,
-  }),
-  new ImageExtension({
-    enableResizing: true,
-  }),
-  new HorizontalRuleExtension({}),
-  new CalloutExtension({}),
-  new NodeFormattingExtension({}),
-  new HardBreakExtension({}),
-  CustomMentionExtension,
-  new GapCursorExtension({}),
-  new DropCursorExtension({}),
-  // new TableExtension({ resizable: true }),
-];
+  return [
+    new MarkdownExtension({}),
+    new SecretExtension({
+      secret: true,
+    }),
+    new PlaceholderExtension({
+      placeholder: "Write something awesome! 📜",
+    }),
+    CustomMentionExtension,
+    new BoldExtension({}),
+    new ItalicExtension({}),
+    new HeadingExtension({}),
+    new UnderlineExtension({}),
+    new BlockquoteExtension({}),
+    new BulletListExtension({
+      enableSpine: false,
+    }),
+    new TaskListExtension({}),
+    new OrderedListExtension({}),
+    new LinkExtension({
+      autoLink: true,
+      defaultTarget: "_blank",
+      selectTextOnClick: true,
+    }),
+    new ImageExtension({
+      enableResizing: true,
+    }),
+    new HorizontalRuleExtension({}),
+    new CalloutExtension({}),
+    new NodeFormattingExtension({}),
+    new HardBreakExtension({}),
+    new GapCursorExtension({}),
+    new DropCursorExtension({}),
+    // new TableExtension({ resizable: true }),
+  ];
+};
 
 export const editorHooks = [
   () => {

@@ -1,4 +1,6 @@
 export * from "./DocumentMention";
 export * from "./GraphMention";
 export * from "./MapMention";
+export * from "./MentionDropdownComponent";
 export * from "./MentionReactComponent";
+export * from "./WordMention";
