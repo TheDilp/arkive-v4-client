@@ -40,7 +40,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
-  const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
+  const { addOrUpdateNode } = useBatchUpdateNodePositions();
   const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
 
   const styleSheet = useMemo(
