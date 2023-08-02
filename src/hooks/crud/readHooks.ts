@@ -166,8 +166,8 @@ export function useGetInfiniteEntities<ReturnType>(
   );
 }
 
-export function useSearch<ReturnType>(
-  request: { data: { search_term: string } },
+export function useSearch<ReturnType extends { value: string; label: string; color?: string; image?: string }>(
+  request: { data: { search_term: string }; limit: number },
   type: SearchableEntities,
   project_id: string,
   options?: UseQueryOptions<any>,

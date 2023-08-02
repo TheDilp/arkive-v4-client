@@ -210,7 +210,7 @@
 /* Mentions */
 
 .remirror-mention-atom-popup-wrapper {
-  @apply bg-zinc-700 p-0 !important;
+  @apply overflow-hidden bg-zinc-700 p-0 !important;
 }
 
 .remirror-mention-atom-popup-item {

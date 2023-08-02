@@ -2,91 +2,93 @@ import { FloatingWrapper, useMentionAtom } from "@remirror/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetAllEntities, useSearch } from "../../../../../hooks";
-import { baseURLS } from "../../../../../utils";
+import { useSearch } from "../../../../../hooks";
+import { SearchableEntities } from "../../../../../types";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
   const [options, setOptions] = useState<{ key: string; id: string; label: string; displayLabel?: string }[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [filter, setFilter] = useState("");
 
   const { state, getMenuProps, getItemProps, indexIsHovered, indexIsSelected } = useMentionAtom({
     items: options,
   });
 
-  // const { data } = useSearch(
-  //   {
-  //     data: {},
-  //     pagination: {
-  //       limit: 5,
-  //     },
-  //   },
-  //   "documents",
-  // );
+  const { data, isFetching } = useSearch<{
+    value: string;
+    label: string;
+    color?: string;
+    image?: string;
+    parent_id?: string;
+    translation: string;
+  }>(
+    {
+      data: {
+        search_term: filter,
+      },
+      limit: 10,
+    },
+    state?.name as SearchableEntities,
+    project_id as string,
+    {
+      enabled: !!state?.name && state?.query?.full?.length >= 2 && !!filter && filter?.length > 2,
+    },
+  );
 
-  // const search = useDebouncedCallback(async () => {
-  //   setIsFetching(true);
-  //   const items: { key: string; id: string; title: string; displayLabel?: string; parentId?: string; translation?: string }[] =
-  //     await FetchFunction({
-  //       url: `${baseURLS.baseServer}search`,
-  //       method: "POST",
-  //       body: JSON.stringify({
-  //         project_id,
-  //         query: state?.query?.full,
-  //         type: state?.name,
-  //         take: 5,
-  //       }),
-  //     });
-  //   setIsFetching(false);
-  //   setOptions(
-  //     items
-  //       .sort()
-  //       .map((item) => {
-  //         if (item?.translation)
-  //           return {
-  //             key: item.id,
-  //             id: item?.parentId || item.id,
-  //             searchItem: item.translation,
-  //             label: item.title,
-  //             displayLabel: `${item.title} (${item.translation})`,
-  //             projectId: project_id,
-  //           };
-  //         return {
-  //           key: item.id,
-  //           id: item?.parentId || item.id,
-  //           alterId: item?.parentId ? item.id : null,
-  //           label: item.title,
-  //           projectId: project_id,
-  //         };
-  //       })
-  //       .slice(0, 10),
-  //   );
-  // }, 700);
   useEffect(() => {
-    if (state && state?.query?.full?.length >= 3) {
-      // search();
-      console.log(state);
-    } else {
-      setOptions([]);
+    if (state && state?.query?.full?.length >= 2) {
+      const timeout = setTimeout(() => {
+        setFilter(state.query.full.toLowerCase());
+      }, 400);
+      return () => {
+        clearTimeout(timeout);
+      };
     }
-  }, [state?.query?.full]);
+    setOptions([]);
+
+    return () => {};
+  }, [state]);
+
+  useEffect(() => {
+    if (data?.data && !isFetching) {
+      setOptions(
+        data?.data.sort().map((item) => {
+          if (item?.translation)
+            return {
+              key: item.value,
+              id: item.value,
+              searchItem: item.translation,
+              label: item.title,
+              displayLabel: `${item.title} (${item.translation})`,
+              projectId: project_id,
+            };
+          return {
+            key: item.id,
+            id: item?.parentId || item.id,
+            alterId: item?.parentId ? item.id : null,
+            label: item.title,
+            projectId: project_id,
+          };
+        }),
+      );
+    }
+  }, [data]);
+
   return (
     <FloatingWrapper
-      containerClass="commandMenu"
+      containerClass="commandMenu overflow-hidden"
       enabled={Boolean(state)}
       placement="auto-end"
       positioner="always"
       renderOutsideEditor>
-      <ul
-        className="remirror-mention-atom-popup-wrapper z-50 max-h-60 w-[12rem] min-w-[12rem] overflow-y-auto p-0"
-        {...getMenuProps()}>
+      <ul className="remirror-mention-atom-popup-wrapper" {...getMenuProps()}>
         {/* {isFetching ? <ProgressSpinner /> : null} */}
         {!isFetching
           ? (options || []).map((item, index) => {
               return (
                 <li
                   key={item.key}
-                  className={`remirror-mention-atom-popup-item flex w-[12rem] items-center justify-between ${
+                  className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center justify-between ${
                     indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
                   } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
                   {...getItemProps({ item, index })}>
