@@ -114,13 +114,13 @@ export function EntitiesView() {
           <div className="w-fit">
             <Button
               icon={IconEnum.add}
-              label="Create new graph"
+              label={`Create new ${entityName}`}
               onClick={() =>
                 setDrawer((prev) => ({
                   ...prev,
                   data: { project_id },
-                  title: "Create new graph",
-                  type: "graphs",
+                  title: `Create new ${entityName}`,
+                  type: "documents",
                   size: "lg",
                 }))
               }
