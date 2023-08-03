@@ -317,6 +317,7 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
 
         setDrawer((prev) => {
           if (prev?.data?.id) {
+            if (prev?.data?.id === rest.id) return prev;
             createNotification({
               title: "Please close the drawer for the current node before editing another.",
               variant: "info",
