@@ -1,9 +1,9 @@
 import { useResetAtom } from "jotai/utils";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useHandleChange } from "../../../hooks";
-import { AvailableEntityType } from "../../../types";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { AvailableEntityType, TagType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, Input } from "../../Form";
 
@@ -13,12 +13,41 @@ type Props = {
     type: AvailableEntityType;
   };
 };
+type ExistingFolderType = { id?: string; project_id: string; is_folder: boolean; title: string; tags: TagType[] };
 
 export function FolderDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const [folder, setFolder] = useState({ title: "", is_folder: true, project_id: project_id as string });
+  const [folder, setFolder] = useState<ExistingFolderType>({
+    title: "",
+    project_id: project_id as string,
+    is_folder: true,
+    tags: [],
+  });
 
-  const { mutateAsync: createFolder } = useCreateEntity(data.type);
+  const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity(data.type);
+  const { mutateAsync: updateFolder, isLoading: isUpdating } = useUpdateEntity<{
+    data: { id: string; title: string };
+    relations: { tags: { id: string }[] };
+  }>(data.type, project_id as string);
+  const { data: existingFolder } = useGetEntity<ExistingFolderType>(
+    data?.id,
+    data.type,
+    {
+      data: {},
+      fields: ["id", "is_folder", "title"],
+      relations: { tags: true },
+    },
+    {
+      enabled: !!data?.id,
+    },
+  );
+
+  useLayoutEffect(() => {
+    if (existingFolder?.data) {
+      setFolder(existingFolder?.data);
+    }
+  }, [existingFolder]);
+
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { changedData, handleChange } = useHandleChange({ data: folder, setData: setFolder });
   return (
@@ -26,54 +55,30 @@ export function FolderDrawer({ data }: Props) {
       <Input label="Title (required)" name="title" onChange={handleChange} value={folder.title} />
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        // isDisabled={isSaveDisabled({ title: document?.title }) || isCreating || isUpdating}
-        // isLoading={isCreating || isUpdating}
+        isDisabled={!folder.title || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (changedData) {
-            await createFolder(
-              { data: folder },
-              {
-                onSuccess: resetDrawerAtom,
-              },
-            );
+            if (data?.id) {
+              await updateFolder(
+                {
+                  data: { id: data.id, title: folder.title },
+                  relations: { tags: folder.tags },
+                },
+                {
+                  onSuccess: resetDrawerAtom,
+                },
+              );
+            } else {
+              await createFolder(
+                { data: folder },
+                {
+                  onSuccess: resetDrawerAtom,
+                },
+              );
+            }
           }
-          //     if (document?.id) {
-          //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          //       const documentToUpdate = { ...(changedData || {}), id: document.id };
-          //       const { alter_names, tags, ...rest } = documentToUpdate;
-          //       const parsedData = UpdateDocumentSchema.parse({
-          //         data: rest,
-          //         relations: { tags, alter_names },
-          //       });
-          //       await update(parsedData, {
-          //         onSuccess: (res) => {
-          //           // if (res?.ok) resetDrawerAtom();
-          //         },
-          //       });
-          //     } else {
-          //       const dataToParse = {
-          //         data: document,
-          //         relations: {
-          //           alter_names: document?.alter_names,
-          //           tags: document?.tags,
-          //         },
-          //       };
-          //       const parsedData = InsertDocumentSchema.parse(dataToParse);
-          //       await create(parsedData, {
-          //         onSuccess: (res) => {
-          //           // if (res?.ok) resetDrawerAtom();
-          //         },
-          //       });
-          //     }
-          //   } else {
-          //     createNotification({
-          //       variant: "info",
-          //       icon: IconEnum.info_circle,
-          //       title: "No data was changed.",
-          //       timer: 3,
-          //     });
-          //   }
         }}
         variant="success"
       />
