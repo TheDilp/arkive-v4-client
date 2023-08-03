@@ -80,6 +80,7 @@ export function Input({
       {label ? <div className={labelClasses()}>{label}</div> : null}
 
       <input
+        autoComplete="off"
         className={input()}
         disabled={isDisabled}
         max={max}

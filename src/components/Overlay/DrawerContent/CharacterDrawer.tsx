@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -205,7 +205,7 @@ export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string
 
   const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
     }

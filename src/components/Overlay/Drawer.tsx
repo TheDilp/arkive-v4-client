@@ -8,12 +8,12 @@ import { drawerAtom, IconEnum } from "../../utils";
 import { GraphDrawer } from "..";
 import { Button } from "../Form";
 import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
+import { DocumentDrawer } from "./DrawerContent/DocumentDrawer";
 import { EdgeDrawer } from "./DrawerContent/EdgeDrawer";
 import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
 import { NodeDrawer } from "./DrawerContent/NodeDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
-import { DocumentDrawer } from "./DrawerContent/DocumentDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -23,8 +23,8 @@ const DrawerClasses = tv({
   },
   variants: {
     size: {
-      sm: "w-full md:w-72",
-      md: "w-full md:w-96",
+      sm: "w-full md:w-[24rem]",
+      md: "w-full md:w-[28rem]",
       lg: "w-full md:w-[32rem]",
     },
     isOpen: {
