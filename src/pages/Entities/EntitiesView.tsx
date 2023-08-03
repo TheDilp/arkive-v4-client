@@ -179,7 +179,7 @@ export function EntitiesView() {
                   event,
                   items: [
                     {
-                      title: `Edit ${entityName}`,
+                      title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
                       onClick: () =>
                         setDrawer((prev) => ({
@@ -191,7 +191,7 @@ export function EntitiesView() {
                         })),
                     },
                     {
-                      title: `Delete ${entityName}`,
+                      title: `Delete ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.trash,
                       onClick: () =>
                         setDialog((prev) => ({
@@ -200,7 +200,7 @@ export function EntitiesView() {
                             ...item,
                             entity_title: type,
                           },
-                          title: `Delete ${entityName}`,
+                          title: `Delete ${item.is_folder ? "folder" : entityName}`,
                           size: "sm",
                           type: "delete_entity",
                         })),
@@ -223,7 +223,7 @@ export function EntitiesView() {
                   event,
                   items: [
                     {
-                      title: `Edit ${entityName}`,
+                      title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
                       onClick: () =>
                         setDrawer((prev) => ({
@@ -245,7 +245,7 @@ export function EntitiesView() {
                             parent_id: item_id,
                             entity_title: type,
                           },
-                          title: `Delete ${entityName}`,
+                          title: `Delete ${item.is_folder ? "folder" : entityName}`,
                           size: "sm",
                           type: "delete_entity",
                         })),
