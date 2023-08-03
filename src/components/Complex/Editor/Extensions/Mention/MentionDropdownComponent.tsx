@@ -14,7 +14,7 @@ export function MentionDropdownComponent() {
     items: options,
   });
 
-  const { data, isFetching } = useMentionsSearch<{
+  const { data, refetch, isFetching } = useMentionsSearch<{
     id: string;
     title: string;
     alterId?: string;
@@ -29,9 +29,13 @@ export function MentionDropdownComponent() {
     state?.name as SearchableMentionEntities,
     project_id as string,
     {
-      enabled: !!state?.name && state?.query?.full?.length >= 2 && !!filter && filter?.length > 2,
+      enabled: false,
     },
   );
+
+  useEffect(() => {
+    if (filter && filter.length >= 2) refetch();
+  }, [filter, refetch]);
 
   useEffect(() => {
     if (state && state?.query?.full?.length >= 2) {
