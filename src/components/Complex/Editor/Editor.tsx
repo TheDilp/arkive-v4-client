@@ -2,8 +2,9 @@ import "remirror/styles/all.css";
 import "../../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
 import { InvalidContentHandler, RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -15,6 +16,7 @@ import { MentionDropdownComponent } from "./Extensions/Mention";
 
 export function Editor({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
+  const queryClient = useQueryClient();
 
   const { data: currentDocument, isLoading } = useGetEntity<DocumentType>(
     item_id as string,
@@ -25,7 +27,7 @@ export function Editor({ editable }: { editable: boolean }) {
     },
     {
       enabled: !!editable && !!item_id,
-      staleTime: 5 * 60 * 1000,
+      staleTime: 1000,
     },
   );
   const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: string | undefined } }>(
@@ -46,6 +48,15 @@ export function Editor({ editable }: { editable: boolean }) {
     onError,
   });
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
+  useBlocker(() => {
+    if (changedData) {
+      const response = !window.confirm("You have unsaved changes, are you sure you want to leave?");
+      queryClient.removeQueries({ queryKey: ["documents", item_id] });
+      return response;
+    }
+    queryClient.removeQueries({ queryKey: ["documents", item_id] });
+    return false;
+  });
 
   if (!currentDocument && !isLoading) {
     return <Navigate to="../" />;
