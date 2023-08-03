@@ -64,7 +64,7 @@ export function EntitiesView() {
 
   if (type === "documents") fields.push("image_id");
 
-  const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType>(
+  const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,
