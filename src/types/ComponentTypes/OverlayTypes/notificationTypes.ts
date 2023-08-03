@@ -7,7 +7,7 @@ export interface NotificationType {
   icon?: string;
   variant?: Variant;
   actions?: {
-    label: string;
+    label?: string;
     onClick: () => void;
     icon?: string;
     variant?: Variant;

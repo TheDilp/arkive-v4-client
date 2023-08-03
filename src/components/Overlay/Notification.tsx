@@ -9,7 +9,7 @@ import { Icon } from "../Misc";
 
 const ToastClasses = tv({
   slots: {
-    base: "flex w-full overflow-hidden relative items-center  border-zinc-800 justify-between box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
+    base: "flex flex-col w-full overflow-hidden relative items-center  border-zinc-800 justify-between box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
     title: "text-sm font-normal",
     iconContainer: "mr-2 flex h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1  transition-all",
@@ -42,7 +42,7 @@ const ToastClasses = tv({
   },
 });
 
-export function Notification({ id, title, timer = 3, icon, variant = "primary" }: NotificationType) {
+export function Notification({ id, title, timer = 3, icon, variant = "primary", actions }: NotificationType) {
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
   useEffect(() => {
@@ -75,10 +75,21 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary" }
           <Icon fontSize={22} icon={icon} />
         </div>
       ) : null}
-      <div className={titleClasses()}>{title}</div>
-      <div className="ml-auto">
-        <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
+      <div className="flex justify-between">
+        <div className={titleClasses()}>{title}</div>
+        <div className="ml-auto">
+          <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
+        </div>
       </div>
+      {actions?.length ? (
+        <div className="flex min-w-fit gap-x-2">
+          {actions.map((action) => (
+            <div key={action.label}>
+              <Button icon={action?.icon} label={action?.label} onClick={action?.onClick} variant={action?.variant} />
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
