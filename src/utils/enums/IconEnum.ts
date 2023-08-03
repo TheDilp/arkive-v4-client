@@ -2,7 +2,7 @@ export const IconEnum = {
   // Item icons
   home: "ph:house",
   character: "ph:user",
-  document: "ph:files-light",
+  document: "ph:files-fill",
   folder: "ph:folder-light",
   map: "ph:map-trifold",
   map_pin: "ph:map-pin-light",
