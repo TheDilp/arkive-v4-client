@@ -4,7 +4,7 @@ import "../../../Editor.css";
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useCallback, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { Fragment, InvalidContentHandler, RemirrorContentType, RemirrorJSON } from "remirror";
+import { InvalidContentHandler, RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
@@ -12,7 +12,6 @@ import { IconEnum } from "../../../utils";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
-import omit from "lodash.omit";
 
 export function Editor({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
@@ -29,7 +28,7 @@ export function Editor({ editable }: { editable: boolean }) {
       staleTime: 5 * 60 * 1000,
     },
   );
-  const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: RemirrorJSON | undefined } }>(
+  const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: string | undefined } }>(
     "documents",
     project_id as string,
   );
@@ -40,7 +39,6 @@ export function Editor({ editable }: { editable: boolean }) {
     // Automatically remove all invalid nodes and marks.
     return transformers.remove(json, invalidContent);
   }, []);
-  console.log(currentDocument?.data?.content);
   const { manager, state, setState, getContext } = useRemirror({
     content: currentDocument?.data?.content ? currentDocument?.data?.content : undefined,
     extensions: () => DefaultEditorExtensions(),
@@ -70,6 +68,7 @@ export function Editor({ editable }: { editable: boolean }) {
                       content: JSON.stringify(editorData.content),
                     },
                   });
+                  resetChanges();
                 },
               },
               {
