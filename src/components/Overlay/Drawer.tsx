@@ -13,6 +13,7 @@ import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
 import { NodeDrawer } from "./DrawerContent/NodeDrawer";
 import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
 import { TagsDrawer } from "./DrawerContent/TagsDrawer";
+import { DocumentDrawer } from "./DrawerContent/DocumentDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -112,6 +113,7 @@ export function Drawer() {
         {drawer.type === "project" ? <ProjectDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
         {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
+        {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
