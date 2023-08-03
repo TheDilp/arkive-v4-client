@@ -46,15 +46,18 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary" }
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
   useEffect(() => {
-    setTimeout(() => {
-      removeNotification(setNotificationAtom, id);
-    }, timer * 1000 + 250);
-    const timeout2 = setTimeout(() => {
-      setTimeRemaining(false);
-    }, 100);
-    return () => {
-      clearTimeout(timeout2);
-    };
+    if (timer) {
+      setTimeout(() => {
+        removeNotification(setNotificationAtom, id);
+      }, timer * 1000 + 250);
+      const timeout2 = setTimeout(() => {
+        setTimeRemaining(false);
+      }, 100);
+      return () => {
+        clearTimeout(timeout2);
+      };
+    }
+    return () => {};
   }, []);
 
   const { base, title: titleClasses, progress, iconContainer } = ToastClasses({ variant });
