@@ -144,6 +144,18 @@ function TableColumnFilterList({
                     value={filt.value as string}
                   />
                 ) : null}
+                {filt.operator && !Array.isArray(filt.value) && filterType?.type === "number" ? (
+                  <Input
+                    name={`${type}[${index}].value`}
+                    onChange={({ name, value }) => handleChange({ name, value: parseFloat(value as string) })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !!filt.value) applyFilterFn();
+                    }}
+                    size="sm"
+                    type="number"
+                    value={filt.value as string}
+                  />
+                ) : null}
               </div>
               <div className="[&>button]:w-8">
                 <Button
