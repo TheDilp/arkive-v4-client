@@ -21,11 +21,8 @@ export function useUpdateEntity<InsertType extends { data: { id?: string; parent
     {
       onSettled: (data, _, vars) => {
         if (data.ok) {
-          if (vars?.data?.parent_id) {
-            queryClient.invalidateQueries([type, vars.data.parent_id]);
-          } else {
-            queryClient.invalidateQueries(["allEntities", project_id, type]);
-          }
+          queryClient.invalidateQueries([type, vars.data.parent_id]);
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
 
           createNotification({
             title: getEntityCRUDNotification(type, "update"),

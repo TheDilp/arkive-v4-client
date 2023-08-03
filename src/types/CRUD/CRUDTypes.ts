@@ -1,8 +1,8 @@
-export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "inArray" | "notInArray" | "ilike";
+export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "is" | "inArray" | "notInArray" | "ilike";
 
 export interface RequestFilterType {
   field: string;
-  value: string | number | string[] | number[] | boolean;
+  value: string | number | string[] | number[] | boolean | null;
   operator: RequestFilterTypes;
 }
 export type SortType = "asc" | "desc" | null;

@@ -1,3 +1,4 @@
+import { UseMutateFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { MouseEvent } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -5,7 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import { Breadcrumbs, Button, Dropdown, Graph, Icon, Skeleton } from "../../components";
 import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
-import { useChangeNavbarTitle, useGetAllEntities, useGetEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetAllEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
 import { capitalizeFirstLetter, contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
@@ -27,14 +28,51 @@ function ItemDisplay({
   icon,
   image_id,
   showContextMenu,
+  changeParent,
 }: EntityItemType & {
   type: AvailableEntityType;
+  changeParent: UseMutateFunction<
+    any,
+    unknown,
+    {
+      data: {
+        id?: string | undefined;
+        parent_id?: string | null | undefined;
+      };
+    },
+    unknown
+  >;
 
   showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
 }) {
   const { project_id } = useParams();
   return (
-    <Link to={`../${type}/${id}`}>
+    <Link
+      draggable
+      onDragLeave={(e) => {
+        e.preventDefault();
+        // eslint-disable-next-line no-param-reassign
+        e.currentTarget.className = "";
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        // eslint-disable-next-line no-param-reassign
+        if (is_folder) e.currentTarget.className = "text-blue-400";
+      }}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("item_move_data", id);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        if (!is_folder) {
+          return;
+        }
+        const child_id = e.dataTransfer.getData("item_move_data");
+        if (child_id === id) return;
+        changeParent({ data: { id: child_id, parent_id: id } });
+        e.dataTransfer.clearData("item_move_data");
+      }}
+      to={`../${type}/${id}`}>
       <div
         className="col-span-1 flex cursor-pointer flex-col items-center justify-center hover:text-blue-400"
         onContextMenu={(e) => {
@@ -74,6 +112,15 @@ export function EntitiesView() {
         project_id,
         item_id,
       },
+      filters: {
+        and: [
+          {
+            field: "parent_id",
+            operator: "is",
+            value: null,
+          },
+        ],
+      },
       fields,
       orderBy: {
         field: "is_folder",
@@ -106,6 +153,8 @@ export function EntitiesView() {
       staleTime: 5 * 60 * 1000,
     },
   );
+
+  const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
   const entityName = getEntityNameFromType(type as AvailableEntityType);
@@ -164,6 +213,7 @@ export function EntitiesView() {
           {(base?.data?.length ? base.data : []).map((item) => (
             <ItemDisplay
               key={item.id}
+              changeParent={changeParent}
               icon={item.icon}
               id={item.id}
               image_id={item?.image_id}
@@ -209,6 +259,7 @@ export function EntitiesView() {
           {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => (
             <ItemDisplay
               key={item.id}
+              changeParent={changeParent}
               icon={item.icon}
               id={item.id}
               is_folder={item?.is_folder ?? false}
