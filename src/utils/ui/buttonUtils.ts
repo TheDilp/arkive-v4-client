@@ -1,4 +1,4 @@
-import { Variant } from "@thearkive/types";
+import { Variant } from "../../types";
 
 export function getButtonGroupVariant(variant: Variant, label: string, value?: string): Variant {
   if (value) {
