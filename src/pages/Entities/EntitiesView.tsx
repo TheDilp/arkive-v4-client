@@ -54,6 +54,10 @@ export function EntitiesView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
 
+  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
+
+  if (type === "documents") fields.push("image_id");
+
   const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType>(
     {
       pagination: {
@@ -64,7 +68,7 @@ export function EntitiesView() {
         project_id,
         item_id,
       },
-      fields: ["id", "title", "icon", "is_folder", "parent_id"],
+      fields,
       orderBy: {
         field: "is_folder",
         sort: "desc",
@@ -88,7 +92,7 @@ export function EntitiesView() {
       relations: {
         children: true,
         parents: true,
-        ...{ nodes: true, edges: true },
+        ...(type === "graphs" ? { nodes: true, edges: true } : {}),
       },
     },
     {
