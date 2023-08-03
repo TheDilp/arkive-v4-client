@@ -119,7 +119,7 @@ export function EntitiesView() {
   return (
     <>
       <div className="flex h-10 items-center justify-between">
-        <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} />
+        <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} type={type as AvailableEntityType} />
         {!item_id || data?.data?.is_folder ? (
           <div className="w-fit">
             <Dropdown
@@ -154,13 +154,7 @@ export function EntitiesView() {
                   },
                 },
               ]}>
-              <Button
-                icon={IconEnum.add}
-                label="Create new"
-                onClick={undefined}
-
-                // }
-              />
+              <Button icon={IconEnum.add} label="Create new" onClick={undefined} />
             </Dropdown>
           </div>
         ) : null}
@@ -258,7 +252,7 @@ export function EntitiesView() {
             />
           ))}
           {!base?.data?.length && !data?.data?.children?.length && data?.data?.is_folder ? (
-            <div className="col-span-1 mt-2 md:col-span-4 lg:col-span-10">
+            <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
             </div>
           ) : null}
