@@ -1,9 +1,10 @@
+import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType, InsertDocumentType, UpdateDocumentType } from "../../../types";
-import { IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex";
 import { Button, Input, Search } from "../../Form";
@@ -35,6 +36,7 @@ export function DocumentDrawer({ data }: Props) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(0);
+  const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const { data: existingDocument } = useGetEntity<DocumentType>(
     data?.id,
@@ -204,9 +206,7 @@ export function DocumentDrawer({ data }: Props) {
                 relations: { tags, alter_names },
               });
               await update(parsedData, {
-                onSuccess: (res) => {
-                  // if (res?.ok) resetDrawerAtom();
-                },
+                onSuccess: resetDrawerAtom,
               });
             } else {
               const dataToParse = {
@@ -218,9 +218,7 @@ export function DocumentDrawer({ data }: Props) {
               };
               const parsedData = InsertDocumentSchema.parse(dataToParse);
               await create(parsedData, {
-                onSuccess: (res) => {
-                  // if (res?.ok) resetDrawerAtom();
-                },
+                onSuccess: resetDrawerAtom,
               });
             }
           } else {

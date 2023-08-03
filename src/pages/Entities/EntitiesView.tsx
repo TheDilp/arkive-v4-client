@@ -77,7 +77,7 @@ export function EntitiesView() {
       fields,
       orderBy: {
         field: "is_folder",
-        sort: "desc",
+        sort: "asc",
       },
     },
     type as AvailableEntityType,
