@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { MouseEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph, Icon, Skeleton } from "../../components";
+import { Breadcrumbs, Button, Dropdown, Graph, Icon, Skeleton } from "../../components";
 import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetAllEntities, useGetEntity } from "../../hooks";
@@ -122,19 +122,33 @@ export function EntitiesView() {
         <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} />
         {!item_id || data?.data?.is_folder ? (
           <div className="w-fit">
-            <Button
-              icon={IconEnum.add}
-              label={`Create new ${entityName}`}
-              onClick={() =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  data: { project_id },
-                  title: `Create new ${entityName}`,
-                  type: "documents",
-                  size: "lg",
-                }))
-              }
-            />
+            <Dropdown
+              allowedPlacements={["bottom-end"]}
+              items={[
+                {
+                  id: "1",
+                  label: `Create new ${entityName}`,
+                  icon: getDefaultEntityIcon(type as AvailableEntityType),
+                  onClick: () => {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      data: { project_id },
+                      title: `Create new ${entityName}`,
+                      type: "documents",
+                      size: "lg",
+                    }));
+                  },
+                },
+                { id: "2", label: "Create new folder", icon: IconEnum.folder },
+              ]}>
+              <Button
+                icon={IconEnum.add}
+                label="Create new"
+                onClick={undefined}
+
+                // }
+              />
+            </Dropdown>
           </div>
         ) : null}
       </div>
