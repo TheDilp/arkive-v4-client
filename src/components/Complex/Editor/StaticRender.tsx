@@ -3,6 +3,7 @@ import { ComponentType } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
+import { deleteObjectPropsRecursive } from "../../../utils";
 import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention";
 // import WordMention from "../Mention/WordMention";
 
@@ -87,7 +88,7 @@ const markMap: MarkMap = {
 
 export default function StaticRender({ content, isReadOnly }: { content: RemirrorJSON; isReadOnly?: boolean }) {
   const { project_id } = useParams();
-  const parsedContent = removeKeys(content, ["style", "resizable"]);
+  const parsedContent = deleteObjectPropsRecursive(content, ["style", "resizable"]);
   if (!parsedContent) return null;
   return (
     <div className="staticRendererContainer">

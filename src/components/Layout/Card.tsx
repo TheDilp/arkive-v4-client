@@ -105,7 +105,7 @@ export function CharacterCard({ id, first_name, last_name, portrait, is_favorite
 
 export function Card({ title, subtitle, children, image }: BaseCardType & { children: JSX.Element | JSX.Element[] | null }) {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-md bg-zinc-800 shadow">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-md bg-zinc-800 p-4 shadow">
       {image ? (
         <div className="mb-4 h-64 w-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${image})` }} />
       ) : null}
