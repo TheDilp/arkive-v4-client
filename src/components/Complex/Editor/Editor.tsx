@@ -4,17 +4,18 @@ import "../../../Editor.css";
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useCallback, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { Fragment, InvalidContentHandler, RemirrorContentType } from "remirror";
+import { Fragment, InvalidContentHandler, RemirrorContentType, RemirrorJSON } from "remirror";
 
-import { useChangeNavbarTitle, useGetEntity, useHandleChange } from "../../../hooks";
+import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
+import omit from "lodash.omit";
 
 export function Editor({ editable }: { editable: boolean }) {
-  const { item_id } = useParams();
+  const { project_id, item_id } = useParams();
 
   const { data: currentDocument, isLoading } = useGetEntity<DocumentType>(
     item_id as string,
@@ -28,6 +29,10 @@ export function Editor({ editable }: { editable: boolean }) {
       staleTime: 5 * 60 * 1000,
     },
   );
+  const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: RemirrorJSON | undefined } }>(
+    "documents",
+    project_id as string,
+  );
   const [editorData, setEditorData] = useState({ content: undefined });
   useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
@@ -35,9 +40,9 @@ export function Editor({ editable }: { editable: boolean }) {
     // Automatically remove all invalid nodes and marks.
     return transformers.remove(json, invalidContent);
   }, []);
-
+  console.log(currentDocument?.data?.content);
   const { manager, state, setState, getContext } = useRemirror({
-    content: currentDocument?.data?.content || undefined,
+    content: currentDocument?.data?.content ? currentDocument?.data?.content : undefined,
     extensions: () => DefaultEditorExtensions(),
     selection: "start",
     onError,
@@ -54,7 +59,19 @@ export function Editor({ editable }: { editable: boolean }) {
         <div className="absolute right-4 top-2 animate-in slide-in-from-right-10 duration-300 ease-out">
           <Notification
             actions={[
-              { icon: IconEnum.save, label: "Save", variant: "success", onClick: () => {} },
+              {
+                icon: IconEnum.save,
+                label: "Save",
+                variant: "success",
+                onClick: () => {
+                  updateDocument({
+                    data: {
+                      id: item_id as string,
+                      content: JSON.stringify(editorData.content),
+                    },
+                  });
+                },
+              },
               {
                 icon: IconEnum.close,
                 label: "Discard",
@@ -81,7 +98,7 @@ export function Editor({ editable }: { editable: boolean }) {
             return;
           }
           setState(params.state);
-          if (params.tr?.docChanged) handleChange({ name: "content", value: params.state.toJSON() });
+          if (params.tr?.docChanged) handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}
         state={state}>
         {/* <MenuBar /> */}

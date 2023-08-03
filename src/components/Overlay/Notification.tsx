@@ -9,9 +9,9 @@ import { Icon } from "../Misc";
 
 const ToastClasses = tv({
   slots: {
-    base: "flex flex-col w-full overflow-hidden relative items-center  border-zinc-800 justify-between box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
+    base: "flex flex-col w-full max-w-fit overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
     title: "text-sm font-normal",
-    iconContainer: "mr-2 flex h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
+    iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1  transition-all",
   },
   variants: {
@@ -70,12 +70,12 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary", 
           transition: `width ${timer}s linear`,
         }}
       />
-      {icon ? (
-        <div className={iconContainer()}>
-          <Icon fontSize={22} icon={icon} />
-        </div>
-      ) : null}
-      <div className="flex justify-between">
+      <div className="flex w-fit items-center justify-between">
+        {icon ? (
+          <div className={iconContainer()}>
+            <Icon fontSize={22} icon={icon} />
+          </div>
+        ) : null}
         <div className={titleClasses()}>{title}</div>
         <div className="ml-auto">
           <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
