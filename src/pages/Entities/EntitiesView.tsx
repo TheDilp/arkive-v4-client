@@ -129,7 +129,7 @@ export function EntitiesView() {
     },
     type as AvailableEntityType,
     {
-      enabled: !item_id,
+      enabled: !item_id && !!type && type !== "characters",
       staleTime: 5 * 60 * 1000,
     },
   );
