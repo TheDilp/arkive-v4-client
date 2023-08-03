@@ -26,6 +26,7 @@ function DefaultTooltip({ children }: DefaultTooltipType) {
 
 export function Tooltip({
   allowedPlacements,
+  delay,
   children,
   content,
   isDisabled,
@@ -58,7 +59,8 @@ export function Tooltip({
       enabled: !isClickable ?? true,
       handleClose: isIgnoringHover ? null : safePolygon(),
       delay: {
-        open: 250,
+        open: delay?.openDelay || 250,
+        close: delay?.closeDelay || 0,
       },
     }),
     useClick(context, {

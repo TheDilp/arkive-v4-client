@@ -4,6 +4,10 @@ import { PositionType } from "../../baseTypes";
 
 export type TooltipContentType = string | JSX.Element | null;
 export interface TooltipType {
+  delay?: {
+    closeDelay?: number;
+    openDelay?: number;
+  };
   allowedPlacements?: PositionType;
   content: TooltipContentType;
   children: JSX.Element;
