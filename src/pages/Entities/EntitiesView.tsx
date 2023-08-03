@@ -186,8 +186,8 @@ export function EntitiesView() {
                           ...prev,
                           size: "sm",
                           title: `Edit ${entityName} - ${item.title}`,
-                          type: type as AvailableEntityType,
-                          data: { id },
+                          type: item.is_folder ? "folder" : (type as AvailableEntityType),
+                          data: { id, type },
                         })),
                     },
                     {
@@ -230,8 +230,8 @@ export function EntitiesView() {
                           ...prev,
                           size: "md",
                           title: `Edit ${entityName} - ${item.title}`,
-                          type: type as AvailableEntityType,
-                          data: { id, parent_id: item_id },
+                          type: item.is_folder ? "folder" : (type as AvailableEntityType),
+                          data: { id, parent_id: item_id, type },
                         })),
                     },
                     {
