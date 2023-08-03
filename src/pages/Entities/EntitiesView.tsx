@@ -7,7 +7,7 @@ import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetAllEntities, useGetEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
-import { capitalizeFirstLetter, contextMenuAtom, dialogAtom, drawerAtom, IconEnum } from "../../utils";
+import { capitalizeFirstLetter, contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
@@ -16,7 +16,7 @@ type EntityItemType = {
   is_folder: boolean | null;
   title: string;
   icon?: string | null;
-  // image?: string;
+  image_id?: string;
 };
 
 function ItemDisplay({
@@ -25,12 +25,14 @@ function ItemDisplay({
   title,
   type,
   icon,
+  image_id,
   showContextMenu,
 }: EntityItemType & {
   type: AvailableEntityType;
 
   showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
 }) {
+  const { project_id } = useParams();
   return (
     <Link to={`../${type}/${id}`}>
       <div
@@ -39,8 +41,12 @@ function ItemDisplay({
           e.preventDefault();
           showContextMenu(e as any, id);
         }}>
-        <div className="pointer-events-none">
-          <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
+        <div className="pointer-events-none h-24 w-24">
+          {image_id ? (
+            <img alt={title} className="object-contain" src={getImageURL(project_id as string, "images", image_id)} />
+          ) : (
+            <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
+          )}
         </div>
         <span className="max-w-full truncate font-lato text-white hover:text-white">{title}</span>
       </div>
@@ -81,7 +87,7 @@ export function EntitiesView() {
     },
   );
 
-  const { data, isFetching } = useGetEntity<BaseEntityType>(
+  const { data, isFetching } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
     {
@@ -139,6 +145,7 @@ export function EntitiesView() {
               key={item.id}
               icon={item.icon}
               id={item.id}
+              image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
               showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                 setContextMenuAtom({

@@ -2,6 +2,9 @@ import { AvailableEntityType } from "../../types";
 import { IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType) {
+  if (type === "characters") return IconEnum.character;
+  if (type === "documents") return IconEnum.document;
+  if (type === "maps") return IconEnum.map;
   if (type === "graphs") return IconEnum.board;
   return IconEnum.error;
 }

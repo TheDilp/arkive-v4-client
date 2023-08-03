@@ -40,7 +40,7 @@ export function useCreateProject<InsertType>() {
 }
 
 export function useCreateEntity<
-  InsertType extends { data: { parent_id?: string; project_id: string }; relations?: { [key: string]: any } },
+  InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
 >(type: AvailableEntityType, isTemplate?: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
