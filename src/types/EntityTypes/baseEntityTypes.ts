@@ -4,7 +4,7 @@ export interface BaseEntityType {
   project_id: string;
   parent_id: string | null;
   parents?: { id: string; title: string; parent_id: string | null }[];
-  children?: BaseEntityType[];
+  children?: (BaseEntityType & { image_id?: string })[];
   is_folder: boolean | null;
   is_public: boolean | null;
   icon: string | null;

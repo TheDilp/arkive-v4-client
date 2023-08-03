@@ -262,6 +262,7 @@ export function EntitiesView() {
               changeParent={changeParent}
               icon={item.icon}
               id={item.id}
+              image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
               showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                 setContextMenuAtom({
