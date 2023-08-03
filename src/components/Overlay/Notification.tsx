@@ -9,7 +9,7 @@ import { Icon } from "../Misc";
 
 const ToastClasses = tv({
   slots: {
-    base: "flex flex-col w-full max-w-fit overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 p-4 text-white shadow ",
+    base: "flex flex-col w-full max-w-fit overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 p-4 text-white shadow animate-in slide-in-from-right-10 duration-300 ease-out",
     title: "text-sm font-normal",
     iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1  transition-all",
@@ -97,9 +97,9 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary", 
 export function NotificationContainer() {
   const notifications = useAtomValue(notificationsAtom);
   return (
-    <div className="pointer-events-none absolute z-[999999] flex w-full flex-col items-end gap-y-4 p-4">
+    <div className="pointer-events-none absolute right-4 top-2 z-[999999] flex w-full flex-col items-end gap-y-4">
       {notifications.map((n) => (
-        <div key={n.id} className="pointer-events-auto w-96">
+        <div key={n.id} className="pointer-events-auto w-fit">
           <Notification {...n} />
         </div>
       ))}
