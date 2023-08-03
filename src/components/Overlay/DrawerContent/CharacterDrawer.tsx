@@ -1,4 +1,5 @@
 import { useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -7,6 +8,7 @@ import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeVa
 import {
   BaseCharacterRelationshipOptionsEnum,
   dialogAtom,
+  drawerAtom,
   getCharacterFullName,
   IconEnum,
   sortEntities,
@@ -164,10 +166,11 @@ const tabs = [
   { id: "4", label: "Tags", icon: IconEnum.tags },
 ];
 
-export function CharacterDrawer({ data, resetDrawerAtom }: { data: { id?: string }; resetDrawerAtom: () => void }) {
+export function CharacterDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDialog = useSetAtom(dialogAtom);
+  const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
   const { data: existingCharacter } = useGetEntity<CharacterType>(
     data?.id,

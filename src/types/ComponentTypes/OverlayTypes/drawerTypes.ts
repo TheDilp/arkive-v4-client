@@ -6,6 +6,7 @@ import { ContextMenuItemType } from "./contextMenuTypes";
 export type DrawerContentType =
   | null
   | AllAvailableEntities
+  | "folder"
   | "full_search"
   | "many_nodes"
   | "many_edges"

@@ -124,7 +124,7 @@ function FieldRow({
   );
 }
 
-export default function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
+export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create } = useCreateEntity<{

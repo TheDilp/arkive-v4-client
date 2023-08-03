@@ -1,16 +1,18 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 
-import { Button, Input } from "../../Form";
-import { CreateType } from "../../../types/utilTypes";
-import { ProjectType } from "../../../types/EntityTypes/projectTypes";
 import { useCreateProject, useHandleChange } from "../../../hooks";
-import { IconEnum } from "../../../utils";
+import { ProjectType } from "../../../types/EntityTypes/projectTypes";
+import { CreateType } from "../../../types/utilTypes";
+import { drawerAtom, IconEnum } from "../../../utils";
+import { Button, Input } from "../../Form";
 
-export function ProjectDrawer({ data, resetDrawerAtom }: { data: CreateType<ProjectType>; resetDrawerAtom: () => void }) {
+export function ProjectDrawer({ data }: { data: CreateType<ProjectType> }) {
   const ownerId = localStorage.getItem("ownerId");
   const [project, setProject] = useState<CreateType<ProjectType>>({ ...data, ownerId: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
   const { mutateAsync } = useCreateProject<CreateType<ProjectType>>();
+  const resetDrawerAtom = useResetAtom(drawerAtom);
   return (
     <>
       <Input

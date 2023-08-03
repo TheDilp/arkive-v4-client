@@ -5,15 +5,17 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { drawerAtom, IconEnum } from "../../utils";
-import { GraphDrawer } from "..";
+import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
-import { CharacterDrawer } from "./DrawerContent/CharacterDrawer";
-import { DocumentDrawer } from "./DrawerContent/DocumentDrawer";
-import { EdgeDrawer } from "./DrawerContent/EdgeDrawer";
-import FieldTemplateDrawer from "./DrawerContent/FieldTemplateDrawer";
-import { NodeDrawer } from "./DrawerContent/NodeDrawer";
-import { ProjectDrawer } from "./DrawerContent/ProjectDrawer";
-import { TagsDrawer } from "./DrawerContent/TagsDrawer";
+import {
+  CharacterDrawer,
+  DocumentDrawer,
+  EdgeDrawer,
+  FieldTemplateDrawer,
+  NodeDrawer,
+  ProjectDrawer,
+  TagsDrawer,
+} from "./DrawerContent";
 
 const DrawerClasses = tv({
   slots: {
@@ -110,9 +112,10 @@ export function Drawer() {
         </div>
       </h3>
       <div className="flex h-[calc(100%-6rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
-        {drawer.type === "project" ? <ProjectDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
-        {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} resetDrawerAtom={resetDrawerAtom} /> : null}
+        {drawer.type === "project" ? <ProjectDrawer data={drawer.data} /> : null}
+        {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
         {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
+        {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
         {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}

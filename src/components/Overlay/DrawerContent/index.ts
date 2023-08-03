@@ -1,5 +1,9 @@
 export * from "./CharacterDrawer";
-export { default as FieldTemplateDrawer } from "./FieldTemplateDrawer";
+export * from "./DocumentDrawer";
+export * from "./EdgeDrawer";
+export * from "./FieldTemplateDrawer";
+export * from "./FolderDrawer";
 export * from "./GraphDrawer";
+export * from "./NodeDrawer";
 export * from "./ProjectDrawer";
 export * from "./TagsDrawer";

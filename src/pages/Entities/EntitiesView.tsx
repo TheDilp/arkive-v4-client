@@ -139,7 +139,20 @@ export function EntitiesView() {
                     }));
                   },
                 },
-                { id: "2", label: "Create new folder", icon: IconEnum.folder },
+                {
+                  id: "2",
+                  label: "Create new folder",
+                  icon: IconEnum.folder,
+                  onClick: () => {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: `Create new ${entityName} folder`,
+                      data: { project_id, type },
+                      type: "folder",
+                      size: "sm",
+                    }));
+                  },
+                },
               ]}>
               <Button
                 icon={IconEnum.add}
