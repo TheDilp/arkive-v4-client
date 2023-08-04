@@ -3,7 +3,7 @@ import "../../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
 import { InvalidContentHandler, RemirrorContentType } from "remirror";
 
@@ -42,12 +42,12 @@ export function Editor({ editable }: { editable: boolean }) {
     return transformers.remove(json, invalidContent);
   }, []);
   const { manager, state, setState, getContext } = useRemirror({
-    content: currentDocument?.data?.content ? currentDocument?.data?.content : undefined,
     extensions: () => DefaultEditorExtensions(),
     selection: "start",
     onError,
   });
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
+
   useBlocker(() => {
     if (changedData) {
       const response = !window.confirm("You have unsaved changes, are you sure you want to leave?");
@@ -58,9 +58,18 @@ export function Editor({ editable }: { editable: boolean }) {
     return false;
   });
 
+  useLayoutEffect(() => {
+    if (currentDocument?.data?.content) {
+      setTimeout(() => {
+        manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
+      }, 10);
+    }
+  }, [currentDocument]);
+
   if (!currentDocument && !isLoading) {
     return <Navigate to="../" />;
   }
+  if (isLoading) return "LOADING...";
 
   return (
     <>
@@ -94,7 +103,7 @@ export function Editor({ editable }: { editable: boolean }) {
             ]}
             id={currentDocument?.data?.id || crypto.randomUUID()}
             timer={0}
-            title="You have unsaved changes"
+            title="You have unsaved changes. Press CTRL/CMD+S to save."
             variant="info"
           />
         </div>
@@ -113,7 +122,7 @@ export function Editor({ editable }: { editable: boolean }) {
         state={state}>
         {/* <MenuBar /> */}
 
-        <div className="flex h-[calc(100%-6rem)] w-full flex-1 rounded border border-zinc-800">
+        <div className="flex h-[calc(85%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:h-[calc(100%-2rem)]">
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onDrop={(e) => {

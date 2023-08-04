@@ -311,7 +311,6 @@ export function EntitiesView() {
           ) : null}
         </div>
       ) : null}
-      {console.log(!!item_id)}
       {!!item_id && !data?.data?.is_folder && type === "documents" ? <Editor editable /> : null}
       {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph data={data?.data as GraphType} /> : null}
     </>
