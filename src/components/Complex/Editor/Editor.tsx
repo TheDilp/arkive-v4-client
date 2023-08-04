@@ -23,6 +23,7 @@ export function Editor({ editable }: { editable: boolean }) {
   const {
     data: currentDocument,
     isFetching,
+    isRefetching,
     refetch,
   } = useGetEntity<DocumentType>(
     item_id as string,
@@ -74,9 +75,9 @@ export function Editor({ editable }: { editable: boolean }) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
       setTimeout(() => {
         manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
-      }, 10);
+      }, 1);
     }
-  }, [currentDocument]);
+  }, [currentDocument, isRefetching]);
 
   if (!currentDocument && !isFetching) {
     return <Navigate to="../" />;
@@ -108,9 +109,8 @@ export function Editor({ editable }: { editable: boolean }) {
                 label: "Discard",
                 variant: "primary",
                 onClick: () => {
-                  // resetChanges();
+                  resetChanges();
                   refetch();
-                  getContext()?.setContent((currentDocument?.data?.content ?? undefined) as RemirrorContentType);
                 },
               },
             ]}
