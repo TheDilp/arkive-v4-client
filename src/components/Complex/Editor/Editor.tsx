@@ -12,6 +12,7 @@ import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } 
 import { DocumentType } from "../../../types";
 import { breadcrumbsAtom, IconEnum } from "../../../utils";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
+import { Skeleton } from "../../Misc";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
 
@@ -77,6 +78,7 @@ export function Editor({ editable }: { editable: boolean }) {
   if (!currentDocument && !isLoading) {
     return <Navigate to="../" />;
   }
+  if (isLoading) return <Skeleton type="editor" />;
 
   return (
     <>
