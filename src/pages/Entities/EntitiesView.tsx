@@ -1,14 +1,22 @@
 import { UseMutateFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { MouseEvent } from "react";
+import { MouseEvent, useLayoutEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Dropdown, Graph, Icon, Skeleton } from "../../components";
+import { Breadcrumbs, Button, Dropdown, Graph, Icon } from "../../components";
 import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetAllEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
-import { capitalizeFirstLetter, contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../utils";
+import {
+  breadcrumbsAtom,
+  capitalizeFirstLetter,
+  contextMenuAtom,
+  dialogAtom,
+  drawerAtom,
+  getImageURL,
+  IconEnum,
+} from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
 
@@ -94,16 +102,15 @@ function ItemDisplay({
 
 export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
-  const params = useParams();
-  console.log(params);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
 
   if (type === "documents") fields.push("image_id");
 
-  const { data: base, isFetching: isFetchingRoot } = useGetAllEntities<BaseEntityType & { image_id?: string }>(
+  const { data: base } = useGetAllEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,
@@ -135,14 +142,14 @@ export function EntitiesView() {
     },
   );
 
-  const { data, isFetching } = useGetEntity<BaseEntityType & { image_id?: string }>(
+  const { data } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
     {
       data: {
         project_id,
       },
-
+      fields: ["id", "title", "is_folder", "icon", "image_id"],
       relations: {
         children: true,
         parents: true,
@@ -162,12 +169,20 @@ export function EntitiesView() {
 
   useChangeNavbarTitle(`The Arkive | ${capitalizeFirstLetter(type || "")}`);
 
+  useLayoutEffect(() => {
+    if (!item_id) {
+      setBreadcrumbs({ items: [], type: type as AvailableEntityType });
+    } else if (data?.data?.parents && data?.data?.parents?.length) {
+      setBreadcrumbs({ items: data?.data?.parents, type: type as AvailableEntityType });
+    }
+  }, [data, type, setBreadcrumbs, item_id]);
+
   if (!item_id && type === "characters") return <CharactersView />;
 
   return (
     <>
       <div className="flex h-10 items-center justify-between">
-        <Breadcrumbs items={data?.data?.parents?.length ? data.data.parents : []} type={type as AvailableEntityType} />
+        <Breadcrumbs />
         {!item_id || data?.data?.is_folder ? (
           <div className="w-fit">
             <Dropdown

@@ -3,13 +3,14 @@ import "../../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { useCallback, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
 import { InvalidContentHandler, RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { breadcrumbsAtom, IconEnum } from "../../../utils";
 import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
@@ -24,7 +25,11 @@ export function Editor({ editable }: { editable: boolean }) {
     {
       data: {},
       fields: ["id", "title", "content"],
+      relations: {
+        parents: true,
+      },
     },
+
     {
       enabled: !!editable && !!item_id,
       staleTime: 1000,
@@ -36,6 +41,7 @@ export function Editor({ editable }: { editable: boolean }) {
     project_id as string,
   );
   const [editorData, setEditorData] = useState({ content: undefined });
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const onError: InvalidContentHandler = useCallback(({ json, invalidContent, transformers }) => {
@@ -61,6 +67,7 @@ export function Editor({ editable }: { editable: boolean }) {
 
   useLayoutEffect(() => {
     if (currentDocument?.data?.content) {
+      setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
       setTimeout(() => {
         manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
       }, 10);
@@ -70,7 +77,6 @@ export function Editor({ editable }: { editable: boolean }) {
   if (!currentDocument && !isLoading) {
     return <Navigate to="../" />;
   }
-  if (isLoading) return "LOADING...";
 
   return (
     <>
@@ -123,7 +129,7 @@ export function Editor({ editable }: { editable: boolean }) {
         state={state}>
         {/* <MenuBar /> */}
 
-        <div className="flex h-[calc(85%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:h-[calc(100%-2rem)]">
+        <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:h-[calc(100%-2rem)]">
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onDrop={(e) => {

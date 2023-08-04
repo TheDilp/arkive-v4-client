@@ -1,13 +1,12 @@
+import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 
-import { AvailableEntityType } from "../../types";
-import { IconEnum } from "../../utils";
+import { breadcrumbsAtom, IconEnum } from "../../utils";
 import { Icon } from "..";
 
-type Props = { items: { id: string; title: string }[]; type: AvailableEntityType };
-
-export function Breadcrumbs({ items = [], type }: Props) {
+export function Breadcrumbs() {
+  const { items, type } = useAtomValue(breadcrumbsAtom);
   return (
     <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2 truncate">
       <Link to={`../${type}`}>
