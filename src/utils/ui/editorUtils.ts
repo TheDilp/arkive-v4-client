@@ -2,7 +2,7 @@ import { PlaceholderExtension, useHelpers, useKeymap } from "@remirror/react";
 import { saveAs } from "file-saver";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { AnyExtension, EditorState } from "remirror";
+import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
 import {
   BlockquoteExtension,
   BoldExtension,
@@ -105,8 +105,11 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     // new TableExtension({ resizable: true }),
   ];
 };
-
-export const editorHooks = [
+export function onError({ json, invalidContent, transformers }: InvalidContentHandlerProps) {
+  // Automatically remove all invalid nodes and marks.
+  return transformers.remove(json, invalidContent);
+}
+export const editorHooks = (resetChanges: () => void) => [
   () => {
     const { getJSON, getText, getHTML } = useHelpers();
     const { project_id, item_id } = useParams();
@@ -119,12 +122,17 @@ export const editorHooks = [
     );
     const handleSaveShortcut = useCallback(
       ({ state }: { state: EditorState }) => {
-        mutate({
-          data: {
-            id: item_id as string,
-            content: getJSON(state),
+        mutate(
+          {
+            data: {
+              id: item_id as string,
+              content: JSON.stringify(getJSON(state)),
+            },
           },
-        });
+          {
+            onSuccess: resetChanges,
+          },
+        );
         return true; // Prevents any further key handlers from being run.
       },
       [getJSON, item_id],

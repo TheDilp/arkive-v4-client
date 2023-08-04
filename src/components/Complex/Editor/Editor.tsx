@@ -4,14 +4,14 @@ import "../../../Editor.css";
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
-import { InvalidContentHandler, RemirrorContentType } from "remirror";
+import { RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
 import { breadcrumbsAtom, IconEnum } from "../../../utils";
-import { DefaultEditorExtensions, editorHooks } from "../../../utils/ui/editorUtils";
+import { DefaultEditorExtensions, editorHooks, onError } from "../../../utils/ui/editorUtils";
 import { Skeleton } from "../../Misc";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
@@ -20,7 +20,11 @@ export function Editor({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
 
-  const { data: currentDocument, isLoading } = useGetEntity<DocumentType>(
+  const {
+    data: currentDocument,
+    isFetching,
+    refetch,
+  } = useGetEntity<DocumentType>(
     item_id as string,
     "documents",
     {
@@ -37,23 +41,22 @@ export function Editor({ editable }: { editable: boolean }) {
       queryKeyConcat: ["content"],
     },
   );
+
   const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: string | undefined } }>(
     "documents",
     project_id as string,
   );
+
   const [editorData, setEditorData] = useState({ content: undefined });
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
-  const onError: InvalidContentHandler = useCallback(({ json, invalidContent, transformers }) => {
-    // Automatically remove all invalid nodes and marks.
-    return transformers.remove(json, invalidContent);
-  }, []);
   const { manager, state, setState, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(),
     selection: "start",
     onError,
   });
+
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
 
   useBlocker(() => {
@@ -75,10 +78,10 @@ export function Editor({ editable }: { editable: boolean }) {
     }
   }, [currentDocument]);
 
-  if (!currentDocument && !isLoading) {
+  if (!currentDocument && !isFetching) {
     return <Navigate to="../" />;
   }
-  if (isLoading) return <Skeleton type="editor" />;
+  if (isFetching) return <Skeleton type="editor" />;
 
   return (
     <>
@@ -105,7 +108,8 @@ export function Editor({ editable }: { editable: boolean }) {
                 label: "Discard",
                 variant: "primary",
                 onClick: () => {
-                  resetChanges();
+                  // resetChanges();
+                  refetch();
                   getContext()?.setContent((currentDocument?.data?.content ?? undefined) as RemirrorContentType);
                 },
               },
@@ -119,7 +123,7 @@ export function Editor({ editable }: { editable: boolean }) {
       ) : null}
       <Remirror
         editable={editable}
-        hooks={editorHooks}
+        hooks={editorHooks(resetChanges)}
         manager={manager}
         onChange={(params) => {
           if (params.firstRender) {
