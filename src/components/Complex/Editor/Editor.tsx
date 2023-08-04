@@ -28,6 +28,7 @@ export function Editor({ editable }: { editable: boolean }) {
     {
       enabled: !!editable && !!item_id,
       staleTime: 1000,
+      queryKeyConcat: ["content"],
     },
   );
   const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: string | undefined } }>(
@@ -97,7 +98,7 @@ export function Editor({ editable }: { editable: boolean }) {
                 variant: "primary",
                 onClick: () => {
                   resetChanges();
-                  getContext()?.setContent(currentDocument?.data?.content as RemirrorContentType);
+                  getContext()?.setContent((currentDocument?.data?.content ?? undefined) as RemirrorContentType);
                 },
               },
             ]}

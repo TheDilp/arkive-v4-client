@@ -14,10 +14,17 @@ export function useGetEntity<EntityType>(
   id: string | undefined,
   type: AvailableEntityType,
   body: RequestBodyType,
-  options?: UseQueryOptions,
+  options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
+  let queryKey = [type, id];
+  if (options?.queryKeyConcat) {
+    queryKey = queryKey.concat(options.queryKeyConcat);
+  }
+  if (options?.queryKeyOverwrite) {
+    queryKey = options.queryKeyOverwrite;
+  }
   return useQuery<{ data: EntityType }>(
-    [type, id],
+    queryKey,
     async () =>
       FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type.toLowerCase()}/${id}` }),
     {
@@ -61,16 +68,9 @@ export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOp
 export function useGetAllEntities<ReturnType>(
   request: RequestBodyType,
   type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean },
+  options?: UseQueryOptions<any> & { prefetch?: boolean; queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
-  const baseQueryKey = [
-    "allEntities",
-    request.data.project_id,
-    type,
-    request.data?.item_id,
-    request?.filters,
-    request?.orderBy,
-  ];
+  let baseQueryKey = ["allEntities", request.data.project_id, type, request.data?.item_id, request?.filters, request?.orderBy];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
@@ -108,12 +108,22 @@ export function useGetAllEntities<ReturnType>(
       ...configuredOptions,
     });
   }
+  if (typeof request?.pagination?.page === "number") {
+    baseQueryKey = baseQueryKey.concat(request?.pagination);
+  }
 
-  return useQuery<{ data: ReturnType[] }, unknown>(
-    typeof request?.pagination?.page === "number" ? baseQueryKey.concat(request?.pagination) : baseQueryKey,
-    async () => queryFn(request),
-    { ...configuredOptions, ...options },
-  );
+  if (options?.queryKeyConcat) {
+    baseQueryKey = baseQueryKey.concat(options.queryKeyOverwrite);
+  }
+
+  if (options?.queryKeyOverwrite) {
+    baseQueryKey = options.queryKeyOverwrite;
+  }
+
+  return useQuery<{ data: ReturnType[] }, unknown>(baseQueryKey, async () => queryFn(request), {
+    ...configuredOptions,
+    ...options,
+  });
 }
 export function useGetSubEntities<ReturnType>(
   request: { data: { project_id: string; parentId: string } },

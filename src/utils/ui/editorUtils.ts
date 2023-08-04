@@ -32,6 +32,18 @@ import { DocumentType } from "../../types";
 
 export const DefaultEditorExtensions: () => AnyExtension[] = () => {
   const CustomMentionExtension = new MentionAtomExtension({
+    extraAttributes: {
+      alterId: {
+        default: null,
+        parseDOM: (dom) => dom.getAttribute("data-alterId"),
+        toDOM: () => ["data-alterId"],
+      },
+      projectId: {
+        default: null,
+        parseDOM: (dom) => dom.getAttribute("data-projectId"),
+        toDOM: () => ["data-projectId"],
+      },
+    },
     matchers: [
       {
         char: "@",

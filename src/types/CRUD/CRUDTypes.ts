@@ -21,7 +21,12 @@ export type RequestColumnsType = {
 };
 
 export type RequestRelationsType = {
-  [key: string]: boolean;
+  [key: string]:
+    | boolean
+    | {
+        and?: RequestFilterType[];
+        or?: RequestFilterType[];
+      };
 };
 
 export interface ResponseType<DataType = []> {

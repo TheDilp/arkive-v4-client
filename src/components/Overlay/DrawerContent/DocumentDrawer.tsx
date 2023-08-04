@@ -203,8 +203,12 @@ export function DocumentDrawer({ data }: Props) {
               const { alter_names, tags, ...rest } = documentToUpdate;
               const parsedData = UpdateDocumentSchema.parse({
                 data: rest,
-                relations: { tags, alter_names },
+                relations: {
+                  tags,
+                  alter_names: alter_names.map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
+                },
               });
+
               await update(parsedData, {
                 onSuccess: resetDrawerAtom,
               });

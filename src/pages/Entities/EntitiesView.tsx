@@ -164,8 +164,6 @@ export function EntitiesView() {
 
   if (!item_id && type === "characters") return <CharactersView />;
 
-  if (isFetchingRoot || isFetching) return <Skeleton type="breadcrumbs" />;
-
   return (
     <>
       <div className="flex h-10 items-center justify-between">

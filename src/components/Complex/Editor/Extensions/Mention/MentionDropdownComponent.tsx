@@ -34,13 +34,10 @@ export function MentionDropdownComponent() {
   );
 
   useEffect(() => {
-    if (filter && filter.length >= 2) refetch();
-  }, [filter, refetch]);
-
-  useEffect(() => {
     if (state && state?.query?.full?.length >= 2) {
       const timeout = setTimeout(() => {
         setFilter(state.query.full.toLowerCase());
+        refetch();
       }, 400);
       return () => {
         clearTimeout(timeout);
@@ -56,9 +53,9 @@ export function MentionDropdownComponent() {
       setOptions(
         data?.data.map((item) => {
           return {
-            key: item.id,
-            id: item.id,
-            alterId: item?.alterId ? item.alterId : null,
+            key: item?.alterId || item.id,
+            id: item?.parent_id || item.id,
+            alterId: item?.alterId ?? null,
             label: item.title,
             projectId: project_id,
           };

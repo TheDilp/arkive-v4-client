@@ -11,6 +11,7 @@ export function MentionReactComponent({ node }: Props) {
 
   if (node?.attrs) {
     const { id, name, label, alterId } = node.attrs;
+
     if (name === "documents")
       return <DocumentMention alterId={alterId} id={id} label={label} project_id={project_id} title={label} />;
     if (name === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
