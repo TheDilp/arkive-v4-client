@@ -164,7 +164,7 @@ function DropdownItem({ id, label, icon, onClick, subitems }: DropdownItemType) 
         <div className="select-none truncate">{label}</div>
         {subitems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
         {icon && !subitems?.length ? (
-          <div className="ml-3 flex min-w-[22px] justify-end">
+          <div className="ml-auto flex min-w-[22px] justify-end">
             <Icon fontSize={20} icon={icon} />
           </div>
         ) : null}
