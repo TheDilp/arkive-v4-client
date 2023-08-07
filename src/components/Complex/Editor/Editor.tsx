@@ -15,6 +15,7 @@ import { DefaultEditorExtensions, editorHooks, onError } from "../../../utils/ui
 import { Skeleton } from "../../Misc";
 import { Notification } from "../../Overlay";
 import { MentionDropdownComponent } from "./Extensions/Mention";
+import { Menubar } from "./Menubar";
 
 export function Editor({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
@@ -142,7 +143,7 @@ export function Editor({ editable }: { editable: boolean }) {
         state={state}>
         {/* <MenuBar /> */}
 
-        <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:h-[calc(100%-2rem)]">
+        <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]">
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onDrop={(e) => {
@@ -154,6 +155,7 @@ export function Editor({ editable }: { editable: boolean }) {
                 getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
               }
             }}>
+            <Menubar />
             <EditorComponent />
 
             <MentionDropdownComponent />
