@@ -95,13 +95,20 @@ export function Editor({ editable }: { editable: boolean }) {
                 label: "Save",
                 variant: "success",
                 onClick: () => {
-                  updateDocument({
-                    data: {
-                      id: item_id as string,
-                      content: JSON.stringify(editorData.content),
+                  updateDocument(
+                    {
+                      data: {
+                        id: item_id as string,
+                        content: JSON.stringify(editorData.content),
+                      },
                     },
-                  });
-                  resetChanges();
+                    {
+                      onSuccess: () => {
+                        queryClient.invalidateQueries(["documents", item_id, "mention"]);
+                        resetChanges();
+                      },
+                    },
+                  );
                 },
               },
               {

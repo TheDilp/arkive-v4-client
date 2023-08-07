@@ -20,7 +20,7 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
     id as string,
     "documents",
     { data: {}, fields: ["id", "title", "content"] },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["content"] },
+    { enabled: !!id, queryKeyConcat: ["mention"] },
   );
   return (
     <Card title={title || "TEST"}>
