@@ -1,68 +1,66 @@
 import { FloatingWrapper, useMentionAtom } from "@remirror/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useDebouncedCallback } from "use-debounce";
 
-import { useMentionsSearch } from "../../../../../hooks";
-import { SearchableMentionEntities } from "../../../../../types";
+import { baseURLS, FetchFunction } from "../../../../../utils";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
   const [options, setOptions] = useState<{ key: string; id: string; label: string; displayLabel?: string }[]>([]);
-  const [filter, setFilter] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
 
   const { state, getMenuProps, getItemProps, indexIsHovered, indexIsSelected } = useMentionAtom({
     items: options,
   });
 
-  const { data, refetch, isFetching } = useMentionsSearch<{
-    id: string;
-    title: string;
-    alterId?: string;
-    parent_id?: string;
-  }>(
-    {
-      data: {
-        search_term: filter,
-      },
-      limit: 10,
-    },
-    state?.name as SearchableMentionEntities,
-    project_id as string,
-    {
-      enabled: false,
-    },
-  );
-
-  useEffect(() => {
-    if (state && state?.query?.full?.length >= 2) {
-      const timeout = setTimeout(() => {
-        setFilter(state.query.full.toLowerCase());
-        refetch();
-      }, 400);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-    setOptions([]);
-
-    return () => {};
-  }, [state]);
-
-  useEffect(() => {
-    if (data?.data && !isFetching) {
-      setOptions(
-        data?.data.map((item) => {
+  const search = useDebouncedCallback(async () => {
+    setIsFetching(true);
+    const items: {
+      data: { key: string; id: string; title: string; displayLabel?: string; parentId?: string; translation?: string }[];
+    } = await FetchFunction({
+      url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
+      method: "POST",
+      body: JSON.stringify({
+        data: {
+          search_term: state?.query?.full,
+        },
+        limit: 5,
+      }),
+    });
+    setIsFetching(false);
+    setOptions(
+      items.data
+        .sort()
+        .map((item) => {
+          if (item?.translation)
+            return {
+              key: item.id,
+              id: item?.parentId || item.id,
+              searchItem: item.translation,
+              label: item.title,
+              displayLabel: `${item.title} (${item.translation})`,
+              projectId: project_id,
+            };
           return {
-            key: item?.alterId || item.id,
-            id: item?.parent_id || item.id,
-            alterId: item?.alterId ?? null,
+            key: item.id,
+            id: item?.parentId || item.id,
+            alterId: item?.parentId ? item.id : null,
             label: item.title,
             projectId: project_id,
           };
-        }),
-      );
+        })
+        .slice(0, 10),
+    );
+  }, 700);
+
+  useEffect(() => {
+    if (state && state?.query?.full?.length >= 3) {
+      search();
+    } else {
+      setOptions([]);
     }
-  }, [data]);
+  }, [state?.query?.full]);
 
   return (
     <FloatingWrapper
@@ -81,7 +79,10 @@ export function MentionDropdownComponent() {
                   className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center justify-between ${
                     indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
                   } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
-                  {...getItemProps({ item, index })}>
+                  {...getItemProps({
+                    item,
+                    index,
+                  })}>
                   {item?.displayLabel || item.label}
                 </li>
               );

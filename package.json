@@ -24,6 +24,7 @@
     "react-router-dom": "^6.14.1",
     "remirror": "^2.0.34",
     "tailwind-variants": "^0.1.12",
+    "use-debounce": "^9.0.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
