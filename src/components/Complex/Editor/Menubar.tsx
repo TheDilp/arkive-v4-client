@@ -16,7 +16,7 @@ const menuBarIcons = [
         id: "heading_1",
         icon: IconEnum.heading_one,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 1",
       },
       {
@@ -24,7 +24,7 @@ const menuBarIcons = [
 
         icon: IconEnum.heading_two,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 2",
       },
       {
@@ -32,14 +32,14 @@ const menuBarIcons = [
 
         icon: IconEnum.heading_three,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 3",
       },
       {
         id: "heading_4",
         icon: IconEnum.heading_four,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 4",
       },
       {
@@ -47,14 +47,14 @@ const menuBarIcons = [
 
         icon: IconEnum.heading_five,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 5",
       },
       {
         id: "heading_6",
         icon: IconEnum.heading_six,
         action: () => {},
-        iconThickness: "light",
+        iconThickness: "light" as const,
         label: "Heading 6",
       },
     ],
@@ -71,29 +71,28 @@ const menuBarIcons = [
         icon: IconEnum.text_align_left,
         action: () => {},
         label: "Align left",
-        iconThickness: "light",
-        iconThickness: "light",
+        iconThickness: "light" as const,
       },
       {
         id: "align_text_center",
         icon: IconEnum.text_align_center,
         action: () => {},
         label: "Align center",
-        iconThickness: "light",
+        iconThickness: "light" as const,
       },
       {
         id: "align_text_right",
         icon: IconEnum.text_align_right,
         action: () => {},
         label: "Align right",
-        iconThickness: "light",
+        iconThickness: "light" as const,
       },
       {
         id: "align_text_justify",
         icon: IconEnum.text_align_justify,
         action: () => {},
         label: "Align justify",
-        iconThickness: "light",
+        iconThickness: "light" as const,
       },
     ],
   },
@@ -144,12 +143,12 @@ export function Menubar() {
           {item?.subItems?.length ? (
             <Dropdown items={item?.subItems}>
               <div className="flex items-center">
-                <Button hasNoBackground icon={item.icon} isIconOnly />
+                <Button hasNoBackground icon={item.icon} isIconOnly onClick={undefined} />
                 <Icon icon={IconEnum.chevron_down} />
               </div>
             </Dropdown>
           ) : (
-            <Button hasNoBackground icon={item.icon} isIconOnly />
+            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.action} />
           )}
         </div>
       ))}
