@@ -4,36 +4,141 @@ import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
 
 const menuBarIcons = [
-  { icon: IconEnum.text_bold, action: () => {} },
-  { icon: IconEnum.text_italic, action: () => {} },
-  { icon: IconEnum.text_underline, action: () => {} },
+  { id: "text_bold", icon: IconEnum.text_bold, action: () => {} },
+  { id: "text_italic", icon: IconEnum.text_italic, action: () => {} },
+  { id: "text_underline", icon: IconEnum.text_underline, action: () => {} },
   {
+    id: "heading",
     icon: IconEnum.heading,
     action: undefined,
     subItems: [
-      { icon: IconEnum.heading_one, action: () => {}, label: "Heading 1" },
-      { icon: IconEnum.heading_two, action: () => {}, label: "Heading 2" },
-      { icon: IconEnum.heading_three, action: () => {}, label: "Heading 3" },
-      { icon: IconEnum.heading_four, action: () => {}, label: "Heading 4" },
-      { icon: IconEnum.heading_five, action: () => {}, label: "Heading 5" },
-      { icon: IconEnum.heading_six, action: () => {}, label: "Heading 6" },
+      {
+        id: "heading_1",
+        icon: IconEnum.heading_one,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 1",
+      },
+      {
+        id: "heading_2",
+
+        icon: IconEnum.heading_two,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 2",
+      },
+      {
+        id: "heading_3",
+
+        icon: IconEnum.heading_three,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 3",
+      },
+      {
+        id: "heading_4",
+        icon: IconEnum.heading_four,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 4",
+      },
+      {
+        id: "heading_5",
+
+        icon: IconEnum.heading_five,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 5",
+      },
+      {
+        id: "heading_6",
+        icon: IconEnum.heading_six,
+        action: () => {},
+        iconThickness: "light",
+        label: "Heading 6",
+      },
+    ],
+  },
+
+  {
+    id: "align_text",
+    icon: IconEnum.text_align_justify,
+    action: undefined,
+    label: "Align text",
+    subItems: [
+      {
+        id: "align_text_left",
+        icon: IconEnum.text_align_left,
+        action: () => {},
+        label: "Align left",
+        iconThickness: "light",
+        iconThickness: "light",
+      },
+      {
+        id: "align_text_center",
+        icon: IconEnum.text_align_center,
+        action: () => {},
+        label: "Align center",
+        iconThickness: "light",
+      },
+      {
+        id: "align_text_right",
+        icon: IconEnum.text_align_right,
+        action: () => {},
+        label: "Align right",
+        iconThickness: "light",
+      },
+      {
+        id: "align_text_justify",
+        icon: IconEnum.text_align_justify,
+        action: () => {},
+        label: "Align justify",
+        iconThickness: "light",
+      },
     ],
   },
   {
-    icon: IconEnum.text_align_justify,
+    id: "bullet_list",
+    icon: IconEnum.bullet_list,
+    action: undefined,
+  },
+  {
+    id: "numbered_list",
+    icon: IconEnum.numbered_list,
+    action: undefined,
+  },
+
+  {
+    id: "callout",
+    icon: IconEnum.callout,
     action: undefined,
     subItems: [
-      { icon: IconEnum.text_align_left, action: () => {}, label: "Align left" },
-      { icon: IconEnum.text_align_center, action: () => {}, label: "Align center" },
-      { icon: IconEnum.text_align_right, action: () => {}, label: "Align right" },
-      { icon: IconEnum.text_align_justify, action: () => {}, label: "Align justify" },
+      { id: "callout_info", icon: IconEnum.info_circle, action: () => {}, label: "Info", iconColor: "#2563eb" },
+      { id: "callout_error", icon: IconEnum.error, action: () => {}, label: "Error", iconColor: "#b91c1c" },
+      { id: "callout_warning", icon: IconEnum.warning, action: () => {}, label: "Warning", iconColor: "#ea580c" },
+      { id: "callout_success", icon: IconEnum.check_circle, action: () => {}, label: "Success", iconColor: "#16a34a" },
     ],
+  },
+  {
+    id: "insert_image",
+    icon: IconEnum.image,
+    action: undefined,
+  },
+  {
+    id: "divider",
+    icon: IconEnum.divider,
+    action: undefined,
+  },
+  {
+    id: "secret",
+    icon: IconEnum.eye,
+    action: undefined,
   },
 ];
 
 export function Menubar() {
   return (
-    <ul className="mb-1 flex h-8 flex-nowrap items-center bg-zinc-800 px-3">
+    <ul className="mb-1 flex h-10 flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
       {menuBarIcons.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
