@@ -162,7 +162,7 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
   {
     id: "secret",
     icon: IconEnum.eye,
-    onClick: undefined,
+    onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
   },
 ];
 
