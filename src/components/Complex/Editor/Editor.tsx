@@ -84,7 +84,6 @@ export function Editor({ editable }: { editable: boolean }) {
     return <Navigate to="../" />;
   }
   if (isFetching) return <Skeleton type="editor" />;
-
   return (
     <>
       {changedData ? (
@@ -124,7 +123,7 @@ export function Editor({ editable }: { editable: boolean }) {
             ]}
             id={currentDocument?.data?.id || crypto.randomUUID()}
             timer={0}
-            title="You have unsaved changes. Press CTRL/CMD+S to save."
+            title="You have unsaved changes. Press CTRL/CMD+S to save, CTRL/CMD+K to discard changes."
             variant="info"
           />
         </div>
@@ -141,8 +140,6 @@ export function Editor({ editable }: { editable: boolean }) {
           if (params.tr?.docChanged) handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}
         state={state}>
-        {/* <MenuBar /> */}
-
         <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]">
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"

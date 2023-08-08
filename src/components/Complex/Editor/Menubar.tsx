@@ -1,21 +1,29 @@
+import { Remirror, useChainedCommands } from "@remirror/react";
+import { useMemo } from "react";
+import { AnyExtension, ChainedFromExtensions } from "remirror";
+
 import { IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
 
-const menuBarIcons = [
-  { id: "text_bold", icon: IconEnum.text_bold, action: () => {} },
-  { id: "text_italic", icon: IconEnum.text_italic, action: () => {} },
-  { id: "text_underline", icon: IconEnum.text_underline, action: () => {} },
+const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions> }) => [
+  { id: "text_bold", icon: IconEnum.text_bold, onClick: () => chain?.toggleBold()?.run() },
+  { id: "text_italic", icon: IconEnum.text_italic, onClick: () => chain?.toggleItalic()?.run() },
+  {
+    id: "text_underline",
+    icon: IconEnum.text_underline,
+    onClick: () => chain?.toggleUnderline()?.run(),
+  },
   {
     id: "heading",
     icon: IconEnum.heading,
-    action: undefined,
+    onClick: undefined,
     subItems: [
       {
         id: "heading_1",
         icon: IconEnum.heading_one,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 1 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 1",
       },
@@ -23,7 +31,7 @@ const menuBarIcons = [
         id: "heading_2",
 
         icon: IconEnum.heading_two,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 2 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 2",
       },
@@ -31,14 +39,14 @@ const menuBarIcons = [
         id: "heading_3",
 
         icon: IconEnum.heading_three,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 3 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 3",
       },
       {
         id: "heading_4",
         icon: IconEnum.heading_four,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 4 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 4",
       },
@@ -46,51 +54,50 @@ const menuBarIcons = [
         id: "heading_5",
 
         icon: IconEnum.heading_five,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 5 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 5",
       },
       {
         id: "heading_6",
         icon: IconEnum.heading_six,
-        action: () => {},
+        onClick: () => chain?.toggleHeading({ level: 6 })?.run(),
         iconThickness: "light" as const,
         label: "Heading 6",
       },
     ],
   },
-
   {
     id: "align_text",
     icon: IconEnum.text_align_justify,
-    action: undefined,
+    onClick: undefined,
     label: "Align text",
     subItems: [
       {
         id: "align_text_left",
         icon: IconEnum.text_align_left,
-        action: () => {},
+        onClick: () => chain?.leftAlign()?.run(),
         label: "Align left",
         iconThickness: "light" as const,
       },
       {
         id: "align_text_center",
         icon: IconEnum.text_align_center,
-        action: () => {},
+        onClick: () => chain?.centerAlign()?.run(),
         label: "Align center",
         iconThickness: "light" as const,
       },
       {
         id: "align_text_right",
         icon: IconEnum.text_align_right,
-        action: () => {},
+        onClick: () => chain?.rightAlign()?.run(),
         label: "Align right",
         iconThickness: "light" as const,
       },
       {
         id: "align_text_justify",
         icon: IconEnum.text_align_justify,
-        action: () => {},
+        onClick: () => chain?.justifyAlign()?.run(),
         label: "Align justify",
         iconThickness: "light" as const,
       },
@@ -99,46 +106,73 @@ const menuBarIcons = [
   {
     id: "bullet_list",
     icon: IconEnum.bullet_list,
-    action: undefined,
+    onClick: () => chain?.toggleBulletList()?.run(),
   },
   {
     id: "numbered_list",
     icon: IconEnum.numbered_list,
-    action: undefined,
+    onClick: () => chain?.toggleOrderedList()?.run(),
   },
 
   {
     id: "callout",
     icon: IconEnum.callout,
-    action: undefined,
+    onClick: undefined,
     subItems: [
-      { id: "callout_info", icon: IconEnum.info_circle, action: () => {}, label: "Info", iconColor: "#2563eb" },
-      { id: "callout_error", icon: IconEnum.error, action: () => {}, label: "Error", iconColor: "#b91c1c" },
-      { id: "callout_warning", icon: IconEnum.warning, action: () => {}, label: "Warning", iconColor: "#ea580c" },
-      { id: "callout_success", icon: IconEnum.check_circle, action: () => {}, label: "Success", iconColor: "#16a34a" },
+      {
+        id: "callout_info",
+        icon: IconEnum.info_circle,
+        onClick: () => chain?.toggleCallout({ type: "info" })?.run(),
+        label: "Info",
+        iconColor: "#60a5fa",
+      },
+      {
+        id: "callout_error",
+        icon: IconEnum.error,
+        onClick: () => chain?.toggleCallout({ type: "error" })?.run(),
+        label: "Error",
+        iconColor: "#b91c1c",
+      },
+      {
+        id: "callout_warning",
+        icon: IconEnum.warning,
+        onClick: () => chain?.toggleCallout({ type: "warning" })?.run(),
+        label: "Warning",
+        iconColor: "#fb923c",
+      },
+      {
+        id: "callout_success",
+        onClick: () => chain?.toggleCallout({ type: "success" })?.run(),
+        icon: IconEnum.check_circle,
+        label: "Success",
+        iconColor: "#4ade80",
+      },
     ],
   },
   {
     id: "insert_image",
     icon: IconEnum.image,
-    action: undefined,
+    onClick: undefined,
   },
   {
     id: "divider",
     icon: IconEnum.divider,
-    action: undefined,
+    onClick: undefined,
   },
   {
     id: "secret",
     icon: IconEnum.eye,
-    action: undefined,
+    onClick: undefined,
   },
 ];
 
 export function Menubar() {
+  const chain = useChainedCommands();
+
+  const items = useMemo(() => menuBarItems({ chain }), []);
   return (
     <ul className="mb-1 flex h-10 flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
-      {menuBarIcons.map((item) => (
+      {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
             <Dropdown items={item?.subItems}>
@@ -148,7 +182,7 @@ export function Menubar() {
               </div>
             </Dropdown>
           ) : (
-            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.action} />
+            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.onClick} />
           )}
         </div>
       ))}

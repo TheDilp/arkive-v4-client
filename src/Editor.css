@@ -2,7 +2,7 @@
   @apply flex-1 flex-col;
 }
 .remirror-editor.ProseMirror {
-  @apply h-full overflow-y-auto pt-0 !important;
+  @apply h-full overflow-y-auto pt-2 !important;
 }
 
 .remirror-editor,
