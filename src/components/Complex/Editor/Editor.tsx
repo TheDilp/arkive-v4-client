@@ -87,7 +87,7 @@ export function Editor({ editable }: { editable: boolean }) {
   return (
     <>
       {changedData ? (
-        <div className="absolute right-4 top-2 animate-in slide-in-from-right-10 duration-300 ease-out">
+        <div className="absolute right-4 top-2 z-50 animate-in slide-in-from-right-10 duration-300 ease-out">
           <Notification
             actions={[
               {
@@ -140,7 +140,7 @@ export function Editor({ editable }: { editable: boolean }) {
           if (params.tr?.docChanged) handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}
         state={state}>
-        <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]">
+        <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-6rem)]">
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onDrop={(e) => {

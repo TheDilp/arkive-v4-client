@@ -171,7 +171,7 @@ export function Menubar() {
 
   const items = useMemo(() => menuBarItems({ chain }), []);
   return (
-    <ul className="mb-1 flex h-10 flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
+    <ul className="mb-1 flex h-10 min-h-[2.5rem] flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
