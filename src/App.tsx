@@ -26,11 +26,11 @@ export default function App() {
         <ReactQueryDevtools position="top-left" />
         <Routes>
           <Route path="/projects/*">
-            <Route element={<ProjectsView />} path="" />
+            <Route element={<ProjectsView />} path="*" />
             <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<SettingsView />} path="settings/:type/*" />
-              <Route element={<EntitiesView />} path=":type" />
-              <Route element={<EntitiesView />} path=":type/:item_id" />
+              <Route element={<EntitiesView />} path=":type/*" />
+              <Route element={<EntitiesView />} path=":type/:item_id/*" />
             </Route>
           </Route>
         </Routes>
