@@ -134,6 +134,8 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                       <DropdownItem
                         key={dropdownItem.id}
                         icon={dropdownItem.icon}
+                        iconColor={dropdownItem?.iconColor}
+                        iconThickness={dropdownItem?.iconThickness}
                         id={dropdownItem.id}
                         label={dropdownItem.label}
                         onClick={() => {
@@ -156,7 +158,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   );
 }
 
-function DropdownItem({ id, label, icon, onClick, subitems }: DropdownItemType) {
+function DropdownItem({ id, label, icon, onClick, subitems, iconColor, iconThickness }: DropdownItemType) {
   const { dropdownItem: dropdownItemClasses } = DropdownClasses();
   return (
     <Dropdown key={id} items={subitems || []}>
@@ -165,7 +167,7 @@ function DropdownItem({ id, label, icon, onClick, subitems }: DropdownItemType) 
         {subitems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
         {icon && !subitems?.length ? (
           <div className="ml-auto flex min-w-[22px] justify-end">
-            <Icon fontSize={20} icon={icon} />
+            <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
           </div>
         ) : null}
       </div>
