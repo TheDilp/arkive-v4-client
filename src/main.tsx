@@ -16,15 +16,15 @@ gridguide(cytoscape);
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/*",
     element: <App />,
     children: [
       {
-        path: "/projects",
+        path: "projects/*",
         element: <ProjectsView />,
       },
       {
-        path: "/projects/:project_id/*",
+        path: "projects/:project_id/*",
         element: <ProjectLayout />,
         children: [
           {
