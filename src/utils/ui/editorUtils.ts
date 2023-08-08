@@ -1,4 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap } from "@remirror/react";
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -109,7 +110,18 @@ export function onError({ json, invalidContent, transformers }: InvalidContentHa
   // Automatically remove all invalid nodes and marks.
   return transformers.remove(json, invalidContent);
 }
-export const editorHooks = (resetChanges: () => void) => [
+export const editorHooks = (
+  changedData: any,
+  resetChanges: () => void,
+  refetch: (options?: (RefetchOptions & RefetchQueryFilters<unknown>) | undefined) => Promise<
+    QueryObserverResult<
+      {
+        data: DocumentType;
+      },
+      unknown
+    >
+  >,
+) => [
   () => {
     const { getJSON, getText, getHTML } = useHelpers();
     const { project_id, item_id } = useParams();
@@ -137,6 +149,13 @@ export const editorHooks = (resetChanges: () => void) => [
       },
       [getJSON, item_id],
     );
+    const handleCancelSaveShortcut = useCallback(() => {
+      if (changedData) {
+        resetChanges();
+        refetch();
+      }
+      return true;
+    }, [changedData]);
     const handleExportShortcut = useCallback(() => {
       const htmlString = getHTML();
       saveAs(
@@ -151,6 +170,7 @@ export const editorHooks = (resetChanges: () => void) => [
     // "Mod" means platform agnostic modifier key - i.e. Ctrl on Windows, or Cmd on MacOS
 
     useKeymap("Mod-s", handleSaveShortcut);
+    useKeymap("Mod-k", handleCancelSaveShortcut);
     useKeymap("Mod-e", handleExportShortcut);
   },
 ];

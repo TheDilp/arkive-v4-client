@@ -131,7 +131,7 @@ export function Editor({ editable }: { editable: boolean }) {
       ) : null}
       <Remirror
         editable={editable}
-        hooks={editorHooks(resetChanges)}
+        hooks={editorHooks(changedData, resetChanges, refetch)}
         manager={manager}
         onChange={(params) => {
           if (params.firstRender) {
