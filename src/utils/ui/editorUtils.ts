@@ -21,11 +21,11 @@ import {
   MentionAtomExtension,
   NodeFormattingExtension,
   OrderedListExtension,
-  // TableExtension,
   TaskListExtension,
   UnderlineExtension,
 } from "remirror/extensions";
 
+import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { useGetEntity, useUpdateEntity } from "../../hooks";
@@ -103,7 +103,13 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     new HardBreakExtension({}),
     new GapCursorExtension({}),
     new DropCursorExtension({}),
-    // new TableExtension({ resizable: true }),
+    // new TableExtension(),
+    new CustomTableExtension({
+      resizable: false,
+      resizeableOptions: {
+        cellMinWidth: 500,
+      },
+    }),
   ];
 };
 export function onError({ json, invalidContent, transformers }: InvalidContentHandlerProps) {

@@ -1,5 +1,5 @@
 import { Callout, Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
-import { ComponentType } from "react";
+import { ComponentType, ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -9,7 +9,7 @@ import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention"
 
 export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
 
-const typeMap = (project_id: string, isReadOnly?: boolean): MarkMap => ({
+const typeMap = (project_id: string): MarkMap => ({
   bulletList: "ul",
   doc: Doc,
   hardBreak: "br",
@@ -23,25 +23,26 @@ const typeMap = (project_id: string, isReadOnly?: boolean): MarkMap => ({
   callout: Callout,
   horizontalRule: "hr",
   image: "img",
-  // tableRow: (...props: any) => <div className="flex h-96 w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</div>,
-  // tableCell: (...props: any) => {
-  //   console.log(props?.[0]?.node?.attrs?.colwidth);
-  //   return (
-  //     <div className="h-full overflow-y-auto border" style={{ width: "33.3%" }}>
-  //       {props?.[0]?.children?.map((c: ReactElement) => (
-  //         <div className="max-w-sm break-all ">{c}</div>
-  //       ))}
-  //     </div>
-  //   );
-  // },
-  // tableHeaderCell: () => "test",
-  // table: (...props: any) => {
-  //   return (
-  //     <div className="w-full">
-  //       <div className="w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</div>
-  //     </div>
-  //   );
-  // },
+  table: (...props: any) => {
+    return (
+      <div className="h-min w-full">
+        <table className="">{props?.[0]?.children?.map((c: ReactElement) => c)}</table>
+      </div>
+    );
+  },
+  tableHeaderCell: (...props: any) => (
+    <th className="flex w-full items-center justify-center">{props?.[0]?.children?.map((c: ReactElement) => c)}</th>
+  ),
+  tableRow: (...props: any) => <tr className="flex w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</tr>,
+  tableCell: (...props: any) => {
+    return (
+      <td className="w-full overflow-y-auto border">
+        {props?.[0]?.children?.map((c: ReactElement) => (
+          <div className="max-w-sm break-all ">{c}</div>
+        ))}
+      </td>
+    );
+  },
 
   mentionAtom: (...props: any) => {
     if (props?.[0]?.node) {
@@ -50,15 +51,7 @@ const typeMap = (project_id: string, isReadOnly?: boolean): MarkMap => ({
         const { id, label, alterId, name: type } = attrs;
         if (type === "documents")
           return (
-            <DocumentMention
-              alterId={alterId}
-              id={id}
-              isDisabledTooltip
-              isReadOnly={isReadOnly}
-              label={label}
-              project_id={project_id}
-              title={label}
-            />
+            <DocumentMention alterId={alterId} id={id} isDisabledTooltip label={label} project_id={project_id} title={label} />
           );
 
         if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
@@ -86,17 +79,13 @@ const markMap: MarkMap = {
   link: "a",
 };
 
-export function StaticRender({ content, isReadOnly }: { content: RemirrorJSON; isReadOnly?: boolean }) {
+export function StaticRender({ content }: { content: RemirrorJSON }) {
   const { project_id } = useParams();
   const parsedContent = deleteObjectPropsRecursive(content, ["style", "resizable"]);
   if (!parsedContent) return null;
   return (
     <div className="staticRendererContainer">
-      <RemirrorRenderer
-        json={parsedContent as RemirrorJSON}
-        markMap={markMap}
-        typeMap={typeMap(project_id as string, isReadOnly)}
-      />
+      <RemirrorRenderer json={parsedContent as RemirrorJSON} markMap={markMap} typeMap={typeMap(project_id as string)} />
     </div>
   );
 }

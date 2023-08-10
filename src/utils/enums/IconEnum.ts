@@ -69,6 +69,7 @@ export const IconEnum = {
   text_align_center: "ph:text-align-center",
   text_align_left: "ph:text-align-left",
   text_align_right: "ph:text-align-right",
+  table_add: "ph:grid-nine",
   image_template: "ph:file-image",
   info_circle: "ph:info",
   link: "ph:link",

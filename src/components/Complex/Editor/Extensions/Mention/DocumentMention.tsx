@@ -24,7 +24,7 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
   );
   return (
     <Card title={title || "TEST"}>
-      <div className="h-96 w-96 overflow-y-auto whitespace-pre-line">
+      <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
         {data?.data?.content && !isLoading ? <StaticRender content={data.data.content as RemirrorJSON} /> : null}
       </div>
     </Card>

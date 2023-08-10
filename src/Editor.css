@@ -1,5 +1,5 @@
 .remirror-editor-wrapper {
-  @apply flex-1 flex-col;
+  @apply w-full max-w-full flex-1 flex-col;
 }
 .remirror-editor.ProseMirror {
   @apply h-full overflow-y-auto pt-2 !important;
@@ -53,6 +53,27 @@
   blockquote > * {
     @apply border-l-[3px] pl-2 font-merriweather text-2xl font-normal text-zinc-300 !important;
   }
+  table {
+    @apply table-fixed overflow-visible font-lato !important;
+    th {
+      @apply h-10 p-0 text-xl;
+
+      p {
+        @apply m-0 -mt-px flex h-full items-center justify-center text-center;
+      }
+    }
+    td {
+      @apply max-h-fit min-h-fit px-1 !important;
+    }
+
+    .selectedCell {
+      @apply bg-zinc-800 !important;
+    }
+  }
+
+  .remirror-table-controller-wrapper {
+    @apply hidden !important;
+  }
 
   *[data-node-text-align="none"]:not(blockquote) {
     @apply float-none;
@@ -94,6 +115,7 @@
       @apply accent-sky-400 filter-none !important;
     }
   }
+
   .secretBlock {
     border: solid 2px rgba(131, 238, 255, 0.5);
     background-color: rgba(131, 238, 255, 0.2);

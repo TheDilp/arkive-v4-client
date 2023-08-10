@@ -155,6 +155,19 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
     onClick: undefined,
   },
   {
+    id: "table",
+    icon: IconEnum.table,
+    onClick: undefined,
+    subItems: [
+      {
+        id: "create_basic_table",
+        icon: IconEnum.table_add,
+        label: "Create table",
+        onClick: () => chain?.createTable({ rowsCount: 3, columnsCount: 3, withHeaderRow: true })?.run(),
+      },
+    ],
+  },
+  {
     id: "divider",
     icon: IconEnum.divider,
     onClick: undefined,
