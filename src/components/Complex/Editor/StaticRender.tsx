@@ -37,12 +37,16 @@ const typeMap = (project_id: string): MarkMap => ({
   ),
   tableRow: (...props: any) => <tr className="flex w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</tr>,
   tableCell: (...props: any) => {
-    const id = crypto.randomUUID();
     return (
-      <td key={id} className="w-full overflow-y-auto border">
-        {props?.[0]?.children?.map((c: ReactElement) => (
-          <div className="max-w-sm break-all ">{c}</div>
-        ))}
+      <td className="w-full overflow-y-auto border">
+        {props?.[0]?.children?.map((c: ReactElement) => {
+          const id = crypto.randomUUID();
+          return (
+            <div key={id} className="max-w-sm break-all ">
+              {c}
+            </div>
+          );
+        })}
       </td>
     );
   },
