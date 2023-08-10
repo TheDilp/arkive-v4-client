@@ -61,7 +61,6 @@ export function MentionDropdownComponent() {
       setOptions([]);
     }
   }, [state?.query?.full]);
-
   return (
     <FloatingWrapper
       containerClass="commandMenu overflow-hidden"

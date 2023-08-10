@@ -33,6 +33,7 @@ import { DocumentType } from "../../types";
 
 export const DefaultEditorExtensions: () => AnyExtension[] = () => {
   const CustomMentionExtension = new MentionAtomExtension({
+    priority: 10,
     extraAttributes: {
       alterId: {
         default: null,
@@ -105,6 +106,7 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     new DropCursorExtension({}),
     // new TableExtension(),
     new CustomTableExtension({
+      priority: 0,
       resizable: false,
       resizeableOptions: {
         cellMinWidth: 500,

@@ -26,7 +26,9 @@ const typeMap = (project_id: string): MarkMap => ({
   table: (...props: any) => {
     return (
       <div className="h-min w-full">
-        <table className="">{props?.[0]?.children?.map((c: ReactElement) => c)}</table>
+        <table className="">
+          <tbody>{props?.[0]?.children?.map((c: ReactElement) => c)}</tbody>
+        </table>
       </div>
     );
   },
@@ -35,8 +37,9 @@ const typeMap = (project_id: string): MarkMap => ({
   ),
   tableRow: (...props: any) => <tr className="flex w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</tr>,
   tableCell: (...props: any) => {
+    const id = crypto.randomUUID();
     return (
-      <td className="w-full overflow-y-auto border">
+      <td key={id} className="w-full overflow-y-auto border">
         {props?.[0]?.children?.map((c: ReactElement) => (
           <div className="max-w-sm break-all ">{c}</div>
         ))}
@@ -81,7 +84,7 @@ const markMap: MarkMap = {
 
 export function StaticRender({ content }: { content: RemirrorJSON }) {
   const { project_id } = useParams();
-  const parsedContent = deleteObjectPropsRecursive(content, ["style", "resizable"]);
+  const parsedContent = deleteObjectPropsRecursive(content, ["style", "closed", "resizable", "nested"]);
   if (!parsedContent) return null;
   return (
     <div className="staticRendererContainer">
