@@ -12,6 +12,7 @@ export type DrawerContentType =
   | "many_edges"
   | "mention"
   | "insert_word"
+  | "insert_image"
   | "swatches"
   | "content_preview";
 

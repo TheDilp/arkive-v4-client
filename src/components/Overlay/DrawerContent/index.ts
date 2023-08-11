@@ -4,6 +4,7 @@ export * from "./EdgeDrawer";
 export * from "./FieldTemplateDrawer";
 export * from "./FolderDrawer";
 export * from "./GraphDrawer";
+export * from "./InsertEditorImageDrawer";
 export * from "./NodeDrawer";
 export * from "./ProjectDrawer";
 export * from "./TagsDrawer";

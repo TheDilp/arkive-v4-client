@@ -13,7 +13,6 @@ import {
   HardBreakExtension,
   HeadingExtension,
   HorizontalRuleExtension,
-  ImageExtension,
   ItalicExtension,
   LinkExtension,
   MarkdownExtension,
@@ -25,6 +24,7 @@ import {
 } from "remirror/extensions";
 
 import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
+import { CustomImageExtension } from "../../components/Complex/Editor/Extensions/CustomImageExtension";
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
@@ -69,6 +69,7 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
       },
     ],
   });
+
   CustomMentionExtension.ReactComponent = MentionReactComponent;
 
   return [
@@ -98,7 +99,7 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
       defaultTarget: "_blank",
       selectTextOnClick: true,
     }),
-    new ImageExtension({
+    new CustomImageExtension({
       enableResizing: true,
     }),
     new HorizontalRuleExtension({}),

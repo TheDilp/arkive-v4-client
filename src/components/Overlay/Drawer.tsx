@@ -12,6 +12,7 @@ import {
   DocumentDrawer,
   EdgeDrawer,
   FieldTemplateDrawer,
+  InsertEditorImageDrawer,
   NodeDrawer,
   ProjectDrawer,
   TagsDrawer,
@@ -121,6 +122,7 @@ export function Drawer() {
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
+        {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
       </div>
     </div>
   );

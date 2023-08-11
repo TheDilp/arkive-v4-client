@@ -1,8 +1,10 @@
-import { Remirror, useActive, useChainedCommands } from "@remirror/react";
+import { ReactFrameworkOutput, Remirror, useActive, useChainedCommands, useRemirrorContext } from "@remirror/react";
+import { useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { ColorPresets, IconEnum } from "../../../utils";
+import { Variant } from "../../../types";
+import { ColorPresets, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
@@ -10,33 +12,37 @@ import { Dropdown } from "../../Overlay";
 const menuBarItems = ({
   active,
   chain,
+  setDrawer,
+  getContext,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
+  setDrawer: (props: any) => void;
+  getContext: ReactFrameworkOutput<Remirror.Extensions>;
 }) => [
   {
     id: "text_bold",
     icon: IconEnum.text_bold,
     onClick: () => chain?.toggleBold()?.run(),
-    variant: active.bold() ? "info" : "primary",
+    variant: active.bold() ? ("info" as Variant) : ("primary" as Variant),
   },
   {
     id: "text_italic",
     icon: IconEnum.text_italic,
     onClick: () => chain?.toggleItalic()?.run(),
-    variant: active.italic() ? "info" : "primary",
+    variant: active.italic() ? ("info" as Variant) : ("primary" as Variant),
   },
   {
     id: "text_underline",
     icon: IconEnum.text_underline,
     onClick: () => chain?.toggleUnderline()?.run(),
-    variant: active.underline() ? "info" : "primary",
+    variant: active.underline() ? ("info" as Variant) : ("primary" as Variant),
   },
   {
     id: "heading",
     icon: IconEnum.heading,
     onClick: undefined,
-    variant: active.heading() ? "info" : "primary",
+    variant: active.heading() ? ("info" as Variant) : ("primary" as Variant),
 
     subItems: [
       {
@@ -126,26 +132,26 @@ const menuBarItems = ({
     id: "bullet_list",
     icon: IconEnum.bullet_list,
     onClick: () => chain?.toggleBulletList()?.run(),
-    variant: active.bulletList() ? "info" : "primary",
+    variant: active.bulletList() ? ("info" as Variant) : ("primary" as Variant),
   },
   {
     id: "numbered_list",
     icon: IconEnum.numbered_list,
     onClick: () => chain?.toggleOrderedList()?.run(),
-    variant: active.orderedList() ? "info" : "primary",
+    variant: active.orderedList() ? ("info" as Variant) : ("primary" as Variant),
   },
 
   {
     id: "callout",
     icon: IconEnum.callout,
     onClick: undefined,
-    variant: active.callout() ? "info" : "primary",
+    variant: active.callout() ? ("info" as Variant) : ("primary" as Variant),
     subItems: [
       {
         id: "callout_info",
         icon: IconEnum.info_circle,
-        onClick: () => chain?.toggleCallout({ type: "info" })?.run(),
-        label: "Info",
+        onClick: () => chain?.toggleCallout({ type: "info" as Variant })?.run(),
+        label: "Info" as Variant,
         iconColor: "#60a5fa",
       },
       {
@@ -190,13 +196,18 @@ const menuBarItems = ({
   {
     id: "insert_image",
     icon: IconEnum.image,
-    onClick: undefined,
+    onClick: () =>
+      setDrawer({
+        data: { getContext },
+        type: "insert_image",
+        size: "md",
+      }),
   },
   {
     id: "table",
     icon: IconEnum.table,
     onClick: undefined,
-    variant: active.table() ? "info" : "primary",
+    variant: active.table() ? ("info" as Variant) : ("primary" as Variant),
     subItems: [
       {
         id: "create_basic_table",
@@ -214,30 +225,42 @@ const menuBarItems = ({
   {
     id: "secret",
     icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
-    variant: active.secret() ? "info" : "primary",
-
+    variant: active.secret() ? ("info" as Variant) : ("primary" as Variant),
     onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
   },
 ];
 
 export function Menubar() {
   const chain = useChainedCommands();
-
+  const getContext = useRemirrorContext();
+  const setDrawer = useSetAtom(drawerAtom);
   const active = useActive();
-  const items = useMemo(() => menuBarItems({ active, chain }), [chain]);
+  const items = useMemo(() => menuBarItems({ active, chain, setDrawer, getContext }), [chain]);
   return (
-    <ul className="sticky top-0 z-50 mb-1 flex h-10 min-h-[2.5rem] flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
+    <ul className="sticky top-0 z-40 mb-1 flex h-10 min-h-[2.5rem] w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3">
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
             <Dropdown items={item?.subItems}>
               <div className="flex items-center">
-                <Button hasNoBackground icon={item.icon} isIconOnly onClick={undefined} variant={item?.variant || "primary"} />
+                <Button
+                  hasNoBackground
+                  icon={item.icon}
+                  isIconOnly
+                  onClick={undefined}
+                  variant={item?.variant || ("primary" as Variant)}
+                />
                 <Icon icon={IconEnum.chevron_down} />
               </div>
             </Dropdown>
           ) : (
-            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.onClick} variant={item?.variant || "primary"} />
+            <Button
+              hasNoBackground
+              icon={item.icon}
+              isIconOnly
+              onClick={item.onClick}
+              variant={item?.variant || ("primary" as Variant)}
+            />
           )}
         </div>
       ))}

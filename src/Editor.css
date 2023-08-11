@@ -74,6 +74,18 @@
     @apply hidden !important;
   }
 
+  p {
+    .remirror-resizable-view {
+      div {
+        @apply bg-transparent;
+      }
+    }
+  }
+
+  img {
+    @apply bg-transparent focus-visible:border-8 !important;
+  }
+
   *[data-node-text-align="none"]:not(blockquote) {
     @apply float-none;
   }

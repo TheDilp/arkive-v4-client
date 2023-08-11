@@ -86,7 +86,7 @@ export function Editor({ editable }: { editable: boolean }) {
   return (
     <div className="h-full w-full max-w-[95vw] pr-2.5">
       {changedData ? (
-        <div className="absolute right-4 top-2 z-50 animate-in slide-in-from-right-10 duration-300 ease-out">
+        <div className="absolute right-4 top-2 z-40 animate-in slide-in-from-right-10 duration-300 ease-out">
           <Notification
             actions={[
               {
@@ -139,7 +139,8 @@ export function Editor({ editable }: { editable: boolean }) {
           if (params.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
             handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}>
-        <div className="flex h-[calc(95%)] w-[calc(100vw)] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-6rem)]">
+        <div className="relative flex h-[calc(95%)] w-[calc(100vw)] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-6rem)]">
+          <Menubar />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onDrop={(e) => {
@@ -151,7 +152,6 @@ export function Editor({ editable }: { editable: boolean }) {
                 getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
               }
             }}>
-            <Menubar />
             <EditorComponent />
             <MentionDropdownComponent />
             {/* <CommandMenu /> */}
