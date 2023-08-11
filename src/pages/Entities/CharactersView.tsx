@@ -35,7 +35,7 @@ function createColumns(
 ) {
   return [
     columnHelper.display({
-      id: "imageId",
+      id: "portrait_id",
       header: "Portrait",
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">

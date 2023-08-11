@@ -141,7 +141,7 @@ export function getNodeImage(node: NodeType, project_id: string) {
     image = node.image_id;
   }
   if (image === null) return [];
-  if (image !== "") return getImageURL(project_id as string, "images", image);
+  if (image !== "") return getImageURL(project_id as string, "images", image, true);
   return [];
 }
 export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boolean) {
