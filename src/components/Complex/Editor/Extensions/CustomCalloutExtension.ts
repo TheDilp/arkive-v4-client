@@ -77,7 +77,8 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
         border-width: 0 0 0 ${type === "custom" ? 0 : 4}px;
         padding: 8px;
         border-top-left-radius: 0.25rem; 
-        border-bottom-left-radius: 0.25rem; 
+        border-bottom-left-radius: 0.25rem;
+        color: ${type === "custom" ? "white" : "black"}
         `,
       );
       dom.append(contentDOM);
@@ -140,7 +141,7 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
   createInputRules(): InputRule[] {
     return [
       nodeInputRule({
-        regexp: /^::: $/,
+        regexp: /^:::i$/,
         type: this.type,
         beforeDispatch: ({ tr, start }: { tr: any; start: number }) => {
           const $pos = tr.doc.resolve(start);
@@ -148,7 +149,46 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
         },
         getAttributes: () => {
           return {
-            secret: true,
+            type: "info",
+          };
+        },
+      }),
+      nodeInputRule({
+        regexp: /^:::e$/,
+        type: this.type,
+        beforeDispatch: ({ tr, start }: { tr: any; start: number }) => {
+          const $pos = tr.doc.resolve(start);
+          tr.setSelection(TextSelection.near($pos));
+        },
+        getAttributes: () => {
+          return {
+            type: "error",
+          };
+        },
+      }),
+      nodeInputRule({
+        regexp: /^:::w$/,
+        type: this.type,
+        beforeDispatch: ({ tr, start }: { tr: any; start: number }) => {
+          const $pos = tr.doc.resolve(start);
+          tr.setSelection(TextSelection.near($pos));
+        },
+        getAttributes: () => {
+          return {
+            type: "warning",
+          };
+        },
+      }),
+      nodeInputRule({
+        regexp: /^:::s$/,
+        type: this.type,
+        beforeDispatch: ({ tr, start }: { tr: any; start: number }) => {
+          const $pos = tr.doc.resolve(start);
+          tr.setSelection(TextSelection.near($pos));
+        },
+        getAttributes: () => {
+          return {
+            type: "success",
           };
         },
       }),

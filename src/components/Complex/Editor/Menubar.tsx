@@ -154,7 +154,7 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
           id: color,
           child: (
             <div
-              className="h-4 w-4 rounded-full"
+              className="m-2 h-5 w-5 rounded-full"
               style={{
                 backgroundColor: color,
               }}
