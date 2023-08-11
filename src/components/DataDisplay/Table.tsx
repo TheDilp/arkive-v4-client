@@ -58,7 +58,7 @@ const TableClasses = tv({
     content: "flex flex-1 items-center h-full truncate max-w-full px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 max-w-full sticky bottom-0 bg-zinc-950",
+      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
@@ -536,73 +536,73 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
           ) : (
             <Alert label="There's no content." variant="info" />
           )}
-        </div>
-        {pagination ? (
-          <div className={paginationContainer()}>
-            <div className={pageCountContainer()}>
-              <div className={pageCount()}>Page {(pagination?.page || 0) + 1} |</div>
-              <div className={showPageCount()}>
-                Show:
-                <div className={showPageCountSelectContainer()}>
-                  <Select
-                    name="limit"
-                    onChange={({ value }) => {
-                      if (value && !Array.isArray(value))
-                        dispatch({
-                          type: "setPagination",
-                          payload: { ...pagination, limit: parseInt(value, 10) },
-                        });
-                    }}
-                    options={[
-                      { label: "10", value: "10" },
-                      { label: "20", value: "20" },
-                      { label: "30", value: "30" },
-                      { label: "40", value: "40" },
-                      { label: "50", value: "50" },
-                      { label: "60", value: "60" },
-                      { label: "70", value: "70" },
-                      { label: "80", value: "80" },
-                      { label: "90", value: "90" },
-                      { label: "100", value: "100" },
-                    ]}
-                    size="sm"
-                    value={pagination?.limit?.toFixed() || "10"}
-                  />
+          {pagination ? (
+            <div className={paginationContainer()}>
+              <div className={pageCountContainer()}>
+                <div className={pageCount()}>Page {(pagination?.page || 0) + 1} |</div>
+                <div className={showPageCount()}>
+                  Show:
+                  <div className={showPageCountSelectContainer()}>
+                    <Select
+                      name="limit"
+                      onChange={({ value }) => {
+                        if (value && !Array.isArray(value))
+                          dispatch({
+                            type: "setPagination",
+                            payload: { ...pagination, limit: parseInt(value, 10) },
+                          });
+                      }}
+                      options={[
+                        { label: "10", value: "10" },
+                        { label: "20", value: "20" },
+                        { label: "30", value: "30" },
+                        { label: "40", value: "40" },
+                        { label: "50", value: "50" },
+                        { label: "60", value: "60" },
+                        { label: "70", value: "70" },
+                        { label: "80", value: "80" },
+                        { label: "90", value: "90" },
+                        { label: "100", value: "100" },
+                      ]}
+                      size="sm"
+                      value={pagination?.limit?.toFixed() || "10"}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className={paginationButtonsContainer()}>
-              <ButtonGroup
-                buttons={[
-                  {
-                    icon: IconEnum.chevron_left,
-                    isDisabled: pagination?.page === 0,
-                    onClick: () => {
-                      if (pagination?.page && pagination?.page > 0) {
+              <div className={paginationButtonsContainer()}>
+                <ButtonGroup
+                  buttons={[
+                    {
+                      icon: IconEnum.chevron_left,
+                      isDisabled: pagination?.page === 0,
+                      onClick: () => {
+                        if (pagination?.page && pagination?.page > 0) {
+                          dispatch({
+                            type: "setPagination",
+                            payload: { ...pagination, page: pagination.page - 1 },
+                          });
+                        }
+                      },
+                      variant: "secondary",
+                    },
+                    {
+                      icon: IconEnum.chevron_right,
+                      isDisabled: data.length < (pagination?.limit || 10),
+                      onClick: () =>
                         dispatch({
                           type: "setPagination",
-                          payload: { ...pagination, page: pagination.page - 1 },
-                        });
-                      }
+                          payload: { ...pagination, page: (pagination?.page || 0) + 1 },
+                        }),
+                      variant: "secondary",
                     },
-                    variant: "secondary",
-                  },
-                  {
-                    icon: IconEnum.chevron_right,
-                    isDisabled: data.length < (pagination?.limit || 10),
-                    onClick: () =>
-                      dispatch({
-                        type: "setPagination",
-                        payload: { ...pagination, page: (pagination?.page || 0) + 1 },
-                      }),
-                    variant: "secondary",
-                  },
-                ]}
-              />
+                  ]}
+                />
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </div>
   );
