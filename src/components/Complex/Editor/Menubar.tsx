@@ -2,7 +2,7 @@ import { Remirror, useChainedCommands } from "@remirror/react";
 import { useMemo } from "react";
 import { AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { IconEnum } from "../../../utils";
+import { ColorPresets, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
@@ -150,8 +150,18 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
       {
         id: "callout_custom",
         label: "Custom",
-        icon: IconEnum.brush,
-        onClick: () => chain?.toggleCallout({ type: "custom", customColor: "red" })?.run(),
+        subItems: ColorPresets.map((color) => ({
+          id: color,
+          child: (
+            <div
+              className="h-4 w-4 rounded-full"
+              style={{
+                backgroundColor: color,
+              }}
+            />
+          ),
+          onClick: () => chain?.toggleCallout({ type: "custom", customColor: color })?.run(),
+        })),
       },
     ],
   },

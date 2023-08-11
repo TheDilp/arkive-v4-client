@@ -1,5 +1,5 @@
 export const DefaultTagColor = "#1d4ed8";
-export const TagColors = [
+export const ColorPresets = [
   "#ffffff",
   "#000000",
   "#121212",

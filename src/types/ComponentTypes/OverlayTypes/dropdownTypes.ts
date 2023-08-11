@@ -1,13 +1,16 @@
+import { ReactNode } from "react";
+
 import { PositionType } from "../../baseTypes";
 import { IconThickness } from "../MiscTypes";
 
 export interface DropdownItemType {
   id: string;
   label: string;
+  child?: ReactNode;
   icon?: string;
   iconColor?: string;
   iconThickness?: IconThickness;
-  subitems?: DropdownItemType[];
+  subItems?: DropdownItemType[];
   isDisabled?: boolean;
   onClick?: () => void;
 }

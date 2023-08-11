@@ -3,7 +3,7 @@
 
 import { ColorPaletteType, ColorPickerType } from "../../types";
 import { validateHexCode } from "../../utils";
-import { DefaultTagColor, TagColors } from "../../utils/enums/ColorEnums";
+import { ColorPresets, DefaultTagColor } from "../../utils/enums/ColorEnums";
 import { Input } from "..";
 import { Tooltip } from ".";
 
@@ -44,7 +44,7 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
         </div>
       ) : null}
       <div className="flex flex-wrap justify-between gap-4 overflow-auto  p-4 shadow">
-        {TagColors.map((color) => (
+        {ColorPresets.map((color) => (
           <div
             key={color}
             className="h-6 w-6 cursor-pointer rounded-full"

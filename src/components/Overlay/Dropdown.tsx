@@ -32,8 +32,8 @@ import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600",
-    floatingBase: "overflow-y-auto rounded divide-y h-fit",
+    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 ",
+    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y h-fit",
     baseItem: "h-10 items-center gap-x-2 text-white border-zinc-600",
     dropdownItem:
       "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
@@ -123,7 +123,6 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
         {...getReferenceProps()}>
         {children}
       </div>
-
       <FloatingList elementsRef={elementsRef}>
         {isOpen ? (
           <FloatingPortal>
@@ -133,6 +132,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                   ? items.map((dropdownItem) => (
                       <DropdownItem
                         key={dropdownItem.id}
+                        child={dropdownItem?.child}
                         icon={dropdownItem.icon}
                         iconColor={dropdownItem?.iconColor}
                         iconThickness={dropdownItem?.iconThickness}
@@ -145,7 +145,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                           }
                           setIsOpen(false);
                         }}
-                        subitems={dropdownItem.subitems}
+                        subItems={dropdownItem.subItems}
                       />
                     ))
                   : null}
@@ -158,18 +158,19 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   );
 }
 
-function DropdownItem({ id, label, icon, onClick, subitems, iconColor, iconThickness }: DropdownItemType) {
+function DropdownItem({ id, label, icon, onClick, subItems, iconColor, iconThickness, child }: DropdownItemType) {
   const { dropdownItem: dropdownItemClasses } = DropdownClasses();
   return (
-    <Dropdown key={id} items={subitems || []}>
+    <Dropdown key={id} items={subItems || []}>
       <div className={dropdownItemClasses()} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
-        <div className="select-none truncate">{label}</div>
-        {subitems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
-        {icon && !subitems?.length ? (
+        {label && !child ? <div className="select-none truncate">{label}</div> : null}
+        {child ?? null}
+        {icon && !subItems?.length ? (
           <div className="ml-auto flex min-w-[22px] justify-end">
             <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
           </div>
         ) : null}
+        {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
       </div>
     </Dropdown>
   );
