@@ -18,7 +18,7 @@ const ImageUploadClasses = tv({
       lg: {
         base: "h-[40rem] lg:w-[50rem] w-full",
         imageUploadContainer: "h-[15rem] max-h-[15rem]",
-        imagesList: "h-[15rem]",
+        imagesList: "min-h-[10rem]",
       },
     },
   },
