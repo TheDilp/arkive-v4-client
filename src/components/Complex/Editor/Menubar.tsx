@@ -147,6 +147,12 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
         label: "Success",
         iconColor: "#4ade80",
       },
+      {
+        id: "callout_custom",
+        label: "Custom",
+        icon: IconEnum.brush,
+        onClick: () => chain?.toggleCallout({ type: "custom", customColor: "red" })?.run(),
+      },
     ],
   },
   {

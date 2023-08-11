@@ -8,7 +8,6 @@ import {
   BlockquoteExtension,
   BoldExtension,
   BulletListExtension,
-  CalloutExtension,
   DropCursorExtension,
   GapCursorExtension,
   HardBreakExtension,
@@ -25,6 +24,7 @@ import {
   UnderlineExtension,
 } from "remirror/extensions";
 
+import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
@@ -80,6 +80,9 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
       placeholder: "Write something awesome! 📜",
     }),
     CustomMentionExtension,
+    new CustomCalloutExtension({
+      type: "info",
+    }),
     new BoldExtension({}),
     new ItalicExtension({}),
     new HeadingExtension({}),
@@ -99,12 +102,11 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
       enableResizing: true,
     }),
     new HorizontalRuleExtension({}),
-    new CalloutExtension({}),
+
     new NodeFormattingExtension({}),
     new HardBreakExtension({}),
     new GapCursorExtension({}),
     new DropCursorExtension({}),
-    // new TableExtension(),
     new CustomTableExtension({
       priority: 0,
       resizable: false,

@@ -34,6 +34,7 @@ export const IconEnum = {
   add_calendar: "ph:calendar-plus-light",
   additional_fields: "ph:textbox",
   archive: "ph:archive",
+  brush: "ph:paint-brush",
   bullet_list: "ph:list-dashes",
   numbered_list: "ph:list-numbers",
   card: "ph:cards",

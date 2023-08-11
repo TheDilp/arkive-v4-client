@@ -7,8 +7,6 @@ import {
   ExtensionTag,
   InputRule,
   isElementDomNode,
-  keyBinding,
-  KeyBindingProps,
   NodeExtension,
   NodeExtensionSpec,
   nodeInputRule,
@@ -19,20 +17,46 @@ import {
 } from "@remirror/core";
 import { TextSelection } from "@remirror/pm/state";
 
-interface SecretOptions {
-  secret?: boolean;
-  classNames?: string;
+export type CalloutType = "info" | "success" | "warning" | "error" | "custom";
+
+function getCalloutColor(type: CalloutType, customColor?: string | null): string {
+  if (type === "custom") {
+    if (customColor) return customColor;
+    return "#eef6fc";
+  }
+  if (type === "info") return "#eef6fc";
+  if (type === "success") return "#effaf3";
+  if (type === "warning") return "#fffbeb";
+  if (type === "error") return "#feecf0";
+  return "#eef6fc";
 }
 
-@extension<SecretOptions>({
+function getCalloutBorderColor(type: CalloutType, customColor?: string | null): string {
+  if (type === "custom") {
+    if (customColor) return customColor;
+    return "#3298dc";
+  }
+  if (type === "info") return "#3298dc";
+  if (type === "success") return "#48c774";
+  if (type === "warning") return "#ffdd57";
+  if (type === "error") return "#f14668";
+  return "#3298dc";
+}
+
+export interface CustomCalloutOptions {
+  type: CalloutType;
+  customColor?: string | null;
+}
+
+@extension<CustomCalloutOptions>({
   defaultOptions: {
-    secret: true,
-    classNames: "secretBlock",
+    type: "info",
+    customColor: null,
   },
 })
-export class SecretExtension extends NodeExtension<SecretOptions> {
+export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
   get name() {
-    return "secret" as const;
+    return "samp" as const;
   }
 
   createTags() {
@@ -41,17 +65,21 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
 
   createNodeViews(): NodeViewMethod {
     return (node) => {
-      const { secret, classNames } = node.attrs;
+      const { customColor, type } = node.attrs;
       const dom = document.createElement("div");
-      dom.setAttribute("secret", secret);
-      dom.setAttribute("class", classNames);
-
       const contentDOM = document.createElement("div");
 
-      const secretIcon = document.createElement("span");
-      secretIcon.classList.add("secret-icon");
-
-      dom.append(secretIcon);
+      contentDOM.setAttribute(
+        "style",
+        `background-color: ${getCalloutColor(type, customColor)}; 
+        border-style: solid;
+        border-color:${getCalloutBorderColor(type, customColor)};
+        border-width: 0 0 0 ${type === "custom" ? 0 : 4}px;
+        padding: 8px;
+        border-top-left-radius: 0.25rem; 
+        border-bottom-left-radius: 0.25rem; 
+        `,
+      );
       dom.append(contentDOM);
 
       return { dom, contentDOM };
@@ -60,7 +88,7 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
 
   createNodeSpec(extra: ApplySchemaAttributes, override: NodeSpecOverride): NodeExtensionSpec {
     //    @ts-ignore
-    const { classNames, secret } = this.options;
+    const { type, customColor, classNames } = this.options;
 
     return {
       content: "block+",
@@ -70,12 +98,13 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
       attrs: {
         ...extra.defaults(),
         classNames: { default: classNames },
-        secret: { default: secret },
+        type: { default: type ?? "info" },
+        customColor: { default: customColor ?? "" },
       },
 
       parseDOM: [
         {
-          tag: `p[secret="${secret}"]`,
+          tag: "p",
           getAttrs: (node: any) => {
             if (!isElementDomNode(node)) {
               return false;
@@ -84,9 +113,10 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
             const content = node.textContent;
             return {
               ...extra.parse(node),
-              secret,
               classNames,
               content,
+              type,
+              customColor,
             };
           },
         },
@@ -98,6 +128,9 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
           ...extra.dom(node),
           ...rest,
           classNames,
+
+          type,
+          customColor: customColor ?? "",
         };
         return ["p", attributes, 0];
       },
@@ -107,7 +140,7 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
   createInputRules(): InputRule[] {
     return [
       nodeInputRule({
-        regexp: /^::s$/,
+        regexp: /^::: $/,
         type: this.type,
         beforeDispatch: ({ tr, start }: { tr: any; start: number }) => {
           const $pos = tr.doc.resolve(start);
@@ -123,20 +156,7 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
   }
 
   @command()
-  toggleSecret(attributes?: { secret: boolean; classNames: string }): CommandFunction {
+  toggleCallout(attributes?: { type: CalloutType; customColor?: string | null }): CommandFunction {
     return toggleWrap(this.type, attributes);
-  }
-
-  @keyBinding({ shortcut: "Mod-g", command: "toggleSecret" })
-  shortcut(props: KeyBindingProps): boolean {
-    return this.toggleSecret()(props);
-  }
-}
-
-declare global {
-  namespace Remirror {
-    interface AllExtensions {
-      secret: SecretExtension;
-    }
   }
 }

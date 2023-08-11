@@ -36,16 +36,15 @@
   :is(ol, ul) {
     @apply pl-3;
   }
-  ol {
-    @apply list-decimal;
-  }
 
   hr {
     @apply border-zinc-700 !important;
   }
-
+  ol {
+    @apply ml-1 list-decimal;
+  }
   ul {
-    @apply list-disc;
+    @apply ml-1 list-disc;
   }
   blockquote {
     @apply my-2 border-0 px-0 italic;

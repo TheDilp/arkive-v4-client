@@ -69,7 +69,6 @@ export function MentionDropdownComponent() {
       positioner="always"
       renderOutsideEditor>
       <ul className="remirror-mention-atom-popup-wrapper" {...getMenuProps()}>
-        {/* {isFetching ? <ProgressSpinner /> : null} */}
         {!isFetching
           ? (options || []).map((item, index) => {
               return (
