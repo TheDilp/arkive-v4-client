@@ -3,6 +3,11 @@ import { keyBinding, KeyBindingProps } from "remirror";
 import { TableExtension } from "remirror/extensions";
 
 export class CustomTableExtension extends TableExtension {
+  @keyBinding({ shortcut: "Mod-Shift-Delete", command: "deleteTable" })
+  delTableShortcut(props: KeyBindingProps): boolean {
+    return this.deleteTable()(props);
+  }
+
   @keyBinding({ shortcut: "Mod-Delete", command: "deleteCol" })
   delColShortcut(props: KeyBindingProps): boolean {
     return this.deleteTableColumn()(props);

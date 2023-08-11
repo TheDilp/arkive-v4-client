@@ -62,7 +62,7 @@
       }
     }
     td {
-      @apply max-h-fit min-h-fit px-1 !important;
+      @apply max-h-fit min-h-fit p-1 !important;
     }
 
     .selectedCell {

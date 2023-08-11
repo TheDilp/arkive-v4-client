@@ -56,7 +56,7 @@ export interface CustomCalloutOptions {
 })
 export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
   get name() {
-    return "samp" as const;
+    return "callout" as const;
   }
 
   createTags() {

@@ -1,31 +1,50 @@
-import { Remirror, useChainedCommands } from "@remirror/react";
+import { Remirror, useActive, useChainedCommands } from "@remirror/react";
 import { useMemo } from "react";
-import { AnyExtension, ChainedFromExtensions } from "remirror";
+import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
 import { ColorPresets, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
 
-const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions> }) => [
-  { id: "text_bold", icon: IconEnum.text_bold, onClick: () => chain?.toggleBold()?.run() },
-  { id: "text_italic", icon: IconEnum.text_italic, onClick: () => chain?.toggleItalic()?.run() },
+const menuBarItems = ({
+  active,
+  chain,
+}: {
+  active: ActiveFromExtensions<Remirror.Extensions>;
+  chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
+}) => [
+  {
+    id: "text_bold",
+    icon: IconEnum.text_bold,
+    onClick: () => chain?.toggleBold()?.run(),
+    variant: active.bold() ? "info" : "primary",
+  },
+  {
+    id: "text_italic",
+    icon: IconEnum.text_italic,
+    onClick: () => chain?.toggleItalic()?.run(),
+    variant: active.italic() ? "info" : "primary",
+  },
   {
     id: "text_underline",
     icon: IconEnum.text_underline,
     onClick: () => chain?.toggleUnderline()?.run(),
+    variant: active.underline() ? "info" : "primary",
   },
   {
     id: "heading",
     icon: IconEnum.heading,
     onClick: undefined,
+    variant: active.heading() ? "info" : "primary",
+
     subItems: [
       {
         id: "heading_1",
         icon: IconEnum.heading_one,
         onClick: () => chain?.toggleHeading({ level: 1 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 1",
+        iconColor: active.heading({ level: 1 }) ? "#60a5fa" : "#ffffff",
       },
       {
         id: "heading_2",
@@ -33,7 +52,7 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
         icon: IconEnum.heading_two,
         onClick: () => chain?.toggleHeading({ level: 2 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 2",
+        iconColor: active.heading({ level: 2 }) ? "#60a5fa" : "#ffffff",
       },
       {
         id: "heading_3",
@@ -41,14 +60,14 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
         icon: IconEnum.heading_three,
         onClick: () => chain?.toggleHeading({ level: 3 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 3",
+        iconColor: active.heading({ level: 3 }) ? "#60a5fa" : "#ffffff",
       },
       {
         id: "heading_4",
         icon: IconEnum.heading_four,
         onClick: () => chain?.toggleHeading({ level: 4 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 4",
+        iconColor: active.heading({ level: 4 }) ? "#60a5fa" : "#ffffff",
       },
       {
         id: "heading_5",
@@ -56,14 +75,14 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
         icon: IconEnum.heading_five,
         onClick: () => chain?.toggleHeading({ level: 5 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 5",
+        iconColor: active.heading({ level: 5 }) ? "#60a5fa" : "#ffffff",
       },
       {
         id: "heading_6",
         icon: IconEnum.heading_six,
         onClick: () => chain?.toggleHeading({ level: 6 })?.run(),
         iconThickness: "light" as const,
-        label: "Heading 6",
+        iconColor: active.heading({ level: 6 }) ? "#60a5fa" : "#ffffff",
       },
     ],
   },
@@ -107,17 +126,20 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
     id: "bullet_list",
     icon: IconEnum.bullet_list,
     onClick: () => chain?.toggleBulletList()?.run(),
+    variant: active.bulletList() ? "info" : "primary",
   },
   {
     id: "numbered_list",
     icon: IconEnum.numbered_list,
     onClick: () => chain?.toggleOrderedList()?.run(),
+    variant: active.orderedList() ? "info" : "primary",
   },
 
   {
     id: "callout",
     icon: IconEnum.callout,
     onClick: undefined,
+    variant: active.callout() ? "info" : "primary",
     subItems: [
       {
         id: "callout_info",
@@ -174,6 +196,7 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
     id: "table",
     icon: IconEnum.table,
     onClick: undefined,
+    variant: active.table() ? "info" : "primary",
     subItems: [
       {
         id: "create_basic_table",
@@ -186,11 +209,13 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
   {
     id: "divider",
     icon: IconEnum.divider,
-    onClick: undefined,
+    onClick: () => chain?.insertHorizontalRule()?.run(),
   },
   {
     id: "secret",
-    icon: IconEnum.eye,
+    icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
+    variant: active.secret() ? "info" : "primary",
+
     onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
   },
 ];
@@ -198,20 +223,21 @@ const menuBarItems = ({ chain }: { chain: ChainedFromExtensions<AnyExtension | R
 export function Menubar() {
   const chain = useChainedCommands();
 
-  const items = useMemo(() => menuBarItems({ chain }), []);
+  const active = useActive();
+  const items = useMemo(() => menuBarItems({ active, chain }), [chain]);
   return (
-    <ul className="mb-1 flex h-10 min-h-[2.5rem] flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
+    <ul className="sticky top-0 z-50 mb-1 flex h-10 min-h-[2.5rem] flex-nowrap items-center gap-x-4 bg-zinc-900 px-3">
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
             <Dropdown items={item?.subItems}>
               <div className="flex items-center">
-                <Button hasNoBackground icon={item.icon} isIconOnly onClick={undefined} />
+                <Button hasNoBackground icon={item.icon} isIconOnly onClick={undefined} variant={item?.variant || "primary"} />
                 <Icon icon={IconEnum.chevron_down} />
               </div>
             </Dropdown>
           ) : (
-            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.onClick} />
+            <Button hasNoBackground icon={item.icon} isIconOnly onClick={item.onClick} variant={item?.variant || "primary"} />
           )}
         </div>
       ))}
