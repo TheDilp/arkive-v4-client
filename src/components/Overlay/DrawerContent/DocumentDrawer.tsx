@@ -196,6 +196,7 @@ export function DocumentDrawer({ data }: Props) {
         isLoading={isCreating || isUpdating}
         label={document?.id ? "Update" : "Create"}
         onClick={async () => {
+          console.log(changedData);
           if (changedData) {
             if (document?.id) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -205,7 +206,7 @@ export function DocumentDrawer({ data }: Props) {
                 data: rest,
                 relations: {
                   tags,
-                  alter_names: alter_names.map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
+                  alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
                 },
               });
 

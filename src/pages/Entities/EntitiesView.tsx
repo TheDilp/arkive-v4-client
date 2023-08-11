@@ -7,7 +7,7 @@ import { Breadcrumbs, Button, Dropdown, Graph, Icon } from "../../components";
 import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetAllEntities, useGetEntity, useUpdateEntity } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, GraphType } from "../../types";
+import { AvailableEntityType, BaseEntityType, DrawerContentType } from "../../types";
 import {
   breadcrumbsAtom,
   capitalizeFirstLetter,
@@ -153,7 +153,6 @@ export function EntitiesView() {
       relations: {
         children: true,
         parents: true,
-        ...(type === "graphs" ? { nodes: true, edges: true } : {}),
       },
     },
     {
@@ -197,7 +196,7 @@ export function EntitiesView() {
                       ...prev,
                       data: { project_id },
                       title: `Create new ${entityName}`,
-                      type: "documents",
+                      type: type as DrawerContentType,
                       size: "lg",
                     }));
                   },
@@ -325,7 +324,7 @@ export function EntitiesView() {
         </div>
       ) : null}
       {!!item_id && !data?.data?.is_folder && type === "documents" ? <Editor editable /> : null}
-      {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph data={data?.data as GraphType} /> : null}
+      {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph /> : null}
     </>
   );
 }

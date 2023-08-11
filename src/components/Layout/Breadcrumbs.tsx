@@ -8,7 +8,7 @@ import { Icon } from "..";
 export function Breadcrumbs() {
   const { items, type } = useAtomValue(breadcrumbsAtom);
   return (
-    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2 truncate">
+    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2">
       <Link to={`../${type}`}>
         <Icon fontSize={22} icon={IconEnum.home} />
       </Link>

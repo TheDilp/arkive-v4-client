@@ -25,7 +25,7 @@ export default function ProjectsView() {
               setDrawer((prev: DrawerAtomType) => ({
                 ...prev,
                 type: "project",
-                data: { ownerId },
+                data: { owner_id: ownerId },
               }))
             }
           />

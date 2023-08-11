@@ -9,9 +9,9 @@ import { Button, Input } from "../../Form";
 
 export function ProjectDrawer({ data }: { data: CreateType<ProjectType> }) {
   const ownerId = localStorage.getItem("ownerId");
-  const [project, setProject] = useState<CreateType<ProjectType>>({ ...data, ownerId: ownerId as string });
+  const [project, setProject] = useState<CreateType<ProjectType>>({ ...data, owner_id: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
-  const { mutateAsync } = useCreateProject<CreateType<ProjectType>>();
+  const { mutateAsync, isLoading: isMutating } = useCreateProject<CreateType<ProjectType>>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   return (
     <>
@@ -25,7 +25,8 @@ export function ProjectDrawer({ data }: { data: CreateType<ProjectType> }) {
 
       <Button
         icon={IconEnum.add}
-        isDisabled={!project?.title}
+        isDisabled={!project?.title || isMutating}
+        isLoading={isMutating}
         label="Create project"
         onClick={async () => {
           if (project)

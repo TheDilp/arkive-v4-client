@@ -44,10 +44,9 @@ export function Editor({ editable }: { editable: boolean }) {
     },
   );
 
-  const { mutate: updateDocument } = useUpdateEntity<{ data: { id: string; content: string | undefined } }>(
-    "documents",
-    project_id as string,
-  );
+  const { mutate: updateDocument } = useUpdateEntity<{
+    data: { id: string; content: string | undefined };
+  }>("documents", project_id as string);
 
   const [editorData, setEditorData] = useState({ content: undefined });
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);

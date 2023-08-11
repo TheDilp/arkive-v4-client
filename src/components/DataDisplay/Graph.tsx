@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
@@ -5,7 +6,13 @@ import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
-import { useChangeNavbarTitle, useCreateSubEntity, useDeleteSubEntity, useUpdateManySubEntities } from "../../hooks";
+import {
+  useChangeNavbarTitle,
+  useCreateSubEntity,
+  useDeleteSubEntity,
+  useGetEntity,
+  useUpdateManySubEntities,
+} from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
@@ -18,18 +25,26 @@ type Props = {
   isReadOnly?: boolean;
   isViewOnly?: boolean;
   center_on?: string;
-  data: Omit<GraphType, "tags" | "project_id" | "parent_id" | "id" | "is_folder" | "is_public" | "icon">;
 };
 
-export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props) {
-  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
+export function Graph({ isReadOnly, isViewOnly, center_on }: Props) {
+  const { project_id, item_id, subitem_id } = useParams();
 
+  const { data } = useGetEntity<GraphType>(item_id, "graphs", {
+    data: {},
+    fields: ["default_node_shape", "default_node_color", "default_edge_color"],
+    relations: { nodes: true, edges: true },
+  });
+
+  const graph = data?.data;
+
+  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
+  const queryClient = useQueryClient();
   const { mutate: createNode } = useCreateSubEntity("nodes");
   const { mutate: createEdges } = useCreateSubEntity("edges");
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
-  const { project_id, item_id, subitem_id } = useParams();
   const [drawer, setDrawer] = useAtom(drawerAtom);
   const createNotification = useNotifications();
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
@@ -63,8 +78,8 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
     };
 
     createEdges(newEdge, {
-      onSuccess: (data) => {
-        setEdges((prev) => [...prev, { ...newEdge, ...data.data }]);
+      onSuccess: (d) => {
+        setEdges((prev) => [...prev, { ...newEdge, ...d.data }]);
       },
     });
   };
@@ -97,6 +112,9 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
       }
       setNodes([]);
       setEdges([]);
+      setTimeout(() => {
+        queryClient.invalidateQueries(["graphs", item_id]);
+      }, 500);
     };
   }, [item_id]);
 
@@ -124,12 +142,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
                   createNode(
                     { parent_id: item_id, x: evt.position.x, y: evt.position.y },
                     {
-                      onSuccess: (data: { data: { id: string } }) => {
+                      onSuccess: (d: { data: { id: string } }) => {
                         setNodes((prev) => [
                           ...prev,
                           {
                             ...DefaultNode,
-                            id: data.data.id,
+                            id: d.data.id,
                             x: evt.position.x,
                             y: evt.position.y,
                             label: "",
@@ -383,12 +401,12 @@ export function Graph({ data: graph, isReadOnly, isViewOnly, center_on }: Props)
         createNode(
           { parent_id: item_id, x: evt.position.x, y: evt.position.y },
           {
-            onSuccess: (data: { data: { id: string } }) => {
+            onSuccess: (d: { data: { id: string } }) => {
               setNodes((prev) => [
                 ...prev,
                 {
                   ...DefaultNode,
-                  id: data.data.id,
+                  id: d.data.id,
                   x: evt.position.x,
                   y: evt.position.y,
                   label: "",
