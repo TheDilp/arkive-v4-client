@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
-import { MutableRefObject, useEffect, useMemo, useRef } from "react";
+import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
@@ -16,7 +16,15 @@ import {
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types/EntityTypes/graphTypes";
 import { IconEnum, useNotifications } from "../../utils";
-import { BoardReferenceAtom, BoardStateAtom, contextMenuAtom, drawerAtom, edgesAtom, nodesAtom } from "../../utils/atoms";
+import {
+  BoardReferenceAtom,
+  BoardStateAtom,
+  breadcrumbsAtom,
+  contextMenuAtom,
+  drawerAtom,
+  edgesAtom,
+  nodesAtom,
+} from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { Quickbar } from "..";
@@ -29,12 +37,20 @@ type Props = {
 
 export function Graph({ isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
-
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const { data } = useGetEntity<GraphType>(item_id, "graphs", {
     data: {},
     fields: ["default_node_shape", "default_node_color", "default_edge_color"],
-    relations: { nodes: true, edges: true },
+    relations: { nodes: true, edges: true, parents: true },
   });
+
+  useLayoutEffect(() => {
+    if (!item_id) {
+      setBreadcrumbs({ items: [], type: "graphs" });
+    } else if (data?.data?.parents && data?.data?.parents?.length) {
+      setBreadcrumbs({ items: data?.data?.parents, type: "graphs" });
+    }
+  }, [data, setBreadcrumbs, item_id]);
 
   const graph = data?.data;
 
