@@ -9,7 +9,7 @@ import { Icon } from "../Misc";
 
 const ToastClasses = tv({
   slots: {
-    base: "flex flex-col w-full max-w-[30rem] overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow animate-in slide-in-from-right-10 duration-300 ease-out",
+    base: "flex flex-col w-fit max-w-[30rem] overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow  duration-300 ease-out",
     title: "text-sm font-normal text-center",
     iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1  transition-all",
@@ -39,10 +39,26 @@ const ToastClasses = tv({
         progress: "bg-red-600",
       },
     },
+    position: {
+      "top-right": {
+        base: "animate-in slide-in-from-right-10 right-4 top-2",
+      },
+      center: {
+        base: "animate-in zoom-in m-auto",
+      },
+    },
   },
 });
 
-export function Notification({ id, title, timer = 3, icon, variant = "primary", actions }: NotificationType) {
+export function Notification({
+  id,
+  title,
+  timer = 3,
+  icon,
+  variant = "primary",
+  actions,
+  position = "top-right",
+}: NotificationType) {
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
   useEffect(() => {
@@ -60,7 +76,7 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary", 
     return () => {};
   }, []);
 
-  const { base, title: titleClasses, progress, iconContainer } = ToastClasses({ variant });
+  const { base, title: titleClasses, progress, iconContainer } = ToastClasses({ variant, position });
   return (
     <div className={base()} role="alert">
       <div
@@ -97,11 +113,9 @@ export function Notification({ id, title, timer = 3, icon, variant = "primary", 
 export function NotificationContainer() {
   const notifications = useAtomValue(notificationsAtom);
   return (
-    <div className="pointer-events-none absolute right-4 top-2 z-[999999] flex w-full flex-col items-end gap-y-4">
+    <div className="pointer-events-none absolute z-[999999] flex h-full w-full flex-col items-end gap-y-4 ">
       {notifications.map((n) => (
-        <div key={n.id} className="pointer-events-auto w-fit">
-          <Notification {...n} />
-        </div>
+        <Notification key={n.id} {...n} />
       ))}
     </div>
   );
