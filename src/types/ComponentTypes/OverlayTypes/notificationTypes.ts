@@ -15,7 +15,7 @@ export interface NotificationType {
   timer: number;
   icon?: string;
   variant?: Variant;
-  position: NotificationPositionsType;
+  position?: NotificationPositionsType;
   actions?: {
     label?: string;
     onClick: () => void;
