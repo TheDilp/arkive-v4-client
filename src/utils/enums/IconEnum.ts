@@ -49,6 +49,7 @@ export const IconEnum = {
   document_template: "fluent-mdl2:save-template",
   download: "ph:download",
   divider: "radix-icons:divider-horizontal",
+  d20: "game-icons:dice-twenty-faces-twenty",
   edit_many_nodes_edges: "mdi:vector-polyline-edit",
   eye: "ph:eye",
   eye_slash: "ph:eye-slash",

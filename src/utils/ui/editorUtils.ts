@@ -32,7 +32,10 @@ import { SecretExtension } from "../../components/Complex/Editor/Extensions/Secr
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
+import { IconEnum } from "../enums";
 import { constructFinalRollDisplay, Dice, DiceRollParser } from "./diceRollerUtils";
+
+export const DiceRollRegex = /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi;
 
 export const DefaultEditorExtensions: (
   createNotification: (notification: Omit<NotificationType, "id">) => void,
@@ -80,7 +83,7 @@ export const DefaultEditorExtensions: (
     extraAttributes: {
       class: () => "dice-roll",
     },
-    autoLinkRegex: /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi,
+    autoLinkRegex: DiceRollRegex,
     autoLink: true,
     selectTextOnClick: false,
     priority: 10,
@@ -91,12 +94,22 @@ export const DefaultEditorExtensions: (
     const parsedNotation = DiceRollParser.parseNotation(props[1].text);
     const res = await Dice.roll(parsedNotation);
     const rollData = DiceRollParser.parseFinalResults(res);
-    createNotification({
-      timer: 2,
-      title: constructFinalRollDisplay(rollData),
-      variant: "info",
-      position: "top",
-    });
+    if (rollData?.valid) {
+      createNotification({
+        timer: 2,
+        title: constructFinalRollDisplay(rollData),
+        variant: "info",
+        position: "top",
+      });
+    } else {
+      createNotification({
+        timer: 2,
+        title: "The dice roll notation is not valid.",
+        icon: IconEnum.warning,
+        variant: "error",
+        position: "top",
+      });
+    }
 
     return true;
   });
