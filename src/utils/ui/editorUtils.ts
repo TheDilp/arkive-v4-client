@@ -35,7 +35,7 @@ import { DocumentType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
 import { constructFinalRollDisplay, Dice, DiceRollParser } from "./diceRollerUtils";
 
-export const DiceRollRegex = /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi;
+export const DiceRollRegex = /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]?[(DdKkHh)|(DdDdLl)]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi;
 
 export const DefaultEditorExtensions: (
   createNotification: (notification: Omit<NotificationType, "id">) => void,
