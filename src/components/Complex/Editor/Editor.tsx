@@ -139,7 +139,9 @@ export function Editor({ editable }: { editable: boolean }) {
           if (params.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
             handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}>
-        <div className="relative flex h-[calc(95%)] w-[calc(100vw)] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-6rem)]">
+        <div
+          className="relative flex h-[calc(95%)] w-[calc(100vw)] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-6rem)]"
+          id="editor">
           <Menubar />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"

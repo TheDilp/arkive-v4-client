@@ -28,6 +28,7 @@ import { CustomImageExtension } from "../../components/Complex/Editor/Extensions
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
+import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType } from "../../types";
 
@@ -86,7 +87,11 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     }),
     new BoldExtension({}),
     new ItalicExtension({}),
-    new HeadingExtension({}),
+    new HeadingExtension({
+      extraAttributes: {
+        id: () => crypto.randomUUID(),
+      },
+    }),
     new UnderlineExtension({}),
     new BlockquoteExtension({}),
     new BulletListExtension({
@@ -108,6 +113,7 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     new HardBreakExtension({}),
     new GapCursorExtension({}),
     new DropCursorExtension({}),
+    new TableOfContentsExtension({}),
     new CustomTableExtension({
       priority: 0,
       resizable: false,

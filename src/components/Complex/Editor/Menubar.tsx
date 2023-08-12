@@ -237,7 +237,7 @@ export function Menubar() {
   const active = useActive();
   const items = useMemo(() => menuBarItems({ active, chain, setDrawer, getContext }), [chain]);
   return (
-    <ul className="sticky top-0 z-40 mb-1 flex h-10 min-h-[2.5rem] w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3">
+    <ul className="sticky top-0 z-30 mb-1 flex h-10 min-h-[2.5rem] w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3">
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
