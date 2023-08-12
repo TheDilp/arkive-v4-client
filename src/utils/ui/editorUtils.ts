@@ -14,7 +14,6 @@ import {
   HeadingExtension,
   HorizontalRuleExtension,
   ItalicExtension,
-  LinkExtension,
   MarkdownExtension,
   MentionAtomExtension,
   NodeFormattingExtension,
@@ -26,13 +25,17 @@ import {
 import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
 import { CustomImageExtension } from "../../components/Complex/Editor/Extensions/CustomImageExtension";
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
+import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions/DiceFormulaExtension";
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useGetEntity, useUpdateEntity } from "../../hooks";
-import { DocumentType } from "../../types";
+import { DocumentType, NotificationType } from "../../types";
+import { constructFinalRollDisplay, Dice, DiceRollParser } from "./diceRollerUtils";
 
-export const DefaultEditorExtensions: () => AnyExtension[] = () => {
+export const DefaultEditorExtensions: (
+  createNotification: (notification: Omit<NotificationType, "id">) => void,
+) => AnyExtension[] = (createNotification) => {
   const CustomMentionExtension = new MentionAtomExtension({
     priority: 10,
     extraAttributes: {
@@ -70,8 +73,30 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
       },
     ],
   });
-
   CustomMentionExtension.ReactComponent = MentionReactComponent;
+
+  const DiceRollerExtension = new DiceFormulaExtension({
+    extraAttributes: {
+      class: () => "dice-roll",
+    },
+    autoLinkRegex: /^(?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$/gm,
+    autoLink: true,
+    selectTextOnClick: false,
+  });
+
+  // @ts-ignore
+  DiceRollerExtension.addHandler("onClick", async (...props) => {
+    const parsedNotation = DiceRollParser.parseNotation(props[1].text);
+    const res = await Dice.roll(parsedNotation);
+    const rollData = DiceRollParser.parseFinalResults(res);
+    createNotification({
+      timer: 2,
+      title: constructFinalRollDisplay(rollData),
+      variant: "info",
+      position: "center",
+    });
+    return true;
+  });
 
   return [
     new MarkdownExtension({}),
@@ -99,11 +124,12 @@ export const DefaultEditorExtensions: () => AnyExtension[] = () => {
     }),
     new TaskListExtension({}),
     new OrderedListExtension({}),
-    new LinkExtension({
-      autoLink: true,
-      defaultTarget: "_blank",
-      selectTextOnClick: true,
-    }),
+    // new LinkExtension({
+    //   autoLink: true,
+    //   defaultTarget: "_blank",
+    //   selectTextOnClick: true,
+    // }),
+    DiceRollerExtension,
     new CustomImageExtension({
       enableResizing: true,
     }),

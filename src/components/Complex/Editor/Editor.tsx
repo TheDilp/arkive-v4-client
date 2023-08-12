@@ -10,7 +10,7 @@ import { RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
-import { breadcrumbsAtom, IconEnum } from "../../../utils";
+import { breadcrumbsAtom, IconEnum, useNotifications } from "../../../utils";
 import { DefaultEditorExtensions, editorHooks, onError } from "../../../utils/ui/editorUtils";
 import { Skeleton } from "../../Misc";
 import { Notification } from "../../Overlay";
@@ -20,7 +20,7 @@ import { Menubar } from "./Menubar";
 export function Editor({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
-
+  const createNotification = useNotifications();
   const {
     data: currentDocument,
     isFetching,
@@ -53,7 +53,7 @@ export function Editor({ editable }: { editable: boolean }) {
   useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const { manager, state, getContext } = useRemirror({
-    extensions: () => DefaultEditorExtensions(),
+    extensions: () => DefaultEditorExtensions(createNotification),
     selection: "start",
     onError,
   });
@@ -121,6 +121,7 @@ export function Editor({ editable }: { editable: boolean }) {
               },
             ]}
             id={currentDocument?.data?.id || crypto.randomUUID()}
+            position="top-right"
             timer={0}
             title="You have unsaved changes. Press CTRL/CMD+S to save, CTRL/CMD+K to discard changes."
             variant="info"

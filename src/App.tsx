@@ -6,6 +6,7 @@ import { NotificationContainer, ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import ProjectsView from "./pages/Projects/ProjectsView";
 import { SettingsView } from "./pages/Settings";
+import { Dice } from "./utils/ui/diceRollerUtils";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,6 +15,7 @@ const queryClient = new QueryClient({
     },
   },
 });
+
 export default function App() {
   return (
     <main

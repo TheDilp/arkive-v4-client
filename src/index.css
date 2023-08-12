@@ -30,7 +30,7 @@
 }
 
 body {
-  @apply bg-black text-white;
+  @apply relative bg-black text-white;
 }
 
 ::-webkit-scrollbar {
@@ -74,4 +74,9 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 }
 input[type="color"]::-webkit-color-swatch {
   @apply rounded-full border-none;
+}
+
+#dice-box,
+#dice-box canvas {
+  @apply pointer-events-none fixed z-[999] h-full w-full;
 }
