@@ -14,6 +14,7 @@ import {
   HeadingExtension,
   HorizontalRuleExtension,
   ItalicExtension,
+  LinkExtension,
   MarkdownExtension,
   MentionAtomExtension,
   NodeFormattingExtension,
@@ -79,9 +80,10 @@ export const DefaultEditorExtensions: (
     extraAttributes: {
       class: () => "dice-roll",
     },
-    autoLinkRegex: /^(?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$/gm,
+    autoLinkRegex: /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi,
     autoLink: true,
     selectTextOnClick: false,
+    priority: 10,
   });
 
   // @ts-ignore
@@ -124,11 +126,10 @@ export const DefaultEditorExtensions: (
     }),
     new TaskListExtension({}),
     new OrderedListExtension({}),
-    // new LinkExtension({
-    //   autoLink: true,
-    //   defaultTarget: "_blank",
-    //   selectTextOnClick: true,
-    // }),
+    new LinkExtension({
+      defaultTarget: "_blank",
+      priority: 0,
+    }),
     DiceRollerExtension,
     new CustomImageExtension({
       enableResizing: true,
