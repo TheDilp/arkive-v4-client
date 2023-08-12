@@ -10,12 +10,18 @@ export const Dice = new DiceBox(
   "#dice-box", // target DOM element to inject the canvas for rendering
   {
     assetPath: "/assets/dice-box/",
-    themeColor: "#ff0000",
+    themeColor: "#ff00bb",
     scale: 4,
   },
 );
 
 Dice.init();
+
+Dice.onRollComplete = () => {
+  setTimeout(() => {
+    Dice.clear();
+  }, 1000);
+};
 
 export function constructFinalRollDisplay(res: {
   value: number;
