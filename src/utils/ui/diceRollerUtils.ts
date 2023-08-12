@@ -17,6 +17,10 @@ export const Dice = new DiceBox(
 
 Dice.init();
 
+export function getRandomHexColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+}
+
 export function constructFinalRollDisplay(res: {
   value: number;
   valid: boolean;
@@ -31,7 +35,7 @@ export function constructFinalRollDisplay(res: {
     const formatted = (res?.dice || res?.rolls || []).map((die, idx) => {
       if ("rolls" in die) {
         if (die?.rolls?.length) {
-          return `${idx === 0 ? "" : "+"}${die.rolls.map((roll) => roll.value.toString()).join("+")}`;
+          return `${idx === 0 ? "" : res?.ops?.[idx - 1] || "+"}${die.rolls.map((roll) => roll.value.toString()).join("+")}`;
         }
         return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
       }

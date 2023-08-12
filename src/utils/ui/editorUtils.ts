@@ -32,7 +32,7 @@ import { SecretExtension } from "../../components/Complex/Editor/Extensions/Secr
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
-import { constructFinalRollDisplay, Dice, DiceRollParser } from "./diceRollerUtils";
+import { constructFinalRollDisplay, Dice, DiceRollParser, getRandomHexColor } from "./diceRollerUtils";
 
 export const DefaultEditorExtensions: (
   createNotification: (notification: Omit<NotificationType, "id">) => void,
@@ -98,7 +98,7 @@ export const DefaultEditorExtensions: (
       position: "center",
     });
 
-    Dice.updateConfig({ themeColor: `#${Math.floor(Math.random() * 16777215).toString(16)}` });
+    Dice.updateConfig({ themeColor: getRandomHexColor() });
     return true;
   });
 
