@@ -4,7 +4,7 @@ import "../../../Editor.css";
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
 import { RemirrorContentType } from "remirror";
 
@@ -78,12 +78,17 @@ export function Editor({ editable }: { editable: boolean }) {
         manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
       }, 1);
     }
-    if (currentDocument?.data?.dice_color) {
-      Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
-    } else {
-      Dice.updateConfig({ themeColor: DefaultTagColor });
-    }
   }, [currentDocument, isRefetching]);
+
+  useEffect(() => {
+    if (!isFetching) {
+      if (currentDocument?.data?.dice_color) {
+        Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
+      } else {
+        Dice.updateConfig({ themeColor: DefaultTagColor });
+      }
+    }
+  }, [currentDocument]);
 
   if (!currentDocument && !isFetching) {
     return <Navigate to="../" />;

@@ -14,6 +14,7 @@ export const Dice = new DiceBox(
     assetPath: "/assets/dice-box/",
     themeColor: DefaultTagColor,
     scale: 4,
+    throwForce: 10,
   },
 );
 
