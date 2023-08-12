@@ -97,6 +97,8 @@ export const DefaultEditorExtensions: (
       variant: "info",
       position: "center",
     });
+
+    Dice.updateConfig({ themeColor: `#${Math.floor(Math.random() * 16777215).toString(16)}` });
     return true;
   });
 
