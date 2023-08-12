@@ -2,6 +2,8 @@ import DiceBox from "@3d-dice/dice-box";
 import DiceParser from "@3d-dice/dice-parser-interface";
 import DisplayResults from "@3d-dice/dice-ui/src/displayResults"; // fui index exports are messed up -> going to src
 
+import { DefaultTagColor } from "../enums";
+
 export const DiceRollParser = new DiceParser();
 
 export const DiceResults = new DisplayResults("#dice-box");
@@ -10,12 +12,17 @@ export const Dice = new DiceBox(
   "#dice-box", // target DOM element to inject the canvas for rendering
   {
     assetPath: "/assets/dice-box/",
-    themeColor: "#0cb0cc",
+    themeColor: DefaultTagColor,
     scale: 4,
   },
 );
 
-Dice.init();
+Dice.init().then(() => {
+  document.addEventListener("mousedown", () => {
+    Dice.clear();
+    DiceResults.clear();
+  });
+});
 
 export function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`;

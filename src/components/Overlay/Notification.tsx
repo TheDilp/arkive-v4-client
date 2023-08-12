@@ -40,6 +40,9 @@ const ToastClasses = tv({
       },
     },
     position: {
+      top: {
+        base: "animate-in slide-in-from-top-10 mx-auto top-2",
+      },
       "top-right": {
         base: "animate-in slide-in-from-right-10 right-4 top-2",
       },

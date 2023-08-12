@@ -4,12 +4,13 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType, InsertDocumentType, UpdateDocumentType } from "../../../types";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex";
 import { Button, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Badge } from "../../Misc";
+import { ColorPicker } from "../ColorPicker";
 
 function isSaveDisabled(document: Partial<DocumentType>) {
   if (!document.title) return true;
@@ -44,7 +45,7 @@ export function DocumentDrawer({ data }: Props) {
     {
       data: {},
       relations: { alter_names: true, tags: true },
-      fields: ["id", "title", "image_id"],
+      fields: ["id", "title", "image_id", "dice_color"],
     },
     {
       enabled: !!data?.id,
@@ -140,6 +141,12 @@ export function DocumentDrawer({ data }: Props) {
                 ))
               : null}
           </div>
+          <div className="flex gap-x-2">
+            <span>Dice color:</span>
+            <div className="ml-auto self-end pb-2">
+              <ColorPicker name="dice_color" onChange={handleChange} value={document?.dice_color || DefaultTagColor} />
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -196,7 +203,6 @@ export function DocumentDrawer({ data }: Props) {
         isLoading={isCreating || isUpdating}
         label={document?.id ? "Update" : "Create"}
         onClick={async () => {
-          console.log(changedData);
           if (changedData) {
             if (document?.id) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars

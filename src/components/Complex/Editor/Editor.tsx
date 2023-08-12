@@ -10,7 +10,8 @@ import { RemirrorContentType } from "remirror";
 
 import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType } from "../../../types";
-import { breadcrumbsAtom, IconEnum, useNotifications } from "../../../utils";
+import { breadcrumbsAtom, DefaultTagColor, IconEnum, useNotifications } from "../../../utils";
+import { Dice } from "../../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, editorHooks, onError } from "../../../utils/ui/editorUtils";
 import { Skeleton } from "../../Misc";
 import { Notification } from "../../Overlay";
@@ -31,7 +32,7 @@ export function Editor({ editable }: { editable: boolean }) {
     "documents",
     {
       data: {},
-      fields: ["id", "title", "content"],
+      fields: ["id", "title", "content", "dice_color"],
       relations: {
         parents: true,
       },
@@ -76,6 +77,11 @@ export function Editor({ editable }: { editable: boolean }) {
       setTimeout(() => {
         manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
       }, 1);
+    }
+    if (currentDocument?.data?.dice_color) {
+      Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
+    } else {
+      Dice.updateConfig({ themeColor: DefaultTagColor });
     }
   }, [currentDocument, isRefetching]);
 

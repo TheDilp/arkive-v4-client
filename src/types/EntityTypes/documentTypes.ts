@@ -16,6 +16,7 @@ export interface DocumentType extends BaseEntityType {
   image_id?: string | null;
   alter_names: AlterNameType[];
   tags: TagType[];
+  dice_color?: string | null;
   image: ImageType;
 }
 
