@@ -1,6 +1,6 @@
 import { BaseEntityType } from "./baseEntityTypes";
 
-export interface RandomTableOption {
+export interface RandomTableOptionType {
   id: string;
   title: string;
   description?: string;
@@ -10,7 +10,6 @@ export interface RandomTableOption {
 }
 
 export interface RandomTableType extends BaseEntityType {
-  description?: string;
-  dice_color?: string;
-  random_table_options: RandomTableOption[];
+  description?: string | null;
+  random_table_options: RandomTableOptionType[];
 }

@@ -1,6 +1,6 @@
 import { SetStateAction } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -180,7 +180,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (existingTemplate?.data) {
       setTemplate(existingTemplate.data);
       setFields(

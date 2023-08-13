@@ -9,8 +9,8 @@ import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotificatio
 import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
-type insertGraphType = Partial<GraphType> & { parent_id?: string; project_id: string };
-type updateGraphType = Partial<GraphType> & { parent_id?: string };
+type insertGraphType = Partial<GraphType> & { parent_id?: string | null; project_id: string };
+type updateGraphType = Partial<GraphType> & { parent_id?: string | null };
 
 type graphRelationsType = {
   tags?: { id: string }[];
@@ -86,7 +86,6 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
           onChange={({ name, color, value, label }) => {
             if ((graph?.tags || [])?.some((tag) => tag.id === value)) {
               createNotification({
-                id: crypto.randomUUID(),
                 title: "Cannot add the same tag twice.",
                 variant: "warning",
                 icon: IconEnum.info_circle,

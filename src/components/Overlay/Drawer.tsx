@@ -17,6 +17,7 @@ import {
   ProjectDrawer,
   TagsDrawer,
 } from "./DrawerContent";
+import { RandomTableDrawer } from "./DrawerContent/RandomTableDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -121,6 +122,7 @@ export function Drawer() {
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
+        {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
         {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
       </div>
