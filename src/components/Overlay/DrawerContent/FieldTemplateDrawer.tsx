@@ -60,7 +60,7 @@ function FieldRow({
   deleteField: (i: number) => void;
 }) {
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-2">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
@@ -149,12 +149,12 @@ function FieldRow({
 export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateEntity<{
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
     data: insertTemplateType;
     relations?: { character_fields: Omit<FieldType, "id">[] };
   }>("character_fields_templates");
 
-  const { mutateAsync: update } = useUpdateEntity<{
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: Partial<Omit<FieldTemplate, "fields">>;
     relations?: { character_fields?: FieldType[] };
   }>("character_fields_templates", project_id as string);
@@ -237,7 +237,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       </div>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(template?.title, fields)}
+        isDisabled={isSaveDisabled(template?.title, fields) || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (!data?.id)
