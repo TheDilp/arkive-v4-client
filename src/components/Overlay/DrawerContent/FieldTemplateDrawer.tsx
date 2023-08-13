@@ -5,7 +5,8 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
-import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, sortEntities } from "../../../utils";
+import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
+import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { Button, Input, Select } from "../../Form";
 
 type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
@@ -29,10 +30,15 @@ function isSaveDisabled(
   if (!fields.length) return true;
   if (
     fields.some(
-      (field) => !field.title || !field.field_type || (field.field_type === "select_multiple" && !field?.options?.length),
+      (field) =>
+        !field.title ||
+        !field.field_type ||
+        (field.field_type === "select_multiple" && !field?.options?.length) ||
+        (field.field_type === "dice_roll" && !field?.formula),
     )
   )
     return true;
+
   return false;
 }
 
@@ -54,7 +60,7 @@ function FieldRow({
   deleteField: (i: number) => void;
 }) {
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-4">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
@@ -125,11 +131,13 @@ function FieldRow({
         <div className="flex flex-col gap-y-2 pl-8">
           <div className="flex flex-col gap-y-2">
             <Input
+              helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
               label="Dice formula"
               name={`[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={formula}
+              variant={formula?.match?.(DiceRollRegex) ? "primary" : "error"}
             />
           </div>
         </div>
@@ -185,7 +193,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   }, [existingTemplate]);
 
   return (
-    <div className="flex flex-col gap-y-4 text-white">
+    <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-auto text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex-1">
           <Input label="Template title (required)" name="title" onChange={handleChange} value={template?.title || ""} />
@@ -210,13 +218,14 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
-      <div className="flex max-h-[30rem] flex-col gap-y-4 overflow-y-auto">
+      <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto">
         {fields.sort(sortEntities).map((field, index) => (
           <FieldRow
             key={field.id}
             changeField={handleChangeFields}
             deleteField={(i: number) => removeField(i, setFields)}
             field_type={field.field_type}
+            formula={field?.formula}
             id={field.id}
             index={index}
             options={field?.options}
