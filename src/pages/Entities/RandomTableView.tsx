@@ -3,10 +3,11 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetSubEntities, useTable } from "../../hooks";
+import { useGetAllEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum, NameFilters, useNotifications } from "../../utils";
+import { rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 
 const columnHelper = createColumnHelper<RandomTableOptionType>();
 
@@ -80,16 +81,17 @@ function createColumns(
 export function RandomTableView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const createNotification = useNotifications();
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
     orderBy: { field: "first_name", sort: "asc" },
     pagination: { limit: 10, page: 0 },
   });
   const { project_id, item_id } = useParams();
-  const { data, isLoading } = useGetSubEntities<RandomTableOptionType>(
+  const { data, isLoading } = useGetAllEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id: project_id as string },
     },
-    "characters",
+    "random_table_options",
     {
       staleTime: 5 * 60 * 1000,
       prefetch: false,
@@ -122,6 +124,17 @@ export function RandomTableView() {
             value={view}
           />
         </div> */}
+        <div className="w-fit">
+          <Button
+            icon={IconEnum.d20}
+            isDisabled={!data?.data?.length}
+            label="Roll on table"
+            onClick={async () => {
+              await rollDiceWithNotification(createNotification, `1d${data?.data?.length}`);
+            }}
+            variant="info"
+          />
+        </div>
         <div className="w-fit">
           <Button
             icon={IconEnum.add}

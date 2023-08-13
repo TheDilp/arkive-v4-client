@@ -5,7 +5,7 @@ export interface RandomTableOptionType {
   title: string;
   description?: string;
   parent_id: string;
-  icon: string;
+  icon?: string;
   icon_color?: string | null;
 }
 

@@ -2,7 +2,8 @@ import DiceBox from "@3d-dice/dice-box";
 import DiceParser from "@3d-dice/dice-parser-interface";
 import DisplayResults from "@3d-dice/dice-ui/src/displayResults"; // fui index exports are messed up -> going to src
 
-import { DefaultTagColor } from "../enums";
+import { NotificationType } from "../../types";
+import { DefaultTagColor, IconEnum } from "../enums";
 
 export const DiceRollParser = new DiceParser();
 
@@ -139,4 +140,44 @@ export function getRollValue(res: {
     return `${formattedString}= ${res.value}`;
   }
   return "";
+}
+
+export async function rollDiceWithNotification(
+  createNotification: (notification: Omit<NotificationType, "id">) => void,
+  diceRoll: string,
+) {
+  if (diceRoll) {
+    try {
+      const parsedNotation = DiceRollParser.parseNotation(diceRoll);
+      Dice.roll(parsedNotation)
+        .then((r: any) => {
+          const rollData = DiceRollParser.parseFinalResults(r);
+          if (rollData?.valid) {
+            createNotification({
+              timer: 2,
+              title: constructFinalRollDisplay(rollData),
+              variant: "info",
+              position: "top",
+            });
+          }
+        })
+        .catch(() => {
+          createNotification({
+            timer: 2,
+            title: "The dice roll notation is not valid.",
+            icon: IconEnum.warning,
+            variant: "error",
+            position: "top",
+          });
+        });
+    } catch (error) {
+      createNotification({
+        timer: 2,
+        title: "The dice roll notation is not valid.",
+        icon: IconEnum.warning,
+        variant: "error",
+        position: "top",
+      });
+    }
+  }
 }

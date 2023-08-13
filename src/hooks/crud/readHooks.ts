@@ -119,29 +119,6 @@ export function useGetAllEntities<ReturnType>(
     ...options,
   });
 }
-export function useGetSubEntities<ReturnType>(
-  request: { data: { project_id: string; parent_id: string } },
-  type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean },
-) {
-  const baseQueryKey = ["allSubEntities", request.data.project_id, type, request.data.parent_id];
-
-  const configuredOptions = {
-    enabled: !!request.data.project_id && (options?.enabled ?? true),
-    staleTime: options?.staleTime,
-    select: options?.select,
-  };
-
-  return useQuery<{ data: ReturnType[] }, unknown>(
-    baseQueryKey,
-    async () =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/${request.data.project_id}/${request.data.parent_id}`,
-        method: "GET",
-      }),
-    configuredOptions,
-  );
-}
 
 export function useGetInfiniteEntities<ReturnType>(
   request: RequestBodyType,

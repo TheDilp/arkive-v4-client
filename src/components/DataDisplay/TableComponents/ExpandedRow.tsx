@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useGetSubEntities } from "../../../hooks";
-import { AvailableEntityType, FieldType } from "../../../types";
+import { AvailableEntityType } from "../../../types";
 import { getSentenceCase } from "../../../utils";
 import { Badge } from "../../Misc/Badge";
 
@@ -12,16 +11,7 @@ const ExpandedTableRowClasses = tv({
 
 function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   const { project_id } = useParams();
-  const { data } = useGetSubEntities<FieldType>(
-    {
-      data: {
-        parent_id: templateId,
-        project_id: project_id as string,
-      },
-    },
-    "character_fields",
-    { enabled: !!templateId },
-  );
+  const data = { data: [] };
   return (
     <div className="flex flex-col gap-y-2">
       {data?.data?.map((field) => (

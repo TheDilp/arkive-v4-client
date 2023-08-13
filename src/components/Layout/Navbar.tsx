@@ -1,49 +1,11 @@
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 
-import { NotificationType } from "../../types";
 import { IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
-import { constructFinalRollDisplay, Dice, DiceRollParser, DiceRollRegex } from "../../utils/ui/diceRollerUtils";
+import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { Tooltip } from "../Overlay";
 import { Card } from "./Card";
-
-async function rollDice(createNotification: (notification: Omit<NotificationType, "id">) => void, diceRoll: string) {
-  if (diceRoll) {
-    try {
-      const parsedNotation = DiceRollParser.parseNotation(diceRoll);
-      Dice.roll(parsedNotation)
-        .then((r: any) => {
-          const rollData = DiceRollParser.parseFinalResults(r);
-          if (rollData?.valid) {
-            createNotification({
-              timer: 2,
-              title: constructFinalRollDisplay(rollData),
-              variant: "info",
-              position: "top",
-            });
-          }
-        })
-        .catch(() => {
-          createNotification({
-            timer: 2,
-            title: "The dice roll notation is not valid.",
-            icon: IconEnum.warning,
-            variant: "error",
-            position: "top",
-          });
-        });
-    } catch (error) {
-      createNotification({
-        timer: 2,
-        title: "The dice roll notation is not valid.",
-        icon: IconEnum.warning,
-        variant: "error",
-        position: "top",
-      });
-    }
-  }
-}
 
 function DiceRoller() {
   const createNotification = useNotifications();
@@ -65,7 +27,7 @@ function DiceRoller() {
                   position: "top",
                 });
               } else {
-                await rollDice(createNotification, diceRoll);
+                await rollDiceWithNotification(createNotification, diceRoll);
               }
             }
           }}
@@ -76,7 +38,7 @@ function DiceRoller() {
           icon={IconEnum.d20}
           isDisabled={!diceRoll || !diceRoll.match(DiceRollRegex)}
           label="Roll"
-          onClick={async () => rollDice(createNotification, diceRoll)}
+          onClick={async () => rollDiceWithNotification(createNotification, diceRoll)}
           variant="info"
         />
       </div>
