@@ -18,6 +18,17 @@ export const Dice = new DiceBox(
   },
 );
 
+export const DiceNoSim = new DiceBox(
+  "#dice-box-no-sim", // target DOM element to inject the canvas for rendering
+  {
+    id: "no-sim-canvas",
+    assetPath: "/assets/dice-box/",
+    suspendSimulation: true,
+  },
+);
+
+DiceNoSim.init();
+
 Dice.init().then(() => {
   document.addEventListener("mousedown", () => {
     Dice.clear();

@@ -77,6 +77,8 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 #dice-box,
-#dice-box canvas {
+#dice-box canvas,
+#dice-box-no-sim,
+#dice-box-no-sim canvas {
   @apply pointer-events-none fixed z-[999] h-full w-full;
 }

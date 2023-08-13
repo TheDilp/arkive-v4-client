@@ -14,7 +14,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { Dice, DiceRollParser } from "../../../utils/ui/diceRollerUtils";
+import { DiceNoSim, DiceRollParser } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
@@ -117,7 +117,7 @@ function CharacterFieldInputs({
             onClick={() => {
               try {
                 const parsedNotation = DiceRollParser.parseNotation(formula);
-                Dice.roll(parsedNotation)
+                DiceNoSim.roll(parsedNotation)
                   .then((r: any) => {
                     const rollData = DiceRollParser.parseFinalResults(r);
                     if (rollData?.valid) {
