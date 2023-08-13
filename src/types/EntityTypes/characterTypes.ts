@@ -29,7 +29,7 @@ export interface CharacterType {
   dayOfBirth?: number | null;
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
-  character_fields?: { id: string; value: string | string[]; template_id: string }[];
+  character_fields?: { id: string; value: string | string[] | number; template_id: string }[];
   tags?: TagType[];
   related_to?: {
     id: string;

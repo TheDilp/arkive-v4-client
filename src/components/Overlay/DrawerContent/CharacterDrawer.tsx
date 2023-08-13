@@ -14,6 +14,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
+import { Dice, DiceRollParser } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
@@ -25,7 +26,7 @@ import Alert from "../../Misc/Alert";
 type insertCharacterType = Partial<CharacterType> & { project_id: string };
 type updateCharacterType = Partial<CharacterType>;
 type characterRelationsType = {
-  character_fields?: { id: string; value: string | string[] }[];
+  character_fields?: { id: string; value: string | string[] | number }[];
   related_to?: { id: string; relation_type: string }[];
   related_from?: { id: string; relation_type: string }[];
   tags?: { id: string }[];
@@ -40,9 +41,7 @@ function isSaveDisabled(character: Partial<CharacterType> & characterRelationsTy
   if (character?.related_to?.length) {
     if (character?.related_to?.some((rel) => !rel?.relation_type)) return true;
   }
-  if (character?.character_fields?.length) {
-    if (character?.character_fields?.some((field) => !field?.value)) return true;
-  }
+
   return false;
 }
 
@@ -53,10 +52,11 @@ function CharacterFieldInputs({
   options,
   value: currentValue,
   index,
+  formula,
   handleChange,
 }: FieldType & {
   index: number;
-  value: string | string[] | undefined;
+  value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
   const name = `character_fields[${index}]`;
@@ -95,6 +95,52 @@ function CharacterFieldInputs({
           }}
           value={currentValue as string}
         />
+      </div>
+    );
+  }
+  if (fieldType === "dice_roll") {
+    return (
+      <div className="flex flex-nowrap items-center gap-x-2">
+        <Input
+          label={title}
+          name={name}
+          onChange={({ value }) => {
+            handleChange({ name, value: { id, value } });
+          }}
+          value={currentValue as string}
+        />
+        <div className="flex self-end pb-1.5">
+          <Button
+            hasNoBackground
+            icon={IconEnum.d20}
+            iconSize={24}
+            onClick={() => {
+              try {
+                const parsedNotation = DiceRollParser.parseNotation(formula);
+                Dice.roll(parsedNotation)
+                  .then((r: any) => {
+                    const rollData = DiceRollParser.parseFinalResults(r);
+                    if (rollData?.valid) {
+                      handleChange({ name, value: { id, value: rollData.value } });
+                    }
+                  })
+                  .catch((err: any) => {
+                    console.log(err);
+                    // createNotification({
+                    //   timer: 2,
+                    //   title: "The dice roll notation is not valid.",
+                    //   icon: IconEnum.warning,
+                    //   variant: "error",
+                    //   position: "top",
+                    // });
+                  });
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+            tooltip={`Roll (${formula})`}
+          />
+        </div>
       </div>
     );
   }
@@ -392,6 +438,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
                           <CharacterFieldInputs
                             key={f.id}
                             {...f}
+                            formula={f?.formula}
                             handleChange={handleChange}
                             index={fieldIndex === -1 ? character?.character_fields?.length || 0 : fieldIndex}
                             value={character?.character_fields?.[fieldIndex]?.value || ""}
