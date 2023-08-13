@@ -16,7 +16,7 @@ export const IconEnum = {
   timeline: "mdi:timeline-clock-outline",
   event: "ph:flag",
   dictionary: "ph:book-bookmark-light",
-  randomtables: "game-icons:perspective-dice-six-faces-random",
+  random_table: "game-icons:perspective-dice-six-faces-random",
   word: "codicon:whole-word",
   alter_names: "ph:arrows-left-right",
   tags: "ph:tag",

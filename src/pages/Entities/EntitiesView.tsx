@@ -15,6 +15,7 @@ import {
   dialogAtom,
   drawerAtom,
   getImageURL,
+  getNavbarEntityType,
   IconEnum,
 } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
@@ -166,7 +167,7 @@ export function EntitiesView() {
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
   const entityName = getEntityNameFromType(type as AvailableEntityType);
 
-  useChangeNavbarTitle(`The Arkive | ${capitalizeFirstLetter(type || "")}`);
+  useChangeNavbarTitle(`The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType) || "")}`);
 
   useLayoutEffect(() => {
     if (!item_id) {

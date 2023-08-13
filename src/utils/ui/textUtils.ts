@@ -1,3 +1,5 @@
+import { AvailableEntityType } from "../../types";
+
 export function getFirstLetters(sentence: string): string {
   const words = sentence.split(" ");
   return words
@@ -10,6 +12,14 @@ export function getAvatarInitials(first_name: string, last_name: string): string
 }
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+export function getNavbarEntityType(type: AvailableEntityType) {
+  console.log(type);
+  if (type === "random_tables") {
+    return "random tables";
+  }
+  return type;
 }
 
 export function capitalizeSentence(sentence: string): string {
