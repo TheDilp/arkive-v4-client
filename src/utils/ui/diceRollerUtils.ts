@@ -28,7 +28,7 @@ Dice.init().then(() => {
 export function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 }
-export const DiceRollRegex = /(\d+)(([1-9]\d*)?([Dd])?[1-9]?((kh|dl)\d+)*( ?[*+-] ?)?)+()/gi;
+export const DiceRollRegex = /((\d+)(([Dd])?(\d+)?((kh|dl)\d+)*( ?[*+-] ?)?)+())/gi;
 
 export function constructFinalRollDisplay(res: {
   value: number;
