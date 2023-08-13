@@ -41,6 +41,7 @@ function FieldRow({
   sort,
   field_type,
   options,
+  formula,
   index,
   changeField,
   deleteField,
@@ -118,6 +119,19 @@ function FieldRow({
               </div>
             </div>
           ))}
+        </div>
+      ) : null}
+      {field_type === "dice_roll" ? (
+        <div className="flex flex-col gap-y-2 pl-8">
+          <div className="flex flex-col gap-y-2">
+            <Input
+              label="Dice formula"
+              name={`[${index}].formula`}
+              onChange={changeField}
+              placeholder="E.g. 4d6dl1"
+              value={formula}
+            />
+          </div>
         </div>
       ) : null}
     </div>

@@ -33,9 +33,7 @@ import { TableOfContentsExtension } from "../../components/Complex/Editor/Extens
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
-import { constructFinalRollDisplay, Dice, DiceRollParser } from "./diceRollerUtils";
-
-export const DiceRollRegex = /((?!\d+$)(([1-9]\d*)?[Dd]?[1-9]?[(DdKkHh)|(DdDdLl)]\d*( ?[*+-] ?)?)+(?<![*+-] ?)$)/gi;
+import { constructFinalRollDisplay, Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export const DefaultEditorExtensions: (
   createNotification: (notification: Omit<NotificationType, "id">) => void,

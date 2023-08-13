@@ -1,10 +1,11 @@
-export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple";
+export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll";
 export interface FieldType {
   id: string;
   project_id: string;
   sort: number;
   title: string;
   field_type: FieldTypes;
+  formula?: string;
   options?: string[];
 }
 export interface FieldTemplate {

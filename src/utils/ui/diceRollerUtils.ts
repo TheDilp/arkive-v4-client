@@ -28,31 +28,54 @@ Dice.init().then(() => {
 export function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 }
+export const DiceRollRegex = /(\d+)(([1-9]\d*)?([Dd])?[1-9]?((kh|dl)\d+)*( ?[*+-] ?)?)+()/gi;
 
 export function constructFinalRollDisplay(res: {
   value: number;
   valid: boolean;
   dice?: {
     value: number;
-    rolls: { value: number; critical: "success" | "failure"; order: number; type: "die" | "number" }[];
+    rolls: {
+      value: number;
+      critical: "success" | "failure";
+      order: number;
+      type: "die" | "number";
+      drop?: boolean | undefined;
+    }[];
   }[];
-  rolls?: { value: number; critical: "success" | "failure"; order: number; type: "die" | "number" }[];
+  rolls?: {
+    value: number;
+    critical: "success" | "failure";
+    order: number;
+    drop?: boolean | undefined;
+    type: "die" | "number";
+  }[];
   ops: ("+" | "-" | "/" | "*")[];
 }) {
   if (res.valid) {
     const formatted = (res?.dice || res?.rolls || []).map((die, idx) => {
       if ("rolls" in die) {
         if (die?.rolls?.length) {
-          return `${idx === 0 ? "" : res?.ops?.[idx - 1] || "+"}${die.rolls.map((roll) => roll.value.toString()).join("+")}`;
+          return `${idx === 0 ? "" : res?.ops?.[idx - 1] || "+"}${die.rolls
+            .filter((r) => !r.drop)
+            .map((roll) => roll.value.toString())
+            .join("+")}`;
         }
         return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
       }
+
       if (res?.ops?.[idx - 1]) {
-        return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
+        if (!die?.drop) return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
+        return "";
       }
-      return `${idx === 0 ? "" : "+"}${die.value.toString()}`;
+      if (!die?.drop) return `${idx === 0 ? "" : "+"}${die.value.toString()}`;
+      return "";
     });
-    return `${formatted.join("")}= ${res.value}`;
+    const formattedString = formatted.join("");
+    if (formattedString.charAt(0) === "+") {
+      return `${formattedString.slice(1, formattedString.length)}= ${res.value}`;
+    }
+    return `${formattedString}= ${res.value}`;
   }
   return "";
 }
