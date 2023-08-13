@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
+import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, NotificationType, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
   dialogAtom,
@@ -54,10 +54,12 @@ function CharacterFieldInputs({
   index,
   formula,
   handleChange,
+  createNotification,
 }: FieldType & {
   index: number;
   value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
+  createNotification: (notification: Omit<NotificationType, "id">) => void;
 }) {
   const name = `character_fields[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
@@ -124,15 +126,14 @@ function CharacterFieldInputs({
                       handleChange({ name, value: { id, value: rollData.value } });
                     }
                   })
-                  .catch((err: any) => {
-                    console.log(err);
-                    // createNotification({
-                    //   timer: 2,
-                    //   title: "The dice roll notation is not valid.",
-                    //   icon: IconEnum.warning,
-                    //   variant: "error",
-                    //   position: "top",
-                    // });
+                  .catch(() => {
+                    createNotification({
+                      timer: 2,
+                      title: "The dice roll notation is not valid.",
+                      icon: IconEnum.warning,
+                      variant: "error",
+                      position: "top",
+                    });
                   });
               } catch (error) {
                 console.log(error);
@@ -438,6 +439,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
                           <CharacterFieldInputs
                             key={f.id}
                             {...f}
+                            createNotification={createNotification}
                             formula={f?.formula}
                             handleChange={handleChange}
                             index={fieldIndex === -1 ? character?.character_fields?.length || 0 : fieldIndex}
