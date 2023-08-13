@@ -20,6 +20,7 @@ import {
 } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
+import { RandomTableView } from "./RandomTableView";
 
 type EntityItemType = {
   id: string;
@@ -326,6 +327,7 @@ export function EntitiesView() {
       ) : null}
       {!!item_id && !data?.data?.is_folder && type === "documents" ? <Editor editable /> : null}
       {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph /> : null}
+      {!!item_id && !data?.data?.is_folder && type === "random_tables" ? <RandomTableView /> : null}
     </>
   );
 }

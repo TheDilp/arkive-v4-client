@@ -15,7 +15,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   const { data } = useGetSubEntities<FieldType>(
     {
       data: {
-        parentId: templateId,
+        parent_id: templateId,
         project_id: project_id as string,
       },
     },

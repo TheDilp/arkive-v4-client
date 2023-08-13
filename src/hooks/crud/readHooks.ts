@@ -120,11 +120,11 @@ export function useGetAllEntities<ReturnType>(
   });
 }
 export function useGetSubEntities<ReturnType>(
-  request: { data: { project_id: string; parentId: string } },
+  request: { data: { project_id: string; parent_id: string } },
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allSubEntities", request.data.project_id, type, request.data.parentId];
+  const baseQueryKey = ["allSubEntities", request.data.project_id, type, request.data.parent_id];
 
   const configuredOptions = {
     enabled: !!request.data.project_id && (options?.enabled ?? true),
@@ -136,7 +136,7 @@ export function useGetSubEntities<ReturnType>(
     baseQueryKey,
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/${request.data.project_id}/${request.data.parentId}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/${request.data.project_id}/${request.data.parent_id}`,
         method: "GET",
       }),
     configuredOptions,

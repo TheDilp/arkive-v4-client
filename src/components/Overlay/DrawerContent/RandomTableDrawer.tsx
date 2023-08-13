@@ -2,7 +2,7 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../../hooks";
 import { RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertRandomTableSchema } from "../../../validation/random_tables";
@@ -19,6 +19,11 @@ export function RandomTableDrawer({ data }: Props) {
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
+
+  const [{ orderBy, filters, pagination }, dispatch] = useTable({
+    orderBy: { field: "title", sort: "asc" },
+    pagination: { limit: 10, page: 0 },
+  });
 
   const { data: existingRandomTable } = useGetEntity<RandomTableType>(
     data?.id,

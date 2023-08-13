@@ -10,6 +10,7 @@ export type DrawerContentType =
   | "full_search"
   | "many_nodes"
   | "many_edges"
+  | "random_table_options"
   | "mention"
   | "insert_word"
   | "insert_image"
