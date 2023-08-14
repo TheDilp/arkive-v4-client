@@ -95,7 +95,7 @@ export function RandomTableView() {
 
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
+      <div className="top-0 flex w-full items-center justify-end gap-x-2">
         {/* <div className="w-56">
           <Input
             name="quick_filter"
@@ -145,6 +145,7 @@ export function RandomTableView() {
                 }
               }
             }}
+            tooltip={Object.values(selection || {})?.length > 0 ? "Roll from selected." : ""}
             variant="info"
           />
         </div>
