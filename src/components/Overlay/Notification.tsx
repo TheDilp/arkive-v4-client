@@ -12,7 +12,7 @@ const NotificationClasses = tv({
   slots: {
     base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
     titleContainer: "text-sm font-normal h-fit text-center flex items-center gap-x-2 w-full justify-between",
-    title: "text-xl",
+    title: "text-base",
     description: "text-center text-sm mt-1 flex-1",
     iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] max-w-fit items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1 transition-all",
@@ -47,7 +47,7 @@ const NotificationClasses = tv({
         base: "animate-in slide-in-from-top-10 mx-auto top-2",
       },
       "top-right": {
-        base: "animate-in slide-in-from-right-10 right-4 top-2",
+        base: "animate-in slide-in-from-right-10 ml-auto top-2",
       },
       center: {
         base: "animate-in zoom-in m-auto",
@@ -56,6 +56,7 @@ const NotificationClasses = tv({
     hasTitleBorder: {
       true: {
         titleContainer: "border-b border-zinc-600 pb-2",
+        title: "text-xl",
       },
     },
   },
@@ -188,7 +189,7 @@ export function Notification({
 export function NotificationContainer() {
   const notifications = useAtomValue(notificationsAtom);
   return (
-    <div className="scrollbar-hidden pointer-events-none absolute z-[999999] flex h-screen w-screen flex-col gap-y-4 overflow-y-auto">
+    <div className="scrollbar-hidden pointer-events-none absolute z-[999999] flex h-full w-full flex-col gap-y-4 overflow-y-auto">
       {notifications.map((n) => (
         <Notification key={n.id} {...n} />
       ))}

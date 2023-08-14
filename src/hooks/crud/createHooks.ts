@@ -33,6 +33,7 @@ export function useCreateProject<InsertType>() {
           variant: "success",
           icon: IconEnum.check,
           timer: 2,
+          position: "top-right",
         });
       },
     },
@@ -66,13 +67,15 @@ export function useCreateEntity<
             variant: "success",
             icon: IconEnum.check,
             timer: 2,
+            position: "top-right",
           });
         } else {
           createNotification({
-            title: data?.message || "There was an error creating this entity.",
+            title: "There was an error creating this entity.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,
+            position: "top-right",
           });
         }
       },
@@ -116,6 +119,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
             variant: "success",
             icon: IconEnum.check,
             timer: 2,
+            position: "top-right",
           });
         } else {
           createNotification({
@@ -123,6 +127,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
             variant: "error",
             icon: IconEnum.error,
             timer: 5,
+            position: "top-right",
           });
         }
       },

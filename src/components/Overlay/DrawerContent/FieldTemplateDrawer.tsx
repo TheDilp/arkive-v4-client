@@ -136,7 +136,7 @@ function FieldRow({
               name={`[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
-              value={formula}
+              value={formula || ""}
               variant={formula?.match?.(DiceRollRegex) ? "primary" : "error"}
             />
           </div>

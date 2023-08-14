@@ -21,7 +21,7 @@ export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginat
       }}
       value={
         table.getPaginationRowModel().flatRows.length ===
-        (table.options.meta as MetaType).selection[pagination?.page || 0]?.length
+        (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.length
       }
     />
   ),
@@ -29,7 +29,7 @@ export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginat
     <Checkbox
       name={row.id}
       onChange={() => dispatch({ type: "setSelection", payload: { row: row.index } })}
-      value={((table.options.meta as MetaType).selection[pagination?.page || 0] || []).includes(row.index)}
+      value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.index)}
     />
   ),
 });

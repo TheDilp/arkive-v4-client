@@ -135,7 +135,7 @@ export function RandomTableView() {
                 if (option) {
                   createNotification({
                     title: option.title,
-                    timer: 500,
+                    timer: 15,
                     description: option?.description,
                     variant: "info",
                     icon: IconEnum.d20,
