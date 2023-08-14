@@ -5,6 +5,17 @@
   @apply h-full overflow-y-auto pt-2 !important;
 }
 
+.editor-component {
+  @apply max-h-[30rem] overflow-auto;
+  .remirror-editor.ProseMirror {
+    @apply overflow-hidden !important;
+  }
+}
+
+&.editor-component {
+  @apply h-full !important;
+}
+
 .remirror-editor,
 .staticRendererContainer {
   @apply p-4 font-lato focus-visible:outline-none;

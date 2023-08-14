@@ -4,7 +4,6 @@ import { MouseEvent, useLayoutEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Dropdown, Graph, Icon } from "../../components";
-import { Editor } from "../../components/Complex/Editor/Editor";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetAllEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DrawerContentType } from "../../types";
@@ -20,6 +19,7 @@ import {
 } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
 import { CharactersView } from ".";
+import { DocumentView } from "./DocumentView";
 import { RandomTableView } from "./RandomTableView";
 
 type EntityItemType = {
@@ -325,7 +325,7 @@ export function EntitiesView() {
           ) : null}
         </div>
       ) : null}
-      {!!item_id && !data?.data?.is_folder && type === "documents" ? <Editor editable /> : null}
+      {!!item_id && !data?.data?.is_folder && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph /> : null}
       {!!item_id && !data?.data?.is_folder && type === "random_tables" ? <RandomTableView /> : null}
     </>

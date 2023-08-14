@@ -17,8 +17,9 @@ import {
 import { DiceNoSim, DiceRollParser } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 import { Badge, CharacterPreview, ImagePreview } from "../..";
+import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, Search, Select, Textarea } from "../../Form";
+import { Button, Checkbox, Input, Search, Select } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
@@ -88,15 +89,20 @@ function CharacterFieldInputs({
   }
   if (fieldType === "textarea") {
     return (
-      <div className="h-[10rem] max-h-full min-h-[10rem]">
-        <Textarea
+      <div className="flex max-h-[30rem] min-h-[10rem] flex-col">
+        <Editor
+          initialContent={currentValue as string}
+          name={name}
+          onChange={({ value }) => handleChange({ name, value: { id, value: JSON.stringify(value) } })}
+        />
+        {/* <Textarea
           label={title}
           name={name}
           onChange={({ value }) => {
             handleChange({ name, value: { id, value } });
           }}
           value={currentValue as string}
-        />
+        /> */}
       </div>
     );
   }

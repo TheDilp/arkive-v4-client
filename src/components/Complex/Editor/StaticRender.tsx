@@ -22,6 +22,7 @@ const typeMap = (project_id: string): MarkMap => ({
   blockquote: "blockquote",
   callout: Callout,
   horizontalRule: "hr",
+  tableofcontents: "p",
   image: "img",
   table: (...props: any) => {
     return (

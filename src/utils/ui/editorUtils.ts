@@ -36,7 +36,7 @@ import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export const DefaultEditorExtensions: (
-  createNotification: (notification: Omit<NotificationType, "id">) => void,
+  createNotification?: (notification: Omit<NotificationType, "id">) => void,
 ) => AnyExtension[] = (createNotification) => {
   const CustomMentionExtension = new MentionAtomExtension({
     priority: 10,
@@ -93,15 +93,16 @@ export const DefaultEditorExtensions: (
     const res = await Dice.roll(parsedNotation);
     const rollData = DiceRollParser.parseFinalResults(res);
     if (rollData?.valid) {
-      createNotification({
-        timer: 2,
-        title: "Dice roll",
-        variant: "info",
-        position: "top",
-        data: rollData,
-        type: "dice_roll",
-      });
-    } else {
+      if (createNotification)
+        createNotification({
+          timer: 2,
+          title: "Dice roll",
+          variant: "info",
+          position: "top",
+          data: rollData,
+          type: "dice_roll",
+        });
+    } else if (createNotification)
       createNotification({
         timer: 2,
         title: "The dice roll notation is not valid.",
@@ -109,7 +110,6 @@ export const DefaultEditorExtensions: (
         variant: "error",
         position: "top",
       });
-    }
 
     return true;
   });
