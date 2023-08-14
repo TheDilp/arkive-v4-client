@@ -49,7 +49,7 @@ interface ItemProps {
 
 const SearchClasses = tv({
   slots: {
-    base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-l-md items-center pl-2 h-10 border border-zinc-700",
+    base: "flex w-full bg-zinc-900 focus:bg-zinc-950 text-white rounded-md items-center pl-2 h-10 border border-zinc-700",
     input: "flex h-10 w-full items-center justify-center bg-zinc-900 pr-2 text-base outline-none placeholder:italic border-y",
     label: "text-sm truncate block min-h-[20px]",
     helperText: "text-xs truncate block",
@@ -60,32 +60,37 @@ const SearchClasses = tv({
   variants: {
     variant: {
       primary: {
+        base: "border-zinc-700",
         input: "border-zinc-700",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
       secondary: {
+        base: "border-zinc-400",
         input: "border-zinc-400",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
       info: {
+        base: "border-blue-600",
         input: "border-blue-600",
         label: "text-blue-400",
         helperText: "text-blue-400",
         icon: "text-blue-200",
       },
       success: {
+        base: "border-green-600",
         input: "border-green-600",
         label: "text-green-400",
         helperText: "text-green-400",
       },
       warning: {
-        input: "border-orange-400",
+        base: "border-orange-400",
         label: "text-orange-400",
         helperText: "text-orange-400",
       },
       error: {
+        base: "border-red-600",
         input: "border-red-600",
         label: "text-red-500",
         helperText: "text-red-500",
@@ -166,6 +171,7 @@ export function Search({
   name,
   helperText,
   value,
+  hasShownOption,
   onChange,
 }: SearchType) {
   const { project_id } = useParams();
@@ -184,6 +190,7 @@ export function Search({
   });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [displayValue, setDisplayValue] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
@@ -276,26 +283,28 @@ export function Search({
               } else if (!value && typeof activeIndex === "number") {
                 const item = data?.data?.[activeIndex];
                 if (item) {
-                  onChange({ name, value: item.value, label: item.label, color: item?.color });
-                  if (!isAutocomplete) {
-                    setInputValue("");
-                  } else {
-                    setInputValue(item.label);
-                  }
+                  onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
+                  setInputValue("");
+                  if (hasShownOption) setDisplayValue(item.label);
                   setOpen(false);
                   remove();
                   inputRef.current?.focus();
                 }
               }
             }
-            if (e.key === "Backspace" && inputValue) {
+            if (e.key === "Backspace") {
               if (value) {
                 e.preventDefault();
                 onChange({ name, value: "", label: "" });
                 setInputValue("");
+                setDisplayValue("");
               }
               remove();
+              if (displayValue) {
+                setDisplayValue("");
+              }
             }
+
             if (e.key === "ArrowUp") {
               if (activeIndex === 0 && data?.data) {
                 setActiveIndex(data.data.length - 1);
@@ -310,7 +319,7 @@ export function Search({
             }
           }}
           placeholder={placeholder}
-          value={inputValue}
+          value={hasShownOption && !inputValue ? displayValue : inputValue}
         />
 
         <div className={buttonContainer()}>
@@ -354,6 +363,7 @@ export function Search({
                     onClick() {
                       onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
                       setInputValue("");
+                      if (hasShownOption) setDisplayValue(item.label);
                       setOpen(false);
                       remove();
                       inputRef.current?.focus();

@@ -10,6 +10,7 @@ export interface SearchType extends BaseFormComponentType {
   placeholder?: string;
   buttonIcon?: string;
   isAutocomplete?: boolean;
+  hasShownOption?: boolean;
   onChange: ({
     name,
     value,
