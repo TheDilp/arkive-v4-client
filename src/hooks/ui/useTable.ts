@@ -115,11 +115,24 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
           ...state,
           selection: {
             ...(selection || {}),
-            [page]: [action.payload.row],
+            [page || 0]: [action.payload.row],
           },
         };
       }
-      return state;
+      if (state?.selection?.[0]?.includes(action.payload.row)) {
+        return {
+          ...state,
+          selection: {
+            0: [...(state.selection?.[0] || [])].filter((r) => r !== action.payload.row),
+          },
+        };
+      }
+      return {
+        ...state,
+        selection: {
+          0: [...(state.selection?.[0] || []), action.payload.row],
+        },
+      };
     }
     case "selectAll": {
       return { ...state, selection: { ...(state.selection || {}), [state?.pagination?.page || 0]: action.payload.rows } };
