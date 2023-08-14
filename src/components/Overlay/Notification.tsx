@@ -72,7 +72,7 @@ function DiceRollNotification({ data }: { data: DiceRollType }) {
               .filter((r) => !r.drop)
               .map((roll, rIdx) => (
                 <span key={crypto.randomUUID()}>
-                  {idx > 0 ? <span>{idx === 0 ? "" : data?.ops?.[idx - 1] || "+"}</span> : null}
+                  {idx > 0 && rIdx === 0 ? <span>{data?.ops?.[idx - 1]}</span> : null}
                   {rIdx > 0 ? <span>+</span> : null}
                   <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
                 </span>
