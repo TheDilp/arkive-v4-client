@@ -4,6 +4,8 @@ import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType 
 import { AvailableEntityType } from "../../EntityTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
+export type TableSelectionType = { [key: number]: number[] };
+
 export interface FilterEnumType extends SelectOptionType {
   type: "boolean" | "text" | "number";
   options?: SelectOptionType[];
@@ -12,15 +14,17 @@ export interface MetaType {
   sortable?: boolean;
   centered?: boolean;
   noLink?: boolean;
-
+  selection: TableSelectionType;
   filterOptions?: FilterEnumType[];
 }
 
 export type TableColumnFilterType = RequestFilterType & { id: string };
+
 export interface TableParams {
   orderBy?: RequestOrderByType;
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   pagination?: RequestPaginationType;
+  selection?: TableSelectionType;
 }
 export type TableActionTypes = "setSort" | "removeFilter" | "setSelected" | "setAllSelected" | "clearSelected" | "clearFilters";
 export type TableActionType =
@@ -38,7 +42,10 @@ export type TableActionType =
   | {
       type: "setSort";
       payload: { field: string; sort: SortType };
-    };
+    }
+  | { type: "setSelection"; payload: { row: number } }
+  | { type: "selectAll"; payload: { rows: number[] } }
+  | { type: "clearSelection" };
 
 export interface TableDispatch extends Dispatch<TableActionType> {}
 export interface TableType {
@@ -52,6 +59,7 @@ export interface TableType {
     hasSelect?: boolean;
     hasTags?: boolean;
     orderBy?: RequestOrderByType;
+    selection?: TableSelectionType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     getLink?: (rowData: any) => string;

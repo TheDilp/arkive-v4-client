@@ -55,18 +55,6 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
       }
       return state;
     }
-    case "setPagination":
-      return { ...state, pagination: { ...state.pagination, ...action.payload } };
-    case "setSort": {
-      if (action.payload?.field && action.payload?.sort) {
-        return { ...state, orderBy: action.payload };
-      }
-      if (action?.payload?.field && action.payload.sort === null) {
-        return deleteObjectProps(state, ["orderBy"]);
-      }
-      return { ...state };
-    }
-
     case "removeFilter": {
       if (action.payload?.and) {
         return {
@@ -82,55 +70,75 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
       }
       return state;
     }
-
     case "clearAllFilters": {
       const newState = deleteObjectProps({ ...state }, ["filters"]);
 
       return newState;
     }
+    case "setPagination":
+      return { ...state, pagination: { ...state.pagination, ...action.payload } };
+    case "setSort": {
+      if (action.payload?.field && action.payload?.sort) {
+        return { ...state, orderBy: action.payload };
+      }
+      if (action?.payload?.field && action.payload.sort === null) {
+        return deleteObjectProps(state, ["orderBy"]);
+      }
+      return { ...state };
+    }
+    case "setSelection": {
+      if (typeof state.pagination?.page === "number") {
+        const {
+          selection,
+          pagination: { page },
+        } = state;
 
-    // case "setSelected":
-    //   if (state?.selection?.[action?.payload?.page] && includes(state?.selection?.[action?.payload?.page], action.payload.id)) {
-    //     return {
-    //       ...state,
-    //       selection: {
-    //         ...state.selection,
-    //         [action.payload.page]: filter(state.selection[action?.payload?.page], (id) => id !== action.payload.id),
-    //       },
-    //     };
-    //   }
-    //   if (state.selection[action?.payload?.page]) {
-    //     return {
-    //       ...state,
-    //       selection: {
-    //         ...state.selection,
-    //         [action.payload.page]: [...state.selection[action.payload.page], action.payload.id],
-    //       },
-    //     };
-    //   }
-    //   return {
-    //     ...state,
-    //     selection: { ...state.selection, [action.payload.page]: [action.payload.id] },
-    //   };
-    // case "setAllSelected":
-    //   if (typeof action?.payload?.page === "number" && action?.payload?.ids) {
-    //     return { ...state, selection: { ...state.selection, [action.payload.page]: action.payload.ids } };
-    //   }
-    //   if (typeof action?.payload?.page === "number" && !action?.payload?.ids) {
-    //     const tempSelection = { ...state.selection };
-    //     tempSelection[action.payload.page] = [];
-    //     return { ...state, selection: tempSelection };
-    //   }
-    //   return { ...state, selection: {} };
+        if (selection?.[page]) {
+          if (!selection[page].includes(action.payload.row)) {
+            return {
+              ...state,
+              selection: {
+                ...(selection || {}),
+                [page]: [...selection[page], action.payload.row],
+              },
+            };
+          }
+          return {
+            ...state,
+            selection: {
+              ...(selection || {}),
+              [page]: selection[page].filter((r) => r !== action.payload.row),
+            },
+          };
+        }
+        return {
+          ...state,
+          selection: {
+            ...(selection || {}),
+            [page]: [action.payload.row],
+          },
+        };
+      }
+      return state;
+    }
+    case "selectAll": {
+      return { ...state, selection: { ...(state.selection || {}), [state?.pagination?.page || 0]: action.payload.rows } };
+    }
+    case "clearSelection": {
+      return { ...state, selection: {} };
+    }
 
-    // case "clearSelected":
-    //   return { ...state, selection: {} };
     default:
       return state;
   }
 };
 
-export function useTable({ orderBy, pagination, filters }: TableParams): [state: TableParams, dispatch: TableDispatch] {
-  const [state, dispatch] = useReducer(tableReducerFn, { orderBy, pagination, filters });
+export function useTable({
+  orderBy,
+  selection,
+  pagination,
+  filters,
+}: TableParams): [state: TableParams, dispatch: TableDispatch] {
+  const [state, dispatch] = useReducer(tableReducerFn, { orderBy, selection, pagination, filters });
   return [state, dispatch];
 }

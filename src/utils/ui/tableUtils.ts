@@ -3,7 +3,7 @@ import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 
 import { FavoriteColumn, SelectColumn, TagColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
-import { SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
+import { RequestPaginationType, SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
 export function getTableColumns(
@@ -13,15 +13,24 @@ export function getTableColumns(
     hasFavorite,
     hasTags,
     setFavorite,
-  }: { hasSelect?: boolean; hasFavorite?: boolean; hasTags?: boolean; setFavorite?: (data: SetFavoriteType) => Promise<void> },
+    dispatch,
+    pagination,
+  }: {
+    hasSelect?: boolean;
+    hasFavorite?: boolean;
+    hasTags?: boolean;
+    setFavorite?: (data: SetFavoriteType) => Promise<void>;
+    dispatch?: TableDispatch;
+    pagination?: RequestPaginationType;
+  },
 ) {
   const finalColumns = [...columns];
 
   if (hasFavorite && setFavorite) {
     finalColumns.unshift(FavoriteColumn(setFavorite));
   }
-  if (hasSelect) {
-    finalColumns.unshift(SelectColumn);
+  if (hasSelect && dispatch) {
+    finalColumns.unshift(SelectColumn(dispatch, pagination));
   }
   if (hasTags) {
     finalColumns.splice(finalColumns.length - 1, 0, TagColumn);

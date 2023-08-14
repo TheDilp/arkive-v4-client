@@ -1,32 +1,38 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { SetFavoriteType, TagType } from "../../../types";
+import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
 import { FavoritesFilters, IconEnum } from "../../../utils";
 import { Badge, Button, Checkbox, Tooltip } from "../..";
 
-export const SelectColumn: ColumnDef<any> = {
+export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginationType) => ColumnDef<any> = (
+  dispatch,
+  pagination,
+) => ({
   id: "select",
   header: ({ table }) => (
     <Checkbox
       name="selectAll"
-      onChange={(_, e) => {
-        const t = table.getToggleAllRowsSelectedHandler();
-        t(e);
+      onChange={({ value }) => {
+        if (value) {
+          dispatch({ type: "selectAll", payload: { rows: table.getPaginationRowModel().flatRows.map((_, i) => i) } });
+        } else {
+          dispatch({ type: "clearSelection" });
+        }
       }}
-      value={table.getIsAllRowsSelected()}
+      value={
+        table.getPaginationRowModel().flatRows.length ===
+        (table.options.meta as MetaType).selection[pagination?.page || 0]?.length
+      }
     />
   ),
-  cell: ({ row }) => (
+  cell: ({ table, row }) => (
     <Checkbox
       name={row.id}
-      onChange={(_, e) => {
-        const t = row.getToggleSelectedHandler();
-        t(e);
-      }}
-      value={row.getIsSelected()}
+      onChange={() => dispatch({ type: "setSelection", payload: { row: row.index } })}
+      value={((table.options.meta as MetaType).selection[pagination?.page || 0] || []).includes(row.index)}
     />
   ),
-};
+});
 
 export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<void>) => ColumnDef<any> = (
   setFavorite: (data: SetFavoriteType) => Promise<void>,
