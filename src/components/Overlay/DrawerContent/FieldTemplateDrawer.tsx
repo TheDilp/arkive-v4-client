@@ -4,9 +4,10 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
+import { FieldTemplate, FieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
 import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
+import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
 import { Button, Input, Search, Select } from "../../Form";
 
 type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
@@ -192,7 +193,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: Partial<Omit<FieldTemplate, "fields">>;
-    relations?: { character_fields?: FieldType[] };
+    relations?: { character_fields?: Partial<FieldType>[] };
   }>("character_fields_templates", project_id as string);
 
   const { data: existingTemplate, isFetching } = useGetEntity<FieldTemplate & { fields: FieldType[] }>(
@@ -317,7 +318,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 onSuccess: resetDrawerAtom,
               },
             );
-          else
+          else {
             await update(
               {
                 data: {
@@ -326,17 +327,21 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                   sort: template.sort,
                 },
                 relations: {
-                  character_fields: fields.map((field) => ({
-                    ...field,
-                    project_id: project_id as string,
-                    options: field.options?.map((opt) => opt.title),
-                  })),
+                  character_fields: fields.map((field) => {
+                    const parsedData = UpdateCharacterFieldsSchema.parse({
+                      ...field,
+                      project_id: project_id as string,
+                      options: field.options?.map((opt) => opt.title),
+                    });
+                    return { ...parsedData, field_type: parsedData.field_type as FieldTypes };
+                  }),
                 },
               },
               {
                 onSuccess: resetDrawerAtom,
               },
             );
+          }
         }}
         variant="success"
       />

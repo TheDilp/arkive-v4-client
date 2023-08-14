@@ -5,8 +5,8 @@ export interface FieldType {
   sort: number;
   title: string;
   field_type: FieldTypes;
-  formula?: string;
-  random_table_id?: string;
+  formula?: string | null;
+  random_table_id?: string | null;
   options?: string[];
   random_table?: { id: string; title: string };
 }

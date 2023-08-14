@@ -17,3 +17,12 @@ export const InsertRandomTableSchema = z.object({
   is_folder: z.boolean().nullable().optional(),
   is_public: z.boolean().nullable().optional(),
 });
+
+export const UpdateRandomTableSchema = z.object({
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  parent_id: z.string().nullable().optional(),
+  icon: z.string().nullable().optional(),
+  is_folder: z.boolean().nullable().optional(),
+  is_public: z.boolean().nullable().optional(),
+});

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
@@ -7,8 +8,10 @@ import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpda
 import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, NotificationType, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
+  baseURLS,
   dialogAtom,
   drawerAtom,
+  FetchFunction,
   getCharacterFullName,
   IconEnum,
   sortEntities,
@@ -46,6 +49,71 @@ function isSaveDisabled(character: Partial<CharacterType> & characterRelationsTy
   return false;
 }
 
+function RandomTableInput({
+  id,
+  title,
+  value: currentValue,
+  index,
+  random_table_id,
+  random_table,
+  handleChange,
+}: Omit<FieldType, "project_id" | "sort"> & {
+  index: number;
+  value: string | string[] | number | undefined;
+  handleChange: ({ name, value }: { name: string; value: any }) => void;
+}) {
+  const name = `character_fields[${index}]`;
+
+  const { data, refetch, isFetching } = useQuery({
+    // @ts-ignore
+    queryKey: ["allEntities", "random_table_options", random_table_id],
+
+    queryFn: async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/random_table_options/random/${random_table_id}`,
+        body: JSON.stringify({
+          data: {
+            count: 1,
+          },
+        }),
+        method: "POST",
+      }),
+
+    options: { enabled: !!random_table_id },
+  });
+
+  return (
+    <div className="flex flex-nowrap items-center gap-x-2">
+      <Input
+        isDisabled
+        label={title}
+        name={name}
+        onChange={({ value }) => {
+          handleChange({ name, value: { id, value } });
+        }}
+        value={currentValue as string}
+      />
+      <div className="flex self-end pb-1.5">
+        <Button
+          hasNoBackground
+          icon={IconEnum.d20}
+          iconSize={24}
+          isIconOnly
+          isLoading={isFetching}
+          onClick={async () => {
+            await refetch();
+            console.log(data?.data?.[0]);
+            if (data?.data?.[0]?.title) {
+              handleChange({ name, value: { id, value: data?.data?.[0]?.title } });
+            }
+          }}
+          tooltip={`Roll (${random_table?.title})`}
+        />
+      </div>
+    </div>
+  );
+}
+
 function CharacterFieldInputs({
   id,
   title,
@@ -54,6 +122,8 @@ function CharacterFieldInputs({
   value: currentValue,
   index,
   formula,
+  random_table_id,
+  random_table,
   handleChange,
   createNotification,
 }: FieldType & {
@@ -142,7 +212,13 @@ function CharacterFieldInputs({
                     });
                   });
               } catch (error) {
-                console.log(error);
+                createNotification({
+                  timer: 2,
+                  title: "The dice roll notation is not valid.",
+                  icon: IconEnum.warning,
+                  variant: "error",
+                  position: "top",
+                });
               }
             }}
             tooltip={`Roll (${formula})`}
@@ -152,48 +228,18 @@ function CharacterFieldInputs({
     );
   }
   if (fieldType === "random_table") {
-    <div className="flex flex-nowrap items-center gap-x-2">
-      <Input
-        isDisabled
-        label={title}
-        name={name}
-        onChange={({ value }) => {
-          handleChange({ name, value: { id, value } });
-        }}
-        value={currentValue as string}
+    return (
+      <RandomTableInput
+        field_type={fieldType}
+        handleChange={handleChange}
+        id={id}
+        index={index}
+        random_table={random_table}
+        random_table_id={random_table_id}
+        title={title}
+        value={currentValue}
       />
-      <div className="flex self-end pb-1.5">
-        <Button
-          hasNoBackground
-          icon={IconEnum.d20}
-          iconSize={24}
-          onClick={() => {
-            try {
-              const parsedNotation = DiceRollParser.parseNotation(formula);
-              DiceNoSim.roll(parsedNotation)
-                .then((r: any) => {
-                  const rollData = DiceRollParser.parseFinalResults(r);
-                  if (rollData?.valid) {
-                    handleChange({ name, value: { id, value: rollData.value } });
-                  }
-                })
-                .catch(() => {
-                  createNotification({
-                    timer: 2,
-                    title: "The dice roll notation is not valid.",
-                    icon: IconEnum.warning,
-                    variant: "error",
-                    position: "top",
-                  });
-                });
-            } catch (error) {
-              console.log(error);
-            }
-          }}
-          tooltip={`Roll (${formula})`}
-        />
-      </div>
-    </div>;
+    );
   }
   return null;
 }
