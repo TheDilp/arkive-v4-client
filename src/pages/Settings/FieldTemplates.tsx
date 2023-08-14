@@ -88,10 +88,11 @@ export function FieldTemplates() {
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
 
-  const [{ orderBy, filters, pagination }, dispatch] = useTable({
+  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: { field: "title", sort: "asc" },
     filters: {},
     pagination: { limit: 10, page: 0 },
+    selection: {},
   });
 
   const { data } = useGetAllEntities<FieldTemplate>(
@@ -131,6 +132,7 @@ export function FieldTemplates() {
             hasSelect: true,
             expandable: true,
             filters,
+            selection,
             orderBy,
           }}
           data={data?.data || []}

@@ -51,6 +51,7 @@ function FieldRow({
   index,
   changeField,
   deleteField,
+  isLoading,
 }: (Omit<FieldType, "options" | "parentId"> & { options?: { id: string; title: string }[] }) & {
   index: number;
   changeField: ({
@@ -58,12 +59,14 @@ function FieldRow({
     value,
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; title: string }[] }) => void;
   deleteField: (i: number) => void;
+  isLoading: boolean;
 }) {
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
+            isDisabled={isLoading}
             label="Field title"
             name={`[${index}].title`}
             onChange={changeField}
@@ -73,6 +76,7 @@ function FieldRow({
         </div>
         <div className="h-full flex-1">
           <Select
+            isDisabled={isLoading}
             label="Field type"
             name={`[${index}].field_type`}
             onChange={changeField}
@@ -89,6 +93,7 @@ function FieldRow({
             <Button
               hasNoBackground
               icon={IconEnum.add}
+              isDisabled={isLoading}
               onClick={() =>
                 changeField({
                   name: `[${index}].options`,
@@ -101,7 +106,13 @@ function FieldRow({
           </div>
         ) : null}
         <div className="h-10 w-8 self-end">
-          <Button hasNoBackground icon={IconEnum.trash} onClick={() => deleteField(index)} variant="error" />
+          <Button
+            hasNoBackground
+            icon={IconEnum.trash}
+            isDisabled={isLoading}
+            onClick={() => deleteField(index)}
+            variant="error"
+          />
         </div>
       </div>
       {field_type === "select" || field_type === "select_multiple" ? (
@@ -109,13 +120,19 @@ function FieldRow({
           {options?.map((opt, optIndex) => (
             <div key={opt.id} className="flex w-full flex-nowrap">
               <div className="w-[calc(100%-5rem)]">
-                <Input name={`[${index}].options[${optIndex}].title`} onChange={changeField} value={opt.title} />
+                <Input
+                  isDisabled={isLoading}
+                  name={`[${index}].options[${optIndex}].title`}
+                  onChange={changeField}
+                  value={opt.title}
+                />
               </div>
               <div className="flex flex-1 justify-end">
                 <div className="h-10 w-8">
                   <Button
                     hasNoBackground
                     icon={IconEnum.trash}
+                    isDisabled={isLoading}
                     onClick={() =>
                       changeField({ name: `[${index}].options`, value: (options || []).filter((o) => o.id !== opt.id) })
                     }
@@ -132,6 +149,7 @@ function FieldRow({
           <div className="flex flex-col gap-y-2">
             <Input
               helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
+              isDisabled={isLoading}
               label="Dice formula"
               name={`[${index}].formula`}
               onChange={changeField}
@@ -159,7 +177,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     relations?: { character_fields?: FieldType[] };
   }>("character_fields_templates", project_id as string);
 
-  const { data: existingTemplate } = useGetEntity<FieldTemplate & { fields: FieldType[] }>(
+  const { data: existingTemplate, isFetching } = useGetEntity<FieldTemplate & { fields: FieldType[] }>(
     data?.id,
     "character_fields_templates",
     {
@@ -180,6 +198,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
+  const isLoading = isFetching || isCreating || isUpdating;
+
   useLayoutEffect(() => {
     if (existingTemplate?.data) {
       setTemplate(existingTemplate.data);
@@ -196,10 +216,23 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-auto text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex-1">
-          <Input label="Template title (required)" name="title" onChange={handleChange} value={template?.title || ""} />
+          <Input
+            isDisabled={isLoading}
+            label="Template title (required)"
+            name="title"
+            onChange={handleChange}
+            value={template?.title || ""}
+          />
         </div>
         <div className="w-20">
-          <Input label="Sort weight" name="sort" onChange={handleChange} type="number" value={template?.sort || 0} />
+          <Input
+            isDisabled={isLoading}
+            label="Sort weight"
+            name="sort"
+            onChange={handleChange}
+            type="number"
+            value={template?.sort || 0}
+          />
         </div>
       </div>
       <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
@@ -208,6 +241,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         <div className="h-8 w-8">
           <Button
             icon={IconEnum.add}
+            isDisabled={isLoading}
             onClick={() =>
               setFields((prev) => [
                 ...prev,
@@ -228,6 +262,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             formula={field?.formula}
             id={field.id}
             index={index}
+            isLoading={isLoading}
             options={field?.options}
             project_id={field?.project_id}
             sort={field.sort}
@@ -237,8 +272,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       </div>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(template?.title, fields) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
+        isDisabled={isSaveDisabled(template?.title, fields) || isLoading}
+        isLoading={isLoading}
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (!data?.id)
