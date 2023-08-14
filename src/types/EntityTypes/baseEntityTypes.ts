@@ -21,6 +21,7 @@ export type AvailableEntityType =
   | "timelines"
   | "random_tables"
   | "character_fields_templates"
+  | "generators"
   | "tags";
 export type AvailableSubEntityType =
   | "alter_names"

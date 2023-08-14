@@ -68,14 +68,15 @@ function DiceRollNotification({ data }: { data: DiceRollType }) {
       {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
         if ("rolls" in die) {
           if (die?.rolls?.length) {
-            return `${idx === 0 ? "" : data?.ops?.[idx - 1] || "+"}${die.rolls
+            return die.rolls
               .filter((r) => !r.drop)
-              .map((roll) => (
+              .map((roll, rIdx) => (
                 <span key={crypto.randomUUID()}>
+                  {idx > 0 ? <span>{idx === 0 ? "" : data?.ops?.[idx - 1] || "+"}</span> : null}
+                  {rIdx > 0 ? <span>+</span> : null}
                   <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
                 </span>
-              ))
-              .join("+")}`;
+              ));
           }
           return (
             <span key={crypto.randomUUID()}>
