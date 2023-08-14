@@ -63,7 +63,8 @@ const NotificationClasses = tv({
   },
 });
 
-function DiceRollNotification({ data }: { data: DiceRollType }) {
+function DiceRollNotification({ id, data }: { id: string; data: DiceRollType }) {
+  const setNotificationAtom = useSetAtom(notificationsAtom);
   return (
     <div className="max-w-full">
       <div className="max-w-full truncate">
@@ -108,7 +109,12 @@ function DiceRollNotification({ data }: { data: DiceRollType }) {
           return "";
         })}
       </div>
-      <span> = {data.value}</span>
+      <span className="flex items-center justify-between">
+        <span>= {data.value}</span>
+        <div className=" w-min">
+          <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
+        </div>
+      </span>
     </div>
   );
 }
@@ -176,7 +182,7 @@ export function Notification({
           {description ? <p className={descriptionClasses()}>{description}</p> : null}
         </div>
       ) : null}
-      {type === "dice_roll" ? <DiceRollNotification data={data} /> : null}
+      {type === "dice_roll" ? <DiceRollNotification data={data} id={id} /> : null}
       {actions?.length ? (
         <div className="flex min-w-fit gap-x-2">
           {actions.map((action) => (
