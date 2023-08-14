@@ -75,7 +75,7 @@ export async function rollDiceWithNotification(
           const rollData = DiceRollParser.parseFinalResults(r);
           if (rollData?.valid) {
             createNotification({
-              timer: 2,
+              timer: 2000,
               title: "Dice roll",
               variant: "info",
               position: "top",

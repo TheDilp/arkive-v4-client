@@ -11,8 +11,9 @@ import { Icon } from "../Misc";
 const NotificationClasses = tv({
   slots: {
     base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
-    titleContainer: "text-sm font-normal h-fit text-center flex items-center gap-x-2 w-full justify-between",
-    title: "text-base",
+    titleContainer:
+      "text-sm font-normal h-fit text-center flex items-center gap-x-2 w-full justify-between truncate max-w-full",
+    title: "text-base truncate max-w-full",
     description: "text-center text-sm mt-1 flex-1",
     iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] max-w-fit items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1 transition-all",
@@ -64,47 +65,49 @@ const NotificationClasses = tv({
 
 function DiceRollNotification({ data }: { data: DiceRollType }) {
   return (
-    <div>
-      {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
-        if ("rolls" in die) {
-          if (die?.rolls?.length) {
-            return die.rolls
-              .filter((r) => !r.drop)
-              .map((roll, rIdx) => (
-                <span key={crypto.randomUUID()}>
-                  {idx > 0 && rIdx === 0 ? <span>{data?.ops?.[idx - 1]}</span> : null}
-                  {rIdx > 0 ? <span>+</span> : null}
-                  <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
-                </span>
-              ));
-          }
-          return (
-            <span key={crypto.randomUUID()}>
-              {data?.ops?.[idx - 1] || "+"}
-              <span className={getCritColor(die.critical)}>{die.value}</span>
-            </span>
-          );
-        }
-
-        if (data?.ops?.[idx - 1]) {
-          if (!die?.drop)
+    <div className="max-w-full">
+      <div className="max-w-full truncate">
+        {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
+          if ("rolls" in die) {
+            if (die?.rolls?.length) {
+              return die.rolls
+                .filter((r) => !r.drop)
+                .map((roll, rIdx) => (
+                  <span key={crypto.randomUUID()}>
+                    {idx > 0 && rIdx === 0 ? <span>{data?.ops?.[idx - 1]}</span> : null}
+                    {rIdx > 0 ? <span>+</span> : null}
+                    <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
+                  </span>
+                ));
+            }
             return (
               <span key={crypto.randomUUID()}>
                 {data?.ops?.[idx - 1] || "+"}
                 <span className={getCritColor(die.critical)}>{die.value}</span>
               </span>
             );
+          }
+
+          if (data?.ops?.[idx - 1]) {
+            if (!die?.drop)
+              return (
+                <span key={crypto.randomUUID()}>
+                  {data?.ops?.[idx - 1] || "+"}
+                  <span className={getCritColor(die.critical)}>{die.value}</span>
+                </span>
+              );
+            return "";
+          }
+          if (!die?.drop)
+            return (
+              <span key={crypto.randomUUID()}>
+                {idx === 0 ? "" : "+"}
+                <span className={getCritColor(die.critical)}>{die.value.toString()}</span>
+              </span>
+            );
           return "";
-        }
-        if (!die?.drop)
-          return (
-            <span key={crypto.randomUUID()}>
-              {idx === 0 ? "" : "+"}
-              <span className={getCritColor(die.critical)}>{die.value.toString()}</span>
-            </span>
-          );
-        return "";
-      })}
+        })}
+      </div>
       <span> = {data.value}</span>
     </div>
   );

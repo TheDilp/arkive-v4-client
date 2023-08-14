@@ -55,7 +55,7 @@ export function Navbar() {
         <div className="w-1/2 truncate lg:w-max">{navbarTitle || "The Arkive"}</div>
       </h1>
       <div className="w-min pr-4">
-        <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ crossAxis: 50 }} isClickable>
+        <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
           <div className="h-full">
             <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
           </div>
