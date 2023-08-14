@@ -1,6 +1,6 @@
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 
-import { DefaultEditorExtensions, onError } from "../../../utils";
+import { DefaultEditorExtensions, onError, useNotifications } from "../../../utils";
 import { MentionDropdownComponent } from ".";
 import { Menubar } from "./Menubar";
 
@@ -11,8 +11,9 @@ type Props = {
 };
 
 export function Editor({ initialContent, name, onChange }: Props) {
+  const createNotification = useNotifications();
   const { manager, state, getContext } = useRemirror({
-    extensions: () => DefaultEditorExtensions(() => {}),
+    extensions: () => DefaultEditorExtensions(createNotification),
     selection: "start",
     onError,
     content: initialContent ? JSON.parse(initialContent || "{}") : undefined,

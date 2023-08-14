@@ -47,7 +47,7 @@ const NotificationClasses = tv({
         base: "animate-in slide-in-from-top-10 mx-auto top-2",
       },
       "top-right": {
-        base: "animate-in slide-in-from-right-10 ml-auto top-2",
+        base: "animate-in slide-in-from-right-10 ml-auto mr-2 top-2",
       },
       center: {
         base: "animate-in zoom-in m-auto",
