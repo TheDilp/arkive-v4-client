@@ -131,7 +131,8 @@ export function RandomTableView() {
             isDisabled={!data?.data?.length}
             label="Roll on table"
             onClick={async () => {
-              await rollDiceWithNotification(createNotification, `1d${data?.data?.length}`);
+              const selectedItems = Object.values(selection || {}).flatMap((a) => a);
+              await rollDiceWithNotification(createNotification, `1d${selectedItems?.length || data?.data?.length}`);
             }}
             variant="info"
           />
