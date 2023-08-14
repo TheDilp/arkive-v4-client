@@ -78,8 +78,6 @@ export function RandomTableDrawer({ data }: Props) {
                 },
                 {
                   onSuccess: (res) => {
-                    console.log(res);
-
                     if (res?.ok) resetDrawerAtom();
                   },
                 },

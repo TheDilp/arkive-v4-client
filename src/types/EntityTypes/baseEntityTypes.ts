@@ -5,8 +5,8 @@ export interface BaseEntityType {
   parent_id?: string | null;
   parents?: { id: string; title: string; parent_id: string | null }[];
   children?: (BaseEntityType & { image_id?: string })[];
-  is_folder: boolean | null;
-  is_public: boolean | null;
+  is_folder?: boolean | null;
+  is_public?: boolean | null;
   icon?: string | null;
 }
 export type AvailableEntityType =
