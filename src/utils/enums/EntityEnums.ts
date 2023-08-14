@@ -1,4 +1,4 @@
-export const FieldTypesEnum = ["text", "textarea", "number", "select", "select_multiple", "dice_roll"];
+export const FieldTypesEnum = ["text", "textarea", "number", "select", "select_multiple", "dice_roll", "random_table"];
 export const BaseCharacterRelationshipOptionsEnum = [
   { label: "Father", value: "father" },
   { label: "Mother", value: "mother" },

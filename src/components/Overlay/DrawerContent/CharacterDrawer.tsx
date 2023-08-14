@@ -151,6 +151,50 @@ function CharacterFieldInputs({
       </div>
     );
   }
+  if (fieldType === "random_table") {
+    <div className="flex flex-nowrap items-center gap-x-2">
+      <Input
+        isDisabled
+        label={title}
+        name={name}
+        onChange={({ value }) => {
+          handleChange({ name, value: { id, value } });
+        }}
+        value={currentValue as string}
+      />
+      <div className="flex self-end pb-1.5">
+        <Button
+          hasNoBackground
+          icon={IconEnum.d20}
+          iconSize={24}
+          onClick={() => {
+            try {
+              const parsedNotation = DiceRollParser.parseNotation(formula);
+              DiceNoSim.roll(parsedNotation)
+                .then((r: any) => {
+                  const rollData = DiceRollParser.parseFinalResults(r);
+                  if (rollData?.valid) {
+                    handleChange({ name, value: { id, value: rollData.value } });
+                  }
+                })
+                .catch(() => {
+                  createNotification({
+                    timer: 2,
+                    title: "The dice roll notation is not valid.",
+                    icon: IconEnum.warning,
+                    variant: "error",
+                    position: "top",
+                  });
+                });
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+          tooltip={`Roll (${formula})`}
+        />
+      </div>
+    </div>;
+  }
   return null;
 }
 

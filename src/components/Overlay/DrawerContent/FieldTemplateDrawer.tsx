@@ -160,6 +160,22 @@ function FieldRow({
           </div>
         </div>
       ) : null}
+      {field_type === "random_table" ? (
+        <div className="flex flex-col gap-y-2 pl-8">
+          <div className="flex flex-col gap-y-2">
+            <Input
+              helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
+              isDisabled={isLoading}
+              label="Dice formula"
+              name={`[${index}].formula`}
+              onChange={changeField}
+              placeholder="E.g. 4d6dl1"
+              value={formula || ""}
+              variant={formula?.match?.(DiceRollRegex) ? "primary" : "error"}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function useUpdateEntity<InsertType extends { data: { id?: string; parent
           });
         } else
           createNotification({
-            title: "There was an error updating this item.",
+            title: data?.message || "There was an error updating this item.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,

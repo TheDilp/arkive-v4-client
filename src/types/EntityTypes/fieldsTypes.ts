@@ -1,4 +1,4 @@
-export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll";
+export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll" | "random_table";
 export interface FieldType {
   id: string;
   project_id: string;
