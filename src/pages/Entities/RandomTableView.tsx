@@ -82,9 +82,10 @@ export function RandomTableView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const createNotification = useNotifications();
-  const [{ orderBy, filters, pagination }, dispatch] = useTable({
+  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: { field: "first_name", sort: "asc" },
     pagination: { limit: 10, page: 0 },
+    selection: {},
   });
   const { project_id, item_id } = useParams();
   const { data, isLoading } = useGetAllEntities<RandomTableOptionType>(
@@ -160,6 +161,7 @@ export function RandomTableView() {
             hasTags: true,
             orderBy,
             filters,
+            selection,
           }}
           data={data?.data || []}
           dispatch={dispatch}

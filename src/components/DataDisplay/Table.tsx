@@ -58,7 +58,7 @@ const TableClasses = tv({
     content: "flex flex-1 items-center h-full truncate max-w-full px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950",
+      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
@@ -503,7 +503,10 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
             <div className={body()}>
               {table.getRowModel().rows.map((row) => (
                 <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
-                  <div className={`${rowClasses()} ${row.getIsSelected() ? selectedRow() : ""}`}>
+                  <div
+                    className={`${rowClasses()} ${
+                      config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index) ? selectedRow() : ""
+                    }`}>
                     {row.getVisibleCells().map((cell) => (
                       <div
                         key={cell.id}
