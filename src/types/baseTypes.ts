@@ -41,3 +41,27 @@ export interface BaseFormComponentType extends BaseComponentType {
   isDisabled?: boolean;
   isLoading?: boolean;
 }
+
+export type DiceRollType = {
+  value: number;
+  valid: boolean;
+  dice?: {
+    value: number;
+    critical: "success" | "failure" | null;
+    rolls: {
+      value: number;
+      critical: "success" | "failure";
+      order: number;
+      type: "die" | "number";
+      drop?: boolean | undefined;
+    }[];
+  }[];
+  rolls?: {
+    value: number;
+    critical: "success" | "failure" | null;
+    order: number;
+    drop?: boolean | undefined;
+    type: "die" | "number";
+  }[];
+  ops: ("+" | "-" | "/" | "*")[];
+};

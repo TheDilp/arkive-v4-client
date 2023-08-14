@@ -33,7 +33,7 @@ import { TableOfContentsExtension } from "../../components/Complex/Editor/Extens
 import { useGetEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
-import { constructFinalRollDisplay, Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
+import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export const DefaultEditorExtensions: (
   createNotification: (notification: Omit<NotificationType, "id">) => void,
@@ -95,9 +95,11 @@ export const DefaultEditorExtensions: (
     if (rollData?.valid) {
       createNotification({
         timer: 2,
-        title: constructFinalRollDisplay(rollData),
+        title: "Dice roll",
         variant: "info",
         position: "top",
+        data: rollData,
+        type: "dice_roll",
       });
     } else {
       createNotification({

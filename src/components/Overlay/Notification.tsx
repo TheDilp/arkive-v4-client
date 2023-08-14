@@ -2,8 +2,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { NotificationType } from "../../types";
+import { DiceRollType, NotificationType } from "../../types";
 import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
+import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
 import { Icon } from "../Misc";
 
@@ -60,6 +61,53 @@ const NotificationClasses = tv({
   },
 });
 
+function DiceRollNotification({ data }: { data: DiceRollType }) {
+  return (
+    <div>
+      {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
+        if ("rolls" in die) {
+          if (die?.rolls?.length) {
+            return `${idx === 0 ? "" : data?.ops?.[idx - 1] || "+"}${die.rolls
+              .filter((r) => !r.drop)
+              .map((roll) => (
+                <span key={crypto.randomUUID()}>
+                  <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
+                </span>
+              ))
+              .join("+")}`;
+          }
+          return (
+            <span key={crypto.randomUUID()}>
+              {data?.ops?.[idx - 1] || "+"}
+              <span className={getCritColor(die.critical)}>{die.value}</span>
+            </span>
+          );
+        }
+
+        if (data?.ops?.[idx - 1]) {
+          if (!die?.drop)
+            return (
+              <span key={crypto.randomUUID()}>
+                {data?.ops?.[idx - 1] || "+"}
+                <span className={getCritColor(die.critical)}>{die.value}</span>
+              </span>
+            );
+          return "";
+        }
+        if (!die?.drop)
+          return (
+            <span key={crypto.randomUUID()}>
+              {idx === 0 ? "" : "+"}
+              <span className={getCritColor(die.critical)}>{die.value.toString()}</span>
+            </span>
+          );
+        return "";
+      })}
+      <span> = {data.value}</span>
+    </div>
+  );
+}
+
 export function Notification({
   id,
   title,
@@ -70,6 +118,8 @@ export function Notification({
   actions,
   position = "top-right",
   hasTitleBorder,
+  type,
+  data,
 }: NotificationType) {
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
@@ -105,20 +155,23 @@ export function Notification({
           transition: `width ${timer}s linear`,
         }}
       />
-      <div className="flex w-fit flex-col items-center justify-between ">
-        <div className={titleContainer()}>
-          {icon ? (
-            <div className={iconContainer()}>
-              <Icon fontSize={22} icon={icon} />
+      {!type ? (
+        <div className="flex w-fit flex-col items-center justify-between">
+          <div className={titleContainer()}>
+            {icon ? (
+              <div className={iconContainer()}>
+                <Icon fontSize={22} icon={icon} />
+              </div>
+            ) : null}
+            <span className={titleClasses()}>{title}</span>
+            <div className=" w-min">
+              <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
             </div>
-          ) : null}
-          <span className={titleClasses()}>{title}</span>
-          <div className=" w-min">
-            <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
           </div>
+          {description ? <p className={descriptionClasses()}>{description}</p> : null}
         </div>
-        {description ? <p className={descriptionClasses()}>{description}</p> : null}
-      </div>
+      ) : null}
+      {type === "dice_roll" ? <DiceRollNotification data={data} /> : null}
       {actions?.length ? (
         <div className="flex min-w-fit gap-x-2">
           {actions.map((action) => (

@@ -9,6 +9,8 @@ export type NotificationPositionsType =
   | "top-left"
   | "bottom-right"
   | "bottom-left";
+
+export type NotificationContentType = "dice_roll" | null;
 export interface NotificationType {
   id: string;
   title: string;
@@ -18,6 +20,8 @@ export interface NotificationType {
   variant?: Variant;
   position?: NotificationPositionsType;
   hasTitleBorder?: boolean;
+  type?: NotificationContentType;
+  data?: any;
   actions?: {
     label?: string;
     onClick: () => void;
