@@ -37,7 +37,7 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
         backgroundColor: customColor,
       }}
       tabIndex={0}>
-      <span className="h-full">{label}</span>
+      <span className="flex h-full items-center">{label}</span>
       {clearAction ? <Button hasNoBackground icon={IconEnum.close} onClick={clearAction} /> : null}
     </span>
   );
