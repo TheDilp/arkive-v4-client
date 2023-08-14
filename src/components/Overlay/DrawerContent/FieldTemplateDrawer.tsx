@@ -52,6 +52,7 @@ function FieldRow({
   index,
   changeField,
   deleteField,
+  random_table,
   isLoading,
 }: (Omit<FieldType, "options" | "parentId"> & { options?: { id: string; title: string }[] }) & {
   index: number;
@@ -166,6 +167,7 @@ function FieldRow({
           <div className="flex flex-col gap-y-2">
             <Search
               hasShownOption
+              initialDisplayValue={random_table?.title || ""}
               isDisabled={isLoading}
               label="Random table"
               name={`[${index}].random_table_id`}
@@ -281,6 +283,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             isLoading={isLoading}
             options={field?.options}
             project_id={field?.project_id}
+            random_table={field?.random_table}
             random_table_id={field?.random_table_id}
             sort={field.sort}
             title={field.title}
@@ -315,22 +318,25 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               },
             );
           else
-            await update({
-              data: {
-                id: data?.id,
-                title: template.title,
-                sort: template.sort,
+            await update(
+              {
+                data: {
+                  id: data?.id,
+                  title: template.title,
+                  sort: template.sort,
+                },
+                relations: {
+                  character_fields: fields.map((field) => ({
+                    ...field,
+                    project_id: project_id as string,
+                    options: field.options?.map((opt) => opt.title),
+                  })),
+                },
               },
-              relations: {
-                character_fields: fields.map((field) => ({
-                  ...field,
-                  project_id: project_id as string,
-                  options: field.options?.map((opt) => opt.title),
-                })),
+              {
+                onSuccess: resetDrawerAtom,
               },
-            });
-
-          resetDrawerAtom();
+            );
         }}
         variant="success"
       />

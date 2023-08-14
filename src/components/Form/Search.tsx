@@ -162,6 +162,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>((
 });
 
 export function Search({
+  initialDisplayValue,
   placeholder,
   label,
   isAutocomplete,
@@ -190,7 +191,7 @@ export function Search({
   });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [displayValue, setDisplayValue] = useState("");
+  const [displayValue, setDisplayValue] = useState(initialDisplayValue || "");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
