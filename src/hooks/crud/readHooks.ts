@@ -59,12 +59,19 @@ export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOp
   );
 }
 
-export function useGetAllEntities<ReturnType>(
+export function useGetEntities<ReturnType>(
   request: RequestBodyType,
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean; queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
-  let baseQueryKey = ["allEntities", request.data.project_id, type, request.data?.item_id, request?.filters, request?.orderBy];
+  let baseQueryKey = [
+    "allEntities",
+    request.data.project_id,
+    type,
+    request.data?.item_id || request.data?.parent_id,
+    request?.filters,
+    request?.orderBy,
+  ];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",

@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetAllEntities, useTable } from "../../hooks";
+import { useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import { dialogAtom, drawerAtom, IconEnum, useNotifications } from "../../utils";
@@ -82,7 +82,7 @@ export function RandomTableView() {
     selection: {},
   });
   const { project_id, item_id } = useParams();
-  const { data, isLoading } = useGetAllEntities<RandomTableOptionType>(
+  const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id: project_id as string },
     },

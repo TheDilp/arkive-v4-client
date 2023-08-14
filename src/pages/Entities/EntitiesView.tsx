@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Dropdown, Graph, Icon } from "../../components";
 import Alert from "../../components/Misc/Alert";
-import { useChangeNavbarTitle, useGetAllEntities, useGetEntity, useUpdateEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DrawerContentType } from "../../types";
 import {
   breadcrumbsAtom,
@@ -112,7 +112,7 @@ export function EntitiesView() {
 
   if (type === "documents") fields.push("image_id");
 
-  const { data: base } = useGetAllEntities<BaseEntityType & { image_id?: string }>(
+  const { data: base } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,

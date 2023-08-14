@@ -7,7 +7,7 @@ import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from 
 import { FieldTemplate, FieldType, InputOnChangeValue, onChangeValue } from "../../../types";
 import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
-import { Button, Input, Select } from "../../Form";
+import { Button, Input, Search, Select } from "../../Form";
 
 type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
 
@@ -46,6 +46,7 @@ function FieldRow({
   title,
   sort,
   field_type,
+  random_table_id,
   options,
   formula,
   index,
@@ -163,15 +164,14 @@ function FieldRow({
       {field_type === "random_table" ? (
         <div className="flex flex-col gap-y-2 pl-8">
           <div className="flex flex-col gap-y-2">
-            <Input
-              helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
+            <Search
+              hasShownOption
               isDisabled={isLoading}
-              label="Dice formula"
-              name={`[${index}].formula`}
+              label="Random table"
+              name={`[${index}].random_table_id`}
               onChange={changeField}
-              placeholder="E.g. 4d6dl1"
-              value={formula || ""}
-              variant={formula?.match?.(DiceRollRegex) ? "primary" : "error"}
+              searchEntity="random_tables"
+              value={random_table_id || ""}
             />
           </div>
         </div>
@@ -281,6 +281,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             isLoading={isLoading}
             options={field?.options}
             project_id={field?.project_id}
+            random_table_id={field?.random_table_id}
             sort={field.sort}
             title={field.title}
           />

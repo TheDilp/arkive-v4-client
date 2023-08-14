@@ -3,7 +3,7 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetAllEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, NotificationType, onChangeValue } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
@@ -295,7 +295,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     relations?: characterRelationsType;
   }>("characters", project_id as string);
 
-  const { data: templates } = useGetAllEntities<FieldTemplate>(
+  const { data: templates } = useGetEntities<FieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
     {

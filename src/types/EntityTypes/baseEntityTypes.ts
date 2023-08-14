@@ -44,6 +44,7 @@ export type SearchableEntities =
   | "boards"
   | "nodes"
   | "edges"
+  | "random_tables"
   | "events"
   | "images"
   | "tags";

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useGetAllEntities } from "../../../hooks";
+import { useGetEntities } from "../../../hooks";
 import { AvailableEntityType, FieldType } from "../../../types";
 import { getSentenceCase } from "../../../utils";
 import { Badge } from "../../Misc/Badge";
@@ -12,7 +12,7 @@ const ExpandedTableRowClasses = tv({
 
 function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   const { project_id } = useParams();
-  const { data } = useGetAllEntities<FieldType>(
+  const { data } = useGetEntities<FieldType>(
     {
       data: {
         project_id,

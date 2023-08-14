@@ -6,6 +6,7 @@ export interface FieldType {
   title: string;
   field_type: FieldTypes;
   formula?: string;
+  random_table_id?: string;
   options?: string[];
 }
 export interface FieldTemplate {

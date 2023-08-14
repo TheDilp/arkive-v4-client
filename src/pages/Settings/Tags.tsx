@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetAllEntities, useTable } from "../../hooks";
+import { useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -96,7 +96,7 @@ export function Tags() {
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
   const [{ orderBy }, dispatch] = useTable({ orderBy: { field: "title", sort: "asc" } });
-  const { data } = useGetAllEntities({ data: { project_id }, orderBy }, "tags");
+  const { data } = useGetEntities({ data: { project_id }, orderBy }, "tags");
 
   return (
     <TablePageLayout>

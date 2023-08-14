@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useGetAllEntities, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, FieldTemplate } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -95,7 +95,7 @@ export function FieldTemplates() {
     selection: {},
   });
 
-  const { data } = useGetAllEntities<FieldTemplate>(
+  const { data } = useGetEntities<FieldTemplate>(
     {
       filters,
       orderBy,

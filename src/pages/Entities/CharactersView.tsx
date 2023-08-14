@@ -14,7 +14,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useChangeNavbarTitle, useGetAllEntities, useGetInfiniteEntities, useTable, useUpdateEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useGetInfiniteEntities, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import {
   dialogAtom,
@@ -166,7 +166,7 @@ export function CharactersView() {
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
-  const { data, isLoading } = useGetAllEntities<CharacterType>(
+  const { data, isLoading } = useGetEntities<CharacterType>(
     {
       data: { project_id: project_id as string },
       relations: {
