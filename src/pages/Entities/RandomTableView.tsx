@@ -6,8 +6,8 @@ import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "..
 import { useGetAllEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters, useNotifications } from "../../utils";
-import { rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
+import { dialogAtom, drawerAtom, IconEnum, useNotifications } from "../../utils";
+import { getRollValue } from "../../utils/ui/diceRollerUtils";
 
 const columnHelper = createColumnHelper<RandomTableOptionType>();
 
@@ -20,10 +20,6 @@ function createColumns(
       id: "title",
       header: "Title",
       cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-        filterOptions: NameFilters,
-      },
     }),
 
     columnHelper.display({
@@ -82,9 +78,7 @@ export function RandomTableView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const createNotification = useNotifications();
-  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: { field: "first_name", sort: "asc" },
-    pagination: { limit: 10, page: 0 },
+  const [{ selection }, dispatch] = useTable({
     selection: {},
   });
   const { project_id, item_id } = useParams();
@@ -132,7 +126,24 @@ export function RandomTableView() {
             label="Roll on table"
             onClick={async () => {
               const selectedItems = Object.values(selection || {}).flatMap((a) => a);
-              await rollDiceWithNotification(createNotification, `1d${selectedItems?.length || data?.data?.length}`);
+              const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
+              const idx = value - 1;
+              if (idx > -1) {
+                const optionIdx = selectedItems?.[idx];
+                const option = data?.data?.[optionIdx ?? idx];
+
+                if (option) {
+                  createNotification({
+                    title: option.title,
+                    timer: 500,
+                    description: option?.description,
+                    variant: "info",
+                    icon: IconEnum.d20,
+                    hasTitleBorder: true,
+                    position: "top",
+                  });
+                }
+              }
             }}
             variant="info"
           />
@@ -160,15 +171,12 @@ export function RandomTableView() {
             hasSelect: true,
             hasFavorite: true,
             hasTags: true,
-            orderBy,
-            filters,
             selection,
           }}
           data={data?.data || []}
           dispatch={dispatch}
           isLoading={isLoading}
-          pagination={pagination}
-          type="characters"
+          type="random_table_options"
         />
       </div>
     </TablePageLayout>

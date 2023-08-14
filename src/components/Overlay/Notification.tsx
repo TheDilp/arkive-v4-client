@@ -7,12 +7,14 @@ import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { Button } from "../Form";
 import { Icon } from "../Misc";
 
-const ToastClasses = tv({
+const NotificationClasses = tv({
   slots: {
-    base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] overflow-hidden relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow  duration-300 ease-out",
-    title: "text-sm font-normal text-center",
-    iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] items-center justify-center rounded",
-    progress: "absolute left-0 top-0 h-1  transition-all",
+    base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
+    titleContainer: "text-sm font-normal h-fit text-center flex items-center gap-x-2 w-full justify-between",
+    title: "text-xl",
+    description: "text-center text-sm mt-1 flex-1",
+    iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] max-w-fit items-center justify-center rounded",
+    progress: "absolute left-0 top-0 h-1 transition-all",
   },
   variants: {
     variant: {
@@ -50,17 +52,24 @@ const ToastClasses = tv({
         base: "animate-in zoom-in m-auto",
       },
     },
+    hasTitleBorder: {
+      true: {
+        titleContainer: "border-b border-zinc-600 pb-2",
+      },
+    },
   },
 });
 
 export function Notification({
   id,
   title,
+  description,
   timer = 3,
   icon,
   variant = "primary",
   actions,
   position = "top-right",
+  hasTitleBorder,
 }: NotificationType) {
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
@@ -79,7 +88,14 @@ export function Notification({
     return () => {};
   }, []);
 
-  const { base, title: titleClasses, progress, iconContainer } = ToastClasses({ variant, position });
+  const {
+    base,
+    titleContainer,
+    title: titleClasses,
+    description: descriptionClasses,
+    progress,
+    iconContainer,
+  } = NotificationClasses({ variant, position, hasTitleBorder });
   return (
     <div className={base()} role="alert">
       <div
@@ -89,16 +105,19 @@ export function Notification({
           transition: `width ${timer}s linear`,
         }}
       />
-      <div className="flex w-fit items-center justify-between">
-        {icon ? (
-          <div className={iconContainer()}>
-            <Icon fontSize={22} icon={icon} />
+      <div className="flex w-fit flex-col items-center justify-between ">
+        <div className={titleContainer()}>
+          {icon ? (
+            <div className={iconContainer()}>
+              <Icon fontSize={22} icon={icon} />
+            </div>
+          ) : null}
+          <span className={titleClasses()}>{title}</span>
+          <div className=" w-min">
+            <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
           </div>
-        ) : null}
-        <div className={titleClasses()}>{title}</div>
-        <div className="ml-auto">
-          <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
         </div>
+        {description ? <p className={descriptionClasses()}>{description}</p> : null}
       </div>
       {actions?.length ? (
         <div className="flex min-w-fit gap-x-2">
@@ -116,7 +135,7 @@ export function Notification({
 export function NotificationContainer() {
   const notifications = useAtomValue(notificationsAtom);
   return (
-    <div className="pointer-events-none absolute z-[999999] flex h-full w-full flex-col items-end gap-y-4 ">
+    <div className="scrollbar-hidden pointer-events-none absolute z-[999999] flex h-screen w-screen flex-col gap-y-4 overflow-y-auto">
       {notifications.map((n) => (
         <Notification key={n.id} {...n} />
       ))}

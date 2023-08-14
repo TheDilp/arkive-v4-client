@@ -92,54 +92,19 @@ export function constructFinalRollDisplay(res: {
   return "";
 }
 
-export function getRollValue(res: {
-  value: number;
-  valid: boolean;
-  dice?: {
-    value: number;
-    rolls: {
-      value: number;
-      critical: "success" | "failure";
-      order: number;
-      type: "die" | "number";
-      drop?: boolean | undefined;
-    }[];
-  }[];
-  rolls?: {
-    value: number;
-    critical: "success" | "failure";
-    order: number;
-    drop?: boolean | undefined;
-    type: "die" | "number";
-  }[];
-  ops: ("+" | "-" | "/" | "*")[];
-}) {
-  if (res.valid) {
-    const formatted = (res?.dice || res?.rolls || []).map((die, idx) => {
-      if ("rolls" in die) {
-        if (die?.rolls?.length) {
-          return `${idx === 0 ? "" : res?.ops?.[idx - 1] || "+"}${die.rolls
-            .filter((r) => !r.drop)
-            .map((roll) => roll.value.toString())
-            .join("+")}`;
-        }
-        return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
-      }
+export async function getRollValue(notation: string) {
+  const parsedNotation = DiceRollParser.parseNotation(notation);
 
-      if (res?.ops?.[idx - 1]) {
-        if (!die?.drop) return `${res?.ops?.[idx - 1] || "+"}${die.value}`;
-        return "";
-      }
-      if (!die?.drop) return `${idx === 0 ? "" : "+"}${die.value.toString()}`;
-      return "";
-    });
-    const formattedString = formatted.join("");
-    if (formattedString.charAt(0) === "+") {
-      return `${formattedString.slice(1, formattedString.length)}= ${res.value}`;
-    }
-    return `${formattedString}= ${res.value}`;
-  }
-  return "";
+  const rollData = await Dice.roll(parsedNotation);
+  const { value } = DiceRollParser.parseFinalResults(rollData);
+  return value;
+}
+
+export function parseDiceResults(r: any) {
+  const parsedNotation = DiceRollParser.parseNotation(r);
+
+  const rollData = DiceRollParser.parseFinalResults(parsedNotation);
+  return rollData;
 }
 
 export async function rollDiceWithNotification(

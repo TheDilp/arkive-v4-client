@@ -12,10 +12,12 @@ export type NotificationPositionsType =
 export interface NotificationType {
   id: string;
   title: string;
+  description?: string;
   timer: number;
   icon?: string;
   variant?: Variant;
   position?: NotificationPositionsType;
+  hasTitleBorder?: boolean;
   actions?: {
     label?: string;
     onClick: () => void;
