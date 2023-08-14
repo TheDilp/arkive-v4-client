@@ -102,7 +102,6 @@ function RandomTableInput({
           isLoading={isFetching}
           onClick={async () => {
             await refetch();
-            console.log(data?.data?.[0]);
             if (data?.data?.[0]?.title) {
               handleChange({ name, value: { id, value: data?.data?.[0]?.title } });
             }

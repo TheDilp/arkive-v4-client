@@ -14,11 +14,12 @@ const SidebarClasses = tv({
   slots: {
     base: "flex w-full max-w-full flex-col border-r border-zinc-800 bg-zinc-900 lg:w-16 lg:min-w-[4rem] lg:max-w-[4rem] h-16 lg:h-full sticky bottom-0 lg:relative z-10",
     nav: "flex h-48 flex-1 flex-col overflow-x-hidden overflow-y-hidden lg:h-full lg:max-w-[4rem] lg:overflow-y-auto lg:overflow-x-hidden",
-    list: "flex w-screen overflow-x-auto lg:w-full lg:flex-1 lg:flex-col lg:items-center lg:justify-start lg:overflow-x-hidden",
-    sidebarLogo: "flex h-16 items-center",
+    list: "flex w-screen overflow-x-auto lg:w-full overflow-y-hidden lg:flex-1 lg:flex-col lg:items-center lg:justify-start lg:overflow-x-hidden",
+    sidebarLogo: "flex h-16 items-center w-16 min-w-[4rem]",
     listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16",
-    listItem: "flex h-16 max-w-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
-    listSettingsItem: "mx-4 ml-auto flex h-16 items-center lg:mx-0 lg:ml-0 lg:mt-auto",
+    listItem:
+      "flex h-16 max-w-[4rem] min-w-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
+    listSettingsItem: "justify-center flex h-16 min-w-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto",
     settingsSubitem: "flex items-center gap-x-2",
     activeSettingsSubItem: "text-blue-400",
     navIcon: "cursor-pointer hover:text-blue-300 text-white",
@@ -54,7 +55,7 @@ export function Sidebar() {
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
                 <Tooltip allowedPlacements={["right"]} content={item.tooltip}>
                   <li className={listItem()}>
-                    <Icon className={navIcon()} fontSize={32} icon={item.icon} />
+                    <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
                   </li>
                 </Tooltip>
               </Link>

@@ -10,11 +10,12 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.screen, navigate: "screens", tooltip: "Screens" },
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
+  { icon: IconEnum.additional_fields, navigate: "field-templates", tooltip: "Character field templates" },
+  { icon: IconEnum.generator, navigate: "generators", tooltip: "Generators" },
+  { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
 ];
 
 export const settingsSubnavItems = [
   { icon: IconEnum.settings, navigate: "project-settings", tooltip: "Project settings" },
-  { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
-  { icon: IconEnum.additional_fields, navigate: "field-templates", tooltip: "Character field templates" },
   { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
 ];

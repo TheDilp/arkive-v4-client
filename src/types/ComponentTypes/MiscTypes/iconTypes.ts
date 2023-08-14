@@ -4,6 +4,8 @@ export interface IconType {
   icon: string;
   fontSize?: number;
   color?: string;
+  hFlip?: boolean;
+  vFlip?: boolean;
   className?: string;
   thickness?: IconThickness;
 }
