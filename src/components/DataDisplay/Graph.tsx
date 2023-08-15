@@ -30,29 +30,35 @@ import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../
 import { Quickbar } from "..";
 
 type Props = {
+  data?: Partial<GraphType>;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
   center_on?: string;
 };
 
-export function Graph({ isReadOnly, isViewOnly, center_on }: Props) {
+export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-  const { data } = useGetEntity<GraphType>(item_id, "graphs", {
-    data: {},
-    fields: ["default_node_shape", "default_node_color", "default_edge_color"],
-    relations: { nodes: true, edges: true, parents: true },
-  });
+  const { data: existingGraphData } = useGetEntity<GraphType>(
+    item_id,
+    "graphs",
+    {
+      data: {},
+      fields: ["default_node_shape", "default_node_color", "default_edge_color"],
+      relations: { nodes: true, edges: true, parents: true },
+    },
+    { enabled: !data },
+  );
 
   useLayoutEffect(() => {
     if (!item_id) {
       setBreadcrumbs({ items: [], type: "graphs" });
-    } else if (data?.data?.parents && data?.data?.parents?.length) {
-      setBreadcrumbs({ items: data?.data?.parents, type: "graphs" });
+    } else if (existingGraphData?.data?.parents && existingGraphData?.data?.parents?.length) {
+      setBreadcrumbs({ items: existingGraphData?.data?.parents, type: "graphs" });
     }
-  }, [data, setBreadcrumbs, item_id]);
+  }, [existingGraphData, setBreadcrumbs, item_id]);
 
-  const graph = data?.data;
+  const graph = existingGraphData?.data || data;
 
   useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
   const queryClient = useQueryClient();
