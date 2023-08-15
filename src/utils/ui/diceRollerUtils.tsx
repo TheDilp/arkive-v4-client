@@ -48,8 +48,13 @@ export function getCritColor(critical: "success" | "failure" | null | undefined)
 }
 export const DiceRollRegex = /((((\d+)?[Dd]\d+)|(\d+))((kh)|(dl))?([*+-])?)+/gi;
 
-export async function getRollValue(notation: string) {
+export async function getRollValue(notation: string, hasNoSimulation?: boolean) {
   const parsedNotation = DiceRollParser.parseNotation(notation);
+  if (hasNoSimulation) {
+    const rollData = await DiceNoSim.roll(parsedNotation);
+    const { value } = DiceRollParser.parseFinalResults(rollData);
+    return value;
+  }
 
   const rollData = await Dice.roll(parsedNotation);
   const { value } = DiceRollParser.parseFinalResults(rollData);

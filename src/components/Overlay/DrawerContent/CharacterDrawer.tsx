@@ -25,7 +25,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { DiceNoSim, DiceRollParser } from "../../../utils/ui/diceRollerUtils";
+import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
 import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
@@ -131,6 +131,7 @@ function CharacterFieldInputs({
   formula,
   random_table_id,
   random_table,
+  isRolling,
   handleChange,
   createNotification,
 }: CharacterFieldType & {
@@ -138,6 +139,7 @@ function CharacterFieldInputs({
   value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
+  isRolling?: boolean;
 }) {
   const name = `character_fields[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
@@ -187,6 +189,8 @@ function CharacterFieldInputs({
     return (
       <div className="flex flex-nowrap items-center gap-x-2">
         <Input
+          isDisabled={isRolling}
+          isLoading={isRolling}
           label={title}
           name={name}
           onChange={({ value }) => {
@@ -199,6 +203,8 @@ function CharacterFieldInputs({
             hasNoBackground
             icon={IconEnum.d20}
             iconSize={24}
+            isDisabled={isRolling}
+            isLoading={isRolling}
             onClick={() => {
               try {
                 const parsedNotation = DiceRollParser.parseNotation(formula);
@@ -330,9 +336,14 @@ function FieldTemplateRow({
   handleChange: (props: HandleChangePropsType) => void;
   selectedTemplates: string[];
 }) {
+  const [isRolling, setIsRolling] = useState(false);
   const randomTableFields = character_fields
     .filter((field) => field.field_type === "random_table")
     .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
+
+  const diceRollFields = character_fields
+    .filter((field) => field.field_type === "dice_roll")
+    .map((field) => ({ field_id: field.id, formula: field?.formula }));
 
   const { data, refetch } = useQuery<{ data: Required<Pick<CharacterFieldType, "random_table_id" | "random_table">[]> }>(
     ["randomTables", "many", id],
@@ -347,11 +358,31 @@ function FieldTemplateRow({
   const hasRandomTableOrRoll = character_fields.some(
     (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
   );
+
   const collapsibleActions = hasRandomTableOrRoll
     ? [
         {
           icon: IconEnum.d20,
-          onClick: async () => refetch(),
+          onClick: async () => {
+            if (randomTableFields.length) await refetch();
+
+            const fieldsToChange: { name: string; value: { id: string; value: number } }[] = [];
+            for (let i = 0; i < diceRollFields.length; i += 1) {
+              const formula = diceRollFields[i]?.formula;
+
+              if (formula) {
+                if (!isRolling) setIsRolling(true);
+                const idx = character_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
+                if (idx > -1) {
+                  // eslint-disable-next-line no-await-in-loop
+                  const value = await getRollValue(formula, true);
+                  fieldsToChange.push({ name: `character_fields[${idx}]`, value: { id: diceRollFields[i].field_id, value } });
+                }
+              }
+            }
+            handleChange(fieldsToChange);
+            setIsRolling(false);
+          },
           tooltip: "Autoroll all random table and dice roll fields in this template.",
         },
       ]
@@ -369,27 +400,26 @@ function FieldTemplateRow({
           });
         }
       }
-      console.log(fieldsToChange);
       handleChange(fieldsToChange);
     }
   }, [data?.data]);
-
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
       <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(id)} label={title}>
         <div className="flex select-none flex-col gap-y-2 pt-2">
-          {character_fields.sort(sortEntities).map((f) => {
-            const fieldIndex = (character_fields || [])?.findIndex((field) => f.id === field.id);
-            if (fieldIndex !== undefined)
+          {character_fields.sort(sortEntities).map((template_field) => {
+            const fieldValueIndex = (character_fields_data || [])?.findIndex((field) => template_field?.id === field?.id);
+            if (fieldValueIndex !== undefined)
               return (
                 <CharacterFieldInputs
-                  key={f.id}
-                  {...f}
+                  key={template_field.id}
+                  {...template_field}
                   createNotification={createNotification}
-                  formula={f?.formula}
+                  formula={template_field?.formula}
                   handleChange={handleChange}
-                  index={fieldIndex === -1 ? character_fields?.length || 0 : fieldIndex}
-                  value={character_fields_data?.[fieldIndex]?.value || ""}
+                  index={fieldValueIndex === -1 ? character_fields_data?.length ?? 0 : fieldValueIndex}
+                  isRolling={isRolling}
+                  value={character_fields_data?.[fieldValueIndex]?.value || ""}
                 />
               );
             return null;
@@ -496,7 +526,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
       enabled: selectedTab === 2,
     },
   );
-  const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
+  const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field?.template_id))];
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
 
   useLayoutEffect(() => {
@@ -736,6 +766,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const characterToUpdate = { ...(changedData || {}), id: character.id };
               const { related_to, related_from, tags, ...rest } = characterToUpdate;
+
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
                 relations: { character_fields: character?.character_fields || [], related_from, related_to, tags },
