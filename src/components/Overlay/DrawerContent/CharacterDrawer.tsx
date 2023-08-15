@@ -301,6 +301,83 @@ function RelationshipRow({
   );
 }
 
+// #region tabs
+function AdditionalFieldsTab({
+  templates,
+  createNotification,
+  handleChange,
+  character_fields,
+  selectedTemplates,
+}: {
+  templates:
+    | {
+        data: FieldTemplate[];
+      }
+    | undefined;
+  character_fields?:
+    | {
+        id: string;
+        value: string | number | string[];
+        template_id: string;
+      }[]
+    | undefined;
+  createNotification: (notification: Omit<NotificationType, "id">) => void;
+  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  selectedTemplates: string[];
+}) {
+  return (
+    <ul className="flex flex-col gap-y-2 overflow-y-auto">
+      {templates?.data?.length ? (
+        templates?.data?.sort(sortEntities)?.map((t) => {
+          const hasRandomTableOrRoll = t.character_fields.some(
+            (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
+          );
+          const collapsibleActions = hasRandomTableOrRoll
+            ? [
+                {
+                  icon: IconEnum.d20,
+                  onClick: () => {
+                    console.log(
+                      t.character_fields.filter((f) => f.field_type === "dice_roll" || f.field_type === "random_table"),
+                    );
+                  },
+                  tooltip: "Autoroll all random table and dice roll fields in this template.",
+                },
+              ]
+            : [];
+          return (
+            <li key={t.id} className="mt-4 flex flex-col gap-y-2 first:mt-0">
+              <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(t.id)} label={t.title}>
+                <div className="flex select-none flex-col gap-y-2 pt-2">
+                  {t.character_fields.sort(sortEntities).map((f) => {
+                    const fieldIndex = (character_fields || [])?.findIndex((field) => f.id === field.id);
+                    if (fieldIndex !== undefined)
+                      return (
+                        <CharacterFieldInputs
+                          key={f.id}
+                          {...f}
+                          createNotification={createNotification}
+                          formula={f?.formula}
+                          handleChange={handleChange}
+                          index={fieldIndex === -1 ? character_fields?.length || 0 : fieldIndex}
+                          value={character_fields?.[fieldIndex]?.value || ""}
+                        />
+                      );
+                    return null;
+                  })}
+                </div>
+              </Collapsible>
+            </li>
+          );
+        })
+      ) : (
+        <Alert label="There are no templates available." variant="info" />
+      )}
+    </ul>
+  );
+}
+// #endregion tabs
+
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Realationships", icon: IconEnum.family_tree },
@@ -522,49 +599,13 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
         </>
       ) : null}
       {selectedTab === 2 ? (
-        <ul className="flex flex-col gap-y-2 overflow-y-auto">
-          {templates?.data?.length ? (
-            templates?.data?.sort(sortEntities)?.map((t) => (
-              <li key={t.id} className="mt-4 flex flex-col gap-y-2 first:mt-0">
-                <Collapsible
-                  actions={[
-                    {
-                      icon: IconEnum.d20,
-                      onClick: () => {
-                        console.log(
-                          t.character_fields.filter((f) => f.field_type === "dice_roll" || f.field_type === "random_table"),
-                        );
-                      },
-                      tooltip: "Autoroll all random table and dice roll fields in this template.",
-                    },
-                  ]}
-                  initialOpen={selectedTemplates.includes(t.id)}
-                  label={t.title}>
-                  <div className="flex select-none flex-col gap-y-2 pt-2">
-                    {t.character_fields.sort(sortEntities).map((f) => {
-                      const fieldIndex = (character?.character_fields || [])?.findIndex((field) => f.id === field.id);
-                      if (fieldIndex !== undefined)
-                        return (
-                          <CharacterFieldInputs
-                            key={f.id}
-                            {...f}
-                            createNotification={createNotification}
-                            formula={f?.formula}
-                            handleChange={handleChange}
-                            index={fieldIndex === -1 ? character?.character_fields?.length || 0 : fieldIndex}
-                            value={character?.character_fields?.[fieldIndex]?.value || ""}
-                          />
-                        );
-                      return null;
-                    })}
-                  </div>
-                </Collapsible>
-              </li>
-            ))
-          ) : (
-            <Alert label="There are no templates available." variant="info" />
-          )}
-        </ul>
+        <AdditionalFieldsTab
+          character_fields={character?.character_fields}
+          createNotification={createNotification}
+          handleChange={handleChange}
+          selectedTemplates={selectedTemplates}
+          templates={templates}
+        />
       ) : null}
       {selectedTab === 3 ? (
         <div className="flex flex-col gap-y-2">
