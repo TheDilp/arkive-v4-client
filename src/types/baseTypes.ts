@@ -37,6 +37,7 @@ export interface BaseComponentType {
   size?: Size;
   variant?: Variant;
 }
+export type HandleChangePropsType = { name: string; value: any | any[] } | { name: string; value: any | any[] }[];
 export interface BaseFormComponentType extends BaseComponentType {
   isDisabled?: boolean;
   isLoading?: boolean;
