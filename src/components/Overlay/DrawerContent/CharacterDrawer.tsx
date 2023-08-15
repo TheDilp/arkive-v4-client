@@ -60,14 +60,17 @@ function isSaveDisabled(character: Partial<CharacterType> & characterRelationsTy
 function RandomTableInput({
   id,
   title,
+  random_table_options,
   value: currentValue,
   index,
   random_table_id,
+  isRolling,
   random_table,
   handleChange,
 }: Omit<CharacterFieldType, "project_id" | "sort"> & {
   index: number;
   value: string | string[] | number | undefined;
+  isRolling: boolean;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
   const name = `character_fields[${index}]`;
@@ -87,18 +90,19 @@ function RandomTableInput({
         method: "POST",
       }),
 
-    options: { enabled: !!random_table_id },
+    enabled: false,
   });
 
   return (
     <div className="flex flex-nowrap items-center gap-x-2">
-      <Input
-        isDisabled
+      <Select
+        isDisabled={isRolling}
         label={title}
         name={name}
         onChange={({ value }) => {
           handleChange({ name, value: { id, value } });
         }}
+        options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
         value={currentValue as string}
       />
       <div className="flex self-end pb-1.5">
@@ -111,7 +115,7 @@ function RandomTableInput({
           onClick={async () => {
             await refetch();
             if (data?.data?.[0]?.title) {
-              handleChange({ name, value: { id, value: data?.data?.[0]?.title } });
+              handleChange({ name, value: { id, value: data?.data?.[0]?.id } });
             }
           }}
           tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
@@ -126,6 +130,7 @@ function CharacterFieldInputs({
   title,
   field_type: fieldType,
   options,
+  random_table_options,
   value: currentValue,
   index,
   formula,
@@ -139,7 +144,7 @@ function CharacterFieldInputs({
   value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
-  isRolling?: boolean;
+  isRolling: boolean;
 }) {
   const name = `character_fields[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
@@ -247,8 +252,10 @@ function CharacterFieldInputs({
         handleChange={handleChange}
         id={id}
         index={index}
+        isRolling={isRolling}
         random_table={random_table}
         random_table_id={random_table_id}
+        random_table_options={random_table_options}
         title={title}
         value={currentValue}
       />
@@ -396,7 +403,7 @@ function FieldTemplateRow({
         if (idx > -1) {
           fieldsToChange.push({
             name: `character_fields[${idx}]`,
-            value: { id: character_fields[idx].id, value: data?.data[i].random_table?.[0]?.title },
+            value: { id: character_fields[idx].id, value: data?.data[i].random_table?.[0]?.id },
           });
         }
       }

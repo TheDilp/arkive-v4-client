@@ -14,7 +14,12 @@ export function Collapsible({ label, children, actions }: CollapsibleType) {
         </span>
         {actions?.length
           ? actions.map((act) => (
-              <div key={act.label || act.icon}>
+              <div
+                key={act.label || act.icon}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}>
                 <Button
                   hasNoBackground
                   icon={act?.icon}
