@@ -8,7 +8,7 @@ export interface FieldType {
   formula?: string | null;
   random_table_id?: string | null;
   options?: string[];
-  random_table?: { id: string; title: string };
+  random_table?: { id: string; title: string }[];
 }
 export interface FieldTemplate {
   id: string;

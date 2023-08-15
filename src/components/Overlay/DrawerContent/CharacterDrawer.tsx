@@ -106,7 +106,7 @@ function RandomTableInput({
               handleChange({ name, value: { id, value: data?.data?.[0]?.title } });
             }
           }}
-          tooltip={`Roll (${random_table?.title})`}
+          tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
         />
       </div>
     </div>
@@ -311,9 +311,11 @@ const tabs = [
 export function CharacterDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+
   const setDialog = useSetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
+
   const { data: existingCharacter } = useGetEntity<CharacterType>(
     data?.id,
     "characters",
@@ -339,7 +341,6 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     data: updateCharacterType;
     relations?: characterRelationsType;
   }>("characters", project_id as string);
-
   const { data: templates } = useGetEntities<FieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
@@ -347,9 +348,9 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
       enabled: selectedTab === 2,
     },
   );
-
   const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field.template_id))];
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
+
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
@@ -525,7 +526,20 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
           {templates?.data?.length ? (
             templates?.data?.sort(sortEntities)?.map((t) => (
               <li key={t.id} className="mt-4 flex flex-col gap-y-2 first:mt-0">
-                <Collapsible initialOpen={selectedTemplates.includes(t.id)} label={t.title}>
+                <Collapsible
+                  actions={[
+                    {
+                      icon: IconEnum.d20,
+                      onClick: () => {
+                        console.log(
+                          t.character_fields.filter((f) => f.field_type === "dice_roll" || f.field_type === "random_table"),
+                        );
+                      },
+                      tooltip: "Autoroll all random table and dice roll fields in this template.",
+                    },
+                  ]}
+                  initialOpen={selectedTemplates.includes(t.id)}
+                  label={t.title}>
                   <div className="flex select-none flex-col gap-y-2 pt-2">
                     {t.character_fields.sort(sortEntities).map((f) => {
                       const fieldIndex = (character?.character_fields || [])?.findIndex((field) => f.id === field.id);

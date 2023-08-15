@@ -168,7 +168,7 @@ function FieldRow({
           <div className="flex flex-col gap-y-2">
             <Search
               hasShownOption
-              initialDisplayValue={random_table?.title || ""}
+              initialDisplayValue={random_table?.[0]?.title || ""}
               isDisabled={isLoading}
               label="Random table"
               name={`[${index}].random_table_id`}

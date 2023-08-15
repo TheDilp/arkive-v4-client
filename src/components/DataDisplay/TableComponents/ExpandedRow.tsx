@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useGetEntities } from "../../../hooks";
-import { AvailableEntityType, FieldType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, FieldType } from "../../../types";
 import { getSentenceCase } from "../../../utils";
 import { Badge } from "../../Misc/Badge";
 
@@ -58,7 +58,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   );
 }
 
-export function ExpandedTableRow({ data, type }: { data: any; type: AvailableEntityType }) {
+export function ExpandedTableRow({ data, type }: { data: any; type: AvailableEntityType | AvailableSubEntityType }) {
   return (
     <div className={ExpandedTableRowClasses()}>
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
