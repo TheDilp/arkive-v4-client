@@ -63,7 +63,8 @@ const TableClasses = tv({
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
     showPageCountSelectContainer: "w-16",
-    paginationButtonsContainer: "flex h-full flex-nowrap [&>*>button]:w-10 [&>*>button]:border-y-0 [&>*>button]:border-r-0",
+    paginationButtonsContainer:
+      "flex min-h-full lg:h-9 h-8 flex-nowrap [&>*>button]:w-10 [&>*>button]:border-y-0 [&>*>button]:border-r-0",
   },
   variants: {
     isSubheaderEnabled: {
