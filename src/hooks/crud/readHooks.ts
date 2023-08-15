@@ -164,10 +164,10 @@ export function useSearch<ReturnType extends { value: string; label: string; col
   request: { data: { search_term: string }; limit: number },
   type: SearchableEntities,
   project_id: string,
-  options?: UseQueryOptions<any>,
+  options?: UseQueryOptions<any> & { queryKeyConcat?: string[] },
 ) {
   return useQuery<{ data: ReturnType[] }, unknown>(
-    ["search", type],
+    ["search", type].concat(options?.queryKeyConcat || []),
     async () =>
       FetchFunction({
         url: `${baseURLS.baseServer}/search/${project_id}/${type}`,

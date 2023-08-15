@@ -192,6 +192,7 @@ export function Search({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [displayValue, setDisplayValue] = useState(initialDisplayValue || "");
+  const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
@@ -202,6 +203,7 @@ export function Search({
     project_id as string,
     {
       enabled: false,
+      queryKeyConcat: [searchTerm],
     },
   );
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
@@ -241,6 +243,7 @@ export function Search({
     if (isAutocomplete && inputValue && document.activeElement === inputRef.current) {
       const timeout = setTimeout(() => {
         refetch();
+        setSearchTerm(inputValue);
       }, 1000);
 
       return () => {
