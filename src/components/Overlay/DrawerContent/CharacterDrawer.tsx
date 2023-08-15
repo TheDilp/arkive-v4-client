@@ -363,9 +363,8 @@ function FieldTemplateRow({
     ? [
         {
           icon: IconEnum.d20,
-          onClick: async () => {
-            if (randomTableFields.length) await refetch();
-
+          onClick: async (e: Event) => {
+            e.preventDefault();
             const fieldsToChange: { name: string; value: { id: string; value: number } }[] = [];
             for (let i = 0; i < diceRollFields.length; i += 1) {
               const formula = diceRollFields[i]?.formula;
@@ -382,6 +381,7 @@ function FieldTemplateRow({
             }
             handleChange(fieldsToChange);
             setIsRolling(false);
+            if (randomTableFields.length) await refetch();
           },
           tooltip: "Autoroll all random table and dice roll fields in this template.",
         },
