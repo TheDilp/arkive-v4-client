@@ -1,5 +1,5 @@
 export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll" | "random_table";
-export interface FieldType {
+export interface CharacterFieldType {
   id: string;
   project_id: string;
   sort: number;
@@ -10,9 +10,9 @@ export interface FieldType {
   options?: string[];
   random_table?: { id: string; title: string }[];
 }
-export interface FieldTemplate {
+export interface CharacterFieldTemplate {
   id: string;
   title: string;
-  character_fields: FieldType[];
+  character_fields: CharacterFieldType[];
   sort: number;
 }

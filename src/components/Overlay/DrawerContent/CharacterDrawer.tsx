@@ -1,11 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterType, FieldTemplate, FieldType, InputOnChangeValue, NotificationType, onChangeValue } from "../../../types";
+import {
+  CharacterFieldTemplate,
+  CharacterFieldType,
+  CharacterType,
+  HandleChangePropsType,
+  InputOnChangeValue,
+  NotificationType,
+  onChangeValue,
+} from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
   baseURLS,
@@ -57,7 +65,7 @@ function RandomTableInput({
   random_table_id,
   random_table,
   handleChange,
-}: Omit<FieldType, "project_id" | "sort"> & {
+}: Omit<CharacterFieldType, "project_id" | "sort"> & {
   index: number;
   value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
@@ -125,7 +133,7 @@ function CharacterFieldInputs({
   random_table,
   handleChange,
   createNotification,
-}: FieldType & {
+}: CharacterFieldType & {
   index: number;
   value: string | string[] | number | undefined;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
@@ -301,6 +309,97 @@ function RelationshipRow({
   );
 }
 
+function FieldTemplateRow({
+  id,
+  title,
+  character_fields = [],
+  character_fields_data = [],
+  selectedTemplates,
+  createNotification,
+  handleChange,
+}: {
+  id: string;
+  title: string;
+  character_fields?: CharacterFieldType[] | undefined;
+  character_fields_data?: {
+    id: string;
+    value: string | number | string[];
+    template_id: string;
+  }[];
+  createNotification: (notification: Omit<NotificationType, "id">) => void;
+  handleChange: (props: HandleChangePropsType) => void;
+  selectedTemplates: string[];
+}) {
+  const randomTableFields = character_fields
+    .filter((field) => field.field_type === "random_table")
+    .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
+
+  const { data, refetch } = useQuery<{ data: Required<Pick<CharacterFieldType, "random_table_id" | "random_table">[]> }>(
+    ["randomTables", "many", id],
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/random_table_options/random/many`,
+        body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
+        method: "POST",
+      }),
+    { enabled: false },
+  );
+  const hasRandomTableOrRoll = character_fields.some(
+    (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
+  );
+  const collapsibleActions = hasRandomTableOrRoll
+    ? [
+        {
+          icon: IconEnum.d20,
+          onClick: async () => refetch(),
+          tooltip: "Autoroll all random table and dice roll fields in this template.",
+        },
+      ]
+    : [];
+
+  useEffect(() => {
+    if (data?.data?.length) {
+      const fieldsToChange = [];
+      for (let i = 0; i < data?.data?.length; i += 1) {
+        const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
+        if (idx > -1) {
+          fieldsToChange.push({
+            name: `character_fields[${idx}]`,
+            value: { id: character_fields[idx].id, value: data?.data[i].random_table?.[0]?.title },
+          });
+        }
+      }
+      console.log(fieldsToChange);
+      handleChange(fieldsToChange);
+    }
+  }, [data?.data]);
+
+  return (
+    <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
+      <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(id)} label={title}>
+        <div className="flex select-none flex-col gap-y-2 pt-2">
+          {character_fields.sort(sortEntities).map((f) => {
+            const fieldIndex = (character_fields || [])?.findIndex((field) => f.id === field.id);
+            if (fieldIndex !== undefined)
+              return (
+                <CharacterFieldInputs
+                  key={f.id}
+                  {...f}
+                  createNotification={createNotification}
+                  formula={f?.formula}
+                  handleChange={handleChange}
+                  index={fieldIndex === -1 ? character_fields?.length || 0 : fieldIndex}
+                  value={character_fields_data?.[fieldIndex]?.value || ""}
+                />
+              );
+            return null;
+          })}
+        </div>
+      </Collapsible>
+    </li>
+  );
+}
+
 // #region tabs
 function AdditionalFieldsTab({
   templates,
@@ -311,7 +410,7 @@ function AdditionalFieldsTab({
 }: {
   templates:
     | {
-        data: FieldTemplate[];
+        data: CharacterFieldTemplate[];
       }
     | undefined;
   character_fields?:
@@ -322,54 +421,26 @@ function AdditionalFieldsTab({
       }[]
     | undefined;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  handleChange: (props: HandleChangePropsType) => void;
   selectedTemplates: string[];
 }) {
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
       {templates?.data?.length ? (
-        templates?.data?.sort(sortEntities)?.map((t) => {
-          const hasRandomTableOrRoll = t.character_fields.some(
-            (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
-          );
-          const collapsibleActions = hasRandomTableOrRoll
-            ? [
-                {
-                  icon: IconEnum.d20,
-                  onClick: () => {
-                    console.log(
-                      t.character_fields.filter((f) => f.field_type === "dice_roll" || f.field_type === "random_table"),
-                    );
-                  },
-                  tooltip: "Autoroll all random table and dice roll fields in this template.",
-                },
-              ]
-            : [];
-          return (
-            <li key={t.id} className="mt-4 flex flex-col gap-y-2 first:mt-0">
-              <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(t.id)} label={t.title}>
-                <div className="flex select-none flex-col gap-y-2 pt-2">
-                  {t.character_fields.sort(sortEntities).map((f) => {
-                    const fieldIndex = (character_fields || [])?.findIndex((field) => f.id === field.id);
-                    if (fieldIndex !== undefined)
-                      return (
-                        <CharacterFieldInputs
-                          key={f.id}
-                          {...f}
-                          createNotification={createNotification}
-                          formula={f?.formula}
-                          handleChange={handleChange}
-                          index={fieldIndex === -1 ? character_fields?.length || 0 : fieldIndex}
-                          value={character_fields?.[fieldIndex]?.value || ""}
-                        />
-                      );
-                    return null;
-                  })}
-                </div>
-              </Collapsible>
-            </li>
-          );
-        })
+        templates?.data
+          ?.sort(sortEntities)
+          ?.map((t) => (
+            <FieldTemplateRow
+              key={t?.id}
+              character_fields={t.character_fields}
+              character_fields_data={character_fields}
+              createNotification={createNotification}
+              handleChange={handleChange}
+              id={t?.id}
+              selectedTemplates={selectedTemplates}
+              title={t?.title}
+            />
+          ))
       ) : (
         <Alert label="There are no templates available." variant="info" />
       )}
@@ -418,7 +489,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     data: updateCharacterType;
     relations?: characterRelationsType;
   }>("characters", project_id as string);
-  const { data: templates } = useGetEntities<FieldTemplate>(
+  const { data: templates } = useGetEntities<CharacterFieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
     {

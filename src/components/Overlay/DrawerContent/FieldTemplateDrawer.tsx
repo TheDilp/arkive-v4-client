@@ -4,17 +4,17 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { FieldTemplate, FieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
+import { CharacterFieldTemplate, CharacterFieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
 import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
 import { Button, Input, Search, Select } from "../../Form";
 
-type insertTemplateType = Partial<FieldTemplate> & { project_id: string };
+type insertTemplateType = Partial<CharacterFieldTemplate> & { project_id: string };
 
 function removeField(
   index: number,
-  setFields: Dispatch<SetStateAction<(Omit<FieldType, "options"> & { options?: { id: string; title: string }[] })[]>>,
+  setFields: Dispatch<SetStateAction<(Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[]>>,
 ) {
   setFields((prev) => {
     const temp = [...prev];
@@ -25,7 +25,7 @@ function removeField(
 
 function isSaveDisabled(
   title: string | undefined,
-  fields: (Omit<FieldType, "options"> & { options?: { id: string; title: string }[] })[],
+  fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[],
 ) {
   if (!title) return true;
   if (!fields.length) return true;
@@ -55,7 +55,7 @@ function FieldRow({
   deleteField,
   random_table,
   isLoading,
-}: (Omit<FieldType, "options" | "parentId"> & { options?: { id: string; title: string }[] }) & {
+}: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; title: string }[] }) & {
   index: number;
   changeField: ({
     name,
@@ -188,15 +188,15 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
     data: insertTemplateType;
-    relations?: { character_fields: Omit<FieldType, "id">[] };
+    relations?: { character_fields: Omit<CharacterFieldType, "id">[] };
   }>("character_fields_templates");
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: Partial<Omit<FieldTemplate, "fields">>;
-    relations?: { character_fields?: Partial<FieldType>[] };
+    data: Partial<Omit<CharacterFieldTemplate, "fields">>;
+    relations?: { character_fields?: Partial<CharacterFieldType>[] };
   }>("character_fields_templates", project_id as string);
 
-  const { data: existingTemplate, isFetching } = useGetEntity<FieldTemplate & { fields: FieldType[] }>(
+  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplate & { fields: CharacterFieldType[] }>(
     data?.id,
     "character_fields_templates",
     {
@@ -213,7 +213,9 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   );
 
   const [template, setTemplate] = useState<{ title: string; sort: number }>({ title: "", sort: 0 });
-  const [fields, setFields] = useState<(Omit<FieldType, "options"> & { options?: { id: string; title: string }[] })[]>([]);
+  const [fields, setFields] = useState<(Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[]>(
+    [],
+  );
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
