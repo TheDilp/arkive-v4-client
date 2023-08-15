@@ -15,9 +15,11 @@ export function capitalizeFirstLetter(word: string): string {
 }
 
 export function getNavbarEntityType(type: AvailableEntityType) {
-  console.log(type);
   if (type === "random_tables") {
     return "random tables";
+  }
+  if (type === "character_fields_templates") {
+    return "Character field templates";
   }
   return type;
 }

@@ -18,6 +18,7 @@ import {
   IconEnum,
 } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
+import { CharacterFieldTemplates } from "../Settings";
 import { CharactersView } from ".";
 import { DocumentView } from "./DocumentView";
 import { RandomTableView } from "./RandomTableView";
@@ -177,6 +178,8 @@ export function EntitiesView() {
       setBreadcrumbs({ items: data?.data?.parents, type: type as AvailableEntityType });
     }
   }, [data, type, setBreadcrumbs, item_id]);
+
+  if (type === "character_fields_templates") return <CharacterFieldTemplates />;
 
   if (!item_id && type === "characters") return <CharactersView />;
 

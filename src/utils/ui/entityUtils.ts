@@ -7,11 +7,12 @@ export function getDefaultEntityIcon(type: AvailableEntityType) {
   if (type === "maps") return IconEnum.map;
   if (type === "graphs") return IconEnum.board;
   if (type === "random_tables") return IconEnum.random_table;
+  if (type === "character_fields_templates") return IconEnum.additional_fields;
   return IconEnum.error;
 }
 export function getEntityNameFromType(type: AvailableEntityType) {
-  if (type === "random_tables") return "random table";
   if (type === "dictionaries") return "dictionary";
+  if (type === "random_tables") return "random table";
   if (type === "character_fields_templates") return "Field template";
   return type.substring(0, type.length - 1);
 }

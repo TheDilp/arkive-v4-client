@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, CharacterFieldTemplate } from "../../types";
+import { CharacterFieldTemplate, DialogAtomType, DrawerAtomType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterFieldTemplate>();
@@ -81,7 +81,7 @@ function createColumns(
   ];
 }
 
-export function FieldTemplates() {
+export function CharacterFieldTemplates() {
   const { project_id } = useParams();
   useChangeNavbarTitle("The Arkive | Field templates");
   const setDrawer = useSetAtom(drawerAtom);
