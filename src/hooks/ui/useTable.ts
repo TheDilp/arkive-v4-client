@@ -40,7 +40,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
           : tempFilters;
       }
 
-      return { ...state, filters: tempFilters };
+      return { ...state, pagination: { limit: state.pagination?.limit || 10, page: 0 }, filters: tempFilters };
     }
     case "removeFilterByField": {
       if (action.payload) {
@@ -59,12 +59,14 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
       if (action.payload?.and) {
         return {
           ...state,
+          pagination: { limit: state.pagination?.limit || 10, page: 0 },
           filters: { ...state.filters, and: (state.filters?.and || []).filter((filt) => filt.id !== action.payload.and?.id) },
         };
       }
       if (action.payload?.or) {
         return {
           ...state,
+          pagination: { limit: state.pagination?.limit || 10, page: 0 },
           filters: { ...state.filters, or: (state.filters?.or || []).filter((filt) => filt.id !== action.payload.or?.id) },
         };
       }
