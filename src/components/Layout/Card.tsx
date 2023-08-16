@@ -96,7 +96,7 @@ export function CharacterCard({ id, first_name, last_name, portrait, is_favorite
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-top transition-all duration-300 group-hover:scale-125 group-hover:brightness-75 lg:bg-center"
         style={{
-          backgroundImage: `url(${getImageURL(project_id as string, "images", portrait?.id)})`,
+          backgroundImage: portrait?.id ? `url(${getImageURL(project_id as string, "images", portrait?.id)})` : "",
         }}
       />
     </Link>
