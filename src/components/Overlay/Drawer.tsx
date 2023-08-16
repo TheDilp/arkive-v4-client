@@ -34,7 +34,7 @@ const DrawerClasses = tv({
     },
     isOpen: {
       true: "translate-x-0 animate-drawer",
-      false: "translate-x-full",
+      false: "translate-x-full hidden",
     },
   },
 });
