@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
@@ -205,6 +205,7 @@ function TableColumnFilter({
     and: (filters?.and || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
     or: (filters?.or || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
   });
+
   const { handleChange } = useHandleChange({ data: columnFilters, setData: setColumnFilters });
 
   return (
@@ -368,6 +369,8 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     paginationButtonsContainer,
   } = TableClasses({ isSubheaderEnabled });
 
+  const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
+
   const { base: baseFilterClasses } = TableFilterClasses();
 
   const table = useReactTable({
@@ -393,7 +396,14 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     getRowCanExpand: () => !!expandable,
     getExpandedRowModel: getExpandedRowModel(),
   });
-  if (isLoading) return <Skeleton type="table" />;
+
+  useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  }, [pagination?.page]);
+
+  if (isLoading) return <Skeleton limit={pagination?.limit} type="table" />;
   return (
     <div className={container()}>
       <div className={tableClasses()}>
@@ -463,23 +473,27 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                           if ((meta as MetaType)?.sortable && dispatch) {
                             let sortValue;
                             const column_id = hdr.column.columnDef?.id;
-                            if (orderBy?.sort === "asc" && column_id === orderBy.field) {
-                              sortValue = "desc" as const;
-                            } else if (orderBy?.sort === "desc" && column_id === orderBy.field) {
-                              sortValue = null;
-                            } else {
-                              sortValue = "asc" as const;
+                            const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
+                            if (columnOrderBy) {
+                              if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
+                                sortValue = "desc" as const;
+                              } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
+                                sortValue = null;
+                              } else {
+                                sortValue = "asc" as const;
+                              }
+
+                              dispatch({
+                                type: "setSort",
+                                payload: {
+                                  field: id as string,
+                                  sort: sortValue,
+                                },
+                              });
                             }
-                            dispatch({
-                              type: "setSort",
-                              payload: {
-                                field: id as string,
-                                sort: sortValue,
-                              },
-                            });
                           }
                         }}
-                        orderBy={orderBy}
+                        orderBy={orderBy?.find((ob) => ob.field === id)}
                       />
                     ) : null}
                     {hdr.column.getIsSorted() ? (
@@ -501,7 +515,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
         </div>
         <div className={bodyContainer()}>
           {data?.length ? (
-            <div className={body()}>
+            <div ref={bodyRef} className={body()}>
               {table.getRowModel().rows.map((row) => (
                 <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
                   <div

@@ -21,7 +21,7 @@ export interface MetaType {
 export type TableColumnFilterType = RequestFilterType & { id: string };
 
 export interface TableParams {
-  orderBy?: RequestOrderByType;
+  orderBy?: RequestOrderByType[];
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   pagination?: RequestPaginationType;
   selection?: TableSelectionType;
@@ -58,7 +58,7 @@ export interface TableType {
     hasFavorite?: boolean;
     hasSelect?: boolean;
     hasTags?: boolean;
-    orderBy?: RequestOrderByType;
+    orderBy?: RequestOrderByType[];
     selection?: TableSelectionType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };

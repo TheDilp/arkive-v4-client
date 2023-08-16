@@ -40,7 +40,7 @@ export interface RequestBodyType {
     [key: string]: any;
   };
   fields?: string[];
-  orderBy?: RequestOrderByType;
+  orderBy?: RequestOrderByType[];
   filters?: {
     and?: RequestFilterType[];
     or?: RequestFilterType[];

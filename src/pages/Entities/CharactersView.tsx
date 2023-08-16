@@ -1,6 +1,6 @@
 import { SetStateAction, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -162,7 +162,7 @@ export function CharactersView() {
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: { field: "first_name", sort: "asc" },
+    orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
@@ -201,10 +201,12 @@ export function CharactersView() {
       pagination: {
         limit: 12,
       },
-      orderBy: {
-        field: "first_name",
-        sort: "asc",
-      },
+      orderBy: [
+        {
+          field: "first_name",
+          sort: "asc",
+        },
+      ],
     },
     "characters",
     {
@@ -220,8 +222,8 @@ export function CharactersView() {
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  useEffect(() => {
-    if (!filter) {
+  useLayoutEffect(() => {
+    if (!filter || view === "card") {
       dispatch({
         type: "clearAllFilters",
       });
@@ -244,7 +246,8 @@ export function CharactersView() {
     return () => {
       clearTimeout(timeout);
     };
-  }, [filter, dispatch]);
+  }, [filter, dispatch, view]);
+
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
