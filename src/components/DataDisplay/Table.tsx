@@ -3,6 +3,7 @@
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useVirtual } from "react-virtual";
 import { tv } from "tailwind-variants";
 
 import { useHandleChange } from "../../hooks";
@@ -403,7 +404,15 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     }
   }, [pagination?.page]);
 
-  console.log(orderBy);
+  const rowVirtualizer = useVirtual({
+    parentRef: bodyRef,
+    size: data.length,
+    overscan: 10,
+  });
+  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
+  const { rows } = table.getRowModel();
+  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
+  const paddingBottom = virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0;
 
   if (isLoading) return <Skeleton limit={pagination?.limit} type="table" />;
   return (
@@ -526,42 +535,55 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
         <div className={bodyContainer()}>
           {data?.length ? (
             <div ref={bodyRef} className={body()}>
-              {table.getRowModel().rows.map((row) => (
-                <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
-                  <div
-                    className={`${rowClasses()} ${
-                      config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index) ? selectedRow() : ""
-                    }`}>
-                    {row.getVisibleCells().map((cell) => (
-                      <div
-                        key={cell.id}
-                        className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                          (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                        }`}
-                        onClick={(e) => {
-                          if (
-                            cell.column.id === "select" ||
-                            cell.column.id === "action" ||
-                            cell.column.id === "is_favorite" ||
-                            (cell.column.columnDef.meta as MetaType)?.noLink
-                          ) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }
-                        }}
-                        style={{
-                          ...getTableColumnWidths(cell.column.id, {
-                            minSize: cell.column.columnDef.minSize,
-                            maxSize: cell.column.columnDef.maxSize,
-                          }),
-                        }}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </div>
-                    ))}
-                  </div>
-                  {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
-                </Link>
-              ))}
+              {paddingTop > 0 && (
+                <div>
+                  <div style={{ height: `${paddingTop}px` }} />
+                </div>
+              )}
+              {virtualRows.map((virtualRow) => {
+                const row = rows[virtualRow.index];
+                return (
+                  <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
+                    <div
+                      className={`${rowClasses()} ${
+                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index) ? selectedRow() : ""
+                      }`}>
+                      {row.getVisibleCells().map((cell) => (
+                        <div
+                          key={cell.id}
+                          className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                            (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
+                          }`}
+                          onClick={(e) => {
+                            if (
+                              cell.column.id === "select" ||
+                              cell.column.id === "action" ||
+                              cell.column.id === "is_favorite" ||
+                              (cell.column.columnDef.meta as MetaType)?.noLink
+                            ) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }
+                          }}
+                          style={{
+                            ...getTableColumnWidths(cell.column.id, {
+                              minSize: cell.column.columnDef.minSize,
+                              maxSize: cell.column.columnDef.maxSize,
+                            }),
+                          }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
+                      ))}
+                    </div>
+                    {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
+                  </Link>
+                );
+              })}
+              {paddingBottom > 0 && (
+                <div>
+                  <div style={{ height: `${paddingBottom}px` }} />
+                </div>
+              )}
             </div>
           ) : (
             <Alert label="There's no content." variant="info" />
@@ -593,6 +615,13 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                         { label: "80", value: "80" },
                         { label: "90", value: "90" },
                         { label: "100", value: "100" },
+                        { label: "200", value: "200" },
+                        { label: "250", value: "250" },
+                        { label: "300", value: "300" },
+                        { label: "350", value: "350" },
+                        { label: "400", value: "400" },
+                        { label: "450", value: "450" },
+                        { label: "500", value: "500" },
                       ]}
                       size="sm"
                       value={pagination?.limit?.toFixed() || "10"}

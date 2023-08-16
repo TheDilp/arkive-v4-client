@@ -228,24 +228,27 @@ export function CharactersView() {
         type: "clearAllFilters",
       });
     }
-    const timeout = setTimeout(() => {
-      if (filter) {
-        dispatch({
-          type: "clearAllFilters",
-        });
-        dispatch({
-          type: "setFilter",
-          payload: {
-            and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
-            field: "first_name",
-          },
-        });
-      }
-    }, 750);
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
+              field: "first_name",
+            },
+          });
+        }
+      }, 750);
 
-    return () => {
-      clearTimeout(timeout);
-    };
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
   }, [filter, dispatch, view]);
 
   return (
