@@ -89,7 +89,7 @@ export function CharacterFieldTemplates() {
   const columns = createColumns(setDrawer, setDialog);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: { field: "title", sort: "asc" },
+    orderBy: [{ field: "title", sort: "asc" }],
     filters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},

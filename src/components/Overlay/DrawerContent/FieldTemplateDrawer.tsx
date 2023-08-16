@@ -9,6 +9,7 @@ import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sor
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
 import { Button, Input, Search, Select } from "../../Form";
+import { Skeleton } from "../../Misc";
 
 type insertTemplateType = Partial<CharacterFieldTemplate> & { project_id: string };
 
@@ -232,6 +233,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       );
     }
   }, [existingTemplate]);
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-auto text-white">

@@ -31,6 +31,7 @@ export function getEntityCRUDNotification(type: AllAvailableEntities, action_typ
   }
   if (type === "alter_names") return `Alter name successfully ${action}.`;
   if (type === "character_fields_templates") return `Template successfully ${action}.`;
+  if (type === "random_table_options") return `Option successfully ${action}.`;
   const entityTitle = capitalizeFirstLetter(type);
   return `${entityTitle} successfully ${action}.`;
 }

@@ -43,7 +43,7 @@ function createColumns(
                     data: row.original,
                     title: `Edit option - ${row.original.title}`,
                     size: "lg",
-                    type: "random_table_options",
+                    type: "random_table_option",
                   }));
                 },
               },
