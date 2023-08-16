@@ -403,6 +403,8 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     }
   }, [pagination?.page]);
 
+  console.log(orderBy);
+
   if (isLoading) return <Skeleton limit={pagination?.limit} type="table" />;
   return (
     <div className={container()}>
@@ -488,6 +490,14 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                                 payload: {
                                   field: id as string,
                                   sort: sortValue,
+                                },
+                              });
+                            } else {
+                              dispatch({
+                                type: "setSort",
+                                payload: {
+                                  field: id as string,
+                                  sort: "asc",
                                 },
                               });
                             }

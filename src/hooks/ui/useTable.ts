@@ -81,10 +81,21 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
       return { ...state, pagination: { ...state.pagination, ...action.payload } };
     case "setSort": {
       if (action.payload?.field && action.payload?.sort) {
-        return { ...state, orderBy: action.payload };
+        if (state.orderBy?.length) {
+          const fieldIdx = state.orderBy.findIndex((ob) => ob.field === action.payload.field);
+
+          if (fieldIdx > -1) {
+            const newOrderBy = state.orderBy.splice(fieldIdx);
+            newOrderBy.push(action.payload);
+            return { ...state, orderBy: newOrderBy };
+          }
+
+          return { ...state, orderBy: state?.orderBy?.length ? [...state.orderBy, action.payload] : [action.payload] };
+        }
+        return { ...state, orderBy: [action.payload] };
       }
       if (action?.payload?.field && action.payload.sort === null) {
-        return deleteObjectProps(state, ["orderBy"]);
+        return { ...state, orderBy: (state.orderBy || [])?.filter((ob) => ob.field !== action.payload.field) };
       }
       return { ...state };
     }
