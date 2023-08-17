@@ -198,8 +198,6 @@ export function RandomTableView() {
           columns={createColumns(setDrawer, setDialog)}
           config={{
             hasSelect: true,
-            hasFavorite: true,
-            hasTags: true,
             selection,
           }}
           data={data?.data || []}

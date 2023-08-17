@@ -14,7 +14,13 @@ export const InsertCharacterSchema = z.object({
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),
     character_fields: z
-      .object({ id: z.string(), value: z.string().or(z.string().array()).or(z.number()) })
+      .object({
+        id: z.string(),
+        value: z.object({
+          value: z.string().or(z.string().array()).or(z.number()),
+          subOptionValue: z.string().optional(),
+        }),
+      })
       .array()
       .optional(),
     related_to: z.object({ id: z.string(), relation_type: z.string() }).array().optional(),

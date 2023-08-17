@@ -316,7 +316,7 @@ export function Select({
                     aria-selected={i === activeIndex}
                     className={SelectOption({
                       isActive: activeIndex === i,
-                      isSelected: Array.isArray(value) ? value.includes(options[i].value) : value === options[i].value,
+                      isSelected: Array.isArray(value) ? value?.includes(options?.[i]?.value) : value === options?.[i]?.value,
                       size,
                     })}
                     role="option"

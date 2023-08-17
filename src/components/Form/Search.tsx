@@ -203,7 +203,7 @@ export function Search({
     project_id as string,
     {
       enabled: false,
-      queryKeyConcat: [searchTerm],
+      queryKeyConcat: [searchTerm, name],
     },
   );
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
