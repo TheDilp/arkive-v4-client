@@ -85,6 +85,7 @@ export function RandomTableView() {
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id: project_id as string },
+      relations: { suboptions: true },
     },
     "random_table_options",
     {
@@ -133,15 +134,42 @@ export function RandomTableView() {
                 const option = data?.data?.[optionIdx ?? idx];
 
                 if (option) {
-                  createNotification({
-                    title: option.title,
-                    timer: 15,
-                    description: option?.description,
-                    variant: "info",
-                    icon: IconEnum.d20,
-                    hasTitleBorder: true,
-                    position: "top",
-                  });
+                  if (option?.suboptions?.length) {
+                    const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`);
+                    const subIdx = subOptionRoll - 1;
+                    const subOption = option.suboptions[subIdx];
+                    if (subOption) {
+                      createNotification({
+                        title: `${option.title} - ${subOption.title}`,
+                        timer: 15,
+                        description: `${option?.description || ""} ${subOption?.description || ""}`,
+                        variant: "info",
+                        icon: IconEnum.d20,
+                        hasTitleBorder: true,
+                        position: "top",
+                      });
+                    } else {
+                      createNotification({
+                        title: option.title,
+                        timer: 15,
+                        description: option?.description || "",
+                        variant: "info",
+                        icon: IconEnum.d20,
+                        hasTitleBorder: true,
+                        position: "top",
+                      });
+                    }
+                  } else {
+                    createNotification({
+                      title: option.title,
+                      timer: 15,
+                      description: option?.description || "",
+                      variant: "info",
+                      icon: IconEnum.d20,
+                      hasTitleBorder: true,
+                      position: "top",
+                    });
+                  }
                 }
               }
             }}

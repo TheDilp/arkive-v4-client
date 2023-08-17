@@ -21,7 +21,11 @@ import { cloneElement, ReactElement, useRef, useState } from "react";
 import { DefaultTooltipType, TooltipType } from "../../types";
 
 function DefaultTooltip({ children }: DefaultTooltipType) {
-  return <div className="z-50 rounded border-none border-transparent bg-black p-2 text-sm text-white shadow">{children}</div>;
+  return (
+    <div className="z-50 select-none rounded border-none border-transparent bg-black p-2 text-sm text-white shadow">
+      {children}
+    </div>
+  );
 }
 
 export function Tooltip({

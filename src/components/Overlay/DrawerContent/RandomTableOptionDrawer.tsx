@@ -91,13 +91,26 @@ export default function RandomTableOptionDrawer({ data }: Props) {
               {randomTableOption.suboptions?.map((suboption, index) => (
                 <div key={suboption.id} className="flex flex-col gap-y-1">
                   <div className="flex flex-nowrap items-center gap-x-2 border-t border-zinc-700 pt-2">
-                    <div className="flex-1">
+                    <div className="flex flex-1 items-center gap-x-2">
                       <Input
                         label="Title (required)"
                         name={`suboptions[${index}].title`}
                         onChange={handleChange}
                         value={suboption?.title || ""}
                       />
+                      <div className="h-10 w-min self-end">
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.trash}
+                          onClick={() => {
+                            handleChange({
+                              name: "suboptions",
+                              value: randomTableOption.suboptions?.filter((subopt) => subopt.id !== suboption.id),
+                            });
+                          }}
+                          variant="error"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div>
