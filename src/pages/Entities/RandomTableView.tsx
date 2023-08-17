@@ -135,7 +135,7 @@ export function RandomTableView() {
 
                 if (option) {
                   if (option?.suboptions?.length) {
-                    const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`);
+                    const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`, true);
                     const subIdx = subOptionRoll - 1;
                     const subOption = option.suboptions[subIdx];
                     if (subOption) {
