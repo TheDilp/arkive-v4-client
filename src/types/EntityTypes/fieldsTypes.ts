@@ -1,3 +1,5 @@
+import { RandomTableOptionType } from "./randomTableTypes";
+
 export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll" | "random_table";
 export interface CharacterFieldType {
   id: string;
@@ -8,7 +10,7 @@ export interface CharacterFieldType {
   formula?: string | null;
   random_table_id?: string | null;
   options?: string[];
-  random_table_options?: { id: string; title: string }[];
+  random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string }[];
 }
 export interface CharacterFieldTemplate {

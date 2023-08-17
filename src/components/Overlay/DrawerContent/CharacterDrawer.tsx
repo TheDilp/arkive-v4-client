@@ -38,7 +38,7 @@ import Alert from "../../Misc/Alert";
 type insertCharacterType = Partial<CharacterType> & { project_id: string };
 type updateCharacterType = Partial<CharacterType>;
 type characterRelationsType = {
-  character_fields?: { id: string; value: string | string[] | number }[];
+  character_fields?: { id: string; value: { value: string | string[] | number; subOptionValue?: string } }[];
   related_to?: { id: string; relation_type: string }[];
   related_from?: { id: string; relation_type: string }[];
   tags?: { id: string }[];
@@ -62,6 +62,7 @@ function RandomTableInput({
   title,
   random_table_options,
   value: currentValue,
+  subOptionValue,
   index,
   random_table_id,
   isRolling,
@@ -71,13 +72,14 @@ function RandomTableInput({
   index: number;
   value: string | string[] | number | undefined;
   isRolling: boolean;
+  subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `character_fields[${index}]`;
+  const name = `character_fields[${index}].value`;
 
   const { data, refetch, isFetching } = useQuery({
     // @ts-ignore
-    queryKey: ["allEntities", "random_table_options", random_table_id],
+    queryKey: ["allEntities", "random_table_options", "random_roll", random_table_id],
 
     queryFn: async () =>
       FetchFunction({
@@ -92,34 +94,49 @@ function RandomTableInput({
 
     enabled: false,
   });
-
+  const selectedOptionSuboptions = random_table_options?.find((opt) => opt?.id === currentValue)?.suboptions;
   return (
-    <div className="flex flex-nowrap items-center gap-x-2">
-      <Select
-        isDisabled={isRolling}
-        label={title}
-        name={name}
-        onChange={({ value }) => {
-          handleChange({ name, value: { id, value } });
-        }}
-        options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
-        value={currentValue as string}
-      />
-      <div className="flex self-end pb-1.5">
-        <Button
-          hasNoBackground
-          icon={IconEnum.d20}
-          iconSize={24}
-          isIconOnly
-          isLoading={isFetching}
-          onClick={async () => {
-            await refetch();
-            if (data?.data?.[0]?.title) {
-              handleChange({ name, value: { id, value: data?.data?.[0]?.id } });
-            }
+    <div className="flex flex-col gap-y-1">
+      <div className="flex flex-nowrap items-center gap-x-2">
+        <Select
+          isDisabled={isRolling}
+          label={title}
+          name={`${name}`}
+          onChange={({ value }) => {
+            handleChange({ name, value: { id, value } });
           }}
-          tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
+          options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
+          value={currentValue as string}
         />
+        <div className="flex self-end pb-1.5">
+          <Button
+            hasNoBackground
+            icon={IconEnum.d20}
+            iconSize={24}
+            isIconOnly
+            isLoading={isFetching}
+            onClick={async () => {
+              await refetch();
+              if (data?.data?.[0]?.title) {
+                handleChange({ name, value: { id, value: data?.data?.[0]?.id, subOptionValue: data?.data?.[0]?.subitem_id } });
+              }
+            }}
+            tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col pl-4 pr-[1.55rem]">
+        {selectedOptionSuboptions?.length ? (
+          <div className="flex flex-nowrap gap-x-2">
+            <Select
+              name={`${name}.subOptionValue`}
+              onChange={({ name: suboptionName, value }) => handleChange({ name: suboptionName, value })}
+              options={selectedOptionSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
+              value={subOptionValue}
+            />
+            <div className="flex self-end pb-1.5" />
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -137,11 +154,13 @@ function CharacterFieldInputs({
   random_table_id,
   random_table,
   isRolling,
+  subOptionValue,
   handleChange,
   createNotification,
 }: CharacterFieldType & {
   index: number;
   value: string | string[] | number | undefined;
+  subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
@@ -165,7 +184,7 @@ function CharacterFieldInputs({
         isMultiple={fieldType === "select_multiple"}
         label={title}
         name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value } })}
+        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
         options={options?.map((opt) => ({ label: opt, value: opt })) || []}
         value={currentValue}
       />
@@ -177,7 +196,7 @@ function CharacterFieldInputs({
         <Editor
           initialContent={currentValue as string}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: JSON.stringify(value) } })}
+          onChange={({ value }) => handleChange({ name, value: { id, value: { value: JSON.stringify(value) } } })}
         />
         {/* <Textarea
           label={title}
@@ -198,9 +217,7 @@ function CharacterFieldInputs({
           isLoading={isRolling}
           label={title}
           name={name}
-          onChange={({ value }) => {
-            handleChange({ name, value: { id, value } });
-          }}
+          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">
@@ -217,7 +234,7 @@ function CharacterFieldInputs({
                   .then((r: any) => {
                     const rollData = DiceRollParser.parseFinalResults(r);
                     if (rollData?.valid) {
-                      handleChange({ name, value: { id, value: rollData.value } });
+                      handleChange({ name, value: { id, value: { value: rollData.value } } });
                     }
                   })
                   .catch(() => {
@@ -256,6 +273,7 @@ function CharacterFieldInputs({
         random_table={random_table}
         random_table_id={random_table_id}
         random_table_options={random_table_options}
+        subOptionValue={subOptionValue}
         title={title}
         value={currentValue}
       />
@@ -336,7 +354,7 @@ function FieldTemplateRow({
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data?: {
     id: string;
-    value: string | number | string[];
+    value: { value: string | number | string[]; subOptionValue?: string };
     template_id: string;
   }[];
   createNotification: (notification: Omit<NotificationType, "id">) => void;
@@ -352,7 +370,7 @@ function FieldTemplateRow({
     .filter((field) => field.field_type === "dice_roll")
     .map((field) => ({ field_id: field.id, formula: field?.formula }));
 
-  const { data, refetch } = useQuery<{ data: Required<Pick<CharacterFieldType, "random_table_id" | "random_table">[]> }>(
+  const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
     ["randomTables", "many", id],
     async () =>
       FetchFunction({
@@ -372,7 +390,7 @@ function FieldTemplateRow({
           icon: IconEnum.d20,
           onClick: async (e: Event) => {
             e.preventDefault();
-            const fieldsToChange: { name: string; value: { id: string; value: number } }[] = [];
+            const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
             for (let i = 0; i < diceRollFields.length; i += 1) {
               const formula = diceRollFields[i]?.formula;
 
@@ -382,7 +400,10 @@ function FieldTemplateRow({
                 if (idx > -1) {
                   // eslint-disable-next-line no-await-in-loop
                   const value = await getRollValue(formula, true);
-                  fieldsToChange.push({ name: `character_fields[${idx}]`, value: { id: diceRollFields[i].field_id, value } });
+                  fieldsToChange.push({
+                    name: `character_fields[${idx}]`,
+                    value: { id: diceRollFields[i].field_id, value: { value } },
+                  });
                 }
               }
             }
@@ -403,7 +424,13 @@ function FieldTemplateRow({
         if (idx > -1) {
           fieldsToChange.push({
             name: `character_fields[${idx}]`,
-            value: { id: character_fields[idx].id, value: data?.data[i].random_table?.[0]?.id },
+            value: {
+              id: character_fields[idx].id,
+              value: {
+                value: data?.data[i].random_table?.[0]?.id,
+                subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
+              },
+            },
           });
         }
       }
@@ -426,7 +453,8 @@ function FieldTemplateRow({
                   handleChange={handleChange}
                   index={fieldValueIndex === -1 ? character_fields_data?.length ?? 0 : fieldValueIndex}
                   isRolling={isRolling}
-                  value={character_fields_data?.[fieldValueIndex]?.value || ""}
+                  subOptionValue={character_fields_data?.[fieldValueIndex]?.value?.subOptionValue}
+                  value={character_fields_data?.[fieldValueIndex]?.value?.value || ""}
                 />
               );
             return null;
@@ -453,7 +481,7 @@ function AdditionalFieldsTab({
   character_fields?:
     | {
         id: string;
-        value: string | number | string[];
+        value: { value: string | number | string[]; subOptionValue?: string };
         template_id: string;
       }[]
     | undefined;
@@ -773,11 +801,11 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const characterToUpdate = { ...(changedData || {}), id: character.id };
               const { related_to, related_from, tags, ...rest } = characterToUpdate;
-
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
                 relations: { character_fields: character?.character_fields || [], related_from, related_to, tags },
               });
+
               await update(parsedData, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
