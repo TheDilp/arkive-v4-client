@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 export interface MapType {
   id: string;
   title: string;
@@ -8,6 +9,17 @@ export interface MapType {
   project_id: string;
   parent_id: string | null;
   image_id: string | null;
+
+  map_pins: MapPinType[];
+  map_layers: MapLayers[];
+}
+
+export interface MapLayers {
+  id: string;
+  title: string;
+  parent_id: string;
+  is_public: boolean | null;
+  image_id: string;
 }
 
 export interface MapPinType {

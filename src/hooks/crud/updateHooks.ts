@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType, GraphType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, GraphType, MapType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
@@ -43,6 +43,63 @@ export function useUpdateEntity<InsertType extends { data: { id?: string; parent
   );
 }
 
+export function useUpdateMapSubEntity<InsertType extends { data: { id?: string } }>(
+  subtype: "map_pins" | "map_layers",
+  parent_id: string,
+) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${subtype.toLowerCase()}/update/${updateValues?.data?.id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onMutate: (vars) => {
+        const old = queryClient.getQueryData(["maps", parent_id]);
+        queryClient.setQueryData<{ data: MapType }>(["maps", parent_id], (oldData) => {
+          if (oldData?.data)
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                [subtype]: oldData.data[subtype].map((subitem) => {
+                  if (subitem.id === vars.data.id) return { ...subitem, ...vars.data };
+                  return subitem;
+                }),
+              },
+            };
+          return oldData;
+        });
+
+        return { old };
+      },
+
+      onError: (_, __, context) => {
+        queryClient.setQueryData(["maps", parent_id], context?.old);
+
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: () => {
+        createNotification({
+          title: getEntityCRUDNotification(subtype, "update"),
+          variant: "success",
+          icon: IconEnum.check,
+          timer: 2,
+        });
+      },
+    },
+  );
+}
 export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string } }>(
   subtype: "nodes" | "edges",
   parent_id: string,
@@ -126,7 +183,6 @@ export function useUpdateRandomTableOption(parent_id: string | undefined, projec
     },
   );
 }
-
 export function useUpdateManySubEntities(type: AvailableSubEntityType) {
   return useMutation(async (updateItemValues: { [key: string]: any }[]) => {
     if (updateItemValues.length) {

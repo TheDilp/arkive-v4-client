@@ -110,7 +110,7 @@ export function EntitiesView() {
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
-  const noFetchTypes = ["random_tables", "random_table_options", "tags", "characters"];
+  const noFetchTypes = ["random_table_options", "tags", "characters"];
 
   if (type === "documents" && !fields.includes("image_id")) fields.push("image_id");
 
