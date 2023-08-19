@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -532,6 +532,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
   const setDialog = useSetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
+  const queryClient = useQueryClient();
 
   const { data: existingCharacter } = useGetEntity<CharacterType>(
     data?.id,
@@ -570,6 +571,8 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
 
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
+      queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
+
       setCharacter(existingCharacter?.data);
     }
   }, [existingCharacter?.data]);

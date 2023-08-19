@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { SetStateAction } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, useLayoutEffect, useState } from "react";
@@ -185,6 +186,7 @@ function FieldRow({
 }
 
 export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
+  const queryClient = useQueryClient();
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
@@ -320,7 +322,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 },
               },
               {
-                onSuccess: resetDrawerAtom,
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                  });
+                  resetDrawerAtom();
+                },
               },
             );
           else {
@@ -343,7 +350,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 },
               },
               {
-                onSuccess: resetDrawerAtom,
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                  });
+                  resetDrawerAtom();
+                },
               },
             );
           }

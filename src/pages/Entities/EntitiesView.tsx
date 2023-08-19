@@ -133,10 +133,12 @@ export function EntitiesView() {
         ],
       },
       fields,
-      orderBy: {
-        field: "is_folder",
-        sort: "asc",
-      },
+      orderBy: [
+        {
+          field: "is_folder",
+          sort: "asc",
+        },
+      ],
     },
     type as AvailableEntityType,
     {
