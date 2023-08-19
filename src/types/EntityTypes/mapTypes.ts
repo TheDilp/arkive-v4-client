@@ -1,17 +1,21 @@
+import { TagType } from "./tagTypes";
+
 /* eslint-disable no-use-before-define */
 export interface MapType {
   id: string;
   title: string;
-  is_folder: boolean | null;
-  is_public: boolean | null;
-  cluster_pins: boolean | null;
-  icon: string | null;
+  is_folder?: boolean | null;
+  is_public?: boolean | null;
+  cluster_pins?: boolean | null;
+  icon?: string | null;
   project_id: string;
-  parent_id: string | null;
+  parent_id?: string | null;
   image_id: string | null;
 
-  map_pins: MapPinType[];
-  map_layers: MapLayers[];
+  map_pins?: MapPinType[];
+  map_layers?: MapLayers[];
+
+  tags?: TagType[];
 }
 
 export interface MapLayers {

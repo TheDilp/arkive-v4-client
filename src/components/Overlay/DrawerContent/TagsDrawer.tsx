@@ -37,7 +37,7 @@ export function TagsDrawer({ data }: { data: TagType }) {
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });
 
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-2">
       {data?.id ? null : (
         <div className="flex h-8 w-full justify-between">
           <span>Insert new tag:</span>

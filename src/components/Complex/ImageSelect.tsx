@@ -14,6 +14,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
         <div className="col-span-4">
           <Search
             helperText={helperText}
+            imageType={type}
             isAutocomplete
             name={name}
             onChange={onChange}

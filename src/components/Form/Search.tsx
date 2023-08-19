@@ -173,6 +173,7 @@ export function Search({
   helperText,
   value,
   hasShownOption,
+  imageType,
   onChange,
 }: SearchType) {
   const { project_id } = useParams();
@@ -263,7 +264,7 @@ export function Search({
         })}>
         {searchEntity === "images" && value ? (
           <Avatar
-            image={getImageURL(project_id as string, "images", value as string)}
+            image={getImageURL(project_id as string, imageType || "images", value as string)}
             imageLoading="lazy"
             isTooltipDisabled
             label={label || ""}
@@ -349,7 +350,7 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses}>{helperText}</span> : null}
       <FloatingPortal>
-        {open && (
+        {(open || searchTerm || displayValue) && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
             <div
               {...getFloatingProps({
@@ -376,7 +377,11 @@ export function Search({
                   active={activeIndex === index}>
                   {searchEntity === "images" || searchEntity === "characters" ? (
                     <Avatar
-                      image={getImageURL(project_id as string, "images", searchEntity === "images" ? item?.value : item?.image)}
+                      image={getImageURL(
+                        project_id as string,
+                        imageType || "images",
+                        searchEntity === "images" ? item?.value : item?.image,
+                      )}
                       imageLoading="lazy"
                       isTooltipDisabled
                       label={label || ""}

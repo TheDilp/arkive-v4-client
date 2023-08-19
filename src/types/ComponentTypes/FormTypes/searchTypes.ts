@@ -1,4 +1,4 @@
-import { BaseFormComponentType, SearchableEntities, SelectOptionType } from "../..";
+import { AssetType, BaseFormComponentType, SearchableEntities, SelectOptionType } from "../..";
 
 export interface SearchType extends BaseFormComponentType {
   value?: string | string[] | undefined | null;
@@ -12,6 +12,7 @@ export interface SearchType extends BaseFormComponentType {
   isAutocomplete?: boolean;
   hasShownOption?: boolean;
   initialDisplayValue?: string;
+  imageType?: AssetType;
   onChange: ({
     name,
     value,
