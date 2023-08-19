@@ -95,7 +95,7 @@ export function Tags() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
-  const [{ orderBy }, dispatch] = useTable({ orderBy: [{ field: "title", sort: "asc" }] });
+  const [{ orderBy, selection }, dispatch] = useTable({ selection: {}, orderBy: [{ field: "title", sort: "asc" }] });
   const { data } = useGetEntities({ data: { project_id }, orderBy }, "tags");
 
   return (
@@ -125,6 +125,7 @@ export function Tags() {
             expandable: true,
             orderBy,
             filters: {},
+            selection,
           }}
           data={data?.data || []}
           dispatch={dispatch}

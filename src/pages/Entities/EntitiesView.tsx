@@ -18,7 +18,7 @@ import {
   IconEnum,
 } from "../../utils";
 import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/entityUtils";
-import { CharacterFieldTemplates } from "../Settings";
+import { CharacterFieldTemplates, Tags } from "../Settings";
 import { CharactersView } from ".";
 import { DocumentView } from "./DocumentView";
 import { RandomTableView } from "./RandomTableView";
@@ -110,8 +110,9 @@ export function EntitiesView() {
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
+  const noFetchTypes = ["random_tables", "random_table_options", "tags", "characters"];
 
-  if (type === "documents") fields.push("image_id");
+  if (type === "documents" && !fields.includes("image_id")) fields.push("image_id");
 
   const { data: base } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -142,7 +143,7 @@ export function EntitiesView() {
     },
     type as AvailableEntityType,
     {
-      enabled: !item_id && !!type && type !== "characters",
+      enabled: !item_id && !!type && !noFetchTypes.includes(type),
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -161,7 +162,7 @@ export function EntitiesView() {
       },
     },
     {
-      enabled: !!item_id,
+      enabled: !!item_id && !!type && !noFetchTypes.includes(type),
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -182,7 +183,7 @@ export function EntitiesView() {
   }, [data, type, setBreadcrumbs, item_id]);
 
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
-
+  if (type === "tags") return <Tags />;
   if (!item_id && type === "characters") return <CharactersView />;
 
   return (

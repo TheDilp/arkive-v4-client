@@ -89,7 +89,7 @@ export function TagsDrawer({ data }: { data: TagType }) {
         onClick={async () => {
           if (!data?.id) {
             if (Array.isArray(tags)) {
-              await createMany({ data: tags.map((tag) => omit(tag, ["id"])) });
+              await createMany({ data: tags.map((tag) => ({ ...omit(tag, ["id"]), color: tag?.color || DefaultTagColor })) });
             } else {
               await create({ data: tags });
             }
