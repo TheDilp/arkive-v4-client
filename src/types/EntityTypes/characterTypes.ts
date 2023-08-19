@@ -31,7 +31,7 @@ export interface CharacterType {
   yearOfBirth?: number | null;
   character_fields?: {
     id: string;
-    value: { value: string | string[] | number; subOptionValue?: string };
+    value: { id: string; value: string | string[] | number; subOptionValue?: string };
     template_id: string;
   }[];
   tags?: TagType[];

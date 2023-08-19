@@ -35,7 +35,7 @@ export default function ProjectsView() {
         <div className="w-full">
           <Navbar />
         </div>
-        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 2xl:grid-cols-4">
           {data?.data
             ? data.data.map((project) => <ProjectCard key={project.id} id={project.id} image="" title={project.title} />)
             : null}

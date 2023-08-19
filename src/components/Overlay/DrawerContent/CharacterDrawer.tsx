@@ -61,7 +61,7 @@ function RandomTableInput({
   id,
   title,
   random_table_options,
-  value: currentValue,
+  currentValue,
   subOptionValue,
   index,
   random_table_id,
@@ -70,12 +70,12 @@ function RandomTableInput({
   handleChange,
 }: Omit<CharacterFieldType, "project_id" | "sort"> & {
   index: number;
-  value: string | string[] | number | undefined;
+  currentValue: string | string[] | number | undefined;
   isRolling: boolean;
   subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `character_fields[${index}].value`;
+  const name = `character_fields[${index}]`;
 
   const { data, refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -103,7 +103,7 @@ function RandomTableInput({
           label={title}
           name={`${name}`}
           onChange={({ value }) => {
-            handleChange({ name, value: { id, value } });
+            handleChange({ name, value: { id, value: { value } } });
           }}
           options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
           value={currentValue as string}
@@ -118,7 +118,10 @@ function RandomTableInput({
             onClick={async () => {
               await refetch();
               if (data?.data?.[0]?.title) {
-                handleChange({ name, value: { id, value: data?.data?.[0]?.id, subOptionValue: data?.data?.[0]?.subitem_id } });
+                handleChange({
+                  name,
+                  value: { id, value: { value: data?.data?.[0]?.id, subOptionValue: data?.data?.[0]?.subitem_id } },
+                });
               }
             }}
             tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
@@ -129,8 +132,10 @@ function RandomTableInput({
         {selectedOptionSuboptions?.length ? (
           <div className="flex flex-nowrap gap-x-2">
             <Select
-              name={`${name}.subOptionValue`}
-              onChange={({ name: suboptionName, value }) => handleChange({ name: suboptionName, value })}
+              name={name}
+              onChange={({ value }) =>
+                handleChange({ name, value: { id, value: { value: currentValue, subOptionValue: value } } })
+              }
               options={selectedOptionSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
               value={subOptionValue}
             />
@@ -165,15 +170,13 @@ function CharacterFieldInputs({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
-  const name = `character_fields[${index}]`;
+  const name = `character_fields[${index}].value`;
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
         label={title}
         name={name}
-        onChange={({ value }) => {
-          handleChange({ name, value: { id, value } });
-        }}
+        onChange={({ value }) => handleChange({ name, value: { id, value } })}
         value={currentValue as string}
       />
     );
@@ -217,7 +220,7 @@ function CharacterFieldInputs({
           isLoading={isRolling}
           label={title}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+          onChange={({ value }) => handleChange({ name, value: { id, value } })}
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">
@@ -234,7 +237,7 @@ function CharacterFieldInputs({
                   .then((r: any) => {
                     const rollData = DiceRollParser.parseFinalResults(r);
                     if (rollData?.valid) {
-                      handleChange({ name, value: { id, value: { value: rollData.value } } });
+                      handleChange({ name, value: { id, value: rollData.value } });
                     }
                   })
                   .catch(() => {
@@ -265,6 +268,7 @@ function CharacterFieldInputs({
   if (fieldType === "random_table") {
     return (
       <RandomTableInput
+        currentValue={currentValue}
         field_type={fieldType}
         handleChange={handleChange}
         id={id}
@@ -275,7 +279,6 @@ function CharacterFieldInputs({
         random_table_options={random_table_options}
         subOptionValue={subOptionValue}
         title={title}
-        value={currentValue}
       />
     );
   }
@@ -354,7 +357,7 @@ function FieldTemplateRow({
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data?: {
     id: string;
-    value: { value: string | number | string[]; subOptionValue?: string };
+    value: { id: string; value: string | number | string[]; subOptionValue?: string };
     template_id: string;
   }[];
   createNotification: (notification: Omit<NotificationType, "id">) => void;
@@ -437,6 +440,7 @@ function FieldTemplateRow({
       handleChange(fieldsToChange);
     }
   }, [data?.data]);
+  console.log(character_fields_data);
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
       <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(id)} label={title}>
@@ -481,7 +485,7 @@ function AdditionalFieldsTab({
   character_fields?:
     | {
         id: string;
-        value: { value: string | number | string[]; subOptionValue?: string };
+        value: { id: string; value: string | number | string[]; subOptionValue?: string };
         template_id: string;
       }[]
     | undefined;
