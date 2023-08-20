@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
+import { useVirtual } from "@tanstack/react-virtual";
 import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useVirtual } from "react-virtual";
 import { tv } from "tailwind-variants";
 
 import { useHandleChange } from "../../hooks";

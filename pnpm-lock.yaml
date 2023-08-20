@@ -38,6 +38,9 @@ dependencies:
   '@tanstack/react-table':
     specifier: ^8.9.3
     version: 8.9.3(react-dom@18.2.0)(react@18.2.0)
+  '@tanstack/react-virtual':
+    specifier: 3.0.0-alpha.0
+    version: 3.0.0-alpha.0(react@18.2.0)
   cytoscape:
     specifier: ^3.26.0
     version: 3.26.0
@@ -92,9 +95,6 @@ dependencies:
   react-router-dom:
     specifier: ^6.14.1
     version: 6.14.1(react-dom@18.2.0)(react@18.2.0)
-  react-virtual:
-    specifier: ^2.10.4
-    version: 2.10.4(react@18.2.0)
   remirror:
     specifier: ^2.0.36
     version: 2.0.36(@remirror/pm@2.0.8)(prettier@2.8.8)
@@ -2962,6 +2962,17 @@ packages:
       '@tanstack/table-core': 8.9.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@tanstack/react-virtual@3.0.0-alpha.0(react@18.2.0):
+    resolution: {integrity: sha512-WpHU/dt34NwZZ8qtiE05TF+nX/b1W6qrWZarO+s8jJFpPVicrTbJKp5Bjt4eSJuk7aYw272oEfsH3ABBRgj+3A==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      '@babel/runtime': 7.22.10
+      '@reach/observe-rect': 1.2.0
+      react: 18.2.0
     dev: false
 
   /@tanstack/table-core@8.9.3:
@@ -6056,15 +6067,6 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    dev: false
-
-  /react-virtual@2.10.4(react@18.2.0):
-    resolution: {integrity: sha512-Ir6+oPQZTVHfa6+JL9M7cvMILstFZH/H3jqeYeKI4MSUX+rIruVwFC6nGVXw9wqAw8L0Kg2KvfXxI85OvYQdpQ==}
-    peerDependencies:
-      react: ^16.6.3 || ^17.0.0
-    dependencies:
-      '@reach/observe-rect': 1.2.0
-      react: 18.2.0
     dev: false
 
   /react@18.2.0:

@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { MouseEvent, useLayoutEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Dropdown, Graph, Icon } from "../../components";
+import { Breadcrumbs, Button, Dropdown, Graph, Icon, IconPicker } from "../../components";
 import Alert from "../../components/Misc/Alert";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DrawerContentType } from "../../types";
@@ -238,6 +238,7 @@ export function EntitiesView() {
           </div>
         ) : null}
       </div>
+      <IconPicker />
       {!item_id || data?.data?.is_folder ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-2 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length ? base.data : []).map((item) => (
