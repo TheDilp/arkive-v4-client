@@ -6,8 +6,8 @@ export interface IconPickerType {
     closeDelay?: number;
     openDelay?: number;
   };
-  iconTypes?: ("general" | "weather")[];
   allowedPlacements?: PositionType;
+  setIcon: (icon: string) => void;
   arrowColor?: string;
   isDisabled?: boolean;
   closeOnClick?: boolean;

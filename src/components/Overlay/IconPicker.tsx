@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import {
   autoPlacement,
   autoUpdate,
@@ -12,16 +14,18 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { useVirtual } from "@tanstack/react-virtual";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { IconPickerType } from "../../types";
 import { iconList } from "../../utils/enums/IconPickerEnums";
 import { Input } from "../Form";
 import { Icon } from "../Misc";
 
-export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisabled, iconTypes = ["general"] }: IconPickerType) {
+export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
+
+  const [filteredIcons, setFilteredIcons] = useState<string[]>(iconList);
 
   const { floatingStyles, refs, context } = useFloating({
     open,
@@ -32,7 +36,7 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useClick(context, {
-      enabled: true,
+      enabled: !isDisabled,
     }),
     useRole(context, { role: "tooltip" }),
     useDismiss(context),
@@ -44,7 +48,7 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
 
   const rowVirtualizer = useVirtual({
     parentRef: refs.floating,
-    size: Math.ceil(iconList.length / 6),
+    size: Math.ceil(filteredIcons.length / 6),
     overscan: 10,
   });
   const columnVirtualizer = useVirtual({
@@ -53,6 +57,22 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
     parentRef: refs.floating,
     overscan: 5,
   });
+
+  useEffect(() => {
+    if (filter && filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        setFilteredIcons(iconList.filter((icon) => icon.split(":")?.[1]?.includes(filter.toLowerCase())));
+      }, 250);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    if (filter.length === 0) {
+      setFilteredIcons(iconList);
+    }
+    return () => {};
+  }, [filter]);
+
   return (
     <>
       <div {...getReferenceProps({ ref: refs.setReference })}>TEST</div>
@@ -69,7 +89,14 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
               style: { ...floatingStyles, zIndex: 99999 },
             })}>
             <div className="sticky top-0 z-50">
-              <Input isInline name="iconFilter" placeholder="Search icons" size="sm" />
+              <Input
+                isInline
+                name="iconFilter"
+                onChange={({ value }) => setFilter(value as string)}
+                placeholder="Search icons"
+                size="sm"
+                value={filter}
+              />
             </div>
             <div
               style={{
@@ -84,7 +111,8 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
                       key={virtualColumn.index}
                       className="p-4"
                       onClick={() => {
-                        console.log(iconList[virtualRow.index * 6 + virtualColumn.index]);
+                        const selectedIcon = filteredIcons[virtualRow.index * 6 + virtualColumn.index];
+                        if (selectedIcon) setIcon(selectedIcon);
                       }}
                       style={{
                         position: "absolute",
@@ -97,7 +125,7 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
                       <Icon
                         className="mx-auto cursor-pointer hover:text-blue-300"
                         fontSize={30}
-                        icon={`${iconList[virtualRow.index * 6 + virtualColumn.index]}`}
+                        icon={`${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}`}
                       />
                     </div>
                   ))}
