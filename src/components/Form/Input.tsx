@@ -55,6 +55,11 @@ const InputClasses = tv({
         input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
+    isInline: {
+      true: {
+        input: "rounded-none border-none",
+      },
+    },
   },
 });
 
@@ -72,9 +77,15 @@ export function Input({
   helperText,
   min,
   max,
+  isInline,
   step,
 }: InputType) {
-  const { base, input, label: labelClasses, helperText: helperTextClasses } = InputClasses({ variant, size, isDisabled });
+  const {
+    base,
+    input,
+    label: labelClasses,
+    helperText: helperTextClasses,
+  } = InputClasses({ variant, size, isDisabled, isInline });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}

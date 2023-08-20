@@ -11,6 +11,7 @@ export interface InputType extends BaseFormComponentType {
   type?: HTMLInputTypeAttribute;
   placeholder?: string;
   label?: string;
+  isInline?: boolean;
   onChange: ({ name, value }: InputOnChangeValue) => void;
   onKeyDown?: (e: KeyboardEvent) => void;
   value: string | number | undefined;
