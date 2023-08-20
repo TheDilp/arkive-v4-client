@@ -21,7 +21,7 @@ import { iconList } from "../../utils/enums/IconPickerEnums";
 import { Input } from "../Form";
 import { Icon } from "../Misc";
 
-export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
+export function IconPicker({ name, onChange, icon, iconColor, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
 
@@ -61,7 +61,7 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
   useEffect(() => {
     if (filter && filter.length >= 3) {
       const timeout = setTimeout(() => {
-        setFilteredIcons(iconList.filter((icon) => icon.split(":")?.[1]?.includes(filter.toLowerCase())));
+        setFilteredIcons(iconList.filter((i) => i.split(":")?.[1]?.includes(filter.toLowerCase())));
       }, 250);
       return () => {
         clearTimeout(timeout);
@@ -75,14 +75,22 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
 
   return (
     <>
-      <div {...getReferenceProps({ ref: refs.setReference })}>TEST</div>
+      <div {...getReferenceProps({ ref: refs.setReference })}>
+        {icon ? (
+          <div className="cursor-pointer">
+            <Icon color={iconColor || "#ffffff"} fontSize={24} icon={icon} />
+          </div>
+        ) : (
+          <div className="h-6 w-6 cursor-pointer rounded-full border border-dashed" />
+        )}
+      </div>
       {open && (
         <FloatingFocusManager context={context} modal={false} order={["reference", "content"]} returnFocus={false}>
           <div
             ref={refs.setFloating}
             aria-describedby={descriptionId}
             aria-labelledby={labelId}
-            className="h-[20rem] max-h-[20rem] w-80 overflow-y-auto rounded bg-zinc-800"
+            className="h-[20rem] max-h-[20rem] w-80 overflow-y-auto rounded border border-zinc-700 bg-zinc-800"
             style={floatingStyles}
             {...getFloatingProps({
               ref: refs.setFloating,
@@ -112,7 +120,10 @@ export function IconPicker({ setIcon, customOffset, allowedPlacements, isDisable
                       className="p-4"
                       onClick={() => {
                         const selectedIcon = filteredIcons[virtualRow.index * 6 + virtualColumn.index];
-                        if (selectedIcon) setIcon(selectedIcon);
+                        if (selectedIcon) {
+                          onChange({ name, value: selectedIcon });
+                          setOpen(false);
+                        }
                       }}
                       style={{
                         position: "absolute",

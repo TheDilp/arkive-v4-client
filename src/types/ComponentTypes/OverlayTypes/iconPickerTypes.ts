@@ -1,14 +1,18 @@
 import { PositionType } from "../../baseTypes";
+import { InputOnChangeValue } from "../FormTypes";
 
 export type IconCategoriesType = "general" | "weather";
 export interface IconPickerType {
+  name: string;
+
   delay?: {
     closeDelay?: number;
     openDelay?: number;
   };
   allowedPlacements?: PositionType;
-  setIcon: (icon: string) => void;
-  arrowColor?: string;
+  onChange: (newValue: InputOnChangeValue) => void;
+  icon?: string;
+  iconColor?: string;
   isDisabled?: boolean;
   closeOnClick?: boolean;
   passCloseTooltip?: boolean;

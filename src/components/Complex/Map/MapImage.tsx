@@ -75,7 +75,7 @@ export function MapImage({ src, bounds, imgRef, cm, isReadOnly, isClusteringPins
               icon: IconEnum.add,
               title: "Add pin",
               onClick: () => {
-                setDrawer((prev) => ({ ...prev, data: {}, title: "", type: "map_pins" }));
+                setDrawer((prev) => ({ ...prev, data: {}, title: "Create new map pin", type: "map_pins" }));
               },
             },
           ],

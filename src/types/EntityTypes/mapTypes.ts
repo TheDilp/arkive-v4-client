@@ -1,3 +1,4 @@
+import { ImageType } from "./imageTypes";
 import { TagType } from "./tagTypes";
 
 /* eslint-disable no-use-before-define */
@@ -42,4 +43,5 @@ export interface MapPinType {
   map_link: string | null;
   doc_id: string | null;
   image_id: string | null;
+  image: ImageType;
 }

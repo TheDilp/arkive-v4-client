@@ -18,6 +18,7 @@ import {
   TagsDrawer,
 } from "./DrawerContent";
 import { MapDrawer } from "./DrawerContent/MapDrawer";
+import { MapPinDrawer } from "./DrawerContent/MapPinDrawer";
 import { RandomTableDrawer } from "./DrawerContent/RandomTableDrawer";
 import RandomTableOptionDrawer from "./DrawerContent/RandomTableOptionDrawer";
 import { RandomTableOptionsDrawer } from "./DrawerContent/RandomTableOptionsDrawer";
@@ -123,6 +124,7 @@ export function Drawer() {
         {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
         {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
         {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
+        {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}

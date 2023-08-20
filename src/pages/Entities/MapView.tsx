@@ -53,8 +53,8 @@ export function MapView({ isReadOnly }: Props) {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-
-      {currentMap ? (
+      {loading || isLoading ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
+      {currentMap?.data && !isLoading && !loading ? (
         <div className="h-full w-full">
           <MapContainer
             ref={mapRef}
