@@ -25,8 +25,8 @@ export function MapView({ isReadOnly }: Props) {
   const cm = useRef() as any;
 
   const { data: currentMap, isLoading } = useGetEntity<MapType>(item_id as string, "maps", { data: {} });
-
   useChangeNavbarTitle(`The Arkive | Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
+
   useEffect(() => {
     if (currentMap?.data && currentMap?.data?.image_id) {
       setLoading(true);
@@ -51,7 +51,7 @@ export function MapView({ isReadOnly }: Props) {
   // if (loading || isLoading) return <ProgressSpinner />;
   if (!currentMap) return null;
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
 
       {currentMap ? (

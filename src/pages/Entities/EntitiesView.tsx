@@ -21,6 +21,7 @@ import { getDefaultEntityIcon, getEntityNameFromType } from "../../utils/ui/enti
 import { CharacterFieldTemplates, Tags } from "../Settings";
 import { CharactersView } from ".";
 import { DocumentView } from "./DocumentView";
+import { MapView } from "./MapView";
 import { RandomTableView } from "./RandomTableView";
 
 type EntityItemType = {
@@ -31,7 +32,7 @@ type EntityItemType = {
   image_id?: string;
 };
 
-function ItemDisplay({
+function EntityItem({
   id,
   is_folder,
   title,
@@ -92,7 +93,11 @@ function ItemDisplay({
         }}>
         <div className="pointer-events-none h-24 w-24">
           {image_id ? (
-            <img alt={title} className="object-contain" src={getImageURL(project_id as string, "images", image_id)} />
+            <img
+              alt={title}
+              className="object-contain"
+              src={getImageURL(project_id as string, type === "maps" ? "maps" : "images", image_id)}
+            />
           ) : (
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
           )}
@@ -103,16 +108,20 @@ function ItemDisplay({
   );
 }
 
+const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
+const noFetchTypes = ["random_table_options", "tags", "characters"];
+
 export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
-  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
-  const noFetchTypes = ["random_table_options", "tags", "characters"];
+  // IMAGE_ID MUST BE LAST ELEMENT FOR POP
+  // !REWORK WITH SMARTER IMPLEMENTATION
+  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
 
-  if (type === "documents" && !fields.includes("image_id")) fields.push("image_id");
+  if (type === "graphs" || (type === "random_tables" && fields.includes("image_id"))) fields.pop();
 
   const { data: base } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -232,7 +241,7 @@ export function EntitiesView() {
       {!item_id || data?.data?.is_folder ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-2 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length ? base.data : []).map((item) => (
-            <ItemDisplay
+            <EntityItem
               key={item.id}
               changeParent={changeParent}
               icon={item.icon}
@@ -278,7 +287,7 @@ export function EntitiesView() {
             />
           ))}
           {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => (
-            <ItemDisplay
+            <EntityItem
               key={item.id}
               changeParent={changeParent}
               icon={item.icon}
@@ -332,6 +341,7 @@ export function EntitiesView() {
         </div>
       ) : null}
       {!!item_id && !data?.data?.is_folder && type === "documents" ? <DocumentView editable /> : null}
+      {!!item_id && !data?.data?.is_folder && type === "maps" ? <MapView /> : null}
       {!!item_id && !data?.data?.is_folder && type === "graphs" ? <Graph /> : null}
       {!!item_id && !data?.data?.is_folder && type === "random_tables" ? <RandomTableView /> : null}
     </>

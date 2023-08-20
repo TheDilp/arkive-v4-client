@@ -80,7 +80,7 @@ export function ContextMenu() {
   return (
     <FloatingPortal>
       {isOpen && (
-        <FloatingOverlay className="pointer-events-none" lockScroll>
+        <FloatingOverlay className="pointer-events-none z-[1000]" lockScroll>
           <FloatingFocusManager context={context} initialFocus={refs.floating}>
             <div
               ref={refs.setFloating}
