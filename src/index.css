@@ -87,7 +87,7 @@ input[type="color"]::-webkit-color-swatch {
   }
 }
 .leaflet-control-container {
-  @apply z-10 select-none;
+  @apply z-[10] select-none;
 }
 
 #dice-box,

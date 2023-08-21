@@ -51,7 +51,7 @@ export function MapView({ isReadOnly }: Props) {
   // if (loading || isLoading) return <ProgressSpinner />;
   if (!currentMap) return null;
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
       {loading || isLoading ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
       {currentMap?.data && !isLoading && !loading ? (
