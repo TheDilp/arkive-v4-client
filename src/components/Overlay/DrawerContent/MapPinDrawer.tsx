@@ -1,16 +1,48 @@
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useResetAtom } from "jotai/utils";
+import { useLayoutEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { useHandleChange } from "../../../hooks";
+import { useCreateSubEntity, useGetSubEntity, useHandleChange } from "../../../hooks";
 import { MapPinType } from "../../../types";
-import { DefaultTagColor, IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
+import { InsertMapPinSchema, InsertMapPinType } from "../../../validation/maps/map_pins";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { ColorPicker, IconPicker } from "..";
 
-export function MapPinDrawer() {
-  const [mapPin, setMapPin] = useState<Partial<MapPinType>>({ icon: "", color: DefaultTagColor });
+type Props = {
+  data: { id?: string; lat: number; lng: number };
+};
+
+export function MapPinDrawer({ data }: Props) {
+  const { item_id } = useParams();
+  const [mapPin, setMapPin] = useState<Partial<MapPinType>>({
+    parent_id: item_id as string,
+  });
+  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const { data: existingMapPin } = useGetSubEntity(data?.id, "map_pins", { data: {} }, { enabled: !!data?.id });
+  const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins");
+
+  const queryClient = useQueryClient();
 
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
+
+  useLayoutEffect(() => {
+    if (existingMapPin?.data) {
+      setMapPin(existingMapPin.data);
+    } else {
+      setMapPin({
+        parent_id: item_id as string,
+        lat: data.lat,
+        lng: data.lng,
+        background_color: "#000000",
+        border_color: "#ffffff",
+        show_background: true,
+        show_border: true,
+      });
+    }
+  }, [existingMapPin]);
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -28,15 +60,15 @@ export function MapPinDrawer() {
       <div className="flex flex-nowrap justify-between">
         <span className="block min-h-[20px] truncate">Marker border:</span>
         <div className="flex items-center gap-x-2 pb-2">
-          <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.border_color as string} />
+          <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
           <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
         </div>
       </div>
       <div className="flex flex-nowrap justify-between">
         <span className="block min-h-[20px] truncate">Marker background:</span>
         <div className="flex items-center gap-x-2 pb-2">
-          <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.background_color as string} />
-          <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_background} />
+          <ColorPicker hasCustom name="background_color" onChange={handleChange} value={mapPin.background_color as string} />
+          <Checkbox name="show_background" onChange={handleChange} value={mapPin?.show_background} />
         </div>
       </div>
       <div className="flex flex-nowrap justify-between">
@@ -63,7 +95,24 @@ export function MapPinDrawer() {
           />
         )}
       </div>
-      <Button icon={IconEnum.save} label="Save" variant="success" />
+      <Button
+        icon={IconEnum.save}
+        label="Save"
+        onClick={async () => {
+          if (!("id" in data) || !data?.id) {
+            const parsed = InsertMapPinSchema.parse({ data: mapPin });
+            await createMapPin(parsed, {
+              onSuccess: (res) => {
+                if (res?.ok) {
+                  queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
+                  resetDrawerAtom();
+                }
+              },
+            });
+          }
+        }}
+        variant="success"
+      />
     </div>
   );
 }

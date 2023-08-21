@@ -3,10 +3,10 @@ import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useHandleChange } from "../../../hooks";
+import { useCreateSubEntities, useHandleChange } from "../../../hooks";
 import { RandomTableOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
-import { InsertRandomTableOptionSchema } from "../../../validation/random_tables";
+import { InsertRandomTableOptionSchema, InsertRandomTableOptionType } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
 
 export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string } }) {
@@ -16,7 +16,8 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
     [],
   );
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("random_table_options");
+  const { mutateAsync: create, isLoading: isCreating } =
+    useCreateSubEntities<InsertRandomTableOptionType[]>("random_table_options");
   const { handleChange } = useHandleChange({ data: options, setData: setOptions });
   return (
     <div className="flex h-full flex-col gap-y-2">

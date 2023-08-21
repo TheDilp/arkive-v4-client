@@ -32,11 +32,13 @@ export const RandomTableSubOptionSchema = z.object({
 });
 
 export const InsertRandomTableOptionSchema = z.object({
-  title: z.string(),
-  description: z.string().nullable().optional(),
-  parent_id: z.string(),
-  icon: z.string().nullable().optional(),
-  icon_color: z.string().nullable().optional(),
+  data: z.object({
+    title: z.string(),
+    description: z.string().nullable().optional(),
+    parent_id: z.string(),
+    icon: z.string().nullable().optional(),
+    icon_color: z.string().nullable().optional(),
+  }),
 });
 export const UpdateRandomTableOptionSchema = z.object({
   data: z.object({
@@ -54,3 +56,6 @@ export const UpdateRandomTableOptionSchema = z.object({
 
 export type InsertRandomTableType = z.infer<typeof InsertRandomTableSchema>;
 export type UpdateRandomTableType = z.infer<typeof UpdateRandomTableSchema>;
+
+export type InsertRandomTableOptionType = z.infer<typeof InsertRandomTableOptionSchema>;
+export type UpdateRandomTableOptionType = z.infer<typeof UpdateRandomTableOptionSchema>;
