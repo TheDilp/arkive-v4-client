@@ -26,7 +26,7 @@ import {
   useNotifications,
 } from "../../../utils";
 import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
-import { InsertCharacterSchema, UpdateCharacterSchema } from "../../../validation";
+import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
 import { Badge, CharacterPreview, ImagePreview } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
@@ -35,8 +35,6 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
 
-type insertCharacterType = Partial<CharacterType> & { project_id: string };
-type updateCharacterType = Partial<CharacterType>;
 type characterRelationsType = {
   character_fields?: { id: string; value: { value: string | string[] | number; subOptionValue?: string } }[];
   related_to?: { id: string; relation_type: string }[];
@@ -440,7 +438,6 @@ function FieldTemplateRow({
       handleChange(fieldsToChange);
     }
   }, [data?.data]);
-  console.log(character_fields_data);
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
       <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(id)} label={title}>
@@ -551,14 +548,11 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     existingCharacter?.data || { project_id: project_id as string },
   );
 
-  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
-    data: insertCharacterType;
-    relations?: characterRelationsType;
-  }>("characters");
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: updateCharacterType;
-    relations?: characterRelationsType;
-  }>("characters", project_id as string);
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
+    "characters",
+    project_id as string,
+  );
   const { data: templates } = useGetEntities<CharacterFieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",

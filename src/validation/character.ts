@@ -55,3 +55,6 @@ export const UpdateCharacterSchema = z.object({
     related_from: z.object({ id: z.string(), relation_type: z.string() }).array().optional(),
   }),
 });
+
+export type InsertCharacterType = z.infer<typeof InsertCharacterSchema>;
+export type UpdateCharacterType = z.infer<typeof UpdateCharacterSchema>;
