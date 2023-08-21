@@ -5,7 +5,12 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
-import { InsertRandomTableSchema } from "../../../validation/random_tables";
+import {
+  InsertRandomTableSchema,
+  InsertRandomTableType,
+  UpdateRandomTableSchema,
+  UpdateRandomTableType,
+} from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
 
 type Props = {
@@ -27,10 +32,11 @@ export function RandomTableDrawer({ data }: Props) {
     },
     { enabled: !!data?.id },
   );
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity("random_tables", project_id as string);
-  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
-    data: Omit<RandomTableType, "id" | "random_table_options">;
-  }>("random_tables");
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertRandomTableType>("random_tables");
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateRandomTableType>(
+    "random_tables",
+    project_id as string,
+  );
 
   const [randomTable, setRandomTable] = useState<Partial<RandomTableType> & { project_id: string }>(
     existingRandomTable?.data || { project_id: project_id as string, parent_id: item_id },
@@ -72,28 +78,19 @@ export function RandomTableDrawer({ data }: Props) {
         onClick={async () => {
           if (changedData) {
             if (randomTable?.id) {
-              await update(
-                {
-                  data: changedData,
+              const parsed = UpdateRandomTableSchema.parse(randomTable);
+              await update(parsed, {
+                onSuccess: (res) => {
+                  if (res?.ok) resetDrawerAtom();
                 },
-                {
-                  onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
-                },
-              );
+              });
             } else {
               const parsed = InsertRandomTableSchema.parse(randomTable);
-              await create(
-                {
-                  data: parsed,
+              await create(parsed, {
+                onSuccess: (res) => {
+                  if (res?.ok) resetDrawerAtom();
                 },
-                {
-                  onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
-                },
-              );
+              });
             }
           }
         }}

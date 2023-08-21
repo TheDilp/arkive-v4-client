@@ -1,22 +1,27 @@
 import { z } from "zod";
 
 export const InsertRandomTableSchema = z.object({
-  title: z.string(),
-  description: z.string().nullable().optional(),
-  project_id: z.string(),
-  parent_id: z.string().nullable().optional(),
-  icon: z.string().nullable().optional(),
-  is_folder: z.boolean().nullable().optional(),
-  is_public: z.boolean().nullable().optional(),
+  data: z.object({
+    title: z.string(),
+    description: z.string().nullable().optional(),
+    project_id: z.string(),
+    parent_id: z.string().nullable().optional(),
+    icon: z.string().nullable().optional(),
+    is_folder: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
+  }),
 });
 
 export const UpdateRandomTableSchema = z.object({
-  title: z.string(),
-  description: z.string().nullable().optional(),
-  parent_id: z.string().nullable().optional(),
-  icon: z.string().nullable().optional(),
-  is_folder: z.boolean().nullable().optional(),
-  is_public: z.boolean().nullable().optional(),
+  data: z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    description: z.string().nullable().optional(),
+    parent_id: z.string().nullable().optional(),
+    icon: z.string().nullable().optional(),
+    is_folder: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
+  }),
 });
 
 export const RandomTableSubOptionSchema = z.object({
@@ -46,3 +51,6 @@ export const UpdateRandomTableOptionSchema = z.object({
     suboptions: RandomTableSubOptionSchema.array().optional(),
   }),
 });
+
+export type InsertRandomTableType = z.infer<typeof InsertRandomTableSchema>;
+export type UpdateRandomTableType = z.infer<typeof UpdateRandomTableSchema>;
