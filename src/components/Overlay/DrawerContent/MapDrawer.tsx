@@ -1,12 +1,11 @@
 import { useResetAtom } from "jotai/utils";
-import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { MapType } from "../../../types";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
-import { InsertMapSchema } from "../../../validation/maps/maps";
+import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { ImageSelect } from "../../Complex";
 import { Button, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
@@ -33,9 +32,9 @@ export function MapDrawer({ data }: { data: MapType }) {
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateEntity<{ data: Omit<MapType, "id"> }>("maps");
+  const { mutateAsync: create } = useCreateEntity<InsertMapType>("maps");
 
-  const { mutateAsync: update } = useUpdateEntity<{ data: Omit<MapType, "project_id"> }>("maps", project_id as string);
+  const { mutateAsync: update } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
   const { handleChange } = useHandleChange({ data: map, setData: setMap });
 
   return (
@@ -99,12 +98,13 @@ export function MapDrawer({ data }: { data: MapType }) {
         isDisabled={isDisabled(map)}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {
+          const { tags, ...rest } = map;
           if (!data?.id) {
-            const { tags, ...rest } = map;
             const parsedData = InsertMapSchema.parse({ data: rest, relations: { tags } });
             await create(parsedData);
-          } else if (!Array.isArray(map)) {
-            await update({ data: omit(map, ["project_id"]) });
+          } else {
+            const parsedData = UpdateMapSchema.parse({ data: rest, relations: { tags } });
+            await update(parsedData);
           }
 
           resetDrawerAtom();
