@@ -16,7 +16,7 @@ import {
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
-import { updateNodeSchema } from "../../../validation";
+import { UpdateNodeSchema } from "../../../validation";
 import {
   Alert,
   Badge,
@@ -405,7 +405,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
               const { tags, ...rest } = nodeToUpdate;
-              const parsedData = updateNodeSchema.parse({ data: rest, relations: { tags } });
+              const parsedData = UpdateNodeSchema.parse({ data: rest, relations: { tags } });
               await update(parsedData, {
                 onSuccess: () => {
                   resetDrawerAtom();

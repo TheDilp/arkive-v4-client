@@ -83,11 +83,11 @@ export function useCreateEntity<
   );
 }
 
-export function useCreateSubEntity(type: AvailableSubEntityType) {
-  return useMutation(async (updateItemValues: { [key: string]: any }) => {
+export function useCreateSubEntity<InsertType extends { data: { parent_id: string } }>(type: AvailableSubEntityType) {
+  return useMutation(async (updateItemValues: InsertType) => {
     return FetchFunction({
       url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
-      body: JSON.stringify({ data: updateItemValues }),
+      body: JSON.stringify(updateItemValues),
       method: "POST",
     });
   });

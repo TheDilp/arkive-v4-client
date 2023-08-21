@@ -27,6 +27,7 @@ import {
 } from "../../utils/atoms";
 import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
+import { InsertEdgeType, InsertNodeType } from "../../validation";
 import { Quickbar } from "..";
 
 type Props = {
@@ -62,8 +63,8 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
   useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
   const queryClient = useQueryClient();
-  const { mutate: createNode } = useCreateSubEntity("nodes");
-  const { mutate: createEdges } = useCreateSubEntity("edges");
+  const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes");
+  const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges");
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
@@ -99,11 +100,14 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       parent_id: item_id as string,
     };
 
-    createEdges(newEdge, {
-      onSuccess: (d) => {
-        setEdges((prev) => [...prev, { ...newEdge, ...d.data }]);
+    createEdges(
+      { data: newEdge },
+      {
+        onSuccess: (d) => {
+          setEdges((prev) => [...prev, { ...newEdge, ...d.data }]);
+        },
       },
-    });
+    );
   };
 
   useEffect(() => {
@@ -162,7 +166,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                 icon: IconEnum.add,
                 onClick: () => {
                   createNode(
-                    { parent_id: item_id, x: evt.position.x, y: evt.position.y },
+                    { data: { parent_id: item_id as string, x: evt.position.x, y: evt.position.y } },
                     {
                       onSuccess: (d: { data: { id: string } }) => {
                         setNodes((prev) => [
@@ -421,7 +425,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       // If the target is the background of the canvas
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
         createNode(
-          { parent_id: item_id, x: evt.position.x, y: evt.position.y },
+          { data: { parent_id: item_id as string, x: evt.position.x, y: evt.position.y } },
           {
             onSuccess: (d: { data: { id: string } }) => {
               setNodes((prev) => [

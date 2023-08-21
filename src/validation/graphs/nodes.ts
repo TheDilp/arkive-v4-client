@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createNodeSchema = z.object({
+export const InsertNodeSchema = z.object({
   data: z.object({
     parent_id: z.string(),
     label: z.string().nullable().optional(),
@@ -33,7 +33,7 @@ export const createNodeSchema = z.object({
     .optional(),
 });
 
-export const updateNodeSchema = z.object({
+export const UpdateNodeSchema = z.object({
   data: z.object({
     id: z.string(),
     label: z.string().nullable().optional(),
@@ -89,3 +89,6 @@ export const updateNodeSchema = z.object({
     })
     .optional(),
 });
+
+export type InsertNodeType = z.infer<typeof InsertNodeSchema>;
+export type UpdateNodeType = z.infer<typeof UpdateNodeSchema>;
