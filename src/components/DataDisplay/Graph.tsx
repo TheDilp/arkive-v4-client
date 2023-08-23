@@ -133,7 +133,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         ehRef.current = undefined;
       }
       if (refVariable?._cy) {
-        refVariable?._cy.removeListener("click mousedown cxttap dbltap free");
         setBoardState((prev) => ({ ...prev, draw_mode: false }));
       }
       setNodes([]);
@@ -277,7 +276,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                   icon: IconEnum.trash,
                   onClick: () =>
                     deleteNode(
-                      { data: { id } },
+                      { data: { id, parent_id: item_id as string } },
                       {
                         onSuccess: () => {
                           setEdges((prev) => prev.filter((e) => e.source_id !== id && e.target_id !== id));
@@ -358,12 +357,11 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         const target = evt.target._private;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
-
         setDrawer((prev) => {
           if (prev?.data?.id) {
             if (prev?.data?.id === rest.id) return prev;
             createNotification({
-              title: "Please close the drawer for the current node before editing another.",
+              title: "Please close the current drawer before editing another.",
               variant: "info",
               timer: 5,
             });
@@ -381,16 +379,30 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       });
       cyRef?.current?._cy.on("dbltap", "edge", function (evt: any) {
         const targetEdge = evt.target._private;
-        setDrawer((prev) => ({
-          ...prev,
-          data: { id: targetEdge.data.id, parent_id: item_id },
-          position: "right",
-          title: `Edit edge ${targetEdge?.data?.label ? "-".concat(targetEdge.data.label) : ""}`,
-          type: "edges",
-          size: "md",
-        }));
+        setDrawer((prev) => {
+          if (prev?.data?.id) {
+            if (prev?.data?.id === targetEdge.data.id) return prev;
+            createNotification({
+              title: "Please close the current drawer before editing another.",
+              variant: "info",
+              timer: 5,
+            });
+            return prev;
+          }
+          return {
+            ...prev,
+            data: { id: targetEdge.data.id, parent_id: item_id },
+            position: "right",
+            title: `Edit edge ${targetEdge?.data?.label ? "-".concat(targetEdge?.data.label) : ""}`,
+            type: "edges",
+            size: "md",
+          };
+        });
       });
     }
+    return () => {
+      cyRef?.current?._cy.removeListener("click mousedown cxttap dbltap free");
+    };
   }, [cyRef?.current?._cy, item_id]);
 
   useEffect(() => {

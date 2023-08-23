@@ -283,7 +283,7 @@ export function EdgeDrawer({ data }: Props) {
               value={edge?.width?.toString() || "1"}
             />
             <div className="self-end pb-2">
-              <ColorPicker hasCustom name="font_color" onChange={handleChange} value={edge?.font_color || "#ffffff"} />
+              <ColorPicker hasCustom name="line_color" onChange={handleChange} value={edge?.line_color || "#595959"} />
             </div>
           </div>
         </>
@@ -387,10 +387,10 @@ export function EdgeDrawer({ data }: Props) {
           label="Save"
           onClick={async () => {
             if (changedData) {
+              console.log(edge.id);
               const edgeToUpdate = { ...(changedData || {}), id: edge.id };
               const { tags, ...rest } = edgeToUpdate;
               const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
-
               await update(parsedData, {
                 onSuccess: () => {
                   resetDrawerAtom();
