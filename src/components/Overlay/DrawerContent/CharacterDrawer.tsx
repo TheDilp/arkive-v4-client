@@ -75,7 +75,7 @@ function RandomTableInput({
 }) {
   const name = `character_fields[${index}]`;
 
-  const { data, refetch, isFetching } = useQuery({
+  const { refetch, isFetching } = useQuery({
     // @ts-ignore
     queryKey: ["allEntities", "random_table_options", "random_roll", random_table_id],
 
@@ -114,13 +114,14 @@ function RandomTableInput({
             isIconOnly
             isLoading={isFetching}
             onClick={async () => {
-              await refetch();
-              if (data?.data?.[0]?.title) {
-                handleChange({
-                  name,
-                  value: { id, value: { value: data?.data?.[0]?.id, subOptionValue: data?.data?.[0]?.subitem_id } },
-                });
-              }
+              refetch().then((res) => {
+                if (res?.data?.data?.[0]?.title) {
+                  handleChange({
+                    name,
+                    value: { id, value: { value: res?.data?.data?.[0]?.id, subOptionValue: res?.data?.data?.[0]?.subitem_id } },
+                  });
+                }
+              });
             }}
             tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
           />
@@ -168,13 +169,13 @@ function CharacterFieldInputs({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
-  const name = `character_fields[${index}].value`;
+  const name = `character_fields[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
         label={title}
         name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value } })}
+        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
         value={currentValue as string}
       />
     );
@@ -235,7 +236,7 @@ function CharacterFieldInputs({
                   .then((r: any) => {
                     const rollData = DiceRollParser.parseFinalResults(r);
                     if (rollData?.valid) {
-                      handleChange({ name, value: { id, value: rollData.value } });
+                      handleChange({ name, value: { id, value: { value: rollData.value } } });
                     }
                   })
                   .catch(() => {
@@ -547,7 +548,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
   const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
     existingCharacter?.data || { project_id: project_id as string },
   );
-
+  console.log(character);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
@@ -608,35 +609,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
             )}
           </div>
           <Input label="Age (optional)" name="age" onChange={handleChange} type="number" value={character?.age || ""} />
-          <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
-            <div className="w-full lg:w-1/3">
-              <Input
-                label="Day of birth (optional)"
-                name="dayOfBirth"
-                onChange={handleChange}
-                type="number"
-                value={character?.dayOfBirth || ""}
-              />
-            </div>
-            <div className="w-full lg:w-1/3">
-              <Input
-                label="Month of birth (optional)"
-                name="monthOfBirth"
-                onChange={handleChange}
-                type="number"
-                value={character?.monthOfBirth || ""}
-              />
-            </div>
-            <div className="w-full lg:w-1/3">
-              <Input
-                label="Year of birth (optional)"
-                name="yearOfBirth"
-                onChange={handleChange}
-                type="number"
-                value={character?.yearOfBirth || ""}
-              />
-            </div>
-          </div>
+
           <ul className="flex w-full flex-col gap-y-2">
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
