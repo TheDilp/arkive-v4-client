@@ -7,8 +7,8 @@ export function getFirstLetters(sentence: string): string {
     .map((word) => word.charAt(0))
     .join("");
 }
-export function getAvatarInitials(first_name: string, last_name: string): string {
-  return `${first_name.charAt(0)}${last_name.charAt(0)}`;
+export function getAvatarInitials(first_name: string, last_name?: string): string {
+  return `${first_name.charAt(0)}${last_name ? last_name.charAt(0) : ""}`;
 }
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
@@ -19,7 +19,7 @@ export function getNavbarEntityType(type: AvailableEntityType) {
     return "random tables";
   }
   if (type === "character_fields_templates") {
-    return "Character field templates";
+    return "character fields templates";
   }
   return type;
 }
@@ -29,7 +29,7 @@ export function capitalizeSentence(sentence: string): string {
 }
 
 export function getCharacterFullName(first_name: string, nickname?: string | null, last_name?: string | null): string {
-  return `${first_name.trim()}${nickname ? ` ${nickname} ` : " "}${last_name || ""}`;
+  return `${first_name.trim()}${nickname ? ` ${nickname.trim()}` : ""}${last_name ? ` ${last_name?.trim()}` : ""}`;
 }
 
 export function getSentenceCase(field: string) {
