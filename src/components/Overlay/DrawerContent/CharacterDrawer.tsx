@@ -27,7 +27,7 @@ import {
 } from "../../../utils";
 import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import { Badge, CharacterPreview, ImagePreview } from "../..";
+import { Badge, CharacterPreview, ImagePreview, Skeleton } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select } from "../../Form";
@@ -474,6 +474,7 @@ function AdditionalFieldsTab({
   handleChange,
   character_fields,
   selectedTemplates,
+  isLoading,
 }: {
   templates:
     | {
@@ -490,7 +491,9 @@ function AdditionalFieldsTab({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
   selectedTemplates: string[];
+  isLoading: boolean;
 }) {
+  if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
       {templates?.data?.length ? (
@@ -553,7 +556,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     "characters",
     project_id as string,
   );
-  const { data: templates } = useGetEntities<CharacterFieldTemplate>(
+  const { data: templates, isFetching } = useGetEntities<CharacterFieldTemplate>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
     {
@@ -712,6 +715,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
           character_fields={character?.character_fields}
           createNotification={createNotification}
           handleChange={handleChange}
+          isLoading={isFetching}
           selectedTemplates={selectedTemplates}
           templates={templates}
         />
