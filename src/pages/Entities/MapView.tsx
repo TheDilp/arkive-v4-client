@@ -19,7 +19,6 @@ export function MapView({ isReadOnly }: Props) {
   const [loading, setLoading] = useState(true);
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
-  const cm = useRef() as any;
 
   const { data: currentMap, isLoading } = useGetEntity<MapType>(item_id as string, "maps", {
     data: {},
@@ -71,7 +70,6 @@ export function MapView({ isReadOnly }: Props) {
             zoomSnap={0}>
             <MapImage
               bounds={bounds as LatLngBoundsExpression}
-              cm={cm}
               imgRef={imgRef}
               isClusteringPins={!!currentMap?.data?.cluster_pins}
               isReadOnly={isReadOnly}

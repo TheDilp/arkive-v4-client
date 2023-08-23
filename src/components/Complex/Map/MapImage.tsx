@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { LatLngBoundsExpression } from "leaflet";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
@@ -11,7 +11,6 @@ import { MapPin } from "./MapPin";
 
 type Props = {
   mapData: MapType;
-  cm: MutableRefObject<any>;
   src: string;
   bounds: LatLngBoundsExpression;
   imgRef: any;
@@ -19,7 +18,7 @@ type Props = {
   isClusteringPins: boolean;
 };
 
-export function MapImage({ mapData, src, bounds, imgRef, cm, isReadOnly, isClusteringPins }: Props) {
+export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusteringPins }: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
   const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | false>(false);
@@ -122,14 +121,14 @@ export function MapImage({ mapData, src, bounds, imgRef, cm, isReadOnly, isClust
             {mapData?.map_pins &&
               mapData?.map_pins
                 ?.filter(PinFilter)
-                .map((pin) => <MapPin key={pin.id} cm={cm} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
             {mapData?.map_pins &&
               mapData?.map_pins
                 ?.filter(PinFilter)
-                .map((pin) => <MapPin key={pin.id} cm={cm} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
           </LayerGroup>
         )}
       </LayersControl.Overlay>

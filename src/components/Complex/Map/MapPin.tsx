@@ -1,24 +1,15 @@
+import { useSetAtom } from "jotai";
 import L, { LatLngExpression } from "leaflet";
-import { MutableRefObject, useState } from "react";
+import { useState } from "react";
 import ReactDOM from "react-dom/server";
 import { Marker, Tooltip } from "react-leaflet";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
-import { getImageURL } from "../../../utils";
+import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 
-export function MapPin({
-  map_id,
-  pinData: markerData,
-  cm,
-  readOnly,
-}: {
-  map_id: string;
-  pinData: MapPinType;
-  cm: MutableRefObject<any>;
-  readOnly?: boolean;
-}) {
+export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: string; pinData: MapPinType; readOnly?: boolean }) {
   const {
     id,
     icon,
@@ -39,7 +30,8 @@ export function MapPin({
   const { project_id } = useParams();
   const { mutate: updateMapPin } = useUpdateMapSubEntity<{ data: Partial<MapPinType> }>("map_pins", map_id);
   const [position, setPosition] = useState<LatLngExpression>([lat, lng]);
-  // const setDrawer = useSetAtom(drawerAtom);
+  const setContextMenu = useSetAtom(contextMenuAtom);
+  const setDrawer = useSetAtom(drawerAtom);
 
   const eventHandlers = {
     click: (e: any) => {
@@ -79,8 +71,17 @@ export function MapPin({
     },
     contextmenu: (e: any) => {
       if (!readOnly) {
-        // setMapContext({ type: "pin", data: markerData });
-        cm.current.show(e.originalEvent);
+        setContextMenu({
+          event: e.originalEvent as any,
+          items: [
+            {
+              title: "Edit pin",
+              icon: IconEnum.edit,
+              onClick: () => setDrawer((prev) => ({ ...prev, type: "map_pins", data: markerData })),
+            },
+            { title: "Delete pin", icon: IconEnum.trash, onClick: () => {} },
+          ],
+        });
       }
     },
     dragend(e: any) {
@@ -112,10 +113,6 @@ export function MapPin({
             <div className="absolute h-12 w-12">
               <div
                 className="fixed h-full w-full rounded-full p-4"
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
                 style={{
                   background: image_id ? "" : background,
                   backgroundImage: image_id ? `url(${getImageURL(project_id as string, "images", image_id)})` : "",

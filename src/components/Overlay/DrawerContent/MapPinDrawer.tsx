@@ -3,12 +3,13 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetSubEntity, useHandleChange } from "../../../hooks";
+import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
-import { InsertMapPinSchema, InsertMapPinType } from "../../../validation/maps/map_pins";
+import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
+import { Skeleton } from "../../Misc";
 import { ColorPicker, IconPicker } from "..";
 
 type Props = {
@@ -21,13 +22,13 @@ export function MapPinDrawer({ data }: Props) {
     parent_id: item_id as string,
   });
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { data: existingMapPin } = useGetSubEntity(data?.id, "map_pins", { data: {} }, { enabled: !!data?.id });
+  const { data: existingMapPin, isFetching } = useGetSubEntity(data?.id, "map_pins", { data: {} }, { enabled: !!data?.id });
   const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins");
+  const { mutateAsync: updateMapPin } = useUpdateMapSubEntity<UpdateMapPinType>("map_pins", item_id as string);
 
   const queryClient = useQueryClient();
 
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
-
   useLayoutEffect(() => {
     if (existingMapPin?.data) {
       setMapPin(existingMapPin.data);
@@ -40,9 +41,12 @@ export function MapPinDrawer({ data }: Props) {
         border_color: "#ffffff",
         show_background: true,
         show_border: true,
+        color: "#ffffff",
       });
     }
   }, [existingMapPin]);
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -102,6 +106,16 @@ export function MapPinDrawer({ data }: Props) {
           if (!("id" in data) || !data?.id) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin });
             await createMapPin(parsed, {
+              onSuccess: (res) => {
+                if (res?.ok) {
+                  queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
+                  resetDrawerAtom();
+                }
+              },
+            });
+          } else {
+            const parsed = UpdateMapPinSchema.parse({ data: mapPin });
+            await updateMapPin(parsed, {
               onSuccess: (res) => {
                 if (res?.ok) {
                   queryClient.invalidateQueries({ queryKey: ["maps", item_id] });

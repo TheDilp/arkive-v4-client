@@ -20,6 +20,7 @@ export const InsertMapPinSchema = z.object({
 });
 export const UpdateMapPinSchema = z.object({
   data: z.object({
+    id: z.string(),
     lat: z.number().optional(),
     lng: z.number().optional(),
     text: z.string().nullable().optional(),
