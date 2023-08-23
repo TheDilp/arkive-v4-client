@@ -1,14 +1,11 @@
 import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, DocumentView, Graph } from "../../components";
-import { CharacterFieldTemplates } from "../Settings";
 import { MapView } from "./MapView";
 import { RandomTableView } from "./RandomTableView";
 
 export function EntitiesView() {
   const { type, item_id } = useParams();
-
-  if (type === "character_fields_templates") return <CharacterFieldTemplates />;
 
   return (
     <>

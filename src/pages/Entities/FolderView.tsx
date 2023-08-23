@@ -19,10 +19,10 @@ import {
   IconEnum,
 } from "../../utils";
 import { CharactersView } from "./CharactersView";
+import { CharacterFieldTemplates } from "./FieldTemplates";
 
 const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
-const noFetchTypes = ["random_table_options", "tags", "characters"];
-const noFieldsTypes = ["character_fields_templates"];
+const noFetchTypes = ["random_table_options", "tags", "characters", "character_fields_templates"];
 
 type EntityItemType = {
   id: string;
@@ -128,17 +128,15 @@ export function FolderView() {
         item_id,
       },
       filters: {
-        and: noFieldsTypes.includes(type as string)
-          ? []
-          : [
-              {
-                field: "parent_id",
-                operator: "is",
-                value: null,
-              },
-            ],
+        and: [
+          {
+            field: "parent_id",
+            operator: "is",
+            value: null,
+          },
+        ],
       },
-      fields: noFieldsTypes.includes(type as string) ? [] : fields,
+      fields,
       orderBy: [
         {
           field: "is_folder",
@@ -159,7 +157,7 @@ export function FolderView() {
       data: {
         project_id,
       },
-      fields: noFieldsTypes.includes(type as string) ? [] : fields,
+      fields,
       relations: {
         children: true,
         parents: true,
@@ -191,6 +189,7 @@ export function FolderView() {
   }, [data, type, setBreadcrumbs, item_id]);
 
   if (!item_id && type === "characters") return <CharactersView />;
+  if (type === "character_fields_templates") return <CharacterFieldTemplates />;
 
   return (
     <>
