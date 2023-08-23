@@ -7,6 +7,7 @@ import {
   getFirstLetters,
   getNavbarEntityType,
   getSentenceCase,
+  getSingularEntityType,
   validateHexCode,
 } from "./textUtils";
 
@@ -77,6 +78,16 @@ test("return sentence case", () => {
   const sentence2 = "random_tables";
   expect(getSentenceCase(sentence1)).toBe("Jack walks his dog in the park every day");
   expect(getSentenceCase(sentence2)).toBe("Random tables");
+});
+
+test("return singular entity type", () => {
+  const type1 = "dictionaries";
+  const type2 = "characters";
+  const type3 = "random_tables";
+
+  expect(getSingularEntityType(type1)).toBe("dictionary");
+  expect(getSingularEntityType(type2)).toBe("character");
+  expect(getSingularEntityType(type3)).toBe("random table");
 });
 
 test("return if hex code is valid", () => {

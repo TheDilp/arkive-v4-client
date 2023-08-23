@@ -37,6 +37,12 @@ export function getSentenceCase(field: string) {
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 
+export function getSingularEntityType(type: AvailableEntityType) {
+  if (type === "dictionaries") return "dictionary";
+  if (type === "random_tables") return "random table";
+  return type.slice(0, type.length - 1);
+}
+
 export function validateHexCode(hex: string) {
   return /^#[0-9A-F]{6}$/i.test(hex);
 }
