@@ -3,6 +3,7 @@ import { tv } from "tailwind-variants";
 
 import { useGetEntities } from "../../../hooks";
 import { AvailableEntityType, AvailableSubEntityType, CharacterFieldType } from "../../../types";
+import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getSentenceCase } from "../../../utils";
 import { Badge } from "../../Misc/Badge";
 
@@ -32,13 +33,12 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   );
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col divide-y divide-zinc-700">
       {data?.data?.map((field) => (
-        <div key={field.id} className="flex flex-col font-lato">
+        <div key={field.id} className="flex flex-col py-2 font-lato">
           <div className="flex gap-x-2">
             <span>{field.title}</span>
-            <span>-</span>
-            <span>
+            <span className="ml-auto">
               <Badge label={getSentenceCase(field.field_type || "")} variant="info" />
             </span>
           </div>
@@ -57,11 +57,30 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
     </div>
   );
 }
+function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOptionType[] }) {
+  return (
+    <div className="flex flex-col gap-y-2">
+      {suboptions?.map((suboption) => (
+        <div key={suboption.id} className="flex flex-col font-lato">
+          <div className="flex gap-x-2">
+            <span>{suboption.title}</span>
+            <span>-</span>
+            <span>
+              <Badge label={getSentenceCase(suboption.title || "")} variant="info" />
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function ExpandedTableRow({ data, type }: { data: any; type: AvailableEntityType | AvailableSubEntityType }) {
   return (
     <div className={ExpandedTableRowClasses()}>
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
+      {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
+      {type === "random_table_options" ? <ExpandedRandomOption suboptions={data?.suboptions || []} /> : null}
     </div>
   );
 }

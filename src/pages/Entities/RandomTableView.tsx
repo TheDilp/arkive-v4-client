@@ -34,7 +34,7 @@ function createColumns(
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
               {
-                id: "1",
+                id: "edit_option",
                 label: "Edit option",
                 icon: IconEnum.edit,
                 onClick: () => {
@@ -47,7 +47,12 @@ function createColumns(
                   }));
                 },
               },
-
+              {
+                id: "expand",
+                label: `${!row.getIsExpanded() ? "Show" : "Hide"} suboptions`,
+                icon: IconEnum.random_table,
+                onClick: row.getToggleExpandedHandler(),
+              },
               {
                 id: "delete_option",
                 label: "Delete option",
@@ -198,6 +203,7 @@ export function RandomTableView() {
           columns={createColumns(setDrawer, setDialog)}
           config={{
             hasSelect: true,
+            expandable: true,
             selection,
           }}
           data={data?.data || []}
