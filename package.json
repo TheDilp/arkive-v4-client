@@ -70,7 +70,8 @@
     "tailwindcss": "^3.3.2",
     "tailwindcss-animate": "^1.0.6",
     "typescript": "^5.0.2",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.2"
   },
   "name": "arkive-v4-client",
   "private": true,
@@ -78,7 +79,8 @@
     "build": "tsc && vite build",
     "start": "vite",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "type": "module",
   "version": "0.0.0"
