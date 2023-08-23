@@ -548,7 +548,6 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
   const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
     existingCharacter?.data || { project_id: project_id as string },
   );
-  console.log(character);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
