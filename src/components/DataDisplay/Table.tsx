@@ -282,7 +282,18 @@ function TableColumnFilter({
         icon={IconEnum.filter}
         isDisabled={getIsApplyColumnFiltersDisabled(columnFilters)}
         label="Apply filters"
-        onClick={() => applyFilter(columnId as string, columnFilters, dispatch)}
+        onClick={() => {
+          if (columnId === "is_favorite") {
+            const andFilter = columnFilters?.and?.[0];
+            // Favorites filter has an empty string by default
+            // Needs to be converted to false
+            if (andFilter?.value === "") {
+              applyFilter(columnId as string, { and: [{ ...andFilter, value: false }] }, dispatch);
+              return;
+            }
+          }
+          applyFilter(columnId as string, columnFilters, dispatch);
+        }}
         variant="success"
       />
     </div>
