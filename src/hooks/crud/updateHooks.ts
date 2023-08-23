@@ -67,7 +67,7 @@ export function useUpdateMapSubEntity<InsertType extends { data: { id?: string }
               ...oldData,
               data: {
                 ...oldData.data,
-                [subtype]: oldData.data[subtype].map((subitem) => {
+                [subtype]: (oldData.data[subtype] || []).map((subitem) => {
                   if (subitem.id === vars.data.id) return { ...subitem, ...vars.data };
                   return subitem;
                 }),

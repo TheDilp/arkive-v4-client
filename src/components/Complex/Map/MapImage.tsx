@@ -98,10 +98,10 @@ export function MapImage({ mapData, src, bounds, imgRef, cm, isReadOnly, isClust
   }, []);
 
   useEffect(() => {
-    if (subitem_id && mapData) {
+    if (subitem_id && mapData && firstRender.current) {
       const pin = mapData?.map_pins?.find((map_pin) => map_pin.id === subitem_id);
       if (pin) map.panTo([pin.lat, pin.lng], {});
-    } else if (bounds) {
+    } else if (bounds && firstRender.current) {
       map.fitBounds(bounds);
     }
     return () => {

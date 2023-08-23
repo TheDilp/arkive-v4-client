@@ -15,10 +15,7 @@ type Props = {
 export function MapView({ isReadOnly }: Props) {
   const { project_id, item_id } = useParams();
   const { mutate: deleteMapPin } = useDeleteSubEntity("map_pins");
-  const [bounds, setBounds] = useState<number[][]>([
-    [0, 0],
-    [0, 0],
-  ]);
+  const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
@@ -31,8 +28,9 @@ export function MapView({ isReadOnly }: Props) {
   useChangeNavbarTitle(`The Arkive | Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
 
   useEffect(() => {
-    if (currentMap?.data && currentMap?.data?.image_id) {
+    if (currentMap?.data && currentMap?.data?.image_id && !bounds) {
       setLoading(true);
+
       const img = new Image();
       img.src = getImageURL(project_id as string, "maps", currentMap?.data?.image_id);
       img.onload = () => {
@@ -57,7 +55,7 @@ export function MapView({ isReadOnly }: Props) {
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
       {loading || isLoading ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap?.data && !isLoading && !loading ? (
+      {currentMap?.data && !isLoading && !loading && !!bounds ? (
         <div className="h-full w-full">
           <MapContainer
             ref={mapRef}
