@@ -78,7 +78,7 @@ input[type="color"]::-webkit-color-swatch {
 
 /* Maps */
 .leaflet-container {
-  @apply flex h-[calc(100%-4rem)] flex-1 bg-black !important;
+  @apply flex h-[calc(100%-4rem)] flex-1 select-none bg-black !important;
   .leafletImageOverlayLayer {
     @apply z-10;
   }
