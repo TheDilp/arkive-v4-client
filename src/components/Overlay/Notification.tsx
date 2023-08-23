@@ -11,9 +11,8 @@ import { Icon } from "../Misc";
 const NotificationClasses = tv({
   slots: {
     base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
-    titleContainer:
-      "text-sm font-normal h-fit text-center flex items-center gap-x-2 w-full justify-between truncate max-w-full",
-    title: "text-base truncate max-w-full",
+    titleContainer: "text-sm font-normal truncate h-fit text-center flex items-center gap-x-2 max-w-[25rem] justify-between ",
+    title: "text-base truncate",
     description: "text-center text-sm mt-1 flex-1",
     iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] max-w-fit items-center justify-center rounded",
     progress: "absolute left-0 top-0 h-1 transition-all",
@@ -174,8 +173,8 @@ export function Notification({
                 <Icon fontSize={22} icon={icon} />
               </div>
             ) : null}
-            <span className={titleClasses()}>{title}</span>
-            <div className=" w-min">
+            <div className={titleClasses()}>{title}</div>
+            <div className="w-8">
               <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
             </div>
           </div>
