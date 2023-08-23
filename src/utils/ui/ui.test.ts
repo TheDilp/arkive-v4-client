@@ -84,10 +84,22 @@ test("return singular entity type", () => {
   const type1 = "dictionaries";
   const type2 = "characters";
   const type3 = "random_tables";
+  const type4 = "alter_names";
+  const type5 = "random_table_options";
+  const type6 = "character_fields";
+  const type7 = "character_fields_templates";
+  const type8 = "map_pins";
+  const type9 = "map_layers";
 
   expect(getSingularEntityType(type1)).toBe("dictionary");
   expect(getSingularEntityType(type2)).toBe("character");
   expect(getSingularEntityType(type3)).toBe("random table");
+  expect(getSingularEntityType(type4)).toBe("alter name");
+  expect(getSingularEntityType(type5)).toBe("random table option");
+  expect(getSingularEntityType(type6)).toBe("character field");
+  expect(getSingularEntityType(type7)).toBe("character field template");
+  expect(getSingularEntityType(type8)).toBe("map pin");
+  expect(getSingularEntityType(type9)).toBe("map layer");
 });
 
 test("return if hex code is valid", () => {
