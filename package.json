@@ -50,6 +50,7 @@
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "@vitejs/plugin-react": "^4.0.1",
+    "@vitest/coverage-v8": "^0.34.2",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.44.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -71,7 +72,8 @@
     "tailwindcss-animate": "^1.0.6",
     "typescript": "^5.0.2",
     "vite": "^4.4.9",
-    "vitest": "^0.34.2"
+    "vitest": "^0.34.2",
+    "husky": "^8.0.0"
   },
   "name": "arkive-v4-client",
   "private": true,
@@ -80,7 +82,8 @@
     "start": "vite",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --run",
+    "prepare": "husky install"
   },
   "type": "module",
   "version": "0.0.0"
