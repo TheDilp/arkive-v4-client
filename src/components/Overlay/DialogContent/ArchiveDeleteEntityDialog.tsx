@@ -1,8 +1,8 @@
 import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
-import { useDeleteEntity } from "../../../hooks";
-import { AvailableEntityType, DialogContentType } from "../../../types";
+import { useDeleteEntity, useDeleteSubEntity } from "../../../hooks";
+import { AvailableEntityType, AvailableSubEntityType, DialogContentType } from "../../../types";
 import {
   capitalizeFirstLetter,
   dialogAtom,
@@ -19,7 +19,12 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
   const action = type?.replace("_entity", "");
   const { project_id } = useParams();
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const { mutate } = useDeleteEntity(data?.entity_title as AvailableEntityType, project_id as string, action === "archive");
+  const { mutate: deleteEntity } = useDeleteEntity(
+    data?.entity_title as AvailableEntityType,
+    project_id as string,
+    action === "archive",
+  );
+  const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType);
   const createNotification = useNotifications();
   return (
     <div className="flex h-full flex-col justify-between">
@@ -53,7 +58,11 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
           label={capitalizeFirstLetter(action || "")}
           onClick={() => {
             if (data?.id && project_id && data?.entity_title) {
-              mutate({ data: { id: data?.id, parent_id: data?.parent_id as string } });
+              if (data?.entity_title satisfies AvailableSubEntityType) {
+                deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
+              } else {
+                deleteEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
+              }
               resetDialogAtom();
             } else {
               createNotification({

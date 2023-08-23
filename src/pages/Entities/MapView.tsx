@@ -4,7 +4,7 @@ import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { MapImage } from "../../components";
-import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntity } from "../../hooks";
 import { MapType } from "../../types";
 import { getImageURL } from "../../utils";
 
@@ -14,7 +14,6 @@ type Props = {
 
 export function MapView({ isReadOnly }: Props) {
   const { project_id, item_id } = useParams();
-  const { mutate: deleteMapPin } = useDeleteSubEntity("map_pins");
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
   const mapRef = useRef() as any;
@@ -48,7 +47,6 @@ export function MapView({ isReadOnly }: Props) {
     }
   }, [currentMap?.data, project_id]);
 
-  // if (loading || isLoading) return <ProgressSpinner />;
   if (!currentMap) return null;
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">

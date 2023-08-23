@@ -10,7 +10,7 @@ const DialogClasses = tv({
   slots: {
     container: "absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
     base: "flex flex-col pointer-events-auto rounded bg-zinc-700 text-white mx-4 border-zinc-600 border-b shadow-lg p-4 h-full w-full",
-    titleContainer: "flex items-center",
+    titleContainer: "flex items-center relative",
     title: "w-full flex justify-center font-merriweather text-2xl select-none text-center",
     imageUploadContainer: "sticky top-0 bg-zinc-700",
     imagesList: "grid grid-cols-2 gap-2 overflow-y-auto",
@@ -73,12 +73,7 @@ export function Dialog() {
   return (
     <div className={container()}>
       <div className={base()}>
-        <div className={titleContainer()}>
-          {dialog?.title ? <h1 className={title()}>{dialog.title}</h1> : null}
-          <div className="ml-auto">
-            <Button hasNoBackground icon={IconEnum.close} iconSize={22} onClick={resetDialogAtom} />
-          </div>
-        </div>
+        <div className={titleContainer()}>{dialog?.title ? <h1 className={title()}>{dialog.title}</h1> : null}</div>
         {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} type={dialog?.data?.type} /> : null}
         {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
@@ -91,7 +86,12 @@ export function Dialog() {
               <Button
                 icon={dialog?.cancel?.icon || IconEnum.close}
                 label={dialog?.cancel?.label || "Cancel"}
-                onClick={dialog?.cancel?.action}
+                onClick={() => {
+                  if (dialog?.cancel?.action && typeof dialog?.cancel?.action === "function") {
+                    dialog?.cancel?.action();
+                  }
+                  resetDialogAtom();
+                }}
                 variant={dialog?.cancel?.variant || "secondary"}
               />
             ) : null}

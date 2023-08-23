@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
-import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 
 export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: string; pinData: MapPinType; readOnly?: boolean }) {
   const {
@@ -19,7 +19,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
     show_border,
     border_color,
     background_color,
-    text,
+    title,
     lat,
     lng,
     doc_id,
@@ -32,6 +32,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
   const [position, setPosition] = useState<LatLngExpression>([lat, lng]);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
 
   const eventHandlers = {
     click: (e: any) => {
@@ -79,7 +80,22 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
               icon: IconEnum.edit,
               onClick: () => setDrawer((prev) => ({ ...prev, type: "map_pins", data: markerData })),
             },
-            { title: "Delete pin", icon: IconEnum.trash, onClick: () => {} },
+            {
+              title: "Delete pin",
+              icon: IconEnum.trash,
+              onClick: () => {
+                setDialog((prev) => ({
+                  ...prev,
+                  data: {
+                    ...markerData,
+                    entity_title: "map_pins",
+                  },
+                  title: "Delete map pin",
+                  size: "sm",
+                  type: "delete_entity",
+                }));
+              },
+            },
           ],
         });
       }
@@ -132,9 +148,9 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
         tooltipAnchor: [-5, -20],
       })}
       position={position}>
-      {text && (
+      {title && (
         <Tooltip className="border-rounded-sm border-solid border-gray-800 bg-gray-800 p-2 text-lg text-white" direction="top">
-          <div className="Lato text-center">{text}</div>
+          <div className="Lato text-center">{title}</div>
         </Tooltip>
       )}
     </Marker>

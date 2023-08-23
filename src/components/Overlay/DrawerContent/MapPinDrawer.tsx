@@ -51,7 +51,7 @@ export function MapPinDrawer({ data }: Props) {
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex flex-nowrap gap-x-2">
-        <Input label="Map pin text (optional)" name="text" onChange={handleChange} value={mapPin?.text || ""} />
+        <Input label="Map pin title (optional)" name="title" onChange={handleChange} value={mapPin?.title || ""} />
 
         <div className="flex flex-col justify-between">
           <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Icon</span>

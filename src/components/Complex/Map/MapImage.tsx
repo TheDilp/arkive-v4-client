@@ -108,6 +108,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
     };
   }, [subitem_id, bounds]);
   if (!map) return null;
+  console.log(mapData?.map_pins);
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">

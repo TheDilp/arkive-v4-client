@@ -29,7 +29,7 @@ export interface MapLayers {
 
 export interface MapPinType {
   id: string;
-  text: string | null;
+  title: string | null;
   parent_id: string;
   lat: number;
   lng: number;

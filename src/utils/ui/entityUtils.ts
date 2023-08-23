@@ -1,4 +1,4 @@
-import { AvailableEntityType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType } from "../../types";
 import { IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType) {
@@ -10,9 +10,10 @@ export function getDefaultEntityIcon(type: AvailableEntityType) {
   if (type === "character_fields_templates") return IconEnum.additional_fields;
   return IconEnum.error;
 }
-export function getEntityNameFromType(type: AvailableEntityType) {
+export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEntityType) {
   if (type === "dictionaries") return "dictionary";
   if (type === "random_tables") return "random table";
-  if (type === "character_fields_templates") return "Field template";
+  if (type === "character_fields_templates") return "field template";
+  if (type === "map_pins") return "map pin";
   return type.substring(0, type.length - 1);
 }
