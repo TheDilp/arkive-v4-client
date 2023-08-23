@@ -5,12 +5,12 @@ import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-lea
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
-import { useGetEntity } from "../../../hooks";
 import { MapPinType, MapType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
 type Props = {
+  mapData: MapType;
   cm: MutableRefObject<any>;
   src: string;
   bounds: LatLngBoundsExpression;
@@ -19,10 +19,9 @@ type Props = {
   isClusteringPins: boolean;
 };
 
-export function MapImage({ src, bounds, imgRef, cm, isReadOnly, isClusteringPins }: Props) {
+export function MapImage({ mapData, src, bounds, imgRef, cm, isReadOnly, isClusteringPins }: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
-  const { data: currentMap } = useGetEntity<MapType>(item_id as string, "maps", { data: {} });
   const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | false>(false);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
@@ -99,8 +98,8 @@ export function MapImage({ src, bounds, imgRef, cm, isReadOnly, isClusteringPins
   }, []);
 
   useEffect(() => {
-    if (subitem_id && currentMap) {
-      const pin = currentMap?.data?.map_pins?.find((map_pin) => map_pin.id === subitem_id);
+    if (subitem_id && mapData) {
+      const pin = mapData?.map_pins?.find((map_pin) => map_pin.id === subitem_id);
       if (pin) map.panTo([pin.lat, pin.lng], {});
     } else if (bounds) {
       map.fitBounds(bounds);
@@ -120,23 +119,23 @@ export function MapImage({ src, bounds, imgRef, cm, isReadOnly, isClusteringPins
       <LayersControl.Overlay checked name="Markers">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {currentMap?.data?.map_pins &&
-              currentMap?.data?.map_pins
+            {mapData?.map_pins &&
+              mapData?.map_pins
                 ?.filter(PinFilter)
                 .map((pin) => <MapPin key={pin.id} cm={cm} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {currentMap?.data?.map_pins &&
-              currentMap?.data?.map_pins
+            {mapData?.map_pins &&
+              mapData?.map_pins
                 ?.filter(PinFilter)
                 .map((pin) => <MapPin key={pin.id} cm={cm} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
           </LayerGroup>
         )}
       </LayersControl.Overlay>
       <LayerGroup>
-        {currentMap?.data?.map_layers?.length
-          ? currentMap?.data.map_layers
+        {mapData?.map_layers?.length
+          ? mapData.map_layers
               .sort((a, b) => {
                 if (a.title > b.title) return 1;
                 if (a.title < b.title) return -1;

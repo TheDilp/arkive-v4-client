@@ -24,7 +24,10 @@ export function MapView({ isReadOnly }: Props) {
   const imgRef = useRef() as any;
   const cm = useRef() as any;
 
-  const { data: currentMap, isLoading } = useGetEntity<MapType>(item_id as string, "maps", { data: {} });
+  const { data: currentMap, isLoading } = useGetEntity<MapType>(item_id as string, "maps", {
+    data: {},
+    relations: { map_pins: true },
+  });
   useChangeNavbarTitle(`The Arkive | Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
 
   useEffect(() => {
@@ -74,6 +77,7 @@ export function MapView({ isReadOnly }: Props) {
               imgRef={imgRef}
               isClusteringPins={!!currentMap?.data?.cluster_pins}
               isReadOnly={isReadOnly}
+              mapData={currentMap?.data}
               src={getImageURL(project_id as string, "maps", currentMap?.data?.image_id)}
             />
           </MapContainer>

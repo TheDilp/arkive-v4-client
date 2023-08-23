@@ -30,7 +30,7 @@ import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
-import { useGetEntity, useUpdateEntity } from "../../hooks";
+import { useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
@@ -179,17 +179,13 @@ export const editorHooks = (
       unknown
     >
   >,
+  title: string,
 ) => [
   () => {
     const { getJSON, getText, getHTML } = useHelpers();
     const { project_id, item_id } = useParams();
     const { mutate } = useUpdateEntity<{ data: Partial<DocumentType> }>("documents", project_id as string);
-    const { data: document } = useGetEntity<DocumentType>(
-      item_id as string,
-      "documents",
-      { data: {} },
-      { staleTime: 5 * 60 * 1000 },
-    );
+
     const handleSaveShortcut = useCallback(
       ({ state }: { state: EditorState }) => {
         mutate(
@@ -220,7 +216,7 @@ export const editorHooks = (
         new Blob([htmlString], {
           type: "text/html;charset=utf-8",
         }),
-        `${document?.data?.title || `Arkive Document - ${item_id}`}.html`,
+        `${title || `Arkive Document - ${item_id}`}.html`,
       );
       return true; // Prevents any further key handlers from being run.
     }, [getText, item_id]);

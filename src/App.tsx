@@ -4,9 +4,9 @@ import { Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
+import { FolderView } from "./pages/Entities/FolderView";
 import ProjectsView from "./pages/Projects/ProjectsView";
 import { SettingsView } from "./pages/Settings";
-import { Dice } from "./utils/ui/diceRollerUtils";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,8 +31,9 @@ export default function App() {
             <Route element={<ProjectsView />} path="*" />
             <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<SettingsView />} path="settings/:type/*" />
-              <Route element={<EntitiesView />} path=":type/*" />
+              <Route element={<FolderView />} path=":type" />
               <Route element={<EntitiesView />} path=":type/:item_id/*" />
+              <Route element={<FolderView />} path=":type/folder/:item_id/*" />
             </Route>
           </Route>
         </Routes>

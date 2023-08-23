@@ -141,7 +141,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       ) : null}
       <Remirror
         editable
-        hooks={editorHooks(changedData, resetChanges, refetch)}
+        hooks={editorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
         initialContent={state}
         manager={manager}
         onChange={(params) => {
