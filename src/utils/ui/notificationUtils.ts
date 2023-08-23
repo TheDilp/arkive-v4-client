@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 
 import { AllAvailableEntities, NotificationType } from "../../types";
 import { notificationsAtom } from "../atoms";
-import { capitalizeFirstLetter } from "./textUtils";
+import { capitalizeFirstLetter, getSingularEntityType } from "./textUtils";
 
 export function useNotifications() {
   const setNotificationAtom = useSetAtom(notificationsAtom);
@@ -29,10 +29,6 @@ export function getEntityCRUDNotification(type: AllAvailableEntities, action_typ
   if (action_type === "delete") {
     action = "deleted";
   }
-  if (type === "alter_names") return `Alter name successfully ${action}.`;
-  if (type === "character_fields_templates") return `Template successfully ${action}.`;
-  if (type === "map_pins") return `Map pin successfully ${action}.`;
-  if (type === "random_table_options") return `Option successfully ${action}.`;
-  const entityTitle = capitalizeFirstLetter(type);
-  return `${entityTitle} successfully ${action}.`;
+  const singularName = capitalizeFirstLetter(getSingularEntityType(type));
+  return `${singularName} successfully ${action}`;
 }
