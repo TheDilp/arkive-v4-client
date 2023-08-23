@@ -22,6 +22,7 @@ import { CharactersView } from "./CharactersView";
 
 const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
 const noFetchTypes = ["random_table_options", "tags", "characters"];
+const noFieldsTypes = ["character_fields_templates"];
 
 type EntityItemType = {
   id: string;
@@ -109,6 +110,13 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
+
+  // IMAGE_ID MUST BE LAST ELEMENT FOR POP
+  // !REWORK WITH SMARTER IMPLEMENTATION
+
+  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
+  if ((type === "graphs" || type === "random_tables") && fields.includes("image_id")) fields.pop();
+
   const { data: base } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
@@ -120,15 +128,17 @@ export function FolderView() {
         item_id,
       },
       filters: {
-        and: [
-          {
-            field: "parent_id",
-            operator: "is",
-            value: null,
-          },
-        ],
+        and: noFieldsTypes.includes(type as string)
+          ? []
+          : [
+              {
+                field: "parent_id",
+                operator: "is",
+                value: null,
+              },
+            ],
       },
-      fields,
+      fields: noFieldsTypes.includes(type as string) ? [] : fields,
       orderBy: [
         {
           field: "is_folder",
@@ -149,7 +159,7 @@ export function FolderView() {
       data: {
         project_id,
       },
-      fields: ["id", "title", "is_folder", "icon", "image_id"],
+      fields: noFieldsTypes.includes(type as string) ? [] : fields,
       relations: {
         children: true,
         parents: true,
@@ -160,11 +170,6 @@ export function FolderView() {
       staleTime: 5 * 60 * 1000,
     },
   );
-
-  // IMAGE_ID MUST BE LAST ELEMENT FOR POP
-  // !REWORK WITH SMARTER IMPLEMENTATION
-  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
-  if (type === "graphs" || (type === "random_tables" && fields.includes("image_id"))) fields.pop();
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
