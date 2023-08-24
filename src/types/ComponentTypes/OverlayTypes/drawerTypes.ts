@@ -55,6 +55,7 @@ export type DrawerAtomType = {
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType }
   | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
+  | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
 );
 
 export interface ContextMenuAtomType {
