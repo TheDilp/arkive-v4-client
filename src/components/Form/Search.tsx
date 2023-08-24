@@ -242,9 +242,9 @@ export function Search({
 
   useEffect(() => {
     if (isAutocomplete && inputValue && document.activeElement === inputRef.current) {
+      setSearchTerm(inputValue);
       const timeout = setTimeout(() => {
         refetch();
-        setSearchTerm(inputValue);
       }, 1000);
 
       return () => {
