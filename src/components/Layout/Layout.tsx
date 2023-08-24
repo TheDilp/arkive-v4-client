@@ -9,7 +9,7 @@ import { Sidebar } from "./Sidebar";
 export function ProjectLayout() {
   const { isLg } = useBreakpoint();
   return (
-    <div className="flex h-screen w-screen flex-1 flex-col lg:flex-row">
+    <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
       <ContextMenu />
       {isLg ? <Sidebar /> : null}
