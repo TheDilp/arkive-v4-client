@@ -6,9 +6,9 @@ import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
 
-export function ProjectDrawer({ data }: { data: InsertProjectType }) {
+export function ProjectDrawer({ data }: { data: InsertProjectType | null }) {
   const ownerId = localStorage.getItem("ownerId");
-  const [project, setProject] = useState<InsertProjectType>({ ...data, owner_id: ownerId as string });
+  const [project, setProject] = useState<InsertProjectType>({ ...(data || { title: "" }), owner_id: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
   const { mutateAsync, isLoading: isMutating } = useCreateProject<InsertProjectType>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
