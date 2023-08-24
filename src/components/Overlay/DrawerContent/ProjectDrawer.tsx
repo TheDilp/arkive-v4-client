@@ -2,16 +2,15 @@ import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 
 import { useCreateProject, useHandleChange } from "../../../hooks";
-import { ProjectType } from "../../../types/EntityTypes/projectTypes";
-import { CreateType } from "../../../types/utilTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
+import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
 
-export function ProjectDrawer({ data }: { data: CreateType<ProjectType> }) {
+export function ProjectDrawer({ data }: { data: InsertProjectType }) {
   const ownerId = localStorage.getItem("ownerId");
-  const [project, setProject] = useState<CreateType<ProjectType>>({ ...data, owner_id: ownerId as string });
+  const [project, setProject] = useState<InsertProjectType>({ ...data, owner_id: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
-  const { mutateAsync, isLoading: isMutating } = useCreateProject<CreateType<ProjectType>>();
+  const { mutateAsync, isLoading: isMutating } = useCreateProject<InsertProjectType>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   return (
     <>
@@ -29,10 +28,12 @@ export function ProjectDrawer({ data }: { data: CreateType<ProjectType> }) {
         isLoading={isMutating}
         label="Create project"
         onClick={async () => {
-          if (project)
-            await mutateAsync(project, {
+          if (project) {
+            const parsed = InsertProjectSchema.parse(project);
+            await mutateAsync(parsed, {
               onSuccess: resetDrawerAtom,
             });
+          }
         }}
         variant="success"
       />
