@@ -52,7 +52,7 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
         icon={IconEnum.upload}
         isDisabled={isMutating}
         isLoading={isMutating}
-        label="Upload"
+        label={isMutating ? "Uploading..." : "Upload"}
         onClick={async () => {
           if (files) await mutateAsync(files);
         }}
