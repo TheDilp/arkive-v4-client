@@ -1,6 +1,8 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { MouseEvent } from "react";
 
-import { AllAvailableEntities } from "../../EntityTypes";
+import { InsertProjectType } from "../../../validation/project";
+import { AllAvailableEntities, AvailableEntityType, MapPinType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
 export type DrawerContentType =
@@ -16,7 +18,8 @@ export type DrawerContentType =
   | "insert_word"
   | "insert_image"
   | "swatches"
-  | "content_preview";
+  | "content_preview"
+  | "map_character_placement";
 
 export type DrawerSize = "sm" | "md" | "lg";
 export type DrawerPosition = "left" | "right";
@@ -27,14 +30,32 @@ export type DrawerExceptions = {
   isReadOnly?: boolean;
 };
 
-export interface DrawerAtomType {
-  data: any | null;
+export type DrawerAtomType = {
   title: string;
-  type: DrawerContentType;
   size?: DrawerSize;
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
-}
+} & (
+  | { type: "project"; data: InsertProjectType | null }
+  | {
+      type:
+        | "characters"
+        | "character_fields_templates"
+        | "documents"
+        | "maps"
+        | "graphs"
+        | "random_tables"
+        | "random_table_option";
+      data: { id?: string };
+    }
+  | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
+  | { type: "random_table_options"; data: { parent_id: string } }
+  | { type: "folder"; data: { id?: string; type: AvailableEntityType } }
+  | { type: "map_pins"; data: { lat: number; lng: number } & Partial<MapPinType> }
+  | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
+  | { type: "tags"; data: TagType }
+  | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
+);
 
 export interface ContextMenuAtomType {
   event: MouseEvent<HTMLDivElement, MouseEvent> | null;

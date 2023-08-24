@@ -17,6 +17,7 @@ import {
   ProjectDrawer,
   TagsDrawer,
 } from "./DrawerContent";
+import { MapCharacterPlacementDrawer } from "./DrawerContent/MapCharacterPlacementDrawer";
 import { MapDrawer } from "./DrawerContent/MapDrawer";
 import { MapPinDrawer } from "./DrawerContent/MapPinDrawer";
 import { RandomTableDrawer } from "./DrawerContent/RandomTableDrawer";
@@ -133,6 +134,7 @@ export function Drawer() {
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
         {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
+        {drawer.type === "map_character_placement" ? <MapCharacterPlacementDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );
