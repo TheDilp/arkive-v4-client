@@ -17,6 +17,8 @@ export async function FetchFunction({
   });
 
   const data = await res.json();
-
+  if (!data.ok) {
+    throw new Error("There was an error with your request.");
+  }
   return data;
 }
