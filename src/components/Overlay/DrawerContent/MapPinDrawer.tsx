@@ -10,7 +10,7 @@ import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinT
 import { CharacterPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Skeleton } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 import { ColorPicker, IconPicker } from "..";
 
 function isSaveDisabled(mapPin: Partial<MapPinType>) {
@@ -135,22 +135,26 @@ export function MapPinDrawer({ data }: Props) {
       ) : null}
       {selectedTab === 1 ? (
         <div className="flex flex-wrap gap-2">
-          {mapPin?.characters?.length
-            ? mapPin.characters.map((character) => (
-                <div key={character.id} className="w-full">
-                  <CharacterPreview
-                    character_name={character?.first_name}
-                    clearAction={() => {
-                      handleChange({
-                        name: "characters",
-                        value: (mapPin?.characters || []).filter((char) => char.id !== character.id),
-                      });
-                    }}
-                    id={character.id}
-                  />
-                </div>
-              ))
-            : null}
+          {mapPin?.characters?.length ? (
+            mapPin.characters.map((character) => (
+              <div key={character.id} className="w-full">
+                <CharacterPreview
+                  character_name={character?.first_name}
+                  clearAction={() => {
+                    handleChange({
+                      name: "characters",
+                      value: (mapPin?.characters || []).filter((char) => char.id !== character.id),
+                    });
+                  }}
+                  id={character.id}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="w-full">
+              <Alert label="There are no characters in this location." variant="info" />
+            </div>
+          )}
         </div>
       ) : null}
       <Button
