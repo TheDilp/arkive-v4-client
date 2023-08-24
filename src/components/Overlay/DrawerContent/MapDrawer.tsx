@@ -2,14 +2,14 @@ import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { MapType } from "../../../types";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { ImageSelect } from "../../Complex";
 import { Button, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge } from "../../Misc";
+import { Badge, Skeleton } from "../../Misc";
 
 function isDisabled(map: Partial<MapType> & { project_id: string }) {
   if (!map?.title) return true;
@@ -23,12 +23,14 @@ const tabs = [
   { id: "2", label: "Tags", icon: IconEnum.tags },
 ];
 
-export function MapDrawer({ data }: { data: MapType }) {
+export function MapDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
 
+  const { data: existingMap, isFetching } = useGetEntity<MapType>(data?.id, "maps", { data: {} }, { enabled: !!data?.id });
+
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
-    data?.id ? data : { project_id: project_id as string },
+    existingMap?.data || { project_id: project_id as string },
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -36,6 +38,8 @@ export function MapDrawer({ data }: { data: MapType }) {
 
   const { mutateAsync: update } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
   const { handleChange } = useHandleChange({ data: map, setData: setMap });
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">

@@ -3,15 +3,15 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateRandomTableOption } from "../../../hooks";
-import { RandomTableOptionType } from "../../../types/EntityTypes/randomTableTypes";
+import { RandomTableOptionType, RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { UpdateRandomTableOptionSchema } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Skeleton } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
-  data: { id: string };
+  data: { id?: string };
 };
 
 const tabs = [
@@ -24,10 +24,17 @@ export default function RandomTableOptionDrawer({ data }: Props) {
 
   const resetDrawer = useResetAtom(drawerAtom);
 
-  const { data: existingOption, isFetching } = useGetSubEntity<RandomTableOptionType>(data?.id, "random_table_options", {
-    data: {},
-    relations: { suboptions: true },
-  });
+  const { data: existingOption, isFetching } = useGetSubEntity<RandomTableOptionType>(
+    data?.id,
+    "random_table_options",
+    {
+      data: {},
+      relations: { suboptions: true },
+    },
+    {
+      enabled: !!data?.id,
+    },
+  );
 
   const [randomTableOption, setRandomTableOption] = useState<Partial<RandomTableOptionType>>(
     existingOption?.data || { id: data?.id },
@@ -43,6 +50,8 @@ export default function RandomTableOptionDrawer({ data }: Props) {
   }, [existingOption]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
+
+  if (!existingOption?.data || !data?.id) return <Alert label="This option does not exist." variant="error" />;
 
   return (
     <>
@@ -80,7 +89,7 @@ export default function RandomTableOptionDrawer({ data }: Props) {
                         title: "",
                         description: "",
                         parent_id: data.id,
-                      }),
+                      } as RandomTableSubOptionType),
                     })
                   }
                   variant="info"
