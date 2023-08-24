@@ -79,6 +79,7 @@
   "private": true,
   "scripts": {
     "build": "tsc && vite build",
+    "prestart": "pnpm run test",
     "start": "vite",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
