@@ -1,3 +1,4 @@
+import { CharacterType } from "./characterTypes";
 import { ImageType } from "./imageTypes";
 import { TagType } from "./tagTypes";
 
@@ -15,6 +16,7 @@ export interface MapType {
 
   map_pins?: MapPinType[];
   map_layers?: MapLayers[];
+  characters: CharacterType[];
 
   tags?: TagType[];
 }
@@ -44,4 +46,6 @@ export interface MapPinType {
   doc_id: string | null;
   image_id: string | null;
   image: ImageType;
+
+  characters: CharacterType[];
 }
