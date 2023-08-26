@@ -22,7 +22,13 @@ const AvatarClasses = tv({
         base: "w-10 h-10 min-w-[2.5rem] min-h-[2.5rem]",
       },
       "2xl": {
-        base: "w-16 h-16 min-w-[2.5rem] min-h-[2.5rem]",
+        base: "w-16 h-16 min-w-[4rem] min-h-[4rem]",
+      },
+      "3xl": {
+        base: "w-20 h-20 min-w-[5rem] min-h-[5rem]",
+      },
+      "4xl": {
+        base: "w-24 h-24 min-w-[6rem] min-h-[6rem] text-[2.5rem]",
       },
     },
     isBordered: {
