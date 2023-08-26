@@ -38,7 +38,7 @@ export interface MapPinType {
   color: string | null;
   border_color: string | null;
   background_color: string | null;
-  icon: string | null;
+  icon: string;
   show_background: boolean;
   show_border: boolean;
   is_public: boolean | null;

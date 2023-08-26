@@ -77,7 +77,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
           event: e.originalEvent,
           items: [
             {
-              icon: IconEnum.map_pin,
+              icon: IconEnum.add,
               title: "Add map pin",
               onClick: () => {
                 setDrawer((prev) => ({
@@ -103,18 +103,19 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
                 }));
               },
             },
-            // {
-            //   icon: IconEnum.character,
-            //   title: "Manage characters",
-            //   onClick: () => {
-            //     setDrawer((prev) => ({
-            //       ...prev,
-            //       data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
-            //       title: "Manage characters",
-            //       type: "map_character_placement",
-            //     }));
-            //   },
-            // },
+            {
+              icon: IconEnum.map_pin,
+              title: "Manage pins",
+              onClick: () => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
+                  title: "Manage pins",
+                  type: "map_pin_management",
+                  size: "lg",
+                }));
+              },
+            },
           ],
         });
         // setDrawer((prev) => ({ ...prev, data: { ...e.latlng } }));

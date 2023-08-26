@@ -32,8 +32,8 @@ import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 ",
-    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y h-fit",
+    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 z-50",
+    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y h-fit z-50",
     baseItem: "h-10 items-center gap-x-2 text-white border-zinc-600",
     dropdownItem:
       "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",

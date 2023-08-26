@@ -18,7 +18,7 @@ const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Suboptions", icon: IconEnum.random_table },
 ];
-export default function RandomTableOptionDrawer({ data }: Props) {
+export function RandomTableOptionDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
 

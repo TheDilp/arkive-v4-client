@@ -300,14 +300,14 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               />
             ) : null}
           </div>
-          <Search
+          {/* <Search
             isDisabled
             label="Document (optional)"
             placeholder="Press enter to search documents"
             searchEntity="documents"
           />
           <Search isDisabled label="Location (optional)" placeholder="Press enter to search map pins" searchEntity="map_pins" />
-          <Search isDisabled label="Event (optional)" placeholder="Press enter to search events" searchEntity="events" />
+          <Search isDisabled label="Event (optional)" placeholder="Press enter to search events" searchEntity="events" /> */}
         </div>
       ) : null}
       {selectedTab === 2 ? (

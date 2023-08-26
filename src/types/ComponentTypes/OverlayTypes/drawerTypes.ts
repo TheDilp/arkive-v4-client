@@ -19,7 +19,7 @@ export type DrawerContentType =
   | "insert_image"
   | "swatches"
   | "content_preview"
-  | "map_character_placement";
+  | "map_pin_management";
 
 export type DrawerSize = "sm" | "md" | "lg";
 export type DrawerPosition = "left" | "right";
@@ -47,7 +47,7 @@ export type DrawerAtomType = {
         | "graphs"
         | "random_tables"
         | "random_table_option";
-      data: { id?: string };
+      data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
   | { type: "random_table_options"; data: { parent_id: string } }
@@ -56,7 +56,7 @@ export type DrawerAtomType = {
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType }
   | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
-  | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
+  | { type: "map_pin_management"; data: { map_id: string } }
 );
 
 export interface ContextMenuAtomType {

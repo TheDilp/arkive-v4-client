@@ -132,30 +132,26 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
       icon={L.divIcon({
         className: "relative",
         html: ReactDOM.renderToString(
-          <div className="relative">
-            <div className="absolute h-12 w-12">
-              <div
-                className="fixed h-full w-full rounded-full"
-                style={{
-                  background: image_id ? "" : background,
-                  backgroundImage:
-                    image_id || (isCharacterPin && character?.portrait_id)
-                      ? `url(${getImageURL(project_id as string, "images", image_id || character.portrait_id)})`
-                      : "",
-                  backgroundColor: show_background ? background_color || "" : "",
-                  backgroundPosition: "center",
-                  backgroundSize: image_id || (isCharacterPin && !!character?.portrait_id) ? "contain" : "2rem",
-                  backgroundRepeat: "no-repeat",
-                  border: show_border ? `${border_color} solid ${isCharacterPin ? "1px" : "3px"}` : "",
-                  zIndex: 999999,
-                }}
-              />
-            </div>
-          </div>,
+          <div
+            className={`fixed rounded-full ${isCharacterPin ? "h-7 w-7" : "h-10 w-10"}`}
+            style={{
+              background: image_id ? "" : background,
+              backgroundImage:
+                image_id || (isCharacterPin && character?.portrait_id)
+                  ? `url(${getImageURL(project_id as string, "images", image_id || character.portrait_id)})`
+                  : "",
+              backgroundColor: show_background ? background_color || "" : "",
+              backgroundPosition: "center",
+              backgroundSize: image_id || (isCharacterPin && !!character?.portrait_id) ? "contain" : "2rem",
+              backgroundRepeat: "no-repeat",
+              border: show_border ? `${border_color} solid ${isCharacterPin ? "1px" : "2px"}` : "",
+              zIndex: 999999,
+            }}
+          />,
         ),
-        iconAnchor: isCharacterPin ? [30, 46] : [30, 46],
-        iconSize: isCharacterPin ? [28, 28] : [48, 48],
-        tooltipAnchor: isCharacterPin ? [-16, -46] : [-5, -46],
+        iconAnchor: isCharacterPin ? [30, 46] : [25.5, 46],
+        iconSize: isCharacterPin ? [28, 28] : [40, 40],
+        tooltipAnchor: isCharacterPin ? [-16, -46] : [-4, -46],
       })}
       position={position}>
       {title || isCharacterPin ? (

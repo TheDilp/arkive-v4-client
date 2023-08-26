@@ -13,16 +13,16 @@ import {
   EdgeDrawer,
   FieldTemplateDrawer,
   InsertEditorImageDrawer,
+  MapDrawer,
+  MapPinDrawer,
+  MapPinManagementDrawer,
   NodeDrawer,
   ProjectDrawer,
+  RandomTableDrawer,
+  RandomTableOptionDrawer,
+  RandomTableOptionsDrawer,
   TagsDrawer,
 } from "./DrawerContent";
-import { MapCharacterPlacementDrawer } from "./DrawerContent/MapCharacterPlacementDrawer";
-import { MapDrawer } from "./DrawerContent/MapDrawer";
-import { MapPinDrawer } from "./DrawerContent/MapPinDrawer";
-import { RandomTableDrawer } from "./DrawerContent/RandomTableDrawer";
-import RandomTableOptionDrawer from "./DrawerContent/RandomTableOptionDrawer";
-import { RandomTableOptionsDrawer } from "./DrawerContent/RandomTableOptionsDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -133,7 +133,7 @@ export function Drawer() {
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
         {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
-        {drawer.type === "map_character_placement" ? <MapCharacterPlacementDrawer data={drawer?.data} /> : null}
+        {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );
