@@ -21,7 +21,7 @@ type Props = {
 export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusteringPins }: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
-  const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | false>(false);
+  const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | "character" | false>(false);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   function PinFilter(mapPin: MapPinType) {
@@ -36,6 +36,9 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
         return true;
       }
       return false;
+    }
+    if (markerFilter === "character") {
+      return !!mapPin?.character_id && !!mapPin?.character;
     }
     if (markerFilter === "map") {
       return Boolean(mapPin.map_link);
@@ -56,7 +59,11 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
       return;
     }
     if (e.shiftKey) {
-      setMarkerFilter("map");
+      if (e.key === "C") {
+        setMarkerFilter("character");
+      } else {
+        setMarkerFilter("map");
+      }
     } else if (e.altKey) {
       setMarkerFilter("doc");
     }
@@ -163,13 +170,13 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
       <LayersControl.Overlay checked name="Markers">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {nonCharacterPins?.filter(PinFilter).map((pin) => (
+            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
               <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
             ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {nonCharacterPins?.filter(PinFilter).map((pin) => (
+            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
               <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
             ))}
           </LayerGroup>
@@ -179,13 +186,13 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
       <LayersControl.Overlay checked name="Characters">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {characterPins.map((pin) => (
+            {characterPins?.filter(PinFilter)?.map((pin) => (
               <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
             ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {characterPins?.map((pin) => (
+            {characterPins?.filter(PinFilter)?.map((pin) => (
               <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
             ))}
           </LayerGroup>
