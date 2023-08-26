@@ -131,10 +131,21 @@ function EditorSkeleton() {
   );
 }
 
+function FamilyTreeSkeleton() {
+  return (
+    <div className="relative animate-pulse">
+      <div className="skeleton_family_tree_parent  absolute left-1/4 top-24 h-[50px] w-[50px] rounded bg-zinc-900" />
+      <div className="skeleton_family_tree_parent absolute right-1/4 top-24 h-[50px] w-[50px] rounded bg-zinc-900" />
+      <div className="skeleton_family_tree_child absolute left-[calc(50%-25px)] top-64 h-[50px] max-h-[50px] w-[50px] max-w-[50px] rounded bg-zinc-900" />
+    </div>
+  );
+}
+
 export function Skeleton({ type, limit }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "breadcrumbs") return <BreadcrumbsSkeleton />;
   if (type === "drawer_form") return <DrawerFormSkeleton />;
   if (type === "editor") return <EditorSkeleton />;
+  if (type === "family_tree") return <FamilyTreeSkeleton />;
   return null;
 }

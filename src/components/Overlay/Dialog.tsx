@@ -73,7 +73,12 @@ export function Dialog() {
   return (
     <div className={container()}>
       <div className={base()}>
-        <div className={titleContainer()}>{dialog?.title ? <h1 className={title()}>{dialog.title}</h1> : null}</div>
+        <div className={titleContainer()}>
+          {dialog?.title ? <h1 className={title()}>{dialog.title}</h1> : null}
+          <div className="w-min">
+            <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => resetDialogAtom()} />
+          </div>
+        </div>
         {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} type={dialog?.data?.type} /> : null}
         {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
