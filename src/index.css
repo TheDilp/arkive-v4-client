@@ -84,6 +84,12 @@ input[type="color"]::-webkit-color-swatch {
   }
   .leaflet-pane {
     @apply z-10;
+    .leaflet-tooltip {
+      @apply border-solid border-zinc-800 bg-zinc-800 p-1 text-sm text-white;
+    }
+    .leaflet-tooltip::before {
+      @apply border-t-zinc-800;
+    }
   }
 }
 .leaflet-control-container {
