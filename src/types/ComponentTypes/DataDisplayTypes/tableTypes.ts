@@ -65,7 +65,7 @@ export interface TableType {
     getLink?: (rowData: any) => string;
     setFavorite?: (rowData: any) => Promise<void>;
   };
-  type: AvailableEntityType | "random_table_options";
+  type: AvailableEntityType | "random_table_options" | "icons";
 }
 
 export interface TableColumnFilterComponentType {

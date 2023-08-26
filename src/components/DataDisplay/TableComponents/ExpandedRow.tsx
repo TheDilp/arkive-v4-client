@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useGetEntities } from "../../../hooks";
-import { AvailableEntityType, AvailableSubEntityType, CharacterFieldType } from "../../../types";
+import { CharacterFieldType, TableType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getSentenceCase } from "../../../utils";
 import { Badge } from "../../Misc/Badge";
@@ -75,7 +75,7 @@ function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOption
   );
 }
 
-export function ExpandedTableRow({ data, type }: { data: any; type: AvailableEntityType | AvailableSubEntityType }) {
+export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
   return (
     <div className={ExpandedTableRowClasses()}>
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
