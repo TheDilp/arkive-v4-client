@@ -7,7 +7,7 @@ import { MapType } from "../../../types";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { ImageSelect } from "../../Complex";
-import { Button, Input, Search } from "../../Form";
+import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 
@@ -47,7 +47,18 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
       {selectedTab === 0 ? (
         <>
           <Input label="Title (required)" name="title" onChange={handleChange} value={map?.title || ""} />
-          <ImageSelect label="Map image (required)" name="image_id" onChange={handleChange} type="maps" value={map?.image_id} />
+          <ImageSelect
+            isIconOnly
+            label="Map image (required)"
+            name="image_id"
+            onChange={handleChange}
+            type="maps"
+            value={map?.image_id}
+          />
+          <div className="flex flex-nowrap justify-between">
+            <span>Cluster pins:</span>
+            <Checkbox name="cluster_pins" onChange={handleChange} value={map?.cluster_pins ?? false} />
+          </div>
         </>
       ) : null}
       {selectedTab === 1 ? (

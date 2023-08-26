@@ -91,6 +91,15 @@ input[type="color"]::-webkit-color-swatch {
       @apply border-t-zinc-800;
     }
   }
+
+  .marker-cluster-small,
+  .marker-cluster-medium,
+  .marker-cluster-large {
+    @apply flex items-center justify-center border border-white bg-zinc-800 !important;
+    div {
+      @apply m-0 bg-transparent font-lato text-base !important;
+    }
+  }
 }
 .leaflet-control-container {
   @apply z-[10] select-none;
