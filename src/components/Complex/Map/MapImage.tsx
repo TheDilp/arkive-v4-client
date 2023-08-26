@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom";
 
 import { MapPinType, MapType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
-import { CharacterPin } from "./CharacterPin";
 import { MapPin } from "./MapPin";
 
 type Props = {
@@ -136,6 +135,24 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
     };
   }, [subitem_id, bounds]);
   if (!map) return null;
+
+  const { nonCharacterPins, characterPins }: { nonCharacterPins: MapPinType[]; characterPins: MapPinType[] } = (
+    mapData?.map_pins || []
+  ).reduce(
+    (accumulator: { nonCharacterPins: MapPinType[]; characterPins: MapPinType[] }, currentValue) => {
+      if (!!currentValue.character_id && !!currentValue.character) {
+        accumulator.characterPins.push(currentValue);
+      } else {
+        accumulator.nonCharacterPins.push(currentValue);
+      }
+      return accumulator;
+    },
+    {
+      nonCharacterPins: [],
+      characterPins: [],
+    },
+  );
+
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">
@@ -146,17 +163,15 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
       <LayersControl.Overlay checked name="Markers">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {mapData?.map_pins &&
-              mapData?.map_pins
-                ?.filter(PinFilter)
-                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+            {nonCharacterPins?.filter(PinFilter).map((pin) => (
+              <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
+            ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {mapData?.map_pins &&
-              mapData?.map_pins
-                ?.filter(PinFilter)
-                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+            {nonCharacterPins?.filter(PinFilter).map((pin) => (
+              <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
+            ))}
           </LayerGroup>
         )}
       </LayersControl.Overlay>
@@ -164,29 +179,15 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
       <LayersControl.Overlay checked name="Characters">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {mapData?.map_pins &&
-              mapData?.map_pins
-                ?.filter(PinFilter)
-                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+            {characterPins.map((pin) => (
+              <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
+            ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {mapData?.characters &&
-              mapData?.characters?.map((pin) => (
-                <CharacterPin
-                  key={pin.id}
-                  // map_id={item_id as string}
-                  pinData={{
-                    ...pin,
-                    // lat: 4300,
-                    // lng: 4700,
-                    // background_color: "#000000",
-                    // border_color: "#ffffff",
-                    // show_background: true,
-                  }}
-                  readOnly={isReadOnly}
-                />
-              ))}
+            {characterPins?.map((pin) => (
+              <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />
+            ))}
           </LayerGroup>
         )}
       </LayersControl.Overlay>

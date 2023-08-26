@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
-import { contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, dialogAtom, drawerAtom, getCharacterFullName, getImageURL, IconEnum } from "../../../utils";
 
 export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: string; pinData: MapPinType; readOnly?: boolean }) {
   const {
@@ -24,6 +24,8 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
     lng,
     doc_id,
     map_link,
+    character,
+    character_id,
     is_public,
   } = markerData;
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
   const setContextMenu = useSetAtom(contextMenuAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-
+  const isCharacterPin = !!character_id && !!character;
   const eventHandlers = {
     click: (e: any) => {
       if (e.originalEvent.shiftKey && e.originalEvent.altKey) return;
@@ -78,7 +80,13 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
             {
               title: "Edit pin",
               icon: IconEnum.edit,
-              onClick: () => setDrawer((prev) => ({ ...prev, type: "map_pins", data: markerData })),
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "map_pins",
+                  data: markerData,
+                  exceptions: { characterPin: !!character && !!character_id },
+                })),
             },
             {
               title: "Delete pin",
@@ -127,31 +135,36 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
           <div className="relative">
             <div className="absolute h-12 w-12">
               <div
-                className="fixed h-full w-full rounded-full p-4"
+                className="fixed h-full w-full rounded-full"
                 style={{
                   background: image_id ? "" : background,
-                  backgroundImage: image_id ? `url(${getImageURL(project_id as string, "images", image_id)})` : "",
+                  backgroundImage:
+                    image_id || (isCharacterPin && character?.portrait_id)
+                      ? `url(${getImageURL(project_id as string, "images", image_id || character.portrait_id)})`
+                      : "",
                   backgroundColor: show_background ? background_color || "" : "",
                   backgroundPosition: "center",
                   backgroundSize: image_id ? "contain" : "2rem",
                   backgroundRepeat: "no-repeat",
-                  border: show_border ? `${border_color} solid 3px` : "",
+                  border: show_border ? `${border_color} solid ${isCharacterPin ? "1px" : "3px"}` : "",
                   zIndex: 999999,
                 }}
               />
             </div>
           </div>,
         ),
-        iconAnchor: [30, 46],
-        iconSize: [48, 48],
-        tooltipAnchor: [-5, -46],
+        iconAnchor: isCharacterPin ? [30, 46] : [30, 46],
+        iconSize: isCharacterPin ? [28, 28] : [48, 48],
+        tooltipAnchor: isCharacterPin ? [-16, -46] : [-5, -46],
       })}
       position={position}>
-      {title && (
-        <Tooltip className="border-rounded-sm border-solid border-gray-800 bg-gray-800 p-2 text-lg text-white" direction="top">
-          <div className="Lato text-center">{title}</div>
+      {title || isCharacterPin ? (
+        <Tooltip direction="top">
+          <div className="Lato text-center">
+            {title || getCharacterFullName(character.first_name, undefined, character.last_name)}
+          </div>
         </Tooltip>
-      )}
+      ) : null}
     </Marker>
   );
 }

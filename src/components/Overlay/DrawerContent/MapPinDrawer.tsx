@@ -43,22 +43,31 @@ const tabs = [
 ];
 
 export function MapPinDrawer({ data, exceptions }: Props) {
-  const { project_id, item_id } = useParams();
+  const { item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const [mapPin, setMapPin] = useState<Partial<MapPinType>>({
     parent_id: item_id as string,
   });
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { data: existingMapPin, isFetching } = useGetSubEntity(data?.id, "map_pins", { data: {} }, { enabled: !!data?.id });
+  const { data: existingMapPin, isFetching } = useGetSubEntity<MapPinType>(
+    data?.id,
+    "map_pins",
+    { data: {} },
+    { enabled: !!data?.id },
+  );
   const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins");
   const { mutateAsync: updateMapPin } = useUpdateMapSubEntity<UpdateMapPinType>("map_pins", item_id as string);
   const queryClient = useQueryClient();
-  const [character, setCharacter] = useState<CharacterType | null>(null);
+  const [character, setCharacter] = useState<Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id"> | null>(
+    null,
+  );
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
   useLayoutEffect(() => {
     if (existingMapPin?.data) {
-      setMapPin(existingMapPin.data);
+      const { character: char, ...existingMapPinData } = existingMapPin.data;
+      setMapPin(existingMapPinData);
+      setCharacter(char);
     } else {
       setMapPin({
         parent_id: item_id as string,
@@ -90,7 +99,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             name="character_id"
             onChange={({ value: id, label, image: portrait_id }) => {
               const [first_name, last_name] = (label || "").split(" ");
-              setCharacter({ id, first_name, last_name, portrait_id, project_id: project_id as string });
+              setCharacter({ id, first_name, last_name, portrait_id });
             }}
             placeholder="Press enter to search characters"
             searchEntity="characters"
