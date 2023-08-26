@@ -144,7 +144,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
         ),
         iconAnchor: [30, 46],
         iconSize: [48, 48],
-        tooltipAnchor: [-5, -20],
+        tooltipAnchor: [-5, -46],
       })}
       position={position}>
       {title && (

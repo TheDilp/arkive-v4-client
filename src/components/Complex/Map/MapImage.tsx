@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 
 import { MapPinType, MapType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
+import { CharacterPin } from "./CharacterPin";
 import { MapPin } from "./MapPin";
 
 type Props = {
@@ -141,6 +142,36 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
               mapData?.map_pins
                 ?.filter(PinFilter)
                 .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+          </LayerGroup>
+        )}
+      </LayersControl.Overlay>
+      {/* Characters layer */}
+      <LayersControl.Overlay checked name="Characters">
+        {isClusteringPins ? (
+          <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
+            {mapData?.map_pins &&
+              mapData?.map_pins
+                ?.filter(PinFilter)
+                .map((pin) => <MapPin key={pin.id} map_id={item_id as string} pinData={pin} readOnly={isReadOnly} />)}
+          </MarkerClusterGroup>
+        ) : (
+          <LayerGroup>
+            {mapData?.characters &&
+              mapData?.characters?.map((pin) => (
+                <CharacterPin
+                  key={pin.id}
+                  // map_id={item_id as string}
+                  pinData={{
+                    ...pin,
+                    // lat: 4300,
+                    // lng: 4700,
+                    // background_color: "#000000",
+                    // border_color: "#ffffff",
+                    // show_background: true,
+                  }}
+                  readOnly={isReadOnly}
+                />
+              ))}
           </LayerGroup>
         )}
       </LayersControl.Overlay>
