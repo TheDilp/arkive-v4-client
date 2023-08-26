@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
@@ -14,7 +15,7 @@ import {
   useUpdateManySubEntities,
 } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
-import { GraphType } from "../../types/EntityTypes/graphTypes";
+import { GraphType } from "../../types";
 import { IconEnum, useNotifications } from "../../utils";
 import {
   BoardReferenceAtom,

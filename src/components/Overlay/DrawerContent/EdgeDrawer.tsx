@@ -387,7 +387,6 @@ export function EdgeDrawer({ data }: Props) {
           label="Save"
           onClick={async () => {
             if (changedData) {
-              console.log(edge.id);
               const edgeToUpdate = { ...(changedData || {}), id: edge.id };
               const { tags, ...rest } = edgeToUpdate;
               const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });

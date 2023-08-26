@@ -63,6 +63,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
 
   useBlocker(() => {
     if (changedData) {
+      // eslint-disable-next-line no-alert
       const response = !window.confirm("You have unsaved changes, are you sure you want to leave?");
       queryClient.removeQueries({ queryKey: ["documents", item_id] });
       return response;
