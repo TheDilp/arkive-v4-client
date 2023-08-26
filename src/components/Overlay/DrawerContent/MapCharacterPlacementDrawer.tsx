@@ -2,8 +2,8 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntity, useUpdateEntity } from "../../../hooks";
-import { CharacterType, MapType } from "../../../types";
+import { useGetEntities, useUpdateEntity } from "../../../hooks";
+import { CharacterType, MapPinType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
 import { UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { CharacterPreview } from "../../DataDisplay";
@@ -19,21 +19,30 @@ export function MapCharacterPlacementDrawer({ data }: { data: { map_id: string; 
   const { project_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
-  const { data: mapWithCharacters, isFetching } = useGetEntity<MapType>(
-    data.map_id,
-    "maps",
+  const { data: pinsWithCharacters, isFetching } = useGetEntities<MapPinType>(
     {
       data: {
         project_id,
       },
       fields: ["id"],
+      filters: {
+        and: [
+          {
+            field: "parent_id",
+            value: data.map_id,
+            operator: "eq",
+          },
+        ],
+      },
       relations: {
         characters: true,
       },
     },
+    "map_pins",
     { queryKeyConcat: ["add_characters_to_map"] },
   );
-  const existingIds = mapWithCharacters?.data.characters.map((char) => char.id);
+  const existingCharacters = (pinsWithCharacters?.data || [])?.flatMap((pin) => pin.characters);
+  const existingIds = existingCharacters.map((char) => char.id);
   const { mutateAsync: updateMap, isLoading: isMutating } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
 
   const [characters, setCharacters] = useState<CharacterListType[]>([]);
@@ -42,8 +51,8 @@ export function MapCharacterPlacementDrawer({ data }: { data: { map_id: string; 
   const charactersToAdd = currentIds.filter((cId) => !existingIds?.includes(cId));
 
   useLayoutEffect(() => {
-    if (mapWithCharacters?.data?.characters?.length) setCharacters(mapWithCharacters?.data?.characters);
-  }, [mapWithCharacters?.data?.characters]);
+    if (existingCharacters?.length) setCharacters(existingCharacters);
+  }, [existingCharacters]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (

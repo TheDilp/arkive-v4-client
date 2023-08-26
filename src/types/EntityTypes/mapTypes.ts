@@ -42,10 +42,11 @@ export interface MapPinType {
   show_background: boolean;
   show_border: boolean;
   is_public: boolean | null;
-  map_link: string | null;
-  doc_id: string | null;
-  image_id: string | null;
+  map_link?: string | null;
+  doc_id?: string | null;
+  image_id?: string | null;
+  character_id?: string | null;
   image: ImageType;
 
-  characters: CharacterType[];
+  character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
 }

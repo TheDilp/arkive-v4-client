@@ -14,7 +14,6 @@ export const InsertMapSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
-      characters: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });
@@ -33,7 +32,6 @@ export const UpdateMapSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
-      characters: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });

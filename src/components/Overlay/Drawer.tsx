@@ -109,7 +109,6 @@ export function Drawer() {
         {drawer.type === "swatches" ? <DrawerSwatchContent /> : null}
         {drawer.type === "content_preview" ? <DrawerContentPreview type={drawer?.data?.type} /> : null}
         {drawer.type === "roles" ? <DrawerRolesContent /> : null} */
-
   return (
     <div ref={drawerRef} className={base()}>
       <h3 className={title()}>
@@ -125,7 +124,7 @@ export function Drawer() {
         {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
         {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
         {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
-        {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} /> : null}
+        {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}

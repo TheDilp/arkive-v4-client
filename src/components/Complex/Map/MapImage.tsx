@@ -72,7 +72,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
           items: [
             {
               icon: IconEnum.map_pin,
-              title: "Add pin",
+              title: "Add map pin",
               onClick: () => {
                 setDrawer((prev) => ({
                   ...prev,
@@ -84,16 +84,31 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
             },
             {
               icon: IconEnum.character,
-              title: "Manage characters on map",
+              title: "Add character pin",
               onClick: () => {
                 setDrawer((prev) => ({
                   ...prev,
-                  data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
-                  title: "Manage characters on map",
-                  type: "map_character_placement",
+                  data: { lat: e.latlng.lat, lng: e.latlng.lng },
+                  title: "Create new map pin",
+                  type: "map_pins",
+                  exceptions: {
+                    characterPin: true,
+                  },
                 }));
               },
             },
+            // {
+            //   icon: IconEnum.character,
+            //   title: "Manage characters",
+            //   onClick: () => {
+            //     setDrawer((prev) => ({
+            //       ...prev,
+            //       data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
+            //       title: "Manage characters",
+            //       type: "map_character_placement",
+            //     }));
+            //   },
+            // },
           ],
         });
         // setDrawer((prev) => ({ ...prev, data: { ...e.latlng } }));

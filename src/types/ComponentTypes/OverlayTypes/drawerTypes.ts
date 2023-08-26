@@ -27,6 +27,7 @@ export type DrawerExceptions = {
   fromTemplate?: boolean;
   createTemplate?: boolean;
   eventDescription?: boolean;
+  characterPin?: boolean;
   isReadOnly?: boolean;
 };
 
