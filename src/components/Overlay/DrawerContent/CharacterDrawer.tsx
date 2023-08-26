@@ -775,7 +775,6 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
         onClick={async () => {
           if (changedData) {
             if (character?.id) {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const characterToUpdate = { ...(changedData || {}), id: character.id };
               const { related_to, related_from, tags, ...rest } = characterToUpdate;
               const parsedData = UpdateCharacterSchema.parse({

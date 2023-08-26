@@ -4,5 +4,3 @@ export * from "./Form";
 export * from "./Layout";
 export * from "./Misc";
 export * from "./Overlay";
-export * from "./Overlay/DialogContent";
-export * from "./Overlay/DrawerContent";

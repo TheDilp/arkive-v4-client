@@ -28,11 +28,12 @@ export const UpdateMapSchema = z.object({
     cluster_pins: z.boolean().nullable().optional(),
     icon: z.string().nullable().optional(),
     parent_id: z.string().nullable().optional(),
-    image_id: z.string(),
+    image_id: z.string().optional(),
   }),
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
+      characters: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });

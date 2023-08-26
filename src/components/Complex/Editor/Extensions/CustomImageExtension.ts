@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { ApplySchemaAttributes, NodeExtensionSpec, NodeSpecOverride } from "remirror";
 import { ImageExtension } from "remirror/extensions";
 

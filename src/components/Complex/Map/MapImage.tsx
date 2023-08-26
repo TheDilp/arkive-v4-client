@@ -62,7 +62,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
     }
   }
   const setDrawer = useSetAtom(drawerAtom);
-  // eslint-disable-next-line no-unused-vars
+
   const map = useMapEvents({
     contextmenu(e: any) {
       if (!isReadOnly) {
@@ -70,7 +70,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
           event: e.originalEvent,
           items: [
             {
-              icon: IconEnum.add,
+              icon: IconEnum.map_pin,
               title: "Add pin",
               onClick: () => {
                 setDrawer((prev) => ({
@@ -78,6 +78,18 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
                   data: { lat: e.latlng.lat, lng: e.latlng.lng },
                   title: "Create new map pin",
                   type: "map_pins",
+                }));
+              },
+            },
+            {
+              icon: IconEnum.character,
+              title: "Manage characters on map",
+              onClick: () => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { lat: e.latlng.lat, lng: e.latlng.lng, map_id: item_id as string },
+                  title: "Manage characters on map",
+                  type: "map_character_placement",
                 }));
               },
             },
@@ -108,7 +120,6 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
     };
   }, [subitem_id, bounds]);
   if (!map) return null;
-  console.log(mapData?.map_pins);
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">

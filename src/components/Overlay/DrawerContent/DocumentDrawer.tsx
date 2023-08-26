@@ -205,7 +205,6 @@ export function DocumentDrawer({ data }: Props) {
         onClick={async () => {
           if (changedData) {
             if (document?.id) {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const documentToUpdate = { ...(changedData || {}), id: document.id };
               const { alter_names, tags, ...rest } = documentToUpdate;
               const parsedData = UpdateDocumentSchema.parse({

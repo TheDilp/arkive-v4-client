@@ -1,5 +1,4 @@
-/* eslint-disable no-use-before-define */
-import { TagType } from ".";
+import { MapType, TagType } from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationshipType {
@@ -29,6 +28,7 @@ export interface CharacterType {
   dayOfBirth?: number | null;
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
+  maps?: MapType | [];
   character_fields?: {
     id: string;
     value: { id: string; value: string | string[] | number; subOptionValue?: string };

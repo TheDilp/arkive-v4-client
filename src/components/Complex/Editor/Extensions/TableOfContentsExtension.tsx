@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/no-redundant-roles */
+
 /* eslint-disable func-names */
 /* eslint-disable class-methods-use-this */
 import { TextSelection } from "@remirror/pm/state";

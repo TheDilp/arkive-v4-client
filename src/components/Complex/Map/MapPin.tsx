@@ -102,7 +102,6 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
     },
     dragend(e: any) {
       if (!readOnly) {
-        // eslint-disable-next-line no-underscore-dangle
         setPosition(e.target._latlng);
         updateMapPin({
           data: {

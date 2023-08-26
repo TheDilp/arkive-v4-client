@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function WordMentionTooltip({ id }: Pick<Props, "id">) {
-  const { data, isLoading } = useQuery<WordType>({
+  const { data, isLoading } = useQuery<any>({
     queryKey: ["words", id],
     queryFn: async () => {
       // return FetchFunction({ url: `${baseURLS.baseServer}getsingleword`, method: "POST", body: JSON.stringify({ id }) });

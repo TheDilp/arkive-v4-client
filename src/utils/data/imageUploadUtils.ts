@@ -1,4 +1,4 @@
-import { ImageUploadOnChange } from "@thearkive/types";
+import { ImageUploadOnChange } from "../../types";
 
 export function mergeFileLists(fileListA: FileList, fileListB: FileList): FileList {
   const dataTransfer = new DataTransfer();

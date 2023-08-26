@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-class-members */
 import { keyBinding, KeyBindingProps } from "remirror";
 import { TableExtension } from "remirror/extensions";
 
