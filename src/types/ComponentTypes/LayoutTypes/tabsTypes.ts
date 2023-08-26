@@ -7,4 +7,5 @@ export interface TabsTypes {
   selectedTab: number;
   tabs: TabType[];
   onChange?: (tab: TabType, index: number) => void;
+  isVertical?: boolean;
 }

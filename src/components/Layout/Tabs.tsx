@@ -10,10 +10,20 @@ const TabsClasses = tv({
     tab: "px-2 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
     tabSelected: "inline-block border-blue-500 border-b-2",
   },
+  variants: {
+    isVertical: {
+      true: {
+        base: "border-none",
+        tabsContainer: "flex-col h-fit gap-y-2 w-full",
+        tab: "p-1 px-2 justify-between text-base",
+        tabSelected: "bg-zinc-700 border-none rounded ",
+      },
+    },
+  },
 });
 
-export function Tabs({ tabs, selectedTab, onChange }: TabsTypes) {
-  const { base, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses();
+export function Tabs({ tabs, selectedTab, onChange, isVertical }: TabsTypes) {
+  const { base, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses({ isVertical });
   return (
     <div className={base()}>
       <ul className={tabsContainer()}>
