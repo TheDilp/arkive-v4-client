@@ -65,6 +65,7 @@
     "eslint-plugin-react-refresh": "^0.4.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
     "globals": "^13.20.0",
+    "husky": "^8.0.0",
     "postcss": "^8.4.25",
     "prettier": "2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
@@ -72,8 +73,7 @@
     "tailwindcss-animate": "^1.0.6",
     "typescript": "^5.0.2",
     "vite": "^4.4.9",
-    "vitest": "^0.34.2",
-    "husky": "^8.0.0"
+    "vitest": "^0.34.2"
   },
   "name": "arkive-v4-client",
   "private": true,
@@ -84,7 +84,9 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest --run",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pretty": "prettier --write 'src/**/*.ts'",
+    "precommit": "pnpm run lint --fix && pnpm run pretty && pnpm run test"
   },
   "type": "module",
   "version": "0.0.0"
