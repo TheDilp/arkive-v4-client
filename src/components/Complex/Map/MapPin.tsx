@@ -144,7 +144,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
                       : "",
                   backgroundColor: show_background ? background_color || "" : "",
                   backgroundPosition: "center",
-                  backgroundSize: image_id ? "contain" : "2rem",
+                  backgroundSize: image_id || (isCharacterPin && !!character?.portrait_id) ? "contain" : "2rem",
                   backgroundRepeat: "no-repeat",
                   border: show_border ? `${border_color} solid ${isCharacterPin ? "1px" : "3px"}` : "",
                   zIndex: 999999,
