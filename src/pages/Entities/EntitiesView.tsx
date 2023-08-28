@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, DocumentView, Graph } from "../../components";
+import { CharacterProfileView } from "./CharacterProfileView";
 import { MapView } from "./MapView";
 import { RandomTableView } from "./RandomTableView";
 
@@ -13,6 +14,7 @@ export function EntitiesView() {
         <Breadcrumbs />
       </div>
 
+      {!!item_id && type === "characters" ? <CharacterProfileView /> : null}
       {!!item_id && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}

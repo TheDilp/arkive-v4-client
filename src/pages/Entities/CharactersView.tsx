@@ -331,7 +331,7 @@ export function CharactersView() {
               orderBy,
               filters,
               selection,
-              getLink: (rowData: any) => `/project/${project_id}/characters/${rowData.id}`,
+              getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
               setFavorite: async (rowData: any) => {
                 await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
               },
