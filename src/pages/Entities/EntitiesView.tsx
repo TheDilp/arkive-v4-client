@@ -1,9 +1,7 @@
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, DocumentView, Graph } from "../../components";
-import { CharacterProfileView } from "./CharacterProfileView";
-import { MapView } from "./MapView";
-import { RandomTableView } from "./RandomTableView";
+import { Breadcrumbs, Graph } from "../../components";
+import { CharacterProfileView, DocumentView, MapView, RandomTableView } from ".";
 
 export function EntitiesView() {
   const { type, item_id } = useParams();
