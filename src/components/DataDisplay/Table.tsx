@@ -223,7 +223,9 @@ function TableColumnFilter({
                   if (columnId)
                     setColumnFilters((prev) => ({
                       ...prev,
-                      and: [...(prev.and || [])].concat({
+                      [columnId === "is_favorite" ? "or" : "and"]: [
+                        ...(prev[columnId === "is_favorite" ? "or" : "and"] || []),
+                      ].concat({
                         id: crypto.randomUUID(),
                         field: columnId,
                         value: "",
@@ -284,15 +286,32 @@ function TableColumnFilter({
         label="Apply filters"
         onClick={() => {
           if (columnId === "is_favorite") {
-            const andFilter = columnFilters?.and?.[0];
+            const orFilter = columnFilters?.or?.find((filt) => filt?.field === "is_favorite");
             // Favorites filter has an empty string by default
             // Needs to be converted to false
-            if (andFilter?.value === "") {
-              applyFilter(columnId as string, { and: [{ ...andFilter, value: false }] }, dispatch);
-              return;
+            if (orFilter && (orFilter?.value === "" || orFilter?.value === false)) {
+              applyFilter(
+                columnId as string,
+                {
+                  or: [
+                    { ...orFilter, value: false },
+                    { ...orFilter, operator: "is", value: null },
+                  ],
+                },
+                dispatch,
+              );
+            } else if (orFilter && orFilter?.value === true) {
+              applyFilter(
+                columnId as string,
+                {
+                  or: [{ ...orFilter, value: true }],
+                },
+                dispatch,
+              );
             }
+          } else {
+            applyFilter(columnId as string, columnFilters, dispatch);
           }
-          applyFilter(columnId as string, columnFilters, dispatch);
         }}
         variant="success"
       />
@@ -468,7 +487,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                               dispatch={dispatch}
                               filterOptions={(meta as MetaType)?.filterOptions || []}
                               filters={activeColumnFilters}
-                              isOrDisabled={["is_favorite"].includes(hdr.column.id)}
+                              isAndDisabled={["is_favorite"].includes(hdr.column.id)}
                             />
                           </div>
                         }
