@@ -13,9 +13,15 @@ export interface CharacterFieldType {
   random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string }[];
 }
-export interface CharacterFieldTemplate {
+export interface CharacterFieldTemplateType {
   id: string;
   title: string;
   character_fields: CharacterFieldType[];
   sort: number;
+}
+
+export interface CharacterFieldValueType {
+  id: string;
+  value: { id: string; value: string | number | string[]; subOptionValue?: string };
+  template_id: string;
 }

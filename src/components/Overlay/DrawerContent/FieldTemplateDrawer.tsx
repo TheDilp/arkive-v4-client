@@ -5,14 +5,14 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterFieldTemplate, CharacterFieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
+import { CharacterFieldTemplateType, CharacterFieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
 import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
 import { Button, Input, Search, Select } from "../../Form";
 import { Skeleton } from "../../Misc";
 
-type insertTemplateType = Partial<CharacterFieldTemplate> & { project_id: string };
+type insertTemplateType = Partial<CharacterFieldTemplateType> & { project_id: string };
 
 function removeField(
   index: number,
@@ -195,11 +195,11 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   }>("character_fields_templates");
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: Partial<Omit<CharacterFieldTemplate, "fields">>;
+    data: Partial<Omit<CharacterFieldTemplateType, "fields">>;
     relations?: { character_fields?: Partial<CharacterFieldType>[] };
   }>("character_fields_templates", project_id as string);
 
-  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplate & { fields: CharacterFieldType[] }>(
+  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType & { fields: CharacterFieldType[] }>(
     data?.id,
     "character_fields_templates",
     {
@@ -313,10 +313,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 },
                 relations: {
                   character_fields: fields.map((field) => ({
+                    ...field,
                     project_id: project_id as string,
-                    title: field.title,
-                    field_type: field.field_type,
-                    sort: field.sort,
                     options: field?.options?.map((opt) => opt.title),
                   })),
                 },

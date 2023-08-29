@@ -1,4 +1,4 @@
-export * from "../../../pages/Entities/DocumentView";
+export * from "./Editor";
 export * from "./Extensions/Mention";
 export * from "./Extensions/SecretExtension";
 export * from "./Menubar";

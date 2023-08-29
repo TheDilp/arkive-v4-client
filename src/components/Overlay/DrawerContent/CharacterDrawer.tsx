@@ -6,8 +6,9 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import {
-  CharacterFieldTemplate,
+  CharacterFieldTemplateType,
   CharacterFieldType,
+  CharacterFieldValueType,
   CharacterType,
   HandleChangePropsType,
   InputOnChangeValue,
@@ -468,7 +469,7 @@ function FieldTemplateRow({
 }
 
 // #region tabs
-function AdditionalFieldsTab({
+export function AdditionalFieldsTab({
   templates,
   createNotification,
   handleChange,
@@ -478,16 +479,10 @@ function AdditionalFieldsTab({
 }: {
   templates:
     | {
-        data: CharacterFieldTemplate[];
+        data: CharacterFieldTemplateType[];
       }
     | undefined;
-  character_fields?:
-    | {
-        id: string;
-        value: { id: string; value: string | number | string[]; subOptionValue?: string };
-        template_id: string;
-      }[]
-    | undefined;
+  character_fields?: CharacterFieldValueType[] | undefined;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
   selectedTemplates: string[];
@@ -556,7 +551,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     "characters",
     project_id as string,
   );
-  const { data: templates, isFetching } = useGetEntities<CharacterFieldTemplate>(
+  const { data: templates, isFetching } = useGetEntities<CharacterFieldTemplateType>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
     {

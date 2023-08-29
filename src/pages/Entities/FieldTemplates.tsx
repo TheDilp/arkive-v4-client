@@ -4,10 +4,10 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
-import { CharacterFieldTemplate, DialogAtomType, DrawerAtomType } from "../../types";
+import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
-const columnHelper = createColumnHelper<CharacterFieldTemplate>();
+const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -95,7 +95,7 @@ export function CharacterFieldTemplates() {
     selection: {},
   });
 
-  const { data, isFetching } = useGetEntities<CharacterFieldTemplate>(
+  const { data, isFetching } = useGetEntities<CharacterFieldTemplateType>(
     {
       filters,
       orderBy,
