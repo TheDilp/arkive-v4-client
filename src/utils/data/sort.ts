@@ -1,3 +1,3 @@
 export function sortEntities(a: { sort: number }, b: { sort: number }) {
-  return b.sort - a.sort;
+  return a.sort - b.sort;
 }

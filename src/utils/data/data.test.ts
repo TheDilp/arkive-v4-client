@@ -3,13 +3,13 @@ import { expect, test } from "vitest";
 import { sortEntities } from "./sort";
 import { deleteObjectPropsRecursive, removeFalsy } from "./transform";
 
-test("sort entities highest to lowest", () => {
+test("sort entities lowest to highest", () => {
   expect([{ sort: 5 }, { sort: 7 }, { sort: 21 }, { sort: 1 }, { sort: 12 }].sort(sortEntities)).toStrictEqual([
-    { sort: 21 },
-    { sort: 12 },
-    { sort: 7 },
-    { sort: 5 },
     { sort: 1 },
+    { sort: 5 },
+    { sort: 7 },
+    { sort: 12 },
+    { sort: 21 },
   ]);
 });
 
