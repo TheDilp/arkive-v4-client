@@ -23,7 +23,17 @@ function createColumns(
         filterOptions: NameFilters,
       },
     }),
-
+    columnHelper.accessor("sort", {
+      id: "sort",
+      header: "Sort weight",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+      maxSize: 10,
+      minSize: 5,
+    }),
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -89,7 +99,7 @@ export function CharacterFieldTemplates() {
   const columns = createColumns(setDrawer, setDialog);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: [{ field: "title", sort: "asc" }],
+    orderBy: [{ field: "sort", sort: "desc" }],
     filters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},
