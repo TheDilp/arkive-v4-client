@@ -19,9 +19,9 @@ const fieldSizeClass = tv({
   base: "flex flex-col text-center mt-1",
   variants: {
     type: {
-      dice_roll: "col-span-1 p-1 bg-zinc-600 rounded shadow-sm",
+      dice_roll: "col-span-1 p-1 bg-zinc-800 rounded shadow-sm",
       text: "col-span-2",
-      select: "col-span-2",
+      select: "col-span-2 p-1 bg-zinc-800 rounded shadow-sm",
       number: "col-span-2",
       textarea: "col-span-6",
     },
@@ -57,7 +57,7 @@ function AdditionalFieldDisplay({
                 field.field_type === "select" ||
                 field.field_type === "select_multiple") &&
               value ? (
-                <Title label={value || ""} size="sm" />
+                <Title label={value || ""} size="lg" />
               ) : null}
               {field.field_type === "textarea" && value ? (
                 <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
@@ -93,7 +93,7 @@ export function CharacterProfileView() {
   if (isFetching || isFetchingTemplates) return null;
   return (
     <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-x-4 overflow-hidden p-4 pb-16">
-      <div className="col-span-1 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-900 p-4">
+      <div className="col-span-1 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4">
         <Avatar
           image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
           isTooltipDisabled
@@ -117,7 +117,7 @@ export function CharacterProfileView() {
           <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
         </div>
       </div>
-      <div className="col-span-4 h-full overflow-y-auto rounded-lg bg-zinc-800 p-4">
+      <div className="col-span-4 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4">
         <ul className="flex flex-col gap-y-2 overflow-y-auto">
           {existingTemplates?.data?.length ? (
             existingTemplates?.data?.sort(sortEntities)?.map(

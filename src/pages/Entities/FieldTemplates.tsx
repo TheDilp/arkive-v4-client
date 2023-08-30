@@ -25,7 +25,7 @@ function createColumns(
     }),
     columnHelper.accessor("sort", {
       id: "sort",
-      header: "Sort weight",
+      header: "Sort",
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
@@ -99,7 +99,7 @@ export function CharacterFieldTemplates() {
   const columns = createColumns(setDrawer, setDialog);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: [{ field: "sort", sort: "desc" }],
+    orderBy: [{ field: "sort", sort: "asc" }],
     filters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},

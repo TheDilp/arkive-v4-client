@@ -260,7 +260,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         <div className="w-20">
           <Input
             isDisabled={isLoading}
-            label="Sort weight"
+            label="Sort"
             name="sort"
             onChange={handleChange}
             type="number"
