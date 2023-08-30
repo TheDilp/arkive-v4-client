@@ -21,6 +21,15 @@ export type DrawerContentType =
   | "content_preview"
   | "map_pin_management";
 
+export type DrawerContentCreateNewType =
+  | "characters"
+  | "character_fields_templates"
+  | "documents"
+  | "maps"
+  | "graphs"
+  | "random_tables"
+  | "random_table_option";
+
 export type DrawerSize = "sm" | "md" | "lg";
 export type DrawerPosition = "left" | "right";
 export type DrawerExceptions = {

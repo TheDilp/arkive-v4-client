@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Alert, Breadcrumbs, Button, Dropdown, Icon } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useUpdateEntity } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, DrawerContentType } from "../../types";
+import { AvailableEntityType, BaseEntityType, DrawerContentCreateNewType } from "../../types";
 import {
   breadcrumbsAtom,
   capitalizeFirstLetter,
@@ -207,9 +207,9 @@ export function FolderView() {
                   onClick: () => {
                     setDrawer((prev) => ({
                       ...prev,
-                      data: { project_id },
+                      data: { id: "dasdas", project_id: project_id as string },
                       title: `Create new ${entityName}`,
-                      type: type as DrawerContentType,
+                      type: type as DrawerContentCreateNewType,
                       size: "lg",
                     }));
                   },
@@ -222,7 +222,7 @@ export function FolderView() {
                     setDrawer((prev) => ({
                       ...prev,
                       title: `Create new ${entityName} folder`,
-                      data: { project_id, type },
+                      data: { project_id, type: type as AvailableEntityType },
                       type: "folder",
                       size: "sm",
                     }));
@@ -252,14 +252,24 @@ export function FolderView() {
                     {
                       title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
-                      onClick: () =>
-                        setDrawer((prev) => ({
-                          ...prev,
-                          size: "sm",
-                          title: `Edit ${entityName} - ${item.title}`,
-                          type: item.is_folder ? "folder" : (type as AvailableEntityType),
-                          data: { id, type },
-                        })),
+                      onClick: () => {
+                        if (item?.is_folder)
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "sm",
+                            title: `Edit ${entityName} - ${item.title}`,
+                            type: "folder",
+                            data: { id, type: type as AvailableEntityType },
+                          }));
+                        else
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "sm",
+                            title: `Edit ${entityName} - ${item.title}`,
+                            type: type as DrawerContentCreateNewType,
+                            data: { id, project_id: project_id as string },
+                          }));
+                      },
                     },
                     {
                       title: `Delete ${item.is_folder ? "folder" : entityName}`,
@@ -298,14 +308,24 @@ export function FolderView() {
                     {
                       title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
-                      onClick: () =>
-                        setDrawer((prev) => ({
-                          ...prev,
-                          size: "md",
-                          title: `Edit ${entityName} - ${item.title}`,
-                          type: item.is_folder ? "folder" : (type as AvailableEntityType),
-                          data: { id, parent_id: item_id, type },
-                        })),
+                      onClick: () => {
+                        if (item?.is_folder)
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "sm",
+                            title: `Edit ${entityName} - ${item.title}`,
+                            type: "folder",
+                            data: { id, type: type as AvailableEntityType },
+                          }));
+                        else
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "sm",
+                            title: `Edit ${entityName} - ${item.title}`,
+                            type: type as DrawerContentCreateNewType,
+                            data: { id, project_id: project_id as string },
+                          }));
+                      },
                     },
                     {
                       title: `Delete ${entityName}`,
