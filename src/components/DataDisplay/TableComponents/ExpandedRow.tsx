@@ -62,12 +62,16 @@ function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOption
     <div className="flex flex-col gap-y-2">
       {suboptions?.map((suboption) => (
         <div key={suboption.id} className="flex flex-col font-lato">
-          <div className="flex gap-x-2">
-            <span>{suboption.title}</span>
-            <span>-</span>
+          <div className="flex w-full max-w-full items-center gap-x-2">
             <span>
               <Badge label={getSentenceCase(suboption.title || "")} variant="info" />
             </span>
+            {suboption?.description ? (
+              <>
+                <span>-</span>
+                <div className="truncate text-sm">{suboption?.description}</div>
+              </>
+            ) : null}
           </div>
         </div>
       ))}
