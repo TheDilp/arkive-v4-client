@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Alert, Avatar, Editor, Tabs, Title } from "../../components";
+import { Alert, Avatar, Collapsible, Editor, Tabs, Title } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterFieldValueType, CharacterType } from "../../types";
 import { getCharacterFullName, getImageURL, IconEnum, sortEntities } from "../../utils";
@@ -31,38 +31,42 @@ const fieldSizeClass = tv({
 function AdditionalFieldDisplay({
   character_fields,
   character_field_data,
+  template_title,
 }: {
   character_fields: CharacterFieldType[];
   character_field_data: CharacterFieldValueType[];
+  template_title: string;
 }) {
   return (
-    <div className="grid grid-cols-6 gap-2 ">
-      {character_fields.map((field) => {
-        const fieldData = character_field_data.find((f) => f.id === field.id);
-        const value =
-          fieldData?.value && fieldData?.value?.value
-            ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
-            : "";
-        const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
+    <Collapsible initialOpen label={template_title}>
+      <div className="grid grid-cols-6 gap-2">
+        {character_fields.map((field) => {
+          const fieldData = character_field_data.find((f) => f.id === field.id);
+          const value =
+            fieldData?.value && fieldData?.value?.value
+              ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
+              : "";
+          const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
 
-        return (
-          <div key={field?.id} className={fieldClasses}>
-            <Title label={field.title} size="xl" />
-            {(field.field_type === "text" ||
-              field.field_type === "number" ||
-              field.field_type === "dice_roll" ||
-              field.field_type === "select" ||
-              field.field_type === "select_multiple") &&
-            value ? (
-              <Title label={value || ""} size="sm" />
-            ) : null}
-            {field.field_type === "textarea" && value ? (
-              <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
+          return (
+            <div key={field?.id} className={fieldClasses}>
+              <Title label={field.title} size="xl" />
+              {(field.field_type === "text" ||
+                field.field_type === "number" ||
+                field.field_type === "dice_roll" ||
+                field.field_type === "select" ||
+                field.field_type === "select_multiple") &&
+              value ? (
+                <Title label={value || ""} size="sm" />
+              ) : null}
+              {field.field_type === "textarea" && value ? (
+                <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </Collapsible>
   );
 }
 
@@ -119,12 +123,12 @@ export function CharacterProfileView() {
             existingTemplates?.data?.sort(sortEntities)?.map(
               (t) => (
                 <div key={t.id} className="flex flex-col">
-                  <Title isDrawerTitle label={t.title} size="2xl" />
                   <AdditionalFieldDisplay
                     character_field_data={
                       existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
                     }
-                    character_fields={t?.character_fields}
+                    character_fields={t.character_fields}
+                    template_title={t.title}
                   />
                 </div>
               ),
