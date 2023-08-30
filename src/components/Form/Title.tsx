@@ -18,7 +18,7 @@ const TitleClasses = tv({
   },
 });
 
-export function Title({ label, size, isDrawerTitle }: TitleType) {
+export function Title({ label, size = "md", isDrawerTitle }: TitleType) {
   const classes = TitleClasses({ size, isDrawerTitle });
   return <div className={classes}>{label}</div>;
 }

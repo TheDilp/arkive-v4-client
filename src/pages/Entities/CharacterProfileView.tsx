@@ -2,28 +2,28 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Alert, Avatar, Collapsible, Editor, Tabs, Title } from "../../components";
+import { Alert, Avatar, Collapsible, Editor, Skeleton, Tabs, Title } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterFieldValueType, CharacterType } from "../../types";
 import { getCharacterFullName, getImageURL, IconEnum, sortEntities } from "../../utils";
 
 const tabs = [
-  { id: "1", label: "Documents", icon: IconEnum.document },
-  { id: "2", label: "Locations", icon: IconEnum.map_pin },
-  { id: "3", label: "Relationships", icon: IconEnum.family_tree },
-  { id: "4", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "5", label: "Images", icon: IconEnum.image },
+  { id: "1", label: "Links", icon: IconEnum.map_pin },
+  { id: "2", label: "Relationships", icon: IconEnum.family_tree },
+  { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "4", label: "Images", icon: IconEnum.image },
 ];
 
 const fieldSizeClass = tv({
-  base: "flex flex-col text-center mt-1",
+  base: "flex flex-col justify-center text-center mt-1 bg-zinc-800 rounded shadow-sm p-0.5",
   variants: {
     type: {
-      dice_roll: "col-span-1 p-1 bg-zinc-800 rounded shadow-sm",
-      text: "col-span-2",
-      select: "col-span-2 p-1 bg-zinc-800 rounded shadow-sm",
-      number: "col-span-2",
-      textarea: "col-span-6",
+      dice_roll: "col-span-3 lg:col-span-1",
+      text: "col-span-3 lg:col-span-2",
+      select: "col-span-3 lg:col-span-2",
+      number: "col-span-3 lg:col-span-2",
+      random_table: "col-span-3 lg:col-span-2",
+      textarea: "col-span-6 bg-transparent rounded-none shadow-none",
     },
   },
 });
@@ -47,6 +47,16 @@ function AdditionalFieldDisplay({
               ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
               : "";
           const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
+          const randomTable =
+            field.field_type === "random_table"
+              ? character_fields
+                  .find((f) => f.id === field?.id)
+                  ?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
+              : null;
+
+          const subOption = randomTable
+            ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+            : null;
 
           return (
             <div key={field?.id} className={fieldClasses}>
@@ -58,6 +68,12 @@ function AdditionalFieldDisplay({
                 field.field_type === "select_multiple") &&
               value ? (
                 <Title label={value || ""} size="lg" />
+              ) : null}
+              {field.field_type === "random_table" ? (
+                <div>
+                  <Title label={randomTable?.title || ""} />
+                  <Title label={subOption?.title || ""} />
+                </div>
               ) : null}
               {field.field_type === "textarea" && value ? (
                 <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
@@ -75,7 +91,7 @@ export function CharacterProfileView() {
   const [selectedTab, setSelectedTab] = useState(0);
   const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(item_id, "characters", {
     data: {},
-    relations: { tags: true, character_fields: true },
+    relations: { tags: true, character_fields: true, locations: true, relationships: true },
   });
   useChangeNavbarTitle(
     `The Arkive | Characters | ${getCharacterFullName(
@@ -85,69 +101,89 @@ export function CharacterProfileView() {
     )}`,
     !!existingCharacter?.data,
   );
+
   const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     { data: { project_id }, fields: ["id", "title"], relations: { character_fields: true } },
     "character_fields_templates",
-    { enabled: selectedTab === 3, staleTime: 5 * 60 * 1000 },
+    { enabled: selectedTab === 2, staleTime: 5 * 60 * 1000 },
   );
-  if (isFetching || isFetchingTemplates) return null;
+
   return (
-    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-x-4 overflow-hidden p-4 pb-16">
-      <div className="col-span-1 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4">
-        <Avatar
-          image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
-          isTooltipDisabled
-          label={getCharacterFullName(
-            existingCharacter?.data?.first_name as string,
-            existingCharacter?.data?.nickname || "",
-            existingCharacter?.data?.last_name || "",
-          )}
-          size="4xl"
-        />
-        <div className="mt-2 flex flex-col gap-y-1">
-          <h2 className="text-center font-merriweather text-lg">
-            {`${existingCharacter?.data?.first_name} ${existingCharacter?.data?.last_name}`.trimEnd()}
-          </h2>
-          {existingCharacter?.data?.nickname ? (
-            <h3 className="text-center font-lato">{existingCharacter?.data?.nickname}</h3>
+    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-4 overflow-hidden p-4 pb-16">
+      {isFetching ? (
+        <Skeleton type="character_profile" />
+      ) : (
+        <div className="col-span-5 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+          <Avatar
+            image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+            isTooltipDisabled
+            label={getCharacterFullName(
+              existingCharacter?.data?.first_name as string,
+              existingCharacter?.data?.nickname || "",
+              existingCharacter?.data?.last_name || "",
+            )}
+            size="4xl"
+          />
+          <div className="mt-2 flex flex-col gap-y-1">
+            <h2 className="text-center font-merriweather text-lg">
+              {`${existingCharacter?.data?.first_name} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
+            </h2>
+            {existingCharacter?.data?.nickname ? (
+              <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
+            ) : null}
+          </div>
+
+          <div className="w-full">
+            <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+          </div>
+        </div>
+      )}
+      {isFetchingTemplates ? (
+        <Skeleton type="character_profile_main" />
+      ) : (
+        <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+          {selectedTab === 0 ? (
+            <ul className="animate-in fade-in fill-mode-both">
+              {existingCharacter?.data?.locations ? (
+                existingCharacter.data.locations.map((location) => <span>{location.title}</span>)
+              ) : (
+                <Alert label="There is no content." variant="info" />
+              )}
+            </ul>
+          ) : null}
+          {selectedTab === 2 ? (
+            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
+              {existingTemplates?.data?.length ? (
+                existingTemplates?.data?.sort(sortEntities)?.map(
+                  (t) => (
+                    <div key={t.id} className="flex flex-col">
+                      <AdditionalFieldDisplay
+                        character_field_data={
+                          existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                        }
+                        character_fields={t.character_fields}
+                        template_title={t.title}
+                      />
+                    </div>
+                  ),
+                  // <FieldTemplateRow
+                  //   key={t?.id}
+                  //   character_fields={t.character_fields}
+                  //   character_fields_data={character_fields}
+                  //   createNotification={createNotification}
+                  //   handleChange={handleChange}
+                  //   id={t?.id}
+                  //   selectedTemplates={selectedTemplates}
+                  //   title={t?.title}
+                  // />
+                )
+              ) : (
+                <Alert label="There are no templates available." variant="info" />
+              )}
+            </ul>
           ) : null}
         </div>
-
-        <div className="w-full">
-          <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-        </div>
-      </div>
-      <div className="col-span-4 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4">
-        <ul className="flex flex-col gap-y-2 overflow-y-auto">
-          {existingTemplates?.data?.length ? (
-            existingTemplates?.data?.sort(sortEntities)?.map(
-              (t) => (
-                <div key={t.id} className="flex flex-col">
-                  <AdditionalFieldDisplay
-                    character_field_data={
-                      existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
-                    }
-                    character_fields={t.character_fields}
-                    template_title={t.title}
-                  />
-                </div>
-              ),
-              // <FieldTemplateRow
-              //   key={t?.id}
-              //   character_fields={t.character_fields}
-              //   character_fields_data={character_fields}
-              //   createNotification={createNotification}
-              //   handleChange={handleChange}
-              //   id={t?.id}
-              //   selectedTemplates={selectedTemplates}
-              //   title={t?.title}
-              // />
-            )
-          ) : (
-            <Alert label="There are no templates available." variant="info" />
-          )}
-        </ul>
-      </div>
+      )}
     </div>
   );
 }

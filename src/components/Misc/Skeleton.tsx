@@ -141,11 +141,37 @@ function FamilyTreeSkeleton() {
   );
 }
 
+function CharacterProfileSkeleton() {
+  return (
+    <div className="col-span-5 flex h-full animate-pulse flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+      <div className="h-24 min-h-[6rem] w-24 min-w-[6rem] rounded-full bg-zinc-700" />
+      <div className="flex w-full flex-col items-center gap-y-2">
+        <span className="h-[18px] w-3/4 rounded bg-zinc-700" />
+        <span className="h-[18px] w-3/4 rounded bg-zinc-700" />
+      </div>
+      <div className="flex w-full animate-pulse flex-col items-center gap-y-2">
+        <span className="h-7 w-full animate-pulse rounded bg-zinc-700" />
+        <span className="h-7 w-full animate-pulse rounded bg-zinc-700" />
+        <span className="h-7 w-full animate-pulse rounded bg-zinc-700" />
+        <span className="h-7 w-full animate-pulse rounded bg-zinc-700" />
+      </div>
+    </div>
+  );
+}
+
+function CharacterProfileMainSkeleton() {
+  return (
+    <div className="col-span-5 flex h-full animate-pulse flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-900 p-4 lg:col-span-4" />
+  );
+}
+
 export function Skeleton({ type, limit }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "breadcrumbs") return <BreadcrumbsSkeleton />;
   if (type === "drawer_form") return <DrawerFormSkeleton />;
   if (type === "editor") return <EditorSkeleton />;
   if (type === "family_tree") return <FamilyTreeSkeleton />;
+  if (type === "character_profile") return <CharacterProfileSkeleton />;
+  if (type === "character_profile_main") return <CharacterProfileMainSkeleton />;
   return null;
 }

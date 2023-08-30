@@ -50,3 +50,5 @@ export interface MapPinType {
 
   character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
 }
+
+export type CharacterLocationType = Pick<MapType, "id" | "title"> & { map_pin_id: string };

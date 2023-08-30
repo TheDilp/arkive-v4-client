@@ -1,4 +1,4 @@
-import { CharacterFieldValueType, MapType, TagType } from ".";
+import { CharacterFieldValueType, CharacterLocationType, MapType, TagType } from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationshipType {
@@ -25,6 +25,7 @@ export interface CharacterType {
   yearOfBirth?: number | null;
   maps?: MapType | [];
   character_fields?: CharacterFieldValueType[];
+  locations: CharacterLocationType[];
   tags?: TagType[];
   related_to?: {
     id: string;
