@@ -1,5 +1,5 @@
 import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch } from "react";
+import { Dispatch, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
@@ -99,6 +99,65 @@ export function RandomTableView() {
     },
   );
 
+  const rollOnTable = useCallback(async () => {
+    const selectedItems = Object.values(selection || {}).flatMap((a) => a);
+    const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
+    const idx = value - 1;
+    if (idx > -1) {
+      const optionIdx = selectedItems?.[idx];
+      const option = data?.data?.[optionIdx ?? idx];
+
+      if (option) {
+        if (option?.suboptions?.length) {
+          const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`, true);
+          const subIdx = subOptionRoll - 1;
+          const subOption = option.suboptions[subIdx];
+          if (subOption) {
+            createNotification({
+              title: `${option.title} - ${subOption.title}`,
+              timer: 15,
+              description: `${option?.description || ""} ${subOption?.description || ""}`,
+              variant: "info",
+              icon: IconEnum.d20,
+              hasTitleBorder: true,
+              position: "top",
+            });
+          } else {
+            createNotification({
+              title: option.title,
+              timer: 15,
+              description: option?.description || "",
+              variant: "info",
+              icon: IconEnum.d20,
+              hasTitleBorder: true,
+              position: "top",
+            });
+          }
+        } else {
+          createNotification({
+            title: option.title,
+            timer: 15,
+            description: option?.description || "",
+            variant: "info",
+            icon: IconEnum.d20,
+            hasTitleBorder: true,
+            position: "top",
+          });
+        }
+      }
+    }
+  }, []);
+
+  function handleOpenNew() {
+    setDrawer((prev) => ({
+      ...prev,
+      data: { project_id, parent_id: item_id as string },
+      title: "Create new options",
+      type: "random_table_options",
+      size: "lg",
+    }));
+  }
+
   return (
     <TablePageLayout>
       <div className="top-0 flex w-full items-center justify-end gap-x-2">
@@ -130,72 +189,13 @@ export function RandomTableView() {
             icon={IconEnum.d20}
             isDisabled={!data?.data?.length}
             label="Roll on table"
-            onClick={async () => {
-              const selectedItems = Object.values(selection || {}).flatMap((a) => a);
-              const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
-              const idx = value - 1;
-              if (idx > -1) {
-                const optionIdx = selectedItems?.[idx];
-                const option = data?.data?.[optionIdx ?? idx];
-
-                if (option) {
-                  if (option?.suboptions?.length) {
-                    const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`, true);
-                    const subIdx = subOptionRoll - 1;
-                    const subOption = option.suboptions[subIdx];
-                    if (subOption) {
-                      createNotification({
-                        title: `${option.title} - ${subOption.title}`,
-                        timer: 15,
-                        description: `${option?.description || ""} ${subOption?.description || ""}`,
-                        variant: "info",
-                        icon: IconEnum.d20,
-                        hasTitleBorder: true,
-                        position: "top",
-                      });
-                    } else {
-                      createNotification({
-                        title: option.title,
-                        timer: 15,
-                        description: option?.description || "",
-                        variant: "info",
-                        icon: IconEnum.d20,
-                        hasTitleBorder: true,
-                        position: "top",
-                      });
-                    }
-                  } else {
-                    createNotification({
-                      title: option.title,
-                      timer: 15,
-                      description: option?.description || "",
-                      variant: "info",
-                      icon: IconEnum.d20,
-                      hasTitleBorder: true,
-                      position: "top",
-                    });
-                  }
-                }
-              }
-            }}
+            onClick={rollOnTable}
             tooltip={Object.values(selection || {})?.length > 0 ? "Roll from selected." : ""}
             variant="info"
           />
         </div>
         <div className="w-fit">
-          <Button
-            icon={IconEnum.add}
-            label="Create new options"
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: { project_id, parent_id: item_id },
-                title: "Create new options",
-                type: "random_table_options",
-                size: "lg",
-              }))
-            }
-          />
+          <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />
         </div>
       </div>
       <div className="h-full max-h-[85%] w-full overflow-hidden">
