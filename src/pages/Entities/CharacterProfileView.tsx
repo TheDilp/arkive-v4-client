@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { tv } from "tailwind-variants";
 
-import { Alert, Avatar, Tabs, Title } from "../../components";
-import { useGetEntities, useGetEntity } from "../../hooks";
+import { Alert, Avatar, Editor, Tabs, Title } from "../../components";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterFieldValueType, CharacterType } from "../../types";
 import { getCharacterFullName, getImageURL, IconEnum, sortEntities } from "../../utils";
 
@@ -14,6 +15,19 @@ const tabs = [
   { id: "5", label: "Images", icon: IconEnum.image },
 ];
 
+const fieldSizeClass = tv({
+  base: "flex flex-col text-center mt-1",
+  variants: {
+    type: {
+      dice_roll: "col-span-1 p-1 bg-zinc-600 rounded shadow-sm",
+      text: "col-span-2",
+      select: "col-span-2",
+      number: "col-span-2",
+      textarea: "col-span-6",
+    },
+  },
+});
+
 function AdditionalFieldDisplay({
   character_fields,
   character_field_data,
@@ -22,26 +36,32 @@ function AdditionalFieldDisplay({
   character_field_data: CharacterFieldValueType[];
 }) {
   return (
-    <div className="grid grid-cols-6">
+    <div className="grid grid-cols-6 gap-2 ">
       {character_fields.map((field) => {
-        const fieldTitle = character_fields.find((f) => f.id === field.id)?.title;
-        if (fieldTitle)
-          return (
-            <div key={field?.id}>
-              <div className="col-span-1 flex flex-col">
-                <Title label={fieldTitle} size="sm" />
-              </div>
-            </div>
-          );
-        return null;
-      })}
-      {character_field_data.map((field) => (
-        <div key={field?.id}>
-          <div className="col-span-1 flex flex-col">
-            <Title label={(field.value.value as string) || ""} size="sm" />
+        const fieldData = character_field_data.find((f) => f.id === field.id);
+        const value =
+          fieldData?.value && fieldData?.value?.value
+            ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
+            : "";
+        const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
+
+        return (
+          <div key={field?.id} className={fieldClasses}>
+            <Title label={field.title} size="xl" />
+            {(field.field_type === "text" ||
+              field.field_type === "number" ||
+              field.field_type === "dice_roll" ||
+              field.field_type === "select" ||
+              field.field_type === "select_multiple") &&
+            value ? (
+              <Title label={value || ""} size="sm" />
+            ) : null}
+            {field.field_type === "textarea" && value ? (
+              <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
+            ) : null}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -53,6 +73,14 @@ export function CharacterProfileView() {
     data: {},
     relations: { tags: true, character_fields: true },
   });
+  useChangeNavbarTitle(
+    `The Arkive | Characters | ${getCharacterFullName(
+      existingCharacter?.data?.first_name || "",
+      undefined,
+      existingCharacter?.data?.last_name,
+    )}`,
+    !!existingCharacter?.data,
+  );
   const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     { data: { project_id }, fields: ["id", "title"], relations: { character_fields: true } },
     "character_fields_templates",
@@ -60,10 +88,11 @@ export function CharacterProfileView() {
   );
   if (isFetching || isFetchingTemplates) return null;
   return (
-    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-x-4 p-4">
+    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-x-4 overflow-hidden p-4 pb-16">
       <div className="col-span-1 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-900 p-4">
         <Avatar
           image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+          isTooltipDisabled
           label={getCharacterFullName(
             existingCharacter?.data?.first_name as string,
             existingCharacter?.data?.nickname || "",
@@ -84,12 +113,12 @@ export function CharacterProfileView() {
           <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
         </div>
       </div>
-      <div className="col-span-4 h-full rounded-lg bg-zinc-800 p-4">
+      <div className="col-span-4 h-full overflow-y-auto rounded-lg bg-zinc-800 p-4">
         <ul className="flex flex-col gap-y-2 overflow-y-auto">
           {existingTemplates?.data?.length ? (
             existingTemplates?.data?.sort(sortEntities)?.map(
               (t) => (
-                <div key={t.id} className="flex flex-col gap-y-2">
+                <div key={t.id} className="flex flex-col">
                   <Title isDrawerTitle label={t.title} size="2xl" />
                   <AdditionalFieldDisplay
                     character_field_data={

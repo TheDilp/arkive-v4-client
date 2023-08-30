@@ -1,16 +1,11 @@
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 
+import { EditorType } from "../../../types";
 import { DefaultEditorExtensions, onError, useNotifications } from "../../../utils";
 import { MentionDropdownComponent } from ".";
 import { Menubar } from "./Menubar";
 
-type Props = {
-  initialContent: string;
-  name: string;
-  onChange: ({ name, value }: { name: string; value: any }) => void;
-};
-
-export function Editor({ initialContent, name, onChange }: Props) {
+export function Editor({ initialContent, name, onChange, isReadOnly }: EditorType) {
   const createNotification = useNotifications();
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),
@@ -20,11 +15,12 @@ export function Editor({ initialContent, name, onChange }: Props) {
   });
   return (
     <Remirror
-      editable
+      editable={!isReadOnly}
       hooks={[]}
       initialContent={state}
       manager={manager}
       onChange={(params) => {
+        if (isReadOnly) return;
         if (params.firstRender) {
           return;
         }
@@ -32,10 +28,11 @@ export function Editor({ initialContent, name, onChange }: Props) {
           onChange({ name, value: params.state.toJSON()?.doc });
       }}>
       <div className="editor-component relative flex h-full w-full max-w-full flex-1 flex-col rounded border border-zinc-800 bg-zinc-900 py-0">
-        <Menubar />
+        {isReadOnly ? null : <Menubar />}
         <div
           className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {
+            if (isReadOnly) return;
             const stringData = e.dataTransfer.getData("Text");
             if (!stringData) return;
             if (stringData) {
@@ -45,8 +42,7 @@ export function Editor({ initialContent, name, onChange }: Props) {
             }
           }}>
           <EditorComponent />
-          <MentionDropdownComponent />
-          {/* <CommandMenu /> */}
+          {isReadOnly ? null : <MentionDropdownComponent />}
         </div>
       </div>
     </Remirror>

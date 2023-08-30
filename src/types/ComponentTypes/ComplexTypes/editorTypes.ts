@@ -6,3 +6,10 @@ export type EditorContext = ReactFrameworkOutput<ReactExtensions<AnyExtension>> 
 export interface MenubarType {
   editorContext: EditorContext;
 }
+
+export interface EditorType {
+  initialContent: string;
+  name: string;
+  onChange: ({ name, value }: { name: string; value: any }) => void;
+  isReadOnly?: boolean;
+}
