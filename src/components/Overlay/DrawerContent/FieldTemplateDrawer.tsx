@@ -91,7 +91,14 @@ function FieldRow({
           />
         </div>
         <div className="h-full w-20">
-          <Input label="Sort weight" name={`[${index}].sort`} onChange={changeField} placeholder="Eg. 10" value={sort} />
+          <Input
+            label="Sort weight"
+            name={`[${index}].sort`}
+            onChange={changeField}
+            placeholder="Eg. 10"
+            type="number"
+            value={sort ?? 0}
+          />
         </div>
         {field_type === "select" || field_type === "select_multiple" ? (
           <div className="h-10 w-8 self-end">
