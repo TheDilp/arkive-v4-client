@@ -6,6 +6,7 @@ const TitleClasses = tv({
   base: "font-lato text-white",
   variants: {
     size: {
+      sm: "text-sm",
       md: "text-base",
       lg: "text-lg",
       xl: "text-xl",
