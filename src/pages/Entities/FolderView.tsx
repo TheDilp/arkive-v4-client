@@ -350,7 +350,7 @@ export function FolderView() {
               type={type as AvailableEntityType}
             />
           ))}
-          {!base?.data?.length && !data?.data?.children?.length && data?.data?.is_folder ? (
+          {!base?.data?.length && !data?.data?.children?.length ? (
             <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
             </div>
