@@ -78,14 +78,14 @@ export function RandomTableDrawer({ data }: Props) {
         onClick={async () => {
           if (changedData) {
             if (randomTable?.id) {
-              const parsed = UpdateRandomTableSchema.parse(randomTable);
+              const parsed = UpdateRandomTableSchema.parse({ data: randomTable });
               await update(parsed, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
                 },
               });
             } else {
-              const parsed = InsertRandomTableSchema.parse(randomTable);
+              const parsed = InsertRandomTableSchema.parse({ data: randomTable });
               await create(parsed, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();

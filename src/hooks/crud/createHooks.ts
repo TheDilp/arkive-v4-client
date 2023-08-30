@@ -135,7 +135,9 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
   );
 }
 
-export function useCreateSubEntities<InsertType extends { data: { parent_id: string } }[]>(type: AvailableSubEntityType) {
+export function useCreateSubEntities<InsertType extends { data: { data: { parent_id: string } }[] }>(
+  type: AvailableSubEntityType,
+) {
   return useMutation(async (updateItemValues: InsertType) => {
     return FetchFunction({
       url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,

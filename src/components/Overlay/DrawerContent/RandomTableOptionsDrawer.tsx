@@ -16,8 +16,9 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
     [],
   );
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create, isLoading: isCreating } =
-    useCreateSubEntities<InsertRandomTableOptionType[]>("random_table_options");
+  const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{ data: InsertRandomTableOptionType[] }>(
+    "random_table_options",
+  );
   const { handleChange } = useHandleChange({ data: options, setData: setOptions });
   return (
     <div className="flex h-full flex-col gap-y-2">
@@ -68,17 +69,20 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
             const optionsToCreate = options.map((opt) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { id, ...rest } = opt;
-              return rest;
+              return { data: rest };
             });
             const parsedData = InsertRandomTableOptionSchema.array().parse(optionsToCreate);
-            await create(parsedData, {
-              onSuccess: (res) => {
-                if (res?.ok) {
-                  queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
-                  resetDrawerAtom();
-                }
+            await create(
+              { data: parsedData },
+              {
+                onSuccess: (res) => {
+                  if (res?.ok) {
+                    queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
+                    resetDrawerAtom();
+                  }
+                },
               },
-            });
+            );
           }}
           variant="success"
         />
