@@ -33,6 +33,7 @@ export default function App() {
               <Route element={<SettingsView />} path="settings/:type/*" />
               <Route element={<FolderView />} path=":type" />
               <Route element={<EntitiesView />} path=":type/:item_id/*" />
+              <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
               <Route element={<FolderView />} path=":type/folder/:item_id/*" />
             </Route>
           </Route>
