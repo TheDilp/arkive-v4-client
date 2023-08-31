@@ -61,7 +61,7 @@ summary::-webkit-details-marker {
 details {
   @apply cursor-pointer;
 }
-details[open] summary svg {
+details[open] summary :not(.no-rotate) > svg {
   @apply rotate-180 cursor-pointer;
 }
 

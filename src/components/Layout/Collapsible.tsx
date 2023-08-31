@@ -4,11 +4,14 @@ import { CollapsibleType } from "../../types";
 import { IconEnum } from "../../utils";
 import { Button, Icon } from "..";
 
-export function Collapsible({ label, initialOpen, children, actions }: CollapsibleType) {
+export function Collapsible({ label, icon, initialOpen, children, actions }: CollapsibleType) {
   return (
     <details className="cursor-default select-none" open={initialOpen}>
       <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1">
-        <span className="select-none text-xl">{label}</span>
+        <span className="flex select-none items-center gap-x-2 text-xl">
+          <span className="no-rotate">{icon ? <Icon icon={icon} /> : null}</span>
+          {label} asdasdasd
+        </span>
         <span className="ml-auto">
           <Icon fontSize={28} icon={IconEnum.chevron_up} />
         </span>
