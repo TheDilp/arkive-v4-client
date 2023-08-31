@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { Alert, Avatar, Collapsible, Editor, Skeleton, Tabs, Title } from "../../components";
@@ -143,13 +143,26 @@ export function CharacterProfileView() {
       ) : (
         <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           {selectedTab === 0 ? (
-            <ul className="animate-in fade-in fill-mode-both">
-              {existingCharacter?.data?.locations ? (
-                existingCharacter.data.locations.map((location) => <span>{location.title}</span>)
-              ) : (
-                <Alert label="There is no content." variant="info" />
-              )}
-            </ul>
+            <div className="flex flex-col gap-y-2">
+              {/* <Collapsible icon={IconEnum.document} initialOpen={false} label="Documents"></Collapsible> */}
+
+              <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+                <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
+                  {existingCharacter?.data?.locations ? (
+                    existingCharacter.data.locations.map((location) => (
+                      <div
+                        key={location.id}
+                        className="flex w-full items-center gap-x-2 rounded bg-zinc-800 p-2 hover:text-blue-300">
+                        <Avatar image={getImageURL(project_id as string, "maps", location.image_id)} label={location.title} />
+                        <Link to={`/projects/${project_id}/maps/${location.id}/${location.map_pin_id}`}>{location.title}</Link>
+                      </div>
+                    ))
+                  ) : (
+                    <Alert label="There is no content." variant="info" />
+                  )}
+                </ul>
+              </Collapsible>
+            </div>
           ) : null}
           {selectedTab === 2 ? (
             <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
