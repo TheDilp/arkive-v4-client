@@ -10,7 +10,7 @@ export function Collapsible({ label, icon, initialOpen, children, actions }: Col
       <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1">
         <span className="flex select-none items-center gap-x-2 text-xl">
           <span className="no-rotate">{icon ? <Icon icon={icon} /> : null}</span>
-          {label} asdasdasd
+          {label}
         </span>
         <span className="ml-auto">
           <Icon fontSize={28} icon={IconEnum.chevron_up} />
