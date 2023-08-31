@@ -1,8 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
+import groupBy from "lodash.groupby";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { flattenArray } from "remirror";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import {
@@ -36,15 +38,13 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import Alert from "../../Misc/Alert";
 
-type characterRelationsType = {
-  character_fields?: { id: string; value: { value: string | string[] | number; subOptionValue?: string } }[];
-  related_to?: { id: string; relation_type: string }[];
-  related_from?: { id: string; relation_type: string }[];
-  tags?: { id: string }[];
-  image?: { id: string | null };
+type CharacterStateCharacterFieldsType = Record<string, CharacterFieldValueType[]>;
+
+type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
+  character_fields?: CharacterStateCharacterFieldsType;
 };
 
-function isSaveDisabled(character: Partial<CharacterType> & characterRelationsType) {
+function isSaveDisabled(character: CharacterStateType) {
   if (!character?.first_name) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type)) return true;
@@ -66,15 +66,17 @@ function RandomTableInput({
   random_table_id,
   isRolling,
   random_table,
+  template_id,
   handleChange,
 }: Omit<CharacterFieldType, "project_id" | "sort"> & {
   index: number;
   currentValue: string | string[] | number | undefined;
   isRolling: boolean;
+  template_id: string;
   subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `character_fields[${index}]`;
+  const name = `character_fields.${template_id}[${index}]`;
 
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -160,17 +162,19 @@ function CharacterFieldInputs({
   random_table,
   isRolling,
   subOptionValue,
+  template_id,
   handleChange,
   createNotification,
 }: CharacterFieldType & {
   index: number;
   value: string | string[] | number | undefined;
   subOptionValue?: string;
+  template_id: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
-  const name = `character_fields[${index}]`;
+  const name = `character_fields.${template_id}[${index}]`;
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -220,7 +224,7 @@ function CharacterFieldInputs({
           isLoading={isRolling}
           label={title}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value } })}
+          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">
@@ -278,6 +282,7 @@ function CharacterFieldInputs({
         random_table_id={random_table_id}
         random_table_options={random_table_options}
         subOptionValue={subOptionValue}
+        template_id={template_id}
         title={title}
       />
     );
@@ -344,25 +349,19 @@ function RelationshipRow({
 }
 
 function FieldTemplateRow({
-  id,
+  template_id,
   title,
   character_fields = [],
-  character_fields_data = [],
-  selectedTemplates,
+  character_fields_data = {},
   createNotification,
   handleChange,
 }: {
-  id: string;
+  template_id: string;
   title: string;
   character_fields?: CharacterFieldType[] | undefined;
-  character_fields_data?: {
-    id: string;
-    value: { id: string; value: string | number | string[]; subOptionValue?: string };
-    template_id: string;
-  }[];
+  character_fields_data?: CharacterStateCharacterFieldsType;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
-  selectedTemplates: string[];
 }) {
   const [isRolling, setIsRolling] = useState(false);
   const randomTableFields = character_fields
@@ -374,7 +373,7 @@ function FieldTemplateRow({
     .map((field) => ({ field_id: field.id, formula: field?.formula }));
 
   const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
-    ["randomTables", "many", id],
+    ["randomTables", "many", template_id],
     async () =>
       FetchFunction({
         url: `${baseURLS.baseServer}/random_table_options/random/many`,
@@ -404,7 +403,7 @@ function FieldTemplateRow({
                   // eslint-disable-next-line no-await-in-loop
                   const value = await getRollValue(formula, true);
                   fieldsToChange.push({
-                    name: `character_fields[${idx}]`,
+                    name: `character_fields.${template_id}[${idx}]`,
                     value: { id: diceRollFields[i].field_id, value: { value } },
                   });
                 }
@@ -426,7 +425,7 @@ function FieldTemplateRow({
         const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
         if (idx > -1) {
           fieldsToChange.push({
-            name: `character_fields[${idx}]`,
+            name: `character_fields.${template_id}[${idx}]`,
             value: {
               id: character_fields[idx].id,
               value: {
@@ -442,10 +441,12 @@ function FieldTemplateRow({
   }, [data?.data]);
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
-      <Collapsible actions={collapsibleActions} initialOpen={selectedTemplates.includes(id)} label={title}>
+      <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
         <div className="flex select-none flex-col gap-y-2 pt-2">
           {character_fields.sort(sortEntities).map((template_field) => {
-            const fieldValueIndex = (character_fields_data || [])?.findIndex((field) => template_field?.id === field?.id);
+            const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
+              (field) => template_field?.id === field?.id,
+            );
             if (fieldValueIndex !== undefined)
               return (
                 <CharacterFieldInputs
@@ -454,10 +455,11 @@ function FieldTemplateRow({
                   createNotification={createNotification}
                   formula={template_field?.formula}
                   handleChange={handleChange}
-                  index={fieldValueIndex === -1 ? character_fields_data?.length ?? 0 : fieldValueIndex}
+                  index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
                   isRolling={isRolling}
-                  subOptionValue={character_fields_data?.[fieldValueIndex]?.value?.subOptionValue}
-                  value={character_fields_data?.[fieldValueIndex]?.value?.value || ""}
+                  subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
+                  template_id={template_id}
+                  value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
                 />
               );
             return null;
@@ -474,7 +476,6 @@ export function AdditionalFieldsTab({
   createNotification,
   handleChange,
   character_fields,
-  selectedTemplates,
   isLoading,
 }: {
   templates:
@@ -482,10 +483,9 @@ export function AdditionalFieldsTab({
         data: CharacterFieldTemplateType[];
       }
     | undefined;
-  character_fields?: CharacterFieldValueType[] | undefined;
+  character_fields?: CharacterStateCharacterFieldsType | undefined;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
-  selectedTemplates: string[];
   isLoading: boolean;
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
@@ -501,8 +501,7 @@ export function AdditionalFieldsTab({
               character_fields_data={character_fields}
               createNotification={createNotification}
               handleChange={handleChange}
-              id={t?.id}
-              selectedTemplates={selectedTemplates}
+              template_id={t?.id}
               title={t?.title}
             />
           ))
@@ -543,9 +542,7 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
     },
   );
 
-  const [character, setCharacter] = useState<Partial<CharacterType> & { project_id: string }>(
-    existingCharacter?.data || { project_id: project_id as string },
-  );
+  const [character, setCharacter] = useState<CharacterStateType>({ project_id: project_id as string });
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
@@ -558,14 +555,16 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
       enabled: selectedTab === 2,
     },
   );
-  const selectedTemplates = [...new Set((character?.character_fields || []).map((field) => field?.template_id))];
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
 
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
-
-      setCharacter(existingCharacter?.data);
+      const fieldsByTemplateId = groupBy(existingCharacter?.data?.character_fields || [], "template_id") as Record<
+        string,
+        CharacterFieldValueType[]
+      >;
+      setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
     }
   }, [existingCharacter?.data]);
 
@@ -711,7 +710,6 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
           createNotification={createNotification}
           handleChange={handleChange}
           isLoading={isFetching}
-          selectedTemplates={selectedTemplates}
           templates={templates}
         />
       ) : null}
@@ -772,9 +770,15 @@ export function CharacterDrawer({ data }: { data: { id?: string } }) {
             if (character?.id) {
               const characterToUpdate = { ...(changedData || {}), id: character.id };
               const { related_to, related_from, tags, ...rest } = characterToUpdate;
+
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
-                relations: { character_fields: character?.character_fields || [], related_from, related_to, tags },
+                relations: {
+                  character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
+                  related_from,
+                  related_to,
+                  tags,
+                },
               });
 
               await update(parsedData, {
