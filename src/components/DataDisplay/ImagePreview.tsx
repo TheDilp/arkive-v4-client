@@ -13,18 +13,20 @@ export function ImagePreview({ id, title, url, clearAction }: ImagePreviewType) 
         <Avatar image={id ? getImageURL(project_id as string, "images", id) : url} label={title} />
       </div>
       <div className="ml-2 truncate font-lato">{title}</div>
-      <div className="ml-auto">
-        <Button
-          hasNoBackground
-          icon={IconEnum.close}
-          iconSize={24}
-          onClick={() => {
-            if (id) clearAction(id);
-            else if (url) clearAction(url);
-          }}
-          tooltip="Remove image"
-        />
-      </div>
+      {clearAction ? (
+        <div className="ml-auto">
+          <Button
+            hasNoBackground
+            icon={IconEnum.close}
+            iconSize={24}
+            onClick={() => {
+              if (id) clearAction(id);
+              else if (url) clearAction(url);
+            }}
+            tooltip="Remove image"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
