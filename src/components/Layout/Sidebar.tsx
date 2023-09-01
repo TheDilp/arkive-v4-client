@@ -49,7 +49,7 @@ export function Sidebar() {
             return (
               <Link
                 key={item.icon}
-                className={`${listItemLink()} ${item.navigate === type ? "sticky left-16 top-16 bg-blue-400" : ""}`}
+                className={`${listItemLink()} ${item.navigate === type ? "sticky top-16 bg-blue-400" : ""}`}
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
                 <Tooltip allowedPlacements={["right"]} content={item.tooltip}>
                   <li className={listItem()}>
