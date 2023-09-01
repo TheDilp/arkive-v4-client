@@ -1,5 +1,5 @@
 import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch, useCallback } from "react";
+import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
@@ -99,7 +99,7 @@ export function RandomTableView() {
     },
   );
 
-  const rollOnTable = useCallback(async () => {
+  async function rollOnTable() {
     const selectedItems = Object.values(selection || {}).flatMap((a) => a);
     const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
     const idx = value - 1;
@@ -146,7 +146,7 @@ export function RandomTableView() {
         }
       }
     }
-  }, []);
+  }
 
   function handleOpenNew() {
     setDrawer((prev) => ({
