@@ -1,10 +1,12 @@
 import { useParams } from "react-router-dom";
+import { RemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
-import { useGetEntities } from "../../../hooks";
-import { CharacterFieldType, TableType } from "../../../types";
+import { useGetEntities, useGetEntity } from "../../../hooks";
+import { CharacterFieldType, DocumentType, TableType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getSentenceCase } from "../../../utils";
+import { StaticRender } from "../../Complex";
 import { Badge } from "../../Misc/Badge";
 
 const ExpandedTableRowClasses = tv({
@@ -78,12 +80,35 @@ function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOption
     </div>
   );
 }
+function ExpandedDocument({ id }: { id: string }) {
+  const { data } = useGetEntity<DocumentType>(
+    id,
+    "documents",
+    {
+      data: {
+        id,
+      },
+      fields: ["id", "content"],
+    },
+    {
+      enabled: !!id,
+    },
+  );
+  return data?.data?.content ? (
+    <div className="w-min min-w-fit">
+      <StaticRender content={data?.data?.content as RemirrorJSON} />
+    </div>
+  ) : null;
+}
 
 export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
   return (
     <div className={ExpandedTableRowClasses()}>
+      {type === "documents" ? <ExpandedDocument id={data?.id} /> : null}
+
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
       {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
+      {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}
       {type === "random_table_options" ? <ExpandedRandomOption suboptions={data?.suboptions || []} /> : null}
     </div>
   );
