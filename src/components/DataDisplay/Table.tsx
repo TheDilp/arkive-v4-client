@@ -56,7 +56,7 @@ const TableClasses = tv({
     rowContainer: "flex flex-col",
     row: "flex flex-1 min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato",
     selectedRow: "bg-blue-400",
-    content: "flex flex-1 items-center h-full truncate max-w-full px-2 box-border border-zinc-600 border-r last:border-r-0",
+    content: "flex flex-1 items-center truncate max-w-full px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
       "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
