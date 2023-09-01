@@ -200,6 +200,7 @@ const menuBarItems = ({
       setDrawer({
         data: { getContext },
         type: "insert_image",
+        title: "Insert image",
         size: "md",
       }),
   },
