@@ -52,3 +52,12 @@ export interface CharacterType {
     portrait_id?: string;
   }[];
 }
+
+export interface CharacterRelationType {
+  id: string;
+  first_name: string;
+  nickname?: string;
+  last_name?: string;
+  portrait_id?: string;
+  relation_type: string;
+}

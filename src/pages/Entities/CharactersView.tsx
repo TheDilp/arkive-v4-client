@@ -314,8 +314,7 @@ export function CharactersView() {
                 id={char?.id}
                 is_favorite={char?.is_favorite}
                 last_name={char?.last_name}
-                portrait={char?.portrait}
-                project_id={char?.project_id}
+                portrait_id={char?.portrait_id}
               />
             )),
           )}

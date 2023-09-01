@@ -1,12 +1,41 @@
 import { useSetAtom } from "jotai";
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Alert, Avatar, Button, CharacterPreview, Collapsible, Editor, Skeleton, Tabs, Title } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
-import { CharacterFieldTemplateType, CharacterFieldType, CharacterFieldValueType, CharacterType } from "../../types";
-import { dialogAtom, getCharacterFullName, getImageURL, getSentenceCase, IconEnum, sortEntities } from "../../utils";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Collapsible,
+  createColumnHelper,
+  Dropdown,
+  Editor,
+  Skeleton,
+  Table,
+  TablePageLayout,
+  Tabs,
+  Title,
+} from "../../components";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import {
+  CharacterFieldTemplateType,
+  CharacterFieldType,
+  CharacterFieldValueType,
+  CharacterRelationType,
+  CharacterType,
+} from "../../types";
+import {
+  dialogAtom,
+  getAvatarInitials,
+  getCharacterFullName,
+  getImageURL,
+  getSentenceCase,
+  IconEnum,
+  sortEntities,
+} from "../../utils";
+
+const columnHelper = createColumnHelper<CharacterRelationType>();
 
 const tabs = [
   { id: "1", label: "Links", icon: IconEnum.map_pin },
@@ -28,6 +57,70 @@ const fieldSizeClass = tv({
     },
   },
 });
+
+const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction) => [
+  columnHelper.display({
+    id: "portrait_id",
+    header: "Portrait",
+    cell: ({ row }) => (
+      <div className="flex w-full items-center justify-center">
+        <Avatar
+          image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
+          initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
+          isBordered
+          isTooltipDisabled
+          label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
+          size="sm"
+        />
+      </div>
+    ),
+    minSize: 5,
+    maxSize: 5,
+  }),
+  columnHelper.display({
+    id: "first_name",
+    header: "First name",
+    cell: ({ row }) => row.original.first_name,
+  }),
+  columnHelper.display({
+    id: "last_name",
+    header: "Last name",
+    cell: ({ row }) => row.original.last_name,
+  }),
+  columnHelper.display({
+    id: "nickname",
+    header: "Nickname",
+    cell: ({ row }) => row.original?.nickname,
+  }),
+  columnHelper.display({
+    id: "relation_type",
+    header: "Relation",
+    cell: ({ row }) => getSentenceCase(row.original?.relation_type),
+  }),
+  columnHelper.display({
+    id: "action",
+    header: "Actions",
+    meta: {
+      centered: true,
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">
+        <Dropdown
+          allowedPlacements={["left", "left-start", "left-end"]}
+          items={[
+            {
+              id: "1",
+              label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+              icon: IconEnum.edit,
+              onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+            },
+          ]}>
+          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+        </Dropdown>
+      </div>
+    ),
+  }),
+];
 
 function AdditionalFieldDisplay({
   character_fields,
@@ -95,6 +188,19 @@ export function CharacterProfileView() {
     data: {},
     relations: { tags: true, character_fields: true, locations: true, relationships: true },
   });
+
+  const navigate = useNavigate();
+
+  const relationships = [
+    ...(existingCharacter?.data?.related_to || []),
+    ...(existingCharacter?.data?.related_from?.map((relation) => ({
+      ...relation,
+      relation_type:
+        relation.relation_type === "father" || relation.relation_type === "mother" ? "child" : relation.relation_type,
+    })) || []),
+    ...(existingCharacter?.data?.siblings?.map((sibling) => ({ ...sibling, relation_type: "sibling" })) || []),
+  ];
+
   useChangeNavbarTitle(
     `The Arkive | Characters | ${getCharacterFullName(
       existingCharacter?.data?.first_name || "",
@@ -103,6 +209,8 @@ export function CharacterProfileView() {
     )}`,
     !!existingCharacter?.data,
   );
+
+  const [, dispatch] = useTable({});
 
   const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     { data: { project_id }, fields: ["id", "title"], relations: { character_fields: true } },
@@ -124,12 +232,14 @@ export function CharacterProfileView() {
       });
   }
 
+  const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
+
   return (
     <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-4 overflow-hidden p-4 pb-16">
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
-        <div className="col-span-5 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+        <div className="col-span-5 flex h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
           <Avatar
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
             isTooltipDisabled
@@ -157,7 +267,7 @@ export function CharacterProfileView() {
       {isFetchingTemplates ? (
         <Skeleton type="character_profile_main" />
       ) : (
-        <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <div className="col-span-5 overflow-y-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           {selectedTab === 0 ? (
             <div className="flex flex-col gap-y-2">
               {/* <Collapsible icon={IconEnum.document} initialOpen={false} label="Documents"></Collapsible> */}
@@ -181,37 +291,16 @@ export function CharacterProfileView() {
             </div>
           ) : null}
           {selectedTab === 1 ? (
-            <div className="flex flex-col gap-y-2">
+            <TablePageLayout>
               <div className="flex w-full">
                 <div className="ml-auto w-min">
                   <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} variant="info" />
                 </div>
               </div>
-              <div className="flex flex-col divide-y divide-zinc-700">
-                {[...(existingCharacter?.data?.related_to || []), ...(existingCharacter?.data?.related_from || [])].map(
-                  (char) => (
-                    <div key={char?.id} className="flex items-center">
-                      <CharacterPreview
-                        character_name={getCharacterFullName(char.first_name, char?.nickname, char?.last_name)}
-                        id={char?.id}
-                        image_id={char?.portrait_id}
-                      />
-                      <span> - {getSentenceCase(char?.relation_type || "")}</span>
-                    </div>
-                  ),
-                )}
-                {(existingCharacter?.data?.siblings || []).map((char) => (
-                  <div key={char?.id} className="flex items-center">
-                    <CharacterPreview
-                      character_name={getCharacterFullName(char.first_name, char?.nickname, char?.last_name)}
-                      id={char?.id}
-                      image_id={char?.portrait_id}
-                    />
-                    <span> - Sibling</span>
-                  </div>
-                ))}
+              <div className="h-full max-h-[85%] w-full overflow-hidden">
+                <Table columns={columns} data={relationships} dispatch={dispatch} type="characters" />
               </div>
-            </div>
+            </TablePageLayout>
           ) : null}
           {selectedTab === 2 ? (
             <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
