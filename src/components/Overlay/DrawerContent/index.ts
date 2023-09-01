@@ -1,3 +1,4 @@
+export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
 export * from "./DocumentDrawer";
 export * from "./EdgeDrawer";

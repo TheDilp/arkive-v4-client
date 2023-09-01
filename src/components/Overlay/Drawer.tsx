@@ -8,6 +8,7 @@ import { drawerAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
+  CharacterAddDrawer,
   CharacterDrawer,
   DocumentDrawer,
   EdgeDrawer,
@@ -134,6 +135,7 @@ export function Drawer() {
         {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
         {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
         {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
+        {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );

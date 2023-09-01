@@ -66,6 +66,8 @@ export type DrawerAtomType = {
   | { type: "tags"; data: TagType }
   | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
   | { type: "map_pin_management"; data: { map_id: string } }
+  | { type: "character_add"; data: { id: string; type: "documents" | "images" } }
+  | { type: null; data: null }
 );
 
 export interface ContextMenuAtomType {
