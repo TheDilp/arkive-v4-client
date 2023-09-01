@@ -12,28 +12,28 @@ export function Collapsible({ label, icon, initialOpen, children, actions }: Col
           <span className="no-rotate">{icon ? <Icon icon={icon} /> : null}</span>
           {label}
         </span>
-        <span className="ml-auto">
+        <span className="ml-auto flex flex-nowrap gap-x-1">
+          {actions?.length
+            ? actions.map((act) => (
+                <div
+                  key={act.label || act.icon}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}>
+                  <Button
+                    hasNoBackground
+                    icon={act?.icon}
+                    label={act?.label}
+                    onClick={act.onClick}
+                    tooltip={act?.tooltip}
+                    variant={act?.variant}
+                  />
+                </div>
+              ))
+            : null}
           <Icon fontSize={28} icon={IconEnum.chevron_up} />
         </span>
-        {actions?.length
-          ? actions.map((act) => (
-              <div
-                key={act.label || act.icon}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}>
-                <Button
-                  hasNoBackground
-                  icon={act?.icon}
-                  label={act?.label}
-                  onClick={act.onClick}
-                  tooltip={act?.tooltip}
-                  variant={act?.variant}
-                />
-              </div>
-            ))
-          : null}
       </summary>
       <div
         onClick={(e) => {
