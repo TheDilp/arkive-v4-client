@@ -24,9 +24,11 @@ import {
   CharacterFieldValueType,
   CharacterRelationType,
   CharacterType,
+  DocumentType,
 } from "../../types";
 import {
   dialogAtom,
+  drawerAtom,
   getAvatarInitials,
   getCharacterFullName,
   getImageURL,
@@ -35,10 +37,11 @@ import {
   sortEntities,
 } from "../../utils";
 
-const columnHelper = createColumnHelper<CharacterRelationType>();
+const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
+const documentsColumnHelper = createColumnHelper<DocumentType>();
 
 const tabs = [
-  { id: "1", label: "Links", icon: IconEnum.map_pin },
+  { id: "1", label: "Resources", icon: IconEnum.document },
   { id: "2", label: "Relationships", icon: IconEnum.family_tree },
   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
   { id: "4", label: "Images", icon: IconEnum.image },
@@ -59,7 +62,7 @@ const fieldSizeClass = tv({
 });
 
 const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction) => [
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "portrait_id",
     header: "Portrait",
     cell: ({ row }) => (
@@ -77,27 +80,27 @@ const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction
     minSize: 5,
     maxSize: 5,
   }),
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "first_name",
     header: "First name",
     cell: ({ row }) => row.original.first_name,
   }),
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "last_name",
     header: "Last name",
     cell: ({ row }) => row.original.last_name,
   }),
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "nickname",
     header: "Nickname",
     cell: ({ row }) => row.original?.nickname,
   }),
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "relation_type",
     header: "Relation",
     cell: ({ row }) => getSentenceCase(row.original?.relation_type),
   }),
-  columnHelper.display({
+  relationshipColumnHelper.display({
     id: "action",
     header: "Actions",
     meta: {
@@ -113,6 +116,42 @@ const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction
               label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
               icon: IconEnum.edit,
               onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+            },
+          ]}>
+          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+        </Dropdown>
+      </div>
+    ),
+  }),
+];
+
+const documentsTableColumns = () => [
+  documentsColumnHelper.display({
+    id: "title",
+    header: "Title",
+    cell: ({ row }) => row.original.title,
+  }),
+  documentsColumnHelper.display({
+    id: "action",
+    header: "Actions",
+    meta: {
+      centered: true,
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">
+        <Dropdown
+          allowedPlacements={["left", "left-start", "left-end"]}
+          items={[
+            {
+              id: "expand",
+              label: `${!row.getIsExpanded() ? "Show" : "Hide"} content`,
+              icon: IconEnum.document,
+              onClick: row.getToggleExpandedHandler(),
+            },
+            {
+              id: "2",
+              label: "Unlink document from character",
+              icon: IconEnum.trash,
             },
           ]}>
           <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
@@ -183,13 +222,14 @@ function AdditionalFieldDisplay({
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
     item_id,
     "characters",
     {
       data: {},
-      relations: { tags: true, character_fields: true, locations: true, relationships: true },
+      relations: { tags: true, character_fields: true, locations: true, relationships: true, documents: true },
     },
     {
       staleTime: 60 * 1000,
@@ -239,6 +279,17 @@ export function CharacterProfileView() {
       });
   }
 
+  function openAddDocumentDrawer() {
+    if (existingCharacter?.data?.id) {
+      setDrawer((prev) => ({
+        ...prev,
+        type: "character_add",
+        title: "Add documents",
+        data: { id: existingCharacter?.data?.id, type: "documents" },
+      }));
+    }
+  }
+
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
   return (
@@ -275,10 +326,34 @@ export function CharacterProfileView() {
         {selectedTab === 0 ? (
           <div className="flex flex-col gap-y-2">
             {isFetching ? (
-              <Skeleton type="character_profile" />
+              <Skeleton type="character_profile_main" />
             ) : (
               <>
-                {/* <Collapsible icon={IconEnum.document} initialOpen={false} label="Documents"></Collapsible> */}
+                <Collapsible
+                  actions={[
+                    {
+                      icon: IconEnum.add,
+                      tooltip: "Add document",
+                      onClick: openAddDocumentDrawer,
+                    },
+                  ]}
+                  icon={IconEnum.document}
+                  initialOpen={false}
+                  label="Documents">
+                  {existingCharacter?.data?.documents?.length ? (
+                    <Table
+                      columns={documentsTableColumns()}
+                      config={{
+                        expandable: true,
+                      }}
+                      data={existingCharacter?.data?.documents || []}
+                      dispatch={dispatch}
+                      type="documents"
+                    />
+                  ) : (
+                    <Alert label="There is no content." variant="info" />
+                  )}
+                </Collapsible>
 
                 <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
                   <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
