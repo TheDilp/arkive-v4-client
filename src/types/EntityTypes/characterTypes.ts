@@ -43,4 +43,12 @@ export interface CharacterType {
     relation_type: string;
     portrait_id?: string;
   }[];
+  siblings?: {
+    id: string;
+    first_name: string;
+    nickname?: string;
+    last_name?: string;
+    relation_type: string;
+    portrait_id?: string;
+  }[];
 }

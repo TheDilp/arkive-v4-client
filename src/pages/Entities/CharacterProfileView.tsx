@@ -1,11 +1,12 @@
+import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Alert, Avatar, Collapsible, Editor, Skeleton, Tabs, Title } from "../../components";
+import { Alert, Avatar, Button, CharacterPreview, Collapsible, Editor, Skeleton, Tabs, Title } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterFieldValueType, CharacterType } from "../../types";
-import { getCharacterFullName, getImageURL, IconEnum, sortEntities } from "../../utils";
+import { dialogAtom, getCharacterFullName, getImageURL, getSentenceCase, IconEnum, sortEntities } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Links", icon: IconEnum.map_pin },
@@ -89,6 +90,7 @@ function AdditionalFieldDisplay({
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const setDialog = useSetAtom(dialogAtom);
   const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(item_id, "characters", {
     data: {},
     relations: { tags: true, character_fields: true, locations: true, relationships: true },
@@ -107,6 +109,20 @@ export function CharacterProfileView() {
     "character_fields_templates",
     { enabled: selectedTab === 2, staleTime: 5 * 60 * 1000 },
   );
+
+  function showFamilyTree() {
+    if (existingCharacter?.data)
+      setDialog({
+        type: "family_tree",
+        title: `Family tree of ${getCharacterFullName(
+          existingCharacter?.data.first_name,
+          existingCharacter?.data?.nickname || "",
+          existingCharacter?.data?.last_name || "",
+        )}`,
+        data: { id: existingCharacter?.data.id },
+        size: "lg",
+      });
+  }
 
   return (
     <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-4 overflow-hidden p-4 pb-16">
@@ -162,6 +178,39 @@ export function CharacterProfileView() {
                   )}
                 </ul>
               </Collapsible>
+            </div>
+          ) : null}
+          {selectedTab === 1 ? (
+            <div className="flex flex-col gap-y-2">
+              <div className="flex w-full">
+                <div className="ml-auto w-min">
+                  <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} variant="info" />
+                </div>
+              </div>
+              <div className="flex flex-col divide-y divide-zinc-700">
+                {[...(existingCharacter?.data?.related_to || []), ...(existingCharacter?.data?.related_from || [])].map(
+                  (char) => (
+                    <div key={char?.id} className="flex items-center">
+                      <CharacterPreview
+                        character_name={getCharacterFullName(char.first_name, char?.nickname, char?.last_name)}
+                        id={char?.id}
+                        image_id={char?.portrait_id}
+                      />
+                      <span> - {getSentenceCase(char?.relation_type || "")}</span>
+                    </div>
+                  ),
+                )}
+                {(existingCharacter?.data?.siblings || []).map((char) => (
+                  <div key={char?.id} className="flex items-center">
+                    <CharacterPreview
+                      character_name={getCharacterFullName(char.first_name, char?.nickname, char?.last_name)}
+                      id={char?.id}
+                      image_id={char?.portrait_id}
+                    />
+                    <span> - Sibling</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : null}
           {selectedTab === 2 ? (
