@@ -48,11 +48,11 @@ const fieldSizeClass = tv({
   base: "flex flex-col justify-center text-center mt-1 bg-zinc-800 rounded shadow-sm p-0.5",
   variants: {
     type: {
-      dice_roll: "col-span-3 lg:col-span-1",
-      text: "col-span-3 lg:col-span-2",
-      select: "col-span-3 lg:col-span-2",
-      number: "col-span-3 lg:col-span-2",
-      random_table: "col-span-3 lg:col-span-2",
+      dice_roll: "col-span-6 sm:col-span-3 lg:col-span-1",
+      text: "col-span-6 sm:col-span-3 lg:col-span-2",
+      select: "col-span-6 sm:col-span-3 lg:col-span-2",
+      number: "col-span-6 sm:col-span-3 lg:col-span-2",
+      random_table: "col-span-6 sm:col-span-3 lg:col-span-2",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
     },
   },
@@ -184,10 +184,17 @@ export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDialog = useSetAtom(dialogAtom);
-  const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(item_id, "characters", {
-    data: {},
-    relations: { tags: true, character_fields: true, locations: true, relationships: true },
-  });
+  const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
+    item_id,
+    "characters",
+    {
+      data: {},
+      relations: { tags: true, character_fields: true, locations: true, relationships: true },
+    },
+    {
+      staleTime: 60 * 1000,
+    },
+  );
 
   const navigate = useNavigate();
 
@@ -235,11 +242,11 @@ export function CharacterProfileView() {
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
   return (
-    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 gap-4 overflow-hidden p-4 pb-16">
+    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden p-4 pb-16 lg:content-stretch">
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
-        <div className="col-span-5 flex h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
+        <div className="col-span-5 flex h-full flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
           <Avatar
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
             isTooltipDisabled
@@ -264,77 +271,98 @@ export function CharacterProfileView() {
           </div>
         </div>
       )}
-      {isFetchingTemplates ? (
-        <Skeleton type="character_profile_main" />
-      ) : (
-        <div className="col-span-5 overflow-y-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
-          {selectedTab === 0 ? (
-            <div className="flex flex-col gap-y-2">
-              {/* <Collapsible icon={IconEnum.document} initialOpen={false} label="Documents"></Collapsible> */}
+      <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 pb-24 lg:col-span-4">
+        {selectedTab === 0 ? (
+          <div className="flex flex-col gap-y-2">
+            {isFetching ? (
+              <Skeleton type="character_profile" />
+            ) : (
+              <>
+                {/* <Collapsible icon={IconEnum.document} initialOpen={false} label="Documents"></Collapsible> */}
 
-              <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
-                  {existingCharacter?.data?.locations ? (
-                    existingCharacter.data.locations.map((location) => (
-                      <div
-                        key={location.id}
-                        className="flex w-full items-center gap-x-2 rounded bg-zinc-800 p-2 hover:text-blue-300">
-                        <Avatar image={getImageURL(project_id as string, "maps", location.image_id)} label={location.title} />
-                        <Link to={`/projects/${project_id}/maps/${location.id}/${location.map_pin_id}`}>{location.title}</Link>
-                      </div>
-                    ))
-                  ) : (
-                    <Alert label="There is no content." variant="info" />
-                  )}
-                </ul>
-              </Collapsible>
-            </div>
-          ) : null}
-          {selectedTab === 1 ? (
-            <TablePageLayout>
-              <div className="flex w-full">
-                <div className="ml-auto w-min">
-                  <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} variant="info" />
+                <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+                  <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
+                    {existingCharacter?.data?.locations ? (
+                      existingCharacter.data.locations.map((location) => (
+                        <div
+                          key={location.id}
+                          className="flex w-full items-center gap-x-2 rounded bg-zinc-800 p-2 hover:text-blue-300">
+                          <Avatar image={getImageURL(project_id as string, "maps", location.image_id)} label={location.title} />
+                          <Link to={`/projects/${project_id}/maps/${location.id}/${location.map_pin_id}`}>
+                            {location.title}
+                          </Link>
+                        </div>
+                      ))
+                    ) : (
+                      <Alert label="There is no content." variant="info" />
+                    )}
+                  </ul>
+                </Collapsible>
+              </>
+            )}
+          </div>
+        ) : null}
+        {selectedTab === 1 ? (
+          <TablePageLayout>
+            {isFetching ? (
+              <div className="pt-10">
+                <Skeleton type="table" />
+              </div>
+            ) : (
+              <>
+                <div className="flex w-full">
+                  <div className="ml-auto w-min">
+                    <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} variant="info" />
+                  </div>
                 </div>
-              </div>
-              <div className="h-full max-h-[85%] w-full overflow-hidden">
-                <Table columns={columns} data={relationships} dispatch={dispatch} type="characters" />
-              </div>
-            </TablePageLayout>
-          ) : null}
-          {selectedTab === 2 ? (
-            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
-              {existingTemplates?.data?.length ? (
-                existingTemplates?.data?.sort(sortEntities)?.map(
-                  (t) => (
-                    <div key={t.id} className="flex flex-col">
-                      <AdditionalFieldDisplay
-                        character_field_data={
-                          existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
-                        }
-                        character_fields={t.character_fields}
-                        template_title={t.title}
-                      />
-                    </div>
-                  ),
-                  // <FieldTemplateRow
-                  //   key={t?.id}
-                  //   character_fields={t.character_fields}
-                  //   character_fields_data={character_fields}
-                  //   createNotification={createNotification}
-                  //   handleChange={handleChange}
-                  //   id={t?.id}
-                  //   selectedTemplates={selectedTemplates}
-                  //   title={t?.title}
-                  // />
-                )
-              ) : (
-                <Alert label="There are no templates available." variant="info" />
-              )}
-            </ul>
-          ) : null}
-        </div>
-      )}
+                <div className="h-full max-h-[85%] w-full overflow-hidden">
+                  <Table
+                    columns={columns}
+                    config={{
+                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
+                    }}
+                    data={relationships}
+                    dispatch={dispatch}
+                    type="characters"
+                  />
+                </div>
+              </>
+            )}
+          </TablePageLayout>
+        ) : null}
+        {selectedTab === 2 ? (
+          <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
+            {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
+            {existingTemplates?.data?.length && !isFetchingTemplates ? (
+              existingTemplates?.data?.sort(sortEntities)?.map(
+                (t) => (
+                  <div key={t.id} className="flex flex-col">
+                    <AdditionalFieldDisplay
+                      character_field_data={
+                        existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                      }
+                      character_fields={t.character_fields}
+                      template_title={t.title}
+                    />
+                  </div>
+                ),
+                // <FieldTemplateRow
+                //   key={t?.id}
+                //   character_fields={t.character_fields}
+                //   character_fields_data={character_fields}
+                //   createNotification={createNotification}
+                //   handleChange={handleChange}
+                //   id={t?.id}
+                //   selectedTemplates={selectedTemplates}
+                //   title={t?.title}
+                // />
+              )
+            ) : (
+              <Alert label="There are no templates available." variant="info" />
+            )}
+          </ul>
+        ) : null}
+      </div>
     </div>
   );
 }
