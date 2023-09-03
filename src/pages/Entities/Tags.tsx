@@ -28,15 +28,16 @@ function createColumns(
       header: "Color",
       cell: (info) => (
         <div className="flex w-full justify-center">
-          <div className="h-6 w-6 rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
+          <div className="h-6 w-6 select-none rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
         </div>
       ),
       meta: {
         sortable: true,
         noLink: true,
+        centered: true,
       },
-      maxSize: 4,
-      minSize: 4,
+      maxSize: 5,
+      minSize: 5,
     }),
 
     columnHelper.display({
@@ -108,7 +109,7 @@ export function Tags() {
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
-                data: { project_id },
+                data: { project_id: project_id as string },
                 title: "Create new tags",
                 type: "tags",
                 size: "lg",
