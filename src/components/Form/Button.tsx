@@ -29,7 +29,8 @@ const ButtonClasses = tv({
       },
     },
     size: {
-      sm: "h-8",
+      sm: "h-8 text-sm",
+      md: "text-base",
     },
     isDisabled: {
       true: "bg-zinc-300 text-zinc-100 cursor-not-allowed ",
@@ -88,7 +89,7 @@ export function Button({
   isIconOnly,
   onClick,
   tooltip,
-  size,
+  size = "md",
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({ variant, size, isDisabled, hasNoBackground, hasNoLabel: !label });
   return (
