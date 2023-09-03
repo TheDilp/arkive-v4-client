@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
-import { Link, NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import {
@@ -25,6 +25,7 @@ import {
   CharacterRelationType,
   CharacterType,
   DocumentType,
+  MapType,
 } from "../../types";
 import {
   dialogAtom,
@@ -39,6 +40,7 @@ import {
 
 const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
+const locationsColumnHelper = createColumnHelper<MapType>();
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -125,7 +127,7 @@ const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction
   }),
 ];
 
-const documentsTableColumns = () => [
+const documentsTableColumns = [
   documentsColumnHelper.display({
     id: "title",
     header: "Title",
@@ -159,6 +161,23 @@ const documentsTableColumns = () => [
       </div>
     ),
   }),
+];
+const locationsTableColumns = (project_id: string) => [
+  locationsColumnHelper.display({
+    id: "image_id",
+    header: "Image",
+    cell: ({ row }) => (
+      <div className="flex w-full items-center justify-center">
+        <Avatar image={getImageURL(project_id, "maps", row.original.image_id)} label={row.original.title} />
+      </div>
+    ),
+    minSize: 5,
+    maxSize: 5,
+    meta: {
+      centered: true,
+    },
+  }),
+  ...documentsTableColumns,
 ];
 
 function AdditionalFieldDisplay({
@@ -342,7 +361,7 @@ export function CharacterProfileView() {
                   label="Documents">
                   {existingCharacter?.data?.documents?.length ? (
                     <Table
-                      columns={documentsTableColumns()}
+                      columns={documentsTableColumns}
                       config={{
                         expandable: true,
                       }}
@@ -358,16 +377,15 @@ export function CharacterProfileView() {
                 <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
                   <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
                     {existingCharacter?.data?.locations ? (
-                      existingCharacter.data.locations.map((location) => (
-                        <div
-                          key={location.id}
-                          className="flex w-full items-center gap-x-2 rounded bg-zinc-800 p-2 hover:text-blue-300">
-                          <Avatar image={getImageURL(project_id as string, "maps", location.image_id)} label={location.title} />
-                          <Link to={`/projects/${project_id}/maps/${location.id}/${location.map_pin_id}`}>
-                            {location.title}
-                          </Link>
-                        </div>
-                      ))
+                      <Table
+                        columns={locationsTableColumns(project_id as string)}
+                        config={{
+                          expandable: true,
+                        }}
+                        data={existingCharacter?.data?.locations || []}
+                        dispatch={dispatch}
+                        type="documents"
+                      />
                     ) : (
                       <Alert label="There is no content." variant="info" />
                     )}

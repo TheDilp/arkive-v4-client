@@ -78,7 +78,7 @@ function createColumns(
         sortable: true,
         filterOptions: NameFilters,
       },
-      maxSize: 20,
+      maxSize: 15,
     }),
     columnHelper.accessor("age", {
       id: "age",
