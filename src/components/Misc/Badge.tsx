@@ -23,13 +23,16 @@ const BadgeClasses = tv({
     hasClearAction: {
       true: "pr-1.5 gap-x-0.5",
     },
+    isColorWhite: {
+      true: "text-black",
+    },
   },
 });
 
 export function Badge({ label, size = "md", variant = "primary", clearAction, customColor }: BadgeType) {
   return (
     <span
-      className={BadgeClasses({ variant, hasClearAction: !!clearAction, size })}
+      className={BadgeClasses({ variant, hasClearAction: !!clearAction, size, isColorWhite: customColor === "#ffffff" })}
       onClick={clearAction}
       onKeyDown={() => {}}
       role="button"
@@ -38,7 +41,14 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
       }}
       tabIndex={0}>
       <span className="flex h-full items-center">{label}</span>
-      {clearAction ? <Button hasNoBackground icon={IconEnum.close} onClick={clearAction} /> : null}
+      {clearAction ? (
+        <Button
+          hasNoBackground
+          icon={IconEnum.close}
+          onClick={clearAction}
+          variant={customColor === "#ffffff" ? "secondary" : "primary"}
+        />
+      ) : null}
     </span>
   );
 }
