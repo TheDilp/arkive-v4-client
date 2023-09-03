@@ -7,6 +7,7 @@ import { CharacterFieldType, DocumentType, TableType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getSentenceCase } from "../../../utils";
 import { StaticRender } from "../../Complex";
+import { Skeleton } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
 
 const ExpandedTableRowClasses = tv({
@@ -81,7 +82,7 @@ function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOption
   );
 }
 function ExpandedDocument({ id }: { id: string }) {
-  const { data } = useGetEntity<DocumentType>(
+  const { data, isFetching } = useGetEntity<DocumentType>(
     id,
     "documents",
     {
@@ -94,6 +95,7 @@ function ExpandedDocument({ id }: { id: string }) {
       enabled: !!id,
     },
   );
+  if (isFetching) return <Skeleton type="editor" />;
   return data?.data?.content ? (
     <div className="w-min min-w-fit">
       <StaticRender content={data?.data?.content as RemirrorJSON} />
