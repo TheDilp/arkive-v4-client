@@ -49,8 +49,11 @@ function createColumns(
           />
         </div>
       ),
-      minSize: 5,
-      maxSize: 5,
+      meta: {
+        centered: true,
+      },
+      minSize: 4.5,
+      maxSize: 4.5,
     }),
     columnHelper.accessor("first_name", {
       id: "first_name",
