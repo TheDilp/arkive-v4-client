@@ -56,5 +56,16 @@ export const UpdateCharacterSchema = z.object({
   }),
 });
 
+export const AddToCharacterSchema = z.object({
+  data: z.object({
+    id: z.string(),
+  }),
+  relations: z.object({
+    documents: z.object({ id: z.string() }).array().optional(),
+    tags: z.object({ id: z.string() }).array().optional(),
+  }),
+});
+
 export type InsertCharacterType = z.infer<typeof InsertCharacterSchema>;
 export type UpdateCharacterType = z.infer<typeof UpdateCharacterSchema>;
+export type AddToCharacterType = z.infer<typeof AddToCharacterSchema>;

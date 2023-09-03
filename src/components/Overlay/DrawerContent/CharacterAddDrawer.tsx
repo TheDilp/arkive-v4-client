@@ -1,46 +1,68 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useUpdateEntity } from "../../../hooks";
-import { IconEnum } from "../../../utils";
-import { UpdateCharacterType } from "../../../validation";
+import { useAddToEntity } from "../../../hooks";
+import { drawerAtom, IconEnum } from "../../../utils";
+import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
 import { ItemPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
+import { Badge } from "../../Misc";
 
 type Props = {
   data: {
     id: string;
-    type: "documents" | "images";
+    type: "documents" | "images" | "tags";
   };
 };
 
 export function CharacterAddDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const [items, setItems] = useState<{ label: string; value: string }[]>([]);
-  const { mutateAsync: updateCharacter } = useUpdateEntity<UpdateCharacterType>("characters", project_id as string);
+  const [items, setItems] = useState<{ label: string; value: string; color?: string }[]>([]);
+  const resetDrawer = useResetAtom(drawerAtom);
+  const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
+    "characters",
+    project_id as string,
+  );
   return (
     <div className="flex flex-col gap-y-2">
       <Search
         name="items"
-        onChange={async ({ label, value }) => {
-          if (label && value) setItems((prev) => (prev || []).concat({ label, value }));
+        onChange={async ({ label, value, color }) => {
+          if (label && value) setItems((prev) => (prev || []).concat({ label, value, color }));
         }}
         placeholder={`Press enter to search and add ${data?.type}.`}
         searchEntity={data?.type}
       />
-      {items.map((i) => (
-        <ItemPreview
-          clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
-          icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
-          id={i.value}
-          title={i.label}
-        />
-      ))}
+      {data?.type === "tags" ? (
+        <div className="flex flex-wrap">
+          {items.map((i) => (
+            <div key={i.value} className="w-fit">
+              <Badge customColor={i?.color} label={i.label} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        items.map((i) => (
+          <ItemPreview
+            clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
+            icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
+            id={i.value}
+            title={i.label}
+          />
+        ))
+      )}
       <Button
         icon={IconEnum.add}
+        isDisabled={isMutating || items.length === 0}
+        isLoading={isMutating}
         label="Save"
         onClick={async () => {
-          await updateCharacter({ data, relations: { [data.type]: items.map((i) => ({ id: i.value })) } });
+          const payload = { data, relations: { [data.type]: items.map((i) => ({ id: i.value })) } };
+          const parsedPayload = AddToCharacterSchema.parse(payload);
+          await addToCharacter(parsedPayload, {
+            onSuccess: resetDrawer,
+          });
         }}
         variant="success"
       />

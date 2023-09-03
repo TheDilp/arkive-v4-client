@@ -6,6 +6,7 @@ import { tv } from "tailwind-variants";
 import {
   Alert,
   Avatar,
+  Badge,
   Button,
   Collapsible,
   createColumnHelper,
@@ -313,6 +314,16 @@ export function CharacterProfileView() {
       }));
     }
   }
+  function openAddTagDrawer() {
+    if (existingCharacter?.data?.id) {
+      setDrawer((prev) => ({
+        ...prev,
+        type: "character_add",
+        title: "Add tags",
+        data: { id: existingCharacter?.data?.id, type: "tags" },
+      }));
+    }
+  }
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
@@ -399,6 +410,28 @@ export function CharacterProfileView() {
                       <Alert label="There is no content." variant="info" />
                     )}
                   </div>
+                </Collapsible>
+
+                <Collapsible
+                  actions={[
+                    {
+                      icon: IconEnum.add,
+                      tooltip: "Add tags",
+                      onClick: openAddTagDrawer,
+                    },
+                  ]}
+                  icon={IconEnum.tags}
+                  initialOpen={false}
+                  label="Tags">
+                  {existingCharacter?.data?.tags?.length ? (
+                    <div className="mt-2 flex flex-wrap">
+                      {existingCharacter.data.tags.map((tag) => (
+                        <div key={tag.id}>
+                          <Badge customColor={tag.color} label={tag.title} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </Collapsible>
               </>
             )}
