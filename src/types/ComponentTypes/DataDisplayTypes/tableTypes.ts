@@ -23,10 +23,19 @@ export type TableColumnFilterType = RequestFilterType & { id: string };
 export interface TableParams {
   orderBy?: RequestOrderByType[];
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
+  relationFilters?: Record<string, string[]>;
   pagination?: RequestPaginationType;
   selection?: TableSelectionType;
 }
-export type TableActionTypes = "setSort" | "removeFilter" | "setSelected" | "setAllSelected" | "clearSelected" | "clearFilters";
+export type TableActionTypes =
+  | "setSort"
+  | "removeFilter"
+  | "setSelected"
+  | "setAllSelected"
+  | "clearSelected"
+  | "clearFilters"
+  | "setRelationFilters"
+  | "clearrelationFilters";
 export type TableActionType =
   | {
       type: "setPagination";
@@ -39,6 +48,7 @@ export type TableActionType =
       type: "removeFilterByField";
       payload: string;
     }
+  | { type: "setRelationFilters"; payload: Record<string, string[]> }
   | {
       type: "setSort";
       payload: { field: string; sort: SortType };
@@ -63,6 +73,7 @@ export interface TableType {
     selection?: TableSelectionType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
+    relationFilters?: Record<string, string[]>;
     getLink?: (rowData: any) => string;
     setFavorite?: (rowData: any) => Promise<void>;
   };

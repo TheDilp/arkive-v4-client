@@ -70,6 +70,7 @@ export function useGetEntities<ReturnType>(
     type,
     request.data?.item_id || request.data?.parent_id,
     request?.filters,
+    request?.relationFilters,
     request?.orderBy,
   ];
   async function queryFn(finalRequest: RequestBodyType) {

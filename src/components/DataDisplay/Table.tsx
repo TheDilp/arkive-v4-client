@@ -2,11 +2,12 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtual } from "@tanstack/react-virtual";
+import omit from "lodash.omit";
 import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useHandleChange } from "../../hooks";
+import { useGetEntities, useHandleChange } from "../../hooks";
 import {
   FilterEnumType,
   MetaType,
@@ -15,7 +16,9 @@ import {
   TableColumnFilterComponentType,
   TableColumnFilterType,
   TableDispatch,
+  TableParams,
   TableType,
+  TagType,
 } from "../../types";
 import {
   applyFilter,
@@ -28,6 +31,7 @@ import {
   getTableColumnWidths,
   groupFiltersByField,
   IconEnum,
+  relationFiltersList,
   removeColumnFilter,
 } from "../../utils";
 import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
@@ -326,19 +330,45 @@ function TableColumnFilter({
   );
 }
 
+function TableTagFilter({ activeTags, dispatch }: { activeTags: string[]; dispatch: TableDispatch }) {
+  const { project_id } = useParams();
+  const { data: tags } = useGetEntities<TagType>({ data: { project_id } }, "tags");
+  const [selectedTags, setSelectedTags] = useState<string[]>(activeTags);
+  useEffect(() => {
+    if (Array.isArray(activeTags)) setSelectedTags(activeTags);
+  }, [activeTags]);
+  if (tags?.data?.length)
+    return (
+      <div className="flex min-w-[15rem] max-w-[15rem] flex-col gap-y-2">
+        <Select
+          hasSearch
+          isMultiple
+          name="tags"
+          onChange={({ value }) => setSelectedTags(value as string[])}
+          options={tags.data.map((tag) => ({ label: tag.title, value: tag.id }))}
+          value={selectedTags}
+        />
+        <Button
+          icon={IconEnum.filter}
+          label="Apply filter"
+          onClick={() => dispatch({ type: "setRelationFilters", payload: { tags: selectedTags } })}
+          variant="success"
+        />
+      </div>
+    );
+}
+
 function TableSubheaderFilterBadges({
   filters,
+  relationFilters,
   dispatch,
-}: {
-  filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-  dispatch: TableDispatch;
-}) {
+}: Pick<TableParams, "filters" | "relationFilters"> & Pick<TableType, "dispatch">) {
   const { subheaderFilterBadges } = TableClasses();
   const andFiltersByField = groupFiltersByField(filters?.and || []);
   const orFiltersByField = groupFiltersByField(filters?.or || []);
 
   const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
-
+  const relationFields = [...new Set(Object.keys(relationFilters || {}))];
   return (
     <div className={subheaderFilterBadges()}>
       {fields.map((field) => (
@@ -359,6 +389,20 @@ function TableSubheaderFilterBadges({
           </div>
         </Tooltip>
       ))}
+      {relationFields.map((field) => (
+        <div key={field}>
+          <Badge
+            clearAction={() =>
+              dispatch({
+                type: "setRelationFilters",
+                payload: omit(relationFilters, [field]),
+              })
+            }
+            label={getSentenceCase(field)}
+            variant="info"
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -376,9 +420,9 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
   );
 }
 export function Table({ columns, data, config, isLoading, pagination, dispatch, type }: TableType) {
-  const { filters, orderBy, expandable, hasNoHeaderGap, getLink } = config || {};
+  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
-  const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length;
+  const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
   const isSubheaderEnabled = areFiltersActive;
 
   const {
@@ -467,6 +511,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                     and: (filters?.and || []).filter((filt) => filt.field === id),
                     or: (filters?.or || []).filter((filt) => filt.field === id),
                   };
+                  const isRelationFilter = relationFiltersList.includes(id || "");
                   return (
                     <div
                       key={hdr.id}
@@ -492,13 +537,18 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                                 e.preventDefault();
                                 e.stopPropagation();
                               }}>
-                              <TableColumnFilter
-                                columnId={id}
-                                dispatch={dispatch}
-                                filterOptions={(meta as MetaType)?.filterOptions || []}
-                                filters={activeColumnFilters}
-                                isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                              />
+                              {isRelationFilter ? null : (
+                                <TableColumnFilter
+                                  columnId={id}
+                                  dispatch={dispatch}
+                                  filterOptions={(meta as MetaType)?.filterOptions || []}
+                                  filters={activeColumnFilters}
+                                  isAndDisabled={["is_favorite"].includes(hdr.column.id)}
+                                />
+                              )}
+                              {id === "tags" ? (
+                                <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
+                              ) : null}
                             </div>
                           }
                           customOffset={{ mainAxis: 8 }}
@@ -567,7 +617,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
               <div className={subheaderContainer()}>
                 <div className={subheaderFiltersRow()}>
                   <h4 className={subheaderRowTitle()}>Filters:</h4>
-                  <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} />
+                  <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
                 </div>
               </div>
             ) : null}

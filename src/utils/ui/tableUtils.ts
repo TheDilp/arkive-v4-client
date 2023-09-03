@@ -6,6 +6,8 @@ import { FavoriteColumn, SelectColumn, TagColumn } from "../../components/DataDi
 import { RequestPaginationType, SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
+export const relationFiltersList = ["tags"];
+
 export function getTableColumns(
   columns: ColumnDef<any>[],
   {

@@ -1,4 +1,4 @@
-export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "inArray" | "notInArray" | "ilike" | "is";
+export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "not in" | "ilike" | "is";
 
 export interface RequestFilterType {
   field: string;
@@ -45,6 +45,9 @@ export interface RequestBodyType {
     and?: RequestFilterType[];
     or?: RequestFilterType[];
   } | null;
+  relationFilters?: {
+    [key: string]: string[];
+  };
   pagination?: RequestPaginationType;
   relations?: RequestRelationsType;
   columns?: RequestColumnsType;

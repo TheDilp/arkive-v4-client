@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
-import { FavoritesFilters, IconEnum } from "../../../utils";
+import { FavoritesFilters, IconEnum, TagFilters } from "../../../utils";
 import { Badge, Button, Checkbox, Tooltip } from "../..";
 
 export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginationType) => ColumnDef<any> = (
@@ -60,6 +60,7 @@ export const TagColumn: ColumnDef<any & { tags: TagType[] }> = {
   header: "Tags",
   meta: {
     noLink: true,
+    filterOptions: TagFilters,
   },
   minSize: 12,
   maxSize: 12,

@@ -164,7 +164,7 @@ export function CharactersView() {
   const [view, setView] = useState<"card" | "list">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
-  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
@@ -178,6 +178,7 @@ export function CharactersView() {
       },
       orderBy,
       filters,
+      relationFilters,
       pagination,
     },
     "characters",
@@ -187,7 +188,6 @@ export function CharactersView() {
       enabled: view === "list",
     },
   );
-
   const {
     data: cardData,
     isFetching,
@@ -332,6 +332,7 @@ export function CharactersView() {
               hasTags: true,
               orderBy,
               filters,
+              relationFilters,
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
               setFavorite: async (rowData: any) => {

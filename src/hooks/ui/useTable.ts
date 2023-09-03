@@ -77,6 +77,12 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
 
       return newState;
     }
+    case "setRelationFilters": {
+      if (action.payload) {
+        return { ...state, relationFilters: action.payload };
+      }
+      return state;
+    }
     case "setPagination":
       return { ...state, pagination: { ...state.pagination, ...action.payload } };
     case "setSort": {

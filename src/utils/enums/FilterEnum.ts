@@ -11,8 +11,9 @@ export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   lt: "Less than",
   lte: "Less than or equal",
   ilike: "Search",
-  inArray: "In array",
-  notInArray: "Not in array",
+  in: "In list",
+  is: "is",
+  "not in": "Not in list",
 };
 
 export const NameFilters = [
@@ -46,6 +47,11 @@ export const NumberFilters = [
     value: "lte",
     type: "number",
   },
+];
+
+export const TagFilters = [
+  { label: FilterNamesEnum.in, value: "in", type: "relation" },
+  { label: FilterNamesEnum["not in"], value: "not in", type: "relation" },
 ];
 
 export const FavoritesFilters = [
