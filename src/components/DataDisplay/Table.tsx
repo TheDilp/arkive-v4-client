@@ -54,7 +54,7 @@ const TableClasses = tv({
     bodyContainer: "min-w-full content-start overflow-x-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col w-full max-h-full lg:max-h-full bg-zinc-950 border-x border-t overflow-y-auto border-zinc-600",
     rowContainer: "flex flex-col",
-    row: "flex flex-1 min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato hover:bg-zinc-900",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato hover:bg-zinc-900",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     selectedRow: "bg-blue-400",
     contentWrapper: "block truncate",
