@@ -129,7 +129,7 @@ const documentsTableColumns = () => [
   documentsColumnHelper.display({
     id: "title",
     header: "Title",
-    cell: ({ row }) => row.original.title,
+    cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
   }),
   documentsColumnHelper.display({
     id: "action",
@@ -150,8 +150,8 @@ const documentsTableColumns = () => [
             },
             {
               id: "2",
-              label: "Unlink document from character",
-              icon: IconEnum.trash,
+              label: "Unlink document",
+              icon: IconEnum.unlink,
             },
           ]}>
           <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
