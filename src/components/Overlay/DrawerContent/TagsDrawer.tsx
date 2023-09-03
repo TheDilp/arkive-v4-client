@@ -25,10 +25,10 @@ function isDisabled(tags: TagType | TagType[]) {
   return false;
 }
 
-export function TagsDrawer({ data }: { data: TagType }) {
+export function TagsDrawer({ data }: { data: TagType | { project_id: string } }) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
-  const [tags, setTags] = useState<TagType | TagType[]>(data?.id ? data : []);
+  const [tags, setTags] = useState<TagType | TagType[]>("id" in data ? data : []);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: createMany, isLoading: isCreatingMany } = useCreateEntities<{ data: Omit<TagType, "id">[] }>(
     "tags",
@@ -44,7 +44,7 @@ export function TagsDrawer({ data }: { data: TagType }) {
   const isMutating = isCreating || isCreatingMany || isUpdating;
   return (
     <div className="flex flex-col gap-y-2">
-      {data?.id ? null : (
+      {"id" in data ? null : (
         <div className="flex h-8 w-full justify-between">
           <span>Insert new tag:</span>
           <div className="h-8 w-8">
@@ -89,12 +89,12 @@ export function TagsDrawer({ data }: { data: TagType }) {
         </div>
       )}
       <Button
-        icon={data?.id ? IconEnum.save : IconEnum.add}
+        icon={"id" in data ? IconEnum.save : IconEnum.add}
         isDisabled={isDisabled(tags) || isMutating}
         isLoading={isMutating}
-        label={data?.id ? "Save" : "Create"}
+        label={"id" in data ? "Save" : "Create"}
         onClick={async () => {
-          if (!data?.id) {
+          if (!("id" in data)) {
             if (Array.isArray(tags)) {
               await createMany({ data: tags.map((tag) => ({ ...omit(tag, ["id"]), color: tag?.color || DefaultTagColor })) });
             } else {
