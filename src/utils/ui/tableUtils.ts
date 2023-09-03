@@ -47,7 +47,7 @@ export function getTableColumnWidths(
   maxWidth?: string;
 } {
   if (id === "select" || id === "is_favorite") {
-    return { minWidth: "2.5rem", maxWidth: "2.5rem" };
+    return { minWidth: "2.75rem", maxWidth: "2.75rem" };
   }
   if (id === "action") {
     return { minWidth: "5rem", maxWidth: "5rem" };

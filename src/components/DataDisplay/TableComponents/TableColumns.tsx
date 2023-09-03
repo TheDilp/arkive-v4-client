@@ -32,6 +32,9 @@ export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginat
       value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.index)}
     />
   ),
+  meta: {
+    centered: true,
+  },
 });
 
 export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<void>) => ColumnDef<any> = (
