@@ -24,6 +24,7 @@ import {
   RandomTableOptionsDrawer,
   TagsDrawer,
 } from "./DrawerContent";
+import { SearchDrawer } from "./DrawerContent/SearchDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -75,7 +76,7 @@ export function Drawer() {
   const drawer = useAtomValue(drawerAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { type, item_id } = useParams();
-  const { base, title } = DrawerClasses({ size: drawer.size, isOpen: !!drawer.data });
+  const { base, title } = DrawerClasses({ size: drawer.size, isOpen: !!drawer.type });
   const drawerRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   useEffect(() => {
@@ -136,6 +137,7 @@ export function Drawer() {
         {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
         {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
         {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
+        {drawer.type === "search" ? <SearchDrawer /> : null}
       </div>
     </div>
   );
