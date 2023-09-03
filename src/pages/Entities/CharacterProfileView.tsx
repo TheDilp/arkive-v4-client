@@ -358,6 +358,14 @@ export function CharacterProfileView() {
         </div>
       )}
       <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 pb-24 lg:col-span-4">
+        <h2 className="mb-4 flex items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
+          {tabs[selectedTab].label}
+          {selectedTab === 1 ? (
+            <div className="ml-auto w-min">
+              <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} size="sm" variant="info" />
+            </div>
+          ) : null}
+        </h2>
         {selectedTab === 0 ? (
           <div className="flex flex-col gap-y-2">
             {isFetching ? (
@@ -452,24 +460,17 @@ export function CharacterProfileView() {
                 <Skeleton type="table" />
               </div>
             ) : (
-              <>
-                <div className="flex w-full">
-                  <div className="ml-auto w-min">
-                    <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} variant="info" />
-                  </div>
-                </div>
-                <div className="h-full max-h-[85%] w-full overflow-hidden">
-                  <Table
-                    columns={columns}
-                    config={{
-                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
-                    }}
-                    data={relationships}
-                    dispatch={dispatch}
-                    type="characters"
-                  />
-                </div>
-              </>
+              <div className="h-full max-h-[85%] w-full overflow-hidden">
+                <Table
+                  columns={columns}
+                  config={{
+                    getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
+                  }}
+                  data={relationships}
+                  dispatch={dispatch}
+                  type="characters"
+                />
+              </div>
             )}
           </TablePageLayout>
         ) : null}
