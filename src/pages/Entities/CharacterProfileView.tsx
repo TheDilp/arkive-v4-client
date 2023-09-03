@@ -23,6 +23,7 @@ import {
   CharacterFieldTemplateType,
   CharacterFieldType,
   CharacterFieldValueType,
+  CharacterLocationType,
   CharacterRelationType,
   CharacterType,
   DocumentType,
@@ -80,6 +81,9 @@ const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction
         />
       </div>
     ),
+    meta: {
+      centered: true,
+    },
     minSize: 5,
     maxSize: 5,
   }),
@@ -183,7 +187,11 @@ const locationsTableColumns = (project_id: string) => [
       centered: true,
     },
   }),
-  ...documentsTableColumns,
+  locationsColumnHelper.display({
+    id: "title",
+    header: "Title",
+    cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+  }),
 ];
 
 function AdditionalFieldDisplay({
@@ -390,6 +398,7 @@ export function CharacterProfileView() {
                         config={{
                           expandable: true,
                           hasNoHeaderGap: true,
+                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
                         }}
                         data={existingCharacter?.data?.documents || []}
                         dispatch={dispatch}
@@ -411,6 +420,8 @@ export function CharacterProfileView() {
                         config={{
                           expandable: true,
                           hasNoHeaderGap: true,
+                          getLink: (rowData: CharacterLocationType) =>
+                            `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
                         }}
                         data={existingCharacter?.data?.locations || []}
                         dispatch={dispatch}
