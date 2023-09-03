@@ -91,6 +91,7 @@ export const IconEnum = {
   table: "ph:table",
   grid: "ph:grid-four",
   search: "ph:magnifying-glass-light",
+  unlink: "ph:link-break",
   upload: "ph:upload",
   image: "ph:images",
   settings: "ph:gear",
