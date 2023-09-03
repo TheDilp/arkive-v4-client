@@ -175,6 +175,7 @@ export function Search({
   hasShownOption,
   imageType,
   onChange,
+  onSearch,
 }: SearchType) {
   const { project_id } = useParams();
   const {
@@ -237,7 +238,13 @@ export function Search({
   });
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([role, dismiss, listNav]);
   useEffect(() => {
-    if (data?.data?.length) setOpen(true);
+    if (data?.data?.length) {
+      setOpen(true);
+
+      if (onSearch) {
+        onSearch(data?.data);
+      }
+    }
   }, [data?.data]);
 
   useEffect(() => {
@@ -353,7 +360,7 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && (
+        {(open || searchTerm || displayValue) && searchEntity !== "all" && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
             <div
               {...getFloatingProps({

@@ -171,7 +171,7 @@ export function useSearch<ReturnType extends { value: string; label: string; col
     ["search", type].concat(options?.queryKeyConcat || []),
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/search/${project_id}/${type}`,
+        url: `${baseURLS.baseServer}/search/${project_id}${type === "all" ? "" : "/".concat(type)}`,
         method: "POST",
         body: JSON.stringify(request),
       }),
