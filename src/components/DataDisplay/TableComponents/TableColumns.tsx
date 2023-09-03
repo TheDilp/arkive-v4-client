@@ -51,6 +51,7 @@ export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<vo
   ),
   meta: {
     filterOptions: FavoritesFilters,
+    centered: true,
   },
 });
 
