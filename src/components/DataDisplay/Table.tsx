@@ -54,7 +54,8 @@ const TableClasses = tv({
     bodyContainer: "min-w-full content-start overflow-x-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col w-full max-h-full lg:max-h-full bg-zinc-950 border-x border-t overflow-y-auto border-zinc-600",
     rowContainer: "flex flex-col",
-    row: "flex flex-1 min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato",
+    row: "flex flex-1 min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato hover:bg-zinc-800",
+    hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     selectedRow: "bg-blue-400",
     contentWrapper: "block truncate",
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
@@ -395,6 +396,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     body,
     rowContainer,
     row: rowClasses,
+    hasLinkRow,
     selectedRow,
     contentWrapper,
     content: contentClasses,
@@ -587,13 +589,16 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                           config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
                             ? selectedRow()
                             : ""
-                        }`}>
+                        }
+                        ${getLink ? hasLinkRow() : ""}
+                        `}>
                         {row.getVisibleCells().map((cell) => (
                           <div
                             key={cell.id}
                             className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                               (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                            }`}
+                            }
+                            `}
                             onClick={(e) => {
                               if (
                                 cell.column.id === "select" ||
