@@ -247,6 +247,8 @@ export function Select({
       if (isMultiple && Array.isArray(value) && value.length !== 0) {
         const selectedOptions = options.filter((opt) => value.includes(opt.value)).map((opt) => opt.label);
         setDisplayText(selectedOptions.join(", "));
+      } else if (isMultiple && Array.isArray(value) && value.length === 0) {
+        setDisplayText("");
       } else if (!isMultiple) {
         if (value) {
           const selectedOption = options.find((opt) => value === opt?.value);
