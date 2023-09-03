@@ -332,30 +332,32 @@ function TableColumnFilter({
 
 function TableTagFilter({ activeTags, dispatch }: { activeTags: string[]; dispatch: TableDispatch }) {
   const { project_id } = useParams();
-  const { data: tags } = useGetEntities<TagType>({ data: { project_id } }, "tags");
+  const { data: tags, isFetching } = useGetEntities<TagType>({ data: { project_id } }, "tags");
   const [selectedTags, setSelectedTags] = useState<string[]>(activeTags);
   useEffect(() => {
     if (Array.isArray(activeTags)) setSelectedTags(activeTags);
   }, [activeTags]);
-  if (tags?.data?.length)
-    return (
-      <div className="flex min-w-[15rem] max-w-[15rem] flex-col gap-y-2">
-        <Select
-          hasSearch
-          isMultiple
-          name="tags"
-          onChange={({ value }) => setSelectedTags(value as string[])}
-          options={tags.data.map((tag) => ({ label: tag.title, value: tag.id }))}
-          value={selectedTags}
-        />
-        <Button
-          icon={IconEnum.filter}
-          label="Apply filter"
-          onClick={() => dispatch({ type: "setRelationFilters", payload: { tags: selectedTags } })}
-          variant="success"
-        />
-      </div>
-    );
+  return (
+    <div className="flex min-w-[15rem] max-w-[15rem] flex-col gap-y-2">
+      <Select
+        hasSearch
+        isDisabled={isFetching}
+        isLoading={isFetching}
+        isMultiple
+        name="tags"
+        onChange={({ value }) => setSelectedTags(value as string[])}
+        options={tags?.data?.map((tag) => ({ label: tag.title, value: tag.id })) || []}
+        value={selectedTags}
+      />
+      <Button
+        icon={IconEnum.filter}
+        isDisabled={isFetching || tags?.data?.length === 0 || selectedTags.length === 0}
+        label="Apply filter"
+        onClick={() => dispatch({ type: "setRelationFilters", payload: { tags: selectedTags } })}
+        variant="success"
+      />
+    </div>
+  );
 }
 
 function TableSubheaderFilterBadges({

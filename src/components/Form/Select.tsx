@@ -260,6 +260,11 @@ export function Select({
       setDisplayText("");
     }
   }, [value, options, isMultiple]);
+
+  useEffect(() => {
+    if (!filteredItems.length && options.length) setFilteredItems(options);
+  }, [options]);
+
   return (
     <div className={base()}>
       {label ? <span className={labelClasses()}>{label}</span> : null}
