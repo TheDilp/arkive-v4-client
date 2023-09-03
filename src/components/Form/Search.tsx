@@ -280,6 +280,9 @@ export function Search({
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
+          onClick={() => {
+            if (data?.data?.length) setOpen(true);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
