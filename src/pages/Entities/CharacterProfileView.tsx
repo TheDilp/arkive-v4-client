@@ -168,7 +168,12 @@ const locationsTableColumns = (project_id: string) => [
     header: "Image",
     cell: ({ row }) => (
       <div className="flex w-full items-center justify-center">
-        <Avatar image={getImageURL(project_id, "maps", row.original.image_id)} label={row.original.title} />
+        <Avatar
+          image={getImageURL(project_id, "maps", row.original.image_id)}
+          isTooltipDisabled
+          label={row.original.title}
+          size="sm"
+        />
       </div>
     ),
     minSize: 5,
@@ -360,27 +365,31 @@ export function CharacterProfileView() {
                   initialOpen={false}
                   label="Documents">
                   {existingCharacter?.data?.documents?.length ? (
-                    <Table
-                      columns={documentsTableColumns}
-                      config={{
-                        expandable: true,
-                      }}
-                      data={existingCharacter?.data?.documents || []}
-                      dispatch={dispatch}
-                      type="documents"
-                    />
+                    <div className="mt-2 animate-in fade-in fill-mode-both">
+                      <Table
+                        columns={documentsTableColumns}
+                        config={{
+                          expandable: true,
+                          hasNoHeaderGap: true,
+                        }}
+                        data={existingCharacter?.data?.documents || []}
+                        dispatch={dispatch}
+                        type="documents"
+                      />
+                    </div>
                   ) : (
                     <Alert label="There is no content." variant="info" />
                   )}
                 </Collapsible>
 
                 <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                  <ul className="mt-2 flex flex-col gap-y-2 animate-in fade-in fill-mode-both">
+                  <div className="mt-2 animate-in fade-in fill-mode-both">
                     {existingCharacter?.data?.locations ? (
                       <Table
                         columns={locationsTableColumns(project_id as string)}
                         config={{
                           expandable: true,
+                          hasNoHeaderGap: true,
                         }}
                         data={existingCharacter?.data?.locations || []}
                         dispatch={dispatch}
@@ -389,7 +398,7 @@ export function CharacterProfileView() {
                     ) : (
                       <Alert label="There is no content." variant="info" />
                     )}
-                  </ul>
+                  </div>
                 </Collapsible>
               </>
             )}
