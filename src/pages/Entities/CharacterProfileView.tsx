@@ -389,13 +389,15 @@ export function CharacterProfileView() {
                       />
                     </div>
                   ) : (
-                    <Alert label="There is no content." variant="info" />
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
                   )}
                 </Collapsible>
 
                 <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
                   <div className="mt-2 animate-in fade-in fill-mode-both">
-                    {existingCharacter?.data?.locations ? (
+                    {existingCharacter?.data?.locations?.length ? (
                       <Table
                         columns={locationsTableColumns(project_id as string)}
                         config={{
@@ -407,7 +409,9 @@ export function CharacterProfileView() {
                         type="documents"
                       />
                     ) : (
-                      <Alert label="There is no content." variant="info" />
+                      <div className="mt-2 w-full">
+                        <Alert label="There is no content." variant="info" />
+                      </div>
                     )}
                   </div>
                 </Collapsible>
@@ -431,7 +435,11 @@ export function CharacterProfileView() {
                         </div>
                       ))}
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  )}
                 </Collapsible>
               </>
             )}
@@ -469,29 +477,17 @@ export function CharacterProfileView() {
           <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {existingTemplates?.data?.length && !isFetchingTemplates ? (
-              existingTemplates?.data?.sort(sortEntities)?.map(
-                (t) => (
-                  <div key={t.id} className="flex flex-col">
-                    <AdditionalFieldDisplay
-                      character_field_data={
-                        existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
-                      }
-                      character_fields={t.character_fields}
-                      template_title={t.title}
-                    />
-                  </div>
-                ),
-                // <FieldTemplateRow
-                //   key={t?.id}
-                //   character_fields={t.character_fields}
-                //   character_fields_data={character_fields}
-                //   createNotification={createNotification}
-                //   handleChange={handleChange}
-                //   id={t?.id}
-                //   selectedTemplates={selectedTemplates}
-                //   title={t?.title}
-                // />
-              )
+              existingTemplates?.data?.sort(sortEntities)?.map((t) => (
+                <div key={t.id} className="flex flex-col">
+                  <AdditionalFieldDisplay
+                    character_field_data={
+                      existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                    }
+                    character_fields={t.character_fields}
+                    template_title={t.title}
+                  />
+                </div>
+              ))
             ) : (
               <Alert label="There are no templates available." variant="info" />
             )}
