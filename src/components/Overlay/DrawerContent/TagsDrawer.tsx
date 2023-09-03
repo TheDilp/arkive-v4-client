@@ -30,12 +30,18 @@ export function TagsDrawer({ data }: { data: TagType }) {
   const { project_id } = useParams();
   const [tags, setTags] = useState<TagType | TagType[]>(data?.id ? data : []);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: createMany } = useCreateEntities<{ data: Omit<TagType, "id">[] }>("tags", project_id as string);
-  const { mutateAsync: create } = useCreateEntity<{ data: Omit<TagType, "id"> }>("tags");
+  const { mutateAsync: createMany, isLoading: isCreatingMany } = useCreateEntities<{ data: Omit<TagType, "id">[] }>(
+    "tags",
+    project_id as string,
+  );
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{ data: Omit<TagType, "id"> }>("tags");
 
-  const { mutateAsync: update } = useUpdateEntity<{ data: Omit<TagType, "project_id"> }>("tags", project_id as string);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{ data: Omit<TagType, "project_id"> }>(
+    "tags",
+    project_id as string,
+  );
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });
-
+  const isMutating = isCreating || isCreatingMany || isUpdating;
   return (
     <div className="flex flex-col gap-y-2">
       {data?.id ? null : (
@@ -84,7 +90,8 @@ export function TagsDrawer({ data }: { data: TagType }) {
       )}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isDisabled(tags)}
+        isDisabled={isDisabled(tags) || isMutating}
+        isLoading={isMutating}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {
           if (!data?.id) {
