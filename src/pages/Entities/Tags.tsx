@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -93,6 +93,7 @@ function createColumns(
 
 export function Tags() {
   const { project_id } = useParams();
+  useChangeNavbarTitle("The Arkive | Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
