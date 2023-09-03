@@ -1,7 +1,7 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 
-import { IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
+import { drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
 import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { Tooltip } from "../Overlay";
@@ -49,17 +49,30 @@ function DiceRoller() {
 export function Navbar() {
   const navbarTitle = useAtomValue(navbarTitleAtom);
 
+  const setDrawer = useSetAtom(drawerAtom);
+
+  function openSearchDrawer() {
+    setDrawer((prev) => ({ ...prev, title: "Search", type: "search" }));
+  }
+
   return (
-    <div className="flex h-16 min-h-[4rem] flex-1 justify-between border-b border-zinc-800 bg-zinc-900 shadow">
-      <h1 className="flex h-full select-none items-center pl-4 font-merriweather text-3xl text-white">
+    <div className="flex h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 pr-4 shadow">
+      <h1 className="mr-auto flex h-full select-none items-center pl-4 font-merriweather text-3xl text-white">
         <div className="w-1/2 truncate lg:w-max">{navbarTitle || "The Arkive"}</div>
       </h1>
-      <div className="w-min pr-4">
-        <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
+      <div className="ml-auto flex items-center gap-x-2">
+        <div className="ml-auto w-min">
+          <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
+            <div className="h-full">
+              <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
+            </div>
+          </Tooltip>
+        </div>
+        <div className="ml-auto w-min">
           <div className="h-full">
-            <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
+            <Button hasNoBackground icon={IconEnum.search} iconSize={24} onClick={openSearchDrawer} />
           </div>
-        </Tooltip>
+        </div>
       </div>
     </div>
   );
