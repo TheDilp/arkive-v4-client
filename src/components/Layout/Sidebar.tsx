@@ -51,7 +51,7 @@ export function Sidebar() {
                 key={item.icon}
                 className={`${listItemLink()} ${item.navigate === type ? "sticky top-16 bg-blue-400" : ""}`}
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
-                <Tooltip allowedPlacements={["right"]} content={item.tooltip}>
+                <Tooltip allowedPlacements={["right"]} content={item.tooltip} isDisabled={item.navigate === type}>
                   <li className={listItem()}>
                     <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
                   </li>
