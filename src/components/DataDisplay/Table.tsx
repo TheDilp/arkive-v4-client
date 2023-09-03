@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtual } from "@tanstack/react-virtual";
-import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
@@ -573,40 +573,44 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
               {virtualRows.map((virtualRow) => {
                 const row = rows[virtualRow.index];
                 return (
-                  <Link key={row.id} className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
-                    <div
-                      className={`${rowClasses()} ${
-                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index) ? selectedRow() : ""
-                      }`}>
-                      {row.getVisibleCells().map((cell) => (
-                        <div
-                          key={cell.id}
-                          className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                            (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                          }`}
-                          onClick={(e) => {
-                            if (
-                              cell.column.id === "select" ||
-                              cell.column.id === "action" ||
-                              cell.column.id === "is_favorite" ||
-                              (cell.column.columnDef.meta as MetaType)?.noLink
-                            ) {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }
-                          }}
-                          style={{
-                            ...getTableColumnWidths(cell.column.id, {
-                              minSize: cell.column.columnDef.minSize,
-                              maxSize: cell.column.columnDef.maxSize,
-                            }),
-                          }}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </div>
-                      ))}
-                    </div>
+                  <Fragment key={row.id}>
+                    <Link className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
+                      <div
+                        className={`${rowClasses()} ${
+                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                            ? selectedRow()
+                            : ""
+                        }`}>
+                        {row.getVisibleCells().map((cell) => (
+                          <div
+                            key={cell.id}
+                            className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                              (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
+                            }`}
+                            onClick={(e) => {
+                              if (
+                                cell.column.id === "select" ||
+                                cell.column.id === "action" ||
+                                cell.column.id === "is_favorite" ||
+                                (cell.column.columnDef.meta as MetaType)?.noLink
+                              ) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                            }}
+                            style={{
+                              ...getTableColumnWidths(cell.column.id, {
+                                minSize: cell.column.columnDef.minSize,
+                                maxSize: cell.column.columnDef.maxSize,
+                              }),
+                            }}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </div>
+                        ))}
+                      </div>
+                    </Link>
                     {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
-                  </Link>
+                  </Fragment>
                 );
               })}
               {paddingBottom > 0 && (
