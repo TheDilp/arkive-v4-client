@@ -38,6 +38,7 @@ export type AvailableSubEntityType =
   | "character_fields";
 
 export type SearchableEntities =
+  | "all"
   | "characters"
   | "documents"
   | "maps"

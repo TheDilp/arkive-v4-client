@@ -19,7 +19,8 @@ export type DrawerContentType =
   | "insert_image"
   | "swatches"
   | "content_preview"
-  | "map_pin_management";
+  | "map_pin_management"
+  | "search";
 
 export type DrawerContentCreateNewType =
   | "characters"
@@ -67,6 +68,7 @@ export type DrawerAtomType = {
   | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
   | { type: "map_pin_management"; data: { map_id: string } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
+  | { type: "search" }
   | { type: null; data: null }
 );
 
