@@ -477,21 +477,22 @@ export function CharacterProfileView() {
         {selectedTab === 2 ? (
           <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
-            {existingTemplates?.data?.length && !isFetchingTemplates ? (
-              existingTemplates?.data?.sort(sortEntities)?.map((t) => (
-                <div key={t.id} className="flex flex-col">
-                  <AdditionalFieldDisplay
-                    character_field_data={
-                      existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
-                    }
-                    character_fields={t.character_fields}
-                    template_title={t.title}
-                  />
-                </div>
-              ))
-            ) : (
+            {existingTemplates?.data?.length && !isFetchingTemplates
+              ? existingTemplates?.data?.sort(sortEntities)?.map((t) => (
+                  <div key={t.id} className="flex flex-col">
+                    <AdditionalFieldDisplay
+                      character_field_data={
+                        existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                      }
+                      character_fields={t.character_fields}
+                      template_title={t.title}
+                    />
+                  </div>
+                ))
+              : null}
+            {!isFetchingTemplates && !existingTemplates?.data?.length ? (
               <Alert label="There are no templates available." variant="info" />
-            )}
+            ) : null}
           </ul>
         ) : null}
       </div>
