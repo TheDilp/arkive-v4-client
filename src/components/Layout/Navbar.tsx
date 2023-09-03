@@ -57,18 +57,18 @@ export function Navbar() {
 
   return (
     <div className="flex h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 pr-4 shadow">
-      <h1 className="mr-auto flex h-full select-none items-center pl-4 font-merriweather text-3xl text-white">
-        <div className="w-1/2 truncate lg:w-max">{navbarTitle || "The Arkive"}</div>
+      <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-3xl text-white">
+        <div className="w-1/2 truncate lg:w-fit">{navbarTitle || "The Arkive"}</div>
       </h1>
-      <div className="ml-auto flex items-center gap-x-2">
-        <div className="ml-auto w-min">
+      <div className="ml-auto flex items-center  gap-x-2 lg:w-20">
+        <div className=" w-fit">
           <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
             <div className="h-full">
               <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
             </div>
           </Tooltip>
         </div>
-        <div className="ml-auto w-min">
+        <div className="w-fit">
           <div className="h-full">
             <Button hasNoBackground icon={IconEnum.search} iconSize={24} onClick={openSearchDrawer} />
           </div>
