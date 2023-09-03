@@ -28,7 +28,7 @@ export function SearchDrawer() {
         name="searchTerm"
         onChange={() => {}}
         onSearch={(res) => setResults(res)}
-        placeholder="Press enter to search entites"
+        placeholder="Press enter to search entites."
         searchEntity="all"
         value={undefined}
       />
