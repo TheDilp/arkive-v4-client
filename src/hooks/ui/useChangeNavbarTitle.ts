@@ -7,7 +7,7 @@ export function useChangeNavbarTitle(title: string, enabled?: boolean) {
   const setNavbarTitleAtom = useSetAtom(navbarTitleAtom);
 
   useEffect(() => {
-    if (title && (enabled || enabled === undefined)) {
+    if (title && (enabled || enabled === undefined) && document.title !== title) {
       setNavbarTitleAtom(title);
       document.title = title;
     }
