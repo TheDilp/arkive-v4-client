@@ -24,7 +24,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     project_id as string,
     action === "archive",
   );
-  const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType);
+  const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType, project_id as string);
   const createNotification = useNotifications();
   return (
     <div className="flex h-full flex-col justify-between">

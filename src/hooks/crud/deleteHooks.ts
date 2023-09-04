@@ -17,7 +17,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
       });
     },
     {
-      onSettled: (data, _, vars) => {
+      onSuccess: (data, vars) => {
         if (data?.ok) {
           if (vars?.data?.parent_id) {
             queryClient.invalidateQueries([type, vars.data.parent_id]);
@@ -43,7 +43,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   );
 }
 
-export function useDeleteSubEntity(type: AvailableSubEntityType) {
+export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string) {
   const queryClient = useQueryClient();
   return useMutation(
     async (vars: { data: { id: string; parent_id: string } }) => {
@@ -71,6 +71,9 @@ export function useDeleteSubEntity(type: AvailableSubEntityType) {
           return { old };
         }
         return { old: {} };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
       },
       onError: (_, vars, context) => {
         queryClient.setQueryData(["maps", vars.data.parent_id], context?.old);

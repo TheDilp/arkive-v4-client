@@ -75,7 +75,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const setBoardRef = useSetAtom(BoardReferenceAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
-  const { mutate: deleteNode } = useDeleteSubEntity("nodes");
+  const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
