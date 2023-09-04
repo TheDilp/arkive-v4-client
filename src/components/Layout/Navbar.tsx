@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
 import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
@@ -47,6 +48,8 @@ function DiceRoller() {
 }
 
 export function Navbar() {
+  const { project_id } = useParams();
+
   const navbarTitle = useAtomValue(navbarTitleAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -60,20 +63,22 @@ export function Navbar() {
       <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-3xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
-      <div className="ml-auto flex items-center gap-x-2 pr-2">
-        <div className=" w-fit">
-          <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
+      {project_id ? (
+        <div className="ml-auto flex items-center gap-x-2 pr-2">
+          <div className=" w-fit">
+            <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
+              <div className="h-full">
+                <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
+              </div>
+            </Tooltip>
+          </div>
+          <div className="w-fit">
             <div className="h-full">
-              <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
+              <Button hasNoBackground icon={IconEnum.search} iconSize={24} onClick={openSearchDrawer} />
             </div>
-          </Tooltip>
-        </div>
-        <div className="w-fit">
-          <div className="h-full">
-            <Button hasNoBackground icon={IconEnum.search} iconSize={24} onClick={openSearchDrawer} />
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

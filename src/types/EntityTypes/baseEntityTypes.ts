@@ -41,7 +41,9 @@ export type SearchableEntities =
   | "all"
   | "characters"
   | "documents"
+  | "alter_names"
   | "maps"
+  | "character_map_pins"
   | "map_pins"
   | "boards"
   | "nodes"
@@ -49,6 +51,7 @@ export type SearchableEntities =
   | "random_tables"
   | "events"
   | "images"
+  | "map_images"
   | "tags";
 
 export type SearchableMentionEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "words";

@@ -174,6 +174,7 @@ export function Search({
   value,
   hasShownOption,
   imageType,
+  isOptionsHidden,
   onChange,
   onSearch,
 }: SearchType) {
@@ -360,7 +361,7 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && searchEntity !== "all" && (
+        {(open || searchTerm || displayValue) && !isOptionsHidden && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
             <div
               {...getFloatingProps({

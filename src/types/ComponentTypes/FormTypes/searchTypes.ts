@@ -16,6 +16,14 @@ export type SearchAllEntitiesType =
     ]
   | null;
 
+export type SearchResultType = {
+  label: string;
+  value: string;
+  color?: string;
+  image?: string;
+  parent_id?: string;
+}[];
+
 export interface SearchType extends BaseFormComponentType {
   value?: string | string[] | undefined | null;
   initialOptions?: SelectOptionType[];
@@ -27,6 +35,7 @@ export interface SearchType extends BaseFormComponentType {
   buttonIcon?: string;
   isAutocomplete?: boolean;
   hasShownOption?: boolean;
+  isOptionsHidden?: boolean;
   initialDisplayValue?: string;
   imageType?: AssetType;
   onSearch?: (result: any) => void;
