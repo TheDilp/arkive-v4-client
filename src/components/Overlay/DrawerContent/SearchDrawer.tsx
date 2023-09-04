@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SearchableEntities, SearchAllEntitiesType, SearchResultType } from "../../../types";
@@ -32,12 +32,12 @@ export function SearchDrawer() {
   const [searchCategory, setSearchCategory] = useState<SearchableEntities | null>(null);
   const [results, setResults] = useState<SearchAllEntitiesType | SearchResultType | null>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       setResults(null);
       queryClient.removeQueries({ queryKey: ["search"] });
     };
-  }, [drawer]);
+  }, [drawer, searchCategory]);
 
   return (
     <div className="flex flex-col gap-y-2 overflow-hidden">
@@ -65,63 +65,70 @@ export function SearchDrawer() {
         ) : null}
       </div>
       <ul className="flex max-h-full min-h-fit flex-col gap-y-2 overflow-y-auto">
-        {(results || []).map((item) => {
-          if ("name" in item) {
-            const { name, result } = item;
-            return (
-              <li key={name}>
-                <Title isDrawerTitle label={getSentenceCase(name)} size="xl" />
-                <ul className="flex flex-col gap-y-2 py-1">
-                  {result?.length ? (
-                    result.map((result_item) => (
-                      <li key={result_item.id}>
-                        <Link
-                          className="transition-all hover:text-blue-400"
-                          to={getSearchLink(
-                            project_id as string,
-                            name,
-                            result_item.id,
-                            "parent_id" in result_item ? result_item?.parent_id : undefined,
-                          )}>
-                          {"title" in result_item ? result_item.title : null}
+        {results?.length
+          ? results.map((item) => {
+              if ("name" in item) {
+                const { name, result } = item;
+                return (
+                  <li key={name}>
+                    <Title isDrawerTitle label={getSentenceCase(name)} size="xl" />
+                    <ul className="flex flex-col gap-y-2 py-1">
+                      {result?.length ? (
+                        result.map((result_item) => (
+                          <li key={result_item.id}>
+                            <Link
+                              className="transition-all hover:text-blue-400"
+                              to={getSearchLink(
+                                project_id as string,
+                                name,
+                                result_item.id,
+                                "parent_id" in result_item ? result_item?.parent_id : undefined,
+                              )}>
+                              {"title" in result_item ? result_item.title : null}
 
-                          {"first_name" in result_item ? (
-                            <CharacterPreview
-                              character_name={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
-                              id={result_item.id}
-                              image_id={result_item?.portrait_id}
-                            />
-                          ) : null}
-                          {"label" in result_item ? result_item.label : null}
-                        </Link>
-                      </li>
-                    ))
-                  ) : (
-                    <Alert label="There is no content." variant="info" />
-                  )}
-                </ul>
-              </li>
-            );
-          }
-          return (
-            <li key={item.value}>
-              <Link
-                className="transition-all hover:text-blue-400"
-                to={getSearchLink(
-                  project_id as string,
-                  searchCategory || "",
-                  item.value,
-                  "parent_id" in item ? item?.parent_id : undefined,
-                )}>
-                {searchCategory === "characters" ? (
-                  <CharacterPreview character_name={item.label} id={item.value} image_id={item?.image} />
-                ) : (
-                  <ItemPreview id={item.value} title={item.label} />
-                )}
-              </Link>
-            </li>
-          );
-        })}
+                              {"first_name" in result_item ? (
+                                <CharacterPreview
+                                  character_name={getCharacterFullName(
+                                    result_item.first_name,
+                                    undefined,
+                                    result_item?.last_name,
+                                  )}
+                                  id={result_item.id}
+                                  image_id={result_item?.portrait_id}
+                                />
+                              ) : null}
+                              {"label" in result_item ? result_item.label : null}
+                            </Link>
+                          </li>
+                        ))
+                      ) : (
+                        <Alert label="There is no content." variant="info" />
+                      )}
+                    </ul>
+                  </li>
+                );
+              }
+              return (
+                <li key={item.value}>
+                  <Link
+                    className="transition-all hover:text-blue-400"
+                    to={getSearchLink(
+                      project_id as string,
+                      searchCategory || "",
+                      item.value,
+                      "parent_id" in item ? item?.parent_id : undefined,
+                    )}>
+                    {searchCategory === "characters" ? (
+                      <CharacterPreview character_name={item.label} id={item.value} image_id={item?.image} />
+                    ) : (
+                      <ItemPreview id={item.value} title={item.label} />
+                    )}
+                  </Link>
+                </li>
+              );
+            })
+          : null}
+        {Array.isArray(results) && results?.length === 0 ? <Alert label="No matching items found." /> : null}
       </ul>
     </div>
   );
