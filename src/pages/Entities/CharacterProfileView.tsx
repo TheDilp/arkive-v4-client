@@ -336,7 +336,7 @@ export function CharacterProfileView() {
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
   return (
-    <div className="grid h-full max-h-[calc(100%-2rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden p-4 pb-16 lg:content-stretch">
+    <div className="grid h-full max-h-[calc(100%-6rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden p-4 pb-16 lg:max-h-full lg:content-stretch">
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
