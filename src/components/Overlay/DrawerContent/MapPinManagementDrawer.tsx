@@ -90,7 +90,7 @@ const getColumns = (project_id: string, setDialog: Dispatch<SetStateAction<Dialo
 
 export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
   const { project_id } = useParams();
-  const { data: existingMapPins } = useGetEntities<MapPinType>(
+  const { data: existingMapPins, isFetching } = useGetEntities<MapPinType>(
     {
       data: {
         project_id: project_id as string,
@@ -101,6 +101,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
       },
     },
     "map_pins",
+    { staleTime: 60 * 1000 },
   );
   const [, dispatch] = useTable({});
   const setDialog = useSetAtom(dialogAtom);
@@ -114,7 +115,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
 
   return (
     <div className="flex flex-col gap-y-2">
-      <Table columns={columns} data={mapPins || []} dispatch={dispatch} type="icons" />
+      <Table columns={columns} data={mapPins || []} dispatch={dispatch} isLoading={isFetching} type="icons" />
     </div>
   );
 }
