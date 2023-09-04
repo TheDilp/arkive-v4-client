@@ -241,10 +241,9 @@ export function Search({
   useEffect(() => {
     if (data?.data?.length) {
       setOpen(true);
-
-      if (onSearch) {
-        onSearch(data?.data);
-      }
+    }
+    if (Array.isArray(data?.data) && onSearch) {
+      onSearch(data?.data);
     }
   }, [data?.data]);
 
