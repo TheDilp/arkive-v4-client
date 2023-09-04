@@ -23,7 +23,9 @@ export function useUpdateEntity<InsertType extends { data: { id?: string; parent
       onSuccess: (data, vars) => {
         if (data.ok) {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
-          queryClient.invalidateQueries([type, vars.data.id]);
+
+          // Invalidating a document causes the editor to refetch while open
+          if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
 
           createNotification({
