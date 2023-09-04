@@ -244,7 +244,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                       type: "nodes",
                       data: {
                         id,
-                        parent_id: item_id,
+                        parent_id: item_id as string,
                       },
                     })),
                 },
@@ -359,7 +359,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
         setDrawer((prev) => {
-          if (prev?.data?.id) {
+          if (prev?.data && "id" in prev.data) {
             if (prev?.data?.id === rest.id) return prev;
             createNotification({
               title: "Please close the current drawer before editing another.",
@@ -370,7 +370,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
           }
           return {
             ...prev,
-            data: { id: rest.id, parent_id: item_id },
+            data: { id: rest.id, parent_id: item_id as string },
             position: "right",
             title: `Edit node ${rest?.label ? "-".concat(rest.label) : ""}`,
             type: "nodes",
@@ -381,7 +381,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       cyRef?.current?._cy.on("dbltap", "edge", function (evt: any) {
         const targetEdge = evt.target._private;
         setDrawer((prev) => {
-          if (prev?.data?.id) {
+          if (prev?.data && "id" in prev.data) {
             if (prev?.data?.id === targetEdge.data.id) return prev;
             createNotification({
               title: "Please close the current drawer before editing another.",
@@ -392,7 +392,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
           }
           return {
             ...prev,
-            data: { id: targetEdge.data.id, parent_id: item_id },
+            data: { id: targetEdge.data.id, parent_id: item_id as string },
             position: "right",
             title: `Edit edge ${targetEdge?.data?.label ? "-".concat(targetEdge?.data.label) : ""}`,
             type: "edges",
