@@ -23,7 +23,7 @@ export function SearchDrawer() {
   }, [drawer]);
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-2 overflow-hidden">
       <Search
         name="searchTerm"
         onChange={() => {}}
@@ -33,7 +33,7 @@ export function SearchDrawer() {
         value={undefined}
       />
 
-      <ul className="flex max-h-[65%] min-h-fit flex-col gap-y-2 overflow-y-auto">
+      <ul className="flex max-h-full min-h-fit flex-col gap-y-2 overflow-y-auto">
         {(results || []).map(({ name, result }) => (
           <li key={name}>
             <Title isDrawerTitle label={getSentenceCase(name)} size="xl" />
