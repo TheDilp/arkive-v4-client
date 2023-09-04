@@ -52,15 +52,15 @@ export function Navbar() {
   const setDrawer = useSetAtom(drawerAtom);
 
   function openSearchDrawer() {
-    setDrawer((prev) => ({ ...prev, title: "Search", type: "search" }));
+    setDrawer((prev) => ({ ...prev, title: "Search", type: "search", data: null }));
   }
 
   return (
     <div className="flex h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
       <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-3xl text-white">
-        <div className="w-1/2 truncate lg:w-fit">{navbarTitle || "The Arkive"}</div>
+        <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
-      <div className="ml-auto flex items-center  gap-x-2 lg:w-24">
+      <div className="ml-auto flex items-center  gap-x-2 pr-2">
         <div className=" w-fit">
           <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
             <div className="h-full">
