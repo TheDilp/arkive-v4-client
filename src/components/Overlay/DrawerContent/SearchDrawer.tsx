@@ -5,15 +5,25 @@ import { Link, useParams } from "react-router-dom";
 
 import { SearchAllEntitiesType } from "../../../types";
 import { drawerAtom, getCharacterFullName, getSentenceCase } from "../../../utils";
+import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { CharacterPreview } from "../../DataDisplay";
-import { Search, Title } from "../../Form";
+import { Search, Select, Title } from "../../Form";
+import { Tabs } from "../../Layout";
 import { Alert } from "../../Misc";
+
+const tabs = [
+  { id: "1", label: "Title" },
+  { id: "2", label: "Category" },
+  { id: "3", label: "Tag" },
+];
 
 export function SearchDrawer() {
   const { project_id } = useParams();
   const queryClient = useQueryClient();
   const drawer = useAtomValue(drawerAtom);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [searchCategory, setSearchCategory] = useState<string | null>(null);
   const [results, setResults] = useState<SearchAllEntitiesType | null>();
   useEffect(() => {
     return () => {
@@ -24,15 +34,24 @@ export function SearchDrawer() {
 
   return (
     <div className="flex flex-col gap-y-2 overflow-hidden">
-      <Search
-        name="searchTerm"
-        onChange={() => {}}
-        onSearch={(res) => setResults(res)}
-        placeholder="Press enter to search entites."
-        searchEntity="all"
-        value={undefined}
-      />
-
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <div className="flex w-full items-center">
+        <Search
+          name="searchTerm"
+          onChange={() => {}}
+          onSearch={(res) => setResults(res)}
+          placeholder="Press enter to search entites."
+          searchEntity="all"
+          value={undefined}
+        />
+        div.
+        <Select
+          name="searchCategory"
+          onChange={({ value }) => setSearchCategory(value as string)}
+          options={SearchCategories}
+          value={searchCategory}
+        />
+      </div>
       <ul className="flex max-h-full min-h-fit flex-col gap-y-2 overflow-y-auto">
         {(results || []).map(({ name, result }) => (
           <li key={name}>

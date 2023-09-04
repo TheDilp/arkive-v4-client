@@ -52,7 +52,7 @@ export function Navbar() {
   const setDrawer = useSetAtom(drawerAtom);
 
   function openSearchDrawer() {
-    setDrawer((prev) => ({ ...prev, title: "Search", type: "search", data: null }));
+    setDrawer((prev) => ({ ...prev, title: "Search", size: "lg", type: "search", data: null }));
   }
 
   return (

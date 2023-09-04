@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants";
 
 import { ButtonType } from "../../types/ComponentTypes/FormTypes";
-import { IconEnum } from "../../utils/enums/IconEnum";
+import { IconEnum } from "../../utils/enums/IconEnums";
 import { Icon, Tooltip } from "..";
 
 const ButtonClasses = tv({

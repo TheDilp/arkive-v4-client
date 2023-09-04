@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants";
 
 import { CheckboxType } from "../../types";
-import { IconEnum } from "../../utils/enums/IconEnum";
+import { IconEnum } from "../../utils/enums/IconEnums";
 import { Icon } from "../Misc/Icon";
 
 const CheckboxClasses = tv({
