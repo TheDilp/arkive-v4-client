@@ -520,9 +520,9 @@ const tabs = [
   { id: "4", label: "Tags", icon: IconEnum.tags },
 ];
 
-export function CharacterDrawer({ data }: { data: { id?: string } }) {
+export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
   const { project_id } = useParams();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(data?.preselectedTab ?? 0);
 
   const setDialog = useSetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);

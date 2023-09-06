@@ -1,12 +1,11 @@
-import { useSetAtom } from "jotai";
-import { useMemo, useState } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import {
   Alert,
   Avatar,
-  Badge,
   Button,
   Collapsible,
   createColumnHelper,
@@ -26,8 +25,10 @@ import {
   CharacterLocationType,
   CharacterRelationType,
   CharacterType,
+  DialogAtomType,
   DocumentType,
   MapType,
+  TagType,
 } from "../../types";
 import {
   dialogAtom,
@@ -43,6 +44,7 @@ import {
 const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
+const tagsColumnHelper = createColumnHelper<TagType>();
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -65,72 +67,74 @@ const fieldSizeClass = tv({
   },
 });
 
-const relationshipTableColumns = (project_id: string, naivgate: NavigateFunction) => [
-  relationshipColumnHelper.display({
-    id: "portrait_id",
-    header: "Portrait",
-    cell: ({ row }) => (
-      <div className="flex w-full items-center justify-center">
-        <Avatar
-          image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
-          initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
-          isBordered
-          isTooltipDisabled
-          label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
-          size="sm"
-        />
-      </div>
-    ),
-    meta: {
-      centered: true,
-    },
-    minSize: 5,
-    maxSize: 5,
-  }),
-  relationshipColumnHelper.display({
-    id: "first_name",
-    header: "First name",
-    cell: ({ row }) => row.original.first_name,
-  }),
-  relationshipColumnHelper.display({
-    id: "last_name",
-    header: "Last name",
-    cell: ({ row }) => row.original.last_name,
-  }),
-  relationshipColumnHelper.display({
-    id: "nickname",
-    header: "Nickname",
-    cell: ({ row }) => row.original?.nickname,
-  }),
-  relationshipColumnHelper.display({
-    id: "relation_type",
-    header: "Relation",
-    cell: ({ row }) => getSentenceCase(row.original?.relation_type),
-  }),
-  relationshipColumnHelper.display({
-    id: "action",
-    header: "Actions",
-    meta: {
-      centered: true,
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Dropdown
-          allowedPlacements={["left", "left-start", "left-end"]}
-          items={[
-            {
-              id: "1",
-              label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
-              icon: IconEnum.edit,
-              onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
-            },
-          ]}>
-          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-        </Dropdown>
-      </div>
-    ),
-  }),
-];
+function relationshipTableColumns(project_id: string, naivgate: NavigateFunction) {
+  return [
+    relationshipColumnHelper.display({
+      id: "portrait_id",
+      header: "Portrait",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar
+            image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
+            initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
+            isBordered
+            isTooltipDisabled
+            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
+            size="sm"
+          />
+        </div>
+      ),
+      meta: {
+        centered: true,
+      },
+      minSize: 5,
+      maxSize: 5,
+    }),
+    relationshipColumnHelper.display({
+      id: "first_name",
+      header: "First name",
+      cell: ({ row }) => row.original.first_name,
+    }),
+    relationshipColumnHelper.display({
+      id: "last_name",
+      header: "Last name",
+      cell: ({ row }) => row.original.last_name,
+    }),
+    relationshipColumnHelper.display({
+      id: "nickname",
+      header: "Nickname",
+      cell: ({ row }) => row.original?.nickname,
+    }),
+    relationshipColumnHelper.display({
+      id: "relation_type",
+      header: "Relation",
+      cell: ({ row }) => getSentenceCase(row.original?.relation_type),
+    }),
+    relationshipColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+                icon: IconEnum.edit,
+                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 
 const documentsTableColumns = [
   documentsColumnHelper.display({
@@ -167,32 +171,93 @@ const documentsTableColumns = [
     ),
   }),
 ];
-const locationsTableColumns = (project_id: string) => [
-  locationsColumnHelper.display({
-    id: "image_id",
-    header: "Image",
-    cell: ({ row }) => (
-      <div className="flex w-full items-center justify-center">
-        <Avatar
-          image={getImageURL(project_id, "maps", row.original.image_id)}
-          isTooltipDisabled
-          label={row.original.title}
-          size="sm"
-        />
-      </div>
-    ),
-    minSize: 5,
-    maxSize: 5,
-    meta: {
-      centered: true,
-    },
-  }),
-  locationsColumnHelper.display({
-    id: "title",
-    header: "Title",
-    cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
-  }),
-];
+function locationsTableColumns(project_id: string) {
+  return [
+    locationsColumnHelper.display({
+      id: "image_id",
+      header: "Image",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar
+            image={getImageURL(project_id, "maps", row.original.image_id)}
+            isTooltipDisabled
+            label={row.original.title}
+            size="sm"
+          />
+        </div>
+      ),
+      minSize: 5,
+      maxSize: 5,
+      meta: {
+        centered: true,
+      },
+    }),
+    locationsColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+    }),
+  ];
+}
+
+function tagsTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+  return [
+    tagsColumnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+    }),
+    tagsColumnHelper.accessor("color", {
+      id: "color",
+      header: "Color",
+      cell: (info) => (
+        <div className="flex w-full justify-center">
+          <div className="h-6 w-6 select-none rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
+        </div>
+      ),
+      meta: {
+        centered: true,
+      },
+      maxSize: 5,
+      minSize: 5,
+    }),
+
+    tagsColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                label: "Unlink tag",
+                icon: IconEnum.unlink,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "tags",
+                    },
+                    title: "Delete tag",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 
 function AdditionalFieldDisplay({
   character_fields,
@@ -322,13 +387,13 @@ export function CharacterProfileView() {
       }));
     }
   }
-  function openAddTagDrawer() {
+  function openEditTagDrawer() {
     if (existingCharacter?.data?.id) {
       setDrawer((prev) => ({
         ...prev,
-        type: "character_add",
-        title: "Add tags",
-        data: { id: existingCharacter?.data?.id, type: "tags" },
+        type: "characters",
+        title: "Edit character",
+        data: { id: existingCharacter?.data?.id, preselectedTab: 3 },
       }));
     }
   }
@@ -365,7 +430,10 @@ export function CharacterProfileView() {
           </div>
         </div>
       )}
-      <div className="col-span-5 h-full overflow-y-auto rounded-lg bg-zinc-950 p-4 pb-24 lg:col-span-4">
+      <div
+        className={`col-span-5 h-full rounded-lg bg-zinc-950 p-4 pb-24 lg:col-span-4 ${
+          selectedTab === 2 ? "overflow-y-auto" : ""
+        }`}>
         <h2 className="mb-4 flex items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
@@ -438,22 +506,31 @@ export function CharacterProfileView() {
                 <Collapsible
                   actions={[
                     {
-                      icon: IconEnum.add,
-                      tooltip: "Add tags",
-                      onClick: openAddTagDrawer,
+                      icon: IconEnum.edit,
+                      tooltip: "Edit tags",
+                      onClick: openEditTagDrawer,
                     },
                   ]}
                   icon={IconEnum.tags}
                   initialOpen={false}
                   label="Tags">
                   {existingCharacter?.data?.tags?.length ? (
-                    <div className="mt-2 flex flex-wrap">
-                      {existingCharacter.data.tags.map((tag) => (
-                        <div key={tag.id}>
-                          <Badge customColor={tag.color} label={tag.title} />
-                        </div>
-                      ))}
-                    </div>
+                    <TablePageLayout>
+                      <div className="mt-2 animate-in fade-in fill-mode-both">
+                        <Table
+                          columns={tagsTableColumns(setDialog)}
+                          config={{
+                            hasNoHeaderGap: true,
+                            expandable: true,
+                            filters: {},
+                          }}
+                          data={existingCharacter?.data?.tags || []}
+                          dispatch={dispatch}
+                          isLoading={isFetching}
+                          type="tags"
+                        />
+                      </div>
+                    </TablePageLayout>
                   ) : (
                     <div className="mt-2 w-full">
                       <Alert label="There is no content." variant="info" />

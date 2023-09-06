@@ -48,15 +48,9 @@ export type DrawerAtomType = {
   exceptions?: DrawerExceptions;
 } & (
   | { type: "project"; data: InsertProjectType | null }
+  | { type: "characters"; data: { id?: string; project_id?: string; preselectedTab?: number } }
   | {
-      type:
-        | "characters"
-        | "character_fields_templates"
-        | "documents"
-        | "maps"
-        | "graphs"
-        | "random_tables"
-        | "random_table_option";
+      type: "character_fields_templates" | "documents" | "maps" | "graphs" | "random_tables" | "random_table_option";
       data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
