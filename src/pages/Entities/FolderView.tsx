@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { MouseEvent, useLayoutEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Alert, Breadcrumbs, Button, Dropdown, Icon } from "../../components";
+import { Alert, Breadcrumbs, Button, Dropdown, Icon, Skeleton } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DrawerContentCreateNewType } from "../../types";
 import {
@@ -117,7 +117,7 @@ export function FolderView() {
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
   if ((type === "graphs" || type === "random_tables") && fields.includes("image_id")) fields.pop();
 
-  const { data: base } = useGetEntities<BaseEntityType & { image_id?: string }>(
+  const { data: base, isFetching } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,
@@ -188,6 +188,8 @@ export function FolderView() {
     }
   }, [data, type, setBreadcrumbs, item_id]);
 
+  if (isFetching) return <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />;
+
   if (!item_id && type === "characters") return <CharactersView />;
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
 
@@ -236,7 +238,7 @@ export function FolderView() {
       </div>
 
       {!item_id ? (
-        <div className="grid h-full w-full grid-cols-2 content-start gap-2 md:grid-cols-4 lg:grid-cols-10">
+        <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length ? base.data : []).map((item) => (
             <EntityItem
               key={item.id}

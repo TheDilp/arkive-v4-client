@@ -1,5 +1,5 @@
 import { SkeletonType } from "../../types";
-import { IconEnum } from "../../utils";
+import { getDefaultEntityIcon, IconEnum } from "../../utils";
 import { Icon } from ".";
 
 function TableRow() {
@@ -103,6 +103,24 @@ function DrawerFormSkeleton() {
   );
 }
 
+function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "entity_type" | "limit">) {
+  return (
+    <div className="px-8">
+      <div className="flex h-10 w-full items-center justify-between" />
+      <div className="grid h-full w-full animate-pulse grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
+        {[...Array(limit).keys()].map((key) => (
+          <div key={key} className="col-span-1">
+            <div className="h-24 w-24">
+              <Icon color="darkgrey" fontSize={100} icon={getDefaultEntityIcon(entity_type)} />
+              <div className="h-4 min-h-[0.25rem] w-full rounded bg-zinc-700" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function EditorSkeleton() {
   return (
     <div className="flex h-[calc(95%)] w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:h-[calc(100%-2rem)]">
@@ -165,8 +183,9 @@ function CharacterProfileMainSkeleton() {
   );
 }
 
-export function Skeleton({ type, limit }: SkeletonType) {
+export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
+  if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
   if (type === "breadcrumbs") return <BreadcrumbsSkeleton />;
   if (type === "drawer_form") return <DrawerFormSkeleton />;
   if (type === "editor") return <EditorSkeleton />;
