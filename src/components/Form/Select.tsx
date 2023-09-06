@@ -29,6 +29,7 @@ const SelectClasses = tv({
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
     placeholder: "text-zinc-500 font-lato",
+    displayItem: "truncate",
   },
   variants: {
     variant: {
@@ -69,6 +70,12 @@ const SelectClasses = tv({
       },
       md: {
         select: "h-10",
+      },
+    },
+    isExpandingToNewRow: {
+      true: {
+        displayItem: "whitespace-normal overflow-visible",
+        select: "h-fit",
       },
     },
   },
@@ -189,6 +196,7 @@ export function Select({
   value,
   hasSearch,
   name,
+  isExpandingToNewRow,
   isDisabled,
   options = [],
   isMultiple,
@@ -208,7 +216,8 @@ export function Select({
     optionsContainer,
     helperText: helperTextClasses,
     placeholder: placeholderClasses,
-  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen });
+    displayItem: displayItemClasses,
+  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen, isExpandingToNewRow });
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
     open: isOpen,
@@ -288,7 +297,7 @@ export function Select({
             {!!value && !Array.isArray(value) && selectedItem?.icon && !selectedItem?.image ? (
               <Icon fontSize={20} icon={selectedItem.icon} />
             ) : null}
-            <span className="truncate">{selectedItem?.label || displayText}</span>
+            <span className={displayItemClasses()}>{selectedItem?.label || displayText}</span>
           </div>
         ) : (
           <div className={placeholderClasses()}>{options.length === 0 ? "No options available." : placeholder || "Select"}</div>
@@ -305,7 +314,7 @@ export function Select({
                   className="sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none"
                   onChange={(e) => {
                     if (e.target.value) {
-                      setFilteredItems(options.filter((opt) => opt.label.toLowerCase().includes(e.target.value)));
+                      setFilteredItems(options.filter((opt) => opt.label.toLowerCase().includes(e.target.value.toLowerCase())));
                     } else {
                       setFilteredItems(options);
                     }

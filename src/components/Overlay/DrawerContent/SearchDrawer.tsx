@@ -3,7 +3,8 @@ import { useAtomValue } from "jotai";
 import { useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { SearchableEntities, SearchAllEntitiesType, SearchResultType } from "../../../types";
+import { useGetEntities } from "../../../hooks";
+import { SearchableEntities, SearchAllEntitiesType, SearchResultType, TagType } from "../../../types";
 import { drawerAtom, getCharacterFullName, getSentenceCase } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
@@ -30,7 +31,10 @@ export function SearchDrawer() {
   const drawer = useAtomValue(drawerAtom);
   const [selectedTab, setSelectedTab] = useState(0);
   const [searchCategory, setSearchCategory] = useState<SearchableEntities | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [results, setResults] = useState<SearchAllEntitiesType | SearchResultType | null>();
+
+  const { data: tags } = useGetEntities<TagType>({ data: { project_id } }, "tags", { staleTime: 5 * 60 * 1000 });
 
   useLayoutEffect(() => {
     return () => {
@@ -43,26 +47,41 @@ export function SearchDrawer() {
     <div className="flex flex-col gap-y-2 overflow-hidden">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       <div className="flex w-full items-center gap-x-2">
-        <Search
-          isDisabled={isSearchDisabled(selectedTab, searchCategory)}
-          isOptionsHidden
-          name="searchTerm"
-          onChange={() => {}}
-          onSearch={(res) => setResults(res)}
-          placeholder="Press enter to search entites."
-          searchEntity={selectedTab === 1 && searchCategory ? searchCategory : "all"}
-          value={undefined}
-        />
-        {selectedTab === 1 ? (
-          <div className="w-1/3">
-            <Select
-              name="searchCategory"
-              onChange={({ value }) => setSearchCategory(value as SearchableEntities)}
-              options={SearchCategories}
-              value={searchCategory}
+        {selectedTab <= 1 ? (
+          <>
+            <Search
+              isDisabled={isSearchDisabled(selectedTab, searchCategory)}
+              isOptionsHidden
+              name="searchTerm"
+              onChange={() => {}}
+              onSearch={(res) => setResults(res)}
+              placeholder="Press enter to search entites."
+              searchEntity={selectedTab === 1 && searchCategory ? searchCategory : "all"}
+              value={undefined}
             />
-          </div>
-        ) : null}
+            {selectedTab === 1 ? (
+              <div className="w-1/3">
+                <Select
+                  name="searchCategory"
+                  onChange={({ value }) => setSearchCategory(value as SearchableEntities)}
+                  options={SearchCategories}
+                  value={searchCategory}
+                />
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <Select
+            hasSearch
+            isExpandingToNewRow
+            isMultiple
+            name="selectedTags"
+            onChange={({ value }) => setSelectedTags(value as string[])}
+            options={tags?.data?.map((t) => ({ value: t.id, label: t.title })) || []}
+            placeholder="Select tags to use for searching."
+            value={selectedTags}
+          />
+        )}
       </div>
       <ul className="flex max-h-full min-h-fit flex-col gap-y-2 overflow-y-auto">
         {results?.length
