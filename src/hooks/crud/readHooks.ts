@@ -162,7 +162,7 @@ export function useGetInfiniteEntities<ReturnType>(
 }
 
 export function useSearch<ReturnType>(
-  request: { data: { search_term: string } | { tag_ids: string[] }; limit: number },
+  request: { data: { search_term: string } | { tag_ids: string[]; match: "all" | "any" }; limit: number },
   type: SearchableEntities,
   project_id: string,
   options?: UseQueryOptions<any> & { queryKeyConcat?: string[] },
