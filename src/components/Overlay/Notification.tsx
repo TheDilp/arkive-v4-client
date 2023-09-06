@@ -10,7 +10,7 @@ import { Icon } from "../Misc";
 
 const NotificationClasses = tv({
   slots: {
-    base: "flex flex-col pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
+    base: "flex flex-col overflow-hidden pointer-events-auto w-fit max-w-[30rem] relative items-center border-zinc-800 box-border rounded-lg bg-zinc-700 py-4 px-2 text-white shadow duration-300 ease-out",
     titleContainer: "text-sm font-normal truncate h-fit text-center flex items-center gap-x-2 max-w-[25rem] justify-between ",
     title: "text-base truncate",
     description: "text-center text-sm mt-1 flex-1",
