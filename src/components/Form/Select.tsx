@@ -173,9 +173,7 @@ function onClick({
     ) {
       onChange({
         name,
-        value: options
-          .filter((opt) => opt?.value === options[index].value || value?.includes(opt?.value))
-          .map((opt) => opt.value),
+        value: value?.concat(options[index].value),
       });
     }
   } else {
@@ -272,7 +270,8 @@ export function Select({
 
   useEffect(() => {
     if (!filteredItems.length && options.length) setFilteredItems(options);
-  }, [options]);
+    if (!isOpen) setFilteredItems(options);
+  }, [options, isOpen]);
 
   return (
     <div className={base()}>
@@ -332,7 +331,9 @@ export function Select({
                     aria-selected={i === activeIndex}
                     className={SelectOption({
                       isActive: activeIndex === i,
-                      isSelected: Array.isArray(value) ? value?.includes(options?.[i]?.value) : value === options?.[i]?.value,
+                      isSelected: Array.isArray(value)
+                        ? value?.includes(filteredItems?.[i]?.value)
+                        : value === filteredItems?.[i]?.value,
                       size,
                     })}
                     role="option"
