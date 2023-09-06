@@ -1,5 +1,5 @@
-import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch, useMemo, useState } from "react";
+import { useSetAtom } from "jotai";
+import { useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
@@ -25,7 +25,6 @@ import {
   CharacterLocationType,
   CharacterRelationType,
   CharacterType,
-  DialogAtomType,
   DocumentType,
   MapType,
   TagType,
@@ -200,64 +199,27 @@ function locationsTableColumns(project_id: string) {
   ];
 }
 
-function tagsTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
-  return [
-    tagsColumnHelper.accessor("title", {
-      id: "title",
-      header: "Title",
-      cell: (info) => info.getValue(),
-    }),
-    tagsColumnHelper.accessor("color", {
-      id: "color",
-      header: "Color",
-      cell: (info) => (
-        <div className="flex w-full justify-center">
-          <div className="h-6 w-6 select-none rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
-        </div>
-      ),
-      meta: {
-        centered: true,
-      },
-      maxSize: 5,
-      minSize: 5,
-    }),
-
-    tagsColumnHelper.display({
-      id: "action",
-      header: "Actions",
-      meta: {
-        centered: true,
-      },
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Dropdown
-            allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                label: "Unlink tag",
-                icon: IconEnum.unlink,
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "tags",
-                    },
-                    title: "Delete tag",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-          </Dropdown>
-        </div>
-      ),
-    }),
-  ];
-}
+const tagsTableColumns = [
+  tagsColumnHelper.accessor("title", {
+    id: "title",
+    header: "Title",
+    cell: (info) => info.getValue(),
+  }),
+  tagsColumnHelper.accessor("color", {
+    id: "color",
+    header: "Color",
+    cell: (info) => (
+      <div className="flex w-full justify-center">
+        <div className="h-6 w-6 select-none rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
+      </div>
+    ),
+    meta: {
+      centered: true,
+    },
+    maxSize: 5,
+    minSize: 5,
+  }),
+];
 
 function AdditionalFieldDisplay({
   character_fields,
@@ -391,9 +353,9 @@ export function CharacterProfileView() {
     if (existingCharacter?.data?.id) {
       setDrawer((prev) => ({
         ...prev,
-        type: "characters",
-        title: "Edit character",
-        data: { id: existingCharacter?.data?.id, preselectedTab: 3 },
+        type: "edit_tags",
+        title: "Edit tags",
+        data: { tags: existingCharacter?.data?.tags || [], entity: { type: "characters", id: existingCharacter?.data?.id } },
       }));
     }
   }
@@ -518,7 +480,7 @@ export function CharacterProfileView() {
                     <TablePageLayout>
                       <div className="mt-2 animate-in fade-in fill-mode-both">
                         <Table
-                          columns={tagsTableColumns(setDialog)}
+                          columns={tagsTableColumns}
                           config={{
                             hasNoHeaderGap: true,
                             expandable: true,

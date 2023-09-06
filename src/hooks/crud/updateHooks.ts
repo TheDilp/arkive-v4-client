@@ -4,10 +4,9 @@ import { AvailableEntityType, AvailableSubEntityType, GraphType, MapType } from 
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
-export function useUpdateEntity<InsertType extends { data: { id?: string; parent_id?: string | null } }>(
-  type: AvailableEntityType,
-  project_id: string,
-) {
+export function useUpdateEntity<
+  InsertType extends { data: { id?: string; parent_id?: string | null }; relations?: { [key: string]: any } },
+>(type: AvailableEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -20,12 +19,41 @@ export function useUpdateEntity<InsertType extends { data: { id?: string; parent
       });
     },
     {
+      onMutate: (vars) => {
+        const old = queryClient.getQueryData([type, vars.data.id]);
+        if (type !== "documents") {
+          queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
+            if (oldData?.data)
+              return {
+                ...oldData,
+                data: {
+                  ...oldData.data,
+                  ...vars.data,
+                  ...vars.relations,
+                },
+              };
+            return oldData;
+          });
+        }
+        return { old };
+      },
+
+      onError: (_, vars, context) => {
+        queryClient.setQueryData([type, vars.data.id], context?.old);
+
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
       onSuccess: (data, vars) => {
         if (data.ok) {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
 
           // Invalidating a document causes the editor to refetch while open
-          if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
+          // if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
 
           createNotification({
@@ -198,7 +226,6 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType) {
     return null;
   });
 }
-
 export function useAddToEntity<InsertType extends { data: { id?: string }; relations: { [key: string]: { id: string }[] } }>(
   type: AvailableEntityType,
   project_id: string,

@@ -24,6 +24,7 @@ import {
   RandomTableOptionsDrawer,
   TagsDrawer,
 } from "./DrawerContent";
+import { EditTags } from "./DrawerContent/EditTags";
 import { SearchDrawer } from "./DrawerContent/SearchDrawer";
 
 const DrawerClasses = tv({
@@ -138,6 +139,7 @@ export function Drawer() {
         {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
         {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
         {drawer.type === "search" ? <SearchDrawer /> : null}
+        {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
       </div>
     </div>
   );
