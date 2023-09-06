@@ -1,4 +1,4 @@
-import { AssetType } from "../../types";
+import { AssetType, SearchableEntities } from "../../types";
 import { baseURLS } from "../enums/ServerEnum";
 
 export function createURL(type: string): string {
@@ -27,4 +27,10 @@ export function getImageURL(project_id: string, type: AssetType, image_id?: stri
   return `https://${import.meta.env.VITE_DO_SPACES_NAME}.${
     isGraphImage ? import.meta.env.VITE_DO_SPACES_ENDPOINT : import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT
   }/assets/${project_id}/${type}/${image_id}.webp`;
+}
+
+export function getSearchURL(type: SearchableEntities) {
+  if (type === "all") return "";
+  if (type === "by_tags") return "/all/tags";
+  return `/${type}`;
 }

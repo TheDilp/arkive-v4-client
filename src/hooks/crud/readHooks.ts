@@ -2,7 +2,7 @@ import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@ta
 
 import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
-import { baseURLS, FetchFunction } from "../../utils";
+import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
@@ -161,17 +161,17 @@ export function useGetInfiniteEntities<ReturnType>(
   );
 }
 
-export function useSearch<ReturnType extends { value: string; label: string; color?: string; image?: string }>(
-  request: { data: { search_term: string }; limit: number },
+export function useSearch<ReturnType>(
+  request: { data: { search_term: string } | { tag_ids: string[] }; limit: number },
   type: SearchableEntities,
   project_id: string,
   options?: UseQueryOptions<any> & { queryKeyConcat?: string[] },
 ) {
-  return useQuery<{ data: ReturnType[] }, unknown>(
+  return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/search/${project_id}${type === "all" ? "" : "/".concat(type)}`,
+        url: `${baseURLS.baseServer}/search/${project_id}${getSearchURL(type)}`,
         method: "POST",
         body: JSON.stringify(request),
       }),

@@ -1,17 +1,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { useGetEntities } from "../../../hooks";
+import { useSearch } from "../../../hooks";
 import { SearchableEntities, SearchAllEntitiesType, SearchResultType, TagType } from "../../../types";
-import { drawerAtom, getCharacterFullName, getSentenceCase } from "../../../utils";
+import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { CharacterPreview, ItemPreview } from "../../DataDisplay";
 import { Search, Select, Title } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Alert } from "../../Misc";
+import { Alert, Badge } from "../../Misc";
 
 const tabs = [
   { id: "1", label: "Title" },
@@ -31,17 +31,41 @@ export function SearchDrawer() {
   const drawer = useAtomValue(drawerAtom);
   const [selectedTab, setSelectedTab] = useState(0);
   const [searchCategory, setSearchCategory] = useState<SearchableEntities | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
   const [results, setResults] = useState<SearchAllEntitiesType | SearchResultType | null>();
+  const createNotification = useNotifications();
 
-  const { data: tags } = useGetEntities<TagType>({ data: { project_id } }, "tags", { staleTime: 5 * 60 * 1000 });
+  const {
+    data: searchByTagsData,
+    refetch,
+    remove,
+  } = useSearch<SearchAllEntitiesType | SearchResultType | null>(
+    { data: { tag_ids: selectedTags.map((tag) => tag.id) }, limit: 100 },
+    "by_tags",
+    project_id as string,
+    {
+      enabled: false,
+    },
+  );
 
   useLayoutEffect(() => {
     return () => {
       setResults(null);
       queryClient.removeQueries({ queryKey: ["search"] });
     };
-  }, [drawer, searchCategory]);
+  }, [drawer, searchCategory, selectedTab]);
+
+  useEffect(() => {
+    if (selectedTags.length) {
+      const timeout = setTimeout(() => {
+        refetch();
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+    remove();
+
+    return () => {};
+  }, [selectedTags]);
 
   return (
     <div className="flex flex-col gap-y-2 overflow-hidden">
@@ -71,21 +95,60 @@ export function SearchDrawer() {
             ) : null}
           </>
         ) : (
-          <Select
-            hasSearch
-            isExpandingToNewRow
-            isMultiple
-            name="selectedTags"
-            onChange={({ value }) => setSelectedTags(value as string[])}
-            options={tags?.data?.map((t) => ({ value: t.id, label: t.title })) || []}
-            placeholder="Select tags to use for searching."
-            value={selectedTags}
+          <Search
+            name="searchTerm"
+            onChange={({ label, value, color }) => {
+              if ((selectedTags || [])?.some((tag) => tag.id === value)) {
+                createNotification({
+                  title: "Cannot add the same tag twice.",
+                  variant: "warning",
+                  icon: IconEnum.info_circle,
+                  timer: 3,
+                });
+                return;
+              }
+              setSelectedTags((prev) =>
+                prev.concat({
+                  title: label as string,
+                  id: value,
+                  project_id: project_id as string,
+                  color: color as string,
+                }),
+              );
+            }}
+            placeholder="Press enter to add tags for searching."
+            searchEntity="tags"
+            value={undefined}
           />
+          // <Select
+          //   hasSearch
+          //   isExpandingToNewRow
+          //   isMultiple
+          //   name="selectedTags"
+          //   onChange={({ value }) => setSelectedTags(value as string[])}
+          //   options={tags?.data?.map((t) => ({ value: t.id, label: t.title })) || []}
+          //   placeholder="Select tags to use for searching."
+          //   value={selectedTags}
+          // />
         )}
       </div>
+      {selectedTab === 2 ? (
+        <ul className="flex flex-wrap">
+          {selectedTags.map((tag) => (
+            <div key={tag.id} className="w-min">
+              <Badge
+                clearAction={() => setSelectedTags((prev) => prev.filter((t) => t.id !== tag.id))}
+                customColor={tag.color}
+                label={tag.title}
+              />
+            </div>
+          ))}
+        </ul>
+      ) : null}
       <ul className="flex max-h-full min-h-fit flex-col gap-y-2 overflow-y-auto">
-        {results?.length
-          ? results.map((item) => {
+        {results?.length || searchByTagsData?.data?.length
+          ? (results || searchByTagsData?.data || []).map((item) => {
+              if (!item) return null;
               if ("name" in item) {
                 const { name, result } = item;
                 return (
@@ -147,6 +210,7 @@ export function SearchDrawer() {
               );
             })
           : null}
+
         {Array.isArray(results) && results?.length === 0 ? <Alert label="No matching items found." /> : null}
       </ul>
     </div>

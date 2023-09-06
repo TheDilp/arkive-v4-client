@@ -200,7 +200,7 @@ export function Search({
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
-  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string; image?: string }>(
+  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string; image?: string }[]>(
     { data: { search_term: inputValue }, limit: 5 },
     searchEntity,
     project_id as string,

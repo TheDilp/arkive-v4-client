@@ -39,6 +39,7 @@ export type AvailableSubEntityType =
 
 export type SearchableEntities =
   | "all"
+  | "by_tags"
   | "characters"
   | "documents"
   | "alter_names"
