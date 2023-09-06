@@ -336,7 +336,7 @@ export function CharacterProfileView() {
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
   return (
-    <div className="grid h-full max-h-[calc(100%-6rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden p-4 pb-16 lg:max-h-full lg:content-stretch">
+    <div className="grid h-full max-h-[calc(100%-6rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:max-h-[calc(100%-2rem)] lg:content-stretch">
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
@@ -471,7 +471,7 @@ export function CharacterProfileView() {
                 <Skeleton type="table" />
               </div>
             ) : (
-              <div className="h-full max-h-[85%] w-full overflow-hidden">
+              <div className="h-full max-h-full w-full overflow-hidden">
                 <Table
                   columns={columns}
                   config={{
@@ -486,7 +486,7 @@ export function CharacterProfileView() {
           </TablePageLayout>
         ) : null}
         {selectedTab === 2 ? (
-          <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
+          <ul className="flex flex-col gap-y-2 overflow-hidden animate-in fade-in fill-mode-both">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {existingTemplates?.data?.length && !isFetchingTemplates
               ? existingTemplates?.data?.sort(sortEntities)?.map((t) => (
