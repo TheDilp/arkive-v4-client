@@ -264,7 +264,7 @@ function AdditionalFieldDisplay({
               ) : null}
               {field.field_type === "random_table" ? (
                 <div>
-                  <Title label={randomTable?.title || ""} />
+                  <Title label={randomTable?.title || ""} size="lg" />
                   <Title label={subOption?.title || ""} />
                 </div>
               ) : null}
