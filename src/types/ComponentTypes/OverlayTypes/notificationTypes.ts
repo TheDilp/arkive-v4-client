@@ -20,6 +20,7 @@ export interface NotificationType {
   variant?: Variant;
   position?: NotificationPositionsType;
   hasTitleBorder?: boolean;
+  hasNoTruncate?: boolean;
   type?: NotificationContentType;
   data?: any;
   actions?: {

@@ -132,6 +132,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                 },
               },
             ]}
+            hasNoTruncate
             id={currentDocument?.data?.id || crypto.randomUUID()}
             position="top-right"
             timer={0}

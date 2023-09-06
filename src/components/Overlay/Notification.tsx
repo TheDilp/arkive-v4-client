@@ -59,6 +59,11 @@ const NotificationClasses = tv({
         title: "text-xl",
       },
     },
+    hasNoTruncate: {
+      true: {
+        title: "overflow-visible whitespace-normal",
+      },
+    },
   },
 });
 
@@ -128,6 +133,7 @@ export function Notification({
   actions,
   position = "top-right",
   hasTitleBorder,
+  hasNoTruncate,
   type,
   data,
 }: NotificationType) {
@@ -155,7 +161,7 @@ export function Notification({
     description: descriptionClasses,
     progress,
     iconContainer,
-  } = NotificationClasses({ variant, position, hasTitleBorder });
+  } = NotificationClasses({ variant, position, hasTitleBorder, hasNoTruncate });
   return (
     <div className={base()} role="alert">
       <div
