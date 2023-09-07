@@ -4,18 +4,18 @@ import { useParams } from "react-router-dom";
 
 import { Button, Input, Select } from "../../components";
 import { useChangeNavbarTitle, useGetEntity } from "../../hooks";
-import { CalendarType, CurrentDateType, MonthType } from "../../types/EntityTypes/calendarTypes";
+import { CalendarType, CurrentDateType } from "../../types/EntityTypes/calendarTypes";
 import { drawerAtom, getFillerDayNumber, getStartingDayForMonth, IconEnum } from "../../utils";
 
 export default function DayNumber({
   dayNumber,
-  month,
+  monthNumber,
   year,
   isFiller,
   isReadOnly,
 }: {
   dayNumber: number;
-  month: MonthType;
+  monthNumber: number;
   year: number;
   isFiller?: boolean;
   isReadOnly?: boolean;
@@ -36,7 +36,7 @@ export default function DayNumber({
                   ...prev,
                   type: "events",
                   title: "Create new event",
-                  data: { day: dayNumber + 1, month, monthsId: month.id, year },
+                  data: { day: dayNumber + 1, month: monthNumber, year },
                 }));
             }}
           />
@@ -48,6 +48,7 @@ export default function DayNumber({
 
 export function CalendarView() {
   const { project_id, item_id } = useParams();
+  const setDrawer = useSetAtom(drawerAtom);
   const { data: existingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
     data: { project_id },
     relations: { months: true },
@@ -57,7 +58,6 @@ export function CalendarView() {
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
-  console.log(existingCalendar?.data?.months[date.month].id);
   return (
     <div className="flex flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
@@ -92,17 +92,15 @@ export function CalendarView() {
         <div className="w-fit self-end">
           <Button
             icon={IconEnum.add}
-            label="Create new character"
-            onClick={
-              () => {}
-              //   setDrawer((prev) => ({
-              //     ...prev,
-              //     data: { project_id },
-              //     title: "Create new character",
-              //     type: "characters",
-              //     size: "lg",
-              //   }))
-            }
+            label="Create new event"
+            onClick={() => {
+              setDrawer((prev) => ({
+                ...prev,
+                data: { month: date.month, year: date.year },
+                title: "Create new event",
+                type: "events",
+              }));
+            }}
           />
         </div>
       </div>
@@ -146,7 +144,7 @@ export function CalendarView() {
                 dayNumber={getFillerDayNumber(existingCalendar?.data?.months, date.month, day)}
                 isFiller
                 //   isReadOnly={isReadOnly}
-                month={existingCalendar?.data.months[date.month]}
+                monthNumber={date.month}
                 year={date.year}
               />
             </div>
@@ -158,7 +156,7 @@ export function CalendarView() {
             onKeyDown={() => {}}
             role="button"
             tabIndex={-1}>
-            <DayNumber key={day} dayNumber={day} month={existingCalendar?.data?.months[date.month]} year={date.year} />
+            <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
           </div>
         ))}
       </div>

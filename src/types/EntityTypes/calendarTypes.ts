@@ -1,14 +1,11 @@
+import { BaseEntityType } from "./baseEntityTypes";
+import { DocumentType } from "./documentTypes";
+import { ImageType } from "./imageTypes";
 import { TagType } from "./tagTypes";
 
 /* eslint-disable no-use-before-define */
-export interface CalendarType {
-  id: string;
-  title: string;
-  project_id: string;
-  parent_id?: string | null;
+export interface CalendarType extends BaseEntityType {
   icon: string | null;
-  is_folder?: boolean | null;
-  is_public?: boolean | null;
   offset: number;
   hours?: number | null;
   minutes?: number | null;
@@ -28,27 +25,24 @@ export type MonthType = {
 export interface EventType {
   id: string;
   title: string;
-  description?: string;
-  backgroundImage?: string;
+  description: string | null;
+  is_public: boolean;
+  background_color?: string | null;
+  text_color?: string | null;
+  hours?: number | null;
+  minutes?: number | null;
+  calendar_id: string | null;
+  document_id?: string | null;
+  image_id?: string | null;
+  endDay?: number | null;
+  startDay: number;
+  endMonth?: number | null;
+  endYear?: number | null;
+  startMonth: number;
+  startYear: number;
 
-  textColor: string;
-  backgroundColor?: string;
-
-  documentsId?: string;
   document?: DocumentType;
-
-  year: number;
-  month: MonthType;
-  day: number;
-  hours?: number;
-  minutes?: number;
-
-  isPublic: boolean;
-
-  erasId: string;
-  monthsId: string | null;
-  calendarsId: string | null;
-
+  background_image?: ImageType;
   tags: TagType[];
 }
 

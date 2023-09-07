@@ -2,7 +2,7 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { MouseEvent } from "react";
 
 import { InsertProjectType } from "../../../validation/project";
-import { AllAvailableEntities, AvailableEntityType, MapPinType, MonthType, TagType } from "../../EntityTypes";
+import { AllAvailableEntities, AvailableEntityType, MapPinType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
 export type DrawerContentType =
@@ -64,7 +64,7 @@ export type DrawerAtomType = {
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } } }
-  | { type: "events"; data: { day: number; month: MonthType; monthsId: string; year: number } }
+  | { type: "events"; data: { day?: number; month: number; year: number } | { id: string } }
   | { type: null; data: null }
 );
 

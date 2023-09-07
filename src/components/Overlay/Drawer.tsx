@@ -25,6 +25,7 @@ import {
   TagsDrawer,
 } from "./DrawerContent";
 import { EditTags } from "./DrawerContent/EditTags";
+import { EventDrawer } from "./DrawerContent/EventDrawer";
 import { SearchDrawer } from "./DrawerContent/SearchDrawer";
 
 const DrawerClasses = tv({
@@ -131,6 +132,7 @@ export function Drawer() {
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
+        {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
