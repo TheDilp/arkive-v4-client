@@ -16,7 +16,7 @@ export interface InputType extends BaseFormComponentType {
   onKeyDown?: (e: KeyboardEvent) => void;
   value: string | number | undefined;
   helperText?: string;
-  min?: string | number;
-  max?: string | number;
-  step?: string | number;
+  min?: number;
+  max?: number;
+  step?: number;
 }

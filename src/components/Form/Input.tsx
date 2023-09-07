@@ -63,6 +63,21 @@ const InputClasses = tv({
   },
 });
 
+function handleNumberChange({
+  name,
+  newValue,
+  min,
+  max,
+  onChange,
+}: {
+  newValue: number;
+} & Pick<InputType, "onChange" | "min" | "max" | "name">) {
+  if (max && newValue > max) return;
+  if (min && newValue < min) return;
+
+  onChange({ name, value: newValue });
+}
+
 export function Input({
   name,
   value,
@@ -97,7 +112,11 @@ export function Input({
         max={max}
         min={min}
         name={name}
-        onChange={(e) => (type === "number" ? onChange({ name, value: e.target.valueAsNumber }) : onChange(e.target))}
+        onChange={(e) =>
+          type === "number"
+            ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, onChange })
+            : onChange(e.target)
+        }
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         step={step}
