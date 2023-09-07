@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { useVirtual } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import omit from "lodash.omit";
 import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -489,15 +489,13 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     }
   }, [pagination?.page]);
 
-  const rowVirtualizer = useVirtual({
-    parentRef: bodyRef,
-    size: data.length,
+  const rowVirtualizer = useVirtualizer({
+    getScrollElement: () => bodyRef.current,
+    estimateSize: () => 40,
+    count: data.length,
     overscan: 10,
   });
-  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
   const { rows } = table.getRowModel();
-  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
-  const paddingBottom = virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0;
 
   if (isLoading) return <Skeleton limit={pagination?.limit} type="table" />;
   return (
@@ -626,12 +624,7 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
           </div>
           {data?.length ? (
             <div ref={bodyRef} className={body()}>
-              {paddingTop > 0 && (
-                <div>
-                  <div style={{ height: `${paddingTop}px` }} />
-                </div>
-              )}
-              {virtualRows.map((virtualRow) => {
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const row = rows[virtualRow.index];
                 return (
                   <Fragment key={row.id}>
@@ -677,11 +670,6 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                   </Fragment>
                 );
               })}
-              {paddingBottom > 0 && (
-                <div>
-                  <div style={{ height: `${paddingBottom}px` }} />
-                </div>
-              )}
             </div>
           ) : (
             <Alert label="There's no content." variant="info" />
