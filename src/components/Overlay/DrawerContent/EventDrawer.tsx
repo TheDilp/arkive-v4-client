@@ -52,13 +52,21 @@ export function EventDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
-          <Input
-            label="Event title (required)"
-            name="title"
-            onChange={handleChange}
-            placeholder="Event title"
-            value={event?.title || ""}
-          />
+          <div className="flex flex-nowrap gap-x-2">
+            <Input
+              label="Event title (required)"
+              name="title"
+              onChange={handleChange}
+              placeholder="Event title"
+              value={event?.title || ""}
+            />
+            <div className="flex flex-col justify-between">
+              <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Color</span>
+              <div className="flex items-center justify-center gap-x-2 pb-2">
+                <ColorPicker hasCustom name="background_color" onChange={handleChange} value={event.background_color || ""} />
+              </div>
+            </div>
+          </div>
           <div className="flex items-center justify-between gap-x-2">
             <Input
               label="Start day (required)"
@@ -153,10 +161,6 @@ export function EventDrawer({ data }: Props) {
             )}
           </div>
           <div>{/* <Search label="Document (optional)" searchEntity="documents" /> */}</div>
-          <div className="flex items-center justify-between">
-            <span>Event color:</span>
-            <ColorPicker name="background_color" onChange={handleChange} value={event?.background_color || ""} />
-          </div>
         </>
       ) : null}
       {selectedTab === 2 ? (
