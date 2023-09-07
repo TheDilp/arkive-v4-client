@@ -168,6 +168,7 @@ export function TimelineView() {
         </div>
         <div className="w-36">
           <Select
+            isDisabled={view === "gantt"}
             name="direction"
             onChange={({ value }) => {
               setDirection(value as TimelineDirectionType);
