@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import {
   autoPlacement,
   autoUpdate,
@@ -13,12 +11,12 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import { useVirtual } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Fragment, useEffect, useState } from "react";
 
 import { IconPickerType } from "../../types";
 import { iconList } from "../../utils/enums/IconPickerEnums";
-import { Input } from "../Form";
+import { Button, Input } from "../Form";
 import { Icon } from "../Misc";
 
 export function IconPicker({ name, onChange, icon, iconColor, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
@@ -42,19 +40,17 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     useDismiss(context),
   ]);
 
-  const id = crypto.randomUUID();
-  const labelId = `${id}-label`;
-  const descriptionId = `${id}-description`;
-
-  const rowVirtualizer = useVirtual({
-    parentRef: refs.floating,
-    size: Math.ceil(filteredIcons.length / 6),
-    overscan: 10,
+  const rowVirtualizer = useVirtualizer({
+    getScrollElement: () => refs.floating.current as any,
+    count: Math.ceil(iconList.filter((ic) => (filter ? ic.includes(filter.toLowerCase()) : true)).length / 6),
+    estimateSize: () => 36,
+    overscan: 1,
   });
-  const columnVirtualizer = useVirtual({
+  const columnVirtualizer = useVirtualizer({
     horizontal: true,
-    size: 6,
-    parentRef: refs.floating,
+    estimateSize: () => 36,
+    count: 6,
+    getScrollElement: () => refs.floating.current as any,
     overscan: 5,
   });
 
@@ -88,43 +84,36 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
         <FloatingFocusManager context={context} modal={false} order={["reference", "content"]} returnFocus={false}>
           <div
             ref={refs.setFloating}
-            aria-describedby={descriptionId}
-            aria-labelledby={labelId}
-            className="h-[20rem] max-h-[20rem] w-80 overflow-y-auto rounded border border-zinc-700 bg-zinc-800"
-            style={floatingStyles}
+            className="border border-zinc-700 bg-zinc-900"
             {...getFloatingProps({
               ref: refs.setFloating,
-              style: { ...floatingStyles, zIndex: 99999 },
-            })}>
-            <div className="sticky top-0 z-50">
-              <Input
-                isInline
-                name="iconFilter"
-                onChange={({ value }) => setFilter(value as string)}
-                placeholder="Search icons"
-                size="sm"
-                value={filter}
-              />
-            </div>
+            })}
+            style={{
+              ...floatingStyles,
+              zIndex: 99999,
+              height: "20rem",
+              width: "fit-content",
+              overflow: "auto",
+            }}>
+            <Input
+              name="filter"
+              onChange={({ value }) => setFilter(value as string)}
+              placeholder="Search icons."
+              value={filter}
+            />
             <div
+              className="p-2"
               style={{
-                width: "100%",
-                height: `${rowVirtualizer.totalSize}px`,
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                width: `${columnVirtualizer.getTotalSize()}px`,
                 position: "relative",
               }}>
-              {rowVirtualizer.virtualItems.map((virtualRow) => (
-                <Fragment key={virtualRow.key}>
-                  {columnVirtualizer.virtualItems.map((virtualColumn) => (
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+                <Fragment key={virtualRow.index}>
+                  {columnVirtualizer.getVirtualItems().map((virtualColumn) => (
                     <div
                       key={virtualColumn.index}
-                      className="p-4"
-                      onClick={() => {
-                        const selectedIcon = filteredIcons[virtualRow.index * 6 + virtualColumn.index];
-                        if (selectedIcon) {
-                          onChange({ name, value: selectedIcon });
-                          setOpen(false);
-                        }
-                      }}
+                      className="transition-all [&>*>svg]:hover:text-blue-400"
                       style={{
                         position: "absolute",
                         top: 0,
@@ -133,10 +122,16 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                         height: `${virtualRow.size}px`,
                         transform: `translateX(${virtualColumn.start}px) translateY(${virtualRow.start}px)`,
                       }}>
-                      <Icon
-                        className="mx-auto cursor-pointer hover:text-blue-300"
-                        fontSize={30}
-                        icon={`${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}`}
+                      <Button
+                        hasNoBackground
+                        icon={filteredIcons[virtualRow.index * 6 + virtualColumn.index]}
+                        iconSize={32}
+                        isIconOnly
+                        onClick={() => {
+                          onChange({ name, value: filteredIcons[virtualRow.index * 6 + virtualColumn.index] });
+                          setOpen(false);
+                        }}
+                        variant="info-bordered"
                       />
                     </div>
                   ))}
