@@ -11,5 +11,5 @@ export type SkeletonType = {
     | "character_profile"
     | "character_profile_main";
   limit?: number;
-  entity_type: AvailableEntityType;
+  entity_type?: AvailableEntityType;
 };
