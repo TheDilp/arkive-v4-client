@@ -210,10 +210,15 @@ export function CalendarView() {
                 .map((event) => (
                   <div key={event.id}>
                     {event.image_id ? (
-                      <div
-                        className="h-24 w-full rounded-md bg-cover bg-center transition-all"
-                        style={{ backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})` }}
-                      />
+                      <div className="relative h-24 w-full overflow-hidden rounded-md transition-all">
+                        <span className="absolute z-10 max-w-full truncate text-sm">{event.title}</span>
+                        <div
+                          className="absolute h-full w-full bg-cover bg-center opacity-60"
+                          style={{
+                            backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
+                          }}
+                        />
+                      </div>
                     ) : (
                       <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
                     )}
