@@ -197,23 +197,31 @@ export function CalendarView() {
             </div>
           ))}
         {[...Array(monthDays).keys()].map((day) => (
-          <div
-            key={day}
-            className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white"
-            onKeyDown={() => {}}
-            role="button"
-            tabIndex={-1}>
+          <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
             <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
             <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
               {singleDayEvents
                 ?.filter((event) => event.startDay === day + 1)
                 .map((event) => (
-                  <div key={event.id}>
+                  <div
+                    key={event.id}
+                    onClick={() =>
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: "Edit event",
+                        type: "events",
+                        data: { id: event.id },
+                        size: "lg",
+                      }))
+                    }
+                    onKeyDown={() => {}}
+                    role="button"
+                    tabIndex={-1}>
                     {event.image_id ? (
                       <div className="relative h-24 w-full overflow-hidden rounded-md transition-all">
-                        <span className="absolute z-10 max-w-full truncate text-sm">{event.title}</span>
+                        <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
                         <div
-                          className="absolute h-full w-full bg-cover bg-center opacity-60"
+                          className="absolute h-full w-full bg-cover bg-center opacity-60 "
                           style={{
                             backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
                           }}

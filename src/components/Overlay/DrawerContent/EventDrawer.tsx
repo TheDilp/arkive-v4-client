@@ -1,10 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntities, useHandleChange } from "../../../hooks";
-import { EventStateType, MonthType, onChangeValue } from "../../../types";
+import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange } from "../../../hooks";
+import { EventStateType, EventType, MonthType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
@@ -19,7 +19,7 @@ import { ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge } from "../../Misc";
+import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
 
 function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrect: boolean }) {
@@ -45,6 +45,16 @@ export function EventDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
+
+  const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
+    data?.id,
+    "events",
+    {
+      data: { project_id },
+    },
+    { enabled: !!data?.id },
+  );
+
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
     { data: { project_id, parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
@@ -52,12 +62,20 @@ export function EventDrawer({ data }: Props) {
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events");
-  const [event, setEvent] = useState<EventStateType>({
-    startMonth: data?.month ?? 0,
-    startDay: data?.day,
-    startYear: data?.year,
-    parent_id: item_id as string,
-  });
+  const [event, setEvent] = useState<EventStateType>(
+    existingEvent?.data ?? {
+      startMonth: data?.month ?? 0,
+      startDay: data?.day,
+      startYear: data?.year,
+      parent_id: item_id as string,
+    },
+  );
+
+  useLayoutEffect(() => {
+    if (existingEvent?.data) {
+      setEvent(existingEvent?.data);
+    }
+  }, [existingEvent]);
 
   const { handleChange } = useHandleChange({ data: event, setData: setEvent });
 
@@ -98,6 +116,11 @@ export function EventDrawer({ data }: Props) {
   const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
   const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
   const isDateCorrect = isYearCorrect && isMonthCorrect && isDayCorrect;
+
+  const isLoading = isFetchingEvent || isFetchingMonths;
+
+  if (isLoading) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
