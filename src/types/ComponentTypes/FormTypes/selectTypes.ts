@@ -13,6 +13,7 @@ export interface SelectType extends BaseFormComponentType {
   label?: string;
   helperText?: string;
   isMultiple?: boolean;
+  isClearable?: boolean;
   hasSearch?: boolean;
   isExpandingToNewRow?: boolean;
   value: string | string[] | number | null | undefined;

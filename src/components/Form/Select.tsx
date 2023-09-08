@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import {
   autoUpdate,
@@ -17,7 +19,9 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { SelectOptionType, SelectType } from "../../types";
+import { IconEnum } from "../../utils";
 import { Avatar, Icon, Spinner } from "../Misc";
+import { Button } from "./Button";
 
 const SelectClasses = tv({
   slots: {
@@ -195,6 +199,7 @@ export function Select({
   hasSearch,
   name,
   isExpandingToNewRow,
+  isClearable,
   isDisabled,
   options = [],
   isMultiple,
@@ -219,7 +224,10 @@ export function Select({
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
     open: isOpen,
-    onOpenChange: options.length !== 0 && !isDisabled ? setIsOpen : () => {},
+    onOpenChange: (o, e) => {
+      // @ts-ignore
+      if (options.length !== 0 && !isDisabled && e?.target?.dataset?.option !== "clearable") setIsOpen(o);
+    },
     whileElementsMounted: autoUpdate,
     middleware: [
       offset({ mainAxis: -3 }),
@@ -282,7 +290,12 @@ export function Select({
         aria-labelledby="select-label"
         className={select()}
         tabIndex={0}
-        {...getReferenceProps()}>
+        {...getReferenceProps({
+          onClick(event) {
+            event.preventDefault();
+            event.stopPropagation();
+          },
+        })}>
         {selectedItem || displayText ? (
           <div className="flex items-center gap-x-2 truncate">
             {!!value && !Array.isArray(value) && selectedItem?.image ? (
@@ -301,6 +314,22 @@ export function Select({
         ) : (
           <div className={placeholderClasses()}>{options.length === 0 ? "No options available." : placeholder || "Select"}</div>
         )}
+
+        {isClearable && !!value ? (
+          <div
+            className="ml-auto"
+            data-option="clearable"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onChange({ name, value: undefined });
+            }}>
+            <span className="pointer-events-none">
+              <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={undefined} />
+            </span>
+          </div>
+        ) : null}
+
         <RightIcon isLoading={isLoading} isOpen={isOpen} optionsLength={options.length} />
       </div>
       {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}
@@ -321,6 +350,7 @@ export function Select({
                   placeholder="Search"
                 />
               ) : null}
+
               {filteredItems.map((opt, i) => {
                 return (
                   <div
