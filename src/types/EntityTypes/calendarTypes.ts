@@ -26,12 +26,12 @@ export interface EventType {
   id: string;
   title: string;
   description: string | null;
-  is_public: boolean;
+  is_public: boolean | null;
   background_color?: string | null;
   text_color?: string | null;
   hours?: number | null;
   minutes?: number | null;
-  calendar_id: string | null;
+  parent_id: string;
   document_id?: string | null;
   image_id?: string | null;
   endDay?: number | null;

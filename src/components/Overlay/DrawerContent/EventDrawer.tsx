@@ -1,16 +1,19 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntities, useHandleChange } from "../../../hooks";
+import { useCreateSubEntity, useGetEntities, useHandleChange } from "../../../hooks";
 import { EventStateType, MonthType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
   checkIfYearCorrect,
+  drawerAtom,
   getImageURL,
   IconEnum,
   useNotifications,
 } from "../../../utils";
+import { InsertEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, Textarea } from "../../Form";
@@ -20,6 +23,9 @@ import { ColorPicker } from "..";
 
 function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrect: boolean }) {
   if (!isDateCorrect) return true;
+  if (!Number.isInteger(event?.startDay)) return true;
+  if (!Number.isInteger(event?.startMonth)) return true;
+  if (!Number.isInteger(event?.startYear)) return true;
   if (!event?.title) return true;
 
   return false;
@@ -36,11 +42,15 @@ export function EventDrawer({ data }: Props) {
   const hasId = "id" in data && data?.id;
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
+  const resetDrawer = useResetAtom(drawerAtom);
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
     { data: { project_id, parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
   );
-  const [event, setEvent] = useState<EventStateType>({ startMonth: data?.month ?? 0 });
+  const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
+    data: EventStateType & { parent_id: string };
+  }>("events");
+  const [event, setEvent] = useState<EventStateType>({ startMonth: data?.month ?? 0, parent_id: item_id as string });
   const { handleChange } = useHandleChange({ data: event, setData: setEvent });
 
   function handleMonthChange({ name, value }: onChangeValue) {
@@ -54,6 +64,14 @@ export function EventDrawer({ data }: Props) {
 
   function handleImageChange({ name, label, value }: { name: string; label?: string; value: string }) {
     handleChange({ name, value: { id: value, title: label } });
+  }
+
+  async function handleSave() {
+    if (!data?.id) {
+      const parsedData = InsertEventSchema.parse({ data: event, relations: event?.tags?.map((tag) => ({ id: tag.id })) });
+
+      createEvent(parsedData, { onSuccess: resetDrawer });
+    }
   }
 
   const isYearCorrect = checkIfYearCorrect(event.startYear, event?.endYear);
@@ -237,9 +255,10 @@ export function EventDrawer({ data }: Props) {
 
       <Button
         icon={hasId ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(event, { isDateCorrect })}
+        isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating}
+        isLoading={isCreating}
         label={hasId ? "Save" : "Create"}
-        onClick={() => {}}
+        onClick={handleSave}
         variant="success"
       />
     </div>

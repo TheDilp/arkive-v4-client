@@ -50,7 +50,12 @@ export function checkIfYearCorrect(startYear: number | undefined, endYear: numbe
   if (typeof startYear === "number" && Number.isInteger(startYear)) {
     if (typeof endYear === "number" && Number.isInteger(endYear)) {
       if (endYear < startYear) return false;
+    } else if (!endYear && endYear !== 0) {
+      return true;
+    } else {
+      return false;
     }
+    return true;
   }
   return true;
 }

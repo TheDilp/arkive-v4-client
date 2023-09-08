@@ -1,11 +1,11 @@
 import { useSetAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, Input, Select } from "../../components";
-import { useChangeNavbarTitle, useGetEntity } from "../../hooks";
-import { CalendarType, CurrentDateType } from "../../types/EntityTypes/calendarTypes";
-import { drawerAtom, getFillerDayNumber, getStartingDayForMonth, IconEnum } from "../../utils";
+import { Badge, Button, Input, Select } from "../../components";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
+import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
+import { DefaultTagColor, drawerAtom, getFillerDayNumber, getStartingDayForMonth, IconEnum } from "../../utils";
 
 export default function DayNumber({
   dayNumber,
@@ -49,15 +49,54 @@ export default function DayNumber({
 export function CalendarView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
+  const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
+
   const { data: existingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
     data: { project_id },
     relations: { months: true },
   });
+  const { data: events, refetch } = useGetEntities<EventType>(
+    {
+      data: { project_id },
+      filters: {
+        and: [
+          {
+            field: "parent_id",
+            value: item_id as string,
+            operator: "eq",
+          },
+          {
+            field: "startMonth",
+            operator: "eq",
+            value: date.month,
+          },
+          {
+            field: "startYear",
+            operator: "eq",
+            value: date.year,
+          },
+        ],
+      },
+    },
+    "events",
+    {
+      enabled: false,
+    },
+  );
   useChangeNavbarTitle(`The Arkive | Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
-  const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      refetch();
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [date]);
+
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
+
+  const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.endYear));
+
   return (
     <div className="flex flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
@@ -158,6 +197,15 @@ export function CalendarView() {
             role="button"
             tabIndex={-1}>
             <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
+            <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
+              {singleDayEvents
+                ?.filter((event) => event.startDay === day)
+                .map((event) => (
+                  <div key={event.id}>
+                    <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
+                  </div>
+                ))}
+            </div>
           </div>
         ))}
       </div>
