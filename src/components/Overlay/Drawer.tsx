@@ -27,6 +27,7 @@ import {
 import { EditTags } from "./DrawerContent/EditTags";
 import { EventDrawer } from "./DrawerContent/EventDrawer";
 import { SearchDrawer } from "./DrawerContent/SearchDrawer";
+import TimelineDrawer from "./DrawerContent/TimelineDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -133,6 +134,7 @@ export function Drawer() {
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
+        {drawer.type === "timelines" ? <TimelineDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}

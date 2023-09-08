@@ -50,7 +50,14 @@ export type DrawerAtomType = {
   | { type: "project"; data: InsertProjectType | null }
   | { type: "characters"; data: { id?: string; project_id?: string; preselectedTab?: number } }
   | {
-      type: "character_fields_templates" | "documents" | "maps" | "graphs" | "random_tables" | "random_table_option";
+      type:
+        | "character_fields_templates"
+        | "documents"
+        | "maps"
+        | "graphs"
+        | "timelines"
+        | "random_tables"
+        | "random_table_option";
       data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
@@ -64,7 +71,7 @@ export type DrawerAtomType = {
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } } }
-  | { type: "events"; data: { day?: number; month: number; year: number } | { id: string } }
+  | { type: "events"; data: { id?: string; day?: number; month: number; year: number } }
   | { type: null; data: null }
 );
 

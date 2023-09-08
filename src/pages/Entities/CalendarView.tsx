@@ -6,6 +6,7 @@ import { Badge, Button, Input, Select } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
+import { TimelineView } from "./TimelineView";
 
 export default function DayNumber({
   dayNumber,
@@ -51,6 +52,7 @@ export function CalendarView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
+  const [view, setView] = useState<"calendar" | "timeline">("calendar");
   const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", date]);
 
   const { data: existingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
@@ -61,25 +63,28 @@ export function CalendarView() {
     {
       data: { project_id },
       filters: {
-        and: [
-          {
-            field: "parent_id",
-            value: item_id as string,
-            operator: "eq",
-          },
-          {
-            field: "start_month",
-            operator: "eq",
-            value: date.month,
-          },
-          {
-            field: "start_year",
-            operator: "eq",
-            value: date.year,
-          },
-        ],
+        and:
+          view === "timeline"
+            ? [
+                {
+                  field: "parent_id",
+                  value: item_id as string,
+                  operator: "eq",
+                },
+                {
+                  field: "start_month",
+                  operator: "eq",
+                  value: date.month,
+                },
+                {
+                  field: "start_year",
+                  operator: "eq",
+                  value: date.year,
+                },
+              ]
+            : [],
       },
-      fields: ["id", "title", "image_id", "start_day", "start_month", "start_year", "parent_id", "background_color"],
+      // fields: ["id", "title", "image_id", "start_day", "start_month", "start_year", "parent_id", "background_color", "s"],
       orderBy: [
         { field: "hours", sort: "asc" },
         { field: "minutes", sort: "asc" },
@@ -94,46 +99,70 @@ export function CalendarView() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setQueryKey(["allEntities", project_id, "events", date]);
+      setQueryKey(["allEntities", project_id, "events", view, view === "calendar" ? date : null]);
     }, 300);
     return () => clearTimeout(timeout);
   }, [date]);
+
+  useEffect(() => {
+    setQueryKey(["allEntities", project_id, "events", view, view === "calendar" ? date : null]);
+  }, [view]);
 
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
   const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.end_year));
-
   return (
     <div className="flex flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
+        {view === "calendar" ? (
+          <>
+            <div className="w-32">
+              <Select
+                label="Month"
+                name="number"
+                onChange={({ value }) => {
+                  const idx = existingCalendar.data.months.findIndex((m) => m.id === value);
+                  if (idx > -1) {
+                    setDate((prev) => ({ ...prev, month: idx }));
+                  }
+                  //   ls.set("characters_view", value);
+                }}
+                options={existingCalendar?.data.months.map((month) => ({ value: month.id, label: month.title }))}
+                placeholder="Month"
+                value={existingCalendar?.data?.months[date.month].id}
+              />
+            </div>
+            <div className="w-32">
+              <Input
+                label="Year"
+                name="year"
+                onChange={({ value }) => {
+                  setDate((prev) => ({ ...prev, year: value as number }));
+                  //   ls.set("characters_view", value);
+                }}
+                placeholder="Year"
+                type="number"
+                value={date.year}
+              />
+            </div>
+          </>
+        ) : null}
+
         <div className="w-32">
           <Select
-            label="Month"
-            name="number"
+            label="View"
+            name="view"
             onChange={({ value }) => {
-              const idx = existingCalendar.data.months.findIndex((m) => m.id === value);
-              if (idx > -1) {
-                setDate((prev) => ({ ...prev, month: idx }));
-              }
-              //   ls.set("characters_view", value);
+              setView(value as "calendar" | "timeline");
+              // ls.set("timeline_view", value);
             }}
-            options={existingCalendar?.data.months.map((month) => ({ value: month.id, label: month.title }))}
-            placeholder="Month"
-            value={existingCalendar?.data?.months[date.month].id}
-          />
-        </div>
-        <div className="w-32">
-          <Input
-            label="Year"
-            name="year"
-            onChange={({ value }) => {
-              setDate((prev) => ({ ...prev, year: value as number }));
-              //   ls.set("characters_view", value);
-            }}
-            placeholder="Year"
-            type="number"
-            value={date.year}
+            options={[
+              { label: "Calendar", value: "calendar", icon: IconEnum.calendar },
+              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt },
+            ]}
+            placeholder="View"
+            value={view}
           />
         </div>
         <div className="w-fit self-end">
@@ -152,92 +181,97 @@ export function CalendarView() {
           />
         </div>
       </div>
-      <div
-        className="grid overflow-auto border border-zinc-700"
-        style={{
-          gridTemplateColumns: `repeat(${existingCalendar?.data?.days?.length || 0}, minmax(9rem, 1fr))`,
-        }}>
-        {existingCalendar?.data?.days?.map((day) => (
-          <div
-            key={day}
-            className="group col-span-1 h-min border-b border-r border-zinc-700 px-2 text-white"
-            onKeyDown={() => {}}
-            role="button"
-            tabIndex={-1}>
-            {day}
-          </div>
-        ))}
-        {[
-          ...Array(
-            existingCalendar?.data?.days?.length
-              ? getStartingDayForMonth(
-                  existingCalendar?.data?.months,
-                  date?.year,
-                  date?.month,
-                  existingCalendar?.data?.days?.length,
-                ) % existingCalendar.data.days.length
-              : 0,
-          ).keys(),
-        ]
-          .reverse()
-          .map((day) => (
+
+      {view === "calendar" ? (
+        <div
+          className="grid overflow-auto border border-zinc-700"
+          style={{
+            gridTemplateColumns: `repeat(${existingCalendar?.data?.days?.length || 0}, minmax(9rem, 1fr))`,
+          }}>
+          {existingCalendar?.data?.days?.map((day) => (
             <div
               key={day}
-              className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white"
+              className="group col-span-1 h-min border-b border-r border-zinc-700 px-2 text-white"
               onKeyDown={() => {}}
               role="button"
               tabIndex={-1}>
-              <DayNumber
-                key={day}
-                dayNumber={getFillerDayNumber(existingCalendar?.data?.months, date.month, day)}
-                isFiller
-                //   isReadOnly={isReadOnly}
-                monthNumber={date.month}
-                year={date.year}
-              />
+              {day}
             </div>
           ))}
-        {[...Array(monthDays).keys()].map((day) => (
-          <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
-            <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
-            <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
-              {singleDayEvents
-                ?.filter((event) => event.start_day === day + 1)
-                .map((event) => (
-                  <div
-                    key={event.id}
-                    className="cursor-pointer"
-                    onClick={() =>
-                      setDrawer((prev) => ({
-                        ...prev,
-                        title: "Edit event",
-                        type: "events",
-                        data: { id: event.id },
-                        size: "lg",
-                      }))
-                    }
-                    onKeyDown={() => {}}
-                    role="button"
-                    tabIndex={-1}>
-                    {event.image_id ? (
-                      <div className="relative h-24 w-full overflow-hidden rounded-md">
-                        <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
-                        <div
-                          className="absolute h-full w-full bg-cover bg-center opacity-60 "
-                          style={{
-                            backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
-                    )}
-                  </div>
-                ))}
+          {[
+            ...Array(
+              existingCalendar?.data?.days?.length
+                ? getStartingDayForMonth(
+                    existingCalendar?.data?.months,
+                    date?.year,
+                    date?.month,
+                    existingCalendar?.data?.days?.length,
+                  ) % existingCalendar.data.days.length
+                : 0,
+            ).keys(),
+          ]
+            .reverse()
+            .map((day) => (
+              <div
+                key={day}
+                className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white"
+                onKeyDown={() => {}}
+                role="button"
+                tabIndex={-1}>
+                <DayNumber
+                  key={day}
+                  dayNumber={getFillerDayNumber(existingCalendar?.data?.months, date.month, day)}
+                  isFiller
+                  //   isReadOnly={isReadOnly}
+                  monthNumber={date.month}
+                  year={date.year}
+                />
+              </div>
+            ))}
+          {[...Array(monthDays).keys()].map((day) => (
+            <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
+              <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
+              <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
+                {singleDayEvents
+                  ?.filter((event) => event.start_day === day + 1)
+                  .map((event) => (
+                    <div
+                      key={event.id}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          title: "Edit event",
+                          type: "events",
+                          data: { id: event.id, month: date.month, year: date.year },
+                          size: "lg",
+                        }))
+                      }
+                      onKeyDown={() => {}}
+                      role="button"
+                      tabIndex={-1}>
+                      {event.image_id ? (
+                        <div className="relative h-24 w-full overflow-hidden rounded-md">
+                          <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
+                          <div
+                            className="absolute h-full w-full bg-cover bg-center opacity-60 "
+                            style={{
+                              backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <TimelineView events={events?.data || []} month_count={existingCalendar?.data?.months.length || 0} />
+      )}
     </div>
   );
 }

@@ -209,7 +209,7 @@ export function FolderView() {
                   onClick: () => {
                     setDrawer((prev) => ({
                       ...prev,
-                      data: { id: "dasdas", project_id: project_id as string },
+                      data: { project_id: project_id as string },
                       title: `Create new ${entityName}`,
                       type: type as DrawerContentCreateNewType,
                       size: "lg",

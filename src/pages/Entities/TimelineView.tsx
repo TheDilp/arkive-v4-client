@@ -1,13 +1,10 @@
 import { randPhrase } from "@ngneat/falso";
 import { elementScroll, useVirtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
-import { useSetAtom } from "jotai";
-import ls from "localstorage-slim";
-import { MutableRefObject, useCallback, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { MutableRefObject, useCallback, useRef } from "react";
 
-import { Button, Select } from "../../components";
-import { TimelineDirectionType, TimelineViewType } from "../../types";
-import { drawerAtom, IconEnum } from "../../utils";
+import { EventType } from "../../types";
+import { TimelineEventType } from "../../types/EntityTypes/timelineTypes";
+import { DefaultTagColor } from "../../utils";
 
 type TimelineDataItem = {
   id: string;
@@ -79,17 +76,24 @@ function easeInOutQuint(t: number): number {
 }
 
 function getEventWidth(start_year: number = 0, end_year: number = 0) {
-  return 10 * ((end_year || 0) - (start_year || 0));
+  if (end_year) return `${200 * ((end_year || 1) - (start_year || 0))}px`;
+  return 20;
 }
 
-function getEventPosition(item: TimelineDataItem, index: number, array: TimelineDataItem[]) {
+function getEventPosition(item: TimelineEventType, index: number, array: TimelineEventType[]) {
   let top = 0;
   let i = index - 1;
   let parent_count = 0;
   while (i <= index - 1 && i > -1) {
-    if (array[i].start_year * 10 >= array[index].end_year * 10 || array[i].end_year * 10 <= array[index].start_year * 10) {
-      parent_count += 1;
+    if (array[index]?.end_year && array[i]?.end_year) {
+      if (
+        array[i].start_year * 10 >= (array[index].end_year || 0) * 10 ||
+        (array[i].end_year || 0) * 10 <= array[index].start_year * 10
+      ) {
+        parent_count += 1;
+      }
     } else break;
+
     i -= 1;
   }
 
@@ -99,19 +103,14 @@ function getEventPosition(item: TimelineDataItem, index: number, array: Timeline
   return { ...item, top };
 }
 
-const positionedData = data
-  .filter((i) => i.end_year - i.start_year >= 8)
-  .sort((a, b) => a.start_year - b.start_year)
-  .map(getEventPosition);
+function getMonthOffset(start_month: number = 0, month_count: number = 1) {
+  return (200 * start_month) / month_count;
+}
 
 const eventHeight = 32;
 
-export function TimelineView() {
-  const { project_id } = useParams();
-  const [view, setView] = useState<TimelineViewType>("gantt");
-  const [direction, setDirection] = useState<TimelineDirectionType>(null);
-
-  const setDrawer = useSetAtom(drawerAtom);
+export function TimelineView({ events, month_count }: { events: EventType[]; month_count: number }) {
+  const positionedEvents = (events || []).sort((a, b) => a.start_year - b.start_year).map(getEventPosition);
 
   const ref = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollingRef = useRef<number>();
@@ -142,106 +141,65 @@ export function TimelineView() {
   const rowVirtualizer = useVirtualizer({
     getScrollElement: () => ref.current,
     estimateSize: () => eventHeight,
-    count: positionedData.length,
+    count: positionedEvents.length,
     overscan: 40,
     scrollToFn,
   });
-
   return (
-    <div>
-      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2 pb-2">
-        <div className="w-32">
-          <Select
-            name="view"
-            onChange={({ value }) => {
-              setView(value as TimelineViewType);
-              ls.set("timeline_view", value);
-            }}
-            options={[
-              { label: "Gantt", value: "gantt", icon: IconEnum.timeline_gantt },
-              { label: "Card", value: "card", icon: IconEnum.card },
-              { label: "Simple", value: "simple", icon: IconEnum.timeline },
-            ]}
-            placeholder="View"
-            value={view}
-          />
-        </div>
-        <div className="w-36">
-          <Select
-            isDisabled={view === "gantt"}
-            name="direction"
-            onChange={({ value }) => {
-              setDirection(value as TimelineDirectionType);
-              ls.set("timeline_direction", value);
-            }}
-            options={[
-              { label: "Horizontal", value: "horizontal", icon: IconEnum.horizontal },
-              { label: "Vertical", value: "vertical", icon: IconEnum.vertical },
-            ]}
-            placeholder="Direction"
-            value={direction}
-          />
-        </div>
-        <div className="w-fit">
-          <Button
-            icon={IconEnum.add}
-            label="Create new event"
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: { project_id },
-                title: "Create new event",
-                type: "characters",
-                size: "lg",
-              }))
-            }
-          />
-        </div>
-      </div>
-      <div>
-        <div ref={ref} className="h-fit max-h-screen overflow-auto pb-40">
-          <div
-            className="flex w-full max-w-full flex-col gap-y-2 px-4"
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: "100%",
-              position: "relative",
-            }}>
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+    <div ref={ref} className="h-fit max-h-screen overflow-auto pb-40">
+      <div
+        className="flex w-full max-w-full flex-col gap-y-2 px-4"
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: "100%",
+          position: "relative",
+        }}>
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const width = getEventWidth(
+            positionedEvents[virtualRow.index]?.start_year || 0,
+            positionedEvents[virtualRow.index]?.end_year || 0,
+          );
+
+          return (
+            <div
+              key={virtualRow.index}
+              className="group flex cursor-pointer items-start"
+              style={{
+                height: virtualRow.size,
+                position: "absolute",
+                transform: `translate(${
+                  10 * (positionedEvents[virtualRow.index]?.start_year || 0) +
+                  getMonthOffset(positionedEvents[virtualRow.index].start_month, month_count)
+                }px, ${virtualRow.start - (positionedEvents[virtualRow.index]?.top || 0)}px)`,
+              }}>
               <div
-                key={virtualRow.index}
-                className="group flex cursor-pointer items-start"
+                className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
                 style={{
-                  height: virtualRow.size,
-                  position: "absolute",
-                  transform: `translate(${10 * (positionedData[virtualRow.index]?.start_year || 0)}px, ${
-                    virtualRow.start - (positionedData[virtualRow.index]?.top || 0)
-                  }px)`,
+                  height: width === 20 ? width : "85%",
+                  position: "relative",
+                  backgroundColor: positionedEvents[virtualRow.index]?.background_color || DefaultTagColor,
+                  backgroundPosition: "center",
+                  backgroundSize: "cover",
+                  backgroundRepeat: "no-repeat",
+                  minWidth: width,
+                  maxWidth: width,
+                  width,
+                  backgroundImage: positionedEvents[virtualRow.index]?.image_id
+                    ? `url(${positionedEvents[virtualRow.index]?.image_id}`
+                    : "",
                 }}>
-                <div
-                  className="max-h-full truncate rounded-md px-2 shadow "
-                  style={{
-                    height: "85%",
-                    position: "relative",
-                    backgroundColor: positionedData[virtualRow.index]?.color,
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                    backgroundRepeat: "no-repeat",
-                    minWidth: getEventWidth(
-                      positionedData[virtualRow.index]?.start_year || 0,
-                      positionedData[virtualRow.index]?.end_year || 0,
-                    ),
-                    backgroundImage:
-                      virtualRow.index % 7 === 0
-                        ? "url(https://images.unsplash.com/photo-1542401886-65d6c61db217?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80)"
-                        : "",
-                  }}>
-                  <h4 className="flex w-full items-center truncate font-lato">{positionedData[virtualRow.index].label}</h4>
-                </div>
+                {width === 20 ? null : (
+                  <div className="flex w-full max-w-full items-center font-lato">
+                    <span className="truncate">
+                      {positionedEvents[virtualRow.index].title}({positionedEvents[virtualRow.index].start_year} -&nbsp;
+                      {positionedEvents[virtualRow.index].end_year})
+                    </span>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -101,7 +101,7 @@ export function EventDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertEventSchema.parse({
         data: { ...event, image_id: event?.image?.id },
-        relations: event?.tags?.map((tag) => ({ id: tag.id })),
+        relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
       });
 
       await createEvent(parsedData, {
