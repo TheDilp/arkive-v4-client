@@ -14,6 +14,7 @@ export const IconEnum = {
   screen: "fluent:board-24-regular",
   section: "ph:columns",
   timeline: "mdi:timeline-clock-outline",
+  blueprint: "ph:compass-tool",
   event: "ph:flag",
   dictionary: "ph:book-bookmark-light",
   random_table: "game-icons:perspective-dice-six-faces-random",
