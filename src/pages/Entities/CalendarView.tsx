@@ -37,6 +37,7 @@ export default function DayNumber({
                   type: "events",
                   title: "Create new event",
                   data: { day: dayNumber + 1, month: monthNumber, year },
+                  size: "lg",
                 }));
             }}
           />
@@ -50,12 +51,13 @@ export function CalendarView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
+  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", date]);
 
   const { data: existingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
     data: { project_id },
     relations: { months: true },
   });
-  const { data: events, refetch } = useGetEntities<EventType>(
+  const { data: events } = useGetEntities<EventType>(
     {
       data: { project_id },
       filters: {
@@ -80,14 +82,14 @@ export function CalendarView() {
     },
     "events",
     {
-      enabled: false,
+      queryKeyOverwrite: queryKey,
     },
   );
   useChangeNavbarTitle(`The Arkive | Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      refetch();
+      setQueryKey(["allEntities", project_id, "events", date]);
     }, 300);
     return () => clearTimeout(timeout);
   }, [date]);
@@ -125,6 +127,7 @@ export function CalendarView() {
               //   ls.set("characters_view", value);
             }}
             placeholder="Year"
+            type="number"
             value={date.year}
           />
         </div>
@@ -199,7 +202,7 @@ export function CalendarView() {
             <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
             <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
               {singleDayEvents
-                ?.filter((event) => event.startDay === day)
+                ?.filter((event) => event.startDay === day + 1)
                 .map((event) => (
                   <div key={event.id}>
                     <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />

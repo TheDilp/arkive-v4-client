@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -38,6 +39,7 @@ const tabs = [
   { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 export function EventDrawer({ data }: Props) {
+  const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
   const hasId = "id" in data && data?.id;
   const [selectedTab, setSelectedTab] = useState(0);
@@ -50,7 +52,13 @@ export function EventDrawer({ data }: Props) {
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events");
-  const [event, setEvent] = useState<EventStateType>({ startMonth: data?.month ?? 0, parent_id: item_id as string });
+  const [event, setEvent] = useState<EventStateType>({
+    startMonth: data?.month ?? 0,
+    startDay: data?.day,
+    startYear: data?.year,
+    parent_id: item_id as string,
+  });
+
   const { handleChange } = useHandleChange({ data: event, setData: setEvent });
 
   function handleMonthChange({ name, value }: onChangeValue) {
@@ -70,7 +78,16 @@ export function EventDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertEventSchema.parse({ data: event, relations: event?.tags?.map((tag) => ({ id: tag.id })) });
 
-      createEvent(parsedData, { onSuccess: resetDrawer });
+      createEvent(parsedData, {
+        onSuccess: () => {
+          resetDrawer();
+          queryClient.refetchQueries({
+            queryKey: ["allEntities", project_id, "events"],
+            exact: false,
+            type: "active",
+          });
+        },
+      });
     }
   }
 
