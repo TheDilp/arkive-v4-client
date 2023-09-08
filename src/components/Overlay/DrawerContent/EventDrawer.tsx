@@ -3,7 +3,7 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange } from "../../../hooks";
+import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
 import { EventStateType, EventType, MonthType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
@@ -14,7 +14,7 @@ import {
   IconEnum,
   useNotifications,
 } from "../../../utils";
-import { InsertEventSchema } from "../../../validation/calendars/event";
+import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, Textarea } from "../../Form";
@@ -24,9 +24,9 @@ import { ColorPicker } from "..";
 
 function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrect: boolean }) {
   if (!isDateCorrect) return true;
-  if (!Number.isInteger(event?.startDay)) return true;
-  if (!Number.isInteger(event?.startMonth)) return true;
-  if (!Number.isInteger(event?.startYear)) return true;
+  if (!Number.isInteger(event?.start_day)) return true;
+  if (!Number.isInteger(event?.start_month)) return true;
+  if (!Number.isInteger(event?.start_year)) return true;
   if (!event?.title) return true;
 
   return false;
@@ -51,6 +51,7 @@ export function EventDrawer({ data }: Props) {
     "events",
     {
       data: { project_id },
+      relations: { tags: true },
     },
     { enabled: !!data?.id },
   );
@@ -58,15 +59,19 @@ export function EventDrawer({ data }: Props) {
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
     { data: { project_id, parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
+    { staleTime: 5 * 60 * 1000 },
   );
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events");
+
+  const { mutateAsync: updateEvent, isLoading: isUpdating } = useUpdateSubEntity("events");
+
   const [event, setEvent] = useState<EventStateType>(
     existingEvent?.data ?? {
-      startMonth: data?.month ?? 0,
-      startDay: data?.day,
-      startYear: data?.year,
+      start_month: data?.month ?? 0,
+      start_day: data?.day,
+      start_year: data?.year,
       parent_id: item_id as string,
     },
   );
@@ -99,7 +104,22 @@ export function EventDrawer({ data }: Props) {
         relations: event?.tags?.map((tag) => ({ id: tag.id })),
       });
 
-      createEvent(parsedData, {
+      await createEvent(parsedData, {
+        onSuccess: () => {
+          resetDrawer();
+          queryClient.refetchQueries({
+            queryKey: ["allEntities", project_id, "events"],
+            exact: false,
+            type: "active",
+          });
+        },
+      });
+    } else {
+      const parsedData = UpdateEventSchema.parse({
+        data: event,
+        relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
+      });
+      await updateEvent(parsedData, {
         onSuccess: () => {
           resetDrawer();
           queryClient.refetchQueries({
@@ -112,7 +132,7 @@ export function EventDrawer({ data }: Props) {
     }
   }
 
-  const isYearCorrect = checkIfYearCorrect(event.startYear, event?.endYear);
+  const isYearCorrect = checkIfYearCorrect(event.start_year, event?.end_year);
   const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
   const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
   const isDateCorrect = isYearCorrect && isMonthCorrect && isDayCorrect;
@@ -144,42 +164,42 @@ export function EventDrawer({ data }: Props) {
           <div className="flex items-center justify-between gap-x-2">
             <Input
               label="Start day (required)"
-              max={existingMonths?.data[event?.startMonth]?.days ?? 0}
+              max={existingMonths?.data[event?.start_month]?.days ?? 0}
               min={1}
-              name="startDay"
+              name="start_day"
               onChange={handleChange}
               type="number"
-              value={event?.startDay || ""}
+              value={event?.start_day || ""}
             />
             <Select
               isDisabled={isFetchingMonths}
               isLoading={isFetchingMonths}
               label="Start month (required)"
-              name="startMonth"
+              name="start_month"
               onChange={handleMonthChange}
               options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.startMonth === "number" ? existingMonths?.data?.[event.startMonth].id : undefined}
+              value={typeof event?.start_month === "number" ? existingMonths?.data?.[event.start_month].id : undefined}
             />
             <Input
               label="Start year (required)"
-              name="startYear"
+              name="start_year"
               onChange={handleChange}
               type="number"
-              value={event?.startYear || ""}
+              value={event?.start_year || ""}
             />
           </div>
           <div className="grid grid-cols-3 gap-x-2">
             <Input
               helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
-              isDisabled={typeof event?.endMonth !== "number"}
+              isDisabled={typeof event?.end_month !== "number"}
               label="End day (optional)"
-              max={typeof event.endMonth === "number" ? existingMonths?.data[event.endMonth].days : 0}
+              max={typeof event.end_month === "number" ? existingMonths?.data[event.end_month].days : 0}
               min={1}
-              name="endDay"
+              name="end_day"
               onChange={handleChange}
-              placeholder={typeof event?.endMonth !== "number" ? "Select a month." : ""}
+              placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
               type="number"
-              value={event?.endDay || ""}
+              value={event?.end_day || ""}
               variant={isDayCorrect ? "primary" : "error"}
             />
             <Select
@@ -188,21 +208,21 @@ export function EventDrawer({ data }: Props) {
               isDisabled={isFetchingMonths}
               isLoading={isFetchingMonths}
               label="End month (optional)"
-              name="endMonth"
+              name="end_month"
               onChange={handleMonthChange}
               options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.endMonth === "number" ? existingMonths?.data?.[event.endMonth].id : undefined}
+              value={typeof event?.end_month === "number" ? existingMonths?.data?.[event.end_month].id : undefined}
               variant={isMonthCorrect ? "primary" : "error"}
             />
             <Input
               helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-              isDisabled={typeof event?.endMonth !== "number"}
+              isDisabled={typeof event?.end_month !== "number"}
               label="End year (optional)"
-              name="endYear"
+              name="end_year"
               onChange={handleChange}
-              placeholder={typeof event?.endMonth !== "number" ? "Select a month." : ""}
+              placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
               type="number"
-              value={event?.endYear || ""}
+              value={event?.end_year || ""}
               variant={isYearCorrect ? "primary" : "error"}
             />
           </div>
@@ -303,8 +323,8 @@ export function EventDrawer({ data }: Props) {
 
       <Button
         icon={hasId ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating}
-        isLoading={isCreating}
+        isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={hasId ? "Save" : "Create"}
         onClick={handleSave}
         variant="success"

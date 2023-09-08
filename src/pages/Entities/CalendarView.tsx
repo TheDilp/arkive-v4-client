@@ -68,17 +68,18 @@ export function CalendarView() {
             operator: "eq",
           },
           {
-            field: "startMonth",
+            field: "start_month",
             operator: "eq",
             value: date.month,
           },
           {
-            field: "startYear",
+            field: "start_year",
             operator: "eq",
             value: date.year,
           },
         ],
       },
+      fields: ["id", "title", "image_id", "start_day", "start_month", "start_year", "parent_id", "background_color"],
       orderBy: [
         { field: "hours", sort: "asc" },
         { field: "minutes", sort: "asc" },
@@ -101,7 +102,7 @@ export function CalendarView() {
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
-  const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.endYear));
+  const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.end_year));
 
   return (
     <div className="flex flex-col">
@@ -201,10 +202,11 @@ export function CalendarView() {
             <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
             <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
               {singleDayEvents
-                ?.filter((event) => event.startDay === day + 1)
+                ?.filter((event) => event.start_day === day + 1)
                 .map((event) => (
                   <div
                     key={event.id}
+                    className="cursor-pointer"
                     onClick={() =>
                       setDrawer((prev) => ({
                         ...prev,
@@ -218,7 +220,7 @@ export function CalendarView() {
                     role="button"
                     tabIndex={-1}>
                     {event.image_id ? (
-                      <div className="relative h-24 w-full overflow-hidden rounded-md transition-all">
+                      <div className="relative h-24 w-full overflow-hidden rounded-md">
                         <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
                         <div
                           className="absolute h-full w-full bg-cover bg-center opacity-60 "

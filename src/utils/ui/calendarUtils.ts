@@ -22,10 +22,10 @@ export function sortEvents(a: EventType, b: EventType) {
 
 export function checkIfDayCorrect(e: EventStateType, isYearCorrect: boolean, isMonthCorrect: boolean): boolean {
   if (isYearCorrect && isMonthCorrect) {
-    if (e?.endMonth === e?.startMonth) {
-      if (typeof e?.startDay === "number" && Number.isInteger(e.startDay)) {
-        if (typeof e?.endDay === "number" && Number.isInteger(e.endDay)) {
-          if (e.endDay < e.startDay) return false;
+    if (e?.end_month === e?.start_month) {
+      if (typeof e?.start_day === "number" && Number.isInteger(e.start_day)) {
+        if (typeof e?.end_day === "number" && Number.isInteger(e.end_day)) {
+          if (e.end_day < e.start_day) return false;
         }
       }
     }
@@ -35,10 +35,10 @@ export function checkIfDayCorrect(e: EventStateType, isYearCorrect: boolean, isM
 
 export function checkIfMonthCorrect(e: EventStateType, isYearCorrect: boolean): boolean {
   if (isYearCorrect) {
-    if (e?.startYear === e?.endYear) {
-      if (typeof e?.startMonth === "number" && Number.isInteger(e?.startMonth)) {
-        if (typeof e?.endMonth === "number" && Number.isInteger(e?.endMonth)) {
-          if (e.endMonth < e.startMonth) return false;
+    if (e?.start_year === e?.end_year) {
+      if (typeof e?.start_month === "number" && Number.isInteger(e?.start_month)) {
+        if (typeof e?.end_month === "number" && Number.isInteger(e?.end_month)) {
+          if (e.end_month < e.start_month) return false;
         }
       }
     }
@@ -46,11 +46,11 @@ export function checkIfMonthCorrect(e: EventStateType, isYearCorrect: boolean): 
   return true;
 }
 
-export function checkIfYearCorrect(startYear: number | undefined, endYear: number | undefined | null): boolean {
-  if (typeof startYear === "number" && Number.isInteger(startYear)) {
-    if (typeof endYear === "number" && Number.isInteger(endYear)) {
-      if (endYear < startYear) return false;
-    } else if (!endYear && endYear !== 0) {
+export function checkIfYearCorrect(start_year: number | undefined, end_year: number | undefined | null): boolean {
+  if (typeof start_year === "number" && Number.isInteger(start_year)) {
+    if (typeof end_year === "number" && Number.isInteger(end_year)) {
+      if (end_year < start_year) return false;
+    } else if (!end_year && end_year !== 0) {
       return true;
     } else {
       return false;

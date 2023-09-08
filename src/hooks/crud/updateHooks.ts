@@ -188,6 +188,7 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
     },
   );
 }
+
 export function useUpdateRandomTableOption(parent_id: string | undefined, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -214,6 +215,16 @@ export function useUpdateRandomTableOption(parent_id: string | undefined, projec
     },
   );
 }
+
+export function useUpdateSubEntity(type: AvailableSubEntityType) {
+  return useMutation(async (updateItemValues: { [key: string]: any }) => {
+    return FetchFunction({
+      url: `${baseURLS.baseServer}/${type}/update/${updateItemValues.data.id}`,
+      body: JSON.stringify(updateItemValues),
+      method: "POST",
+    });
+  });
+}
 export function useUpdateManySubEntities(type: AvailableSubEntityType) {
   return useMutation(async (updateItemValues: { [key: string]: any }[]) => {
     if (updateItemValues.length) {
@@ -226,6 +237,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType) {
     return null;
   });
 }
+
 export function useAddToEntity<InsertType extends { data: { id?: string }; relations: { [key: string]: { id: string }[] } }>(
   type: AvailableEntityType,
   project_id: string,

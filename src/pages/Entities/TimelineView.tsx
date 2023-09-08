@@ -11,8 +11,8 @@ import { drawerAtom, IconEnum } from "../../utils";
 
 type TimelineDataItem = {
   id: string;
-  startYear: number;
-  endYear: number;
+  start_year: number;
+  end_year: number;
   label: string;
   color: string;
   top?: number;
@@ -29,24 +29,24 @@ function getRandomColor() {
 }
 
 for (let i = 0; i <= 250; i += 1) {
-  const randomStartYear = Math.floor(Math.random() * Math.random() * Math.random() * 1000);
-  const randomEndYear =
-    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (100 - randomStartYear));
+  const randomstart_year = Math.floor(Math.random() * Math.random() * Math.random() * 1000);
+  const randomend_year =
+    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (100 - randomstart_year));
   const randomColor = getRandomColor();
   const newEvent = {
     id: i.toString(),
-    startYear: randomStartYear,
-    endYear: randomEndYear,
+    start_year: randomstart_year,
+    end_year: randomend_year,
     label: randPhrase(),
     color: randomColor,
     children: [],
   };
   if (i > 1 && data?.[i - 1]) {
-    if (data[i - 1].endYear * 10 > newEvent.startYear * 10 && data[i - 1].endYear * 10 > newEvent.endYear * 10) {
+    if (data[i - 1].end_year * 10 > newEvent.start_year * 10 && data[i - 1].end_year * 10 > newEvent.end_year * 10) {
       data.push({
         id: i.toString(),
-        startYear: randomStartYear,
-        endYear: randomEndYear,
+        start_year: randomstart_year,
+        end_year: randomend_year,
         label: `Event ${i}`,
         color: randomColor,
         children: [],
@@ -55,8 +55,8 @@ for (let i = 0; i <= 250; i += 1) {
     } else {
       data.push({
         id: i.toString(),
-        startYear: randomStartYear,
-        endYear: randomEndYear,
+        start_year: randomstart_year,
+        end_year: randomend_year,
         label: `Event ${i}`,
         color: randomColor,
         children: [],
@@ -65,8 +65,8 @@ for (let i = 0; i <= 250; i += 1) {
   } else {
     data.push({
       id: i.toString(),
-      startYear: randomStartYear,
-      endYear: randomEndYear,
+      start_year: randomstart_year,
+      end_year: randomend_year,
       label: `Event ${i}`,
       color: randomColor,
       children: [],
@@ -78,8 +78,8 @@ function easeInOutQuint(t: number): number {
   return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * t - 1 * t * t * t * t;
 }
 
-function getEventWidth(startYear: number = 0, endYear: number = 0) {
-  return 10 * ((endYear || 0) - (startYear || 0));
+function getEventWidth(start_year: number = 0, end_year: number = 0) {
+  return 10 * ((end_year || 0) - (start_year || 0));
 }
 
 function getEventPosition(item: TimelineDataItem, index: number, array: TimelineDataItem[]) {
@@ -87,7 +87,7 @@ function getEventPosition(item: TimelineDataItem, index: number, array: Timeline
   let i = index - 1;
   let parent_count = 0;
   while (i <= index - 1 && i > -1) {
-    if (array[i].startYear * 10 >= array[index].endYear * 10 || array[i].endYear * 10 <= array[index].startYear * 10) {
+    if (array[i].start_year * 10 >= array[index].end_year * 10 || array[i].end_year * 10 <= array[index].start_year * 10) {
       parent_count += 1;
     } else break;
     i -= 1;
@@ -100,8 +100,8 @@ function getEventPosition(item: TimelineDataItem, index: number, array: Timeline
 }
 
 const positionedData = data
-  .filter((i) => i.endYear - i.startYear >= 8)
-  .sort((a, b) => a.startYear - b.startYear)
+  .filter((i) => i.end_year - i.start_year >= 8)
+  .sort((a, b) => a.start_year - b.start_year)
   .map(getEventPosition);
 
 const eventHeight = 32;
@@ -214,7 +214,7 @@ export function TimelineView() {
                 style={{
                   height: virtualRow.size,
                   position: "absolute",
-                  transform: `translate(${10 * (positionedData[virtualRow.index]?.startYear || 0)}px, ${
+                  transform: `translate(${10 * (positionedData[virtualRow.index]?.start_year || 0)}px, ${
                     virtualRow.start - (positionedData[virtualRow.index]?.top || 0)
                   }px)`,
                 }}>
@@ -228,8 +228,8 @@ export function TimelineView() {
                     backgroundSize: "cover",
                     backgroundRepeat: "no-repeat",
                     minWidth: getEventWidth(
-                      positionedData[virtualRow.index]?.startYear || 0,
-                      positionedData[virtualRow.index]?.endYear || 0,
+                      positionedData[virtualRow.index]?.start_year || 0,
+                      positionedData[virtualRow.index]?.end_year || 0,
                     ),
                     backgroundImage:
                       virtualRow.index % 7 === 0

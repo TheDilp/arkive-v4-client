@@ -34,19 +34,19 @@ export interface EventType {
   parent_id: string;
   document_id?: string | null;
   image_id?: string | null;
-  endDay?: number | null;
-  startDay: number;
-  endMonth?: number | null;
-  endYear?: number | null;
-  startMonth: number;
-  startYear: number;
+  end_day?: number | null;
+  start_day: number;
+  end_month?: number | null;
+  end_year?: number | null;
+  start_month: number;
+  start_year: number;
 
   document?: DocumentType;
   image?: ImageType;
   tags: TagType[];
 }
 
-export type EventStateType = Partial<Omit<EventType, "document">> & { startMonth: number };
+export type EventStateType = Partial<Omit<EventType, "document">> & { start_month: number };
 
 export interface CurrentDateType {
   month: number;
