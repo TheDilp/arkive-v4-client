@@ -76,7 +76,10 @@ export function EventDrawer({ data }: Props) {
 
   async function handleSave() {
     if (!data?.id) {
-      const parsedData = InsertEventSchema.parse({ data: event, relations: event?.tags?.map((tag) => ({ id: tag.id })) });
+      const parsedData = InsertEventSchema.parse({
+        data: { ...event, image_id: event?.image?.id },
+        relations: event?.tags?.map((tag) => ({ id: tag.id })),
+      });
 
       createEvent(parsedData, {
         onSuccess: () => {
@@ -95,7 +98,6 @@ export function EventDrawer({ data }: Props) {
   const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
   const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
   const isDateCorrect = isYearCorrect && isMonthCorrect && isDayCorrect;
-
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -203,7 +205,7 @@ export function EventDrawer({ data }: Props) {
           <div>
             {event?.image ? (
               <ImagePreview
-                clearAction={() => handleChange({ name: "background_image", value: null })}
+                clearAction={() => handleChange({ name: "image", value: null })}
                 id={event.image.id}
                 title={event.image.title}
                 url={getImageURL(project_id as string, "images", event.image.id)}
@@ -211,7 +213,7 @@ export function EventDrawer({ data }: Props) {
             ) : (
               <ImageSelect
                 label="Event image (optional)"
-                name="background_image"
+                name="image"
                 onChange={handleImageChange}
                 type="images"
                 value={event.image_id}
