@@ -185,8 +185,14 @@ export function EventDrawer({ data }: Props) {
           </div>
 
           <div className="flex items-center gap-x-2">
-            <Input label="Hour (optional)" name="hours" onChange={handleChange} value={event?.hours || ""} />
-            <Input label="Minutes (optional)" name="minutes" onChange={handleChange} value={event?.minutes || ""} />
+            <Input label="Hour (optional)" name="hours" onChange={handleChange} type="number" value={event?.hours || ""} />
+            <Input
+              label="Minutes (optional)"
+              name="minutes"
+              onChange={handleChange}
+              type="number"
+              value={event?.minutes || ""}
+            />
           </div>
         </>
       ) : null}

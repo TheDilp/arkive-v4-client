@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { Badge, Button, Input, Select } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
-import { DefaultTagColor, drawerAtom, getFillerDayNumber, getStartingDayForMonth, IconEnum } from "../../utils";
+import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
 
 export default function DayNumber({
   dayNumber,
@@ -79,6 +79,10 @@ export function CalendarView() {
           },
         ],
       },
+      orderBy: [
+        { field: "hours", sort: "asc" },
+        { field: "minutes", sort: "asc" },
+      ],
     },
     "events",
     {
@@ -205,7 +209,14 @@ export function CalendarView() {
                 ?.filter((event) => event.startDay === day + 1)
                 .map((event) => (
                   <div key={event.id}>
-                    <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
+                    {event.image_id ? (
+                      <div
+                        className="h-24 w-full rounded-md bg-cover bg-center transition-all"
+                        style={{ backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})` }}
+                      />
+                    ) : (
+                      <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
+                    )}
                   </div>
                 ))}
             </div>
