@@ -5,7 +5,7 @@ import { IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
 
 const BadgeClasses = tv({
-  base: "rounded-md h-6 px-1.5 text-sm fond-medium w-full truncate text-center flex items-center justify-center cursor-default",
+  base: "rounded-md h-6 px-1.5 text-sm fond-medium w-full text-center flex items-center justify-center cursor-default",
   variants: {
     variant: {
       primary: "bg-zinc-950 text-white",
@@ -40,7 +40,7 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
         backgroundColor: customColor,
       }}
       tabIndex={0}>
-      <span className="flex h-full items-center">{label}</span>
+      <span className="truncate">{label}</span>
       {clearAction ? (
         <Button
           hasNoBackground
