@@ -42,9 +42,11 @@ export interface EventType {
   startYear: number;
 
   document?: DocumentType;
-  background_image?: ImageType;
+  image?: ImageType;
   tags: TagType[];
 }
+
+export type EventStateType = Partial<Omit<EventType, "document">> & { startMonth: number };
 
 export interface CurrentDateType {
   month: number;

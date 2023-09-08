@@ -99,6 +99,7 @@ export function CalendarView() {
                 data: { month: date.month, year: date.year },
                 title: "Create new event",
                 type: "events",
+                size: "lg",
               }));
             }}
           />

@@ -2,8 +2,15 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetEntities, useHandleChange } from "../../../hooks";
-import { EventType, MonthType, onChangeValue } from "../../../types";
-import { getImageURL, IconEnum, useNotifications } from "../../../utils";
+import { EventStateType, MonthType, onChangeValue } from "../../../types";
+import {
+  checkIfDayCorrect,
+  checkIfMonthCorrect,
+  checkIfYearCorrect,
+  getImageURL,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
 import { ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, Textarea } from "../../Form";
@@ -11,11 +18,10 @@ import { Tabs } from "../../Layout";
 import { Badge } from "../../Misc";
 import { ColorPicker } from "..";
 
-type EventStateType = Partial<Omit<EventType, "document">> & { startMonth: number };
-
-function isSaveDisabled(event: EventStateType) {
+function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrect: boolean }) {
+  if (!isDateCorrect) return true;
   if (!event?.title) return true;
-  if (!event?.startDay || !event?.startMonth || !event?.startMonth) return true;
+
   return false;
 }
 
@@ -34,11 +40,14 @@ export function EventDrawer({ data }: Props) {
     { data: { project_id, parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
   );
-
   const [event, setEvent] = useState<EventStateType>({ startMonth: data?.month ?? 0 });
   const { handleChange } = useHandleChange({ data: event, setData: setEvent });
 
   function handleMonthChange({ name, value }: onChangeValue) {
+    if (value === undefined) {
+      handleChange({ name, value });
+      return;
+    }
     const idx = existingMonths?.data?.findIndex((month) => month.id === value) ?? -1;
     if (idx > -1) handleChange({ name, value: idx });
   }
@@ -46,6 +55,11 @@ export function EventDrawer({ data }: Props) {
   function handleImageChange({ name, label, value }: { name: string; label?: string; value: string }) {
     handleChange({ name, value: { id: value, title: label } });
   }
+
+  const isYearCorrect = checkIfYearCorrect(event.startYear, event?.endYear);
+  const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
+  const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
+  const isDateCorrect = isYearCorrect && isMonthCorrect && isDayCorrect;
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -70,7 +84,7 @@ export function EventDrawer({ data }: Props) {
           <div className="flex items-center justify-between gap-x-2">
             <Input
               label="Start day (required)"
-              max={existingMonths?.data[event.startMonth].days ?? 0}
+              max={existingMonths?.data[event?.startMonth]?.days ?? 0}
               min={1}
               name="startDay"
               onChange={handleChange}
@@ -94,18 +108,23 @@ export function EventDrawer({ data }: Props) {
               value={event?.startYear || ""}
             />
           </div>
-          <div className="flex items-center justify-between gap-x-2">
+          <div className="grid grid-cols-3 gap-x-2">
             <Input
+              helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
               isDisabled={typeof event?.endMonth !== "number"}
               label="End day (optional)"
               max={typeof event.endMonth === "number" ? existingMonths?.data[event.endMonth].days : 0}
               min={1}
               name="endDay"
               onChange={handleChange}
+              placeholder={typeof event?.endMonth !== "number" ? "Select a month." : ""}
               type="number"
               value={event?.endDay || ""}
+              variant={isDayCorrect ? "primary" : "error"}
             />
             <Select
+              helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
+              isClearable
               isDisabled={isFetchingMonths}
               isLoading={isFetchingMonths}
               label="End month (optional)"
@@ -113,14 +132,18 @@ export function EventDrawer({ data }: Props) {
               onChange={handleMonthChange}
               options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
               value={typeof event?.endMonth === "number" ? existingMonths?.data?.[event.endMonth].id : undefined}
+              variant={isMonthCorrect ? "primary" : "error"}
             />
             <Input
+              helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
               isDisabled={typeof event?.endMonth !== "number"}
               label="End year (optional)"
               name="endYear"
               onChange={handleChange}
+              placeholder={typeof event?.endMonth !== "number" ? "Select a month." : ""}
               type="number"
               value={event?.endYear || ""}
+              variant={isYearCorrect ? "primary" : "error"}
             />
           </div>
 
@@ -143,12 +166,12 @@ export function EventDrawer({ data }: Props) {
             />
           </div>
           <div>
-            {event?.background_image ? (
+            {event?.image ? (
               <ImagePreview
                 clearAction={() => handleChange({ name: "background_image", value: null })}
-                id={event.background_image.id}
-                title={event.background_image.title}
-                url={getImageURL(project_id as string, "images", event.background_image.id)}
+                id={event.image.id}
+                title={event.image.title}
+                url={getImageURL(project_id as string, "images", event.image.id)}
               />
             ) : (
               <ImageSelect
@@ -214,7 +237,7 @@ export function EventDrawer({ data }: Props) {
 
       <Button
         icon={hasId ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(event)}
+        isDisabled={isSaveDisabled(event, { isDateCorrect })}
         label={hasId ? "Save" : "Create"}
         onClick={() => {}}
         variant="success"

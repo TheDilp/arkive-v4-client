@@ -1,5 +1,5 @@
 import { EventType } from "../../types";
-import { CalendarType, MonthType } from "../../types/EntityTypes/calendarTypes";
+import { CalendarType, EventStateType, MonthType } from "../../types/EntityTypes/calendarTypes";
 
 export function sortEvents(a: EventType, b: EventType) {
   if (a?.hours && b?.hours) {
@@ -18,6 +18,41 @@ export function sortEvents(a: EventType, b: EventType) {
     return 0;
   }
   return 0;
+}
+
+export function checkIfDayCorrect(e: EventStateType, isYearCorrect: boolean, isMonthCorrect: boolean): boolean {
+  if (isYearCorrect && isMonthCorrect) {
+    if (e?.endMonth === e?.startMonth) {
+      if (typeof e?.startDay === "number" && Number.isInteger(e.startDay)) {
+        if (typeof e?.endDay === "number" && Number.isInteger(e.endDay)) {
+          if (e.endDay < e.startDay) return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+export function checkIfMonthCorrect(e: EventStateType, isYearCorrect: boolean): boolean {
+  if (isYearCorrect) {
+    if (e?.startYear === e?.endYear) {
+      if (typeof e?.startMonth === "number" && Number.isInteger(e?.startMonth)) {
+        if (typeof e?.endMonth === "number" && Number.isInteger(e?.endMonth)) {
+          if (e.endMonth < e.startMonth) return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+export function checkIfYearCorrect(startYear: number | undefined, endYear: number | undefined | null): boolean {
+  if (typeof startYear === "number" && Number.isInteger(startYear)) {
+    if (typeof endYear === "number" && Number.isInteger(endYear)) {
+      if (endYear < startYear) return false;
+    }
+  }
+  return true;
 }
 
 export function getNextDate(date: { month: number; year: number }, calendar: CalendarType, type: "next" | "previous") {
