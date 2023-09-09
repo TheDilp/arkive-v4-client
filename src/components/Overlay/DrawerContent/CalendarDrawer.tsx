@@ -27,8 +27,8 @@ function isSaveDisabled(calendar: Partial<CalendarType>, months: MonthStateType[
 function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths: Dispatch<SetStateAction<MonthStateType[]>> }) {
   const { handleChange } = useHandleChange({ data: months, setData: setMonths });
   return (
-    <div className="mt-2 flex max-h-96 flex-col gap-y-2 overflow-y-auto pr-2">
-      <div className="flex flex-nowrap justify-between">
+    <div className="mt-2 flex flex-col gap-y-2 pr-2">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
         <span>Insert new month:</span>
         <div className="h-8 w-8">
           <Button
@@ -78,6 +78,15 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
                           value={item.days ?? 0}
                         />
                       </div>
+                      <div className="h-10 self-end">
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.trash}
+                          isIconOnly
+                          onClick={() => setMonths((prev) => prev.filter((m) => m.id !== item.id))}
+                          variant="error"
+                        />
+                      </div>
                     </div>
                   )}
                 </Draggable>
@@ -93,8 +102,8 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
 function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<SetStateAction<DayStateType[]>> }) {
   const { handleChange } = useHandleChange({ data: days, setData: setDays });
   return (
-    <div className="mt-2 flex max-h-96 flex-col gap-y-2 overflow-y-auto pr-2">
-      <div className="flex flex-nowrap justify-between">
+    <div className="mt-2 flex flex-col gap-y-2 pr-2">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
         <span>Insert new day:</span>
         <div className="h-8 w-8">
           <Button
@@ -200,7 +209,7 @@ export function CalendarDrawer({ data }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-2 overflow-y-auto">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
@@ -234,14 +243,16 @@ export function CalendarDrawer({ data }: Props) {
 
       {selectedTab === 1 ? <TagInput handleChange={handleChange} tags={calendar?.tags || []} /> : null}
 
-      <Button
-        icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(calendar, months, days) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={data?.id ? "Save" : "Create"}
-        onClick={handleSave}
-        variant="success"
-      />
+      <div>
+        <Button
+          icon={data?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(calendar, months, days) || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={data?.id ? "Save" : "Create"}
+          onClick={handleSave}
+          variant="success"
+        />
+      </div>
     </div>
   );
 }
