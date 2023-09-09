@@ -1,10 +1,11 @@
 import { randPhrase } from "@ngneat/falso";
 import { elementScroll, useVirtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
+import { useSetAtom } from "jotai";
 import { MutableRefObject, useCallback, useRef } from "react";
 
 import { Tooltip } from "../../components";
 import { EventType } from "../../types";
-import { DefaultTagColor } from "../../utils";
+import { DefaultTagColor, drawerAtom } from "../../utils";
 
 type TimelineDataItem = {
   id: string;
@@ -88,7 +89,7 @@ const eventHeight = 32;
 
 export function TimelineView({ events, month_count }: { events: EventType[]; month_count: number }) {
   const positionedEvents = (events || []).sort((a, b) => a.start_year - b.start_year);
-
+  const setDrawer = useSetAtom(drawerAtom);
   const ref = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollingRef = useRef<number>();
   const scrollToFn: VirtualizerOptions<any, any>["scrollToFn"] = useCallback((offset, canSmooth, instance) => {
@@ -155,6 +156,17 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                 variant="secondary">
                 <div
                   className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Edit event",
+                      type: "events",
+                      data: { id: positionedEvents[virtualRow.index].id },
+                      size: "lg",
+                    }))
+                  }
+                  onKeyDown={() => {}}
+                  role="button"
                   style={{
                     height: width === 20 ? width : "85%",
                     position: "relative",
@@ -168,7 +180,8 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                     backgroundImage: positionedEvents[virtualRow.index]?.image_id
                       ? `url(${positionedEvents[virtualRow.index]?.image_id}`
                       : "",
-                  }}>
+                  }}
+                  tabIndex={-1}>
                   {width === 20 ? null : (
                     <div className="flex w-full max-w-full items-center font-lato">
                       <span className="truncate">
