@@ -1,10 +1,11 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, MonthStateType } from "../../../types";
-import { IconEnum, onDragEnd } from "../../../utils";
+import { drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { Button, Input, TagInput } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
@@ -156,7 +157,7 @@ export function CalendarDrawer({ data }: Props) {
   const [calendar, setCalendar] = useState<Partial<CalendarType>>({ project_id });
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
-
+  const resetDrawer = useResetAtom(drawerAtom);
   const { data: existingCalendar } = useGetEntity<CalendarType>(
     data?.id,
     "calendars",
@@ -183,11 +184,11 @@ export function CalendarDrawer({ data }: Props) {
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: { months, tags: calendar.tags },
       });
-      await createCalendar(parsedData);
+      await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
       const parsedData = UpdateCalendarSchema.parse({ data: { ...calendar }, relations: { months, tags: calendar.tags } });
 
-      await updateCalendar(parsedData);
+      await updateCalendar(parsedData, { onSuccess: resetDrawer });
     }
   }
 
