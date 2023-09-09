@@ -9,7 +9,8 @@ export type SkeletonType = {
     | "editor"
     | "family_tree"
     | "character_profile"
-    | "character_profile_main";
+    | "character_profile_main"
+    | "calendar_view";
   limit?: number;
   entity_type?: AvailableEntityType;
 };

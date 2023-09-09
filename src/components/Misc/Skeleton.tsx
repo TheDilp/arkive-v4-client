@@ -183,6 +183,54 @@ function CharacterProfileMainSkeleton() {
   );
 }
 
+function CalendarViewSkeleton() {
+  return (
+    <div>
+      <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
+        <div className="h-10 w-32 bg-zinc-700" />
+        <div className="h-10 w-32 bg-zinc-700" />
+        <div className="h-10 w-32 bg-zinc-700" />
+        <div className="h-10 w-32 bg-zinc-700" />
+      </div>
+      <div
+        className="grid overflow-auto border border-zinc-700"
+        style={{
+          gridTemplateColumns: "repeat(7, minmax(9rem, 1fr))",
+        }}>
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+        <div className="group col-span-1 h-6 border-b border-r border-zinc-700 px-2 text-white" />
+
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+        <div className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white" />
+      </div>
+    </div>
+  );
+}
+
 export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
@@ -192,5 +240,6 @@ export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "family_tree") return <FamilyTreeSkeleton />;
   if (type === "character_profile") return <CharacterProfileSkeleton />;
   if (type === "character_profile_main") return <CharacterProfileMainSkeleton />;
+  if (type === "calendar_view") return <CalendarViewSkeleton />;
   return null;
 }

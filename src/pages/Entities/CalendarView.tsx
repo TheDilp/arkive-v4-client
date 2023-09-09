@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Badge, Button, Input, Select } from "../../components";
+import { Badge, Button, Input, Select, Skeleton } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
@@ -53,13 +53,13 @@ export function CalendarView() {
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
-  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", date]);
+  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, item_id, "events", date]);
 
-  const { data: existingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
+  const { data: existingCalendar, isFetching: isFetchingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
     data: { project_id },
     relations: { months: true },
   });
-  const { data: events } = useGetEntities<EventType>(
+  const { data: events, isFetching: isFetchingEvents } = useGetEntities<EventType>(
     {
       data: { project_id },
       filters: {
@@ -82,7 +82,13 @@ export function CalendarView() {
                   value: date.year,
                 },
               ]
-            : [],
+            : [
+                {
+                  field: "parent_id",
+                  value: item_id as string,
+                  operator: "eq",
+                },
+              ],
       },
       // fields: ["id", "title", "image_id", "start_day", "start_month", "start_year", "parent_id", "background_color", "s"],
       orderBy: [
@@ -99,19 +105,22 @@ export function CalendarView() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setQueryKey(["allEntities", project_id, "events", view, view === "calendar" ? date : null]);
+      setQueryKey(["allEntities", project_id, item_id, "events", view, view === "calendar" ? date : null]);
     }, 300);
     return () => clearTimeout(timeout);
   }, [date]);
 
   useEffect(() => {
-    setQueryKey(["allEntities", project_id, "events", view, view === "calendar" ? date : null]);
+    setQueryKey(["allEntities", project_id, item_id, "events", view, view === "calendar" ? date : null]);
   }, [view]);
 
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
   const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.end_year));
+
+  if (isFetchingCalendar || isFetchingEvents) return <Skeleton type="calendar_view" />;
+
   return (
     <div className="flex flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
