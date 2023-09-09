@@ -103,7 +103,11 @@ export function Tags() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
-  const [{ orderBy, selection }, dispatch] = useTable({ selection: {}, orderBy: [{ field: "title", sort: "asc" }] });
+  const [{ selection, orderBy, pagination }, dispatch] = useTable({
+    selection: {},
+    orderBy: [{ field: "title", sort: "asc" }],
+    pagination: { limit: 10, page: 0 },
+  });
   const { data, isFetching } = useGetEntities({ data: { project_id }, orderBy }, "tags");
 
   return (
@@ -138,6 +142,7 @@ export function Tags() {
           data={data?.data || []}
           dispatch={dispatch}
           isLoading={isFetching}
+          pagination={pagination}
           type="tags"
         />
       </div>
