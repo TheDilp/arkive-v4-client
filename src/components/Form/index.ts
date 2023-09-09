@@ -6,5 +6,6 @@ export * from "./Input";
 export * from "./Range";
 export * from "./Search";
 export * from "./Select";
+export * from "./TagInput";
 export * from "./Textarea";
 export * from "./Title";
