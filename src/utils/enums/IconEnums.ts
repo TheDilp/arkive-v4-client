@@ -88,6 +88,8 @@ export const IconEnum = {
   vertical: "ph:arrows-out-line-vertical",
   save: "ph:floppy-disk",
   star: "ph:star",
+  moon: "ph:moon",
+  sun: "ph:sun",
   drag: "ph:dots-six-vertical",
   filter: "ph:funnel",
   user: "ph:user",

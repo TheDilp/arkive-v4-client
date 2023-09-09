@@ -1,6 +1,7 @@
 export * from "./buttonUtils";
 export * from "./calendarUtils";
 export * from "./diceRollerUtils";
+export * from "./dragAndDropUtils";
 export * from "./editorUtils";
 export * from "./entityUtils";
 export * from "./graphUtils";

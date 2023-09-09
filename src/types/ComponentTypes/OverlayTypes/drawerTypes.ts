@@ -55,7 +55,7 @@ export type DrawerAtomType = {
         | "documents"
         | "maps"
         | "graphs"
-        | "timelines"
+        | "calendars"
         | "random_tables"
         | "random_table_option";
       data: { id?: string; project_id?: string };

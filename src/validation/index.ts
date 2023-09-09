@@ -1,4 +1,4 @@
-export * from "./calendars/event";
+export * from "./calendars";
 export * from "./character";
 export * from "./characterFields";
 export * from "./document";

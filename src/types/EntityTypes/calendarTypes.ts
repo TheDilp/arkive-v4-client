@@ -11,6 +11,7 @@ export interface CalendarType extends BaseEntityType {
   minutes?: number | null;
   months: MonthType[];
   days: string[];
+  tags: TagType[];
 }
 
 export type MonthType = {
@@ -19,7 +20,7 @@ export type MonthType = {
   days: number;
   sort: number;
   events: EventType[];
-  parentId: string;
+  parent_id: string;
 };
 
 export interface EventType {
@@ -46,8 +47,9 @@ export interface EventType {
   tags: TagType[];
 }
 
+export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
+export type DayStateType = { id: string; title: string };
 export type EventStateType = Partial<Omit<EventType, "document">> & { start_month: number };
-
 export interface CurrentDateType {
   month: number;
   year: number;
