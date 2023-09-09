@@ -105,7 +105,7 @@ function DrawerFormSkeleton() {
 
 function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "entity_type" | "limit">) {
   return (
-    <div className="px-8">
+    <div className="px-5">
       <div className="flex h-10 w-full items-center justify-between" />
       <div className="grid h-full w-full animate-pulse grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
         {[...Array(limit).keys()].map((key) => (
