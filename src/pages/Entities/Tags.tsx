@@ -66,7 +66,13 @@ function createColumns(
                 },
               },
               {
-                id: "2",
+                id: "expand",
+                icon: IconEnum.tags,
+                label: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this tag`,
+                onClick: row.getToggleExpandedHandler(),
+              },
+              {
+                id: "3",
                 label: "Delete tag",
                 icon: IconEnum.trash,
                 onClick: () => {
