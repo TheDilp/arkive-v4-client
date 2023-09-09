@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-import { PositionType } from "../../baseTypes";
+import { PositionType, Variant } from "../../baseTypes";
 
 export type TooltipContentType = string | JSX.Element | null;
 export interface TooltipType {
@@ -18,8 +18,10 @@ export interface TooltipType {
   closeOnClick?: boolean;
   passCloseTooltip?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };
+  variant?: Variant;
 }
 
 export type DefaultTooltipType = {
   children: ReactElement | string | null;
+  variant?: Variant;
 };

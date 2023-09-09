@@ -17,15 +17,29 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { cloneElement, ReactElement, useRef, useState } from "react";
+import { tv } from "tailwind-variants";
 
-import { DefaultTooltipType, TooltipType } from "../../types";
+import { DefaultTooltipType, TooltipType, Variant } from "../../types";
 
-function DefaultTooltip({ children }: DefaultTooltipType) {
-  return (
-    <div className="z-50 select-none rounded border-none border-transparent bg-black p-2 text-sm text-white shadow">
-      {children}
-    </div>
-  );
+const defaultTooltipClasses = tv({
+  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow",
+  variants: {
+    variant: {
+      primary: "bg-black",
+      secondary: "bg-zinc-700",
+    },
+  },
+});
+
+function DefaultTooltip({ children, variant }: DefaultTooltipType) {
+  const classes = defaultTooltipClasses({ variant });
+  return <div className={classes}>{children}</div>;
+}
+
+function getArrowColor(variant: Variant) {
+  if (variant === "primary") return "#000000";
+  if (variant === "secondary") return "#3f3f46";
+  return "#000000";
 }
 
 export function Tooltip({
@@ -40,6 +54,7 @@ export function Tooltip({
   isIgnoringHover,
   arrowColor,
   passCloseTooltip,
+  variant = "primary",
 }: TooltipType) {
   const [open, setOpen] = useState(false);
   const arrowRef = useRef(null);
@@ -100,7 +115,7 @@ export function Tooltip({
             style: { ...floatingStyles, zIndex: 99999 },
           })}>
           {typeof content === "string" ? (
-            <DefaultTooltip>{content}</DefaultTooltip>
+            <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
           ) : (
             cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
           )}
@@ -108,7 +123,7 @@ export function Tooltip({
             ref={arrowRef}
             className="z-[9999] [&>path:first-of-type]:stroke-none"
             context={context}
-            fill={arrowColor || "black"}
+            fill={arrowColor || getArrowColor(variant) || "black"}
             strokeWidth={0}
           />
         </div>
