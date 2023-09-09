@@ -2,6 +2,7 @@ import { randPhrase } from "@ngneat/falso";
 import { elementScroll, useVirtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
 import { MutableRefObject, useCallback, useRef } from "react";
 
+import { Tooltip } from "../../components";
 import { EventType } from "../../types";
 import { DefaultTagColor } from "../../utils";
 
@@ -148,31 +149,36 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                   getMonthOffset(positionedEvents[virtualRow.index].start_month, month_count)
                 }px, ${virtualRow.start}px)`,
               }}>
-              <div
-                className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
-                style={{
-                  height: width === 20 ? width : "85%",
-                  position: "relative",
-                  backgroundColor: positionedEvents[virtualRow.index]?.background_color || DefaultTagColor,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                  minWidth: width,
-                  maxWidth: width,
-                  width,
-                  backgroundImage: positionedEvents[virtualRow.index]?.image_id
-                    ? `url(${positionedEvents[virtualRow.index]?.image_id}`
-                    : "",
-                }}>
-                {width === 20 ? null : (
-                  <div className="flex w-full max-w-full items-center font-lato">
-                    <span className="truncate">
-                      {positionedEvents[virtualRow.index].title}({positionedEvents[virtualRow.index].start_year} -&nbsp;
-                      {positionedEvents[virtualRow.index].end_year})
-                    </span>
-                  </div>
-                )}
-              </div>
+              <Tooltip
+                allowedPlacements={["left", "left-end", "left-start", "right", "right-end", "right-start"]}
+                content={positionedEvents[virtualRow.index].title}
+                variant="secondary">
+                <div
+                  className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
+                  style={{
+                    height: width === 20 ? width : "85%",
+                    position: "relative",
+                    backgroundColor: positionedEvents[virtualRow.index]?.background_color || DefaultTagColor,
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    minWidth: width,
+                    maxWidth: width,
+                    width,
+                    backgroundImage: positionedEvents[virtualRow.index]?.image_id
+                      ? `url(${positionedEvents[virtualRow.index]?.image_id}`
+                      : "",
+                  }}>
+                  {width === 20 ? null : (
+                    <div className="flex w-full max-w-full items-center font-lato">
+                      <span className="truncate">
+                        {positionedEvents[virtualRow.index].title}({positionedEvents[virtualRow.index].start_year} -&nbsp;
+                        {positionedEvents[virtualRow.index].end_year})
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </Tooltip>
             </div>
           );
         })}

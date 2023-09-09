@@ -245,12 +245,12 @@ export function CalendarView() {
                   )
                   .map((event) => (
                     <Tooltip
+                      key={event.id}
                       content={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
                         event.end_day === day + 1 ? "(end)" : ""
                       }`}
                       variant="secondary">
                       <div
-                        key={event.id}
                         className="cursor-pointer"
                         onClick={() =>
                           setDrawer((prev) => ({
