@@ -2,10 +2,10 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, MonthStateType } from "../../../types";
 import { IconEnum, onDragEnd } from "../../../utils";
-import { InsertCalendarSchema, InsertCalendarType } from "../../../validation";
+import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { Button, Input, TagInput } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
 import { Icon } from "../../Misc";
@@ -167,6 +167,7 @@ export function CalendarDrawer({ data }: Props) {
   const { handleChange } = useHandleChange({ data: calendar, setData: setCalendar });
 
   const { mutateAsync: createCalendar } = useCreateEntity<InsertCalendarType>("calendars");
+  const { mutateAsync: updateCalendar } = useUpdateEntity<UpdateCalendarType>("calendars", project_id as string);
 
   useLayoutEffect(() => {
     if (existingCalendar?.data) {
@@ -176,13 +177,17 @@ export function CalendarDrawer({ data }: Props) {
     }
   }, [existingCalendar]);
 
-  function handleSave() {
+  async function handleSave() {
     if (!data?.id) {
       const parsedData = InsertCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: { months, tags: calendar.tags },
       });
-      createCalendar({ data: parsedData.data, relations: parsedData.relations });
+      await createCalendar(parsedData);
+    } else {
+      const parsedData = UpdateCalendarSchema.parse({ data: { ...calendar }, relations: { months, tags: calendar.tags } });
+
+      await updateCalendar(parsedData);
     }
   }
 

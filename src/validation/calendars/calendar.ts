@@ -38,3 +38,4 @@ export const UpdateCalendarSchema = z.object({
 });
 
 export type InsertCalendarType = z.infer<typeof InsertCalendarSchema>;
+export type UpdateCalendarType = z.infer<typeof UpdateCalendarSchema>;

@@ -258,7 +258,7 @@ export function FolderView() {
                         if (item?.is_folder)
                           setDrawer((prev) => ({
                             ...prev,
-                            size: "sm",
+                            size: "lg",
                             title: `Edit ${entityName} - ${item.title}`,
                             type: "folder",
                             data: { id, type: type as AvailableEntityType },
@@ -266,7 +266,7 @@ export function FolderView() {
                         else
                           setDrawer((prev) => ({
                             ...prev,
-                            size: "sm",
+                            size: "lg",
                             title: `Edit ${entityName} - ${item.title}`,
                             type: type as DrawerContentCreateNewType,
                             data: { id, project_id: project_id as string },
