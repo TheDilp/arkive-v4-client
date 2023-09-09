@@ -46,7 +46,7 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
           {(providedDroppable) => (
             <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
               {months.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
+                <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
@@ -106,11 +106,11 @@ function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<Se
         </div>
       </div>
       <DragDropContext onDragEnd={(result) => onDragEnd<DayStateType>(result, days, setDays)}>
-        <Droppable droppableId="droppable">
+        <Droppable droppableId="droppableDays">
           {(providedDroppable) => (
             <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
               {days.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
+                <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
@@ -167,14 +167,18 @@ export function CalendarDrawer({ data }: Props) {
 
   const { handleChange } = useHandleChange({ data: calendar, setData: setCalendar });
 
-  const { mutateAsync: createCalendar } = useCreateEntity<InsertCalendarType>("calendars");
-  const { mutateAsync: updateCalendar } = useUpdateEntity<UpdateCalendarType>("calendars", project_id as string);
+  const { mutateAsync: createCalendar, isLoading: isCreating } = useCreateEntity<InsertCalendarType>("calendars");
+  const { mutateAsync: updateCalendar, isLoading: isUpdating } = useUpdateEntity<UpdateCalendarType>(
+    "calendars",
+    project_id as string,
+  );
 
   useLayoutEffect(() => {
     if (existingCalendar?.data) {
       const { months: mths, ...cal } = existingCalendar.data;
       setCalendar(cal);
       setMonths(mths);
+      setDays(cal.days.map((d) => ({ id: crypto.randomUUID(), title: d })));
     }
   }, [existingCalendar]);
 
@@ -186,7 +190,10 @@ export function CalendarDrawer({ data }: Props) {
       });
       await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
-      const parsedData = UpdateCalendarSchema.parse({ data: { ...calendar }, relations: { months, tags: calendar.tags } });
+      const parsedData = UpdateCalendarSchema.parse({
+        data: { ...calendar, days: days.map((d) => d.title) },
+        relations: { months, tags: calendar.tags },
+      });
 
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
     }
@@ -229,7 +236,8 @@ export function CalendarDrawer({ data }: Props) {
 
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(calendar, months, days)}
+        isDisabled={isSaveDisabled(calendar, months, days) || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={data?.id ? "Save" : "Create"}
         onClick={handleSave}
         variant="success"
