@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Badge, Button, Input, Select, Skeleton } from "../../components";
+import { Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
@@ -53,28 +53,23 @@ export function CalendarView() {
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
-  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, item_id, "events", date]);
+  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
 
   const { data: existingCalendar, isFetching: isFetchingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
     data: { project_id },
     relations: { months: true },
   });
-  const { data: events, isFetching: isFetchingEvents } = useGetEntities<EventType>(
+  const { data: events } = useGetEntities<EventType>(
     {
       data: { project_id },
       filters: {
         and:
-          view === "timeline"
+          view === "calendar"
             ? [
                 {
                   field: "parent_id",
                   value: item_id as string,
                   operator: "eq",
-                },
-                {
-                  field: "start_month",
-                  operator: "eq",
-                  value: date.month,
                 },
                 {
                   field: "start_year",
@@ -98,6 +93,7 @@ export function CalendarView() {
     },
     "events",
     {
+      enabled: !!existingCalendar?.data,
       queryKeyOverwrite: queryKey,
     },
   );
@@ -105,24 +101,24 @@ export function CalendarView() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setQueryKey(["allEntities", project_id, item_id, "events", view, view === "calendar" ? date : null]);
+      setQueryKey(["allEntities", project_id, "events", item_id, view, view === "calendar" ? date : null]);
     }, 300);
     return () => clearTimeout(timeout);
   }, [date]);
 
   useEffect(() => {
-    setQueryKey(["allEntities", project_id, item_id, "events", view, view === "calendar" ? date : null]);
+    setQueryKey(["allEntities", project_id, "events", item_id, view, view === "calendar" ? date : null]);
   }, [view]);
 
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
-  const singleDayEvents = events?.data?.filter((event) => !Number.isInteger(event.end_year));
+  if (isFetchingCalendar) return <Skeleton type="calendar_view" />;
 
-  if (isFetchingCalendar || isFetchingEvents) return <Skeleton type="calendar_view" />;
+  // const formattedEvents = grouped.single.concat(grouped.ranged.map(event => ))
 
   return (
-    <div className="flex flex-col">
+    <div className="flex h-full flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         {view === "calendar" ? (
           <>
@@ -241,38 +237,53 @@ export function CalendarView() {
             <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
               <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
               <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
-                {singleDayEvents
-                  ?.filter((event) => event.start_day === day + 1)
+                {(events?.data || [])
+                  ?.filter(
+                    (event) =>
+                      (event.start_day === day + 1 || event.end_day === day + 1) &&
+                      (event.start_month === date.month || event?.end_month === date.month),
+                  )
                   .map((event) => (
-                    <div
-                      key={event.id}
-                      className="cursor-pointer"
-                      onClick={() =>
-                        setDrawer((prev) => ({
-                          ...prev,
-                          title: "Edit event",
-                          type: "events",
-                          data: { id: event.id, month: date.month, year: date.year },
-                          size: "lg",
-                        }))
-                      }
-                      onKeyDown={() => {}}
-                      role="button"
-                      tabIndex={-1}>
-                      {event.image_id ? (
-                        <div className="relative h-24 w-full overflow-hidden rounded-md">
-                          <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
-                          <div
-                            className="absolute h-full w-full bg-cover bg-center opacity-60 "
-                            style={{
-                              backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
-                            }}
+                    <Tooltip
+                      content={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
+                        event.end_day === day + 1 ? "(end)" : ""
+                      }`}
+                      variant="secondary">
+                      <div
+                        key={event.id}
+                        className="cursor-pointer"
+                        onClick={() =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Edit event",
+                            type: "events",
+                            data: { id: event.id, month: date.month, year: date.year },
+                            size: "lg",
+                          }))
+                        }
+                        onKeyDown={() => {}}
+                        role="button"
+                        tabIndex={-1}>
+                        {event.image_id ? (
+                          <div className="relative h-24 w-full overflow-hidden rounded-md">
+                            <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
+                            <div
+                              className="absolute h-full w-full bg-cover bg-center opacity-60 "
+                              style={{
+                                backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <Badge
+                            customColor={event.background_color || DefaultTagColor}
+                            label={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
+                              event.end_day === day + 1 ? "(end)" : ""
+                            }`}
                           />
-                        </div>
-                      ) : (
-                        <Badge customColor={event.background_color || DefaultTagColor} label={event.title} />
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    </Tooltip>
                   ))}
               </div>
             </div>

@@ -3,7 +3,6 @@ import { elementScroll, useVirtualizer, VirtualizerOptions } from "@tanstack/rea
 import { MutableRefObject, useCallback, useRef } from "react";
 
 import { EventType } from "../../types";
-import { TimelineEventType } from "../../types/EntityTypes/timelineTypes";
 import { DefaultTagColor } from "../../utils";
 
 type TimelineDataItem = {
@@ -28,7 +27,7 @@ function getRandomColor() {
 for (let i = 0; i <= 250; i += 1) {
   const randomstart_year = Math.floor(Math.random() * Math.random() * Math.random() * 1000);
   const randomend_year =
-    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (100 - randomstart_year));
+    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (50 - randomstart_year));
   const randomColor = getRandomColor();
   const newEvent = {
     id: i.toString(),
@@ -76,41 +75,18 @@ function easeInOutQuint(t: number): number {
 }
 
 function getEventWidth(start_year: number = 0, end_year: number = 0) {
-  if (end_year) return `${200 * ((end_year || 1) - (start_year || 0))}px`;
+  if (end_year) return `${50 * ((end_year || 1) - (start_year || 0))}px`;
   return 20;
 }
 
-function getEventPosition(item: TimelineEventType, index: number, array: TimelineEventType[]) {
-  let top = 0;
-  let i = index - 1;
-  let parent_count = 0;
-  while (i <= index - 1 && i > -1) {
-    if (array[index]?.end_year && array[i]?.end_year) {
-      if (
-        array[i].start_year * 10 >= (array[index].end_year || 0) * 10 ||
-        (array[i].end_year || 0) * 10 <= array[index].start_year * 10
-      ) {
-        parent_count += 1;
-      }
-    } else break;
-
-    i -= 1;
-  }
-
-  top = parent_count ? (array[i]?.top || 0) + parent_count * 32 : 0;
-  parent_count = 0;
-
-  return { ...item, top };
-}
-
 function getMonthOffset(start_month: number = 0, month_count: number = 1) {
-  return (200 * start_month) / month_count;
+  return (50 * start_month) / month_count;
 }
 
 const eventHeight = 32;
 
 export function TimelineView({ events, month_count }: { events: EventType[]; month_count: number }) {
-  const positionedEvents = (events || []).sort((a, b) => a.start_year - b.start_year).map(getEventPosition);
+  const positionedEvents = (events || []).sort((a, b) => a.start_year - b.start_year);
 
   const ref = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollingRef = useRef<number>();
@@ -146,7 +122,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
     scrollToFn,
   });
   return (
-    <div ref={ref} className="h-fit max-h-screen overflow-auto pb-40">
+    <div ref={ref} className="h-[calc(100%-6rem)] overflow-auto pb-40">
       <div
         className="flex w-full max-w-full flex-col gap-y-2 px-4"
         style={{
@@ -168,9 +144,9 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                 height: virtualRow.size,
                 position: "absolute",
                 transform: `translate(${
-                  10 * (positionedEvents[virtualRow.index]?.start_year || 0) +
+                  50 * (positionedEvents[virtualRow.index]?.start_year || 0) +
                   getMonthOffset(positionedEvents[virtualRow.index].start_month, month_count)
-                }px, ${virtualRow.start - (positionedEvents[virtualRow.index]?.top || 0)}px)`,
+                }px, ${virtualRow.start}px)`,
               }}>
               <div
                 className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
