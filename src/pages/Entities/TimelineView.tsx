@@ -29,7 +29,7 @@ function getRandomColor() {
 for (let i = 0; i <= 250; i += 1) {
   const randomstart_year = Math.floor(Math.random() * Math.random() * Math.random() * 1000);
   const randomend_year =
-    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (50 - randomstart_year));
+    Math.floor(Math.random() * Math.random() * (Math.random() * 1000)) + Math.floor(Math.random() * (20 - randomstart_year));
   const randomColor = getRandomColor();
   const newEvent = {
     id: i.toString(),
@@ -76,19 +76,55 @@ function easeInOutQuint(t: number): number {
   return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * t - 1 * t * t * t * t;
 }
 
-function getEventWidth(start_year: number = 0, end_year: number = 0) {
-  if (end_year) return `${50 * ((end_year || 1) - (start_year || 0))}px`;
-  return 20;
+function getEventWidth(
+  start_month: number,
+  end_month: number,
+  number_of_months: number,
+  start_year: number,
+  end_year: number,
+  month_ratio: number,
+) {
+  if (!end_year || (!end_month && end_month !== 0)) {
+    return month_ratio;
+  }
+  const first_year_duration = number_of_months - start_month;
+  const last_year_duration = end_month + 1;
+  const year_difference = end_year - start_year;
+  const total_months =
+    year_difference > 1
+      ? first_year_duration + last_year_duration + year_difference * number_of_months
+      : first_year_duration + last_year_duration;
+
+  return `${month_ratio * total_months}px`;
 }
 
 function getMonthOffset(start_month: number = 0, month_count: number = 1) {
-  return (50 * start_month) / month_count;
+  return (20 * start_month) / month_count;
 }
 
 const eventHeight = 32;
 
 export function TimelineView({ events, month_count }: { events: EventType[]; month_count: number }) {
-  const positionedEvents = (events || []).sort((a, b) => a.start_year - b.start_year);
+  const positionedEvents = (events || []).sort((a, b) => {
+    if (a.start_year === b.start_year) {
+      if (!a.end_year && !!b.end_year) return -1;
+      if (!!a.end_year && !b.end_year) return 1;
+      if (!!a.end_year && !!b.end_year) {
+        if (a.end_year < b.end_year) return -1;
+        if (a.end_year > b.end_year) return 1;
+        if (a.start_month === b.start_month) {
+          if (!a.end_month && !!b.end_month) return 1;
+          if (!!a.end_month && !b.end_month) return -1;
+          if (!!a.end_month && !!b.end_month) return a.end_month - b.end_month;
+          return 0;
+        }
+        return a.start_month - b.start_month;
+      }
+      return 0;
+    }
+    return a.start_year - b.start_year;
+  });
+  const month_ratio = (5 * month_count) / 12;
   const setDrawer = useSetAtom(drawerAtom);
   const ref = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollingRef = useRef<number>();
@@ -134,8 +170,12 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
         }}>
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const width = getEventWidth(
+            positionedEvents[virtualRow.index]?.start_month,
+            positionedEvents[virtualRow.index]?.end_month || 0,
+            month_count,
             positionedEvents[virtualRow.index]?.start_year || 0,
             positionedEvents[virtualRow.index]?.end_year || 0,
+            month_ratio,
           );
 
           return (
@@ -146,7 +186,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                 height: virtualRow.size,
                 position: "absolute",
                 transform: `translate(${
-                  50 * (positionedEvents[virtualRow.index]?.start_year || 0) +
+                  20 * (positionedEvents[virtualRow.index]?.start_year || 0) +
                   getMonthOffset(positionedEvents[virtualRow.index].start_month, month_count)
                 }px, ${virtualRow.start}px)`,
               }}>
@@ -155,7 +195,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                 content={positionedEvents[virtualRow.index].title}
                 variant="secondary">
                 <div
-                  className={`max-h-full shadow ${width === 20 ? "rounded-sm" : "rounded-md px-2"}`}
+                  className={`max-h-full shadow ${width === month_ratio ? "rounded-sm" : "rounded-md px-2"}`}
                   onClick={() =>
                     setDrawer((prev) => ({
                       ...prev,
@@ -168,7 +208,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                   onKeyDown={() => {}}
                   role="button"
                   style={{
-                    height: width === 20 ? width : "85%",
+                    height: width === month_ratio ? width : "85%",
                     position: "relative",
                     backgroundColor: positionedEvents[virtualRow.index]?.background_color || DefaultTagColor,
                     backgroundPosition: "center",
@@ -182,7 +222,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
                       : "",
                   }}
                   tabIndex={-1}>
-                  {width === 20 ? null : (
+                  {width === month_ratio ? null : (
                     <div className="flex w-full max-w-full items-center font-lato">
                       <span className="truncate">
                         {positionedEvents[virtualRow.index].title}({positionedEvents[virtualRow.index].start_year} -&nbsp;
