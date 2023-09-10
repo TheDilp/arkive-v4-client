@@ -1,2 +1,2 @@
 export * from "./editorTypes";
-export * from "./ImageSelectTypes";
+export * from "./imageSelectTypes";

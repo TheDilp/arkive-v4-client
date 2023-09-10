@@ -115,10 +115,8 @@ export function CalendarView() {
 
   if (isFetchingCalendar) return <Skeleton type="calendar_view" />;
 
-  // const formattedEvents = grouped.single.concat(grouped.ranged.map(event => ))
-
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-[calc(100%-6rem)] flex-col">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         {view === "calendar" ? (
           <>

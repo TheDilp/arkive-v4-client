@@ -88,7 +88,7 @@
     "preview": "vite preview",
     "test": "vitest --run",
     "prepare": "husky install",
-    "pretty": "prettier --write 'src/**/*.ts'",
+    "pretty": "prettier --write src/**/*.{ts,tsx}",
     "precommit": "pnpm run lint --fix && pnpm run pretty && pnpm run test"
   },
   "type": "module",
