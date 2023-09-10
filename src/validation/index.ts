@@ -1,6 +1,7 @@
 export * from "./calendars";
 export * from "./character";
 export * from "./characterFields";
+export * from "./dictionaries";
 export * from "./document";
 export * from "./fieldTemplates";
 export * from "./graphs";

@@ -1,6 +1,7 @@
 export * from "./CalendarDrawer";
 export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
+export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
 export * from "./EdgeDrawer";
 export * from "./EditTags";

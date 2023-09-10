@@ -56,6 +56,7 @@ export type DrawerAtomType = {
         | "maps"
         | "graphs"
         | "calendars"
+        | "dictionaries"
         | "random_tables"
         | "random_table_option";
       data: { id?: string; project_id?: string };
