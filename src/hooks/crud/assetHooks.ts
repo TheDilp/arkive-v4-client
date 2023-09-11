@@ -27,7 +27,6 @@ export function useUploadAsset(type: AssetType, project_id: string) {
       onSettled: (data) => {
         if (data?.ok)
           createNotification({
-            id: crypto.randomUUID(),
             title: data?.message || `${type === "images" ? "Images" : "Maps"} uploaded successfully.`,
             variant: "success",
             icon: IconEnum.check_circle,
