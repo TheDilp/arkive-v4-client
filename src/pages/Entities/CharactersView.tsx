@@ -161,7 +161,7 @@ function createColumns(
 
 export function CharactersView() {
   useChangeNavbarTitle("The Arkive | Characters");
-  const [view, setView] = useState<"card" | "list">(ls.get("characters_view") ?? "card");
+  const [view, setView] = useState<"card" | "table">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
@@ -185,7 +185,7 @@ export function CharactersView() {
     {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
-      enabled: view === "list",
+      enabled: view === "table",
     },
   );
   const {
@@ -269,12 +269,12 @@ export function CharactersView() {
           <Select
             name="view"
             onChange={({ value }) => {
-              setView(value as "card" | "list");
+              setView(value as "card" | "table");
               ls.set("characters_view", value);
             }}
             options={[
               { label: "Card", value: "card", icon: IconEnum.card },
-              { label: "List", value: "list", icon: IconEnum.table },
+              { label: "Table", value: "table", icon: IconEnum.table },
             ]}
             placeholder="View"
             value={view}

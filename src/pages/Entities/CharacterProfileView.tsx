@@ -49,7 +49,7 @@ const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
   { id: "2", label: "Relationships", icon: IconEnum.family_tree },
   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "4", label: "Images", icon: IconEnum.image },
+  { id: "4", label: "Assets", icon: IconEnum.image },
 ];
 
 const fieldSizeClass = tv({
