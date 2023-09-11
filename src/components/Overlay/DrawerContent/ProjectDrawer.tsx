@@ -2,13 +2,14 @@ import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 
 import { useCreateProject, useHandleChange } from "../../../hooks";
+import { ProjectType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
 
 export function ProjectDrawer({ data }: { data: InsertProjectType | null }) {
   const ownerId = localStorage.getItem("ownerId");
-  const [project, setProject] = useState<InsertProjectType>({ ...(data || { title: "" }), owner_id: ownerId as string });
+  const [project, setProject] = useState<Partial<ProjectType>>({ ...(data || { title: "" }), owner_id: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
   const { mutateAsync, isLoading: isMutating } = useCreateProject<InsertProjectType>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -29,7 +30,7 @@ export function ProjectDrawer({ data }: { data: InsertProjectType | null }) {
         label="Create project"
         onClick={async () => {
           if (project) {
-            const parsed = InsertProjectSchema.parse(project);
+            const parsed = InsertProjectSchema.parse({ data: project });
             await mutateAsync(parsed, {
               onSuccess: resetDrawerAtom,
             });

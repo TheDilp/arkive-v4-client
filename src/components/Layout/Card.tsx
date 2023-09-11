@@ -9,7 +9,7 @@ export function ProjectCard({ id, title, image }: ProjectCardType) {
   const navigate = useNavigate();
   return (
     <Link
-      className="group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all animate-in fade-in duration-500"
+      className="group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500 animate-in fade-in"
       to={`/projects/${id}`}>
       <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all ">
         {title}
@@ -89,7 +89,7 @@ export function CharacterCard({
   const { project_id } = useParams();
   return (
     <Link
-      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all animate-in fade-in duration-500"
+      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
       to={id}>
       {is_favorite ? (
         <div className="absolute right-0 top-0 z-10 m-4">

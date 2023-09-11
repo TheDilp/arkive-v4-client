@@ -26,7 +26,7 @@ export default function ProjectsView() {
                 ...prev,
                 type: "project",
                 title: "Create new project",
-                data: { owner_id: ownerId },
+                data: { owner_id: ownerId as string },
               }))
             }
           />

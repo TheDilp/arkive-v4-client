@@ -1,7 +1,6 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { MouseEvent } from "react";
 
-import { InsertProjectType } from "../../../validation/project";
 import { AllAvailableEntities, AvailableEntityType, MapPinType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
@@ -47,7 +46,7 @@ export type DrawerAtomType = {
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
 } & (
-  | { type: "project"; data: InsertProjectType | null }
+  | { type: "project"; data: { owner_id: string } | { id: string } | null }
   | { type: "characters"; data: { id?: string; project_id?: string; preselectedTab?: number } }
   | {
       type:
