@@ -17,6 +17,7 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
 
 export const settingsSubnavItems = [
   { icon: IconEnum.settings, navigate: "project-settings", tooltip: "Project settings" },
-  { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
+  { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
+  { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
 ];
