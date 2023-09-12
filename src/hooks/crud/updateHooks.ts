@@ -226,11 +226,11 @@ export function useUpdateSubEntity(type: AvailableSubEntityType) {
   });
 }
 export function useUpdateManySubEntities(type: AvailableSubEntityType) {
-  return useMutation(async (updateItemValues: { [key: string]: any }[]) => {
-    if (updateItemValues.length) {
+  return useMutation(async (updateItemValues: { data: { [key: string]: any }[] }) => {
+    if (updateItemValues.data.length) {
       return FetchFunction({
         url: `${baseURLS.baseServer}/${type}/update`,
-        body: JSON.stringify({ data: updateItemValues }),
+        body: JSON.stringify(updateItemValues),
         method: "POST",
       });
     }

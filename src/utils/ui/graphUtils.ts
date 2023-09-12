@@ -12,8 +12,8 @@ export function changeLockState(
     any,
     unknown,
     {
-      [key: string]: any;
-    }[],
+      data: { [key: string]: any }[];
+    },
     unknown
   >,
 ) {
@@ -24,7 +24,7 @@ export function changeLockState(
     selected.unlock();
   }
   const data = selected.map((node: any) => ({ id: node.data().id, is_locked: locked }));
-  updateManyNodesLockState(data);
+  updateManyNodesLockState({ data });
 }
 
 export const edgehandlesSettings = {

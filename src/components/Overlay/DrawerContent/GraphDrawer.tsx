@@ -151,7 +151,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
       </div>
       <Button
         icon={graph?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(graph)}
+        isDisabled={isSaveDisabled(graph) || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={graph?.id ? "Save" : "Create"}
         onClick={async () => {

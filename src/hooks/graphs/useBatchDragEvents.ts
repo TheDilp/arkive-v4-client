@@ -21,7 +21,7 @@ const useBatchUpdateNodePositions = () => {
 
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      updateManyNodePositions.mutate(batchedData.current);
+      updateManyNodePositions.mutate({ data: batchedData.current.map((node) => ({ data: node })) });
       batchedData.current = [];
     }, 350);
   };

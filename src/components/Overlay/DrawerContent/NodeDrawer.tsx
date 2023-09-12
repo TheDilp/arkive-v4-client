@@ -94,7 +94,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const resetDialogAtom = useResetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
-  const { mutateAsync: update } = useUpdateGraphSubEntity<
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateGraphSubEntity<
     UpdateNodeType & {
       relations?: {
         tags?: { id: string }[];
@@ -397,6 +397,8 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
         />
         <Button
           icon={IconEnum.save}
+          isDisabled={isUpdating}
+          isLoading={isUpdating}
           label="Save"
           onClick={async () => {
             if (changedData) {
