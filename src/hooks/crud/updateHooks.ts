@@ -3,7 +3,14 @@ import omit from "lodash.omit";
 
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
-import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
+import {
+  baseURLS,
+  FetchFunction,
+  getEntityCRUDNotification,
+  getParentEntityType,
+  IconEnum,
+  useNotifications,
+} from "../../utils";
 
 export function useUpdateEntity<
   InsertType extends { data: { id?: string; parent_id?: string | null }; relations?: { [key: string]: any } },
@@ -223,14 +230,30 @@ export function useUpdateRandomTableOption(parent_id: string | undefined, projec
   );
 }
 
-export function useUpdateSubEntity(type: AvailableSubEntityType) {
-  return useMutation(async (updateItemValues: { [key: string]: any }) => {
-    return FetchFunction({
-      url: `${baseURLS.baseServer}/${type}/update/${updateItemValues.data.id}`,
-      body: JSON.stringify(updateItemValues),
-      method: "POST",
-    });
-  });
+export function useUpdateSubEntity(
+  type: AvailableSubEntityType,
+  project_id: string | undefined,
+  parent_id: string | undefined,
+) {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (updateItemValues: { [key: string]: any }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type}/update/${updateItemValues.data.id}`,
+        body: JSON.stringify(updateItemValues),
+        method: "POST",
+      });
+    },
+    {
+      onSuccess: () => {
+        const parentEntityType = getParentEntityType(type);
+        if (parentEntityType && parentEntityType !== "documents") {
+          queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
+          queryClient.invalidateQueries([type, parent_id]);
+        }
+      },
+    },
+  );
 }
 export function useUpdateManySubEntities(type: AvailableSubEntityType) {
   return useMutation(async (updateItemValues: { data: { [key: string]: any }[] }) => {

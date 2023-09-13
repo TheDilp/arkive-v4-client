@@ -1,7 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { AvailableEntityType, AvailableSubEntityType } from "../../types";
-import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
+import {
+  baseURLS,
+  FetchFunction,
+  getEntityCRUDNotification,
+  getParentEntityType,
+  IconEnum,
+  useNotifications,
+} from "../../utils";
 
 export function useCreateProject<InsertType>() {
   const queryClient = useQueryClient();
@@ -83,14 +90,30 @@ export function useCreateEntity<
   );
 }
 
-export function useCreateSubEntity<InsertType extends { data: { parent_id: string } }>(type: AvailableSubEntityType) {
-  return useMutation(async (updateItemValues: InsertType) => {
-    return FetchFunction({
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
-      body: JSON.stringify(updateItemValues),
-      method: "POST",
-    });
-  });
+export function useCreateSubEntity<InsertType extends { data: { parent_id: string } }>(
+  type: AvailableSubEntityType,
+  project_id: string | undefined,
+) {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (updateItemValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
+        body: JSON.stringify(updateItemValues),
+        method: "POST",
+      });
+    },
+
+    {
+      onSuccess: (_, vars) => {
+        const parentEntityType = getParentEntityType(type);
+        if (parentEntityType && parentEntityType !== "documents") {
+          queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
+          queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
+        }
+      },
+    },
+  );
 }
 
 export function useCreateEntities<InsertType extends { data: { [key: string]: any }[]; relations?: { [key: string]: any } }>(
