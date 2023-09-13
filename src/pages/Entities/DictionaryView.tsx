@@ -171,8 +171,6 @@ export function DictionaryView() {
           columns={createColumns(setDrawer, setDialog)}
           config={{
             hasSelect: true,
-            hasFavorite: true,
-            hasTags: true,
             orderBy,
             filters,
             selection,
