@@ -18,7 +18,7 @@ export function EntitiesView() {
       <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
         {item_id ? (
-          <div className="w-fit">
+          <div className="w-52">
             <Button
               icon={IconEnum.edit}
               label={`Edit current ${entityName}`}

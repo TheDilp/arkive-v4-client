@@ -3,8 +3,8 @@ import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, WordType } from "../../types";
+import { useGetEntity, useTable } from "../../hooks";
+import { DialogAtomType, DictionaryType, DrawerAtomType, WordType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
 type FilterType = "title" | "translation";
@@ -108,21 +108,20 @@ export function DictionaryView() {
     selection: {},
   });
 
-  const { data, isLoading } = useGetEntities<WordType>(
+  const { data, isLoading } = useGetEntity<DictionaryType>(
+    item_id,
+    "dictionaries",
     {
-      data: { parent_id: item_id as string },
+      data: {},
       relations: {
-        portrait: true,
-        tags: true,
+        words: true,
       },
       orderBy,
       filters,
       pagination,
     },
-    "words",
     {
       staleTime: 5 * 60 * 1000,
-      prefetch: true,
     },
   );
 
@@ -151,7 +150,7 @@ export function DictionaryView() {
             value={filterType}
           />
         </div>
-        <div className="w-fit">
+        <div className="w-52">
           <Button
             icon={IconEnum.add}
             label="Create new word"
@@ -178,7 +177,7 @@ export function DictionaryView() {
             filters,
             selection,
           }}
-          data={data?.data || []}
+          data={data?.data?.words || []}
           dispatch={dispatch}
           isLoading={isLoading}
           pagination={pagination}

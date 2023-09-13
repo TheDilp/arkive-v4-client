@@ -115,7 +115,7 @@ export function FolderView() {
   // !REWORK WITH SMARTER IMPLEMENTATION
 
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
-  if ((type === "graphs" || type === "random_tables") && fields.includes("image_id")) fields.pop();
+  if ((type === "graphs" || type === "random_tables" || type === "dictionaries") && fields.includes("image_id")) fields.pop();
 
   const { data: base, isFetching } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -235,7 +235,7 @@ export function FolderView() {
                   },
                 },
               ]}>
-              <Button icon={IconEnum.add} label="Create new" onClick={undefined} />
+              <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
             </Dropdown>
           </div>
         ) : (

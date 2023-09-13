@@ -22,3 +22,12 @@ export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEn
   if (type === "map_pins") return "map pin";
   return type.substring(0, type.length - 1);
 }
+
+export function getParentEntityType(type: AvailableSubEntityType): AvailableEntityType | null {
+  if (type === "map_pins" || type === "map_layers") return "maps";
+  if (type === "nodes" || type === "edges") return "graphs";
+  if (type === "random_table_options") return "random_tables";
+  if (type === "words") return "dictionaries";
+
+  return null;
+}

@@ -94,7 +94,12 @@ export function DocumentView({ editable }: { editable: boolean }) {
   if (!currentDocument && !isFetching) {
     return <Navigate to="../" />;
   }
-  if (isFetching) return <Skeleton type="editor" />;
+  if (isFetching)
+    return (
+      <div className="h-[90%] w-full max-w-[93vw] lg:h-full">
+        <Skeleton type="editor" />
+      </div>
+    );
   return (
     <div className="h-[90%] w-full max-w-[95vw] lg:h-full">
       {changedData ? (
