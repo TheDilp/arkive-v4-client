@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import omit from "lodash.omit";
 
-import { AvailableEntityType, AvailableSubEntityType, GraphType, MapType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
@@ -54,6 +55,12 @@ export function useUpdateEntity<
 
           // Invalidating a document causes the editor to refetch while open
           // if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
+          if (type === "documents") {
+            queryClient.setQueryData<{ data: DocumentType }>(["documents", vars.data.id, "content"], (old) =>
+              //! Omit -> never allow content to be changed through query client
+              old ? { ...old, data: { ...old.data, ...omit(vars.data, ["content"]) } } : old,
+            );
+          }
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
 
           createNotification({
