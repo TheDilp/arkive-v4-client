@@ -118,7 +118,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
               ...state,
               selection: {
                 ...(selection || {}),
-                [page]: [...selection[page], action.payload.row],
+                [page]: [...selection[page], action.payload.row].sort(),
               },
             };
           }
@@ -126,7 +126,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
             ...state,
             selection: {
               ...(selection || {}),
-              [page]: selection[page].filter((r) => r !== action.payload.row),
+              [page]: selection[page].filter((r) => r !== action.payload.row).sort(),
             },
           };
         }
@@ -134,7 +134,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
           ...state,
           selection: {
             ...(selection || {}),
-            [page || 0]: [action.payload.row],
+            [page || 0]: [action.payload.row].sort(),
           },
         };
       }
@@ -142,14 +142,14 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
         return {
           ...state,
           selection: {
-            0: [...(state.selection?.[0] || [])].filter((r) => r !== action.payload.row),
+            0: [...(state.selection?.[0] || [])].filter((r) => r !== action.payload.row).sort(),
           },
         };
       }
       return {
         ...state,
         selection: {
-          0: [...(state.selection?.[0] || []), action.payload.row],
+          0: [...(state.selection?.[0] || []), action.payload.row].sort(),
         },
       };
     }
