@@ -92,7 +92,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
 
     const newEdge = {
-      parentId: item_id as string,
       source_id: source,
       target_id: target,
       line_color: color,
