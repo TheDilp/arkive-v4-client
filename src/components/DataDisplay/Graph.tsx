@@ -64,8 +64,8 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
   useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
   const queryClient = useQueryClient();
-  const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes");
-  const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges");
+  const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
+  const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
@@ -418,9 +418,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       try {
         cyRef?.current?._cy.remove(addedEdge);
       } catch (error) {
-        //! CRITICAL toaster("warning", "Cytoedge couldn't be removed, there was an error.");
+        createNotification({ variant: "warning", title: "Edge couldn't be removed, there was an error.", timer: 3 });
       }
-      makeEdgeCallback(sourceData.id, targetData.id, graph?.default_edge_color);
+      makeEdgeCallback(sourceData.id, targetData.id, existingGraphData?.data?.default_edge_color);
     });
 
     return () => {

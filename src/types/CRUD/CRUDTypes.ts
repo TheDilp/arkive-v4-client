@@ -36,7 +36,7 @@ export interface ResponseType<DataType = []> {
 }
 
 export interface RequestBodyType {
-  data: {
+  data?: {
     [key: string]: any;
   };
   fields?: string[];

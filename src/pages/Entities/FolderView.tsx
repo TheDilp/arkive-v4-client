@@ -202,7 +202,7 @@ export function FolderView() {
       <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
         {!item_id || data?.data?.is_folder ? (
-          <div className="w-fit">
+          <div className="w-52">
             <Dropdown
               allowedPlacements={["bottom-end"]}
               items={[

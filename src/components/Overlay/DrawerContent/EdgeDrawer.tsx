@@ -107,7 +107,6 @@ export function EdgeDrawer({ data }: Props) {
     data?.id,
     "edges",
     {
-      data: {},
       relations: { tags: true },
     },
     {
