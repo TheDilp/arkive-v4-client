@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Graph } from "../../components";
+import { Breadcrumbs, Button, Graph } from "../../components";
+import { IconEnum } from "../../utils";
 import { CharacterProfileView, DocumentView, MapView, RandomTableView } from ".";
 import { CalendarView } from "./CalendarView";
 import { DictionaryView } from "./DictionaryView";
@@ -10,8 +11,13 @@ export function EntitiesView() {
 
   return (
     <>
-      <div className="flex h-10 items-center justify-between">
+      <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
+        {item_id ? (
+          <div className="w-fit">
+            <Button icon={IconEnum.edit} label="Edit current" onClick={undefined} />
+          </div>
+        ) : null}
       </div>
 
       {!!item_id && type === "characters" ? <CharacterProfileView /> : null}

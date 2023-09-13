@@ -178,7 +178,11 @@ export function FolderView() {
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
   const entityName = getEntityNameFromType(type as AvailableEntityType);
 
-  useChangeNavbarTitle(`The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType) || "")}`);
+  useChangeNavbarTitle(
+    `The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType) || "")} ${
+      data?.data?.title ? `| ${data.data.title}` : ""
+    }`,
+  );
 
   useLayoutEffect(() => {
     if (!item_id) {
@@ -195,7 +199,7 @@ export function FolderView() {
 
   return (
     <>
-      <div className="flex h-10 items-center justify-between">
+      <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
         {!item_id || data?.data?.is_folder ? (
           <div className="w-fit">
@@ -234,7 +238,23 @@ export function FolderView() {
               <Button icon={IconEnum.add} label="Create new" onClick={undefined} />
             </Dropdown>
           </div>
-        ) : null}
+        ) : (
+          <div className="w-fit">
+            <Button
+              icon={IconEnum.edit}
+              label="Edit current"
+              onClick={() => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: `Edit ${entityName}`,
+                  type: type as DrawerContentCreateNewType,
+                  data: { id: item_id as string, project_id: project_id as string },
+                }));
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {!item_id ? (
