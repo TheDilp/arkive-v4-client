@@ -242,7 +242,7 @@ export function FolderView() {
           <div className="w-fit">
             <Button
               icon={IconEnum.edit}
-              label="Edit current"
+              label={`Edit current ${entityName}`}
               onClick={() => {
                 setDrawer((prev) => ({
                   ...prev,

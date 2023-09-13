@@ -47,7 +47,7 @@ export function DictionaryDrawer({ data }: Props) {
       await createDictionary({ data: parsedData }, { onSuccess: resetDrawer });
     } else {
       const parsedData = UpdateDictionarySchema.parse(dictionary);
-      await updateDictionary({ data: parsedData });
+      await updateDictionary({ data: parsedData }, { onSuccess: resetDrawer });
     }
   }
 
