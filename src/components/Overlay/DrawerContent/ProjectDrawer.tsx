@@ -7,7 +7,7 @@ import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
 
-export function ProjectDrawer({ data }: { data: InsertProjectType | null }) {
+export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: string } | null }) {
   const ownerId = localStorage.getItem("ownerId");
   const [project, setProject] = useState<Partial<ProjectType>>({ ...(data || { title: "" }), owner_id: ownerId as string });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });

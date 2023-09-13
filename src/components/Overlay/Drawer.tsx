@@ -27,6 +27,7 @@ import {
   RandomTableOptionsDrawer,
   SearchDrawer,
   TagsDrawer,
+  WordDrawer,
 } from "./DrawerContent";
 import { EditTags } from "./DrawerContent/EditTags";
 
@@ -136,8 +137,10 @@ export function Drawer() {
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
         {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
-        {/* {drawer.type === "timelines" ? <TimelineDrawer data={drawer?.data} /> : null} */}
         {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
+
+        {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
+
         {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
