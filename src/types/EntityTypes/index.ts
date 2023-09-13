@@ -11,3 +11,5 @@ export * from "./mapTypes";
 export * from "./projectTypes";
 export * from "./randomTableTypes";
 export * from "./tagTypes";
+export * from "./timelineTypes";
+export * from "./wordTypes";

@@ -1,0 +1,190 @@
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import { useGetEntities, useTable } from "../../hooks";
+import { DialogAtomType, DrawerAtomType, WordType } from "../../types";
+import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+
+type FilterType = "title" | "translation";
+const columnHelper = createColumnHelper<WordType>();
+function createColumns(
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+) {
+  return [
+    columnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+    }),
+    columnHelper.accessor("translation", {
+      id: "translation",
+      header: "Translation",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+    }),
+    columnHelper.accessor("description", {
+      id: "nickname",
+      header: "Nickname",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+      maxSize: 15,
+    }),
+
+    columnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                label: "Edit Word",
+                icon: IconEnum.edit,
+                onClick: () => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: row.original,
+                    title: `Edit word - ${row.original.title}`,
+                    size: "lg",
+                    type: "words",
+                  }));
+                },
+              },
+
+              {
+                id: "delete_word",
+                label: "Delete word",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "words",
+                    },
+                    title: "Delete word",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+
+export function DictionaryView() {
+  const { item_id } = useParams();
+  const [filter, setFilter] = useState("");
+  const [filterType, setFilterType] = useState<FilterType>("title");
+  const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
+
+  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
+    orderBy: [{ field: "title", sort: "asc" }],
+    pagination: { limit: 10, page: 0 },
+    selection: {},
+  });
+
+  const { data, isLoading } = useGetEntities<WordType>(
+    {
+      data: { parent_id: item_id as string },
+      relations: {
+        portrait: true,
+        tags: true,
+      },
+      orderBy,
+      filters,
+      pagination,
+    },
+    "words",
+    {
+      staleTime: 5 * 60 * 1000,
+      prefetch: true,
+    },
+  );
+
+  return (
+    <TablePageLayout>
+      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
+        <div className="w-48">
+          <Input
+            name="quick_filter"
+            onChange={({ value }) => setFilter(value as string)}
+            placeholder={`Search by ${filterType}`}
+            value={filter}
+          />
+        </div>
+        <div className="w-40">
+          <Select
+            name="filterType"
+            onChange={({ value }) => {
+              setFilterType(value as FilterType);
+            }}
+            options={[
+              { label: "Title", value: "title", icon: IconEnum.word },
+              { label: "Translation", value: "translation", icon: IconEnum.dictionary },
+            ]}
+            placeholder="View"
+            value={filterType}
+          />
+        </div>
+        <div className="w-fit">
+          <Button
+            icon={IconEnum.add}
+            label="Create new word"
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: {},
+                title: "Create new word",
+                type: "words",
+                size: "lg",
+              }))
+            }
+          />
+        </div>
+      </div>
+      <div className="h-full max-h-[85%] w-full overflow-hidden">
+        <Table
+          columns={createColumns(setDrawer, setDialog)}
+          config={{
+            hasSelect: true,
+            hasFavorite: true,
+            hasTags: true,
+            orderBy,
+            filters,
+            selection,
+          }}
+          data={data?.data || []}
+          dispatch={dispatch}
+          isLoading={isLoading}
+          pagination={pagination}
+          type="words"
+        />
+      </div>
+    </TablePageLayout>
+  );
+}

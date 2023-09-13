@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Breadcrumbs, Graph } from "../../components";
 import { CharacterProfileView, DocumentView, MapView, RandomTableView } from ".";
 import { CalendarView } from "./CalendarView";
-import { TimelineView } from "./TimelineView";
+import { DictionaryView } from "./DictionaryView";
 
 export function EntitiesView() {
   const { type, item_id } = useParams();
@@ -19,7 +19,8 @@ export function EntitiesView() {
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}
       {!!item_id && type === "calendars" ? <CalendarView /> : null}
-      {!!item_id && type === "timelines" ? <TimelineView /> : null}
+      {/* {!!item_id && type === "timelines" ? <TimelineView /> : null} */}
+      {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
     </>
   );

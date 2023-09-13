@@ -81,7 +81,7 @@ export function useGetEntities<ReturnType>(
     });
   }
   const configuredOptions = {
-    enabled: !!request.data.project_id && (options?.enabled ?? true),
+    enabled: options?.enabled ?? true,
     staleTime: options?.staleTime,
     select: options?.select,
   };
