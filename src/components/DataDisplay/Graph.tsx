@@ -274,6 +274,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                   onClick: () => cyRef?.current?._cy.center(evt.target),
                 },
                 // { title: "Template from node" },
+                // !ADD OPTION TO DELETE MULTIPLE NODES
                 {
                   title: "Delete node",
                   icon: IconEnum.trash,
@@ -305,8 +306,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                     }
                   },
                 },
+                // !DELETE MULTIPLE OR SINGLE EDGE
                 {
-                  title: "Delete selected edge",
+                  title: "Delete selected edges",
                   icon: IconEnum.trash,
                   onClick: () => {
                     if (edges) {
@@ -406,7 +408,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     return () => {
       cyRef?.current?._cy.removeListener("click mousedown cxttap dbltap free");
     };
-  }, [cyRef?.current?._cy, edges, item_id]);
+  }, [cyRef?.current?._cy, nodes, edges, item_id]);
 
   useEffect(() => {
     // Creating edges
