@@ -14,8 +14,8 @@ export function EntitiesView() {
 
   const setDrawer = useSetAtom(drawerAtom);
   return (
-    <>
-      <div className="flex h-12 items-center justify-between">
+    <div className="flex flex-col gap-y-2">
+      <div className="flex h-12 items-center justify-between ">
         <Breadcrumbs />
         {item_id ? (
           <div className="w-52">
@@ -44,6 +44,6 @@ export function EntitiesView() {
       {/* {!!item_id && type === "timelines" ? <TimelineView /> : null} */}
       {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
-    </>
+    </div>
   );
 }

@@ -664,7 +664,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             {character?.related_to?.length
               ? character?.related_to?.map((relationship, index) => (
                   <RelationshipRow
-                    key={`${relationship.id}}`}
+                    key={`${relationship.id}`}
                     character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
                     current_character_first_name={character.first_name}
                     handleChange={handleChange}

@@ -256,8 +256,8 @@ export function CharactersView() {
 
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
-        <div className="w-56">
+      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
+        <div className="w-52">
           <Input
             name="quick_filter"
             onChange={({ value }) => setFilter(value as string)}
@@ -280,7 +280,7 @@ export function CharactersView() {
             value={view}
           />
         </div>
-        <div className="w-fit">
+        <div className="w-52">
           <Button
             icon={IconEnum.add}
             label="Create new character"
