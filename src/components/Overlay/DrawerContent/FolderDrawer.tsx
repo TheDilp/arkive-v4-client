@@ -71,8 +71,9 @@ export function FolderDrawer({ data }: Props) {
                 },
               );
             } else {
+              const { tags, ...rest } = folder;
               await createFolder(
-                { data: folder },
+                { data: rest, relations: { tags } },
                 {
                   onSuccess: resetDrawerAtom,
                 },
