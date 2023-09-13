@@ -5,3 +5,5 @@ export interface WordType {
   parent_id: string;
   description?: string;
 }
+
+export type WordStateType = Partial<WordType>;
