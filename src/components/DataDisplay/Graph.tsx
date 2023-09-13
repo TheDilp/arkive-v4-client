@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import {
   useChangeNavbarTitle,
   useCreateSubEntity,
+  useDeleteMany,
   useDeleteSubEntity,
   useGetEntity,
   useUpdateManySubEntities,
@@ -76,6 +77,8 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
+
+  const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
@@ -307,9 +310,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                   icon: IconEnum.trash,
                   onClick: () => {
                     if (edges) {
-                      // const ids = edges.map((edge: any) => edge.id());
-                      // deleteManyEdges.mutate(ids);
-                      // setEdges((prev) => prev.filter((e) => !ids.includes(e.data.id)));
+                      const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
+                      deleteManyEdges({ data: ids.map((id) => ({ id })) });
+                      setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
                     }
                   },
                 },
@@ -403,7 +406,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     return () => {
       cyRef?.current?._cy.removeListener("click mousedown cxttap dbltap free");
     };
-  }, [cyRef?.current?._cy, item_id]);
+  }, [cyRef?.current?._cy, edges, item_id]);
 
   useEffect(() => {
     // Creating edges
