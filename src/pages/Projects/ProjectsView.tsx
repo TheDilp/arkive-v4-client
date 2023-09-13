@@ -29,6 +29,7 @@ export default function ProjectsView() {
                 data: { owner_id: ownerId as string },
               }))
             }
+            tooltip="Create new project"
           />
         </div>
       </div>
