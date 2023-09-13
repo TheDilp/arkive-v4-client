@@ -60,7 +60,7 @@ const TableClasses = tv({
     rowContainer: "flex flex-col",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato hover:bg-zinc-900",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
-    selectedRow: "bg-blue-400",
+    selectedRow: "bg-blue-400 hover:bg-blue-300",
     contentWrapper: "block truncate",
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
