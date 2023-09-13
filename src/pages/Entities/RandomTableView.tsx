@@ -194,7 +194,7 @@ export function RandomTableView() {
             variant="info"
           />
         </div>
-        <div className="w-fit">
+        <div className="w-52">
           <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />
         </div>
       </div>
