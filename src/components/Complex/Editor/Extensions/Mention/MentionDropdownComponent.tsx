@@ -3,11 +3,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
-import { baseURLS, FetchFunction } from "../../../../../utils";
+import { baseURLS, FetchFunction, getImageURL } from "../../../../../utils";
+import { Avatar } from "../../../../Misc";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
-  const [options, setOptions] = useState<{ key: string; id: string; label: string; displayLabel?: string }[]>([]);
+  const [options, setOptions] = useState<
+    { key: string; id: string; label: string; displayLabel?: string; portrait_id?: string }[]
+  >([]);
   const [isFetching, setIsFetching] = useState(false);
 
   const { state, getMenuProps, getItemProps, indexIsHovered, indexIsSelected } = useMentionAtom({
@@ -17,7 +20,15 @@ export function MentionDropdownComponent() {
   const search = useDebouncedCallback(async () => {
     setIsFetching(true);
     const items: {
-      data: { key: string; id: string; title: string; displayLabel?: string; parentId?: string; translation?: string }[];
+      data: {
+        key: string;
+        id: string;
+        title: string;
+        displayLabel?: string;
+        parentId?: string;
+        translation?: string;
+        portrait_id?: string;
+      }[];
     } = await FetchFunction({
       url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
       method: "POST",
@@ -48,6 +59,7 @@ export function MentionDropdownComponent() {
             alterId: item?.parentId ? item.id : null,
             label: item.title,
             projectId: project_id,
+            portrait_id: item?.portrait_id,
           };
         })
         .slice(0, 10),
@@ -74,13 +86,20 @@ export function MentionDropdownComponent() {
               return (
                 <li
                   key={item.key}
-                  className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center justify-between ${
+                  className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center ${
                     indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
                   } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
                   {...getItemProps({
                     item,
                     index,
                   })}>
+                  {item?.portrait_id ? (
+                    <Avatar
+                      image={getImageURL(project_id as string, "images", item.portrait_id)}
+                      label={item.label}
+                      size="xs"
+                    />
+                  ) : null}
                   {item?.displayLabel || item.label}
                 </li>
               );

@@ -3,8 +3,9 @@ import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../../../hooks";
 import { DocumentType } from "../../../../../types";
-import { Card, Tooltip } from "../../../..";
+import { Card, Icon, Skeleton, Tooltip } from "../../../..";
 import { StaticRender } from "../..";
+import { IconEnum } from "../../../../../utils";
 
 type Props = {
   alterId: string | undefined;
@@ -19,13 +20,14 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
   const { data, isLoading } = useGetEntity<DocumentType>(
     id as string,
     "documents",
-    { data: {}, fields: ["id", "title", "content"] },
+    { fields: ["id", "title", "content"] },
     { enabled: !!id, queryKeyConcat: ["mention"] },
   );
   return (
     <Card title={title || "TEST"}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
         {data?.data?.content && !isLoading ? <StaticRender content={data.data.content as RemirrorJSON} /> : null}
+        {isLoading ? <Skeleton type="editor" /> : null}
       </div>
     </Card>
   );
@@ -35,7 +37,6 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
     id as string,
     "documents",
     {
-      data: {},
       fields: ["id", "title"],
       relations: {
         alter_names: alterId
@@ -60,8 +61,9 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
       delay={{ openDelay: 500 }}
       isDisabled={isDisabledTooltip ?? false}>
       <Link
-        className="font-Lato border-none text-sm font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+        className="inline-flex items-center border-none font-lato text-sm font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         to={!project_id ? `/view/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
+        <Icon fontSize={15} icon={IconEnum.document} />
         {alter_name?.title || data?.data?.title || title || label}
       </Link>
     </Tooltip>

@@ -55,21 +55,26 @@ export const DefaultEditorExtensions: (
     matchers: [
       {
         char: "@",
-        name: "documents",
+        name: "characters",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
       },
       {
         char: "#",
-        name: "maps",
+        name: "documents",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
       },
       {
         char: "$",
-        name: "boards",
+        name: "maps",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
       },
       {
         char: "%",
+        name: "boards",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+      },
+      {
+        char: "^",
         name: "words",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
       },
