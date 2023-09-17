@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
 import { baseURLS, FetchFunction, getImageURL } from "../../../../../utils";
-import { Avatar } from "../../../../Misc";
+import { Avatar, Spinner } from "../../../../Misc";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
@@ -81,30 +81,28 @@ export function MentionDropdownComponent() {
       positioner="always"
       renderOutsideEditor>
       <ul className="remirror-mention-atom-popup-wrapper" {...getMenuProps()}>
-        {!isFetching
-          ? (options || []).map((item, index) => {
-              return (
-                <li
-                  key={item.key}
-                  className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center ${
-                    indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
-                  } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
-                  {...getItemProps({
-                    item,
-                    index,
-                  })}>
-                  {item?.portrait_id ? (
-                    <Avatar
-                      image={getImageURL(project_id as string, "images", item.portrait_id)}
-                      label={item.label}
-                      size="xs"
-                    />
-                  ) : null}
-                  {item?.displayLabel || item.label}
-                </li>
-              );
-            })
-          : null}
+        {!isFetching ? (
+          (options || []).map((item, index) => {
+            return (
+              <li
+                key={item.key}
+                className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center ${
+                  indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
+                } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
+                {...getItemProps({
+                  item,
+                  index,
+                })}>
+                {item?.portrait_id ? (
+                  <Avatar image={getImageURL(project_id as string, "images", item.portrait_id)} label={item.label} size="xs" />
+                ) : null}
+                {item?.displayLabel || item.label}
+              </li>
+            );
+          })
+        ) : (
+          <Spinner />
+        )}
       </ul>
     </FloatingWrapper>
   );
