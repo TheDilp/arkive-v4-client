@@ -14,7 +14,7 @@ export function EntitiesView() {
 
   const setDrawer = useSetAtom(drawerAtom);
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex h-full flex-col gap-y-2">
       <div className="flex h-12 items-center justify-between ">
         <Breadcrumbs />
         {item_id ? (
