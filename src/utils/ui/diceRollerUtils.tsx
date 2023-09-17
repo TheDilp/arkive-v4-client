@@ -46,7 +46,7 @@ export function getCritColor(critical: "success" | "failure" | null | undefined)
   if (critical === "failure") return "text-red-400 font-bold";
   return "";
 }
-export const DiceRollRegex = /((((\d+)?[Dd]\d+)|(\d+))((kh)|(dl))?([*+-])?)+/gi;
+export const DiceRollRegex = /(((([(])?(\d+)?[Dd]\d+)([)])?|(\d+))((kh)|(dl))?([)])?([*+-/()])?)+/gi;
 
 export async function getRollValue(notation: string, hasNoSimulation?: boolean) {
   const parsedNotation = DiceRollParser.parseNotation(notation);
