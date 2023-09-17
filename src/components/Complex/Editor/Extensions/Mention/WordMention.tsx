@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-
+import { useGetSubEntity } from "../../../../../hooks";
+import { WordType } from "../../../../../types";
 import { Tooltip } from "../../../..";
 
 type Props = {
@@ -10,19 +10,20 @@ type Props = {
 };
 
 export function WordMentionTooltip({ id }: Pick<Props, "id">) {
-  const { data, isLoading } = useQuery<any>({
-    queryKey: ["words", id],
-    queryFn: async () => {
-      // return FetchFunction({ url: `${baseURLS.baseServer}getsingleword`, method: "POST", body: JSON.stringify({ id }) });
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
+    id as string,
+    "words",
+    { fields: ["id", "title", "translation"] },
+    { enabled: !!id, queryKeyConcat: ["mention"] },
+  );
   return (
-    <div className="h-fit w-fit max-w-[20rem] rounded border border-zinc-800 bg-black p-2 shadow">
+    <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-800 bg-black p-2 shadow">
       <div className="font-Lato whitespace-pre-line font-light">
-        {isLoading ? <div className="h-4 w-4">LOADING...</div> : null}
-        <span className="italic">{data?.dictionary?.title ? `(${data?.dictionary?.title}: ${data?.translation}) ` : null}</span>
-        {data?.description && !isLoading ? data.description : null}
+        {isLoading ? <div className="">LOADING...</div> : null}
+        <span className="italic">
+          {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation}) ` : null}
+        </span>
+        {existingWord?.data?.description && !isLoading ? existingWord?.data.description : null}
       </div>
     </div>
   );

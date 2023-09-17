@@ -3,9 +3,9 @@ import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../../../hooks";
 import { DocumentType } from "../../../../../types";
+import { IconEnum } from "../../../../../utils";
 import { Card, Icon, Skeleton, Tooltip } from "../../../..";
 import { StaticRender } from "../..";
-import { IconEnum } from "../../../../../utils";
 
 type Props = {
   alterId: string | undefined;

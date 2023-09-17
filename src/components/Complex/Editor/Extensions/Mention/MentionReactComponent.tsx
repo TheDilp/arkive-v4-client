@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { DocumentMention, GraphMention, MapMention } from ".";
+import { DocumentMention, GraphMention, MapMention, WordMention } from ".";
 
 type Props = {
   node: any;
@@ -16,7 +16,7 @@ export function MentionReactComponent({ node }: Props) {
       return <DocumentMention alterId={alterId} id={id} label={label} project_id={project_id} title={label} />;
     if (name === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
     if (name === "boards" || name === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
-    // if (name === "words") return <WordMention id={id} label={label} title={label} />;
+    if (name === "words") return <WordMention id={id} label={label} title={label} />;
 
     return <span>{label}</span>;
   }

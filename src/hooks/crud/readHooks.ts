@@ -31,7 +31,7 @@ export function useGetSubEntity<EntityType>(
   id: string | undefined,
   type: AvailableSubEntityType,
   body: RequestBodyType,
-  options?: UseQueryOptions,
+  options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
   return useQuery<{ data: EntityType }>(
     [type, id],
