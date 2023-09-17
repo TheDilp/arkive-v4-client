@@ -69,7 +69,7 @@ const typeMap = (project_id: string): MarkMap => ({
         // if (type === "words") return <WordMention id={id} label={label} title={label} />;
 
         return (
-          <Link className="font-Lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
+          <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
             {label}
           </Link>
         );

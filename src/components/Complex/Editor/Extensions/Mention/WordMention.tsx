@@ -18,7 +18,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-800 bg-black p-2 shadow">
-      <div className="font-Lato whitespace-pre-line font-light">
+      <div className="whitespace-pre-line font-lato font-light">
         {isLoading ? <div className="">LOADING...</div> : null}
         <span className="italic">
           {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation}) ` : null}
