@@ -61,10 +61,14 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
       delay={{ openDelay: 500 }}
       isDisabled={isDisabledTooltip ?? false}>
       <Link
-        className="inline-flex items-center border-none font-lato text-sm font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+        className="un mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         to={!project_id ? `/view/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
-        <Icon fontSize={15} icon={IconEnum.document} />
-        {alter_name?.title || data?.data?.title || title || label}
+        <div className="flex items-start">
+          <span className="relative top-0.5">
+            <Icon fontSize={16} icon={IconEnum.document} />
+          </span>
+          <span className="underline">{alter_name?.title || data?.data?.title || title || label}</span>
+        </div>
       </Link>
     </Tooltip>
   );

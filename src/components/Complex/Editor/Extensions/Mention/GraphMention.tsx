@@ -30,8 +30,12 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
         className="inline-flex font-lato text-sm font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
         to={!project_id ? `/view/boards/${nodeId}` : `/projects/${project_id}/boards/${nodeId}`}>
-        <Icon fontSize={15} icon={IconEnum.edit} />
-        {title || nodeLabel}
+        <div className="flex items-start">
+          <span className="relative top-0.5">
+            <Icon fontSize={16} icon={IconEnum.board} />
+          </span>
+          <span className="underline">{title || nodeLabel}</span>
+        </div>
       </Link>
     </Tooltip>
   ) : (

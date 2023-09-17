@@ -14,8 +14,12 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props
     <Link
       className="inline-flex items-center font-lato text-sm font-bold text-white underline transition-colors hover:text-sky-400"
       to={!project_id ? `/view/characters/${nodeId}` : `/projects/${project_id}/characters/${nodeId}`}>
-      <Icon fontSize={15} icon={IconEnum.character} />
-      {title || nodeLabel}
+      <div className="flex items-start">
+        <span className="relative top-0.5">
+          <Icon fontSize={16} icon={IconEnum.character} />
+        </span>
+        <span className="underline">{title || nodeLabel}</span>
+      </div>
     </Link>
   ) : (
     <div className="Lato text-white">{nodeLabel}</div>
