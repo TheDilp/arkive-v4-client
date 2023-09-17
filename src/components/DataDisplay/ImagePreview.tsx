@@ -1,16 +1,28 @@
 import { useParams } from "react-router-dom";
+import { tv } from "tailwind-variants";
 
 import { ImagePreviewType } from "../../types";
 import { getImageURL, IconEnum } from "../../utils";
 import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
-export function ImagePreview({ id, title, url, clearAction }: ImagePreviewType) {
+const ImagePreviewClasses = tv({
+  base: "flex h-12 max-h-12 min-h-[3rem] items-center gap-x-2 rounded bg-zinc-700 px-2 w-full",
+  variants: {
+    size: {
+      md: "h-10 max-h-10 min-h-[2.5rem]",
+      lg: "h-12 max-h-12 min-h-[3rem]",
+    },
+  },
+});
+
+export function ImagePreview({ id, title, url, size = "md", clearAction }: ImagePreviewType) {
   const { project_id } = useParams();
+  const classes = ImagePreviewClasses({ size });
   return (
-    <div className="flex h-12 max-h-12 min-h-[3rem] items-center gap-x-2 rounded bg-zinc-700 px-2">
+    <div className={classes}>
       <div className="col-span-1 flex items-center">
-        <Avatar image={id ? getImageURL(project_id as string, "images", id) : url} label={title} />
+        <Avatar image={id ? getImageURL(project_id as string, "images", id) : url} label={title} size={size} />
       </div>
       <div className="ml-2 truncate font-lato">{title}</div>
       {clearAction ? (

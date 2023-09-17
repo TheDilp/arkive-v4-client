@@ -1,30 +1,36 @@
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { MapType } from "../../../types";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, getImageURL, IconEnum, onDragEnd, useNotifications } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { ImageSelect } from "../../Complex";
+import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge, Skeleton } from "../../Misc";
+import { Badge, Icon, Skeleton } from "../../Misc";
 
 function isDisabled(map: Partial<MapType> & { project_id: string }) {
   if (!map?.title) return true;
   if (!map?.image_id) return true;
+  if (map?.map_layers?.length) {
+    return map.map_layers.some((layer) => !layer.title || !layer.image?.id);
+  }
 
   return false;
 }
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Tags", icon: IconEnum.tags },
+  { id: "2", label: "Map layers", icon: IconEnum.map_layers },
+  { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 
 export function MapDrawer({ data }: { data: { id?: string } }) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
 
   const { data: existingMap, isFetching } = useGetEntity<MapType>(data?.id, "maps", { data: {} }, { enabled: !!data?.id });
@@ -66,6 +72,113 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
         </>
       ) : null}
       {selectedTab === 1 ? (
+        <div className="mt-2 flex flex-col gap-y-2 pr-2">
+          <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
+            <span>Insert new layer:</span>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                isIconOnly
+                onClick={
+                  () => {
+                    setMap((prev) => ({
+                      ...prev,
+                      map_layers: (prev.map_layers || []).concat({
+                        id: crypto.randomUUID(),
+                        title: "New layer",
+                        parent_id: item_id as string,
+                        image_id: "",
+                        is_public: false,
+                      }),
+                    }));
+                  }
+                  // setMonths((prev) =>
+                  //   prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0 }]),
+                  // )
+                }
+                variant="info"
+              />
+            </div>
+          </div>
+          <DragDropContext
+            onDragEnd={(result) =>
+              onDragEnd(result, map?.map_layers || [], (newLayers) => handleChange({ name: "map_layers", value: newLayers }))
+            }>
+            <Droppable droppableId="droppable">
+              {(providedDroppable) => (
+                <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
+                  {map?.map_layers?.map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
+                      {(provided, draggableSnapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                            draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                          }`}
+                          {...provided.draggableProps}
+                          style={{
+                            ...provided.draggableProps.style,
+                            left: 16,
+                          }}>
+                          <div {...provided.dragHandleProps} className="self-end pb-2">
+                            <Icon fontSize={24} icon={IconEnum.menu} />
+                          </div>
+                          <div>
+                            <Input
+                              label="Layer name (required)"
+                              name={`[${index}].title`}
+                              onChange={handleChange}
+                              placeholder="Eg November"
+                              value={item.title}
+                            />
+                          </div>
+                          {item?.image ? (
+                            <div className="flex w-full flex-col">
+                              <span className="font-lato text-sm text-zinc-300">Layer image (required)</span>
+                              <ImagePreview
+                                clearAction={() => handleChange({ name: `map_layers[${index}].image`, value: null })}
+                                id={item?.image?.id}
+                                title={item.image.title}
+                                url={getImageURL(project_id as string, "images", item?.image?.id)}
+                              />
+                            </div>
+                          ) : (
+                            <ImageSelect
+                              isIconOnly
+                              label="Layer image (required)"
+                              name={`map_layers[${index}].image`}
+                              onChange={({ name, label, value }) => {
+                                handleChange({ name, value: { id: value, title: label } });
+                              }}
+                              type="images"
+                            />
+                          )}
+                          <div className="h-10 self-end">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.trash}
+                              isIconOnly
+                              onClick={() =>
+                                handleChange({
+                                  name: "map_layers",
+                                  value: map?.map_layers?.filter((layer) => layer.id !== item.id),
+                                })
+                              }
+                              variant="error"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {providedDroppable.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+      ) : null}
+      {selectedTab === 2 ? (
         <div className="flex flex-col gap-y-2">
           <Search
             name="tags"

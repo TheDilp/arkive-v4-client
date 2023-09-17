@@ -27,6 +27,7 @@ export interface MapLayers {
   parent_id: string;
   is_public: boolean | null;
   image_id: string;
+  image?: ImageType;
 }
 
 export interface MapPinType {
