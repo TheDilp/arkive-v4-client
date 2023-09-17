@@ -6,6 +6,7 @@ import { tv } from "tailwind-variants";
 import {
   Alert,
   Avatar,
+  Badge,
   Button,
   Collapsible,
   createColumnHelper,
@@ -27,7 +28,6 @@ import {
   CharacterType,
   DocumentType,
   MapType,
-  TagType,
 } from "../../types";
 import {
   dialogAtom,
@@ -43,7 +43,6 @@ import {
 const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
-const tagsColumnHelper = createColumnHelper<TagType>();
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -198,28 +197,6 @@ function locationsTableColumns(project_id: string) {
     }),
   ];
 }
-
-const tagsTableColumns = [
-  tagsColumnHelper.accessor("title", {
-    id: "title",
-    header: "Title",
-    cell: (info) => info.getValue(),
-  }),
-  tagsColumnHelper.accessor("color", {
-    id: "color",
-    header: "Color",
-    cell: (info) => (
-      <div className="flex w-full justify-center">
-        <div className="h-6 w-6 select-none rounded-full shadow" style={{ backgroundColor: info.getValue() }} />
-      </div>
-    ),
-    meta: {
-      centered: true,
-    },
-    maxSize: 5,
-    minSize: 5,
-  }),
-];
 
 function AdditionalFieldDisplay({
   character_fields,
@@ -477,22 +454,13 @@ export function CharacterProfileView() {
                   initialOpen={false}
                   label="Tags">
                   {existingCharacter?.data?.tags?.length ? (
-                    <TablePageLayout>
-                      <div className="mt-2 animate-in fade-in fill-mode-both">
-                        <Table
-                          columns={tagsTableColumns}
-                          config={{
-                            hasNoHeaderGap: true,
-                            expandable: true,
-                            filters: {},
-                          }}
-                          data={existingCharacter?.data?.tags || []}
-                          dispatch={dispatch}
-                          isLoading={isFetching}
-                          type="tags"
-                        />
-                      </div>
-                    </TablePageLayout>
+                    <div className="mt-2 flex flex-wrap gap-2 animate-in fade-in fill-mode-both">
+                      {existingCharacter.data.tags.map((tag) => (
+                        <div key={tag.id}>
+                          <Badge customColor={tag.color} label={tag.title} />
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <div className="mt-2 w-full">
                       <Alert label="There is no content." variant="info" />
