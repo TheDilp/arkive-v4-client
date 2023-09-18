@@ -143,7 +143,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                                 clearAction={() => handleChange({ name: `map_layers[${index}].image`, value: null })}
                                 id={item?.image?.id}
                                 title={item.image.title}
-                                url={getImageURL(project_id as string, "images", item?.image?.id)}
+                                url={getImageURL(project_id as string, "maps", item?.image?.id)}
                               />
                             </div>
                           ) : (
@@ -154,7 +154,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                               onChange={({ name, label, value }) => {
                                 handleChange({ name, value: { id: value, title: label } });
                               }}
-                              type="images"
+                              type="maps"
                             />
                           )}
                           <div className="h-10 self-end">
