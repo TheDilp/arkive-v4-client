@@ -63,7 +63,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
   const graph = existingGraphData?.data || data;
 
-  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly);
+  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const queryClient = useQueryClient();
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
@@ -77,7 +77,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
-
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   const [nodes, setNodes] = useAtom(nodesAtom);
@@ -93,7 +92,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
   const makeEdgeCallback = (source: string, target: string, color?: string) => {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
-
     const newEdge = {
       source_id: source,
       target_id: target,
@@ -433,7 +431,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         cyRef?.current?._cy.removeListener("ehcomplete");
       }
     };
-  }, [cyRef?.current?._cy, item_id, boardState.curve_style]);
+  }, [cyRef?.current?._cy, item_id, boardState.curve_style, existingGraphData?.data?.default_edge_color]);
 
   useEffect(() => {
     // Creating edges

@@ -115,7 +115,11 @@ export function FolderView() {
   // !REWORK WITH SMARTER IMPLEMENTATION
 
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
-  if ((type === "graphs" || type === "random_tables" || type === "dictionaries") && fields.includes("image_id")) fields.pop();
+  if (
+    (type === "graphs" || type === "random_tables" || type === "calendars" || type === "dictionaries") &&
+    fields.includes("image_id")
+  )
+    fields.pop();
 
   const { data: base, isFetching } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
