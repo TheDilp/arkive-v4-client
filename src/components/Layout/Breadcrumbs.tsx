@@ -17,7 +17,7 @@ export function Breadcrumbs() {
         <Fragment key={item.id}>
           <div className="flex w-fit max-w-[10rem] items-center text-lg">
             <Link to={`../${type}/${item.id}`}>
-              <span className="truncate font-semibold">{item.title}</span>
+              <span className="truncate font-lato font-semibold">{item.title}</span>
             </Link>
           </div>
           {index !== items.length - 1 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}
