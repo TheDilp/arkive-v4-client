@@ -107,7 +107,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
           if (!boardRef || isViewOnly) return;
           const selected = boardRef.elements(":selected");
           if (selected.length === 0) {
-            // toaster("warning", "No elements are selected.");
+            createNotification({ timer: 3, title: "No elements are selected.", variant: "info", icon: IconEnum.info_circle });
           } else {
             const nodes = selected.nodes();
             const node_ids = nodes.map((n) => n.id());
