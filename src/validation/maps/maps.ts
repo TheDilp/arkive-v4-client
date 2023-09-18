@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertMapLayerSchema, UpdateMapLayerSchema } from "./map_layers";
+
 export const InsertMapSchema = z.object({
   data: z.object({
     title: z.string(),
@@ -14,6 +16,7 @@ export const InsertMapSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
+      map_layers: InsertMapLayerSchema.array().optional(),
     })
     .optional(),
 });
@@ -32,6 +35,7 @@ export const UpdateMapSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
+      map_layers: InsertMapLayerSchema.array().or(UpdateMapLayerSchema.array()).optional(),
     })
     .optional(),
 });

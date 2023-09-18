@@ -5,6 +5,7 @@ import { RemirrorJSON } from "remirror";
 
 import { deleteObjectPropsRecursive } from "../../../utils";
 import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention";
+import { CharacterMention } from "./Extensions/Mention/CharacterMention";
 // import WordMention from "../Mention/WordMention";
 
 export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
@@ -57,6 +58,8 @@ const typeMap = (project_id: string): MarkMap => ({
       const { attrs } = props[0].node;
       if (attrs) {
         const { id, label, alterId, name: type } = attrs;
+        if (type === "characters")
+          return <CharacterMention nodeId={id} nodeLabel={label} project_id={project_id} title={label} />;
         if (type === "documents")
           return (
             <DocumentMention alterId={alterId} id={id} isDisabledTooltip label={label} project_id={project_id} title={label} />

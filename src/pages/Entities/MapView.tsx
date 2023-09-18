@@ -21,7 +21,7 @@ export function MapView({ isReadOnly }: Props) {
 
   const { data: currentMap, isLoading } = useGetEntity<MapType>(item_id as string, "maps", {
     data: {},
-    relations: { map_pins: true },
+    relations: { map_pins: true, map_layers: true },
   });
   useChangeNavbarTitle(`The Arkive | Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
 

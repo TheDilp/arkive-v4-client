@@ -1,6 +1,6 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useResetAtom } from "jotai/utils";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -33,7 +33,12 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
 
-  const { data: existingMap, isFetching } = useGetEntity<MapType>(data?.id, "maps", { data: {} }, { enabled: !!data?.id });
+  const { data: existingMap, isFetching } = useGetEntity<MapType>(
+    data?.id,
+    "maps",
+    { relations: { map_pins: true, map_layers: true } },
+    { enabled: !!data?.id },
+  );
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
     existingMap?.data || { project_id: project_id as string },
@@ -44,6 +49,10 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
 
   const { mutateAsync: update } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
   const { handleChange } = useHandleChange({ data: map, setData: setMap });
+
+  useLayoutEffect(() => {
+    if (existingMap?.data) setMap(existingMap?.data);
+  }, [existingMap]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
 
@@ -73,29 +82,24 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
       ) : null}
       {selectedTab === 1 ? (
         <div className="mt-2 flex flex-col gap-y-2 pr-2">
-          <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
+          <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-800">
             <span>Insert new layer:</span>
             <div className="h-8 w-8">
               <Button
                 icon={IconEnum.add}
                 isIconOnly
-                onClick={
-                  () => {
-                    setMap((prev) => ({
-                      ...prev,
-                      map_layers: (prev.map_layers || []).concat({
-                        id: crypto.randomUUID(),
-                        title: "New layer",
-                        parent_id: item_id as string,
-                        image_id: "",
-                        is_public: false,
-                      }),
-                    }));
-                  }
-                  // setMonths((prev) =>
-                  //   prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0 }]),
-                  // )
-                }
+                onClick={() => {
+                  handleChange({
+                    name: "map_layers",
+                    value: (map.map_layers || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New layer",
+                      parent_id: item_id as string,
+                      image_id: "",
+                      is_public: false,
+                    }),
+                  });
+                }}
                 variant="info"
               />
             </div>
@@ -126,9 +130,9 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                           <div>
                             <Input
                               label="Layer name (required)"
-                              name={`[${index}].title`}
+                              name={`map_layers[${index}].title`}
                               onChange={handleChange}
-                              placeholder="Eg November"
+                              placeholder="Eg New layer"
                               value={item.title}
                             />
                           </div>
@@ -230,12 +234,34 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
         isDisabled={isDisabled(map)}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {
-          const { tags, ...rest } = map;
+          const { tags, map_layers, ...rest } = map;
           if (!data?.id) {
-            const parsedData = InsertMapSchema.parse({ data: rest, relations: { tags } });
+            const formattedMapLayers = (map_layers || []).map((layer) => ({
+              data: {
+                id: layer.id,
+                title: layer.title,
+                image_id: layer?.image?.id,
+                is_public: layer.is_public,
+                parent_id: item_id as string,
+              },
+            }));
+            const parsedData = InsertMapSchema.parse({
+              data: rest,
+              relations: { tags, map_layers: formattedMapLayers },
+            });
             await create(parsedData);
           } else {
-            const parsedData = UpdateMapSchema.parse({ data: rest, relations: { tags } });
+            const formattedMapLayers = (map_layers || []).map((layer) => ({
+              data: {
+                id: layer.id,
+                title: layer.title,
+                image_id: layer?.image?.id,
+                is_public: layer.is_public,
+                parent_id: item_id as string,
+              },
+            }));
+
+            const parsedData = UpdateMapSchema.parse({ data: rest, relations: { tags, map_layers: formattedMapLayers } });
             await update(parsedData);
           }
 

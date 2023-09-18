@@ -37,7 +37,7 @@ export function useUpdateEntity<
                 data: {
                   ...oldData.data,
                   ...vars.data,
-                  ...vars.relations,
+                  ...Object.values(vars.relations || {}).map((rel) => rel?.data),
                 },
               };
             return oldData;
