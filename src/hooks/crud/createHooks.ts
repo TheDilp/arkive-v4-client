@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 
-import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, EdgeType, GraphType, NodeType } from "../../types";
 import {
   baseURLS,
+  edgesAtom,
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
   IconEnum,
+  nodesAtom,
   useNotifications,
 } from "../../utils";
 
@@ -95,6 +98,8 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
   project_id: string | undefined,
 ) {
   const queryClient = useQueryClient();
+  const setNodes = useSetAtom(nodesAtom);
+  const setEdges = useSetAtom(edgesAtom);
   return useMutation(
     async (updateItemValues: InsertType) => {
       return FetchFunction({
@@ -105,6 +110,34 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
     },
 
     {
+      onMutate: (vars) => {
+        const parentEntityType = getParentEntityType(type);
+
+        if (parentEntityType === "graphs") {
+          const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
+          queryClient.setQueryData<{ data: GraphType }>([parentEntityType, vars.data.parent_id], (oldData) =>
+            oldData
+              ? {
+                  ...oldData,
+                  data: {
+                    ...oldData?.data,
+                    [type]: (oldData.data?.[type as "nodes" | "edges"] || []).concat(vars.data as NodeType | EdgeType),
+                  },
+                }
+              : oldData,
+          );
+          if (type === "nodes") setNodes((prev) => [...(prev || []), vars.data as NodeType]);
+          if (type === "edges") setEdges((prev) => [...(prev || []), vars.data as EdgeType]);
+          return { old };
+        }
+        return { old: {} };
+      },
+      onError: (_, vars, context) => {
+        const parentEntityType = getParentEntityType(type);
+        if (parentEntityType === "graphs") {
+          queryClient.setQueryData([parentEntityType, vars.data.parent_id], context?.old);
+        }
+      },
       onSuccess: (_, vars) => {
         const parentEntityType = getParentEntityType(type);
         if (parentEntityType && parentEntityType !== "documents" && parentEntityType !== "graphs") {

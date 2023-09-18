@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const InsertNodeSchema = z.object({
   data: z.object({
+    id: z.string(),
     parent_id: z.string(),
     label: z.string().nullable().optional(),
     type: z.string().nullable().optional(),

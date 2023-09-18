@@ -17,6 +17,7 @@ export const ArrowFillEnum = z.enum(["filled", "hollow"]);
 
 export const InsertEdgeSchema = z.object({
   data: z.object({
+    id: z.string(),
     parent_id: z.string(),
     label: z.string().nullable().optional(),
     curve_style: z.string().nullable().optional(),

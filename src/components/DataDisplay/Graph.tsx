@@ -93,6 +93,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const makeEdgeCallback = (source: string, target: string, color?: string) => {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
     const newEdge = {
+      id: crypto.randomUUID(),
       source_id: source,
       target_id: target,
       line_color: color,
@@ -168,6 +169,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                   createNode(
                     {
                       data: {
+                        id: crypto.randomUUID(),
                         parent_id: item_id as string,
                         x: parseFloat(evt.position.x.toFixed(2)),
                         y: parseFloat(evt.position.y.toFixed(2)),
@@ -492,32 +494,15 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     cyRef?.current?._cy.on("click", function (evt: any) {
       // If the target is the background of the canvas
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
-        createNode(
-          {
-            data: {
-              parent_id: item_id as string,
-              x: parseFloat(evt.position.x.toFixed(2)),
-              y: parseFloat(evt.position.y.toFixed(2)),
-              background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
-            },
+        createNode({
+          data: {
+            id: crypto.randomUUID(),
+            parent_id: item_id as string,
+            x: parseFloat(evt.position.x.toFixed(2)),
+            y: parseFloat(evt.position.y.toFixed(2)),
+            background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
           },
-          {
-            onSuccess: (d: { data: { id: string } }) => {
-              setNodes((prev) => [
-                ...prev,
-                {
-                  ...DefaultNode,
-                  background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
-                  id: d.data.id,
-                  x: parseFloat(evt.position.x.toFixed(2)),
-                  y: parseFloat(evt.position.y.toFixed(2)),
-                  label: "",
-                  parent_id: item_id as string,
-                },
-              ]);
-            },
-          },
-        );
+        });
       }
     });
 
