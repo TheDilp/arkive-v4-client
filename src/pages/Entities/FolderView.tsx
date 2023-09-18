@@ -192,8 +192,6 @@ export function FolderView() {
     }
   }, [data, type, setBreadcrumbs, item_id]);
 
-  if (isFetching) return <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />;
-
   if (!item_id && type === "characters") return <CharactersView />;
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
 
@@ -201,7 +199,8 @@ export function FolderView() {
     <>
       <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
-        {!item_id || data?.data?.is_folder ? (
+        {isFetching ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
+        {(!item_id || data?.data?.is_folder) && !isFetching ? (
           <div className="w-52">
             <Dropdown
               allowedPlacements={["bottom-end"]}
@@ -257,8 +256,8 @@ export function FolderView() {
         )}
       </div>
 
-      {!item_id ? (
-        <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
+      {!item_id && !isFetching ? (
+        <div className="grid h-full w-full grid-cols-2 content-start gap-8 px-2 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length ? base.data : []).map((item) => (
             <EntityItem
               key={item.id}
