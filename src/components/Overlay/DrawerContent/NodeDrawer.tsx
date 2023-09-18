@@ -82,7 +82,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     data?.id,
     "nodes",
     {
-      data: {},
       relations: { image: true, character: true, document: true, map_pin: true, event: true, tags: true },
     },
     {

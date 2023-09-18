@@ -46,7 +46,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     item_id,
     "graphs",
     {
-      data: {},
       fields: ["default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
@@ -166,7 +165,13 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                 icon: IconEnum.add,
                 onClick: () => {
                   createNode(
-                    { data: { parent_id: item_id as string, x: evt.position.x, y: evt.position.y } },
+                    {
+                      data: {
+                        parent_id: item_id as string,
+                        x: parseFloat(evt.position.x.toFixed(2)),
+                        y: parseFloat(evt.position.y.toFixed(2)),
+                      },
+                    },
                     {
                       onSuccess: (d: { data: { id: string } }) => {
                         setNodes((prev) => [
@@ -174,8 +179,8 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                           {
                             ...DefaultNode,
                             id: d.data.id,
-                            x: evt.position.x,
-                            y: evt.position.y,
+                            x: parseFloat(evt.position.x.toFixed(2)),
+                            y: parseFloat(evt.position.y.toFixed(2)),
                             label: "",
                             parent_id: item_id as string,
                           },
@@ -404,7 +409,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       });
     }
     return () => {
-      cyRef?.current?._cy.removeListener("click mousedown cxttap dbltap free");
+      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap free");
     };
   }, [cyRef?.current?._cy, nodes, edges, item_id]);
 
@@ -431,7 +436,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         cyRef?.current?._cy.removeListener("ehcomplete");
       }
     };
-  }, [cyRef?.current?._cy, item_id, boardState.curve_style, existingGraphData?.data?.default_edge_color]);
+  }, [cyRef?.current?._cy, item_id, boardState.curve_style]);
 
   useEffect(() => {
     // Creating edges
@@ -440,16 +445,24 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       // If the target is the background of the canvas
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
         createNode(
-          { data: { parent_id: item_id as string, x: evt.position.x, y: evt.position.y } },
+          {
+            data: {
+              parent_id: item_id as string,
+              x: parseFloat(evt.position.x.toFixed(2)),
+              y: parseFloat(evt.position.y.toFixed(2)),
+              background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
+            },
+          },
           {
             onSuccess: (d: { data: { id: string } }) => {
               setNodes((prev) => [
                 ...prev,
                 {
                   ...DefaultNode,
+                  background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
                   id: d.data.id,
-                  x: evt.position.x,
-                  y: evt.position.y,
+                  x: parseFloat(evt.position.x.toFixed(2)),
+                  y: parseFloat(evt.position.y.toFixed(2)),
                   label: "",
                   parent_id: item_id as string,
                 },

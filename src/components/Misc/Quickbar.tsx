@@ -66,7 +66,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   return (
-    <div className="absolute bottom-16 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-0">
+    <div className="absolute bottom-0 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-0">
       <Button
         hasNoBackground
         icon={IconEnum.add}
@@ -77,15 +77,12 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         variant={boardState.add_nodes ? "info" : "primary"}
       />
 
-      {/* Toggle grid visibility */}
-
       <Button
         hasNoBackground
         icon={IconEnum.grid}
         onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })}
         variant={boardState.grid ? "info" : "primary"}
       />
-      {/* Lock selected elements button */}
       <Button
         hasNoBackground
         icon={IconEnum.lock}

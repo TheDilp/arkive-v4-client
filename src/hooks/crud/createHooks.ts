@@ -107,7 +107,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
     {
       onSuccess: (_, vars) => {
         const parentEntityType = getParentEntityType(type);
-        if (parentEntityType && parentEntityType !== "documents") {
+        if (parentEntityType && parentEntityType !== "documents" && parentEntityType !== "graphs") {
           queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
           queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
         }
