@@ -12,7 +12,7 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
   { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
-  { icon: IconEnum.generator, navigate: "generators", tooltip: "Generators" },
+  // { icon: IconEnum.generator, navigate: "generators", tooltip: "Generators" },
 ];
 
 export const settingsSubnavItems = [
