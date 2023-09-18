@@ -1,9 +1,19 @@
 import { SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { useDeleteMany, useUpdateManySubEntities } from "../../hooks";
 import { CurveStyleType } from "../../types";
-import { BoardReferenceAtom, BoardStateAtom, dialogAtom, drawerAtom, edgesAtom, IconEnum, nodesAtom } from "../../utils";
+import {
+  BoardReferenceAtom,
+  BoardStateAtom,
+  dialogAtom,
+  drawerAtom,
+  edgesAtom,
+  IconEnum,
+  nodesAtom,
+  useNotifications,
+} from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
 import { Button, Tooltip } from "..";
 import { ColorPicker } from "../Overlay/ColorPicker";
@@ -37,6 +47,9 @@ function changeCurveStyle(
 }
 
 export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
+  const { item_id } = useParams();
+  const createNotification = useNotifications();
+
   const [pickerColor, setPickerColor] = useState("#595959");
 
   const boardRef = useAtomValue(BoardReferenceAtom);
@@ -53,7 +66,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   return (
-    <div className="absolute bottom-40 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-24">
+    <div className="absolute bottom-16 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-0">
       <Button
         hasNoBackground
         icon={IconEnum.add}
@@ -188,9 +201,15 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         onClick={() => {
           if (!boardRef) return;
           if (boardRef.elements(":selected")?.length > 0) {
-            setDrawer((prev) => ({ ...prev, position: "right", type: "many_nodes", show: true }));
+            setDrawer((prev) => ({
+              ...prev,
+              position: "right",
+              data: { parent_id: item_id as string },
+              type: "many_nodes",
+              show: true,
+            }));
           } else {
-            // toaster("warning", "No elements are selected.");
+            createNotification({ icon: IconEnum.info_circle, variant: "info", title: "No elements are selected.", timer: 3 });
           }
         }}
       />
@@ -206,7 +225,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
               const edges = selected.edges();
 
               if (nodes?.length) {
-                const nodeUpdateData = nodes.map((n) => ({ id: n.id(), background_color: value }));
+                const nodeUpdateData = { data: nodes.map((n) => ({ id: n.id(), background_color: value })) };
                 updateManyNodes(nodeUpdateData, {
                   onSuccess: () => {
                     const node_ids = nodes.map((n) => n.id());
@@ -220,7 +239,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
                 });
               }
               if (edges?.length) {
-                const edgeUpdateData = edges.map((n) => ({ id: n.id(), background_color: value }));
+                const edgeUpdateData = { data: edges.map((n) => ({ id: n.id(), background_color: value })) };
                 updateManyEdges(edgeUpdateData, {
                   onSuccess: () => {
                     const edge_ids = edges.map((n) => n.id());
