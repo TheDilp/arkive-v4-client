@@ -76,6 +76,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
+  const { mutate: deleteManyNodes } = useDeleteMany("nodes");
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   const [nodes, setNodes] = useAtom(nodesAtom);
@@ -221,7 +222,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         // Else - the target is a node or an edge
         else {
           const { group } = evt.target._private;
-
+          const selected = group === "nodes" ? cyRef?.current?._cy.nodes(":selected") : cyRef?.current?._cy.edges(":selected");
           // If the current target is not in the selected group, make it the only selected item
           // This mimics a desktop mouse experience
           // Otherwise, do nothing
@@ -238,62 +239,109 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
 
             setContextMenu({
               event: evt.originalEvent,
-              items: [
-                {
-                  title: "Edit node",
-                  icon: IconEnum.edit,
-                  onClick: () =>
-                    setDrawer((prev) => ({
-                      ...prev,
-                      title: `Edit node ${label ? " - ".concat(label) : ""}`,
-                      type: "nodes",
-                      data: {
-                        id,
-                        parent_id: item_id as string,
-                      },
-                    })),
-                },
-                {
-                  title: "Highlight connected nodes",
-                  icon: IconEnum.board,
-                  onClick: () => {
-                    const incomers = evt.target.incomers();
-                    const outgoers = evt.target.outgoers();
-
-                    incomers.nodes().flashClass("incomingNodeHighlight", 1500);
-                    incomers.edges().flashClass("incomingEdgeHighlight", 1500);
-                    outgoers.nodes().flashClass("outgoingNodeHighlight", 1500);
-                    outgoers.edges().flashClass("outgoingEdgeHighlight", 1500);
-                  },
-                },
-                {
-                  title: locked ? "Unlock node" : "Lock node",
-                  icon: locked ? IconEnum.unlock : IconEnum.lock,
-                  onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
-                },
-                {
-                  title: "Center on node",
-                  icon: IconEnum.center,
-                  onClick: () => cyRef?.current?._cy.center(evt.target),
-                },
-                // { title: "Template from node" },
-                // !ADD OPTION TO DELETE MULTIPLE NODES
-                {
-                  title: "Delete node",
-                  icon: IconEnum.trash,
-                  onClick: () =>
-                    deleteNode(
-                      { data: { id, parent_id: item_id as string } },
+              items:
+                selected.length === 1
+                  ? [
                       {
-                        onSuccess: () => {
-                          setEdges((prev) => prev.filter((e) => e.source_id !== id && e.target_id !== id));
+                        title: "Edit node",
+                        icon: IconEnum.edit,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: `Edit node ${label ? " - ".concat(label) : ""}`,
+                            type: "nodes",
+                            data: {
+                              id,
+                              parent_id: item_id as string,
+                            },
+                          })),
+                      },
+                      {
+                        title: "Highlight connected nodes",
+                        icon: IconEnum.board,
+                        onClick: () => {
+                          const incomers = evt.target.incomers();
+                          const outgoers = evt.target.outgoers();
 
-                          setNodes((prev) => prev.filter((n) => n.id !== id));
+                          incomers.nodes().flashClass("incomingNodeHighlight", 1500);
+                          incomers.edges().flashClass("incomingEdgeHighlight", 1500);
+                          outgoers.nodes().flashClass("outgoingNodeHighlight", 1500);
+                          outgoers.edges().flashClass("outgoingEdgeHighlight", 1500);
                         },
                       },
-                    ),
-                },
-              ],
+                      {
+                        title: locked ? "Unlock node" : "Lock node",
+                        icon: locked ? IconEnum.unlock : IconEnum.lock,
+                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
+                      },
+                      {
+                        title: "Center on node",
+                        icon: IconEnum.center,
+                        onClick: () => cyRef?.current?._cy.center(evt.target),
+                      },
+                      // { title: "Template from node" },
+                      // !ADD OPTION TO DELETE MULTIPLE NODES
+                      {
+                        title: "Delete node",
+                        icon: IconEnum.trash,
+                        onClick: () =>
+                          deleteNode(
+                            { data: { id, parent_id: item_id as string } },
+                            {
+                              onSuccess: () => {
+                                setEdges((prev) => prev.filter((e) => e.source_id !== id && e.target_id !== id));
+
+                                setNodes((prev) => prev.filter((n) => n.id !== id));
+                              },
+                            },
+                          ),
+                      },
+                    ]
+                  : [
+                      {
+                        title: "Edit multiple nodes",
+                        icon: IconEnum.edit,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Edit nodes",
+                            type: "many_nodes",
+                            data: {
+                              parent_id: item_id as string,
+                            },
+                          })),
+                      },
+                      {
+                        title: locked ? "Unlock nodes" : "Lock nodes",
+                        icon: locked ? IconEnum.unlock : IconEnum.lock,
+                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
+                      },
+                      {
+                        title: "Center on nodes",
+                        icon: IconEnum.center,
+                        onClick: () => cyRef?.current?._cy.center(evt.target),
+                      },
+                      {
+                        title: "Delete multiple nodes",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          // @ts-ignore
+                          const ids: string[] = selected.map((el) => el.id());
+                          deleteManyNodes(
+                            { data: ids.map((i) => ({ id: i })) },
+                            {
+                              onSuccess: () => {
+                                setEdges((prev) =>
+                                  prev.filter((e) => !ids.includes(e.source_id) && !ids.includes(e.target_id)),
+                                );
+
+                                setNodes((prev) => prev.filter((n) => !ids.includes(n.id)));
+                              },
+                            },
+                          );
+                        },
+                      },
+                    ],
             });
           } else if (group === "edges") {
             setContextMenu({
