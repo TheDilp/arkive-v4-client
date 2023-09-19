@@ -1,5 +1,4 @@
 /* eslint-disable func-names */
-import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
@@ -49,7 +48,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       fields: ["default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { enabled: !data },
+    { staleTime: 5 * 60 * 1000, enabled: !data },
   );
 
   useLayoutEffect(() => {
@@ -63,7 +62,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const graph = existingGraphData?.data || data;
 
   useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
-  const queryClient = useQueryClient();
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const cyRef = useRef() as any;
@@ -139,9 +137,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       }
       setNodes([]);
       setEdges([]);
-      setTimeout(() => {
-        queryClient.invalidateQueries(["graphs", item_id]);
-      }, 500);
     };
   }, [item_id]);
 
@@ -330,30 +325,61 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
           } else if (group === "edges") {
             setContextMenu({
               event: evt.originalEvent,
-              items: [
-                {
-                  title: "Highlight connected nodes",
-                  icon: IconEnum.board,
-                  onClick: () => {
-                    if (edges) {
-                      evt.target.sources().flashClass("incomingNodeHighlight", 2000);
-                      evt.target.targets().flashClass("outgoingNodeHighlight", 2000);
-                    }
-                  },
-                },
-                // !DELETE MULTIPLE OR SINGLE EDGE
-                {
-                  title: "Delete selected edges",
-                  icon: IconEnum.trash,
-                  onClick: () => {
-                    if (edges) {
-                      const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
-                      deleteManyEdges({ data: ids.map((id) => ({ id })) });
-                      setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
-                    }
-                  },
-                },
-              ],
+              items:
+                selected.length <= 1
+                  ? [
+                      {
+                        title: "Highlight connected nodes",
+                        icon: IconEnum.board,
+                        onClick: () => {
+                          if (edges) {
+                            evt.target.sources().flashClass("incomingNodeHighlight", 2000);
+                            evt.target.targets().flashClass("outgoingNodeHighlight", 2000);
+                          }
+                        },
+                      },
+                      // !DELETE MULTIPLE OR SINGLE EDGE
+                      {
+                        title: "Delete selected edge",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          if (edges) {
+                            const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
+                            deleteManyEdges({ data: ids.map((id) => ({ id })) });
+                            setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
+                          }
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        title: "Edit many edges",
+                        icon: IconEnum.edit,
+                        onClick: () => {
+                          if (edges) {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: "Edit edges",
+                              type: "many_edges",
+                              data: {
+                                parent_id: item_id as string,
+                              },
+                            }));
+                          }
+                        },
+                      },
+                      {
+                        title: "Delete selected edges",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          if (edges) {
+                            const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
+                            deleteManyEdges({ data: ids.map((id) => ({ id })) });
+                            setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
+                          }
+                        },
+                      },
+                    ],
             });
           }
         }
