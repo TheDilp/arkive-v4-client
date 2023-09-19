@@ -1,11 +1,15 @@
+import { Link } from "react-router-dom";
+
 import { ItemPreviewType } from "../../types/ComponentTypes/DataDisplayTypes/itemPreviewTypes";
 import { IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Icon } from "../Misc";
 
-export function ItemPreview({ id, title, icon, clearAction }: ItemPreviewType) {
+export function ItemPreview({ id, title, icon, link, clearAction }: ItemPreviewType) {
   return (
-    <div className="flex items-center gap-x-2 rounded bg-zinc-700 p-2">
+    <Link
+      className={`flex items-center gap-x-2 rounded bg-zinc-700 p-2 ${link ? "transition-all hover:text-blue-400" : ""}`}
+      to={link ?? "#"}>
       {icon ? (
         <span className="">
           <Icon fontSize={20} icon={icon} />
@@ -17,6 +21,6 @@ export function ItemPreview({ id, title, icon, clearAction }: ItemPreviewType) {
           <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => clearAction(id)} />
         </span>
       ) : null}
-    </div>
+    </Link>
   );
 }
