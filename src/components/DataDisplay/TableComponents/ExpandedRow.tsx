@@ -12,7 +12,7 @@ import { StaticRender } from "../../Complex";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
-import { EntityPreview } from "../ItemPreview";
+import { EntityPreview } from "../EntityPreview";
 
 const ExpandedTableRowClasses = tv({
   base: "p-4 border-b border-zinc-600 bg-zinc-800",

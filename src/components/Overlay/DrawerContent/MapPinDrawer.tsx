@@ -7,7 +7,7 @@ import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEn
 import { CharacterType, MapPinType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
-import { ImagePreview, EntityPreview } from "../../DataDisplay";
+import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
