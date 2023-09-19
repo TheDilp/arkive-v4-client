@@ -25,6 +25,7 @@ import {
   ImagePreview,
   ImageSelect,
   Input,
+  ItemPreview,
   Search,
   Select,
   Skeleton,
@@ -287,8 +288,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 searchEntity="characters"
                 value={node?.character?.id || ""}
               />
-            ) : null}
-            {node?.character ? (
+            ) : (
               <CharacterPreview
                 character_name={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name || "")}
                 clearAction={() => {
@@ -297,16 +297,71 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 id={node?.character?.id}
                 image_id={node?.character?.portrait_id ?? undefined}
               />
-            ) : null}
+            )}
           </div>
-          {/* <Search
-            isDisabled
-            label="Document (optional)"
-            placeholder="Press enter to search documents"
-            searchEntity="documents"
-          />
-          <Search isDisabled label="Location (optional)" placeholder="Press enter to search map pins" searchEntity="map_pins" />
-          <Search isDisabled label="Event (optional)" placeholder="Press enter to search events" searchEntity="events" /> */}
+          {!node?.document ? (
+            <Search
+              isAutocomplete
+              name="document.id"
+              onChange={({ value, label }) => {
+                handleChange({ name: "document", value: { id: value, title: label } });
+              }}
+              placeholder="Press enter to search documents"
+              searchEntity="documents"
+              value={node?.document?.id || ""}
+            />
+          ) : (
+            <ItemPreview
+              clearAction={() => {
+                handleChange({ name: "document", value: "" });
+              }}
+              icon={IconEnum.document}
+              id={node?.document?.id}
+              title={node?.document?.title}
+            />
+          )}
+          {!node?.map_pin ? (
+            <Search
+              isAutocomplete
+              name="map_pin.id"
+              onChange={({ value, label }) => {
+                handleChange({ name: "map_pin", value: { id: value, title: label } });
+              }}
+              placeholder="Press enter to search map pins"
+              searchEntity="map_pins"
+              value={node?.document?.id || ""}
+            />
+          ) : (
+            <ItemPreview
+              clearAction={() => {
+                handleChange({ name: "map_pin", value: "" });
+              }}
+              icon={IconEnum.map_pin}
+              id={node?.map_pin?.id}
+              title={node?.map_pin?.title || "Map pin has no title"}
+            />
+          )}
+          {!node?.event ? (
+            <Search
+              isAutocomplete
+              name="event.id"
+              onChange={({ value, label }) => {
+                handleChange({ name: "event", value: { id: value, title: label } });
+              }}
+              placeholder="Press enter to search events"
+              searchEntity="events"
+              value={node?.event?.id || ""}
+            />
+          ) : (
+            <ItemPreview
+              clearAction={() => {
+                handleChange({ name: "event", value: "" });
+              }}
+              icon={IconEnum.event}
+              id={node?.event?.id}
+              title={node?.event?.title}
+            />
+          )}
         </div>
       ) : null}
       {selectedTab === 2 ? (
@@ -403,6 +458,9 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             if (changedData) {
               const nodeToUpdate = { ...(changedData || {}), id: node.id };
               set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+              set(nodeToUpdate, "doc_id", node?.document?.id ?? null);
+              set(nodeToUpdate, "map_pin_id", node?.map_pin?.id ?? null);
+              set(nodeToUpdate, "event_id", node?.event?.id ?? null);
               set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
               const { tags, ...rest } = nodeToUpdate;
