@@ -13,6 +13,7 @@ export function EntitiesView() {
   const entityName = getEntityNameFromType(type as AvailableEntityType);
 
   const setDrawer = useSetAtom(drawerAtom);
+
   return (
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex h-12 items-center justify-between">
@@ -41,7 +42,6 @@ export function EntitiesView() {
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}
       {!!item_id && type === "calendars" ? <CalendarView /> : null}
-      {/* {!!item_id && type === "timelines" ? <TimelineView /> : null} */}
       {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
     </div>

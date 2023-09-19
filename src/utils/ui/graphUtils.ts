@@ -129,18 +129,16 @@ export function getNodeLabel(node: NodeType): string {
 }
 
 export function getNodeImage(node: NodeType, project_id: string) {
-  let image = "";
+  if (node?.image_id) {
+    return getImageURL(project_id as string, "images", node.image_id, true);
+  }
   if (node?.document?.image) {
-    image = node.document.image.id;
+    return getImageURL(project_id as string, "images", node.document.image_id, true);
   }
   if (node?.character?.portrait_id) {
-    image = node.character.portrait_id;
+    return getImageURL(project_id as string, "images", node.character.portrait_id, true);
   }
-  if (node?.image_id) {
-    image = node.image_id;
-  }
-  if (image === null) return [];
-  if (image !== "") return getImageURL(project_id as string, "images", image, true);
+
   return [];
 }
 export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boolean) {

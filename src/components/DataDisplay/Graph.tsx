@@ -1,4 +1,5 @@
 /* eslint-disable func-names */
+import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
 import { useAtom, useSetAtom } from "jotai";
 import set from "lodash.set";
@@ -40,6 +41,7 @@ type Props = {
 
 export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
+  const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const { data: existingGraphData } = useGetEntity<GraphType>(
     item_id,
@@ -48,7 +50,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       fields: ["default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { staleTime: 5 * 60 * 1000, enabled: !data },
+    { enabled: !data },
   );
 
   useLayoutEffect(() => {
@@ -118,7 +120,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       setEdges(graph?.edges);
     }
   }, [graph?.nodes, graph?.edges]);
-
   useEffect(() => {
     if (!cyRef || !ehRef) return () => {};
     if (firstRender && firstRender.current) {
@@ -137,9 +138,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       }
       setNodes([]);
       setEdges([]);
+      queryClient.removeQueries(["graphs", item_id]);
     };
   }, [item_id]);
-
   // Board Events
   useEffect(() => {
     if (cyRef?.current?._cy && !isReadOnly && !isViewOnly) {
@@ -470,7 +471,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       cyRef?.current?._cy.removeListener("mousedown cxttap dbltap free");
     };
   }, [cyRef?.current?._cy, nodes, edges, item_id]);
-
   useEffect(() => {
     // Creating edges
     // @ts-ignore
@@ -495,7 +495,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       }
     };
   }, [cyRef?.current?._cy, item_id, boardState.curve_style]);
-
   useEffect(() => {
     // Creating edges
     // @ts-ignore
@@ -520,7 +519,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       }
     };
   }, [cyRef?.current?._cy, item_id, boardState.add_nodes]);
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       // If there is a node id in the URL navigate to that node
@@ -599,7 +597,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     }
     return () => {};
   }, [drawer]);
-
+  console.log(existingGraphData?.data?.nodes);
   return (
     <div
       className="relative flex h-[calc(100%)] w-full flex-1 justify-center"
@@ -636,7 +634,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
       //             {
       //               data: {
       //                 label,
-      //                 backgroundImage: formatImageURL(image || "") || "",
+      //                 backgroundImage: ImageURL(image || "") || "",
       //                 doc_id,
       //                 ...DefaultNode,
       //                 id: res.id,
