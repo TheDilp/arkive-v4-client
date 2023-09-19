@@ -12,7 +12,7 @@ import { StaticRender } from "../../Complex";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
-import { ItemPreview } from "../ItemPreview";
+import { EntityPreview } from "../ItemPreview";
 
 const ExpandedTableRowClasses = tv({
   base: "p-4 border-b border-zinc-600 bg-zinc-800",
@@ -56,7 +56,7 @@ function ExpandedRowTagListWrapper({
       {type === "characters"
         ? data[type].map((item) => (
             <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/characters/${item.id}`}>
-              <ItemPreview
+              <EntityPreview
                 id={item.id}
                 image_id={item.portrait_id}
                 title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
@@ -71,7 +71,7 @@ function ExpandedRowTagListWrapper({
               key={item.id}
               className="hover:text-blue-400"
               to={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}>
-              <ItemPreview id={item.id} title={item.label} type="graphs" />
+              <EntityPreview id={item.id} title={item.label} type="graphs" />
             </Link>
           ))
         : null}
@@ -79,7 +79,7 @@ function ExpandedRowTagListWrapper({
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
             <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/${type}/${item.id}`}>
-              <ItemPreview id={item.id} title={item.title} type={type === "boards" ? "graphs" : type} />
+              <EntityPreview id={item.id} title={item.title} type={type === "boards" ? "graphs" : type} />
             </Link>
           ))
         : null}

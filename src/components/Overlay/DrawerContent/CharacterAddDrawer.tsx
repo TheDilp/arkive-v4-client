@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useAddToEntity } from "../../../hooks";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
-import { ItemPreview } from "../../DataDisplay";
+import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
 import { Badge } from "../../Misc";
 
@@ -44,7 +44,7 @@ export function CharacterAddDrawer({ data }: Props) {
         </div>
       ) : (
         items.map((i) => (
-          <ItemPreview
+          <EntityPreview
             clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
             icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
             id={i.value}

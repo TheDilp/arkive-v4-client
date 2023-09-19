@@ -15,7 +15,7 @@ import {
 import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
-import { ItemPreview } from "../../DataDisplay";
+import { EntityPreview } from "../../DataDisplay";
 import { Search, Select, Title } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Badge } from "../../Misc";
@@ -193,7 +193,7 @@ export function SearchDrawer() {
                               {"title" in result_item ? result_item.title : null}
 
                               {"first_name" in result_item ? (
-                                <ItemPreview
+                                <EntityPreview
                                   id={result_item.id}
                                   image_id={result_item?.portrait_id}
                                   title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
@@ -222,9 +222,9 @@ export function SearchDrawer() {
                       "parent_id" in item ? item?.parent_id : undefined,
                     )}>
                     {searchCategory === "characters" ? (
-                      <ItemPreview id={item.value} image_id={item?.image} title={item.label} type="characters" />
+                      <EntityPreview id={item.value} image_id={item?.image} title={item.label} type="characters" />
                     ) : (
-                      <ItemPreview
+                      <EntityPreview
                         id={item.value}
                         title={item.label}
                         type={searchCategory as AvailableEntityType | AvailableSubEntityType}

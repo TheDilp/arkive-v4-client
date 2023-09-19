@@ -7,7 +7,7 @@ import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEn
 import { CharacterType, MapPinType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
-import { ImagePreview, ItemPreview } from "../../DataDisplay";
+import { ImagePreview, EntityPreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
@@ -105,7 +105,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             searchEntity="characters"
           />
           {character ? (
-            <ItemPreview
+            <EntityPreview
               clearAction={() => setCharacter(null)}
               id={character.id}
               image_id={character.portrait_id}

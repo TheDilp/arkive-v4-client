@@ -5,7 +5,7 @@ import { getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
-export function ItemPreview({ id, title, type, link, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
+export function EntityPreview({ id, title, type, link, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">

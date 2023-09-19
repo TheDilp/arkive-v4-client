@@ -24,7 +24,7 @@ import {
   ImagePreview,
   ImageSelect,
   Input,
-  ItemPreview,
+  EntityPreview,
   Search,
   Select,
   Skeleton,
@@ -287,7 +287,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               value={node?.character?.id || ""}
             />
           ) : (
-            <ItemPreview
+            <EntityPreview
               clearAction={() => {
                 handleChange({ name: "character", value: "" });
               }}
@@ -312,7 +312,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               value={node?.document?.id || ""}
             />
           ) : (
-            <ItemPreview
+            <EntityPreview
               clearAction={() => {
                 handleChange({ name: "document", value: "" });
               }}
@@ -336,7 +336,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               value={node?.document?.id || ""}
             />
           ) : (
-            <ItemPreview
+            <EntityPreview
               clearAction={() => {
                 handleChange({ name: "map_pin", value: "" });
               }}
@@ -361,7 +361,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               value={node?.event?.id || ""}
             />
           ) : (
-            <ItemPreview
+            <EntityPreview
               clearAction={() => {
                 handleChange({ name: "event", value: "" });
               }}
