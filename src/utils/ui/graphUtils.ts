@@ -2,7 +2,7 @@ import { UseMutateFunction } from "@tanstack/react-query";
 import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
-import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
+import { CurveStyleType, EdgeType, GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
 import { getCharacterFullName, getImageURL } from "..";
 
 export function changeLockState(
@@ -11,11 +11,10 @@ export function changeLockState(
   updateManyNodesLockState: UseMutateFunction<
     any,
     unknown,
-    {
-      data: { [key: string]: any }[];
-    },
-    unknown
+    { data: { data: { [key: string]: any; id: string; parent_id: string } }[] },
+    { old: { data: GraphType } | undefined } | { old: {} }
   >,
+  parent_id: string,
 ) {
   const selected = boardContext.nodes(":selected");
   if (locked) {
@@ -23,7 +22,7 @@ export function changeLockState(
   } else {
     selected.unlock();
   }
-  const data = selected.map((node: any) => ({ id: node.data().id, is_locked: locked }));
+  const data = selected.map((node: any) => ({ data: { id: node.id() as string, parent_id, is_locked: locked as boolean } }));
   updateManyNodesLockState({ data });
 }
 

@@ -82,7 +82,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const { addOrUpdateNode } = useBatchUpdateNodePositions();
-  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
@@ -166,31 +166,14 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                 title: "New node",
                 icon: IconEnum.add,
                 onClick: () => {
-                  createNode(
-                    {
-                      data: {
-                        id: crypto.randomUUID(),
-                        parent_id: item_id as string,
-                        x: parseFloat(evt.position.x.toFixed(2)),
-                        y: parseFloat(evt.position.y.toFixed(2)),
-                      },
+                  createNode({
+                    data: {
+                      id: crypto.randomUUID(),
+                      parent_id: item_id as string,
+                      x: parseFloat(evt.position.x.toFixed(2)),
+                      y: parseFloat(evt.position.y.toFixed(2)),
                     },
-                    {
-                      onSuccess: (d: { data: { id: string } }) => {
-                        setNodes((prev) => [
-                          ...prev,
-                          {
-                            ...DefaultNode,
-                            id: d.data.id,
-                            x: parseFloat(evt.position.x.toFixed(2)),
-                            y: parseFloat(evt.position.y.toFixed(2)),
-                            label: "",
-                            parent_id: item_id as string,
-                          },
-                        ]);
-                      },
-                    },
-                  );
+                  });
                 },
               },
               {
@@ -274,7 +257,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                       {
                         title: locked ? "Unlock node" : "Lock node",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
-                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
+                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
                       {
                         title: "Center on node",
@@ -316,7 +299,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                       {
                         title: locked ? "Unlock nodes" : "Lock nodes",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
-                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes),
+                        onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
                       {
                         title: "Center on nodes",

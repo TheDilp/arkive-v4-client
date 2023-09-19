@@ -60,8 +60,8 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
   const setDialog = useSetAtom(dialogAtom);
 
-  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
-  const { mutate: updateManyEdges } = useUpdateManySubEntities("edges");
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
+  const { mutate: updateManyEdges } = useUpdateManySubEntities("edges", item_id as string);
   const { mutate: deleteManyNodes } = useDeleteMany("nodes");
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
@@ -87,14 +87,14 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         hasNoBackground
         icon={IconEnum.lock}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateManyNodes);
+          if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateManyNodes, item_id as string);
         }}
       />
       <Button
         hasNoBackground
         icon={IconEnum.unlock}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateManyNodes);
+          if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateManyNodes, item_id as string);
         }}
       />
       <Button
@@ -222,32 +222,16 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
               const edges = selected.edges();
 
               if (nodes?.length) {
-                const nodeUpdateData = { data: nodes.map((n) => ({ id: n.id(), background_color: value })) };
-                updateManyNodes(nodeUpdateData, {
-                  onSuccess: () => {
-                    const node_ids = nodes.map((n) => n.id());
-                    setNodes((prev) =>
-                      prev.map((node) => {
-                        if (node_ids.includes(node.id)) return { ...node, background_color: value };
-                        return node;
-                      }),
-                    );
-                  },
-                });
+                const nodeUpdateData = {
+                  data: nodes.map((n) => ({ data: { id: n.id(), parent_id: item_id as string, background_color: value } })),
+                };
+                updateManyNodes(nodeUpdateData, {});
               }
               if (edges?.length) {
-                const edgeUpdateData = { data: edges.map((n) => ({ id: n.id(), background_color: value })) };
-                updateManyEdges(edgeUpdateData, {
-                  onSuccess: () => {
-                    const edge_ids = edges.map((n) => n.id());
-                    setEdges((prev) =>
-                      prev.map((node) => {
-                        if (edge_ids.includes(node.id)) return { ...node, line_color: value };
-                        return node;
-                      }),
-                    );
-                  },
-                });
+                const edgeUpdateData = {
+                  data: edges.map((n) => ({ data: { id: n.id(), parent_id: item_id as string, background_color: value } })),
+                };
+                updateManyEdges(edgeUpdateData);
               }
 
               setPickerColor(value);
