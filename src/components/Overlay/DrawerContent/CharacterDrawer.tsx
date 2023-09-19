@@ -314,7 +314,7 @@ function RelationshipRow({
   return (
     <li className="flex items-center gap-x-2">
       <div className="flex flex-1 items-center gap-x-2">
-        <ItemPreview title={character_name} id={id} type="characters" image_id={portrait_id} />
+        <ItemPreview id={id} image_id={portrait_id} title={character_name} type="characters" />
         <span className="truncate whitespace-nowrap">is {current_character_first_name || "this character"}&apos;s </span>
       </div>
       <div className="max-w-[10rem] flex-1">
