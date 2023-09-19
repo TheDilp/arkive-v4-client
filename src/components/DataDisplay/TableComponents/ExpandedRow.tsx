@@ -7,12 +7,11 @@ import { tv } from "tailwind-variants";
 import { useGetEntities, useGetEntity, useSearch } from "../../../hooks";
 import { CharacterFieldType, CharacterType, DocumentType, SearchAllEntitiesByTagType, TableType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { getCharacterFullName, getDefaultEntityIcon, getSentenceCase, IconEnum } from "../../../utils";
+import { getCharacterFullName, getSentenceCase, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
-import { CharacterPreview } from "../CharacterPreview";
 import { ItemPreview } from "../ItemPreview";
 
 const ExpandedTableRowClasses = tv({
@@ -57,10 +56,11 @@ function ExpandedRowTagListWrapper({
       {type === "characters"
         ? data[type].map((item) => (
             <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/characters/${item.id}`}>
-              <CharacterPreview
-                character_name={getCharacterFullName(item.first_name, undefined, item?.last_name)}
+              <ItemPreview
                 id={item.id}
                 image_id={item.portrait_id}
+                title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
+                type="characters"
               />
             </Link>
           ))
@@ -71,7 +71,7 @@ function ExpandedRowTagListWrapper({
               key={item.id}
               className="hover:text-blue-400"
               to={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}>
-              <ItemPreview id={item.id} title={item.label} />
+              <ItemPreview id={item.id} title={item.label} type="graphs" />
             </Link>
           ))
         : null}
@@ -79,7 +79,7 @@ function ExpandedRowTagListWrapper({
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
             <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/${type}/${item.id}`}>
-              <ItemPreview icon={getDefaultEntityIcon(type === "boards" ? "graphs" : type)} id={item.id} title={item.title} />
+              <ItemPreview id={item.id} title={item.title} type={type === "boards" ? "graphs" : type} />
             </Link>
           ))
         : null}

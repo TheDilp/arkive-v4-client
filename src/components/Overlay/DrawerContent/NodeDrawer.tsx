@@ -21,7 +21,6 @@ import {
   Alert,
   Badge,
   Button,
-  CharacterPreview,
   ImagePreview,
   ImageSelect,
   Input,
@@ -273,35 +272,37 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
         </>
       ) : null}
       {selectedTab === 1 ? (
-        <div className="flex flex-col gap-y-4">
-          <div className="flex flex-col gap-y-2">
-            <span className="text-sm text-zinc-300">Represents character (optional)</span>
-            {!node?.character ? (
-              <Search
-                isAutocomplete
-                name="character.id"
-                onChange={({ value, label, image }) => {
-                  const [first_name, last_name] = (label || "").split(" ");
-                  handleChange({ name: "character", value: { id: value, first_name, last_name, portrait_id: image } });
-                }}
-                placeholder="Press enter to search characters"
-                searchEntity="characters"
-                value={node?.character?.id || ""}
-              />
-            ) : (
-              <CharacterPreview
-                character_name={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name || "")}
-                clearAction={() => {
-                  handleChange({ name: "character", value: "" });
-                }}
-                id={node?.character?.id}
-                image_id={node?.character?.portrait_id ?? undefined}
-              />
-            )}
-          </div>
+        <div className="flex flex-col gap-y-2">
+          {!node?.character ? (
+            <Search
+              isAutocomplete
+              label="Represents character (optional)"
+              name="character.id"
+              onChange={({ value, label, image }) => {
+                const [first_name, last_name] = (label || "").split(" ");
+                handleChange({ name: "character", value: { id: value, first_name, last_name, portrait_id: image } });
+              }}
+              placeholder="Press enter to search characters"
+              searchEntity="characters"
+              value={node?.character?.id || ""}
+            />
+          ) : (
+            <ItemPreview
+              clearAction={() => {
+                handleChange({ name: "character", value: "" });
+              }}
+              id={node?.character?.id}
+              image_id={node?.character?.portrait_id ?? undefined}
+              label="Represents character (optional)"
+              link={`/projects/${project_id}/characters/${node.character_id}`}
+              title={getCharacterFullName(node?.character?.first_name, "", node?.character?.last_name || "")}
+              type="characters"
+            />
+          )}
           {!node?.document ? (
             <Search
               isAutocomplete
+              label="Related document (optional)"
               name="document.id"
               onChange={({ value, label }) => {
                 handleChange({ name: "document", value: { id: value, title: label } });
@@ -317,12 +318,15 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               }}
               icon={IconEnum.document}
               id={node?.document?.id}
+              link={`/projects/${project_id}/documents/${node.document.id}`}
               title={node?.document?.title}
+              type="documents"
             />
           )}
           {!node?.map_pin ? (
             <Search
               isAutocomplete
+              label="Related location (optional)"
               name="map_pin.id"
               onChange={({ value, label }) => {
                 handleChange({ name: "map_pin", value: { id: value, title: label } });
@@ -338,12 +342,16 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               }}
               icon={IconEnum.map_pin}
               id={node?.map_pin?.id}
+              label="Related location (optional)"
+              link={`/projects/${project_id}/maps/${node.map_pin.parent_id}/${node.map_pin.id}`}
               title={node?.map_pin?.title || "Map pin has no title"}
+              type="map_pins"
             />
           )}
           {!node?.event ? (
             <Search
               isAutocomplete
+              label="Related event (optional)"
               name="event.id"
               onChange={({ value, label }) => {
                 handleChange({ name: "event", value: { id: value, title: label } });
@@ -359,7 +367,9 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               }}
               icon={IconEnum.event}
               id={node?.event?.id}
+              link={`/projects/${project_id}/calendars/${node.event.parent_id}/${node.event.id}`}
               title={node?.event?.title}
+              type="events"
             />
           )}
         </div>

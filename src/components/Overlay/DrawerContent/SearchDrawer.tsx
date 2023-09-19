@@ -4,11 +4,18 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { useSearch } from "../../../hooks";
-import { SearchableEntities, SearchAllEntitiesType, SearchResultType, TagType } from "../../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  SearchableEntities,
+  SearchAllEntitiesType,
+  SearchResultType,
+  TagType,
+} from "../../../types";
 import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
-import { CharacterPreview, ItemPreview } from "../../DataDisplay";
+import { ItemPreview } from "../../DataDisplay";
 import { Search, Select, Title } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Badge } from "../../Misc";
@@ -186,14 +193,11 @@ export function SearchDrawer() {
                               {"title" in result_item ? result_item.title : null}
 
                               {"first_name" in result_item ? (
-                                <CharacterPreview
-                                  character_name={getCharacterFullName(
-                                    result_item.first_name,
-                                    undefined,
-                                    result_item?.last_name,
-                                  )}
+                                <ItemPreview
                                   id={result_item.id}
                                   image_id={result_item?.portrait_id}
+                                  title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
+                                  type="characters"
                                 />
                               ) : null}
                               {"label" in result_item ? result_item.label : null}
@@ -218,9 +222,13 @@ export function SearchDrawer() {
                       "parent_id" in item ? item?.parent_id : undefined,
                     )}>
                     {searchCategory === "characters" ? (
-                      <CharacterPreview character_name={item.label} id={item.value} image_id={item?.image} />
+                      <ItemPreview id={item.value} image_id={item?.image} title={item.label} type="characters" />
                     ) : (
-                      <ItemPreview id={item.value} title={item.label} />
+                      <ItemPreview
+                        id={item.value}
+                        title={item.label}
+                        type={searchCategory as AvailableEntityType | AvailableSubEntityType}
+                      />
                     )}
                   </Link>
                 </li>

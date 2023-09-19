@@ -7,7 +7,7 @@ import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEn
 import { CharacterType, MapPinType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
-import { CharacterPreview, ImagePreview } from "../../DataDisplay";
+import { ImagePreview, ItemPreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
@@ -56,7 +56,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     { data: {} },
     { enabled: !!data?.id },
   );
-  const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins");
+  const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins", item_id as string);
   const { mutateAsync: updateMapPin } = useUpdateMapSubEntity<UpdateMapPinType>("map_pins", item_id as string);
   const queryClient = useQueryClient();
   const [character, setCharacter] = useState<Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id"> | null>(
@@ -105,11 +105,12 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             searchEntity="characters"
           />
           {character ? (
-            <CharacterPreview
-              character_name={getCharacterFullName(character.first_name, undefined, character?.last_name)}
+            <ItemPreview
               clearAction={() => setCharacter(null)}
               id={character.id}
               image_id={character.portrait_id}
+              title={getCharacterFullName(character.first_name, undefined, character?.last_name)}
+              type="characters"
             />
           ) : null}
           <div className="flex flex-nowrap justify-between">

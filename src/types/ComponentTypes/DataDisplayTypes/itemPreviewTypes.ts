@@ -6,7 +6,8 @@ export interface ItemPreviewType {
   icon?: string;
   link?: string;
   label?: string;
-  image_id?: string;
+  image_id?: string | null;
+  hasNoBackground?: boolean;
   clearAction?: (id: string) => void;
   type: AvailableEntityType | AvailableSubEntityType;
 }
