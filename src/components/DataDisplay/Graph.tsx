@@ -597,7 +597,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     }
     return () => {};
   }, [drawer]);
-  console.log(existingGraphData?.data?.nodes);
   return (
     <div
       className="relative flex h-[calc(100%)] w-full flex-1 justify-center"
