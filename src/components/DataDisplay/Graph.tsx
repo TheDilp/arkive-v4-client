@@ -221,11 +221,10 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
               data: { id, label },
               locked,
             } = evt.target._private;
-
             setContextMenu({
               event: evt.originalEvent,
               items:
-                selected.length === 1
+                selected.length <= 1
                   ? [
                       {
                         title: "Edit node",
