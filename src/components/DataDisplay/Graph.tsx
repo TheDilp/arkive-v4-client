@@ -281,15 +281,17 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                       {
                         title: "Edit multiple nodes",
                         icon: IconEnum.edit,
-                        onClick: () =>
+                        onClick: () => {
                           setDrawer((prev) => ({
                             ...prev,
                             title: "Edit nodes",
                             type: "many_nodes",
                             data: {
+                              ids: selected.map((el: any) => el.id()) as string[],
                               parent_id: item_id as string,
                             },
-                          })),
+                          }));
+                        },
                       },
                       {
                         title: locked ? "Unlock nodes" : "Lock nodes",
@@ -363,6 +365,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                               title: "Edit edges",
                               type: "many_edges",
                               data: {
+                                ids: selected.map((el: any) => el.id()) as string[],
                                 parent_id: item_id as string,
                               },
                             }));

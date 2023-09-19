@@ -61,7 +61,7 @@ export type DrawerAtomType = {
       data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
-  | { type: "many_nodes" | "many_edges"; data: { parent_id: string } }
+  | { type: "many_nodes" | "many_edges"; data: { ids: string[]; parent_id: string } }
   | { type: "random_table_options"; data: { parent_id: string } }
   | { type: "folder"; data: { id?: string; type: AvailableEntityType } }
   | { type: "map_pins"; data: { lat: number; lng: number } & Partial<MapPinType> }

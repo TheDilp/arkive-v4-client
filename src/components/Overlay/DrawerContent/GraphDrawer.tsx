@@ -36,7 +36,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
         tags: true,
       },
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
 
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>(

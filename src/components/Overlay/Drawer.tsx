@@ -14,9 +14,11 @@ import {
   DictionaryDrawer,
   DocumentDrawer,
   EdgeDrawer,
+  EditTags,
   EventDrawer,
   FieldTemplateDrawer,
   InsertEditorImageDrawer,
+  ManyNodesDrawer,
   MapDrawer,
   MapPinDrawer,
   MapPinManagementDrawer,
@@ -29,7 +31,6 @@ import {
   TagsDrawer,
   WordDrawer,
 } from "./DrawerContent";
-import { EditTags } from "./DrawerContent/EditTags";
 
 const DrawerClasses = tv({
   slots: {
@@ -134,6 +135,7 @@ export function Drawer() {
         {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
         {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
+        {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
         {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}

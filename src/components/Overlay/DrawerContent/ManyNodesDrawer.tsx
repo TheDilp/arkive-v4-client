@@ -4,11 +4,12 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
+import { useHandleChange, useUpdateManySubEntities } from "../../../hooks";
 import { NodeType } from "../../../types";
 import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
+  DefaultNode,
   GraphFontFamiliesEnum,
   GraphFontSizesEnum,
   NodeShapesEnum,
@@ -17,20 +18,7 @@ import {
 } from "../../../utils/enums/GraphEnums";
 import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { UpdateNodeSchema } from "../../../validation";
-import {
-  Alert,
-  Badge,
-  Button,
-  EntityPreview,
-  ImagePreview,
-  ImageSelect,
-  Input,
-  Search,
-  Select,
-  Skeleton,
-  Tabs,
-  Title,
-} from "../..";
+import { Alert, Badge, Button, EntityPreview, ImagePreview, ImageSelect, Input, Search, Select, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 const tabs = [
@@ -39,34 +27,34 @@ const tabs = [
   { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 
-type UpdateNodeType = { data: Partial<NodeType> };
-
 function UpdateGraphNodes({
   setNodes,
   changedData,
-  node,
   project_id,
   rest,
+  ids,
 }: {
   setNodes: (arg: SetStateAction<NodeType[]>) => void;
   changedData: Partial<NodeType>;
-  node: Partial<NodeType> & { parent_id: string };
   project_id: string;
   rest: Partial<NodeType>;
+  ids: string[];
 }) {
   setNodes((oldNodes) => {
     if (oldNodes) {
       const newNodes = [...oldNodes];
-      const idx = newNodes.findIndex((n) => n.id === node.id);
-      if (idx > -1) {
-        const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData };
 
-        set(newNodes, `[${idx}]`, {
-          ...alteredNodeData,
-          label: getNodeLabel(alteredNodeData as NodeType),
-          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
-        });
-        return newNodes;
+      for (let index = 0; index < ids.length; index += 1) {
+        const idx = newNodes.findIndex((n) => n.id === ids[index]);
+        if (idx > -1) {
+          const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData, id: newNodes[idx].id };
+
+          set(newNodes, `[${idx}]`, {
+            ...alteredNodeData,
+            label: getNodeLabel(alteredNodeData as NodeType),
+            background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+          });
+        }
       }
       return newNodes;
     }
@@ -74,61 +62,74 @@ function UpdateGraphNodes({
   });
 }
 
-export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }) {
+export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
-  const { data: existingNode, isFetching } = useGetSubEntity<NodeType>(
-    data?.id,
-    "nodes",
-    {
-      relations: { image: true, character: true, document: true, map_pin: true, event: true, tags: true },
-    },
-    {
-      enabled: !!data?.id,
-    },
-  );
+
   const setNodes = useSetAtom(nodesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateGraphSubEntity<
-    UpdateNodeType & {
-      relations?: {
-        tags?: { id: string }[];
-      };
-    }
-  >("nodes", data.parent_id);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateManySubEntities("nodes", data.parent_id, true);
 
-  const originalNode = existingNode?.data;
-  const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
-
+  const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>({ ...DefaultNode, parent_id: data.parent_id });
   const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
-
-  useEffect(() => {
-    if (existingNode?.data) {
-      setNode(existingNode?.data);
-    }
-  }, [existingNode?.data]);
-
   useEffect(() => {
     if (changedData) {
       const nodeToUpdate = { ...(changedData || {}), id: node.id };
       set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+      set(nodeToUpdate, "doc_id", node?.document?.id ?? null);
+      set(nodeToUpdate, "map_pin_id", node?.map_pin?.id ?? null);
+      set(nodeToUpdate, "event_id", node?.event?.id ?? null);
       set(nodeToUpdate, "image_id", node?.image?.id ?? null);
-
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { tags, ...rest } = nodeToUpdate;
-      UpdateGraphNodes({ project_id: project_id as string, rest, node, changedData, setNodes });
+      UpdateGraphNodes({ project_id: project_id as string, rest, changedData, setNodes, ids: data.ids });
     }
   }, [changedData]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  async function handleSave() {
+    if (changedData) {
+      const nodeToUpdate = { ...(changedData || {}), id: node.id };
+      set(nodeToUpdate, "character_id", node?.character?.id ?? null);
+      set(nodeToUpdate, "doc_id", node?.document?.id ?? null);
+      set(nodeToUpdate, "map_pin_id", node?.map_pin?.id ?? null);
+      set(nodeToUpdate, "event_id", node?.event?.id ?? null);
+      set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+      const { tags, ...rest } = nodeToUpdate;
+      const parsedData = UpdateNodeSchema.array().parse(data.ids.map((id) => ({ data: { ...rest, id }, relations: { tags } })));
+
+      await update(
+        { data: parsedData.map((i) => ({ ...i, data: { ...i.data, parent_id: data.parent_id } })) },
+        {
+          onSuccess: () => {
+            resetDrawerAtom();
+            resetChanges();
+          },
+        },
+      );
+    } else {
+      resetDrawerAtom();
+      createNotification({
+        variant: "info",
+        icon: IconEnum.info_circle,
+        title: "No data was changed.",
+        timer: 3,
+      });
+    }
+  }
 
   return (
     <div className="flex flex-col gap-y-2 overflow-auto font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {changedData ? (
+        <div className="sticky top-0 z-10">
+          <Alert label="You have unsaved changes." variant="warning" />
+        </div>
+      ) : null}
+
       {selectedTab === 0 ? (
         <>
           <Title isDrawerTitle label="Label" size="xl" />
@@ -188,7 +189,25 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             </div>
           </div>
           <Title isDrawerTitle label="Shape" size="xl" />
-
+          <div className="flex-1">
+            <span className="text-sm text-zinc-300">Node image (optional)</span>
+            {!node?.image ? (
+              <ImageSelect
+                isIconOnly
+                name="image"
+                onChange={({ name, label, value }) => handleChange({ name, value: { id: value, title: label } })}
+                type="images"
+                value={node?.image?.id ?? ""}
+              />
+            ) : (
+              <ImagePreview
+                clearAction={() => handleChange({ name: "image", value: null })}
+                id={node?.image?.id}
+                title={node?.image?.title}
+              />
+            )}
+            <span className="text-xs text-zinc-400">Setting an image manually overwrites images from relations.</span>
+          </div>
           <div className="flex w-full items-end justify-between">
             <div className="flex w-full items-end gap-x-2">
               <Select
@@ -209,23 +228,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
               </div>
             </div>
           </div>
-          {!node?.image ? (
-            <ImageSelect
-              helperText="Setting an image manually overwrites images from relations."
-              isIconOnly
-              label="Node image (optional)"
-              name="image"
-              onChange={({ name, label, value }) => handleChange({ name, value: { id: value, title: label } })}
-              type="images"
-              value={node?.image?.id ?? ""}
-            />
-          ) : (
-            <ImagePreview
-              clearAction={() => handleChange({ name: "image", value: null })}
-              id={node?.image?.id}
-              title={node?.image?.title}
-            />
-          )}
           <div className="flex flex-col items-center justify-between gap-2 lg:flex-row">
             <div className="w-full">
               <Input
@@ -434,15 +436,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 size: "md",
                 confirm: {
                   action: () => {
-                    if (originalNode) {
-                      UpdateGraphNodes({
-                        setNodes,
-                        changedData: {},
-                        node,
-                        project_id: project_id as string,
-                        rest: originalNode,
-                      });
-                    }
+                    //
                     resetChanges();
                     resetDrawerAtom();
                     resetDialogAtom();
@@ -463,37 +457,10 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           isDisabled={isUpdating}
           isLoading={isUpdating}
           label="Save"
-          onClick={async () => {
-            if (changedData) {
-              const nodeToUpdate = { ...(changedData || {}), id: node.id };
-              set(nodeToUpdate, "character_id", node?.character?.id ?? null);
-              set(nodeToUpdate, "doc_id", node?.document?.id ?? null);
-              set(nodeToUpdate, "map_pin_id", node?.map_pin?.id ?? null);
-              set(nodeToUpdate, "event_id", node?.event?.id ?? null);
-              set(nodeToUpdate, "image_id", node?.image?.id ?? null);
-
-              const { tags, ...rest } = nodeToUpdate;
-              const parsedData = UpdateNodeSchema.parse({ data: rest, relations: { tags } });
-              await update(parsedData, {
-                onSuccess: () => {
-                  resetDrawerAtom();
-                  resetChanges();
-                },
-              });
-            } else {
-              resetDrawerAtom();
-              createNotification({
-                variant: "info",
-                icon: IconEnum.info_circle,
-                title: "No data was changed.",
-                timer: 3,
-              });
-            }
-          }}
+          onClick={handleSave}
           variant="success"
         />
       </div>
-      {changedData ? <Alert label="You have unsaved changes." variant="warning" /> : null}
     </div>
   );
 }

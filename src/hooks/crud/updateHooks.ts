@@ -258,7 +258,7 @@ export function useUpdateSubEntity(
     },
   );
 }
-export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id: string) {
+export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id: string, isNotOptimisticUpdating?: boolean) {
   const queryClient = useQueryClient();
   const setNodes = useSetAtom(nodesAtom);
   const setEdges = useSetAtom(edgesAtom);
@@ -278,7 +278,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
       onMutate: (vars) => {
         const parentEntityType = getParentEntityType(type);
 
-        if (parentEntityType === "graphs") {
+        if (parentEntityType === "graphs" && !isNotOptimisticUpdating) {
           const old = queryClient.getQueryData<{ data: GraphType }>([parentEntityType, parent_id]);
           const newData = old
             ? {

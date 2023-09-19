@@ -358,7 +358,7 @@ export function Search({
           )}
         </div>
       </div>
-      {helperText ? <span className={helperTextClasses}>{helperText}</span> : null}
+      {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
         {(open || searchTerm || displayValue) && !isOptionsHidden && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
