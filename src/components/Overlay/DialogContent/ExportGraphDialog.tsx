@@ -2,13 +2,14 @@ import { useAtomValue } from "jotai";
 import { useState } from "react";
 
 import { BoardExportType } from "../../../types";
-import { BoardReferenceAtom, dialogAtom, IconEnum } from "../../../utils";
+import { BoardReferenceAtom, dialogAtom, IconEnum, useNotifications } from "../../../utils";
 import { exportBoardFunction } from "../../../utils/ui/graphUtils";
 import { Button, Select } from "../..";
 
 export function ExportGraphDialog() {
   const boardRef = useAtomValue(BoardReferenceAtom);
   const dialog = useAtomValue(dialogAtom);
+  const createNotification = useNotifications();
   const [exportSettings, setExportSettings] = useState<BoardExportType>({
     view: "current_view",
     background: "color",
@@ -35,7 +36,7 @@ export function ExportGraphDialog() {
           onChange={({ name, value }) => setExportSettings((prev) => ({ ...prev, [name]: value }))}
           options={[
             { label: "Color", value: "color" },
-            { label: "transparent", value: "transparent" },
+            { label: "Transparent", value: "transparent" },
           ]}
           value={exportSettings.background}
         />
@@ -67,9 +68,15 @@ export function ExportGraphDialog() {
                 dialog.data?.title,
               );
             } else {
-              // toaster("error", "There was an error exporting your board.");
+              createNotification({
+                title: "There was an error exporting your board.",
+                variant: "error",
+                icon: IconEnum.error,
+                timer: 3,
+              });
             }
           }}
+          variant="success"
         />
       </div>
     </div>

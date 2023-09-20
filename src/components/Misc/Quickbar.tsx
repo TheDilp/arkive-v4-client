@@ -37,7 +37,7 @@ function changeCurveStyle(
   setBoardState((prev) => ({ ...prev, curve_style }));
 }
 
-export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
+export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; graphTitle: string }) {
   const { item_id } = useParams();
   const createNotification = useNotifications();
 
@@ -179,6 +179,9 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
             position: "center",
             modal: true,
             type: "export_graph",
+            data: {
+              title: graphTitle,
+            },
           }));
         }}
         tooltip="Export graph"
