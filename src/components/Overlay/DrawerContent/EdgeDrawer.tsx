@@ -46,15 +46,18 @@ function UpdateGraphEdges({
   changedData: Partial<EdgeType>;
 }) {
   setEdges((oldEdges) => {
-    const idx = oldEdges?.findIndex((e) => e.id === edge.id);
     if (oldEdges) {
-      const newData = { ...edge, ...changedData };
-      const newEdges = [...oldEdges];
-      set(newEdges, `[${idx}]`, {
-        ...newEdges[idx],
-        ...newData,
-      });
-      return newEdges;
+      const idx = oldEdges?.findIndex((e) => e.id === edge.id);
+      if (idx > -1) {
+        const newData = { ...edge, ...changedData };
+        const newEdges = [...oldEdges];
+        set(newEdges, `[${idx}]`, {
+          ...newEdges[idx],
+          ...newData,
+        });
+        return newEdges;
+      }
+      return oldEdges;
     }
     return oldEdges;
   });
@@ -83,7 +86,7 @@ function ArrowForm({
           value={shape}
         />
         <Select label="Arrow fill" name={`${label}_arrow_fill`} onChange={onChange} options={EdgeArrowFillEnum} value={fill} />
-        <div className="w-fit self-end">
+        <div className="w-fit self-end pb-2">
           <ColorPicker name={`${label}_arrow_color`} onChange={onChange} value={color} />
         </div>
       </div>
@@ -115,7 +118,7 @@ export function EdgeDrawer({ data }: Props) {
   );
   const originalEdge = existingEdge?.data;
 
-  const { mutateAsync: update } = useUpdateGraphSubEntity<
+  const { mutateAsync: update, isLoading: isMutating } = useUpdateGraphSubEntity<
     UpdateEdgeType & {
       relations?: {
         tags?: { id: string }[];
@@ -132,6 +135,27 @@ export function EdgeDrawer({ data }: Props) {
       UpdateGraphEdges({ edge, changedData, setEdges });
     }
   }, [changedData]);
+
+  async function handleSave() {
+    if (changedData) {
+      const edgeToUpdate = { ...(changedData || {}), id: edge.id };
+      const { tags, ...rest } = edgeToUpdate;
+      const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
+      await update(parsedData, {
+        onSuccess: () => {
+          resetDrawerAtom();
+          resetChanges();
+        },
+      });
+    } else {
+      createNotification({
+        variant: "info",
+        icon: IconEnum.info_circle,
+        title: "No data was changed.",
+        timer: 3,
+      });
+    }
+  }
 
   if (isFetching) return <Skeleton type="drawer_form" />;
 
@@ -383,27 +407,10 @@ export function EdgeDrawer({ data }: Props) {
         />
         <Button
           icon={IconEnum.save}
+          isDisabled={isFetching || isMutating}
+          isLoading={isFetching || isMutating}
           label="Save"
-          onClick={async () => {
-            if (changedData) {
-              const edgeToUpdate = { ...(changedData || {}), id: edge.id };
-              const { tags, ...rest } = edgeToUpdate;
-              const parsedData = UpdateEdgeSchema.parse({ data: rest, relations: { tags } });
-              await update(parsedData, {
-                onSuccess: () => {
-                  resetDrawerAtom();
-                  resetChanges();
-                },
-              });
-            } else {
-              createNotification({
-                variant: "info",
-                icon: IconEnum.info_circle,
-                title: "No data was changed.",
-                timer: 3,
-              });
-            }
-          }}
+          onClick={handleSave}
           variant="success"
         />
       </div>
