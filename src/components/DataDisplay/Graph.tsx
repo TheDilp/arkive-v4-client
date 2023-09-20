@@ -326,11 +326,31 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                     ],
             });
           } else if (group === "edges") {
+            const {
+              data: { id },
+            } = evt.target._private;
             setContextMenu({
               event: evt.originalEvent,
               items:
                 selected.length <= 1
                   ? [
+                      {
+                        title: "Edit edge",
+                        icon: IconEnum.edit,
+                        onClick: () => {
+                          if (edges) {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: "Edit edge",
+                              type: "edges",
+                              data: {
+                                id,
+                                parent_id: item_id as string,
+                              },
+                            }));
+                          }
+                        },
+                      },
                       {
                         title: "Highlight connected nodes",
                         icon: IconEnum.board,
@@ -348,7 +368,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                         onClick: () => {
                           if (edges) {
                             const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
-                            deleteManyEdges({ data: ids.map((id) => ({ id })) });
+                            deleteManyEdges({ data: ids.map((i) => ({ id: i })) });
                             setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
                           }
                         },
@@ -378,7 +398,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
                         onClick: () => {
                           if (edges) {
                             const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
-                            deleteManyEdges({ data: ids.map((id) => ({ id })) });
+                            deleteManyEdges({ data: ids.map((i) => ({ id: i })) });
                             setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
                           }
                         },
@@ -578,15 +598,21 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   }, [boardState.grid, cyRef?.current?._cy]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
-      if (drawer.type === "edges" || drawer.type === "nodes") {
+      if (drawer.type === "edges" || drawer.type === "nodes" || drawer.type === "many_nodes" || drawer.type === "many_edges") {
         const selectedElements: Collection = cyRef.current._cy.elements(".selected");
-        if (selectedElements && selectedElements.length > 0) {
-          const t = selectedElements.map((el) => `#${el.id()}`).join(", ");
-          cyRef?.current?._cy.$(t).removeClass("selected");
+        if (drawer.type === "edges" || drawer.type === "nodes") {
+          if (selectedElements && selectedElements.length > 0) {
+            const t = selectedElements.map((el) => `#${el.id()}`).join(", ");
+            cyRef?.current?._cy.$(t).removeClass("selected");
+          }
+          const singleEl = cyRef.current._cy.getElementById(drawer?.data?.id);
+          if (singleEl) singleEl.addClass("selected");
+        } else if (drawer.type === "many_nodes" || drawer.type === "many_edges") {
+          if (selectedElements && selectedElements.length > 0) {
+            const t = selectedElements.map((el) => `#${el.id()}`).join(", ");
+            cyRef?.current?._cy.$(t).addClass("selected");
+          }
         }
-
-        const singleEl = cyRef.current._cy.getElementById(drawer?.data?.id);
-        if (singleEl) singleEl.addClass("selected");
       }
     }
     if (drawer.type === null) {
