@@ -43,7 +43,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-  const { data: existingGraphData } = useGetEntity<GraphType>(
+  const { data: existingGraphData, isFetching } = useGetEntity<GraphType>(
     item_id,
     "graphs",
     {
@@ -543,29 +543,32 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     };
   }, [cyRef?.current?._cy, item_id, boardState.add_nodes]);
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      // If there is a node id in the URL navigate to that node
-      if ((subitem_id || center_on) && cyRef?.current?._cy) {
-        const node = cyRef?.current?._cy.getElementById(subitem_id || center_on);
+    if (!isFetching) {
+      const timeout = setTimeout(() => {
+        // If there is a node id in the URL navigate to that node
+        if ((subitem_id || center_on) && cyRef?.current?._cy) {
+          const node = cyRef?.current?._cy.getElementById(subitem_id || center_on);
 
-        if (node)
+          if (node)
+            cyRef?.current?._cy?.animate({
+              center: {
+                eles: node,
+              },
+            });
+        } else if (!subitem_id && cyRef?.current?._cy) {
           cyRef?.current?._cy?.animate({
             center: {
-              eles: node,
+              eles: cyRef?.current?._cy?.nodes(),
             },
           });
-      } else if (!subitem_id && cyRef?.current?._cy) {
-        cyRef?.current?._cy?.animate({
-          center: {
-            eles: cyRef?.current?._cy?.nodes(),
-          },
-        });
-      }
-    }, 250);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [subitem_id, cyRef?.current?._cy]);
+        }
+      }, 250);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [subitem_id, cyRef?.current?._cy, isFetching]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
       if (ehRef?.current) {
