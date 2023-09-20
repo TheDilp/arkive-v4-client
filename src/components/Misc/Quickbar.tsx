@@ -4,16 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { useDeleteMany, useUpdateManySubEntities } from "../../hooks";
 import { CurveStyleType } from "../../types";
-import {
-  BoardReferenceAtom,
-  BoardStateAtom,
-  dialogAtom,
-  drawerAtom,
-  edgesAtom,
-  IconEnum,
-  nodesAtom,
-  useNotifications,
-} from "../../utils";
+import { BoardReferenceAtom, BoardStateAtom, dialogAtom, edgesAtom, IconEnum, nodesAtom, useNotifications } from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
 import { Button, Tooltip } from "..";
 import { ColorPicker } from "../Overlay/ColorPicker";
@@ -54,7 +45,6 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
 
   const boardRef = useAtomValue(BoardReferenceAtom);
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
-  const setDrawer = useSetAtom(drawerAtom);
   const setNodes = useSetAtom(nodesAtom);
   const setEdges = useSetAtom(edgesAtom);
 
@@ -81,6 +71,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         hasNoBackground
         icon={IconEnum.grid}
         onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })}
+        tooltip="Toggle grid"
         variant={boardState.grid ? "info" : "primary"}
       />
       <Button
@@ -89,6 +80,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         onClick={() => {
           if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateManyNodes, item_id as string);
         }}
+        tooltip="Lock selected"
       />
       <Button
         hasNoBackground
@@ -96,6 +88,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
         onClick={() => {
           if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateManyNodes, item_id as string);
         }}
+        tooltip="Unlock selected"
       />
       <Button
         hasNoBackground
@@ -140,9 +133,8 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
               );
           }
         }}
+        tooltip="Delete selected"
       />
-
-      {/* Drawmode button */}
 
       <Tooltip
         content={
@@ -189,26 +181,7 @@ export function Quickbar({ isViewOnly }: { isViewOnly: boolean }) {
             type: "export_graph",
           }));
         }}
-      />
-
-      {/* Edit selected button */}
-      <Button
-        hasNoBackground
-        icon={IconEnum.edit_many_nodes_edges}
-        onClick={() => {
-          if (!boardRef) return;
-          if (boardRef.elements(":selected")?.length > 0) {
-            setDrawer((prev) => ({
-              ...prev,
-              position: "right",
-              data: { parent_id: item_id as string },
-              type: "many_nodes",
-              show: true,
-            }));
-          } else {
-            createNotification({ icon: IconEnum.info_circle, variant: "info", title: "No elements are selected.", timer: 3 });
-          }
-        }}
+        tooltip="Export graph"
       />
 
       <div className="pl-2">
