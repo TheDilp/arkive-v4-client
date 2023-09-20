@@ -152,6 +152,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
       set(nodeToUpdate, "map_pin_id", node?.map_pin?.id ?? null);
       set(nodeToUpdate, "event_id", node?.event?.id ?? null);
       set(nodeToUpdate, "image_id", node?.image?.id ?? null);
+      set(nodeToUpdate, "tags", node?.tags ?? null);
       const { tags, ...rest } = nodeToUpdate;
       const parsedData = UpdateNodeSchema.array().parse(data.ids.map((id) => ({ data: { ...rest, id }, relations: { tags } })));
 
