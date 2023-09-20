@@ -17,7 +17,7 @@ function createColumns(
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
-      cell: (info) => info.getValue(),
+      cell: (info) => <div className="italic">{info.getValue()}</div>,
       meta: {
         sortable: true,
         filterOptions: NameFilters,
