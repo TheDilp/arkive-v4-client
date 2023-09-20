@@ -13,6 +13,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "edges") return IconEnum.edge;
   if (type === "random_tables") return IconEnum.random_table;
   if (type === "character_fields_templates") return IconEnum.additional_fields;
+  if (type === "events") return IconEnum.event;
   return IconEnum.error;
 }
 export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEntityType) {
@@ -27,7 +28,23 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
   if (type === "map_pins" || type === "map_layers") return "maps";
   if (type === "nodes" || type === "edges") return "graphs";
   if (type === "random_table_options") return "random_tables";
+  if (type === "events") return "calendars";
   if (type === "words") return "dictionaries";
 
   return null;
+}
+
+export function getEntityLinkType(type: AvailableEntityType | AvailableSubEntityType) {
+  if (
+    type === "nodes" ||
+    type === "edges" ||
+    type === "random_table_options" ||
+    type === "map_pins" ||
+    type === "map_layers" ||
+    type === "events" ||
+    type === "words"
+  )
+    return getParentEntityType(type);
+
+  return type;
 }

@@ -12,7 +12,14 @@ import {
   SearchResultType,
   TagType,
 } from "../../../types";
-import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
+import {
+  drawerAtom,
+  getCharacterFullName,
+  getEntityLinkType,
+  getSentenceCase,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
@@ -196,6 +203,7 @@ export function SearchDrawer() {
                                 <EntityPreview
                                   id={result_item.id}
                                   image_id={result_item?.portrait_id}
+                                  link={`/projects/${project_id}/characters/${result_item.id}`}
                                   title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
                                   type="characters"
                                 />
@@ -222,10 +230,19 @@ export function SearchDrawer() {
                       "parent_id" in item ? item?.parent_id : undefined,
                     )}>
                     {searchCategory === "characters" ? (
-                      <EntityPreview id={item.value} image_id={item?.image} title={item.label} type="characters" />
+                      <EntityPreview
+                        id={item.value}
+                        image_id={item?.image}
+                        link={`/projects/${project_id}/characters/${item.value}`}
+                        title={item.label}
+                        type="characters"
+                      />
                     ) : (
                       <EntityPreview
                         id={item.value}
+                        link={`/projects/${project_id}/${getEntityLinkType(
+                          searchCategory as AvailableEntityType | AvailableSubEntityType,
+                        )}/${item.value}`}
                         title={item.label}
                         type={searchCategory as AvailableEntityType | AvailableSubEntityType}
                       />

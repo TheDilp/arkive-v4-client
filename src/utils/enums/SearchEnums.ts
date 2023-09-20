@@ -9,6 +9,7 @@ export const SearchCategories: { label: string; value: SearchableEntities }[] = 
   { label: "Map pins", value: "map_pins" },
   { label: "Graphs", value: "boards" },
   { label: "Nodes", value: "nodes" },
+  { label: "Events", value: "events" },
   { label: "Images", value: "images" },
   { label: "Map images", value: "map_images" },
 ];
