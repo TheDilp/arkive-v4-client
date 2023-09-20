@@ -12,14 +12,7 @@ import {
   SearchResultType,
   TagType,
 } from "../../../types";
-import {
-  drawerAtom,
-  getCharacterFullName,
-  getEntityLinkType,
-  getSentenceCase,
-  IconEnum,
-  useNotifications,
-} from "../../../utils";
+import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
@@ -221,33 +214,32 @@ export function SearchDrawer() {
               }
               return (
                 <li key={item.value}>
-                  <Link
-                    className="transition-all hover:text-blue-400"
-                    to={getSearchLink(
-                      project_id as string,
-                      searchCategory || "",
-                      item.value,
-                      "parent_id" in item ? item?.parent_id : undefined,
-                    )}>
-                    {searchCategory === "characters" ? (
-                      <EntityPreview
-                        id={item.value}
-                        image_id={item?.image}
-                        link={`/projects/${project_id}/characters/${item.value}`}
-                        title={item.label}
-                        type="characters"
-                      />
-                    ) : (
-                      <EntityPreview
-                        id={item.value}
-                        link={`/projects/${project_id}/${getEntityLinkType(
-                          searchCategory as AvailableEntityType | AvailableSubEntityType,
-                        )}/${item.value}`}
-                        title={item.label}
-                        type={searchCategory as AvailableEntityType | AvailableSubEntityType}
-                      />
-                    )}
-                  </Link>
+                  {searchCategory === "characters" ? (
+                    <EntityPreview
+                      id={item.value}
+                      image_id={item?.image}
+                      link={getSearchLink(
+                        project_id as string,
+                        searchCategory || "",
+                        item.value,
+                        "parent_id" in item ? item?.parent_id : undefined,
+                      )}
+                      title={item.label}
+                      type="characters"
+                    />
+                  ) : (
+                    <EntityPreview
+                      id={item.value}
+                      link={getSearchLink(
+                        project_id as string,
+                        searchCategory || "",
+                        item.value,
+                        "parent_id" in item ? item?.parent_id : undefined,
+                      )}
+                      title={item.label}
+                      type={searchCategory as AvailableEntityType | AvailableSubEntityType}
+                    />
+                  )}
                 </li>
               );
             })
