@@ -26,6 +26,7 @@ export type AvailableEntityType =
 export type AvailableSubEntityType =
   | "alter_names"
   | "map_pins"
+  | "character_map_pins"
   | "map_layers"
   | "nodes"
   | "edges"

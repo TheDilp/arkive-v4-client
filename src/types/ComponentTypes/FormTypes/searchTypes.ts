@@ -12,7 +12,7 @@ export type SearchAllEntitiesType =
       },
       { name: "alter_names"; result: { id: string; parent_id: string; title: string }[] },
       {
-        name: "map_pins" | "character_map_pins";
+        name: "map_pins" | "character_map_pins" | "events";
         result: { id: string; title: string; parent_title: string; parent_id: string }[];
       },
       { name: "nodes" | "edges"; result: { id: string; label: string; parent_title: string; parent_id: string }[] },

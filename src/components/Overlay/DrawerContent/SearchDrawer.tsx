@@ -190,7 +190,21 @@ export function SearchDrawer() {
                                 title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
                                 type="characters"
                               />
-                            ) : null}
+                            ) : (
+                              <EntityPreview
+                                id={result_item.id}
+                                link={getSearchLink(
+                                  project_id as string,
+                                  name,
+                                  result_item.id,
+                                  "parent_id" in result_item ? result_item.parent_id : undefined,
+                                )}
+                                title={`${"title" in result_item ? result_item.title : ""} ${
+                                  "parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""
+                                }`}
+                                type={name === "boards" ? "graphs" : name}
+                              />
+                            )}
                           </li>
                         ))
                       ) : (
