@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { useSearch } from "../../../hooks";
 import {
@@ -182,27 +182,15 @@ export function SearchDrawer() {
                       {result?.length ? (
                         result.map((result_item) => (
                           <li key={result_item.id}>
-                            <Link
-                              className="transition-all hover:text-blue-400"
-                              to={getSearchLink(
-                                project_id as string,
-                                name,
-                                result_item.id,
-                                "parent_id" in result_item ? result_item?.parent_id : undefined,
-                              )}>
-                              {"title" in result_item ? result_item.title : null}
-
-                              {"first_name" in result_item ? (
-                                <EntityPreview
-                                  id={result_item.id}
-                                  image_id={result_item?.portrait_id}
-                                  link={`/projects/${project_id}/characters/${result_item.id}`}
-                                  title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
-                                  type="characters"
-                                />
-                              ) : null}
-                              {"label" in result_item ? result_item.label : null}
-                            </Link>
+                            {"first_name" in result_item ? (
+                              <EntityPreview
+                                id={result_item.id}
+                                image_id={result_item?.portrait_id}
+                                link={getSearchLink(project_id as string, name, result_item.id, undefined)}
+                                title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
+                                type="characters"
+                              />
+                            ) : null}
                           </li>
                         ))
                       ) : (
@@ -236,7 +224,7 @@ export function SearchDrawer() {
                         item.value,
                         "parent_id" in item ? item?.parent_id : undefined,
                       )}
-                      title={item.label}
+                      title={`${item.label} ${"parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""}`}
                       type={searchCategory as AvailableEntityType | AvailableSubEntityType}
                     />
                   )}

@@ -11,8 +11,11 @@ export type SearchAllEntitiesType =
         result: { id: string; title: string; icon?: string }[];
       },
       { name: "alter_names"; result: { id: string; parent_id: string; title: string }[] },
-      { name: "map_pins" | "character_map_pins"; result: { id: string; title: string; parent_id: string }[] },
-      { name: "nodes" | "edges"; result: { id: string; label: string; parent_id: string }[] },
+      {
+        name: "map_pins" | "character_map_pins";
+        result: { id: string; title: string; parent_title: string; parent_id: string }[];
+      },
+      { name: "nodes" | "edges"; result: { id: string; label: string; parent_title: string; parent_id: string }[] },
     ]
   | null;
 export type SearchAllEntitiesByTagType =
