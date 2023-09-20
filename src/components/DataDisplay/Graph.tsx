@@ -599,18 +599,34 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
   useEffect(() => {
     if (cyRef?.current?._cy) {
       if (drawer.type === "edges" || drawer.type === "nodes" || drawer.type === "many_nodes" || drawer.type === "many_edges") {
-        const selectedElements: Collection = cyRef.current._cy.elements(".selected");
+        const selectedElements: Collection = cyRef.current._cy.elements(":selected");
+        const selectedClassElements: Collection = cyRef.current._cy.elements(".selected");
+
         if (drawer.type === "edges" || drawer.type === "nodes") {
           if (selectedElements && selectedElements.length > 0) {
-            const t = selectedElements.map((el) => `#${el.id()}`).join(", ");
+            const t = selectedClassElements.map((el) => `#${el.id()}`).join(", ");
             cyRef?.current?._cy.$(t).removeClass("selected");
           }
           const singleEl = cyRef.current._cy.getElementById(drawer?.data?.id);
           if (singleEl) singleEl.addClass("selected");
         } else if (drawer.type === "many_nodes" || drawer.type === "many_edges") {
           if (selectedElements && selectedElements.length > 0) {
-            const t = selectedElements.map((el) => `#${el.id()}`).join(", ");
-            cyRef?.current?._cy.$(t).addClass("selected");
+            const t = selectedClassElements.map((el) => `#${el.id()}`).join(", ");
+            cyRef?.current?._cy.$(t).removeClass("selected");
+            if (drawer.type === "many_nodes") {
+              const toHighlight = selectedElements
+                .nodes()
+                .map((el) => `#${el.id()}`)
+                .join(", ");
+              cyRef?.current?._cy.$(toHighlight).addClass("selected");
+            }
+            if (drawer.type === "many_edges") {
+              const toHighlight = selectedElements
+                .edges()
+                .map((el) => `#${el.id()}`)
+                .join(", ");
+              cyRef?.current?._cy.$(toHighlight).addClass("selected");
+            }
           }
         }
       }
