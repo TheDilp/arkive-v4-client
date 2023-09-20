@@ -4,7 +4,7 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useHandleChange, useUpdateManySubEntities } from "../../../hooks";
+import { useGetEntities, useHandleChange, useUpdateManySubEntities } from "../../../hooks";
 import { NodeType } from "../../../types";
 import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
@@ -61,9 +61,63 @@ function UpdateGraphNodes({
     return oldNodes;
   });
 }
+function RestoreGraphNodes({
+  setNodes,
+  nodes,
+  project_id,
+}: {
+  setNodes: (arg: SetStateAction<NodeType[]>) => void;
+  nodes: NodeType[];
+  project_id: string;
+}) {
+  setNodes((oldNodes) => {
+    if (oldNodes) {
+      const newNodes = [...oldNodes];
+
+      for (let index = 0; index < nodes.length; index += 1) {
+        const idx = newNodes.findIndex((n) => n.id === nodes[index].id);
+        if (idx > -1) {
+          const alteredNodeData = { ...newNodes[idx], ...nodes[index] };
+          set(alteredNodeData, "character", nodes[index]?.character ?? null);
+          set(alteredNodeData, "document", nodes[index]?.document ?? null);
+          set(alteredNodeData, "map_pin", nodes[index]?.map_pin?.id ?? null);
+          set(alteredNodeData, "event", nodes[index]?.event?.id ?? null);
+          set(alteredNodeData, "image", nodes[index]?.image?.id ?? null);
+          set(newNodes, `[${idx}]`, {
+            ...alteredNodeData,
+            label: getNodeLabel(alteredNodeData as NodeType),
+            background_image: nodes[index].image ? getNodeImage(alteredNodeData as NodeType, project_id as string) : [],
+          });
+        }
+      }
+      return newNodes;
+    }
+    return oldNodes;
+  });
+}
 
 export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: string } }) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
+
+  const { data: existingNodes } = useGetEntities<NodeType>(
+    {
+      data: {
+        parent_id: item_id,
+      },
+      filters: {
+        and: [
+          {
+            field: "id",
+            operator: "in",
+            value: data.ids,
+          },
+        ],
+      },
+    },
+    "nodes",
+    { enabled: !!data.ids.length },
+  );
+
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
 
@@ -72,8 +126,8 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
   const resetDialogAtom = useResetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
+  const originalNodes = existingNodes?.data;
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateManySubEntities("nodes", data.parent_id, true);
-
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>({ ...DefaultNode, parent_id: data.parent_id });
   const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
   useEffect(() => {
@@ -436,7 +490,13 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
                 size: "md",
                 confirm: {
                   action: () => {
-                    //
+                    if (originalNodes) {
+                      RestoreGraphNodes({
+                        setNodes,
+                        nodes: originalNodes,
+                        project_id: project_id as string,
+                      });
+                    }
                     resetChanges();
                     resetDrawerAtom();
                     resetDialogAtom();
