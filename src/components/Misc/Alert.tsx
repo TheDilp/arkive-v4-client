@@ -24,7 +24,7 @@ const AlertClasses = tv({
   },
 });
 
-export default function Alert({ label, variant = "primary" }: AlertType) {
+export function Alert({ label, variant = "primary" }: AlertType) {
   const { base, label: labelClasses } = AlertClasses({ variant });
   return (
     <div className={base()} role="alert">

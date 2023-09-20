@@ -1,6 +1,6 @@
 import { useGetCharacterFamily } from "../../../hooks";
 import { Graph, Skeleton } from "../..";
-import Alert from "../../Misc/Alert";
+import { Alert } from "../../Misc/Alert";
 
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id);

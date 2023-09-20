@@ -1,3 +1,4 @@
+import { useIsMutating } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -5,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
 import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
+import { IndeterminateProgressBar } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { Card } from "./Card";
 
@@ -49,6 +51,7 @@ function DiceRoller() {
 
 export function Navbar() {
   const { project_id } = useParams();
+  const isMutating = useIsMutating();
 
   const navbarTitle = useAtomValue(navbarTitleAtom);
 
@@ -59,7 +62,8 @@ export function Navbar() {
   }
 
   return (
-    <div className="flex h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
+    <div className="flex  h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
+      {isMutating ? <IndeterminateProgressBar /> : null}
       <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-3xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>

@@ -36,7 +36,7 @@ import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
-import Alert from "../../Misc/Alert";
+import { Alert } from "../../Misc";
 
 type CharacterStateCharacterFieldsType = Record<string, CharacterFieldValueType[]>;
 

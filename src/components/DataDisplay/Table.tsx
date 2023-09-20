@@ -35,8 +35,7 @@ import {
   removeColumnFilter,
 } from "../../utils";
 import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
-import { Badge, Icon, Skeleton } from "../Misc";
-import Alert from "../Misc/Alert";
+import { Alert, Badge, Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
 
