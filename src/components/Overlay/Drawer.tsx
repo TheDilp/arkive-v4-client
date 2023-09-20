@@ -18,6 +18,7 @@ import {
   EventDrawer,
   FieldTemplateDrawer,
   InsertEditorImageDrawer,
+  ManyEdgesDrawer,
   ManyNodesDrawer,
   MapDrawer,
   MapPinDrawer,
@@ -137,6 +138,7 @@ export function Drawer() {
         {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
         {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
         {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
+        {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
         {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
         {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
