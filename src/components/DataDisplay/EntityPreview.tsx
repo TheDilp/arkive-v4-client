@@ -11,16 +11,16 @@ export function EntityPreview({ id, title, type, link, image_id, label, hasNoBac
     <div className="flex flex-col gap-y-2">
       {label ? <div className="block min-h-[20px] truncate text-sm text-zinc-300">{label}</div> : null}
       <Link
-        className={`flex items-center gap-x-2 rounded p-2 ${link ? "transition-all hover:text-blue-400" : "cursor-default"} ${
-          hasNoBackground ? "" : "bg-zinc-700"
-        }`}
+        className={`flex max-h-10 items-center gap-x-2 rounded p-2 ${
+          link ? "transition-all hover:text-blue-400" : "cursor-default"
+        } ${hasNoBackground ? "" : "bg-zinc-700"}`}
         to={link ?? "#"}>
-        {type !== "characters" ? (
+        {image_id ? (
+          <Avatar image={getImageURL(project_id as string, "images", image_id)} label={title} size="sm" />
+        ) : (
           <span>
             <Icon fontSize={20} icon={getDefaultEntityIcon(type)} />
           </span>
-        ) : (
-          <Avatar image={getImageURL(project_id as string, "images", image_id)} label={title} size="sm" />
         )}
         <span className="truncate">{title}</span>
         {clearAction ? (

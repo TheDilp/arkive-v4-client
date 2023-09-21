@@ -54,6 +54,7 @@ export type SearchableEntities =
   | "events"
   | "images"
   | "map_images"
+  | "words"
   | "tags";
 
 export type SearchableMentionEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "words";

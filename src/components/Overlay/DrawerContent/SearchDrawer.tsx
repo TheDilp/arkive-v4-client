@@ -182,13 +182,18 @@ export function SearchDrawer() {
                       {result?.length ? (
                         result.map((result_item) => (
                           <li key={result_item.id}>
-                            {"first_name" in result_item ? (
+                            {"first_name" in result_item && (name === "characters" || name === "nodes") ? (
                               <EntityPreview
                                 id={result_item.id}
                                 image_id={result_item?.portrait_id}
                                 link={getSearchLink(project_id as string, name, result_item.id, undefined)}
-                                title={getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
-                                type="characters"
+                                title={`${getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
+                                ${
+                                  "parent_title" in result_item && result_item?.parent_title
+                                    ? `(${result_item.parent_title})`
+                                    : ""
+                                }`}
+                                type={name}
                               />
                             ) : (
                               <EntityPreview
@@ -200,7 +205,11 @@ export function SearchDrawer() {
                                   "parent_id" in result_item ? result_item.parent_id : undefined,
                                 )}
                                 title={`${"title" in result_item ? result_item.title : ""} ${
-                                  "parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""
+                                  "label" in result_item ? result_item?.label || "(No label)" : ""
+                                } ${
+                                  "parent_title" in result_item && result_item?.parent_title
+                                    ? `(${result_item.parent_title})`
+                                    : ""
                                 }`}
                                 type={name === "boards" ? "graphs" : name}
                               />
@@ -232,6 +241,7 @@ export function SearchDrawer() {
                   ) : (
                     <EntityPreview
                       id={item.value}
+                      image_id={item.image}
                       link={getSearchLink(
                         project_id as string,
                         searchCategory || "",
@@ -239,7 +249,11 @@ export function SearchDrawer() {
                         "parent_id" in item ? item?.parent_id : undefined,
                       )}
                       title={`${item.label} ${"parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""}`}
-                      type={searchCategory as AvailableEntityType | AvailableSubEntityType}
+                      type={
+                        searchCategory === "boards"
+                          ? "graphs"
+                          : (searchCategory as AvailableEntityType | AvailableSubEntityType)
+                      }
                     />
                   )}
                 </li>

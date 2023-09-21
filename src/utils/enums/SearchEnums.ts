@@ -11,6 +11,7 @@ export const SearchCategories: { label: string; value: SearchableEntities }[] = 
   { label: "Nodes", value: "nodes" },
   { label: "Edges", value: "edges" },
   { label: "Events", value: "events" },
+  { label: "Words", value: "words" },
   // { label: "Images", value: "images" },
   // { label: "Map images", value: "map_images" },
 ];
