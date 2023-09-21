@@ -129,7 +129,7 @@ export function CalendarView() {
   if (isFetchingCalendar || isFetchingEvent) return <Skeleton type="calendar_view" />;
 
   return (
-    <div className="flex h-[calc(100%-6rem)] flex-col">
+    <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         {view === "calendar" ? (
           <>
@@ -207,7 +207,7 @@ export function CalendarView() {
           {existingCalendar?.data?.days?.map((day) => (
             <div
               key={day}
-              className="group col-span-1 h-min border-b border-r border-zinc-700 px-2 text-white"
+              className="group sticky top-0 col-span-1 h-min border-b border-r border-zinc-700 bg-black px-2 text-white"
               onKeyDown={() => {}}
               role="button"
               tabIndex={-1}>
