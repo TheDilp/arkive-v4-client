@@ -51,7 +51,7 @@ const DialogClasses = tv({
     isImageView: {
       true: {
         container: "cursor-pointer",
-        base: "bg-transparent border-none",
+        base: "bg-blue-300 border-none",
       },
     },
     isOverlay: {
@@ -83,7 +83,7 @@ export function Dialog() {
         <div className="absolute right-4">
           <Button hasNoBackground icon={IconEnum.close} iconSize={48} isIconOnly onClick={resetDialogAtom} />
         </div>
-        <div className={base()}>
+        <div className={base()} onClick={resetDialogAtom}>
           <ImageViewDialog data={dialog?.data} />
         </div>
       </div>
