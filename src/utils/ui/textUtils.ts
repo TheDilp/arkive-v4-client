@@ -1,4 +1,4 @@
-import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AssetType, AvailableEntityType, AvailableSubEntityType } from "../../types";
 
 export function getFirstLetters(sentence: string): string {
   const words = sentence.split(" ");
@@ -37,7 +37,7 @@ export function getSentenceCase(field: string) {
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 
-export function getSingularEntityType(type: AvailableEntityType | AvailableSubEntityType) {
+export function getSingularEntityType(type: AvailableEntityType | AvailableSubEntityType | AssetType) {
   if (type === "alter_names") return "alter name";
   if (type === "character_fields") return "character field";
   if (type === "character_fields_templates") return "character field template";

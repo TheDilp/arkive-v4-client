@@ -1,5 +1,8 @@
+export * from "./AssetView";
+export * from "./CalendarView";
 export * from "./CharacterProfileView";
 export * from "./CharactersView";
+export * from "./DictionaryView";
 export * from "./DocumentView";
 export * from "./EntitiesView";
 export * from "./FieldTemplates";
@@ -7,3 +10,4 @@ export * from "./FolderView";
 export * from "./MapView";
 export * from "./RandomTableView";
 export * from "./Tags";
+export * from "./TimelineView";

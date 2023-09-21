@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 
-import { AssetType, SelectOptionType } from "../../types";
+import { AssetType, RequestBodyType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
-import { baseURLS, dialogAtom, FetchFunction, IconEnum, useNotifications } from "../../utils";
+import { baseURLS, dialogAtom, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();
@@ -42,15 +42,64 @@ export function useUploadAsset(type: AssetType, project_id: string) {
 export function useGetImages(
   project_id: string,
   type: AssetType,
-  options?: UseQueryOptions<{ data: ImageType[] }, any, SelectOptionType[]>,
+  body: RequestBodyType,
+  options?: UseQueryOptions<{ data: ImageType[] }, any, { data: ImageType[] }>,
 ) {
-  return useQuery<{ data: ImageType[] }, any, SelectOptionType[]>(
-    [project_id, type],
-    async () => FetchFunction({ method: "GET", url: `${baseURLS.baseServer}/assets/${project_id}/${type}` }),
+  return useQuery<{ data: ImageType[] }, any, { data: ImageType[] }>(
+    ["allEntities", project_id, type, body?.filters, body?.pagination, body?.orderBy],
+    async () =>
+      FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/assets/${project_id}/${type}` }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
       select: options?.select,
+    },
+  );
+}
+
+export function useUpdateImage<InsertType extends { data: { title: string } }>(
+  id: string,
+  project_id: string | undefined,
+  type: AssetType,
+) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/assets/update/${id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
     },
   );
 }

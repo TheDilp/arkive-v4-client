@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 
-import { AllAvailableEntities, NotificationType } from "../../types";
+import { AllAvailableEntities, AssetType, NotificationType } from "../../types";
 import { notificationsAtom } from "../atoms";
 import { capitalizeFirstLetter, getSingularEntityType } from "./textUtils";
 
@@ -16,7 +16,10 @@ export function removeNotification(setNotificationAtom: any, id: string) {
   setNotificationAtom((prev: NotificationType[]) => prev.filter((n) => n.id !== id));
 }
 
-export function getEntityCRUDNotification(type: AllAvailableEntities, action_type: "create" | "update" | "archive" | "delete") {
+export function getEntityCRUDNotification(
+  type: AllAvailableEntities | AssetType,
+  action_type: "create" | "update" | "archive" | "delete",
+) {
   let action = "";
   if (action_type === "create") {
     action = "created";
