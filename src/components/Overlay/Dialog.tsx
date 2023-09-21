@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { tv } from "tailwind-variants";
@@ -48,6 +50,7 @@ const DialogClasses = tv({
     },
     isImageView: {
       true: {
+        container: "cursor-pointer",
         base: "bg-transparent border-none",
       },
     },
@@ -76,7 +79,7 @@ export function Dialog() {
   const resetDialogAtom = useResetAtom(dialogAtom);
   if (dialog?.type === "image_view")
     return (
-      <div className={container()}>
+      <div className={container()} onClick={resetDialogAtom}>
         <div className="absolute right-4">
           <Button hasNoBackground icon={IconEnum.close} iconSize={48} isIconOnly onClick={resetDialogAtom} />
         </div>
