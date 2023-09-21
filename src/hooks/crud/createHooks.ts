@@ -20,9 +20,7 @@ export function useCreateProject<InsertType>() {
     async (newItemValues: InsertType) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/projects/create`,
-        body: JSON.stringify({
-          data: newItemValues,
-        }),
+        body: JSON.stringify(newItemValues),
         method: "POST",
       });
     },
