@@ -1,9 +1,9 @@
 import { useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
 import { TimelineView } from "./TimelineView";
@@ -49,7 +49,7 @@ export default function DayNumber({
 }
 
 export function CalendarView() {
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
@@ -97,6 +97,12 @@ export function CalendarView() {
       queryKeyOverwrite: queryKey,
     },
   );
+  const { data: subitemEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
+    subitem_id,
+    "events",
+    { data: { parent_id: item_id } },
+    { enabled: !!subitem_id },
+  );
   useChangeNavbarTitle(`The Arkive | Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
   useEffect(() => {
@@ -110,10 +116,18 @@ export function CalendarView() {
     setQueryKey(["allEntities", project_id, "events", item_id, view, view === "calendar" ? date : null]);
   }, [view]);
 
+  useLayoutEffect(() => {
+    if (subitem_id && subitemEvent?.data) {
+      if (date.year !== subitemEvent?.data?.start_year || date.month !== subitemEvent?.data?.start_month)
+        setDate({ year: subitemEvent?.data?.start_year, month: subitemEvent?.data?.start_month });
+    }
+    console.log(date, subitemEvent?.data);
+  }, [subitem_id, subitemEvent]);
+
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
-  if (isFetchingCalendar) return <Skeleton type="calendar_view" />;
+  if (isFetchingCalendar || isFetchingEvent) return <Skeleton type="calendar_view" />;
 
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col">
