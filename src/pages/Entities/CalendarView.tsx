@@ -121,7 +121,6 @@ export function CalendarView() {
       if (date.year !== subitemEvent?.data?.start_year || date.month !== subitemEvent?.data?.start_month)
         setDate({ year: subitemEvent?.data?.start_year, month: subitemEvent?.data?.start_month });
     }
-    console.log(date, subitemEvent?.data);
   }, [subitem_id, subitemEvent]);
 
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
