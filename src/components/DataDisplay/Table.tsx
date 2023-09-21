@@ -57,9 +57,8 @@ const TableClasses = tv({
     bodyContainer: "min-w-full content-start overflow-x-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col w-full max-h-full lg:max-h-full bg-zinc-950 border-x border-t overflow-y-auto border-zinc-600",
     rowContainer: "flex flex-col",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato hover:bg-zinc-900",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
-    selectedRow: "bg-blue-400 hover:bg-blue-300",
     contentWrapper: "block truncate",
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
@@ -442,7 +441,6 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
     rowContainer,
     row: rowClasses,
     hasLinkRow,
-    selectedRow,
     contentWrapper,
     content: contentClasses,
     centeredContent,
@@ -631,8 +629,8 @@ export function Table({ columns, data, config, isLoading, pagination, dispatch, 
                       <div
                         className={`${rowClasses()} ${
                           config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                            ? selectedRow()
-                            : ""
+                            ? "bg-blue-400 hover:bg-blue-300"
+                            : "hover:bg-zinc-800"
                         }
                         ${getLink ? hasLinkRow() : ""}
                         `}>
