@@ -14,6 +14,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "random_tables") return IconEnum.random_table;
   if (type === "character_fields_templates") return IconEnum.additional_fields;
   if (type === "events") return IconEnum.event;
+
   return IconEnum.error;
 }
 export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEntityType) {

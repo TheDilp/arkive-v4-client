@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAddToEntity } from "../../../hooks";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
@@ -18,6 +18,7 @@ type Props = {
 
 export function CharacterAddDrawer({ data }: Props) {
   const { project_id } = useParams();
+  const createNotification = useNotifications();
   const [items, setItems] = useState<{ label: string; value: string; color?: string }[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
@@ -29,6 +30,16 @@ export function CharacterAddDrawer({ data }: Props) {
       <Search
         name="items"
         onChange={async ({ label, value, color }) => {
+          if (items.some((i) => i.value === value)) {
+            createNotification({
+              title: "Cannot add same image more than once.",
+              variant: "warning",
+              timer: 3,
+              icon: IconEnum.warning,
+            });
+            return;
+          }
+
           if (label && value) setItems((prev) => (prev || []).concat({ label, value, color }));
         }}
         placeholder={`Press enter to search and add ${data?.type}.`}
@@ -48,7 +59,9 @@ export function CharacterAddDrawer({ data }: Props) {
             clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
             icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
             id={i.value}
+            image_id={i.value}
             title={i.label}
+            type={data?.type}
           />
         ))
       )}

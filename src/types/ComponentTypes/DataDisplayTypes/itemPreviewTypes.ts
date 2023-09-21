@@ -9,5 +9,5 @@ export interface ItemPreviewType {
   image_id?: string | null;
   hasNoBackground?: boolean;
   clearAction?: (id: string) => void;
-  type: AvailableEntityType | AvailableSubEntityType;
+  type: AvailableEntityType | AvailableSubEntityType | "images";
 }

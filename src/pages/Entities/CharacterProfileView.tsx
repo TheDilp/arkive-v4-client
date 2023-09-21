@@ -48,7 +48,6 @@ const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
   { id: "2", label: "Relationships", icon: IconEnum.family_tree },
   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "4", label: "Assets", icon: IconEnum.image },
 ];
 
 const fieldSizeClass = tv({
@@ -331,6 +330,16 @@ export function CharacterProfileView() {
       }));
     }
   }
+  function openAddImageDrawer() {
+    if (existingCharacter?.data?.id) {
+      setDrawer((prev) => ({
+        ...prev,
+        type: "character_add",
+        title: "Add images",
+        data: { id: existingCharacter?.data?.id, type: "images" },
+      }));
+    }
+  }
   function openEditTagDrawer() {
     if (existingCharacter?.data?.id) {
       setDrawer((prev) => ({
@@ -453,6 +462,37 @@ export function CharacterProfileView() {
                       </div>
                     )}
                   </div>
+                </Collapsible>
+                <Collapsible
+                  actions={[
+                    {
+                      icon: IconEnum.add,
+                      tooltip: "Add assets",
+                      onClick: openAddImageDrawer,
+                    },
+                  ]}
+                  icon={IconEnum.image}
+                  initialOpen={false}
+                  label="Assets">
+                  {existingCharacter?.data?.images?.length ? (
+                    <div className="mt-2 animate-in fade-in fill-mode-both">
+                      <Table
+                        columns={documentsTableColumns}
+                        config={{
+                          expandable: true,
+                          hasNoHeaderGap: true,
+                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
+                        }}
+                        data={existingCharacter?.data?.documents || []}
+                        dispatch={dispatch}
+                        type="documents"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  )}
                 </Collapsible>
 
                 <Collapsible

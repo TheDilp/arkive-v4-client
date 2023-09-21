@@ -15,7 +15,7 @@ export function EntityPreview({ id, title, type, link, image_id, label, hasNoBac
           link ? "transition-all hover:text-blue-400" : "cursor-default"
         } ${hasNoBackground ? "" : "bg-zinc-700"}`}
         to={link ?? "#"}>
-        {image_id ? (
+        {image_id || type === "images" ? (
           <Avatar image={getImageURL(project_id as string, "images", image_id)} label={title} size="sm" />
         ) : (
           <span>
