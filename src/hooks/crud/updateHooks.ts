@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import omit from "lodash.omit";
 
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
@@ -68,11 +67,26 @@ export function useUpdateEntity<
           if (type === "documents") {
             queryClient.setQueryData<{ data: DocumentType }>(["documents", vars.data.id, "content"], (old) =>
               //! Omit -> never allow document content to be changed through query client
-              old ? { ...old, data: { ...old.data, ...omit(vars.data, ["content"]) } } : old,
+
+              {
+                return old
+                  ? {
+                      ...old,
+                      data: {
+                        ...old.data,
+                        ...vars.data,
+                        content:
+                          "content" in vars.data && vars.data?.content
+                            ? JSON.parse(vars.data.content as string)
+                            : old.data.content,
+                      },
+                    }
+                  : old;
+              },
             );
           }
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
-          if (vars.data.id) queryClient.invalidateQueries([type, vars.data.id]);
+          if (vars.data.id && type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
 
           createNotification({
             title: getEntityCRUDNotification(type, "update"),

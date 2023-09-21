@@ -31,7 +31,6 @@ export function DocumentView({ editable }: { editable: boolean }) {
     item_id as string,
     "documents",
     {
-      data: {},
       fields: ["id", "title", "content", "dice_color"],
       relations: {
         parents: true,
@@ -160,7 +159,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
             handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}>
         <div
-          className="relative flex h-[calc(95%)] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]"
+          className="relative flex h-[calc(95%)] max-h-[92%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]"
           id="editor">
           <Menubar />
           <div

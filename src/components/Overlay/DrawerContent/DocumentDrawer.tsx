@@ -9,7 +9,7 @@ import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation"
 import { ImageSelect } from "../../Complex";
 import { Button, Input, Search } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge } from "../../Misc";
+import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 
 function isSaveDisabled(document: Partial<DocumentType>) {
@@ -39,7 +39,7 @@ export function DocumentDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
-  const { data: existingDocument } = useGetEntity<DocumentType>(
+  const { data: existingDocument, isFetching } = useGetEntity<DocumentType>(
     data?.id,
     "documents",
     {
@@ -74,6 +74,8 @@ export function DocumentDrawer({ data }: Props) {
   useLayoutEffect(() => {
     if (existingDocument?.data) setDocument(existingDocument?.data);
   }, [existingDocument]);
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <>
