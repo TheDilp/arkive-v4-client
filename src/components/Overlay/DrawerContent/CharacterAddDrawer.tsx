@@ -28,6 +28,7 @@ export function CharacterAddDrawer({ data }: Props) {
   return (
     <div className="flex flex-col gap-y-2">
       <Search
+        isMultiple
         name="items"
         onChange={async ({ label, value, color }) => {
           if (items.some((i) => i.value === value)) {
@@ -44,6 +45,7 @@ export function CharacterAddDrawer({ data }: Props) {
         }}
         placeholder={`Press enter to search and add ${data?.type}.`}
         searchEntity={data?.type}
+        value={items.map((i) => i.value)}
       />
       {data?.type === "tags" ? (
         <div className="flex flex-wrap">

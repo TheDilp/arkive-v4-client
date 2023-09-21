@@ -101,7 +101,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       </div>
     );
   return (
-    <div className="h-[90%] w-full max-w-[95vw] lg:h-full">
+    <div className="h-full w-full max-w-[95vw] lg:h-full">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification
@@ -159,7 +159,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
             handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}>
         <div
-          className="relative flex h-[calc(95%)] max-h-[92%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0 lg:h-[calc(100%-2rem)]"
+          className="relative flex h-full max-h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
           <Menubar />
           <div
