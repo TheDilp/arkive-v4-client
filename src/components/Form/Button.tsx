@@ -31,6 +31,9 @@ const ButtonClasses = tv({
     size: {
       sm: "h-8 text-sm",
       md: "text-base",
+      lg: "text-lg",
+      xl: "text-xl",
+      "2xl": "text-2xl",
     },
     isDisabled: {
       true: "bg-zinc-300 text-zinc-100 cursor-not-allowed",

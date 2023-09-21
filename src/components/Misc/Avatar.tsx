@@ -1,13 +1,16 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import { useSetAtom } from "jotai";
 import { tv } from "tailwind-variants";
 
 import { AvatarType } from "../../types";
-import { getFirstLetters } from "../../utils";
+import { dialogAtom, getFirstLetters } from "../../utils";
 import { Tooltip } from "../Overlay/Tooltip";
 
 const AvatarClasses = tv({
   slots: {
-    base: "relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-600 shadow ",
-    label: "h-full w-full object-cover",
+    base: "relative group inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-600 shadow ",
+    image: "h-full w-full object-cover",
     text: "font-lato font-bold text-white",
   },
   variants: {
@@ -31,6 +34,11 @@ const AvatarClasses = tv({
         base: "w-24 h-24 min-w-[6rem] min-h-[6rem] text-[2.5rem]",
       },
     },
+    hasShowImage: {
+      true: {
+        image: "cursor-pointer hover:scale-105 transition-all",
+      },
+    },
     isBordered: {
       true: {
         base: "border border-zinc-400",
@@ -46,15 +54,25 @@ export function Avatar({
   isTooltipDisabled,
   initials,
   isBordered,
+  hasShowImage = false,
   tooltipAllowedPlacements = [],
   size = "md",
 }: AvatarType) {
-  const { base, label: labelClasses, text } = AvatarClasses({ isBordered, size });
+  const setDialog = useSetAtom(dialogAtom);
+  const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage });
   return (
     <Tooltip allowedPlacements={tooltipAllowedPlacements} content={label || ""} isDisabled={!label || isTooltipDisabled}>
       <div className={base()}>
         {image ? (
-          <img alt={label} className={labelClasses()} loading={imageLoading} src={image} />
+          <img
+            alt={label}
+            className={imageClasses()}
+            loading={imageLoading}
+            onClick={() => {
+              if (hasShowImage) setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
+            }}
+            src={image}
+          />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>
         )}

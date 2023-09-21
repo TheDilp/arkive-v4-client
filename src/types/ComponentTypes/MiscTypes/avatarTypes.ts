@@ -9,6 +9,7 @@ export interface AvatarType {
   isTooltipDisabled?: boolean;
   tooltipAllowedPlacements?: PositionType;
   isBordered?: boolean;
+  hasShowImage?: boolean;
   shape?: AvatarShape;
   size?: Size;
 }

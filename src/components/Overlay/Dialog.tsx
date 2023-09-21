@@ -4,7 +4,7 @@ import { tv } from "tailwind-variants";
 
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
-import { DeleteEntityDialog, ExportGraphDialog, FamilyTreeDialog, ImageUploadDialog } from "./DialogContent";
+import { DeleteEntityDialog, ExportGraphDialog, FamilyTreeDialog, ImageUploadDialog, ImageViewDialog } from "./DialogContent";
 
 const DialogClasses = tv({
   slots: {
@@ -46,6 +46,11 @@ const DialogClasses = tv({
         imagesList: "h-[15rem]",
       },
     },
+    isImageView: {
+      true: {
+        base: "bg-transparent border-none",
+      },
+    },
     isOverlay: {
       true: {
         container: "w-screen h-screen lg:w-screen bg-black top-0 left-0 translate-x-0 translate-y-0 bg-opacity-80",
@@ -64,10 +69,22 @@ export function Dialog() {
 
   const { base, container, title, titleContainer } = DialogClasses({
     position: dialog?.position || "center",
-    isOverlay: dialog?.isOverlay,
+    isOverlay: dialog?.type === "image_view" || dialog?.isOverlay,
     size: dialog?.size || "md",
+    isImageView: dialog?.type === "image_view",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
+  if (dialog?.type === "image_view")
+    return (
+      <div className={container()}>
+        <div className="absolute right-4">
+          <Button hasNoBackground icon={IconEnum.close} iconSize={48} isIconOnly onClick={resetDialogAtom} />
+        </div>
+        <div className={base()}>
+          <ImageViewDialog data={dialog?.data} />
+        </div>
+      </div>
+    );
 
   if (!dialog?.title) return null;
   return (

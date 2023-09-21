@@ -351,6 +351,7 @@ export function CharacterProfileView() {
       ) : (
         <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden overflow-y-auto rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
           <Avatar
+            hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
             isTooltipDisabled
             label={getCharacterFullName(
