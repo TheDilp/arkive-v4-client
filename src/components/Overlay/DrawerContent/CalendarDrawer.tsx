@@ -9,7 +9,7 @@ import { drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { Button, Input, TagInput } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
-import { Icon } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 
 type Props = {
   data: { id?: string };
@@ -167,11 +167,11 @@ export function CalendarDrawer({ data }: Props) {
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
-  const { data: existingCalendar } = useGetEntity<CalendarType>(
+  const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
     data?.id,
     "calendars",
-    { data: {}, relations: { months: true, tags: true } },
-    { enabled: !!data?.id },
+    { relations: { months: true, tags: true } },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
 
   const { handleChange } = useHandleChange({ data: calendar, setData: setCalendar });
@@ -207,6 +207,8 @@ export function CalendarDrawer({ data }: Props) {
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
     }
   }
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 overflow-y-auto">

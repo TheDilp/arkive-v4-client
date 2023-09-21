@@ -67,11 +67,12 @@ export function useUpdateEntity<
           // if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
           if (type === "documents") {
             queryClient.setQueryData<{ data: DocumentType }>(["documents", vars.data.id, "content"], (old) =>
-              //! Omit -> never allow content to be changed through query client
+              //! Omit -> never allow document content to be changed through query client
               old ? { ...old, data: { ...old.data, ...omit(vars.data, ["content"]) } } : old,
             );
           }
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
+          if (vars.data.id) queryClient.invalidateQueries([type, vars.data.id]);
 
           createNotification({
             title: getEntityCRUDNotification(type, "update"),
