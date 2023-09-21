@@ -472,7 +472,7 @@ export function CharacterProfileView() {
                   initialOpen={false}
                   label="Assets">
                   {existingCharacter?.data?.images?.length ? (
-                    <div className="mt-2 px-4 animate-in fade-in fill-mode-both">
+                    <div className="mt-2 animate-in fade-in fill-mode-both">
                       <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
                     </div>
                   ) : (
