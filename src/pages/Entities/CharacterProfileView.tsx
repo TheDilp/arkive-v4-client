@@ -18,6 +18,7 @@ import {
   Tabs,
   Title,
 } from "../../components";
+import { Gallery } from "../../components/DataDisplay/Gallery";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import {
   CharacterFieldTemplateType,
@@ -269,8 +270,7 @@ export function CharacterProfileView() {
     item_id,
     "characters",
     {
-      data: {},
-      relations: { tags: true, character_fields: true, locations: true, relationships: true, documents: true },
+      relations: { tags: true, character_fields: true, locations: true, relationships: true, documents: true, images: true },
     },
     {
       staleTime: 60 * 1000,
@@ -476,17 +476,7 @@ export function CharacterProfileView() {
                   label="Assets">
                   {existingCharacter?.data?.images?.length ? (
                     <div className="mt-2 animate-in fade-in fill-mode-both">
-                      <Table
-                        columns={documentsTableColumns}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
-                        }}
-                        data={existingCharacter?.data?.documents || []}
-                        dispatch={dispatch}
-                        type="documents"
-                      />
+                      <Gallery columns={4} images={existingCharacter?.data?.images} />
                     </div>
                   ) : (
                     <div className="mt-2 w-full">

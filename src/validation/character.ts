@@ -62,6 +62,7 @@ export const AddToCharacterSchema = z.object({
   }),
   relations: z.object({
     documents: z.object({ id: z.string() }).array().optional(),
+    images: z.object({ id: z.string() }).array().optional(),
     tags: z.object({ id: z.string() }).array().optional(),
   }),
 });
