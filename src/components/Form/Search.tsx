@@ -44,7 +44,8 @@ import { Button } from ".";
 
 interface ItemProps {
   children: ReactNode;
-  active: boolean;
+  isActive: boolean;
+  isSelected?: boolean;
 }
 
 const SearchClasses = tv({
@@ -152,14 +153,16 @@ const SearchItem = tv({
   },
 });
 
-const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(({ children, active, ...rest }, ref) => {
-  const id = useId();
-  return (
-    <div ref={ref} aria-selected={active} className={SearchItem({ isActive: active })} id={id} role="option" {...rest}>
-      {children}
-    </div>
-  );
-});
+const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(
+  ({ children, isActive, isSelected, ...rest }, ref) => {
+    const id = useId();
+    return (
+      <div ref={ref} aria-selected={isActive} className={SearchItem({ isActive, isSelected })} id={id} role="option" {...rest}>
+        {children}
+      </div>
+    );
+  },
+);
 
 export function Search({
   initialDisplayValue,
@@ -175,6 +178,7 @@ export function Search({
   hasShownOption,
   imageType,
   isOptionsHidden,
+  isMultiple,
   onChange,
   onSearch,
 }: SearchType) {
@@ -189,7 +193,7 @@ export function Search({
   } = SearchClasses({
     variant,
     isAutocomplete,
-    hasValueWithImage: !!value && searchEntity === "images",
+    hasValueWithImage: !isMultiple && !!value && searchEntity === "images",
     isDisabled,
   });
   const [open, setOpen] = useState(false);
@@ -261,6 +265,10 @@ export function Search({
     return () => {};
   }, [isAutocomplete, inputValue, refetch]);
 
+  useEffect(() => {
+    if (document.activeElement !== inputRef.current) setOpen(false);
+  }, [document.activeElement, inputRef.current]);
+
   return (
     <div className="w-full">
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -269,7 +277,7 @@ export function Search({
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
-        {searchEntity === "images" && value ? (
+        {searchEntity === "images" && value && !isMultiple ? (
           <Avatar
             image={getImageURL(project_id as string, imageType || "images", value as string)}
             imageLoading="lazy"
@@ -291,18 +299,25 @@ export function Search({
             if (data?.data?.length) setOpen(true);
           }}
           onKeyDown={(e) => {
+            if (e.key === "Escape" && document.activeElement === inputRef.current) {
+              setInputValue("");
+              setOpen(false);
+              remove();
+            }
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
-              if (!value && activeIndex === null) {
+              if ((!value || isMultiple) && activeIndex === null) {
                 refetch();
-              } else if (!value && typeof activeIndex === "number") {
+              } else if ((!value || isMultiple) && typeof activeIndex === "number") {
                 const item = data?.data?.[activeIndex];
                 if (item) {
                   onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
-                  setInputValue("");
                   if (hasShownOption) setDisplayValue(item.label);
-                  setOpen(false);
-                  remove();
+                  if (!isMultiple) {
+                    setInputValue("");
+                    setOpen(false);
+                    remove();
+                  }
                   inputRef.current?.focus();
                 }
               }
@@ -319,7 +334,6 @@ export function Search({
                 setDisplayValue("");
               }
             }
-
             if (e.key === "ArrowUp") {
               if (activeIndex === 0 && data?.data) {
                 setActiveIndex(data.data.length - 1);
@@ -377,14 +391,18 @@ export function Search({
                     },
                     onClick() {
                       onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
-                      setInputValue("");
+
                       if (hasShownOption) setDisplayValue(item.label);
-                      setOpen(false);
-                      remove();
+                      if (!isMultiple) {
+                        setInputValue("");
+                        setOpen(false);
+                        remove();
+                      }
                       inputRef.current?.focus();
                     },
                   })}
-                  active={activeIndex === index}>
+                  isActive={activeIndex === index}
+                  isSelected={(value || [])?.includes(item.value)}>
                   {searchEntity === "images" || searchEntity === "characters" ? (
                     <Avatar
                       image={getImageURL(
