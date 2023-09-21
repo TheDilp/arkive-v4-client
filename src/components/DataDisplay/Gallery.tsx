@@ -4,7 +4,7 @@ import { GalleryType } from "../../types";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
-  base: "grid gap-1 grid-cols-1 md:grid-cols-2",
+  base: "grid gap-1 grid-cols-1 md:grid-cols-2 h-full max-h-[48rem] overflow-auto",
   variants: {
     columns: {
       1: "lg:grid-cols-1",
@@ -26,100 +26,14 @@ const GalleryClasses = tv({
 export function Gallery({ images, isOpenable, columns = 4 }: GalleryType) {
   const classes = GalleryClasses({ columns });
   return (
-    <div className={classes}>
+    <div
+      className={classes}
+      style={{
+        gridAutoRows: "36rem",
+      }}>
       {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
+        <div key={image.id} className="overflow-hidden">
           <Image image={image} isOpenable={isOpenable} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <Image image={image} />
         </div>
       ))}
     </div>

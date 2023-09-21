@@ -9,10 +9,10 @@ import { DialogAtomType, ImageComponentType } from "../../types";
 import { dialogAtom, getImageURL } from "../../utils";
 
 const ImageClasses = tv({
-  base: "h-full w-full rounded object-cover",
+  base: "object-cover h-full w-full rounded object-center",
   variants: {
     isOpenable: {
-      true: "transition-all hover:z-20 hover:scale-110 hover:shadow-md cursor-pointer",
+      true: "transition-all hover:scale-105 hover:shadow-md cursor-pointer",
     },
   },
 });
