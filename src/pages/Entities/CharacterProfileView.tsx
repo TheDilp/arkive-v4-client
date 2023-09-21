@@ -133,6 +133,11 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
     }),
   ];
 }
+function disableShowFamilyTree(character: CharacterType | undefined) {
+  if (!character) return true;
+  if (!character?.related_from?.length && !character?.related_to?.length) return true;
+  return false;
+}
 
 const documentsTableColumns = [
   documentsColumnHelper.display({
@@ -377,7 +382,14 @@ export function CharacterProfileView() {
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
             <div className="ml-auto w-min">
-              <Button icon={IconEnum.family_tree} label="Show family tree" onClick={showFamilyTree} size="sm" variant="info" />
+              <Button
+                icon={IconEnum.family_tree}
+                isDisabled={disableShowFamilyTree(existingCharacter?.data)}
+                label="Show family tree"
+                onClick={showFamilyTree}
+                size="sm"
+                variant="info"
+              />
             </div>
           ) : null}
         </h2>
