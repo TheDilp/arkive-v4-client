@@ -8,7 +8,7 @@ import { CalendarType, CurrentDateType, EventType } from "../../types/EntityType
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
 import { TimelineView } from "./TimelineView";
 
-export default function DayNumber({
+export function DayNumber({
   dayNumber,
   monthNumber,
   year,
