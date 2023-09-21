@@ -4,7 +4,7 @@ import { GalleryType } from "../../types";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
-  base: "grid gap-1 grid-cols-1 md:grid-cols-2 h-full max-h-[48rem] overflow-auto",
+  base: "grid gap-1 grid-cols-1 md:grid-cols-2 h-full max-h-[48rem] overflow-auto min-h-fit lg:pb-0 pb-48",
   variants: {
     columns: {
       1: "lg:grid-cols-1",

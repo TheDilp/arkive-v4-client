@@ -16,9 +16,8 @@ export function ProjectLayout() {
 
       <div className="flex h-full w-full flex-col">
         <Navbar />
-        <div className="h-full p-4">
+        <div className="h-[calc(100%-6rem)] overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-
           <Outlet />
         </div>
         {!isLg ? <Sidebar /> : null}

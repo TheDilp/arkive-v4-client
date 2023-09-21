@@ -53,6 +53,7 @@ export interface SearchType extends BaseFormComponentType {
   isAutocomplete?: boolean;
   hasShownOption?: boolean;
   isOptionsHidden?: boolean;
+  isMultiple?: boolean;
   initialDisplayValue?: string;
   imageType?: AssetType;
   onSearch?: (result: any) => void;

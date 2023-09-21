@@ -354,11 +354,11 @@ export function CharacterProfileView() {
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
 
   return (
-    <div className="grid h-full max-h-[calc(100%-6rem)] w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:max-h-[calc(100%-2rem)] lg:content-stretch">
+    <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:content-stretch">
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
-        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden overflow-y-auto rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
+        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -384,11 +384,8 @@ export function CharacterProfileView() {
           </div>
         </div>
       )}
-      <div
-        className={`col-span-5 h-full rounded-lg bg-zinc-950 p-4 pb-24 lg:col-span-4 ${
-          selectedTab === 2 ? "overflow-y-auto" : ""
-        }`}>
-        <h2 className="mb-4 flex items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
+      <div className="col-span-5 min-h-[calc(100%)] rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
             <div className="ml-auto w-min">
@@ -404,7 +401,7 @@ export function CharacterProfileView() {
           ) : null}
         </h2>
         {selectedTab === 0 ? (
-          <div className="flex flex-col gap-y-2">
+          <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
             {isFetching ? (
               <Skeleton type="character_profile_main" />
             ) : (
@@ -475,7 +472,7 @@ export function CharacterProfileView() {
                   initialOpen={false}
                   label="Assets">
                   {existingCharacter?.data?.images?.length ? (
-                    <div className="mt-2 animate-in fade-in fill-mode-both">
+                    <div className="mt-2 px-4 animate-in fade-in fill-mode-both">
                       <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
                     </div>
                   ) : (
