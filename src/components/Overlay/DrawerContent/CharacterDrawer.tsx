@@ -529,16 +529,16 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
 
-  const { data: existingCharacter } = useGetEntity<CharacterType>(
+  const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
     data?.id,
     "characters",
     {
-      data: {},
       relations: { character_fields: true, relationships: true, portrait: true, tags: true },
       fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
     },
     {
       enabled: !!data?.id,
+      queryKeyConcat: ["drawer"],
     },
   );
 
@@ -548,7 +548,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     project_id as string,
   );
-  const { data: templates, isFetching } = useGetEntities<CharacterFieldTemplateType>(
+  const { data: templates } = useGetEntities<CharacterFieldTemplateType>(
     { data: { project_id: project_id as string }, relations: { character_fields: true } },
     "character_fields_templates",
     {
@@ -567,6 +567,8 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
     }
   }, [existingCharacter?.data]);
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <>
