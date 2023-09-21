@@ -51,7 +51,7 @@ const DialogClasses = tv({
     isImageView: {
       true: {
         container: "cursor-pointer",
-        base: "bg-blue-300 border-none",
+        base: "bg-transparent border-none",
       },
     },
     isOverlay: {
