@@ -1,7 +1,7 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { MouseEvent } from "react";
 
-import { AllAvailableEntities, AvailableEntityType, MapPinType, TagType } from "../../EntityTypes";
+import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
 export type DrawerContentType =
@@ -48,6 +48,7 @@ export type DrawerAtomType = {
 } & (
   | { type: "project"; data: { owner_id: string } | { id: string } | null }
   | { type: "characters"; data: { id?: string; project_id?: string; preselectedTab?: number } }
+  | { type: "images"; data: ImageType }
   | {
       type:
         | "character_fields_templates"

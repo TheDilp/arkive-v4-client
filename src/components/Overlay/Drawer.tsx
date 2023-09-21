@@ -32,6 +32,7 @@ import {
   TagsDrawer,
   WordDrawer,
 } from "./DrawerContent";
+import { ImageDrawer } from "./DrawerContent/ImageDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -142,9 +143,7 @@ export function Drawer() {
         {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
         {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
-
         {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
-
         {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
         {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
@@ -154,6 +153,7 @@ export function Drawer() {
         {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
         {drawer.type === "search" ? <SearchDrawer /> : null}
         {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
+        {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );
