@@ -40,6 +40,7 @@ function createColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
+            hasShowImage
             image={getImageURL(row.original.project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
             isBordered
@@ -50,6 +51,7 @@ function createColumns(
         </div>
       ),
       meta: {
+        noLink: true,
         centered: true,
       },
       minSize: 4.5,
