@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
 import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { IndeterminateProgressBar } from "../Misc";
@@ -56,9 +56,22 @@ export function Navbar() {
   const navbarTitle = useAtomValue(navbarTitleAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
 
   function openSearchDrawer() {
     setDrawer((prev) => ({ ...prev, title: "Search", size: "lg", type: "search", data: null }));
+  }
+  function openImageUploadDialog() {
+    setDialog((prev) => ({
+      ...prev,
+      type: "image_upload",
+      title: "Upload images",
+      size: "lg",
+      isOverlay: true,
+      data: {
+        type: "images",
+      },
+    }));
   }
 
   return (
@@ -69,7 +82,10 @@ export function Navbar() {
       </h1>
       {project_id ? (
         <div className="ml-auto flex items-center gap-x-2 pr-2">
-          <div className=" w-fit">
+          <div className="w-fit">
+            <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
+          </div>
+          <div className="w-fit">
             <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
               <div className="h-full">
                 <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
