@@ -18,8 +18,8 @@ const SidebarClasses = tv({
     listItem:
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
     listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto",
-    settingsSubitem: "flex items-center gap-x-2",
-    activeSettingsSubItem: "text-blue-400 min-h-[4rem]",
+    settingsSubitem: "flex items-center gap-x-2 select-none",
+    activeSettingsSubItem: "text-blue-400",
     navIcon: "cursor-pointer hover:text-blue-300 text-white",
   },
 });
@@ -61,7 +61,7 @@ export function Sidebar() {
           })}
 
           <Tooltip
-            allowedPlacements={["top", "top-start", "top-end", "right", "right-start", "right-end"]}
+            allowedPlacements={["right", "right-start", "right-end", "top", "top-start", "top-end"]}
             arrowColor="#27272A"
             closeOnClick
             content={
