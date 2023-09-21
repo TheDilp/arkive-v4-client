@@ -1,13 +1,7 @@
-import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { ImageType } from "../../types";
-import { getImageURL } from "../../utils";
-
-type Props = {
-  images: ImageType[];
-  columns: number;
-};
+import { GalleryType } from "../../types";
+import { Image } from "./Image";
 
 const GalleryClasses = tv({
   base: "grid gap-1 grid-cols-1 md:grid-cols-2",
@@ -29,124 +23,103 @@ const GalleryClasses = tv({
   },
 });
 
-export function Gallery({ images, columns = 4 }: Props) {
-  const { project_id } = useParams();
+export function Gallery({ images, isOpenable, columns = 4 }: GalleryType) {
   const classes = GalleryClasses({ columns });
   return (
     <div className={classes}>
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} isOpenable={isOpenable} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
       {images.map((image) => (
         <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
-        </div>
-      ))}
-      {images.map((image) => (
-        <div key={image.id} className="h-full w-full">
-          <img alt={image.title} src={getImageURL(project_id as string, "images", image.id)} />
+          <Image image={image} />
         </div>
       ))}
     </div>

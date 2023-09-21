@@ -18,7 +18,7 @@ import {
   Tabs,
   Title,
 } from "../../components";
-import { Gallery } from "../../components/DataDisplay/Gallery";
+import { Gallery } from "../../components/DataDisplay";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import {
   CharacterFieldTemplateType,
@@ -476,7 +476,7 @@ export function CharacterProfileView() {
                   label="Assets">
                   {existingCharacter?.data?.images?.length ? (
                     <div className="mt-2 animate-in fade-in fill-mode-both">
-                      <Gallery columns={4} images={existingCharacter?.data?.images} />
+                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
                     </div>
                   ) : (
                     <div className="mt-2 w-full">

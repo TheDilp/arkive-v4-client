@@ -1,5 +1,7 @@
 export * from "./EntityPreview";
+export * from "./Gallery";
 export * from "./Graph";
+export * from "./Image";
 export * from "./ImagePreview";
 export * from "./Table";
 export * from "./TableComponents";
