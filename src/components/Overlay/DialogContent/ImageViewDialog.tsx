@@ -6,7 +6,7 @@ export function ImageViewDialog({ data }: { data: { image?: string } }) {
     <div className="flex h-full w-full select-none justify-center">
       <img
         alt="preview"
-        className="cursor-default"
+        className="cursor-default object-contain"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
