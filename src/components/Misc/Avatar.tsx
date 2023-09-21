@@ -36,7 +36,7 @@ const AvatarClasses = tv({
     },
     hasShowImage: {
       true: {
-        image: "cursor-pointer hover:scale-105 transition-all",
+        image: "cursor-pointer transition-all",
       },
     },
     isBordered: {
