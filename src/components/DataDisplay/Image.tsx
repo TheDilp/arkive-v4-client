@@ -27,5 +27,14 @@ export function Image({ image, isOpenable }: ImageComponentType) {
   const classes = ImageClasses({ isOpenable });
   const setDialog = useSetAtom(dialogAtom);
 
-  return <img alt={image.title} className={classes} onClick={() => openImageView(setDialog, imageUrl)} src={imageUrl} />;
+  return (
+    <img
+      alt={image.title}
+      className={classes}
+      onClick={() => {
+        if (isOpenable) openImageView(setDialog, imageUrl);
+      }}
+      src={imageUrl}
+    />
+  );
 }

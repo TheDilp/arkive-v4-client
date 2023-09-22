@@ -241,7 +241,13 @@ export function AssetView() {
               }
             }
           }}>
-          {(infiniteAssets?.pages || [])?.map((page) => page.data.map((img: ImageType) => <Image image={img} />))}
+          {(infiniteAssets?.pages || [])?.map((page) =>
+            page.data.map((img: ImageType) => (
+              <div className="overflow-hidden">
+                <Image image={img} isOpenable />
+              </div>
+            )),
+          )}
         </div>
       ) : (
         <div className="h-full max-h-[85%] w-full overflow-hidden">
