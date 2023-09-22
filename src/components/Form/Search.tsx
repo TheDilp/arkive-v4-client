@@ -325,7 +325,7 @@ export function Search({
             if (e.key === "Backspace") {
               if (value) {
                 e.preventDefault();
-                onChange({ name, value: "", label: "" });
+                if (!isMultiple) onChange({ name, value: "", label: "" });
                 setInputValue("");
                 setDisplayValue("");
               }
