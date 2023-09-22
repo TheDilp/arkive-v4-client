@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { saveAs } from "file-saver";
 import { useResetAtom } from "jotai/utils";
 
 import { AssetType, RequestBodyType } from "../../types";
@@ -99,6 +100,36 @@ export function useUpdateImage<InsertType extends { data: { title: string } }>(
             icon: IconEnum.error,
             timer: 5,
           });
+      },
+    },
+  );
+}
+export function useDownloadImage(project_id: string | undefined, type: AssetType) {
+  return useMutation(
+    async ({ data: { id } }: { data: { id: string; title: string } }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/assets/download/${project_id}/${type}/${id}`,
+        method: "GET",
+      });
+    },
+    {
+      onSuccess: (data: { data: string }, vars) => {
+        const bytesFromBase64 = atob(data.data);
+        const nums = new Array(bytesFromBase64.length);
+        for (let i = 0; i < bytesFromBase64.length; i += 1) {
+          nums[i] = bytesFromBase64.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(nums);
+        saveAs(
+          new Blob(
+            [byteArray],
+
+            {
+              type: "image/webp",
+            },
+          ),
+          `${vars.data.title}.webp`,
+        );
       },
     },
   );

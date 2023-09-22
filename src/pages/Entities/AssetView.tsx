@@ -1,17 +1,29 @@
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetImages, useTable } from "../../hooks";
+import { useDownloadImage, useGetImages, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, ImageType } from "../../types";
 import { dialogAtom, drawerAtom, getAvatarInitials, getImageURL, IconEnum, NameFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<ImageType>();
-
+type downloadImageMutationType = UseMutateAsyncFunction<
+  any,
+  unknown,
+  {
+    data: {
+      id: string;
+      title: string;
+    };
+  },
+  unknown
+>;
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  downloadImage: downloadImageMutationType,
 ) {
   return [
     columnHelper.display({
@@ -71,7 +83,12 @@ function createColumns(
                   }));
                 },
               },
-
+              {
+                id: "2",
+                label: "Download",
+                icon: IconEnum.download,
+                onClick: () => downloadImage({ data: row.original }),
+              },
               {
                 id: "delete_character",
                 label: "Delete character",
@@ -102,16 +119,18 @@ export function AssetView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const [{ orderBy, filters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
+
   const { data: assets, isLoading } = useGetImages(project_id as string, "images", { orderBy, pagination });
   return (
     <TablePageLayout>
       <div className="h-full max-h-[85%] w-full overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog)}
+          columns={createColumns(setDrawer, setDialog, downloadImage)}
           config={{
             hasSelect: true,
             orderBy,
