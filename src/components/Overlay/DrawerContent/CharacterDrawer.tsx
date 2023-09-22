@@ -31,10 +31,10 @@ import {
 } from "../../../utils";
 import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import { Badge, EntityPreview, ImagePreview, Skeleton } from "../..";
+import { EntityPreview, ImagePreview, Skeleton } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, Search, Select } from "../../Form";
+import { Button, Checkbox, Input, Search, Select, TagInput } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
@@ -729,49 +729,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {selectedTab === 3 ? (
         <div className="flex flex-col gap-y-2">
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((character?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-
-              handleChange({
-                name,
-                value: (character?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags"
-            searchEntity="tags"
-          />
-
-          {character?.tags?.length ? (
-            <div className="flex flex-wrap gap-2">
-              {character.tags.map((tag) => (
-                <div key={tag.id} className="w-fit">
-                  <Badge
-                    clearAction={() => {
-                      handleChange({ name: "tags", value: (character?.tags || []).filter((t) => t.id !== tag.id) });
-                    }}
-                    customColor={tag.color}
-                    label={tag.title}
-                    size="lg"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : null}
+          <TagInput handleChange={handleChange} tags={character?.tags || []} />
         </div>
       ) : null}
       <Button
