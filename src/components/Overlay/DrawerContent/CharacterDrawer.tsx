@@ -16,6 +16,7 @@ import {
   InputOnChangeValue,
   NotificationType,
   onChangeValue,
+  TagType,
 } from "../../../types";
 import {
   BaseCharacterRelationshipOptionsEnum,
@@ -100,6 +101,7 @@ function RandomTableInput({
     <div className="flex flex-col gap-y-1">
       <div className="flex flex-nowrap items-center gap-x-2">
         <Select
+          isClearable
           isDisabled={isRolling}
           label={title}
           name={`${name}`}
@@ -134,6 +136,7 @@ function RandomTableInput({
         {selectedOptionSuboptions?.length ? (
           <div className="flex flex-nowrap gap-x-2">
             <Select
+              isClearable
               name={name}
               onChange={({ value }) =>
                 handleChange({ name, value: { id, value: { value: currentValue, subOptionValue: value } } })
@@ -188,6 +191,7 @@ function CharacterFieldInputs({
   if (fieldType === "select" || fieldType === "select_multiple") {
     return (
       <Select
+        isClearable
         isMultiple={fieldType === "select_multiple"}
         label={title}
         name={name}
@@ -477,6 +481,7 @@ export function AdditionalFieldsTab({
   handleChange,
   character_fields,
   isLoading,
+  tags,
 }: {
   templates:
     | {
@@ -487,27 +492,28 @@ export function AdditionalFieldsTab({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
+  tags?: TagType[];
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
-      {templates?.data?.length ? (
-        templates?.data
-          ?.sort(sortEntities)
-          ?.map((t) => (
-            <FieldTemplateRow
-              key={t?.id}
-              character_fields={t.character_fields}
-              character_fields_data={character_fields}
-              createNotification={createNotification}
-              handleChange={handleChange}
-              template_id={t?.id}
-              title={t?.title}
-            />
-          ))
-      ) : (
-        <Alert label="There are no templates available." variant="info" />
-      )}
+      {!tags?.length ? <Alert label="Please select tags first." variant="info" /> : null}
+      {!templates?.data?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
+      {templates?.data?.length && tags?.length
+        ? templates?.data
+            ?.sort(sortEntities)
+            ?.map((t) => (
+              <FieldTemplateRow
+                key={t?.id}
+                character_fields={t.character_fields}
+                character_fields_data={character_fields}
+                createNotification={createNotification}
+                handleChange={handleChange}
+                template_id={t?.id}
+                title={t?.title}
+              />
+            ))
+        : null}
     </ul>
   );
 }
@@ -549,10 +555,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     project_id as string,
   );
   const { data: templates } = useGetEntities<CharacterFieldTemplateType>(
-    { data: { project_id: project_id as string }, relations: { character_fields: true } },
+    {
+      data: { project_id: project_id as string },
+      relations: { character_fields: true },
+      relationFilters: { tags: character?.tags?.map((t) => t.id) || [] },
+    },
     "character_fields_templates",
     {
-      enabled: selectedTab === 2,
+      enabled: selectedTab === 2 && !!character?.tags?.length,
     },
   );
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
@@ -560,6 +570,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
+      // @ts-ignore
       const fieldsByTemplateId = groupBy(existingCharacter?.data?.character_fields || [], "template_id") as Record<
         string,
         CharacterFieldValueType[]
@@ -712,6 +723,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           createNotification={createNotification}
           handleChange={handleChange}
           isLoading={isFetching}
+          tags={character?.tags}
           templates={templates}
         />
       ) : null}

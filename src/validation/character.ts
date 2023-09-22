@@ -45,7 +45,7 @@ export const UpdateCharacterSchema = z.object({
       .object({
         id: z.string(),
         value: z.object({
-          value: z.string().or(z.string().array()).or(z.number()),
+          value: z.string().or(z.string().array()).or(z.number()).optional().nullable(),
           subOptionValue: z.string().optional(),
         }),
       })
