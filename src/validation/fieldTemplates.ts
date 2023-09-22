@@ -32,6 +32,7 @@ export const UpdateTemplateSchema = z
     relations: z.object({
       character_fields: z
         .object({
+          id: z.string(),
           title: z.string().optional(),
           field_type: z.string().optional(),
           project_id: z.string(),
