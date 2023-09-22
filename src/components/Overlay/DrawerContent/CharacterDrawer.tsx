@@ -673,48 +673,48 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               </div>
             ) : null}
           </div>
-          <ul className="flex flex-col gap-y-2">
-            {character?.related_to?.length
-              ? character?.related_to?.map((relationship, index) => (
-                  <RelationshipRow
-                    key={`${relationship.id}`}
-                    character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
-                    current_character_first_name={character.first_name}
-                    handleChange={handleChange}
-                    handleRemove={(character_b_id: string) =>
-                      handleChange({
-                        name: "related_to",
-                        value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
-                      })
-                    }
-                    index={index}
-                    relationship_row_type="related_to"
-                    {...relationship}
-                  />
-                ))
-              : null}
-          </ul>
-          <ul className="flex flex-col gap-y-2">
-            {character?.related_from?.length
-              ? character?.related_from?.map((relationship, index) => (
-                  <RelationshipRow
-                    key={`${relationship.id}`}
-                    character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
-                    current_character_first_name={character.first_name}
-                    handleChange={handleChange}
-                    handleRemove={(character_b_id: string) =>
-                      handleChange({
-                        name: "related_from",
-                        value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
-                      })
-                    }
-                    index={index}
-                    relationship_row_type="related_from"
-                    {...relationship}
-                  />
-                ))
-              : null}
-          </ul>
+          {character?.related_to?.length ? (
+            <ul className="flex flex-col gap-y-2">
+              {character?.related_to?.map((relationship, index) => (
+                <RelationshipRow
+                  key={`${relationship.id}`}
+                  character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
+                  current_character_first_name={character.first_name}
+                  handleChange={handleChange}
+                  handleRemove={(character_b_id: string) =>
+                    handleChange({
+                      name: "related_to",
+                      value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
+                    })
+                  }
+                  index={index}
+                  relationship_row_type="related_to"
+                  {...relationship}
+                />
+              ))}
+            </ul>
+          ) : null}
+          {character?.related_from?.length ? (
+            <ul className="flex flex-col gap-y-2">
+              {character?.related_from?.map((relationship, index) => (
+                <RelationshipRow
+                  key={`${relationship.id}`}
+                  character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
+                  current_character_first_name={character.first_name}
+                  handleChange={handleChange}
+                  handleRemove={(character_b_id: string) =>
+                    handleChange({
+                      name: "related_from",
+                      value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
+                    })
+                  }
+                  index={index}
+                  relationship_row_type="related_from"
+                  {...relationship}
+                />
+              ))}
+            </ul>
+          ) : null}
         </>
       ) : null}
       {selectedTab === 2 ? (
@@ -756,22 +756,22 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             searchEntity="tags"
           />
 
-          <div className="flex flex-wrap gap-2">
-            {character?.tags?.length
-              ? character.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (character?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
+          {character?.tags?.length ? (
+            <div className="flex flex-wrap gap-2">
+              {character.tags.map((tag) => (
+                <div key={tag.id} className="w-fit">
+                  <Badge
+                    clearAction={() => {
+                      handleChange({ name: "tags", value: (character?.tags || []).filter((t) => t.id !== tag.id) });
+                    }}
+                    customColor={tag.color}
+                    label={tag.title}
+                    size="lg"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
       <Button
