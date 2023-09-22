@@ -8,5 +8,13 @@ export const InsertWordSchema = z.object({
     parent_id: z.string(),
   }),
 });
+export const UpdateWordSchema = z.object({
+  data: z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    translation: z.string().optional(),
+    description: z.string().nullable().optional(),
+  }),
+});
 export type InsertWordType = z.infer<typeof InsertWordSchema>;
-// export type UpdateDictionaryType = z.infer<typeof UpdateDictionarySchema>;
+export type UpdateWordType = z.infer<typeof UpdateWordSchema>;

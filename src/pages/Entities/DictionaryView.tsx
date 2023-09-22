@@ -32,16 +32,6 @@ function createColumns(
         filterOptions: NameFilters,
       },
     }),
-    columnHelper.accessor("description", {
-      id: "nickname",
-      header: "Nickname",
-      cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-        filterOptions: NameFilters,
-      },
-      maxSize: 15,
-    }),
 
     columnHelper.display({
       id: "action",
