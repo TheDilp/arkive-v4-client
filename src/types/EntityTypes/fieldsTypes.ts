@@ -1,6 +1,18 @@
 import { RandomTableOptionType } from "./randomTableTypes";
 
-export type FieldTypes = "text" | "textarea" | "number" | "select" | "select_multiple" | "dice_roll" | "random_table";
+export type FieldTypes =
+  | "text"
+  | "textarea"
+  | "number"
+  | "select"
+  | "select_multiple"
+  | "dice_roll"
+  | "date"
+  | "random_table"
+  | "documents_single"
+  | "documents_multiple"
+  | "images_single"
+  | "images_multiple";
 export interface CharacterFieldType {
   id: string;
   project_id: string;

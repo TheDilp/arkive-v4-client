@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
-import { drawerAtom, FieldTypesEnum, getSentenceCase, IconEnum, MessageEnum, sortEntities } from "../../../utils";
+import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, sortEntities } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
 import { Button, Input, Search, Select } from "../../Form";
@@ -85,7 +85,7 @@ function FieldRow({
             label="Field type"
             name={`[${index}].field_type`}
             onChange={changeField}
-            options={FieldTypesEnum.map((t) => ({ label: getSentenceCase(t), value: t }))}
+            options={FieldTypesEnum}
             placeholder="Field type"
             value={field_type}
           />
