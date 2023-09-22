@@ -86,7 +86,25 @@ export function useGetEntities<ReturnType>(
     select: options?.select,
   };
   const queryClient = useQueryClient();
-  if (options?.prefetch && configuredOptions?.enabled) {
+
+  if (typeof request?.pagination?.page === "number") {
+    baseQueryKey = baseQueryKey.concat(request?.pagination);
+  }
+
+  if (options?.queryKeyConcat) {
+    baseQueryKey = baseQueryKey.concat(options.queryKeyOverwrite);
+  }
+
+  if (options?.queryKeyOverwrite) {
+    baseQueryKey = options.queryKeyOverwrite;
+  }
+
+  const res = useQuery<{ data: ReturnType[] }, unknown>(baseQueryKey, async () => queryFn(request), {
+    ...configuredOptions,
+    ...options,
+  });
+
+  if (options?.prefetch && configuredOptions?.enabled && res.data?.data.length === request.pagination?.limit) {
     queryClient.prefetchQuery({
       queryKey:
         typeof request?.pagination?.page === "number"
@@ -110,22 +128,8 @@ export function useGetEntities<ReturnType>(
       ...configuredOptions,
     });
   }
-  if (typeof request?.pagination?.page === "number") {
-    baseQueryKey = baseQueryKey.concat(request?.pagination);
-  }
 
-  if (options?.queryKeyConcat) {
-    baseQueryKey = baseQueryKey.concat(options.queryKeyOverwrite);
-  }
-
-  if (options?.queryKeyOverwrite) {
-    baseQueryKey = options.queryKeyOverwrite;
-  }
-
-  return useQuery<{ data: ReturnType[] }, unknown>(baseQueryKey, async () => queryFn(request), {
-    ...configuredOptions,
-    ...options,
-  });
+  return res;
 }
 
 export function useGetInfiniteEntities<ReturnType>(
