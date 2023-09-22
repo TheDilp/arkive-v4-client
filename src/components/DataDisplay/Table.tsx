@@ -342,6 +342,7 @@ function TableTagFilter({ activeTags, dispatch }: { activeTags: string[]; dispat
         isDisabled={isFetching}
         isLoading={isFetching}
         isMultiple
+        label="Match all"
         name="tags"
         onChange={({ value }) => setSelectedTags(value as string[])}
         options={tags?.data?.map((tag) => ({ label: tag.title, value: tag.id })) || []}
