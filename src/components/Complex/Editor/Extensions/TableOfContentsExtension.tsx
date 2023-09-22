@@ -39,7 +39,7 @@ export class TableOfContentsExtension extends NodeExtension<TableOfContentsOptio
     });
 
     return (
-      <ul className="tableOfContentsList  m-0 flex list-none flex-col">
+      <ul className="tableOfContentsList m-0 flex list-none flex-col border border-zinc-600">
         <h2 className="font-merriweather underline">Table of contents</h2>
         {headings?.length ? (
           headings.map((heading, i) => (
