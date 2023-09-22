@@ -50,22 +50,20 @@ const TextareaClasses = tv({
       },
     },
     isDisabled: {
-      true: "bg-zinc-300 text-zinc-100 cursor-not-allowed pointer-events-none",
+      true: {
+        textarea: "bg-zinc-700 text-zinc-100 cursor-not-allowed",
+      },
     },
     isResizable: {
-      true: "resize-y",
+      true: {
+        textarea: "resize-y",
+      },
     },
-  },
-  compoundVariants: [
-    {
-      variant: ["primary", "secondary", "info", "success", "warning", "error"],
-      isDisabled: true,
-      class: "bg-zinc-300 text-zinc-100 cursor-not-allowed",
+    hasNoBackground: {
+      true: {
+        textarea: "bg-transparent bg-none text-white border-none",
+      },
     },
-  ],
-  defaultVariants: {
-    // size: "md",
-    variant: "primary",
   },
 });
 
@@ -79,19 +77,22 @@ export function Textarea({
   size = "md",
   variant = "primary",
   isResizable = false,
+  isDisabled,
+  hasNoBackground,
 }: TextareaType) {
   const {
     base,
     textarea,
     label: labelClasses,
     helperText: helperTextClasses,
-  } = TextareaClasses({ size, variant, isResizable });
+  } = TextareaClasses({ size, variant, isResizable, isDisabled, hasNoBackground });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
 
       <textarea
         className={textarea()}
+        disabled={isDisabled}
         name={name}
         onChange={(e) => onChange(e.target)}
         placeholder={placeholder}

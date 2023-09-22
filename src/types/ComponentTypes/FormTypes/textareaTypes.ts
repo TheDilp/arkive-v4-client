@@ -10,4 +10,6 @@ export interface TextareaType extends BaseComponentType, BaseFormComponentType {
   value: string | number | undefined;
   helperText?: string;
   isResizable?: boolean;
+  isDisabled?: boolean;
+  hasNoBackground?: boolean;
 }
