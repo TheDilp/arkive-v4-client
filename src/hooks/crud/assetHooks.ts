@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { useResetAtom } from "jotai/utils";
 
@@ -131,6 +131,39 @@ export function useDownloadImage(project_id: string | undefined, type: AssetType
           `${vars.data.title}.webp`,
         );
       },
+    },
+  );
+}
+export function useGetInfiniteAssets<ReturnType>(
+  request: RequestBodyType,
+  type: AssetType,
+  project_id: string | undefined,
+  options?: UseQueryOptions<any> & { prefetch?: boolean },
+) {
+  const baseQueryKey = ["allEntities", "infinite", project_id, type, request.data?.item_id, request?.filters];
+  async function queryFn(finalRequest: RequestBodyType) {
+    return FetchFunction({
+      method: "POST",
+      body: JSON.stringify(finalRequest),
+      url: `${baseURLS.baseServer}/assets/${project_id}/${type.toLowerCase()}`,
+    });
+  }
+  const configuredOptions = {
+    enabled: !!project_id && (options?.enabled ?? true),
+    staleTime: options?.staleTime,
+    select: options?.select,
+    keepPreviousData: options?.keepPreviousData,
+  };
+
+  return useInfiniteQuery<{ data: ReturnType[] }, unknown>(
+    baseQueryKey,
+    async ({ pageParam = 0 }) => {
+      const formattedRequest = { ...request, pagination: { limit: request?.pagination?.limit || 10, page: pageParam } };
+      return queryFn(formattedRequest);
+    },
+    {
+      ...configuredOptions,
+      ...options,
     },
   );
 }

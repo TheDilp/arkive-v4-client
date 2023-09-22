@@ -3,8 +3,8 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useDownloadImage, useGetImages, useTable } from "../../hooks";
+import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
+import { useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, ImageType } from "../../types";
 import { dialogAtom, drawerAtom, getAvatarInitials, getImageURL, IconEnum, NameFilters } from "../../utils";
 
@@ -129,6 +129,35 @@ export function AssetView() {
 
   const { data: assets, isLoading } = useGetImages(project_id as string, "images", { orderBy, filters, pagination });
 
+  const {
+    data: infiniteAssets,
+    isFetching,
+    fetchNextPage,
+  } = useGetInfiniteAssets<ImageType>(
+    {
+      filters,
+      pagination: {
+        limit: 12,
+      },
+      orderBy: [
+        {
+          field: "title",
+          sort: "asc",
+        },
+      ],
+    },
+    "images",
+    project_id,
+    {
+      enabled: view === "card",
+      keepPreviousData: true,
+      getNextPageParam: (_, allPages) => {
+        if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
+        return allPages.length;
+      },
+    },
+  );
+
   useLayoutEffect(() => {
     if (!filter || view === "card") {
       dispatch({
@@ -199,22 +228,39 @@ export function AssetView() {
           />
         </div>
       </div>
-      <div className="h-full max-h-[85%] w-full overflow-hidden">
-        <Table
-          columns={createColumns(setDrawer, setDialog, downloadImage)}
-          config={{
-            hasSelect: true,
-            orderBy,
-            filters,
-            selection,
-          }}
-          data={assets?.data || []}
-          dispatch={dispatch}
-          isLoading={isLoading}
-          pagination={pagination}
-          type="characters"
-        />
-      </div>
+      {view === "card" ? (
+        <div
+          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
+          onScroll={(e) => {
+            const { target } = e;
+            if (target) {
+              // @ts-ignore
+              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 400;
+              if (scrollFetchMarker && !isFetching) {
+                fetchNextPage();
+              }
+            }
+          }}>
+          {(infiniteAssets?.pages || [])?.map((page) => page.data.map((img: ImageType) => <Image image={img} />))}
+        </div>
+      ) : (
+        <div className="h-full max-h-[85%] w-full overflow-hidden">
+          <Table
+            columns={createColumns(setDrawer, setDialog, downloadImage)}
+            config={{
+              hasSelect: true,
+              orderBy,
+              filters,
+              selection,
+            }}
+            data={assets?.data || []}
+            dispatch={dispatch}
+            isLoading={isLoading}
+            pagination={pagination}
+            type="characters"
+          />
+        </div>
+      )}
     </TablePageLayout>
   );
 }
