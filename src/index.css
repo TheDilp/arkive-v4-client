@@ -30,7 +30,7 @@
 }
 
 body {
-  @apply relative bg-black text-white;
+  @apply relative bg-black font-lato text-white;
 }
 
 ::-webkit-scrollbar {

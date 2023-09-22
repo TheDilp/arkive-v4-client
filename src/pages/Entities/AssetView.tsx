@@ -1,9 +1,9 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useDownloadImage, useGetImages, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, ImageType } from "../../types";
 import { dialogAtom, drawerAtom, getAvatarInitials, getImageURL, IconEnum, NameFilters } from "../../utils";
@@ -120,14 +120,85 @@ export function AssetView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
+  const [filter, setFilter] = useState("");
+  const [view, setView] = useState<"card" | "table">("table");
   const [{ orderBy, filters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
 
-  const { data: assets, isLoading } = useGetImages(project_id as string, "images", { orderBy, pagination });
+  const { data: assets, isLoading } = useGetImages(project_id as string, "images", { orderBy, filters, pagination });
+
+  useLayoutEffect(() => {
+    if (!filter || view === "card") {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 750);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch, view]);
+
   return (
     <TablePageLayout>
+      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
+        <div className="w-52">
+          <Input
+            name="quick_filter"
+            onChange={({ value }) => setFilter(value as string)}
+            placeholder="Quick search by title"
+            value={filter}
+          />
+        </div>
+        <div className="w-32">
+          <Select
+            name="view"
+            onChange={({ value }) => {
+              setView(value as "card" | "table");
+            }}
+            options={[
+              { label: "Card", value: "card", icon: IconEnum.card },
+              { label: "Table", value: "table", icon: IconEnum.table },
+            ]}
+            placeholder="View"
+            value={view}
+          />
+        </div>
+        <div className="w-52">
+          <Button
+            icon={IconEnum.add}
+            label="Create new character"
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: { project_id },
+                title: "Create new character",
+                type: "characters",
+                size: "lg",
+              }))
+            }
+          />
+        </div>
+      </div>
       <div className="h-full max-h-[85%] w-full overflow-hidden">
         <Table
           columns={createColumns(setDrawer, setDialog, downloadImage)}
