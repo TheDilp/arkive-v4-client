@@ -22,7 +22,7 @@ export interface CharacterFieldType {
   field_type: FieldTypes;
   formula?: string | null;
   random_table_id?: string | null;
-  options?: string[];
+  options?: { id: string; value: string }[];
   random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string }[];
 }
@@ -37,7 +37,7 @@ export interface CharacterFieldTemplateType {
 
 export type TemplateStateType = Partial<
   Omit<CharacterFieldTemplateType, "character_fields"> & {
-    character_fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[];
+    character_fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] })[];
   }
 >;
 

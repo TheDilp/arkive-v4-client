@@ -196,7 +196,7 @@ function CharacterFieldInputs({
         label={title}
         name={name}
         onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-        options={options?.map((opt) => ({ label: opt, value: opt })) || []}
+        options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
         value={currentValue}
       />
     );

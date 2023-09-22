@@ -47,12 +47,12 @@ function FieldRow({
   deleteField,
   random_table,
   isLoading,
-}: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; title: string }[] }) & {
+}: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
     name,
     value,
-  }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; title: string }[] }) => void;
+  }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
   deleteField: (i: number) => void;
   isLoading: boolean;
 }) {
@@ -99,7 +99,7 @@ function FieldRow({
               onClick={() =>
                 changeField({
                   name: `character_fields[${index}].options`,
-                  value: (options || []).concat({ id: crypto.randomUUID(), title: `New option ${(options?.length || 0) + 1}` }),
+                  value: (options || []).concat({ id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` }),
                 })
               }
               tooltip="Add new option"
@@ -124,9 +124,9 @@ function FieldRow({
               <div className="w-[calc(100%-5rem)]">
                 <Input
                   isDisabled={isLoading}
-                  name={`character_fields[${index}].options[${optIndex}].title`}
+                  name={`character_fields[${index}].options[${optIndex}].value`}
                   onChange={changeField}
-                  value={opt.title}
+                  value={opt.value}
                 />
               </div>
               <div className="flex flex-1 justify-end">
@@ -196,7 +196,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     project_id as string,
   );
 
-  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType & { fields: CharacterFieldType[] }>(
+  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType>(
     data?.id,
     "character_fields_templates",
     {
@@ -226,14 +226,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
   useLayoutEffect(() => {
     if (existingTemplate?.data) {
-      setTemplate({
-        ...existingTemplate.data,
-        character_fields:
-          existingTemplate?.data?.character_fields?.map((f) => ({
-            ...f,
-            options: (f.options || [])?.map((opt) => ({ title: opt, id: crypto.randomUUID() })),
-          })) || [],
-      });
+      setTemplate(existingTemplate?.data);
     }
   }, [existingTemplate]);
 
@@ -334,7 +327,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 character_fields: character_fields?.map((field) => ({
                   ...field,
                   project_id,
-                  options: field.options?.map((opt) => opt.title),
                 })),
               },
             });
@@ -355,7 +347,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 character_fields: character_fields?.map((field) => ({
                   ...field,
                   project_id,
-                  options: field.options?.map((opt) => opt.title),
                 })),
               },
             });

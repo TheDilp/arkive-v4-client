@@ -129,8 +129,8 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
             <div className="flex flex-col pl-4 text-sm">
               <h5 className="mt-2 w-max border-b">Available options</h5>
               <ul>
-                {field.options.map((opt: string) => (
-                  <li key={opt}>{opt}</li>
+                {field.options.map((opt) => (
+                  <li key={opt.id}>{opt.value}</li>
                 ))}
               </ul>
             </div>
