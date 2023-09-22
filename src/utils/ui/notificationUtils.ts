@@ -33,5 +33,5 @@ export function getEntityCRUDNotification(
     action = "deleted";
   }
   const singularName = capitalizeFirstLetter(getSingularEntityType(type));
-  return `${singularName} successfully ${action}`;
+  return `${singularName} successfully ${action}.`;
 }
