@@ -17,6 +17,7 @@ export function TagInput({ tags, label: componentLabel, handleChange }: Props) {
   return (
     <div className="flex flex-col gap-y-2">
       <Search
+        isMultiple
         label={componentLabel || ""}
         name="tags"
         onChange={({ name, label, value, color }) => {
@@ -42,6 +43,7 @@ export function TagInput({ tags, label: componentLabel, handleChange }: Props) {
         }}
         placeholder="Press enter to search tags"
         searchEntity="tags"
+        value={tags.map((t) => t.id)}
       />
 
       <div className="flex flex-wrap gap-2">
