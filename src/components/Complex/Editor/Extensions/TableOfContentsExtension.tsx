@@ -50,7 +50,7 @@ export class TableOfContentsExtension extends NodeExtension<TableOfContentsOptio
                 const el = document.getElementById(heading.id);
                 if (el) {
                   const editor = document.getElementById("editor");
-                  if (editor) editor.scrollTop = el.offsetTop;
+                  if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
                 }
               }}>
               <span
