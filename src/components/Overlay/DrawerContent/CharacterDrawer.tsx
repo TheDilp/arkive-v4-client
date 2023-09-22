@@ -554,7 +554,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     project_id as string,
   );
-  const { data: templates } = useGetEntities<CharacterFieldTemplateType>(
+  const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: { project_id: project_id as string },
       relations: { character_fields: true },
@@ -722,7 +722,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           character_fields={character?.character_fields}
           createNotification={createNotification}
           handleChange={handleChange}
-          isLoading={isFetching}
+          isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
           templates={templates}
         />
@@ -804,7 +804,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               const dataToParse = {
                 data: { ...character, portrait_id: character?.portrait?.id },
                 relations: {
-                  character_fields: character?.character_fields,
+                  character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
                   related_to: character?.related_to,
                   tags: character?.tags,
                 },
