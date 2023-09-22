@@ -35,7 +35,6 @@ export function TagsDrawer({ data }: { data: TagType | { project_id: string } })
     project_id as string,
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{ data: Omit<TagType, "id"> }>("tags");
-
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{ data: Omit<TagType, "project_id"> }>(
     "tags",
     project_id as string,
@@ -77,6 +76,22 @@ export function TagsDrawer({ data }: { data: TagType | { project_id: string } })
             />
             <div className="self-end pb-2">
               <ColorPicker name={`[${index}].color`} onChange={handleChange} value={tag.color} />
+            </div>
+            <div className="self-end pb-2">
+              <Button
+                hasNoBackground
+                icon={IconEnum.trash}
+                isIconOnly
+                onClick={() =>
+                  setTags((prev) => {
+                    if (Array.isArray(prev)) {
+                      return prev.filter((t) => t.id !== tag.id);
+                    }
+                    return prev;
+                  })
+                }
+                variant="error"
+              />
             </div>
           </div>
         ))
