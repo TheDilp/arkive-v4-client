@@ -1,4 +1,5 @@
 import { RandomTableOptionType } from "./randomTableTypes";
+import { TagType } from "./tagTypes";
 
 export type FieldTypes =
   | "text"
@@ -28,9 +29,17 @@ export interface CharacterFieldType {
 export interface CharacterFieldTemplateType {
   id: string;
   title: string;
+  project_id: string;
   character_fields: CharacterFieldType[];
   sort: number;
+  tags: TagType[];
 }
+
+export type TemplateStateType = Partial<
+  Omit<CharacterFieldTemplateType, "character_fields"> & {
+    character_fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[];
+  }
+>;
 
 export interface CharacterFieldValueType {
   id: string;

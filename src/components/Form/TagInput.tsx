@@ -6,16 +6,18 @@ import { Badge } from "../Misc";
 import { Search } from "./Search";
 
 type Props = {
+  label?: string;
   tags: TagType[];
   handleChange: (newData: HandleChangePropsType) => void;
 };
 
-export function TagInput({ tags, handleChange }: Props) {
+export function TagInput({ tags, label: componentLabel, handleChange }: Props) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
+        label={componentLabel || ""}
         name="tags"
         onChange={({ name, label, value, color }) => {
           if ((tags || [])?.some((tag) => tag.id === value)) {

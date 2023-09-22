@@ -1,42 +1,32 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { SetStateAction } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterFieldTemplateType, CharacterFieldType, FieldTypes, InputOnChangeValue, onChangeValue } from "../../../types";
-import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, sortEntities } from "../../../utils";
+import {
+  CharacterFieldTemplateType,
+  CharacterFieldType,
+  InputOnChangeValue,
+  onChangeValue,
+  TemplateStateType,
+} from "../../../types";
+import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
-import { UpdateCharacterFieldsSchema } from "../../../validation/characterFields";
-import { Button, Input, Search, Select } from "../../Form";
+import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
+import { Button, Input, Search, Select, TagInput } from "../../Form";
 import { Skeleton } from "../../Misc";
 
-type insertTemplateType = Partial<CharacterFieldTemplateType> & { project_id: string };
-
-function removeField(
-  index: number,
-  setFields: Dispatch<SetStateAction<(Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[]>>,
-) {
-  setFields((prev) => {
-    const temp = [...prev];
-    temp.splice(index, 1);
-    return temp;
-  });
-}
-
-function isSaveDisabled(
-  title: string | undefined,
-  fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[],
-) {
-  if (!title) return true;
-  if (!fields.length) return true;
+function isSaveDisabled(template: TemplateStateType) {
+  if (!template?.title) return true;
+  if (!template?.character_fields?.length) return true;
+  if (!template?.tags?.length) return true;
   if (
-    fields.some(
+    template.character_fields.some(
       (field) =>
         !field.title ||
         !field.field_type ||
-        (field.field_type === "select_multiple" && !field?.options?.length) ||
+        ((field.field_type === "select_multiple" || field.field_type === "select") && !field?.options?.length) ||
         (field.field_type === "dice_roll" && !field?.formula),
     )
   )
@@ -73,7 +63,7 @@ function FieldRow({
           <Input
             isDisabled={isLoading}
             label="Field title"
-            name={`[${index}].title`}
+            name={`character_fields[${index}].title`}
             onChange={changeField}
             placeholder="Eg. Location"
             value={title}
@@ -83,7 +73,7 @@ function FieldRow({
           <Select
             isDisabled={isLoading}
             label="Field type"
-            name={`[${index}].field_type`}
+            name={`character_fields[${index}].field_type`}
             onChange={changeField}
             options={FieldTypesEnum}
             placeholder="Field type"
@@ -93,7 +83,7 @@ function FieldRow({
         <div className="h-full w-20">
           <Input
             label="Sort weight"
-            name={`[${index}].sort`}
+            name={`character_fields[${index}].sort`}
             onChange={changeField}
             placeholder="Eg. 10"
             type="number"
@@ -108,7 +98,7 @@ function FieldRow({
               isDisabled={isLoading}
               onClick={() =>
                 changeField({
-                  name: `[${index}].options`,
+                  name: `character_fields[${index}].options`,
                   value: (options || []).concat({ id: crypto.randomUUID(), title: `New option ${(options?.length || 0) + 1}` }),
                 })
               }
@@ -134,7 +124,7 @@ function FieldRow({
               <div className="w-[calc(100%-5rem)]">
                 <Input
                   isDisabled={isLoading}
-                  name={`[${index}].options[${optIndex}].title`}
+                  name={`character_fields[${index}].options[${optIndex}].title`}
                   onChange={changeField}
                   value={opt.title}
                 />
@@ -146,7 +136,10 @@ function FieldRow({
                     icon={IconEnum.trash}
                     isDisabled={isLoading}
                     onClick={() =>
-                      changeField({ name: `[${index}].options`, value: (options || []).filter((o) => o.id !== opt.id) })
+                      changeField({
+                        name: `character_fields[${index}].options`,
+                        value: (options || []).filter((o) => o.id !== opt.id),
+                      })
                     }
                     variant="error"
                   />
@@ -163,7 +156,7 @@ function FieldRow({
               helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
               isDisabled={isLoading}
               label="Dice formula"
-              name={`[${index}].formula`}
+              name={`character_fields[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={formula || ""}
@@ -180,7 +173,7 @@ function FieldRow({
               initialDisplayValue={random_table?.[0]?.title || ""}
               isDisabled={isLoading}
               label="Random table"
-              name={`[${index}].random_table_id`}
+              name={`character_fields[${index}].random_table_id`}
               onChange={changeField}
               searchEntity="random_tables"
               value={random_table_id || ""}
@@ -196,15 +189,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
-    data: insertTemplateType;
-    relations?: { character_fields: Omit<CharacterFieldType, "id">[] };
-  }>("character_fields_templates");
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertTemplateType>("character_fields_templates");
 
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: Partial<Omit<CharacterFieldTemplateType, "fields">>;
-    relations?: { character_fields?: Partial<CharacterFieldType>[] };
-  }>("character_fields_templates", project_id as string);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateTemplateType>(
+    "character_fields_templates",
+    project_id as string,
+  );
 
   const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType & { fields: CharacterFieldType[] }>(
     data?.id,
@@ -215,6 +205,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       },
       relations: {
         character_fields: true,
+        tags: true,
       },
     },
     {
@@ -222,24 +213,27 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     },
   );
 
-  const [template, setTemplate] = useState<{ title: string; sort: number }>({ title: "", sort: 0 });
-  const [fields, setFields] = useState<(Omit<CharacterFieldType, "options"> & { options?: { id: string; title: string }[] })[]>(
-    [],
-  );
+  const [template, setTemplate] = useState<TemplateStateType>({
+    title: "",
+    project_id: project_id as string,
+    sort: 0,
+    tags: [],
+  });
+
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
-  const { handleChange: handleChangeFields } = useHandleChange({ data: fields, setData: setFields });
 
   const isLoading = isFetching || isCreating || isUpdating;
 
   useLayoutEffect(() => {
     if (existingTemplate?.data) {
-      setTemplate(existingTemplate.data);
-      setFields(
-        existingTemplate?.data?.character_fields?.map((f) => ({
-          ...f,
-          options: (f.options || [])?.map((opt) => ({ title: opt, id: crypto.randomUUID() })),
-        })) || [],
-      );
+      setTemplate({
+        ...existingTemplate.data,
+        character_fields:
+          existingTemplate?.data?.character_fields?.map((f) => ({
+            ...f,
+            options: (f.options || [])?.map((opt) => ({ title: opt, id: crypto.randomUUID() })),
+          })) || [],
+      });
     }
   }, [existingTemplate]);
 
@@ -268,6 +262,13 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
+      <div>
+        <TagInput
+          handleChange={handleChange}
+          label="Used for entities with these tags (required)"
+          tags={template?.tags || []}
+        />
+      </div>
       <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
       <div className="flex items-center justify-between">
         <span>Insert new field:</span>
@@ -276,93 +277,96 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             icon={IconEnum.add}
             isDisabled={isLoading}
             onClick={() =>
-              setFields((prev) => [
-                ...prev,
-                { id: crypto.randomUUID(), title: "", project_id: project_id as string, field_type: "text", sort: 0 },
-              ])
+              handleChange({
+                name: "character_fields",
+                value: (template.character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "",
+                  project_id: project_id as string,
+                  field_type: "text",
+                  sort: 0,
+                }),
+              })
             }
             variant="info"
           />
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto">
-        {fields.sort(sortEntities).map((field, index) => (
-          <FieldRow
-            key={field.id}
-            changeField={handleChangeFields}
-            deleteField={(i: number) => removeField(i, setFields)}
-            field_type={field.field_type}
-            formula={field?.formula}
-            id={field.id}
-            index={index}
-            isLoading={isLoading}
-            options={field?.options}
-            project_id={field?.project_id}
-            random_table={field?.random_table}
-            random_table_id={field?.random_table_id}
-            sort={field.sort}
-            title={field.title}
-          />
-        ))}
+        {template.character_fields?.length
+          ? template.character_fields.map((field, index) => (
+              <FieldRow
+                key={field.id}
+                changeField={handleChange}
+                deleteField={() =>
+                  handleChange({
+                    name: "character_fields",
+                    value: template?.character_fields?.filter((f) => f.id !== field.id),
+                  })
+                }
+                field_type={field.field_type}
+                formula={field?.formula}
+                id={field.id}
+                index={index}
+                isLoading={isLoading}
+                options={field?.options || []}
+                project_id={field?.project_id}
+                random_table={field?.random_table}
+                random_table_id={field?.random_table_id}
+                sort={field.sort}
+                title={field.title}
+              />
+            ))
+          : null}
       </div>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(template?.title, fields) || isLoading}
+        isDisabled={isSaveDisabled(template) || isLoading}
         isLoading={isLoading}
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
-          if (!data?.id)
-            await create(
-              {
-                data: {
-                  ...template,
-                  project_id: project_id as string,
-                },
-                relations: {
-                  character_fields: fields.map((field) => ({
-                    ...field,
-                    project_id: project_id as string,
-                    options: field?.options?.map((opt) => opt.title),
-                  })),
-                },
+          if (!data?.id) {
+            const { tags, character_fields, ...rest } = template;
+            const parsedData = InsertTemplateSchema.parse({
+              data: rest,
+              relations: {
+                tags,
+                character_fields: character_fields?.map((field) => ({
+                  ...field,
+                  project_id,
+                  options: field.options?.map((opt) => opt.title),
+                })),
               },
-              {
-                onSuccess: () => {
-                  queryClient.invalidateQueries({
-                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
-                  });
-                  resetDrawerAtom();
-                },
+            });
+            await create(parsedData, {
+              onSuccess: () => {
+                queryClient.invalidateQueries({
+                  predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                });
+                resetDrawerAtom();
               },
-            );
-          else {
-            await update(
-              {
-                data: {
-                  id: data?.id,
-                  title: template.title,
-                  sort: template.sort,
-                },
-                relations: {
-                  character_fields: fields.map((field) => {
-                    const parsedData = UpdateCharacterFieldsSchema.parse({
-                      ...field,
-                      project_id: project_id as string,
-                      options: field.options?.map((opt) => opt.title),
-                    });
-                    return { ...parsedData, field_type: parsedData.field_type as FieldTypes };
-                  }),
-                },
+            });
+          } else {
+            const { tags, character_fields, ...rest } = template;
+            const parsedData = UpdateTemplateSchema.parse({
+              data: rest,
+              relations: {
+                tags,
+                character_fields: character_fields?.map((field) => ({
+                  ...field,
+                  project_id,
+                  options: field.options?.map((opt) => opt.title),
+                })),
               },
-              {
-                onSuccess: () => {
-                  queryClient.invalidateQueries({
-                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
-                  });
-                  resetDrawerAtom();
-                },
+            });
+            await update(parsedData, {
+              onSuccess: () => {
+                queryClient.invalidateQueries({
+                  predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                });
+                resetDrawerAtom();
               },
-            );
+            });
           }
         }}
         variant="success"
