@@ -58,7 +58,12 @@ function createColumns(
                   }));
                 },
               },
-
+              {
+                id: "expand",
+                label: `${!row.getIsExpanded() ? "Show" : "Hide"} context`,
+                icon: IconEnum.text_align_justify,
+                onClick: row.getToggleExpandedHandler(),
+              },
               {
                 id: "delete_word",
                 label: "Delete word",
@@ -102,7 +107,6 @@ export function DictionaryView() {
     item_id,
     "dictionaries",
     {
-      data: {},
       relations: {
         words: true,
       },
@@ -164,6 +168,7 @@ export function DictionaryView() {
             orderBy,
             filters,
             selection,
+            expandable: true,
           }}
           data={data?.data?.words || []}
           dispatch={dispatch}

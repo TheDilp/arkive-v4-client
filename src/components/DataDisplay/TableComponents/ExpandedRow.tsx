@@ -4,11 +4,19 @@ import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
-import { useGetEntities, useGetEntity, useSearch } from "../../../hooks";
-import { CharacterFieldType, CharacterType, DocumentType, SearchAllEntitiesByTagType, TableType } from "../../../types";
+import { useGetEntities, useGetEntity, useGetSubEntity, useSearch } from "../../../hooks";
+import {
+  CharacterFieldType,
+  CharacterType,
+  DocumentType,
+  SearchAllEntitiesByTagType,
+  TableType,
+  WordType,
+} from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getCharacterFullName, getSentenceCase, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
+import { Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
@@ -86,7 +94,6 @@ function ExpandedRowTagListWrapper({
     </ul>
   );
 }
-
 function ExpandedTemplateFields({ templateId }: { templateId: string }) {
   const { project_id } = useParams();
   const { data } = useGetEntities<CharacterFieldType>(
@@ -175,7 +182,6 @@ function ExpandedDocument({ id }: { id: string }) {
     </div>
   ) : null;
 }
-
 function ExpandedTag({ id }: { id: string }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
@@ -218,16 +224,33 @@ function ExpandedTag({ id }: { id: string }) {
     </div>
   );
 }
+function ExpandedWord({ id }: { id: string }) {
+  const { data, isFetching } = useGetSubEntity<WordType>(
+    id,
+    "words",
+    {
+      data: {
+        id,
+      },
+      fields: ["description"],
+    },
+    {
+      enabled: !!id,
+    },
+  );
+  if (isFetching) return <Skeleton type="editor" />;
+  return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description} />;
+}
 
 export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
   return (
     <div className={ExpandedTableRowClasses()}>
       {type === "documents" ? <ExpandedDocument id={data?.id} /> : null}
-
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
       {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
       {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}
       {type === "random_table_options" ? <ExpandedRandomOption suboptions={data?.suboptions || []} /> : null}
+      {type === "words" ? <ExpandedWord id={data?.id} /> : null}
       {type === "tags" ? <ExpandedTag id={data?.id} /> : null}
     </div>
   );
