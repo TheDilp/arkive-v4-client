@@ -191,7 +191,7 @@ function ExpandedTag({ id }: { id: string }) {
     { data: { tag_ids: [id], match: "all" }, limit: 100 },
     "by_tags",
     project_id as string,
-    { queryKeyConcat: [id], staleTime: 3 * 60 * 1000 },
+    { queryKeyConcat: [id] },
   );
 
   const formatted: FormattedTagEntitiesSearch = (searchByTagsData?.data || []).reduce(
