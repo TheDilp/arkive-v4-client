@@ -236,13 +236,11 @@ function AdditionalFieldDisplay({
           return (
             <div key={field?.id} className={fieldClasses}>
               <Title label={field.title} size="xl" />
-              {(field.field_type === "text" ||
-                field.field_type === "number" ||
-                field.field_type === "dice_roll" ||
-                field.field_type === "select" ||
-                field.field_type === "select_multiple") &&
-              value ? (
+              {(field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value ? (
                 <Title label={value || ""} size="lg" />
+              ) : null}
+              {(field.field_type === "select" || field.field_type === "select_multiple") && value ? (
+                <Title label={field?.options?.find((opt) => opt.id === fieldData?.value?.value)?.value || ""} size="lg" />
               ) : null}
               {field.field_type === "random_table" ? (
                 <div>
@@ -301,9 +299,14 @@ export function CharacterProfileView() {
   const [, dispatch] = useTable({});
 
   const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
-    { data: { project_id }, fields: ["id", "title"], relations: { character_fields: true } },
+    {
+      data: { project_id },
+      fields: ["id", "title"],
+      relations: { character_fields: true },
+      relationFilters: { tags: (existingCharacter?.data?.tags || [])?.map((t) => t.id) },
+    },
     "character_fields_templates",
-    { enabled: selectedTab === 2, staleTime: 5 * 60 * 1000 },
+    { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
 
   function showFamilyTree() {
