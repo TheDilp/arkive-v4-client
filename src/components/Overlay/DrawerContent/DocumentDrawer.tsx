@@ -30,8 +30,7 @@ type documentRelationsType = {
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Links", icon: IconEnum.link },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
+  { id: "2", label: "Tags", icon: IconEnum.tags },
 ];
 export function DocumentDrawer({ data }: Props) {
   const { project_id } = useParams();
@@ -152,7 +151,7 @@ export function DocumentDrawer({ data }: Props) {
         </div>
       ) : null}
 
-      {selectedTab === 2 ? (
+      {selectedTab === 1 ? (
         <div className="flex flex-col gap-y-2">
           <Search
             name="tags"
