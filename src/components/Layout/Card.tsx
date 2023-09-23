@@ -1,12 +1,13 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { BaseCardType, CharacterType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
-import { getCharacterFullName, getImageURL, IconEnum, navItems } from "../../utils";
+import { getCharacterFullName, getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
 export function ProjectCard({ id, title, image }: ProjectCardType) {
   const navigate = useNavigate();
+
   return (
     <Link
       className="group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500 animate-in fade-in"
@@ -15,7 +16,7 @@ export function ProjectCard({ id, title, image }: ProjectCardType) {
         {title}
       </h2>
       <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
-        {navItems.map((item, index) => (
+        {projectCardNavItems.map((item, index) => (
           <div
             key={item.tooltip}
             onClick={(e) => {
