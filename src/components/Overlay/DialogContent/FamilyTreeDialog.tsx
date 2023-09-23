@@ -4,6 +4,7 @@ import { Alert } from "../../Misc/Alert";
 
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id);
+
   if (isFetching) return <Skeleton type="family_tree" />;
 
   const { nodes, edges } = characterFamilyData.data;

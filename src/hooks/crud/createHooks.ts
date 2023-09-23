@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
+import { useNavigate } from "react-router-dom";
 
 import { AvailableEntityType, AvailableSubEntityType, EdgeType, GraphType, NodeType } from "../../types";
 import {
@@ -199,4 +200,36 @@ export function useCreateSubEntities<InsertType extends { data: { data: { parent
       method: "POST",
     });
   });
+}
+
+export function useGenerateGraph<
+  InsertType extends { data: { project_id: string }; relations: { nodes: any[]; edges: any[] } },
+>() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  const navigate = useNavigate();
+
+  return useMutation(
+    async (newGraph: InsertType) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/graphs/generate`,
+        body: JSON.stringify(newGraph),
+        method: "POST",
+      }),
+
+    {
+      onSuccess: (data: { data: { id: string } }, vars) => {
+        queryClient.invalidateQueries(["allEntities", vars.data.project_id, "graphs"]);
+        navigate(`/projects/${vars.data.project_id}/graphs/${data.data.id}`);
+      },
+      onError: () => {
+        createNotification({
+          title: "There was an error creating this graph.",
+          variant: "error",
+          timer: 3,
+          icon: IconEnum.error,
+        });
+      },
+    },
+  );
 }

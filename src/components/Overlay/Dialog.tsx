@@ -2,6 +2,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { dialogAtom, IconEnum } from "../../utils";
@@ -68,6 +70,7 @@ const DialogClasses = tv({
 });
 
 export function Dialog() {
+  const { item_id } = useParams();
   const dialog = useAtomValue(dialogAtom);
 
   const { base, container, title, titleContainer } = DialogClasses({
@@ -77,6 +80,11 @@ export function Dialog() {
     isImageView: dialog?.type === "image_view",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
+
+  useEffect(() => {
+    resetDialogAtom();
+  }, [item_id]);
+
   if (dialog?.type === "image_view")
     return (
       <div className={container()} onClick={resetDialogAtom}>

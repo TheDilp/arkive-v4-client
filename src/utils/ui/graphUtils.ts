@@ -179,6 +179,7 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
 
         background_image: getNodeImage(node, project_id) || [],
         doc_id: node?.doc_id,
+        character_id: node?.character_id,
       },
       locked: isReadOnly ?? node.is_locked,
       position: { x: node.x, y: node.y },

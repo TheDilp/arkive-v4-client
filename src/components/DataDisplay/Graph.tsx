@@ -12,6 +12,7 @@ import {
   useCreateSubEntity,
   useDeleteMany,
   useDeleteSubEntity,
+  useGenerateGraph,
   useGetEntity,
   useUpdateManySubEntities,
 } from "../../hooks";
@@ -30,7 +31,7 @@ import {
 import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
-import { Quickbar } from "..";
+import { Button, Quickbar } from "..";
 
 type Props = {
   data?: Partial<GraphType>;
@@ -67,6 +68,10 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
   useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
+  const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{
+    data: Partial<GraphType> & { project_id: string };
+    relations: { nodes: any[]; edges: any[] };
+  }>();
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
   const firstRender = useRef(true) as MutableRefObject<boolean>;
@@ -650,7 +655,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
 
   return (
     <div
-      className="relative flex h-[calc(100%)] w-full flex-1 justify-center"
+      className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center"
       // onDrop={(e) => {
       //   const stringData = e.dataTransfer.getData("item_id");
       //   if (!stringData) return;
@@ -740,6 +745,41 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       //   }
       // }}
     >
+      {isFamilyTreeView ? (
+        <div className="ml-auto w-min">
+          <Button
+            icon={IconEnum.add}
+            isDisabled={isMutating}
+            isLoading={isMutating}
+            label="Create graph from tree"
+            onClick={async () => {
+              const nodesToGenerate = (cyRef?.current?._cy as Core).nodes().map((n) => {
+                const d = n.data();
+                const position = n.position();
+                return { data: { id: d.id, character_id: d.character_id, label: d.label, ...position } };
+              });
+              const edgesToGenerate = (cyRef?.current?._cy as Core).edges().map((e) => {
+                const d = e.data();
+                return { data: { source_id: d.source, target_id: d.target, curve_style: "taxi", taxi_direction: "vertical" } };
+              });
+              if (nodesToGenerate.length <= 1) {
+                createNotification({
+                  title: "Tree must contain at least two nodes.",
+                  variant: "warning",
+                  timer: 3,
+                  icon: IconEnum.warning,
+                });
+                return;
+              }
+              await generateGraph({
+                data: { project_id: project_id as string, title: "Family tree" },
+                relations: { nodes: nodesToGenerate, edges: edgesToGenerate },
+              });
+            }}
+            variant="info"
+          />
+        </div>
+      ) : null}
       <CytoscapeComponent
         ref={cyRef}
         className="h-full w-full"
@@ -761,7 +801,9 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         zoom={0.6}
       />
       {isViewOnly || isReadOnly ? null : (
-        <Quickbar graphTitle={existingGraphData?.data?.title || ""} isViewOnly={isViewOnly ?? false} />
+        <div className="flex w-full justify-center">
+          <Quickbar graphTitle={existingGraphData?.data?.title || ""} isViewOnly={isViewOnly ?? false} />
+        </div>
       )}
     </div>
   );
