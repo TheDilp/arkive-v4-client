@@ -59,6 +59,7 @@ function EntityItem({
   showContextMenu: (event: MouseEvent<HTMLDivElement, MouseEvent>, item_id: string) => void;
 }) {
   const { project_id } = useParams();
+
   return (
     <Link
       draggable
@@ -261,10 +262,9 @@ export function FolderView() {
           </div>
         )}
       </div>
-
-      {!item_id && !isFetching ? (
+      {!isFetching ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 px-2 md:grid-cols-4 lg:grid-cols-10">
-          {(base?.data?.length ? base.data : []).map((item) => (
+          {(base?.data?.length && !item_id ? base.data : []).map((item) => (
             <EntityItem
               key={item.id}
               changeParent={changeParent}
@@ -320,63 +320,65 @@ export function FolderView() {
               type={type as AvailableEntityType}
             />
           ))}
-          {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => (
-            <EntityItem
-              key={item.id}
-              changeParent={changeParent}
-              icon={item.icon}
-              id={item.id}
-              image_id={item?.image_id}
-              is_folder={item?.is_folder ?? false}
-              showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
-                setContextMenuAtom({
-                  event,
-                  items: [
-                    {
-                      title: `Edit ${item.is_folder ? "folder" : entityName}`,
-                      icon: IconEnum.edit,
-                      onClick: () => {
-                        if (item?.is_folder)
-                          setDrawer((prev) => ({
-                            ...prev,
-                            size: "sm",
-                            title: `Edit ${entityName} - ${item.title}`,
-                            type: "folder",
-                            data: { id, type: type as AvailableEntityType },
-                          }));
-                        else
-                          setDrawer((prev) => ({
-                            ...prev,
-                            size: "sm",
-                            title: `Edit ${entityName} - ${item.title}`,
-                            type: type as DrawerContentCreateNewType,
-                            data: { id, project_id: project_id as string },
-                          }));
+          {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => {
+            return (
+              <EntityItem
+                key={item.id}
+                changeParent={changeParent}
+                icon={item.icon}
+                id={item.id}
+                image_id={item?.image_id}
+                is_folder={item?.is_folder ?? false}
+                showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
+                  setContextMenuAtom({
+                    event,
+                    items: [
+                      {
+                        title: `Edit ${item.is_folder ? "folder" : entityName}`,
+                        icon: IconEnum.edit,
+                        onClick: () => {
+                          if (item?.is_folder)
+                            setDrawer((prev) => ({
+                              ...prev,
+                              size: "sm",
+                              title: `Edit ${entityName} - ${item.title}`,
+                              type: "folder",
+                              data: { id, type: type as AvailableEntityType },
+                            }));
+                          else
+                            setDrawer((prev) => ({
+                              ...prev,
+                              size: "sm",
+                              title: `Edit ${entityName} - ${item.title}`,
+                              type: type as DrawerContentCreateNewType,
+                              data: { id, project_id: project_id as string },
+                            }));
+                        },
                       },
-                    },
-                    {
-                      title: `Delete ${entityName}`,
-                      icon: IconEnum.trash,
-                      onClick: () =>
-                        setDialog((prev) => ({
-                          ...prev,
-                          data: {
-                            ...item,
-                            parent_id: item_id,
-                            entity_title: type,
-                          },
-                          title: `Delete ${item.is_folder ? "folder" : entityName}`,
-                          size: "sm",
-                          type: "delete_entity",
-                        })),
-                    },
-                  ],
-                })
-              }
-              title={item.title}
-              type={type as AvailableEntityType}
-            />
-          ))}
+                      {
+                        title: `Delete ${entityName}`,
+                        icon: IconEnum.trash,
+                        onClick: () =>
+                          setDialog((prev) => ({
+                            ...prev,
+                            data: {
+                              ...item,
+                              parent_id: item_id,
+                              entity_title: type,
+                            },
+                            title: `Delete ${item.is_folder ? "folder" : entityName}`,
+                            size: "sm",
+                            type: "delete_entity",
+                          })),
+                      },
+                    ],
+                  })
+                }
+                title={item.title}
+                type={type as AvailableEntityType}
+              />
+            );
+          })}
           {!base?.data?.length && !data?.data?.children?.length ? (
             <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
