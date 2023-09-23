@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { IconEnum, navItems, settingsSubnavItems } from "../../utils";
+import { IconEnum, navItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
 
@@ -26,18 +26,7 @@ const SidebarClasses = tv({
 
 export function Sidebar() {
   const { project_id, type } = useParams();
-  const {
-    base,
-    nav,
-    list,
-    sidebarLogo,
-    listItemLink,
-    listItem,
-    listSettingsItem,
-    settingsSubitem,
-    activeSettingsSubItem,
-    navIcon,
-  } = SidebarClasses();
+  const { base, nav, list, sidebarLogo, listItemLink, listItem, listSettingsItem, navIcon } = SidebarClasses();
   return (
     <div className={base()}>
       <nav className={nav()}>
@@ -49,7 +38,11 @@ export function Sidebar() {
             return (
               <Link
                 key={item.icon}
-                className={`${listItemLink()} ${item.navigate === type ? "sticky top-16 bg-blue-400" : ""}`}
+                className={`${listItemLink()} ${item.navigate === type ? "sticky left-16 top-16 bg-blue-400" : ""}
+                
+                ${item.navigate === "project-settings" ? listSettingsItem() : ""}
+                
+                `}
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
                 <Tooltip allowedPlacements={["right"]} content={item.tooltip} isDisabled={item.navigate === type}>
                   <li className={listItem()}>
@@ -59,33 +52,6 @@ export function Sidebar() {
               </Link>
             );
           })}
-
-          <Tooltip
-            allowedPlacements={["right", "right-start", "right-end", "top", "top-start", "top-end"]}
-            arrowColor="#27272A"
-            closeOnClick
-            content={
-              <div className="w-fit rounded border border-zinc-700 bg-zinc-800 py-2 shadow">
-                <ul className="w-max gap-y-4 font-lato text-lg text-white">
-                  {settingsSubnavItems.map((subItem) => (
-                    <li key={subItem.tooltip} className="p-2">
-                      <Link
-                        className={`${settingsSubitem()} ${subItem.navigate === type ? activeSettingsSubItem() : ""}`}
-                        to={`/projects/${project_id}/settings/${subItem.navigate}`}>
-                        <Icon icon={subItem.icon} />
-                        {subItem.tooltip}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            }
-            customOffset={{ mainAxis: 10 }}
-            isClickable>
-            <li className={listSettingsItem()}>
-              <Icon className={navIcon()} fontSize={32} icon={IconEnum.settings} />
-            </li>
-          </Tooltip>
         </ul>
       </nav>
     </div>
