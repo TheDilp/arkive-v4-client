@@ -64,7 +64,7 @@ export function useGetEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean; queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
-  let baseQueryKey = [
+  const baseQueryKey = [
     "allEntities",
     request.data?.project_id,
     type,
@@ -73,6 +73,7 @@ export function useGetEntities<ReturnType>(
     request?.relationFilters,
     request?.orderBy,
   ];
+  let mainRequestQueryKey = [...baseQueryKey];
   async function queryFn(finalRequest: RequestBodyType) {
     return FetchFunction({
       method: "POST",
@@ -88,18 +89,18 @@ export function useGetEntities<ReturnType>(
   const queryClient = useQueryClient();
 
   if (typeof request?.pagination?.page === "number") {
-    baseQueryKey = baseQueryKey.concat(request?.pagination);
+    mainRequestQueryKey = mainRequestQueryKey.concat(request?.pagination);
   }
 
   if (options?.queryKeyConcat) {
-    baseQueryKey = baseQueryKey.concat(options.queryKeyOverwrite);
+    mainRequestQueryKey = mainRequestQueryKey.concat(options.queryKeyOverwrite);
   }
 
   if (options?.queryKeyOverwrite) {
-    baseQueryKey = options.queryKeyOverwrite;
+    mainRequestQueryKey = options.queryKeyOverwrite;
   }
 
-  const res = useQuery<{ data: ReturnType[] }, unknown>(baseQueryKey, async () => queryFn(request), {
+  const res = useQuery<{ data: ReturnType[] }, unknown>(mainRequestQueryKey, async () => queryFn(request), {
     ...configuredOptions,
     ...options,
   });
@@ -108,10 +109,13 @@ export function useGetEntities<ReturnType>(
     queryClient.prefetchQuery({
       queryKey:
         typeof request?.pagination?.page === "number"
-          ? baseQueryKey.concat({
-              ...request.pagination,
-              page: request.pagination.page + 1,
-            })
+          ? [
+              ...baseQueryKey,
+              {
+                ...request.pagination,
+                page: request.pagination.page + 1,
+              },
+            ]
           : baseQueryKey,
       queryFn: async () =>
         queryFn(
