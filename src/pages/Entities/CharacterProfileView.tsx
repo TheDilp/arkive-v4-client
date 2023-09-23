@@ -1,6 +1,7 @@
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { uniqueBy } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
@@ -539,17 +540,19 @@ export function CharacterProfileView() {
           <ul className="flex flex-col gap-y-2 overflow-hidden animate-in fade-in fill-mode-both">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {existingTemplates?.data?.length && !isFetchingTemplates
-              ? existingTemplates?.data?.sort(sortEntities)?.map((t) => (
-                  <div key={t.id} className="flex flex-col">
-                    <AdditionalFieldDisplay
-                      character_field_data={
-                        existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
-                      }
-                      character_fields={t.character_fields}
-                      template_title={t.title}
-                    />
-                  </div>
-                ))
+              ? uniqueBy(existingTemplates?.data, ["id"])
+                  ?.sort(sortEntities)
+                  ?.map((t) => (
+                    <div key={t.id} className="flex flex-col">
+                      <AdditionalFieldDisplay
+                        character_field_data={
+                          existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                        }
+                        character_fields={t.character_fields}
+                        template_title={t.title}
+                      />
+                    </div>
+                  ))
               : null}
             {!isFetchingTemplates && !existingTemplates?.data?.length ? (
               <Alert label="There are no templates available." variant="info" />
