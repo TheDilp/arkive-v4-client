@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import groupBy from "lodash.groupby";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { flattenArray } from "remirror";
+import { flattenArray, uniqueBy } from "remirror";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import {
@@ -720,7 +720,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           handleChange={handleChange}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
-          templates={templates}
+          templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />
       ) : null}
       {selectedTab === 3 ? (
