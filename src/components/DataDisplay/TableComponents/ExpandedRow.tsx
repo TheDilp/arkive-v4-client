@@ -1,6 +1,6 @@
 import set from "lodash.set";
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
@@ -63,32 +63,34 @@ function ExpandedRowTagListWrapper({
     <ul className="mt-2 flex flex-col gap-y-2 overflow-y-auto">
       {type === "characters"
         ? data[type].map((item) => (
-            <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/characters/${item.id}`}>
-              <EntityPreview
-                id={item.id}
-                image_id={item.portrait_id}
-                title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
-                type="characters"
-              />
-            </Link>
+            <EntityPreview
+              id={item.id}
+              image_id={item.portrait_id}
+              link={`/projects/${project_id}/characters/${item.id}`}
+              title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
+              type="characters"
+            />
           ))
         : null}
       {type === "nodes" || type === "edges"
         ? data[type].map((item) => (
-            <Link
-              key={item.id}
-              className="hover:text-blue-400"
-              to={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}>
-              <EntityPreview id={item.id} title={item.label} type="graphs" />
-            </Link>
+            <EntityPreview
+              id={item.id}
+              link={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}
+              title={item.label}
+              type="graphs"
+            />
           ))
         : null}
 
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
-            <Link key={item.id} className="hover:text-blue-400" to={`/projects/${project_id}/${type}/${item.id}`}>
-              <EntityPreview id={item.id} title={item.title} type={type === "boards" ? "graphs" : type} />
-            </Link>
+            <EntityPreview
+              id={item.id}
+              link={`/projects/${project_id}/${type}/${item.id}`}
+              title={item.title}
+              type={type === "boards" ? "graphs" : type}
+            />
           ))
         : null}
     </ul>
@@ -185,7 +187,7 @@ function ExpandedDocument({ id }: { id: string }) {
 function ExpandedTag({ id }: { id: string }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
-  const { data: searchByTagsData } = useSearch<SearchAllEntitiesByTagType | null>(
+  const { data: searchByTagsData, isFetching } = useSearch<SearchAllEntitiesByTagType | null>(
     { data: { tag_ids: [id], match: "all" }, limit: 100 },
     "by_tags",
     project_id as string,
@@ -200,8 +202,10 @@ function ExpandedTag({ id }: { id: string }) {
     { characters: [], documents: [], maps: [], boards: [], nodes: [], edges: [], calendars: [], dictionaries: [] },
   );
 
+  if (isFetching) return <Skeleton type="expanded_tag" />;
+
   return (
-    <div className="w-min min-w-fit">
+    <div className="w-full min-w-fit">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={expandedTagRowTabs} />
       {selectedTab === 0 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="characters" />

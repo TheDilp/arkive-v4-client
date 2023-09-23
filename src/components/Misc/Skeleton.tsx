@@ -228,6 +228,23 @@ function CalendarViewSkeleton() {
   );
 }
 
+function ExpandedTagSkeleton() {
+  return (
+    <div className="flex flex-col gap-y-2">
+      <div className="flex items-center gap-x-2 border-b border-zinc-400 pb-1">
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+        <div className="h-8 w-full animate-pulse bg-zinc-700" />
+      </div>
+    </div>
+  );
+}
+
 export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
@@ -238,5 +255,6 @@ export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "character_profile") return <CharacterProfileSkeleton />;
   if (type === "character_profile_main") return <CharacterProfileMainSkeleton />;
   if (type === "calendar_view") return <CalendarViewSkeleton />;
+  if (type === "expanded_tag") return <ExpandedTagSkeleton />;
   return null;
 }
