@@ -8,6 +8,7 @@ const AlertClasses = tv({
   slots: {
     base: "flex items-center p-2 bg-zinc-900 overflow-hidden rounded",
     label: "ml-3 text-base font-medium",
+    icon: "text-xl",
   },
   variants: {
     variant: {
@@ -25,10 +26,10 @@ const AlertClasses = tv({
 });
 
 export function Alert({ label, variant = "primary" }: AlertType) {
-  const { base, label: labelClasses } = AlertClasses({ variant });
+  const { base, label: labelClasses, icon: iconClasses } = AlertClasses({ variant });
   return (
     <div className={base()} role="alert">
-      <div>
+      <div className={iconClasses()}>
         <Icon icon={IconEnum.info_circle} />
       </div>
       <div className={labelClasses()}>{label}</div>
