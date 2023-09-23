@@ -25,7 +25,7 @@ import { CharacterFieldTemplates } from "./FieldTemplates";
 import { TagView } from "./TagView";
 
 const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
-const noFetchTypes = ["random_table_options", "tags", "characters", "character_fields_templates"];
+const noFetchTypes = ["random_table_options", "tags", "characters", "character_fields_templates", "project-settings", "assets"];
 
 type EntityItemType = {
   id: string;
