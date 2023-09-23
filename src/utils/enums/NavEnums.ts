@@ -17,6 +17,8 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.settings, navigate: "project-settings", tooltip: "Project settings" },
 ];
 
+export const projectCardNavItems = navItems.slice(0, -1);
+
 export const settingsSubnavItems = [
   { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
 ];
