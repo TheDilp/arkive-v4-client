@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import { NotificationContainer, ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import { FolderView } from "./pages/Entities/FolderView";
-import ProjectsView from "./pages/Projects/ProjectsView";
+import { ProjectsView } from "./pages/Projects";
 
 const queryClient = new QueryClient({
   defaultOptions: {

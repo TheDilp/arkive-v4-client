@@ -9,7 +9,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import { ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
-import ProjectsView from "./pages/Projects/ProjectsView";
+import { ProjectsView } from "./pages/Projects";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);

@@ -18,6 +18,7 @@ import {
   getNavbarEntityType,
   IconEnum,
 } from "../../utils";
+import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
 import { CharactersView } from "./CharactersView";
 import { CharacterFieldTemplates } from "./FieldTemplates";
@@ -200,9 +201,10 @@ export function FolderView() {
   }, [data, type, setBreadcrumbs, item_id]);
 
   if (!item_id && type === "characters") return <CharactersView />;
+  if (type === "tags") return <TagView />;
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
   if (type === "assets") return <AssetView />;
-  if (type === "tags") return <TagView />;
+  if (type === "project-settings") return <ProjectSettingsView />;
 
   return (
     <>

@@ -5,7 +5,7 @@ import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { drawerAtom, IconEnum } from "../../utils";
 
-export default function ProjectsView() {
+export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
   const ownerId = localStorage.getItem("ownerId");
   const { data } = useGetAllProjects({ data: { owner_id: ownerId as string } });
