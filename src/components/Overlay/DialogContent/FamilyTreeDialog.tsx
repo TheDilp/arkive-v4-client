@@ -21,6 +21,7 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
         nodes,
         edges,
       }}
+      isFamilyTreeView
       isViewOnly
     />
   );

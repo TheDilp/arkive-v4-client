@@ -27,7 +27,7 @@ import {
   edgesAtom,
   nodesAtom,
 } from "../../utils/atoms";
-import { cytoscapeGridOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
+import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
 import { Quickbar } from "..";
@@ -37,9 +37,10 @@ type Props = {
   isReadOnly?: boolean;
   isViewOnly?: boolean;
   center_on?: string;
+  isFamilyTreeView?: boolean;
 };
 
-export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
+export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -490,6 +491,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         });
       });
     }
+
     return () => {
       cyRef?.current?._cy.removeListener("mousedown cxttap dbltap free");
     };
@@ -645,6 +647,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
     }
     return () => {};
   }, [drawer]);
+
   return (
     <div
       className="relative flex h-[calc(100%)] w-full flex-1 justify-center"
@@ -742,6 +745,10 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on }: Props) {
         className="h-full w-full"
         cy={(cy: Core) => {
           setBoardRef(cy);
+          if (isFamilyTreeView) {
+            cy.layout({ name: "dagre", ...dagreLayoutOptions }).run();
+            cy.nodes().lock();
+          }
         }}
         elements={CytoscapeComponent.normalizeElements({
           nodes: mapNodes(nodes || [], project_id as string),

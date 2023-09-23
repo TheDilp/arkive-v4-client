@@ -1,4 +1,5 @@
 import cytoscape from "cytoscape";
+import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
 import gridguide from "cytoscape-grid-guide";
 import React from "react";
@@ -12,6 +13,7 @@ import ProjectsView from "./pages/Projects/ProjectsView";
 import { SettingsView } from "./pages/Settings";
 
 cytoscape.use(edgehandles);
+cytoscape.use(dagre);
 gridguide(cytoscape);
 
 const router = createBrowserRouter([

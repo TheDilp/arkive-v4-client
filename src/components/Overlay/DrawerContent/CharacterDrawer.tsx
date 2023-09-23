@@ -323,19 +323,15 @@ function RelationshipRow({
       </div>
       <div className="max-w-[10rem] flex-1">
         <Select
-          isDisabled={relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")}
+          isDisabled={relationship_row_type === "related_from" && relation_type === "parent"}
           name={`${relationship_row_type}[${index}].relation_type`}
           onChange={handleChange}
           options={
-            relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")
+            relationship_row_type === "related_from" && relation_type === "parent"
               ? [{ label: "Child", value: "child" }]
               : BaseCharacterRelationshipOptionsEnum
           }
-          value={
-            relationship_row_type === "related_from" && (relation_type === "father" || relation_type === "mother")
-              ? "child"
-              : relation_type
-          }
+          value={relationship_row_type === "related_from" && relation_type === "parent" ? "child" : relation_type}
         />
       </div>
       <div className="max-w-fit flex-1">

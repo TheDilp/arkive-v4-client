@@ -14,9 +14,8 @@ export const FieldTypesEnum = [
 ];
 
 export const BaseCharacterRelationshipOptionsEnum = [
-  { label: "Father", value: "father" },
-  { label: "Mother", value: "mother" },
+  { label: "Parent", value: "parent" },
   { label: "Partner", value: "partner" },
 ];
 
-export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", "graphs", "nodes", "edges"];
+export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", "graphs", "nodes", "edges", "events"];
