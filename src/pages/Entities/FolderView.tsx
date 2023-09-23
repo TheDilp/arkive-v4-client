@@ -18,6 +18,7 @@ import {
   getNavbarEntityType,
   IconEnum,
 } from "../../utils";
+import { AssetView } from "./AssetView";
 import { CharactersView } from "./CharactersView";
 import { CharacterFieldTemplates } from "./FieldTemplates";
 
@@ -198,6 +199,7 @@ export function FolderView() {
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
+  if (type === "assets") return <AssetView />;
 
   return (
     <>

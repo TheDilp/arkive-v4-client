@@ -7,11 +7,11 @@ import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
 const ImagePreviewClasses = tv({
-  base: "flex h-12 max-h-12 min-h-[3rem] items-center gap-x-2 rounded bg-zinc-700 px-2 w-full",
+  base: "flex h-12 min-h-[3rem] items-center gap-x-2 rounded bg-zinc-700 p-2 w-full",
   variants: {
     size: {
-      md: "h-10 max-h-10 min-h-[2.5rem]",
-      lg: "h-12 max-h-12 min-h-[3rem]",
+      md: "h-12 max-h-12 min-h-[3rem]",
+      lg: "h-16 max-h-16 min-h-[4rem]",
     },
   },
 });

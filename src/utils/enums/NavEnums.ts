@@ -12,12 +12,12 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
   { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
+  { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
   // { icon: IconEnum.generator, navigate: "generators", tooltip: "Generators" },
 ];
 
 export const settingsSubnavItems = [
   { icon: IconEnum.settings, navigate: "project-settings", tooltip: "Project settings" },
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
-  { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
   { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
 ];
