@@ -10,7 +10,6 @@ import App from "./App";
 import { ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import ProjectsView from "./pages/Projects/ProjectsView";
-import { SettingsView } from "./pages/Settings";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -29,10 +28,6 @@ const router = createBrowserRouter([
         path: "projects/:project_id/*",
         element: <ProjectLayout />,
         children: [
-          {
-            path: "settings/:type/*",
-            element: <SettingsView />,
-          },
           {
             path: ":type",
             element: <EntitiesView />,

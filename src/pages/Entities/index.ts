@@ -9,5 +9,5 @@ export * from "./FieldTemplates";
 export * from "./FolderView";
 export * from "./MapView";
 export * from "./RandomTableView";
-export * from "./Tags";
+export * from "./TagView";
 export * from "./TimelineView";

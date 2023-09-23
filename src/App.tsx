@@ -6,7 +6,6 @@ import { NotificationContainer, ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import { FolderView } from "./pages/Entities/FolderView";
 import ProjectsView from "./pages/Projects/ProjectsView";
-import { SettingsView } from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,7 +29,6 @@ export default function App() {
           <Route path="/projects/*">
             <Route element={<ProjectsView />} path="*" />
             <Route element={<ProjectLayout />} path=":project_id/*">
-              <Route element={<SettingsView />} path="settings/:type/*" />
               <Route element={<FolderView />} path=":type" />
               <Route element={<EntitiesView />} path=":type/:item_id/*" />
               <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />

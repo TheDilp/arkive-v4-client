@@ -21,6 +21,7 @@ import {
 import { AssetView } from "./AssetView";
 import { CharactersView } from "./CharactersView";
 import { CharacterFieldTemplates } from "./FieldTemplates";
+import { TagView } from "./TagView";
 
 const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
 const noFetchTypes = ["random_table_options", "tags", "characters", "character_fields_templates"];
@@ -201,6 +202,7 @@ export function FolderView() {
   if (!item_id && type === "characters") return <CharactersView />;
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
   if (type === "assets") return <AssetView />;
+  if (type === "tags") return <TagView />;
 
   return (
     <>

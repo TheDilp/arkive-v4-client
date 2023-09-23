@@ -97,7 +97,7 @@ function createColumns(
   ];
 }
 
-export function Tags() {
+export function TagView() {
   const { project_id } = useParams();
   useChangeNavbarTitle("The Arkive | Tags");
   const setDrawer = useSetAtom(drawerAtom);
