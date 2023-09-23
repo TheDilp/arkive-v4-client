@@ -518,8 +518,8 @@ export function AdditionalFieldsTab({
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Realationships", icon: IconEnum.family_tree },
-  { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "4", label: "Tags", icon: IconEnum.tags },
+  { id: "3", label: "Tags", icon: IconEnum.tags },
+  { id: "4", label: "Additional fields", icon: IconEnum.additional_fields },
 ];
 
 export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
@@ -714,6 +714,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         </>
       ) : null}
       {selectedTab === 2 ? (
+        <div className="flex flex-col gap-y-2">
+          <TagInput handleChange={handleChange} tags={character?.tags || []} />
+        </div>
+      ) : null}
+      {selectedTab === 3 ? (
         <AdditionalFieldsTab
           character_fields={character?.character_fields}
           createNotification={createNotification}
@@ -723,11 +728,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />
       ) : null}
-      {selectedTab === 3 ? (
-        <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} tags={character?.tags || []} />
-        </div>
-      ) : null}
+
       <Button
         icon={character?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled(character) || isCreating || isUpdating}

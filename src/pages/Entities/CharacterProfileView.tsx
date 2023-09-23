@@ -366,6 +366,7 @@ export function CharacterProfileView() {
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+            isBordered
             isTooltipDisabled
             label={getCharacterFullName(
               existingCharacter?.data?.first_name as string,
