@@ -187,7 +187,7 @@ export function FolderView() {
   const entityName = getEntityNameFromType(type as AvailableEntityType);
 
   useChangeNavbarTitle(
-    `The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType) || "")} ${
+    `The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "project-settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
   );
