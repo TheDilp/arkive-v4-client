@@ -12,6 +12,7 @@ const columnHelper = createColumnHelper<WordType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  parent_id: string,
 ) {
   return [
     columnHelper.accessor("title", {
@@ -73,6 +74,7 @@ function createColumns(
                     ...prev,
                     data: {
                       ...row.original,
+                      parent_id,
                       entity_title: "words",
                     },
                     title: "Delete word",
@@ -162,7 +164,7 @@ export function DictionaryView() {
       </div>
       <div className="h-full max-h-[85%] w-full overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog)}
+          columns={createColumns(setDrawer, setDialog, item_id as string)}
           config={{
             hasSelect: true,
             orderBy,

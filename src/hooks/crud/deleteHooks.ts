@@ -2,7 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cloneDeep from "lodash.clonedeep";
 import set from "lodash.set";
 
-import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType, MapLayers, MapPinType, MapType } from "../../types";
+import {
+  AllAvailableEntities,
+  AvailableEntityType,
+  AvailableSubEntityType,
+  DictionaryType,
+  MapLayers,
+  MapPinType,
+  MapType,
+  WordType,
+} from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
@@ -45,6 +54,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
 
 export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string) {
   const queryClient = useQueryClient();
+  const createNotification = useNotifications();
   return useMutation(
     async (vars: { data: { id: string; parent_id: string } }) => {
       return FetchFunction({
@@ -70,13 +80,35 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
           });
           return { old };
         }
+        if (type === "words") {
+          const old = queryClient.getQueryData<DictionaryType>(["dictionaries", vars.data.parent_id]);
+          queryClient.setQueryData<{ data: DictionaryType }>(["dictionaries", vars.data.parent_id], (oldData) => {
+            if (oldData) {
+              const temp = cloneDeep(oldData);
+              set(
+                temp,
+                `data.${type}`,
+                ((temp?.data?.[type] as WordType[]) || [])?.filter((item) => item?.id !== vars.data.id),
+              );
+              return temp;
+            }
+            return oldData;
+          });
+          return { old };
+        }
         return { old: {} };
       },
       onSuccess: () => {
+        createNotification({
+          title: getEntityCRUDNotification(type, "delete"),
+          variant: "success",
+          icon: IconEnum.check,
+          timer: 5,
+        });
         queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
       },
       onError: (_, vars, context) => {
-        queryClient.setQueryData(["maps", vars.data.parent_id], context?.old);
+        queryClient.setQueryData(["dictionaries", vars.data.parent_id], context?.old);
       },
     },
   );

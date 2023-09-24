@@ -97,6 +97,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
   project_id: string | undefined,
 ) {
   const queryClient = useQueryClient();
+  const createNotification = useNotifications();
   const setNodes = useSetAtom(nodesAtom);
   const setEdges = useSetAtom(edgesAtom);
   return useMutation(
@@ -137,12 +138,19 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
           queryClient.setQueryData([parentEntityType, vars.data.parent_id], context?.old);
         }
       },
-      onSuccess: (_, vars) => {
+      onSuccess: (data, vars) => {
         const parentEntityType = getParentEntityType(type);
         if (parentEntityType && parentEntityType !== "documents" && parentEntityType !== "graphs") {
           queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
           queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
         }
+        createNotification({
+          title: data?.message || getEntityCRUDNotification(type, "create"),
+          variant: "success",
+          icon: IconEnum.check,
+          timer: 2,
+          position: "top-right",
+        });
       },
     },
   );
