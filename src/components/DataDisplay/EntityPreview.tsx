@@ -19,7 +19,7 @@ export function EntityPreview({ id, title, type, link, image_id, label, hasNoBac
           <Avatar image={getImageURL(project_id as string, "images", image_id)} label={title} size="sm" />
         ) : (
           <span>
-            <Icon fontSize={20} icon={getDefaultEntityIcon(type)} />
+            <Icon fontSize={32} icon={getDefaultEntityIcon(type)} />
           </span>
         )}
         <span className="truncate">{title}</span>
