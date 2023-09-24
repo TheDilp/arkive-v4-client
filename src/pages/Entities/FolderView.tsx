@@ -158,7 +158,7 @@ export function FolderView() {
       staleTime: 5 * 60 * 1000,
     },
   );
-  const { data } = useGetEntity<BaseEntityType & { image_id?: string }>(
+  const { data, isFetching: isFetchingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
     {
@@ -210,7 +210,7 @@ export function FolderView() {
     <>
       <div className="flex h-12 items-center justify-between">
         <Breadcrumbs />
-        {isFetching ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
+        {isFetching || isFetchingFolder ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
         {(!item_id || data?.data?.is_folder) && !isFetching ? (
           <div className="w-52">
             <Dropdown
@@ -383,7 +383,7 @@ export function FolderView() {
               />
             );
           })}
-          {!base?.data?.length && !data?.data?.children?.length ? (
+          {!base?.data?.length && !data?.data?.children?.length && !isFetchingFolder ? (
             <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
             </div>
