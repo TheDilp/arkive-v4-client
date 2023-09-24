@@ -30,22 +30,25 @@ export function useUpdateEntity<
     },
     {
       onMutate: (vars) => {
-        const old = queryClient.getQueryData([type, vars.data.id]);
-        if (type !== "documents") {
-          queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
-            if (oldData?.data)
-              return {
-                ...oldData,
-                data: {
-                  ...oldData.data,
-                  ...vars.data,
-                  ...Object.values(vars.relations || {}).map((rel) => rel?.data),
-                },
-              };
-            return oldData;
-          });
+        if (type !== "projects") {
+          const old = queryClient.getQueryData([type, vars.data.id]);
+          if (type !== "documents") {
+            queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
+              if (oldData?.data)
+                return {
+                  ...oldData,
+                  data: {
+                    ...oldData.data,
+                    ...vars.data,
+                    ...Object.values(vars.relations || {}).map((rel) => rel?.data),
+                  },
+                };
+              return oldData;
+            });
+          }
+          return { old };
         }
-        return { old };
+        return {};
       },
 
       onError: (_, vars, context) => {
