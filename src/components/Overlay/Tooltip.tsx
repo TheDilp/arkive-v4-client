@@ -4,6 +4,7 @@ import {
   autoPlacement,
   autoUpdate,
   FloatingArrow,
+  hide,
   inline,
   offset,
   safePolygon,
@@ -66,6 +67,7 @@ export function Tooltip({
       autoPlacement({ allowedPlacements }),
       offset(customOffset),
       shift(),
+      hide(),
       arrow({
         element: arrowRef,
       }),

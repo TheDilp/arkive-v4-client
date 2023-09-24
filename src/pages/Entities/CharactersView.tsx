@@ -331,7 +331,7 @@ export function CharactersView() {
           )}
         </div>
       ) : (
-        <div className="h-full max-h-[85%] w-full overflow-hidden">
+        <div className="w-full flex-1 overflow-hidden">
           <Table
             columns={createColumns(setDrawer, setDialog)}
             config={{

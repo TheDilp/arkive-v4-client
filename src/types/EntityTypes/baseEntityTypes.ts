@@ -10,7 +10,7 @@ export interface BaseEntityType {
   icon?: string | null;
 }
 export type AvailableEntityType =
-  | "project"
+  | "projects"
   | "characters"
   | "documents"
   | "maps"
