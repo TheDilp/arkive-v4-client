@@ -1,6 +1,7 @@
 export * from "./CalendarDrawer";
 export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
+export * from "./CharacterRelationshipTypeDrawer";
 export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
 export * from "./EdgeDrawer";
@@ -9,6 +10,7 @@ export * from "./EventDrawer";
 export * from "./FieldTemplateDrawer";
 export * from "./FolderDrawer";
 export * from "./GraphDrawer";
+export * from "./ImageDrawer";
 export * from "./InsertEditorImageDrawer";
 export * from "./ManyEdgesDrawer";
 export * from "./ManyNodesDrawer";

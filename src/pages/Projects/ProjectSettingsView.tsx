@@ -1,10 +1,11 @@
+import { useSetAtom } from "jotai";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, ColorPicker, Input, Tabs } from "../../components";
 import { useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
 import { ProjectType } from "../../types";
-import { DefaultTagColor, IconEnum } from "../../utils";
+import { DefaultTagColor, drawerAtom, IconEnum } from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
 const tabs = [
@@ -19,6 +20,7 @@ export function ProjectSettingsView() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
+  const setDrawer = useSetAtom(drawerAtom);
   const { data: projectData } = useGetEntity<ProjectType>(project_id as string, "projects", {
     fields: ["id", "title", "image_id", "default_dice_color"],
   });
@@ -30,6 +32,14 @@ export function ProjectSettingsView() {
 
   async function handleSave() {
     if (project) await updateProject({ data: project });
+  }
+  function handleOpenNewRelationshipTypeDrawer() {
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Create new relationship type",
+      type: "character_relationship_types",
+      data: { project_id },
+    }));
   }
 
   return (
@@ -47,6 +57,11 @@ export function ProjectSettingsView() {
           {selectedTab === 0 ? (
             <div className="ml-auto w-min">
               <Button icon={IconEnum.save} label="Save" onClick={handleSave} variant="success" />
+            </div>
+          ) : null}
+          {selectedTab === 1 ? (
+            <div className="ml-auto w-min">
+              <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewRelationshipTypeDrawer} variant="info" />
             </div>
           ) : null}
         </h2>

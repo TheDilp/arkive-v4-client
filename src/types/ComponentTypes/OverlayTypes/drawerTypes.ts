@@ -58,7 +58,8 @@ export type DrawerAtomType = {
         | "calendars"
         | "dictionaries"
         | "random_tables"
-        | "random_table_option";
+        | "random_table_option"
+        | "character_relationship_types";
       data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }

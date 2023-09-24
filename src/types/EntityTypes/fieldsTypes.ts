@@ -25,7 +25,6 @@ export interface CharacterFieldType {
   options?: { id: string; value: string }[];
   random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string }[];
-  template_id: string;
 }
 export interface CharacterFieldTemplateType {
   id: string;

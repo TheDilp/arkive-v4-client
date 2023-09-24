@@ -1,5 +1,6 @@
 export * from "./baseEntityTypes";
 export * from "./calendarTypes";
+export * from "./characterRelationshipTypes";
 export * from "./characterTypes";
 export * from "./dictionaryTypes";
 export * from "./documentTypes";

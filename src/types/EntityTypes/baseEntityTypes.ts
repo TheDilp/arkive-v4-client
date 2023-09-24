@@ -22,6 +22,7 @@ export type AvailableEntityType =
   | "random_tables"
   | "character_fields_templates"
   | "generators"
+  | "character_relationship_types"
   | "tags";
 export type AvailableSubEntityType =
   | "alter_names"

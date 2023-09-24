@@ -63,9 +63,13 @@ export function EventDrawer({ data }: Props) {
   );
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
-  }>("events");
+  }>("events", project_id as string);
 
-  const { mutateAsync: updateEvent, isLoading: isUpdating } = useUpdateSubEntity("events");
+  const { mutateAsync: updateEvent, isLoading: isUpdating } = useUpdateSubEntity(
+    "events",
+    project_id as string,
+    item_id as string,
+  );
 
   const [event, setEvent] = useState<EventStateType>(
     existingEvent?.data ?? {
