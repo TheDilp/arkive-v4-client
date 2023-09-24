@@ -4,6 +4,7 @@ import "../../Editor.css";
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
 import { RemirrorContentType } from "remirror";
@@ -86,7 +87,8 @@ export function DocumentView({ editable }: { editable: boolean }) {
       if (currentDocument?.data?.dice_color) {
         Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
       } else {
-        Dice.updateConfig({ themeColor: DefaultTagColor });
+        const defaultDiceColor: string | null = ls.get("default_dice_color");
+        Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
       }
     }
   }, [currentDocument]);

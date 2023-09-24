@@ -1,10 +1,11 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { dialogAtom, drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
-import { DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
+import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
+import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { IndeterminateProgressBar } from "../Misc";
 import { Tooltip } from "../Overlay";
@@ -13,6 +14,7 @@ import { Card } from "./Card";
 function DiceRoller() {
   const createNotification = useNotifications();
   const [diceRoll, setDiceRoll] = useState("");
+  const defaultDiceColor = ls.get("default_dice_color");
   return (
     <Card title="Roll dice">
       <div className="flex flex-col gap-y-2">
@@ -21,6 +23,7 @@ function DiceRoller() {
           onChange={(e) => setDiceRoll(e.value as string)}
           onKeyDown={async (e) => {
             if (e.key === "Enter") {
+              Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
               if (!diceRoll.match(DiceRollRegex)) {
                 createNotification({
                   timer: 2,
@@ -41,7 +44,10 @@ function DiceRoller() {
           icon={IconEnum.d20}
           isDisabled={!diceRoll || !diceRoll.match(DiceRollRegex)}
           label="Roll"
-          onClick={async () => rollDiceWithNotification(createNotification, diceRoll)}
+          onClick={async () => {
+            Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
+            await rollDiceWithNotification(createNotification, diceRoll);
+          }}
           variant="info"
         />
       </div>
