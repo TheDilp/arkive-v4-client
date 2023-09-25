@@ -248,7 +248,8 @@ export function FolderView() {
               <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
             </Dropdown>
           </div>
-        ) : (
+        ) : null}
+        {(item_id || data?.data?.is_folder) && !isFetching ? (
           <div className="w-fit">
             <Button
               icon={IconEnum.edit}
@@ -264,7 +265,7 @@ export function FolderView() {
               }}
             />
           </div>
-        )}
+        ) : null}
       </div>
       {!isFetching ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 px-2 md:grid-cols-4 lg:grid-cols-10">
