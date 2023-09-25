@@ -282,8 +282,7 @@ export function CharacterProfileView() {
     ...(existingCharacter?.data?.related_to || []),
     ...(existingCharacter?.data?.related_from?.map((relation) => ({
       ...relation,
-      relation_type:
-        relation.relation_type === "father" || relation.relation_type === "mother" ? "child" : relation.relation_type,
+      relation_type: relation.relation_type === "parent" ? "child" : relation.relation_type,
     })) || []),
     ...(existingCharacter?.data?.siblings?.map((sibling) => ({ ...sibling, relation_type: "sibling" })) || []),
   ];
