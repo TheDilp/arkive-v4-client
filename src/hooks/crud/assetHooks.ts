@@ -167,3 +167,8 @@ export function useGetInfiniteAssets<ReturnType>(
     },
   );
 }
+export function useDeleteAsset<InsertType extends { data: { id: string } }>(project_id: string | undefined, type: AssetType) {
+  return useMutation(async (vars: InsertType) =>
+    FetchFunction({ method: "DELETE", url: `${baseURLS.baseServer}/assets/${project_id}/${type}/${vars.data.id}` }),
+  );
+}

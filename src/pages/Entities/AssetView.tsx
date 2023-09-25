@@ -90,17 +90,18 @@ function createColumns(
                 onClick: () => downloadImage({ data: row.original }),
               },
               {
-                id: "delete_character",
-                label: "Delete character",
+                id: "delete_image",
+                label: "Delete image",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "characters",
+                      entity_title: "images",
+                      asset_type: "images",
                     },
-                    title: "Delete character",
+                    title: "Delete image",
                     size: "sm",
                     type: "delete_entity",
                   }));

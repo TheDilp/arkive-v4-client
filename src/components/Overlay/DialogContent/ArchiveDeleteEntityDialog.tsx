@@ -1,7 +1,7 @@
 import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
-import { useDeleteEntity, useDeleteSubEntity } from "../../../hooks";
+import { useDeleteAsset, useDeleteEntity, useDeleteSubEntity } from "../../../hooks";
 import { AvailableEntityType, AvailableSubEntityType, DialogContentType } from "../../../types";
 import {
   capitalizeFirstLetter,
@@ -25,6 +25,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     action === "archive",
   );
   const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType, project_id as string);
+  const { mutate: deleteAsset } = useDeleteAsset(project_id as string, data.asset_type);
   const createNotification = useNotifications();
   return (
     <div className="flex h-full flex-col justify-between">
@@ -58,7 +59,9 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
           label={capitalizeFirstLetter(action || "")}
           onClick={() => {
             if (data?.id && project_id && data?.entity_title) {
-              if (data?.entity_title satisfies AvailableSubEntityType) {
+              if (data?.entity_title === "images") {
+                deleteAsset({ data: { id: data?.id } });
+              } else if (data?.entity_title satisfies AvailableSubEntityType) {
                 deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
               } else {
                 deleteEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
