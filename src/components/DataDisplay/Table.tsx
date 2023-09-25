@@ -45,10 +45,10 @@ const TableClasses = tv({
   slots: {
     container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
     table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
-    head: "border-x border-t border-zinc-600 sticky top-0 z-50 shadow-lg bg-zinc-950 overflow-y-hidden flex min-w-full flex-col mb-4 w-max flex-1 max-h-12 min-h-[3rem] border-b",
+    head: "border-x border-t border-zinc-600 sticky top-0 z-50 shadow-lg bg-zinc-950 overflow-y-hidden flex min-w-full flex-col mb-4 w-max min-h-fit border-b",
     headerGroup: "flex w-full h-12",
     select: "select-none",
-    header: "font-merriweather truncate select-none h-12",
+    header: "font-merriweather truncate select-none flex-1 min-h-[2.5rem]",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "px-2",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
