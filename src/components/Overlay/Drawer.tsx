@@ -37,7 +37,7 @@ import { ImageDrawer } from "./DrawerContent/ImageDrawer";
 
 const DrawerClasses = tv({
   slots: {
-    base: "bg-zinc-800 absolute right-0 top-0 h-full transition-transform px-4 pb-4 z-50 duration-300 ease-in-out max-h-full",
+    base: "bg-zinc-800 absolute right-0 top-0 h-full transition-transform px-4 pb-4 z-[60] duration-300 ease-in-out max-h-full",
     title:
       "font-merriweather text-white h-16 max-h-[4rem] text-2xl text-center border-b items-center border-zinc-700 mb-4 flex justify-between flex-nowrap",
   },
