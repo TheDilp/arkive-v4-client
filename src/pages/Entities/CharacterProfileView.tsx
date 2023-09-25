@@ -362,7 +362,7 @@ export function CharacterProfileView() {
       {isFetching ? (
         <Skeleton type="character_profile" />
       ) : (
-        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
+        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -389,7 +389,7 @@ export function CharacterProfileView() {
           </div>
         </div>
       )}
-      <div className="col-span-5 min-h-[calc(100%)] rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+      <div className="col-span-5 min-h-full rounded-lg bg-zinc-950 p-4 lg:col-span-4">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
