@@ -1,11 +1,11 @@
-import { useSetAtom } from "jotai";
-import { useLayoutEffect, useState } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, ColorPicker, Input, Tabs } from "../../components";
-import { useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
-import { ProjectType } from "../../types";
-import { DefaultTagColor, drawerAtom, IconEnum } from "../../utils";
+import { Button, ColorPicker, createColumnHelper, Dropdown, Input, Table, TablePageLayout, Tabs } from "../../components";
+import { useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
+import { CharacterRelationshipType, DialogAtomType, ProjectType } from "../../types";
+import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum } from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
 const tabs = [
@@ -15,14 +15,76 @@ const tabs = [
   // { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
 ];
 
+const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
+
+function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+  return [
+    relationshipTypesColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <b>{row.original.title}</b>,
+    }),
+    relationshipTypesColumnHelper.display({
+      id: "ascendant_title",
+      header: "Ascendant",
+      cell: ({ row }) => row.original?.ascendant_title || "",
+    }),
+    relationshipTypesColumnHelper.display({
+      id: "descendant_title",
+      header: "Descendant",
+      cell: ({ row }) => row.original?.descendant_title || "",
+    }),
+
+    relationshipTypesColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "delete_relationship_type",
+                label: "Delete relationship type",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "characters",
+                    },
+                    title: "Delete character",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+
 export function ProjectSettingsView() {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
+  const setDialog = useSetAtom(dialogAtom);
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
+  const [, dispatch] = useTable({});
   const setDrawer = useSetAtom(drawerAtom);
   const { data: projectData } = useGetEntity<ProjectType>(project_id as string, "projects", {
     fields: ["id", "title", "image_id", "default_dice_color"],
+    relations: {
+      character_relationship_types: true,
+    },
   });
 
   const { mutateAsync: updateProject } = useUpdateEntity<UpdateProjectType>("projects", project_id as string);
@@ -57,12 +119,18 @@ export function ProjectSettingsView() {
           {tabs[selectedTab].label}
           {selectedTab === 0 ? (
             <div className="ml-auto w-min">
-              <Button icon={IconEnum.save} label="Save" onClick={handleSave} variant="success" />
+              <Button icon={IconEnum.save} label="Save" onClick={handleSave} size="sm" variant="success" />
             </div>
           ) : null}
           {selectedTab === 1 ? (
             <div className="ml-auto w-min">
-              <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewRelationshipTypeDrawer} variant="info" />
+              <Button
+                icon={IconEnum.add}
+                label="Create"
+                onClick={handleOpenNewRelationshipTypeDrawer}
+                size="sm"
+                variant="info"
+              />
             </div>
           ) : null}
         </h2>
@@ -78,6 +146,16 @@ export function ProjectSettingsView() {
               />
             </div>
           </div>
+        ) : null}
+        {selectedTab === 1 ? (
+          <TablePageLayout>
+            <Table
+              columns={relationshipTableColumns(setDialog)}
+              data={projectData?.data?.character_relationship_types || []}
+              dispatch={dispatch}
+              type="character_relationship_types"
+            />
+          </TablePageLayout>
         ) : null}
       </div>
     </div>

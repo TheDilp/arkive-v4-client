@@ -420,7 +420,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
     </div>
   );
 }
-export function Table({ columns, data, config, isLoading, pagination, dispatch, type }: TableType) {
+export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type }: TableType) {
   const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
