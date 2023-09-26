@@ -33,7 +33,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
             icon: IconEnum.check_circle,
             timer: 5,
           });
-        queryClient.invalidateQueries([project_id, type]);
+        queryClient.invalidateQueries(["allEntities", project_id, type]);
         resetDialogAtom();
       },
     },
@@ -168,7 +168,29 @@ export function useGetInfiniteAssets<ReturnType>(
   );
 }
 export function useDeleteAsset<InsertType extends { data: { id: string } }>(project_id: string | undefined, type: AssetType) {
-  return useMutation(async (vars: InsertType) =>
-    FetchFunction({ method: "DELETE", url: `${baseURLS.baseServer}/assets/${project_id}/${type}/${vars.data.id}` }),
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (vars: InsertType) =>
+      FetchFunction({ method: "DELETE", url: `${baseURLS.baseServer}/assets/${project_id}/${type}/${vars.data.id}` }),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(["allEntities", project_id, "images"]);
+        createNotification({
+          title: data?.message || `${type === "images" ? "Image" : "Map"} deleted successfully.`,
+          timer: 3,
+          variant: "success",
+          icon: IconEnum.check_circle,
+        });
+      },
+      onError: () => {
+        createNotification({
+          title: `There was an error deleting this ${type === "images" ? "image" : "maps"}.`,
+          timer: 3,
+          variant: "success",
+          icon: IconEnum.error,
+        });
+      },
+    },
   );
 }

@@ -128,7 +128,12 @@ export function AssetView() {
     pagination: { limit: 10, page: 0 },
   });
 
-  const { data: assets, isLoading } = useGetImages(project_id as string, "images", { orderBy, filters, pagination });
+  const { data: assets, isLoading } = useGetImages(
+    project_id as string,
+    "images",
+    { orderBy, filters, pagination },
+    { enabled: view === "table" },
+  );
 
   const {
     data: infiniteAssets,
