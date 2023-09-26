@@ -24,6 +24,7 @@ export function ProjectSettingsView() {
   const { data: projectData } = useGetEntity<ProjectType>(project_id as string, "projects", {
     fields: ["id", "title", "image_id", "default_dice_color"],
   });
+
   const { mutateAsync: updateProject } = useUpdateEntity<UpdateProjectType>("projects", project_id as string);
 
   useLayoutEffect(() => {

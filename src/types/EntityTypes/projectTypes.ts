@@ -1,3 +1,4 @@
+import { CharacterRelationshipType } from "./characterRelationshipTypes";
 import { ImageType } from "./imageTypes";
 
 export interface ProjectType {
@@ -7,4 +8,5 @@ export interface ProjectType {
   image_id: string | null;
   images?: ImageType[];
   default_dice_color?: string;
+  character_relationship_types?: CharacterRelationshipType[];
 }
