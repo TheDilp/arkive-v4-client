@@ -39,9 +39,10 @@ type Props = {
   isViewOnly?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
+  layoutOptions?: Record<string, any>;
 };
 
-export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView }: Props) {
+export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -786,7 +787,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         cy={(cy: Core) => {
           setBoardRef(cy);
           if (isFamilyTreeView) {
-            cy.layout({ name: "dagre", ...dagreLayoutOptions }).run();
+            cy.layout({ name: "dagre", ...dagreLayoutOptions, ...(layoutOptions || {}) }).run();
             cy.nodes().lock();
           }
         }}

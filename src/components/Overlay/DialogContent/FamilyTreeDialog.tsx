@@ -1,28 +1,64 @@
-import { useGetCharacterFamily } from "../../../hooks";
-import { Graph, Skeleton } from "../..";
+import { useState } from "react";
+
+import { useGetCharacterFamily, useGetEntity } from "../../../hooks";
+import { CharacterRelationshipDataType, CharacterType, EdgeType } from "../../../types";
+import { Graph, Select, Skeleton } from "../..";
 import { Alert } from "../../Misc/Alert";
 
+function getLayoutDirection(character_relationship_types: CharacterRelationshipDataType[], relationShipTypeId: string) {
+  const selectedType = character_relationship_types?.find((rt) => rt.id === relationShipTypeId);
+  if (selectedType) {
+    if (!selectedType.related_to_ascendant_title && !selectedType.related_from_ascendant_title) {
+      return "LR";
+    }
+    return "TB";
+  }
+  return "TB";
+}
+
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
-  const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id);
-
-  if (isFetching) return <Skeleton type="family_tree" />;
-
-  const { nodes, edges } = characterFamilyData.data;
-
-  if (!nodes.length) return <Alert label="There are no related characters." variant="info" />;
+  const [relationShipTypeId, setRelationshipTypeId] = useState("");
+  const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, {
+    enabled: !!relationShipTypeId,
+  });
+  const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(data?.id, "characters", {
+    fields: ["id"],
+    relations: {
+      character_relationship_types: true,
+    },
+  });
+  if (isFetching || isFetchingCharacterData) return <Skeleton type="family_tree" />;
+  const layoutDirection = getLayoutDirection(characterData?.data?.character_relationship_types || [], relationShipTypeId);
+  const { nodes, edges } = characterFamilyData?.data ?? { nodes: [], edges: [] };
 
   return (
-    <Graph
-      data={{
-        title: "Family tree",
-        default_edge_color: "#595959",
-        default_node_color: "#595959",
-        default_node_shape: "rectangle",
-        nodes,
-        edges,
-      }}
-      isFamilyTreeView
-      isViewOnly
-    />
+    <div className="flex h-full flex-col gap-y-2">
+      <Select
+        name="relationshipTypeId"
+        onChange={({ value }) => setRelationshipTypeId(value as string)}
+        options={(characterData?.data?.character_relationship_types || []).map((rt) => ({
+          label: rt.related_from_title || rt.related_to_title || "",
+          value: rt.id,
+        }))}
+        value={relationShipTypeId}
+      />
+      {relationShipTypeId ? (
+        <Graph
+          data={{
+            title: "Relationship tree",
+            default_edge_color: "#595959",
+            default_node_color: "#595959",
+            default_node_shape: "rectangle",
+            nodes: nodes || [],
+            edges: layoutDirection === "TB" ? edges || [] : edges.map((e: EdgeType) => ({ ...e, curve_style: "straight" })),
+          }}
+          isFamilyTreeView
+          isViewOnly
+          layoutOptions={{ rankDir: layoutDirection }}
+        />
+      ) : (
+        <Alert label="No relation type selected." />
+      )}
+    </div>
   );
 }

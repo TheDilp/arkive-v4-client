@@ -10,8 +10,8 @@ import { Button, Input, Title } from "../../Form";
 
 function isSaveDisabled(relationship_type: Partial<CharacterRelationshipType>) {
   if (!relationship_type?.title) return true;
-  if (!relationship_type?.ascendant_title) return true;
-  if (!relationship_type?.descendant_title) return true;
+  if (relationship_type?.ascendant_title && !relationship_type?.descendant_title) return true;
+  if (!relationship_type?.ascendant_title && relationship_type?.descendant_title) return true;
   return false;
 }
 
@@ -29,15 +29,21 @@ export function CharacterRelationshipTypeDrawer() {
 
   return (
     <div className="flex flex-col gap-y-2">
-      <Input label="Title (required)" name="title" onChange={handleChange} value={relationshipType?.title || ""} />
       <Input
-        label="Ascendant title (required)"
+        helperText="Note: If ascendant and descendant titles are left blank, the title will be used for the relationship name."
+        label="Title (required, must be unique)"
+        name="title"
+        onChange={handleChange}
+        value={relationshipType?.title || ""}
+      />
+      <Input
+        label="Ascendant title (optional)"
         name="ascendant_title"
         onChange={handleChange}
         value={relationshipType?.ascendant_title || ""}
       />
       <Input
-        label="Descendant title (required)"
+        label="Descendant title (optional)"
         name="descendant_title"
         onChange={handleChange}
         value={relationshipType?.descendant_title || ""}
@@ -47,12 +53,16 @@ export function CharacterRelationshipTypeDrawer() {
         <Title isDrawerTitle label="Example" size="sm" />
         <div className="text-zinc-400">
           <span>Character A is a/the </span>
-          <span className="italic text-white">{relationshipType?.ascendant_title || "ascendant (eg. parent)"} </span>
+          <span className="italic text-white">
+            {relationshipType?.title || relationshipType?.ascendant_title || "ascendant (eg. parent)"}{" "}
+          </span>
           <span>of character B.</span>
         </div>
         <div className="text-zinc-400">
           <span>Character B is a/the </span>
-          <span className="italic text-white">{relationshipType?.descendant_title || "descendant (eg. child)"} </span>
+          <span className="italic text-white">
+            {relationshipType?.title || relationshipType?.descendant_title || "descendant (eg. child)"}{" "}
+          </span>
           <span>of character A.</span>
         </div>
       </div>

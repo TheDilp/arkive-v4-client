@@ -68,6 +68,8 @@ export function useCreateEntity<
         if (data?.ok) {
           if (vars?.data?.parent_id) {
             queryClient.invalidateQueries([type, vars.data.parent_id]);
+          } else if (type === "character_relationship_types") {
+            queryClient.invalidateQueries(["projects", vars.data.project_id]);
           } else {
             queryClient.invalidateQueries(["allEntities", vars.data.project_id, type]);
           }

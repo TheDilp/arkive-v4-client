@@ -1,7 +1,6 @@
 import { tv } from "tailwind-variants";
 
 import { InputType } from "../../types";
-import { Tooltip } from "../Overlay";
 
 const InputClasses = tv({
   slots: {
@@ -9,7 +8,7 @@ const InputClasses = tv({
     input:
       "flex h-10 w-full items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-md border p-2 text-base outline-none placeholder:italic",
     label: "text-sm truncate block min-h-[20px]",
-    helperText: "text-xs truncate",
+    helperText: "text-xs",
   },
   variants: {
     variant: {
@@ -124,11 +123,7 @@ export function Input({
         type={type}
         value={value}
       />
-      {helperText ? (
-        <Tooltip content={helperText} delay={{ openDelay: 500 }}>
-          <div className={helperTextClasses()}>{helperText}</div>
-        </Tooltip>
-      ) : null}
+      {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}
     </div>
   );
 }

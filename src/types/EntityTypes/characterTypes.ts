@@ -1,11 +1,19 @@
 import { CharacterFieldValueType, CharacterLocationType, CharacterRelationshipType, DocumentType, MapType, TagType } from ".";
 import { ImageType } from "./imageTypes";
 
-export interface RelationshipType {
+export interface RelationType {
   character_a_id: string;
   character_b_id: string;
   relation_type_id: string;
   relation_type: CharacterRelationshipType;
+}
+
+export interface CharacterRelationshipDataType {
+  id: string;
+  related_to_title?: string;
+  related_from_title?: string;
+  related_to_ascendant_title?: string;
+  related_from_ascendant_title?: string;
 }
 
 export interface CharacterType {
@@ -25,6 +33,7 @@ export interface CharacterType {
   yearOfBirth?: number | null;
   maps?: MapType | [];
   character_fields?: CharacterFieldValueType[];
+  character_relationship_types?: CharacterRelationshipDataType[];
   locations: CharacterLocationType[];
   documents: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: TagType[];

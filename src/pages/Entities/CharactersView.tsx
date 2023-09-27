@@ -130,12 +130,16 @@ function createColumns(
               },
               {
                 id: "2",
-                label: "View family tree",
+                label: "View relationship tree",
                 icon: IconEnum.family_tree,
                 onClick: () => {
                   setDialog({
                     type: "family_tree",
-                    title: `Family tree of ${getCharacterFullName(row.original.first_name, "", row.original?.last_name || "")}`,
+                    title: `Relationship tree of ${getCharacterFullName(
+                      row.original.first_name,
+                      "",
+                      row.original?.last_name || "",
+                    )}`,
                     data: { id: row.original.id },
                     size: "lg",
                   });
