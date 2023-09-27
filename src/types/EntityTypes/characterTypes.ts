@@ -1,11 +1,11 @@
-import { CharacterFieldValueType, CharacterLocationType, DocumentType, MapType, TagType } from ".";
+import { CharacterFieldValueType, CharacterLocationType, CharacterRelationshipType, DocumentType, MapType, TagType } from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationshipType {
   character_a_id: string;
   character_b_id: string;
-  relation_type: string;
-  character_b_name: string;
+  relation_type_id: string;
+  relation_type: CharacterRelationshipType;
 }
 
 export interface CharacterType {
@@ -33,7 +33,8 @@ export interface CharacterType {
     first_name: string;
     nickname?: string;
     last_name?: string;
-    relation_type: string;
+    relation_type_id: string;
+    relation_type?: CharacterRelationshipType;
     portrait_id?: string;
   }[];
   related_from?: {
@@ -41,7 +42,8 @@ export interface CharacterType {
     first_name: string;
     nickname?: string;
     last_name?: string;
-    relation_type: string;
+    relation_type_id: string;
+    relation_type?: CharacterRelationshipType;
     portrait_id?: string;
   }[];
   siblings?: {
@@ -49,7 +51,8 @@ export interface CharacterType {
     first_name: string;
     nickname?: string;
     last_name?: string;
-    relation_type: string;
+    relation_type_id: string;
+    relation_type?: CharacterRelationshipType;
     portrait_id?: string;
   }[];
 }

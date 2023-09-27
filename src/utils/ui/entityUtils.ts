@@ -22,6 +22,7 @@ export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEn
   if (type === "random_tables") return "random table";
   if (type === "character_fields_templates") return "field template";
   if (type === "map_pins") return "map pin";
+  if (type === "character_relationship_types") return "character relationship type";
   return type.substring(0, type.length - 1);
 }
 

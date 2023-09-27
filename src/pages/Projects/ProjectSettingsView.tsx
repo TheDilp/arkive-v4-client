@@ -55,7 +55,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "characters",
+                      entity_title: "character_relationship_types",
                     },
                     title: "Delete character",
                     size: "sm",
