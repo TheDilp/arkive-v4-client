@@ -98,9 +98,9 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
         }
         return { old: {} };
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         createNotification({
-          title: getEntityCRUDNotification(type, "delete"),
+          title: data?.message || getEntityCRUDNotification(type, "delete"),
           variant: "success",
           icon: IconEnum.check,
           timer: 5,
