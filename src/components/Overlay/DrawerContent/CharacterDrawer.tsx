@@ -20,7 +20,6 @@ import {
   TagType,
 } from "../../../types";
 import {
-  BaseCharacterRelationshipOptionsEnum,
   baseURLS,
   dialogAtom,
   drawerAtom,
@@ -49,10 +48,10 @@ type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
 function isSaveDisabled(character: CharacterStateType) {
   if (!character?.first_name) return true;
   if (character?.related_from?.length) {
-    if (character?.related_from?.some((rel) => !rel?.relation_type)) return true;
+    if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
   }
   if (character?.related_to?.length) {
-    if (character?.related_to?.some((rel) => !rel?.relation_type)) return true;
+    if (character?.related_to?.some((rel) => !rel?.relation_type_id)) return true;
   }
 
   return false;
@@ -78,7 +77,7 @@ function RandomTableInput({
   subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `character_fields.${template_id}[${index}]`;
+  const name = `character_fields[${template_id}][${index}]`;
 
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -178,7 +177,7 @@ function CharacterFieldInputs({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
-  const name = `character_fields.${template_id}[${index}]`;
+  const name = `character_fields[${template_id}][${index}]`;
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -297,6 +296,7 @@ function CharacterFieldInputs({
 
 function RelationshipRow({
   current_character_first_name,
+  relation_type_id,
   relation_type,
   character_name,
   portrait_id,
@@ -310,7 +310,8 @@ function RelationshipRow({
   id: string;
   current_character_first_name?: string;
   character_name: string;
-  relation_type: string;
+  relation_type?: CharacterRelationshipType;
+  relation_type_id: string;
   portrait_id?: string;
   index: number;
   relationship_row_type: "related_to" | "related_from";
@@ -319,10 +320,14 @@ function RelationshipRow({
   handleRemove: (char_id: string) => void;
 }) {
   const customOptions = customRelationshipTypes.map((rt) => {
-    if (relationship_row_type === "related_to") return { label: rt.ascendant_title, value: rt.ascendant_title.toLowerCase() };
-    return { label: rt.descendant_title, value: rt.descendant_title.toLowerCase() };
+    if (relationship_row_type === "related_to") {
+      if (rt?.ascendant_title) return { label: rt.ascendant_title, value: rt.id };
+      return { label: rt.title, value: rt.id };
+    }
+
+    return { label: rt?.descendant_title || rt.title, value: rt.id };
   });
-  const RelationshipOptions = BaseCharacterRelationshipOptionsEnum.concat(customOptions);
+
   return (
     <li className="flex items-center gap-x-2">
       <div className="flex flex-1 items-center justify-between gap-x-2">
@@ -331,15 +336,11 @@ function RelationshipRow({
       </div>
       <div className="max-w-[10rem] flex-1">
         <Select
-          isDisabled={relationship_row_type === "related_from" && relation_type === "parent"}
-          name={`${relationship_row_type}[${index}].relation_type`}
+          isDisabled={relationship_row_type === "related_from" && relation_type?.id === relation_type_id}
+          name={`${relationship_row_type}[${index}].relation_type_id`}
           onChange={handleChange}
-          options={
-            relationship_row_type === "related_from" && relation_type === "parent"
-              ? [{ label: "Child", value: "child" }]
-              : RelationshipOptions
-          }
-          value={relationship_row_type === "related_from" && relation_type === "parent" ? "child" : relation_type}
+          options={customOptions}
+          value={relation_type_id}
         />
       </div>
       <div className="max-w-fit flex-1">
@@ -411,7 +412,7 @@ function FieldTemplateRow({
                   // eslint-disable-next-line no-await-in-loop
                   const value = await getRollValue(formula, true);
                   fieldsToChange.push({
-                    name: `character_fields.${template_id}[${idx}]`,
+                    name: `character_fields[${template_id}][${idx}]`,
                     value: { id: diceRollFields[i].field_id, value: { value } },
                   });
                 }
@@ -433,7 +434,7 @@ function FieldTemplateRow({
         const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
         if (idx > -1) {
           fieldsToChange.push({
-            name: `character_fields.${template_id}[${idx}]`,
+            name: `character_fields[${template_id}][${idx}]`,
             value: {
               id: character_fields[idx].id,
               value: {
@@ -566,7 +567,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_fields_templates",
     {
-      enabled: selectedTab === 2 && !!character?.tags?.length,
+      enabled: selectedTab === 3 && !!character?.tags?.length,
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -582,7 +583,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   );
 
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
-
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
@@ -596,7 +596,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   }, [existingCharacter?.data]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
-
   return (
     <>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -672,7 +671,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                           first_name,
                           last_name,
                           portrait_id: image,
-                          relation_type: "",
+                          relation_type_id: "",
                         }),
                       });
                     }
@@ -727,7 +726,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                       handleRemove={(character_b_id: string) =>
                         handleChange({
                           name: "related_from",
-                          value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
+                          value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
                         })
                       }
                       index={index}
@@ -766,12 +765,13 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           if (changedData) {
             if (character?.id) {
               const characterToUpdate = { ...(changedData || {}), id: character.id };
-              const { related_to, related_from, tags, ...rest } = characterToUpdate;
-
+              const { related_to, related_from, tags, character_fields, ...rest } = characterToUpdate;
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
                 relations: {
-                  character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
+                  character_fields: character_fields
+                    ? flattenArray(Object.values(character?.character_fields || {})) || []
+                    : undefined,
                   related_from,
                   related_to,
                   tags,

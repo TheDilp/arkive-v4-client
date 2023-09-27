@@ -15,15 +15,18 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
     if (Array.isArray(newData)) {
       for (let index = 0; index < newData.length; index += 1) {
         const { name, value } = newData[index];
-        if (!changedFields.includes(name)) {
-          changedFieldsUpdated.push(name);
+        const formattedName = name.includes("[") || name.includes("]") ? name.split("[")[0] : name;
+        if (!changedFields.includes(formattedName)) {
+          changedFieldsUpdated.push(formattedName);
         }
         set(updatedData, name, value);
       }
     } else {
       const { name, value } = newData;
-      if (!changedFields.includes(name)) {
-        changedFieldsUpdated.push(name);
+      const formattedName = name.includes("[") || name.includes("]") ? name.split("[")[0] : name;
+
+      if (!changedFields.includes(formattedName)) {
+        changedFieldsUpdated.push(formattedName);
         setChangedFields(changedFieldsUpdated);
       }
       set(updatedData, name, value);
