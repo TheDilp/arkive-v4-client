@@ -14,13 +14,13 @@ const SidebarClasses = tv({
     nav: "flex h-48 flex-1 flex-col overflow-x-hidden overflow-y-hidden lg:h-full lg:max-w-[4rem] lg:overflow-y-auto lg:overflow-x-hidden",
     list: "flex w-screen overflow-x-auto lg:w-full scrollbar-hidden lg:flex-1 lg:flex-col lg:items-center lg:justify-start lg:overflow-x-hidden",
     sidebarLogo: "flex h-16 items-center justify-center w-16 min-w-[4rem] min-h-[4rem] sticky top-0 left-0 bg-zinc-900",
-    listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16",
+    listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16 hover:fill-blue-300",
     listItem:
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
     listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto",
     settingsSubitem: "flex items-center gap-x-2 select-none",
     activeSettingsSubItem: "text-blue-400",
-    navIcon: "cursor-pointer hover:text-blue-300 text-white",
+    navIcon: "cursor-pointer",
   },
 });
 
