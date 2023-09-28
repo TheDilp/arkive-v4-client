@@ -54,14 +54,14 @@ export function CharacterRelationshipTypeDrawer() {
         <div className="text-zinc-400">
           <span>Character A is a/the </span>
           <span className="italic text-white">
-            {relationshipType?.title || relationshipType?.ascendant_title || "ascendant (eg. parent)"}{" "}
+            {relationshipType?.ascendant_title || relationshipType?.title || "ascendant (eg. parent)"}{" "}
           </span>
           <span>of character B.</span>
         </div>
         <div className="text-zinc-400">
           <span>Character B is a/the </span>
           <span className="italic text-white">
-            {relationshipType?.title || relationshipType?.descendant_title || "descendant (eg. child)"}{" "}
+            {relationshipType?.descendant_title || relationshipType?.title || "descendant (eg. child)"}{" "}
           </span>
           <span>of character A.</span>
         </div>

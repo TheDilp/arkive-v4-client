@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import groupBy from "lodash.groupby";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -11,6 +10,7 @@ import {
   CharacterFieldTemplateType,
   CharacterFieldType,
   CharacterFieldValueType,
+  CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
   HandleChangePropsType,
@@ -21,7 +21,6 @@ import {
 } from "../../../types";
 import {
   baseURLS,
-  dialogAtom,
   drawerAtom,
   FetchFunction,
   getCharacterFullName,
@@ -295,7 +294,6 @@ function CharacterFieldInputs({
 }
 
 function RelationshipRow({
-  current_character_first_name,
   relation_type_id,
   relation_type,
   character_name,
@@ -308,7 +306,6 @@ function RelationshipRow({
   customRelationshipTypes,
 }: {
   id: string;
-  current_character_first_name?: string;
   character_name: string;
   relation_type?: CharacterRelationshipType;
   relation_type_id: string;
@@ -320,21 +317,24 @@ function RelationshipRow({
   handleRemove: (char_id: string) => void;
 }) {
   const customOptions = customRelationshipTypes.map((rt) => {
+    const result = { label: "", value: rt.id };
     if (relationship_row_type === "related_to") {
-      if (rt?.ascendant_title) return { label: rt.ascendant_title, value: rt.id };
-      return { label: rt.title, value: rt.id };
+      if (rt?.ascendant_title) result.label = `${rt.ascendant_title} (${rt.title})`;
+      else result.label = rt.title;
     }
-
-    return { label: rt?.descendant_title || rt.title, value: rt.id };
+    if (relationship_row_type === "related_from") {
+      if (rt?.descendant_title) result.label = `${rt.descendant_title} (${rt.title})`;
+      else result.label = rt.title;
+    }
+    return result;
   });
 
   return (
-    <li className="flex items-center gap-x-2">
-      <div className="flex flex-1 items-center justify-between gap-x-2">
+    <li className="grid grid-cols-12 items-center gap-x-2">
+      <div className="col-span-5 flex items-center justify-between gap-x-2">
         <EntityPreview hasNoBackground id={id} image_id={portrait_id} title={character_name} type="characters" />
-        <span className="truncate whitespace-nowrap">is {current_character_first_name || "this character"}&apos;s </span>
       </div>
-      <div className="max-w-[10rem] flex-1">
+      <div className="col-span-6">
         <Select
           isDisabled={relationship_row_type === "related_from" && relation_type?.id === relation_type_id}
           name={`${relationship_row_type}[${index}].relation_type_id`}
@@ -343,7 +343,7 @@ function RelationshipRow({
           value={relation_type_id}
         />
       </div>
-      <div className="max-w-fit flex-1">
+      <div className="col-span-1">
         <Button
           hasNoBackground
           icon={IconEnum.trash}
@@ -524,6 +524,84 @@ export function AdditionalFieldsTab({
 }
 // #endregion tabs
 
+export function CharacterRelationshipGroup({
+  character_id,
+  title,
+  relationships,
+  relationshipTypes,
+  relation_type,
+  handleChange,
+}: {
+  character_id?: string;
+  title: string;
+  relationships: CharacterRelatedType[];
+  relationshipTypes: CharacterRelationshipType[];
+  relation_type: "related_from" | "related_to";
+  handleChange: (newData: HandleChangePropsType) => void;
+}) {
+  const createNotification = useNotifications();
+
+  return (
+    <Collapsible label={title}>
+      <div className="mt-0.5 flex flex-col gap-y-2">
+        <div className="flex items-center justify-between gap-x-2">
+          <Search
+            name={relation_type}
+            onChange={({ label, value, image }) => {
+              if (character_id === value) {
+                createNotification({
+                  title: "Cannot add a character to themselves.",
+                  variant: "warning",
+                  timer: 2,
+                  icon: IconEnum.info_circle,
+                });
+                return;
+              }
+              if (value) {
+                const [first_name, last_name] = (label || "").split(" ");
+
+                handleChange({
+                  name: relation_type,
+                  value: (relationships || []).concat({
+                    id: value,
+                    first_name,
+                    last_name,
+                    portrait_id: image,
+                    relation_type_id: "",
+                  }),
+                });
+              }
+            }}
+            placeholder="Press enter to search characters"
+            searchEntity="characters"
+          />
+        </div>
+        {relationships.length ? (
+          <ul className="flex flex-col gap-y-2">
+            {relationships?.map((relationship, index) => (
+              <RelationshipRow
+                key={`${relationship.id}`}
+                character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
+                customRelationshipTypes={relationshipTypes || []}
+                handleChange={handleChange}
+                handleRemove={(character_b_id: string) =>
+                  handleChange({
+                    name: relation_type,
+                    value: (relationships || []).filter((r) => r.id !== character_b_id),
+                  })
+                }
+                index={index}
+                relationship_row_type={relation_type}
+                {...relationship}
+              />
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </Collapsible>
+  );
+}
+
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Realationships", icon: IconEnum.family_tree },
@@ -535,7 +613,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab ?? 0);
 
-  const setDialog = useSetAtom(dialogAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
@@ -648,94 +725,22 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <Skeleton type="drawer_form" />
           ) : (
             <>
-              <div className="flex items-center justify-between gap-x-2">
-                <Search
-                  name="related_to"
-                  onChange={({ label, value, image }) => {
-                    if (character?.related_to?.some((relationship) => relationship?.id === value)) {
-                      createNotification({
-                        title: "Cannot add same character more than once as a relationship.",
-                        variant: "warning",
-                        timer: 2,
-                        icon: IconEnum.info_circle,
-                      });
-                      return;
-                    }
-                    if (value) {
-                      const [first_name, last_name] = (label || "").split(" ");
-
-                      handleChange({
-                        name: "related_to",
-                        value: (character?.related_to || []).concat({
-                          id: value,
-                          first_name,
-                          last_name,
-                          portrait_id: image,
-                          relation_type_id: "",
-                        }),
-                      });
-                    }
-                  }}
-                  placeholder="Press enter to search characters"
-                  searchEntity="characters"
-                />
-                {data?.id ? (
-                  <div className="h-full w-10">
-                    <Button
-                      icon={IconEnum.family_tree}
-                      onClick={() => {
-                        setDialog({ type: "family_tree", title: "Family tree", data, size: "lg" });
-                      }}
-                      tooltip="Show family tree"
-                      variant="info"
-                    />
-                  </div>
-                ) : null}
-              </div>
-              {character?.related_to?.length ? (
-                <ul className="flex flex-col gap-y-2">
-                  {character?.related_to?.map((relationship, index) => (
-                    <RelationshipRow
-                      key={`${relationship.id}`}
-                      character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
-                      current_character_first_name={character.first_name}
-                      customRelationshipTypes={relationshipTypes?.data || []}
-                      handleChange={handleChange}
-                      handleRemove={(character_b_id: string) =>
-                        handleChange({
-                          name: "related_to",
-                          value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
-                        })
-                      }
-                      index={index}
-                      relationship_row_type="related_to"
-                      {...relationship}
-                    />
-                  ))}
-                </ul>
-              ) : null}
-              {character?.related_from?.length ? (
-                <ul className="flex flex-col gap-y-2">
-                  {character?.related_from?.map((relationship, index) => (
-                    <RelationshipRow
-                      key={`${relationship.id}`}
-                      character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
-                      current_character_first_name={character.first_name}
-                      customRelationshipTypes={relationshipTypes?.data || []}
-                      handleChange={handleChange}
-                      handleRemove={(character_b_id: string) =>
-                        handleChange({
-                          name: "related_from",
-                          value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
-                        })
-                      }
-                      index={index}
-                      relationship_row_type="related_from"
-                      {...relationship}
-                    />
-                  ))}
-                </ul>
-              ) : null}
+              <CharacterRelationshipGroup
+                character_id={character?.id}
+                handleChange={handleChange}
+                relation_type="related_to"
+                relationships={character?.related_to || []}
+                relationshipTypes={relationshipTypes?.data || []}
+                title="Ascendants"
+              />
+              <CharacterRelationshipGroup
+                character_id={character?.id}
+                handleChange={handleChange}
+                relation_type="related_from"
+                relationships={character?.related_from || []}
+                relationshipTypes={relationshipTypes?.data || []}
+                title="Descendants"
+              />
             </>
           )}
         </div>

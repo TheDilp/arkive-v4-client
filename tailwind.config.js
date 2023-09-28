@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      transitionProperty: {
+        width: "width",
+      },
       animation: {
         progress: "progress 1s infinite linear",
       },

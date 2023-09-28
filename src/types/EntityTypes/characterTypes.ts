@@ -16,6 +16,16 @@ export interface CharacterRelationshipDataType {
   related_from_ascendant_title?: string;
 }
 
+export interface CharacterRelatedType {
+  id: string;
+  first_name: string;
+  nickname?: string;
+  last_name?: string;
+  relation_type_id: string;
+  relation_type?: CharacterRelationshipType;
+  portrait_id?: string;
+}
+
 export interface CharacterType {
   id: string;
   project_id: string;
@@ -37,33 +47,9 @@ export interface CharacterType {
   locations: CharacterLocationType[];
   documents: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: TagType[];
-  related_to?: {
-    id: string;
-    first_name: string;
-    nickname?: string;
-    last_name?: string;
-    relation_type_id: string;
-    relation_type?: CharacterRelationshipType;
-    portrait_id?: string;
-  }[];
-  related_from?: {
-    id: string;
-    first_name: string;
-    nickname?: string;
-    last_name?: string;
-    relation_type_id: string;
-    relation_type?: CharacterRelationshipType;
-    portrait_id?: string;
-  }[];
-  siblings?: {
-    id: string;
-    first_name: string;
-    nickname?: string;
-    last_name?: string;
-    relation_type_id: string;
-    relation_type?: CharacterRelationshipType;
-    portrait_id?: string;
-  }[];
+  related_to?: CharacterRelatedType[];
+  related_from?: CharacterRelatedType[];
+  siblings?: CharacterRelatedType[];
 }
 
 export interface CharacterRelationType {
