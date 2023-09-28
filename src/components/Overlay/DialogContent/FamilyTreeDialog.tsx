@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useGetCharacterFamily, useGetEntity } from "../../../hooks";
-import { CharacterRelationshipDataType, CharacterType, EdgeType } from "../../../types";
+import { CharacterRelationshipDataType, CharacterType } from "../../../types";
 import { Graph, Select, Skeleton } from "../..";
 import { Alert } from "../../Misc/Alert";
 
@@ -18,22 +18,33 @@ function getLayoutDirection(character_relationship_types: CharacterRelationshipD
 
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const [relationShipTypeId, setRelationshipTypeId] = useState("");
+  const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(
+    data?.id,
+    "characters",
+    {
+      fields: ["id"],
+      relations: {
+        character_relationship_types: true,
+      },
+    },
+    {
+      queryKeyConcat: ["family_tree"],
+    },
+  );
+  const layoutDirection = getLayoutDirection(characterData?.data?.character_relationship_types || [], relationShipTypeId);
+
   const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, {
     enabled: !!relationShipTypeId,
+    staleTime: 60 * 1000,
   });
-  const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(data?.id, "characters", {
-    fields: ["id"],
-    relations: {
-      character_relationship_types: true,
-    },
-  });
-  if (isFetching || isFetchingCharacterData) return <Skeleton type="family_tree" />;
-  const layoutDirection = getLayoutDirection(characterData?.data?.character_relationship_types || [], relationShipTypeId);
+
+  if (isFetching) return <Skeleton type="family_tree" />;
   const { nodes, edges } = characterFamilyData?.data ?? { nodes: [], edges: [] };
 
   return (
     <div className="flex h-full flex-col gap-y-2">
       <Select
+        isLoading={isFetchingCharacterData}
         name="relationshipTypeId"
         onChange={({ value }) => setRelationshipTypeId(value as string)}
         options={(characterData?.data?.character_relationship_types || []).map((rt) => ({
@@ -42,7 +53,8 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
         }))}
         value={relationShipTypeId}
       />
-      {relationShipTypeId ? (
+      {isFetching ? <Skeleton type="family_tree" /> : null}
+      {relationShipTypeId && !isFetching ? (
         <Graph
           data={{
             title: "Relationship tree",
@@ -50,7 +62,7 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
             default_node_color: "#595959",
             default_node_shape: "rectangle",
             nodes: nodes || [],
-            edges: layoutDirection === "TB" ? edges || [] : edges.map((e: EdgeType) => ({ ...e, curve_style: "straight" })),
+            edges: edges || [],
           }}
           isFamilyTreeView
           isViewOnly
