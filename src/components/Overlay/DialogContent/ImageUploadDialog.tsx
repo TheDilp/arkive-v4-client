@@ -32,7 +32,7 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
   const [files, setFiles] = useState<File[]>([]);
   const imageUrls = getPreviewImageURLs(files);
   return (
-    <div className="flex h-full flex-col justify-start gap-y-2 p-4">
+    <div className="flex h-full flex-col justify-start gap-y-2 overflow-hidden p-2">
       <div className={imageUploadContainer()}>
         <ImageUpload images={files} onChange={setFiles} />
       </div>
@@ -42,22 +42,25 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
               <ImagePreview
                 key={`${img.name}${img.url}`}
                 clearAction={(name) => setFiles((prev) => prev.filter((f) => f.name !== name))}
+                id={img.name}
                 title={img.name}
                 url={img.url}
               />
             ))
           : null}
       </div>
-      <Button
-        icon={IconEnum.upload}
-        isDisabled={isMutating}
-        isLoading={isMutating}
-        label={isMutating ? "Uploading..." : "Upload"}
-        onClick={async () => {
-          if (files) await mutateAsync(files);
-        }}
-        variant="info"
-      />
+      <div>
+        <Button
+          icon={IconEnum.upload}
+          isDisabled={isMutating}
+          isLoading={isMutating}
+          label={isMutating ? "Uploading..." : "Upload"}
+          onClick={async () => {
+            if (files) await mutateAsync(files);
+          }}
+          variant="info"
+        />
+      </div>
     </div>
   );
 }

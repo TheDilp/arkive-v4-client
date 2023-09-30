@@ -629,7 +629,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 isDisabled: relationGroupIds.includes(rt.id),
                 onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
               }))}>
-              <div className="h-6 w-6">
+              <div className="h-8 w-8">
                 <Button icon={IconEnum.add} onClick={undefined} variant="info" />
               </div>
             </Dropdown>

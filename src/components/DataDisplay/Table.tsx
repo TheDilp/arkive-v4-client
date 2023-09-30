@@ -67,7 +67,7 @@ const TableClasses = tv({
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
-    showPageCountSelectContainer: "w-16",
+    showPageCountSelectContainer: "w-20",
     paginationButtonsContainer:
       "flex min-h-full lg:h-9 h-8 flex-nowrap [&>*>button]:w-10 [&>*>button]:border-y-0 [&>*>button]:border-r-0",
   },

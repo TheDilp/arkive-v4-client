@@ -22,7 +22,7 @@ export function ImagePreview({ id, title, url, size = "md", clearAction }: Image
   return (
     <div className={classes}>
       <div className="col-span-1 flex items-center">
-        <Avatar image={id ? getImageURL(project_id as string, "images", id) : url} label={title} size={size} />
+        <Avatar image={url || getImageURL(project_id as string, "images", id) || ""} label={title} size={size} />
       </div>
       <div className="ml-2 truncate font-lato">{title}</div>
       {clearAction ? (
