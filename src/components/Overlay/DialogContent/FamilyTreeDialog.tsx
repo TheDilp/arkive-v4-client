@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useGetCharacterFamily, useGetEntity } from "../../../hooks";
 import { CharacterRelationshipDataType, CharacterType } from "../../../types";
+import { FamilyTreeGenerationsCountOptions } from "../../../utils";
 import { Graph, Select, Skeleton } from "../..";
 import { Alert } from "../../Misc/Alert";
 
@@ -18,6 +19,7 @@ function getLayoutDirection(character_relationship_types: CharacterRelationshipD
 
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const [relationShipTypeId, setRelationshipTypeId] = useState("");
+  const [generationCount, setGenerationCount] = useState("5");
   const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(
     data?.id,
     "characters",
@@ -33,8 +35,8 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   );
   const layoutDirection = getLayoutDirection(characterData?.data?.character_relationship_types || [], relationShipTypeId);
 
-  const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, {
-    enabled: !!relationShipTypeId,
+  const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, generationCount, {
+    enabled: !!relationShipTypeId && !!generationCount,
     // staleTime: 60 * 1000,
   });
 
@@ -43,16 +45,30 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
 
   return (
     <div className="flex h-full flex-col gap-y-2">
-      <Select
-        isLoading={isFetchingCharacterData}
-        name="relationshipTypeId"
-        onChange={({ value }) => setRelationshipTypeId(value as string)}
-        options={(characterData?.data?.character_relationship_types || []).map((rt) => ({
-          label: rt.related_from_title || rt.related_to_title || "",
-          value: rt.id,
-        }))}
-        value={relationShipTypeId}
-      />
+      <div className="flex flex-nowrap gap-x-2">
+        <Select
+          isLoading={isFetchingCharacterData}
+          label="Relationship type"
+          name="relationshipTypeId"
+          onChange={({ value }) => setRelationshipTypeId(value as string)}
+          options={(characterData?.data?.character_relationship_types || []).map((rt) => ({
+            label: rt.related_from_title || rt.related_to_title || "",
+            value: rt.id,
+          }))}
+          value={relationShipTypeId}
+        />
+        <div className="w-36">
+          <Select
+            isLoading={isFetchingCharacterData}
+            label="Number of generations"
+            name="generationCount"
+            onChange={({ value }) => setGenerationCount(value as string)}
+            options={FamilyTreeGenerationsCountOptions}
+            value={generationCount}
+          />
+        </div>
+      </div>
+
       {isFetching ? <Skeleton type="family_tree" /> : null}
       {relationShipTypeId && !isFetching ? (
         <Graph

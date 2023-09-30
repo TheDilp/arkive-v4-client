@@ -190,14 +190,15 @@ export function useSearch<ReturnType>(
 export function useGetCharacterFamily(
   character_id: string | undefined,
   relationship_type_id: string,
+  count?: string,
   options?: UseQueryOptions,
 ) {
   return useQuery(
-    ["family", character_id, relationship_type_id],
+    ["family", character_id, relationship_type_id, count || "5"],
     async () =>
       FetchFunction({
         method: "GET",
-        url: `${baseURLS.baseServer}/characters/family/${relationship_type_id}/${character_id}`,
+        url: `${baseURLS.baseServer}/characters/family/${relationship_type_id}/${character_id}/${count || "5"}`,
       }),
     {
       enabled: options?.enabled && !!character_id,
