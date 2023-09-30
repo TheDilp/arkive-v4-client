@@ -562,9 +562,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       >;
       setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
       setRelationGroupIds(
-        (character?.related_from || [])
-          .concat(character?.related_to || [])
-          .concat(character?.related_other || [])
+        (existingCharacter?.data?.related_from || [])
+          .concat(existingCharacter?.data?.related_to || [])
+          .concat(existingCharacter?.data?.related_other || [])
           .map((relation: CharacterRelatedType) => relation.relation_type_id),
       );
     }
@@ -623,12 +623,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <span>Insert new type:</span>
             <Dropdown
               allowedPlacements={["left", "left-start", "left-end"]}
-              items={(relationshipTypes?.data || []).map((rt) => ({
-                id: rt.id,
-                label: rt.title,
-                isDisabled: relationGroupIds.includes(rt.id),
-                onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
-              }))}>
+              items={(relationshipTypes?.data || [])
+                .filter((rt) => !relationGroupIds.includes(rt.id))
+                .map((rt) => ({
+                  id: rt.id,
+                  label: rt.title,
+                  isDisabled: relationGroupIds.includes(rt.id),
+                  onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
+                }))}>
               <div className="h-8 w-8">
                 <Button icon={IconEnum.add} onClick={undefined} variant="info" />
               </div>
