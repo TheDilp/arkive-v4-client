@@ -323,7 +323,7 @@ export function Search({
               }
             }
             if (e.key === "Backspace") {
-              if (value) {
+              if (value || inputValue || displayValue) {
                 e.preventDefault();
                 if (!isMultiple) onChange({ name, value: "", label: "" });
                 setInputValue("");
@@ -374,7 +374,7 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && !isOptionsHidden && (
+        {(open || searchTerm || displayValue) && !isOptionsHidden && data?.data?.length && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
             <div
               {...getFloatingProps({
