@@ -39,6 +39,8 @@ export type SearchResultType = {
   color?: string;
   image?: string;
   parent_id?: string;
+  first_name?: string;
+  last_name?: string;
 }[];
 
 export interface SearchType extends BaseFormComponentType {
@@ -62,11 +64,15 @@ export interface SearchType extends BaseFormComponentType {
     value,
     label,
     image,
+    first_name,
+    last_name,
   }: {
     name: string;
     value: string;
     label?: string;
     color?: string;
     image?: string;
+    first_name?: string;
+    last_name?: string;
   }) => void;
 }

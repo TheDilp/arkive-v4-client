@@ -7,7 +7,14 @@ export const InsertCharacterSchema = z.object({
     last_name: z.string().nullable().optional(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
-    portrait_id: z.string().nullable().optional(),
+    portrait_id: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => {
+        if (val === "") return null;
+        return val;
+      }),
     map_pin_id: z.string().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),
   }),
@@ -37,7 +44,14 @@ export const UpdateCharacterSchema = z.object({
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),
-    portrait_id: z.string().nullable().optional(),
+    portrait_id: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => {
+        if (val === "") return null;
+        return val;
+      }),
     map_pin_id: z.string().nullable().optional(),
   }),
   relations: z.object({

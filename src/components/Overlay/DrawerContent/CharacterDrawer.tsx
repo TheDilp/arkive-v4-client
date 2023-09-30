@@ -589,7 +589,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           </div>
           <div>
             <span className="text-sm text-zinc-300">Character image (optional)</span>
-            {!character?.portrait ? (
+            {!character?.portrait?.id ? (
               <ImageSelect
                 isIconOnly
                 name="portrait"
@@ -651,7 +651,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                       <div className="flex flex-col gap-y-1">
                         <Search
                           name="related_other"
-                          onChange={({ label, value, image }) => {
+                          onChange={({ first_name, last_name, value, image }) => {
                             if (character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -661,9 +661,16 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
-                            if (value) {
-                              const [first_name, last_name] = (label || "").split(" ");
-
+                            if (character?.related_other?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
+                              createNotification({
+                                title: "Cannot add a character to the same group twice.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value && first_name) {
                               handleChange({
                                 name: "related_other",
                                 value: (character?.related_other || []).concat({
@@ -702,7 +709,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         <Search
                           label="Ascendants"
                           name="related_to"
-                          onChange={({ label, value, image }) => {
+                          onChange={({ value, image, first_name, last_name }) => {
                             if (character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -712,9 +719,16 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
-                            if (value) {
-                              const [first_name, last_name] = (label || "").split(" ");
-
+                            if (character?.related_to?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
+                              createNotification({
+                                title: "Cannot add a character to the same group twice.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value && first_name) {
                               handleChange({
                                 name: "related_to",
                                 value: (character?.related_to || []).concat({
@@ -751,7 +765,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         <Search
                           label="Descendants"
                           name="related_from"
-                          onChange={({ label, value, image }) => {
+                          onChange={({ first_name, last_name, value, image }) => {
                             if (character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -761,9 +775,16 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
-                            if (value) {
-                              const [first_name, last_name] = (label || "").split(" ");
-
+                            if (character?.related_from?.some((ro) => ro.id === value && ro.relation_type_id === rg.id)) {
+                              createNotification({
+                                title: "Cannot add a character to the same group twice.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value && first_name) {
                               handleChange({
                                 name: "related_from",
                                 value: (character?.related_from || []).concat({

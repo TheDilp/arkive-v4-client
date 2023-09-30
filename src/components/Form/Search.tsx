@@ -204,15 +204,12 @@ export function Search({
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
-  const { data, isFetching, remove, refetch } = useSearch<{ label: string; value: string; color?: string; image?: string }[]>(
-    { data: { search_term: inputValue }, limit: 5 },
-    searchEntity,
-    project_id as string,
-    {
-      enabled: false,
-      queryKeyConcat: [searchTerm, name],
-    },
-  );
+  const { data, isFetching, remove, refetch } = useSearch<
+    { label: string; value: string; color?: string; image?: string; first_name?: string; last_name?: string }[]
+  >({ data: { search_term: inputValue }, limit: 5 }, searchEntity, project_id as string, {
+    enabled: false,
+    queryKeyConcat: [searchTerm, inputValue, name],
+  });
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
     whileElementsMounted: autoUpdate,
     open,
@@ -311,7 +308,15 @@ export function Search({
               } else if ((!value || isMultiple) && typeof activeIndex === "number") {
                 const item = data?.data?.[activeIndex];
                 if (item) {
-                  onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
+                  onChange({
+                    name,
+                    value: item.value,
+                    label: item.label,
+                    color: item?.color,
+                    image: item?.image,
+                    first_name: item?.first_name,
+                    last_name: item?.last_name,
+                  });
                   if (hasShownOption) setDisplayValue(item.label);
                   if (!isMultiple) {
                     setInputValue("");
