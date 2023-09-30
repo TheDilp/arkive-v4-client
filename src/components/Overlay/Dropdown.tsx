@@ -33,10 +33,16 @@ import { Icon } from "../Misc";
 const DropdownClasses = tv({
   slots: {
     base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 z-40 font-lato",
-    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y border-zinc-700 border h-fit z-50 font-lato",
+    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y border-zinc-700 border h-fit z-[60] font-lato",
     baseItem: "h-10 items-center gap-x-2 text-white border-zinc-600",
-    dropdownItem:
-      "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  },
+});
+const DropdownItemClasses = tv({
+  base: "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  variants: {
+    isDisabled: {
+      true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
+    },
   },
 });
 
@@ -137,8 +143,10 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                         iconColor={dropdownItem?.iconColor}
                         iconThickness={dropdownItem?.iconThickness}
                         id={dropdownItem.id}
+                        isDisabled={dropdownItem?.isDisabled}
                         label={dropdownItem.label}
                         onClick={() => {
+                          if (dropdownItem?.isDisabled) return;
                           tree?.events.emit("click");
                           if (dropdownItem?.onClick) {
                             dropdownItem.onClick();
@@ -158,11 +166,11 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   );
 }
 
-function DropdownItem({ id, label, icon, onClick, subItems, iconColor, iconThickness, child }: DropdownItemType) {
-  const { dropdownItem: dropdownItemClasses } = DropdownClasses();
+function DropdownItem({ id, label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
+  const dropdownItemClasses = DropdownItemClasses({ isDisabled });
   return (
     <Dropdown key={id} items={subItems || []}>
-      <div className={dropdownItemClasses()} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+      <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
         {label && !child ? <div className="select-none truncate">{label}</div> : null}
         {child ?? null}
         {icon && !subItems?.length ? (

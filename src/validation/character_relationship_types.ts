@@ -4,7 +4,21 @@ export const InsertCharacterRelationshipSchema = z.object({
   data: z.object({
     title: z.string(),
     project_id: z.string(),
-    ascendant_title: z.string(),
-    descendant_title: z.string(),
+    ascendant_title: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => {
+        if (val === "") return null;
+        return val;
+      }),
+    descendant_title: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => {
+        if (val === "") return null;
+        return val;
+      }),
   }),
 });

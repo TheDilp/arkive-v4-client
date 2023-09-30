@@ -35,7 +35,7 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
 
   const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, {
     enabled: !!relationShipTypeId,
-    staleTime: 60 * 1000,
+    // staleTime: 60 * 1000,
   });
 
   if (isFetching) return <Skeleton type="family_tree" />;

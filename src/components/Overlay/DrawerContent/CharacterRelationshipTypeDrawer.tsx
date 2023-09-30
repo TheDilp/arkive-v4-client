@@ -34,18 +34,21 @@ export function CharacterRelationshipTypeDrawer() {
         label="Title (required, must be unique)"
         name="title"
         onChange={handleChange}
+        placeholder="Eg Family"
         value={relationshipType?.title || ""}
       />
       <Input
         label="Ascendant title (optional)"
         name="ascendant_title"
         onChange={handleChange}
+        placeholder="Eg Parent"
         value={relationshipType?.ascendant_title || ""}
       />
       <Input
         label="Descendant title (optional)"
         name="descendant_title"
         onChange={handleChange}
+        placeholder="Eg Child"
         value={relationshipType?.descendant_title || ""}
       />
 
@@ -65,6 +68,9 @@ export function CharacterRelationshipTypeDrawer() {
           </span>
           <span>of character A.</span>
         </div>
+      </div>
+      <div className="text-sm text-zinc-400">
+        Siblings are automatically displayed in relationship trees based on the relations between ascendants and descendants.
       </div>
       <Button
         icon={IconEnum.save}

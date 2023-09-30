@@ -25,6 +25,7 @@ export const InsertCharacterSchema = z.object({
       .optional(),
     related_to: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
     related_from: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
+    related_other: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
   }),
 });
 
@@ -51,8 +52,18 @@ export const UpdateCharacterSchema = z.object({
       })
       .array()
       .optional(),
-    related_to: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
-    related_from: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
+    related_to: z
+      .object({ id: z.string(), relation_type_id: z.string(), character_relationship_id: z.string().optional() })
+      .array()
+      .optional(),
+    related_from: z
+      .object({ id: z.string(), relation_type_id: z.string(), character_relationship_id: z.string().optional() })
+      .array()
+      .optional(),
+    related_other: z
+      .object({ id: z.string(), relation_type_id: z.string(), character_relationship_id: z.string().optional() })
+      .array()
+      .optional(),
   }),
 });
 

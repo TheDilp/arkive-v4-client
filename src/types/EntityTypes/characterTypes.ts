@@ -2,6 +2,7 @@ import { CharacterFieldValueType, CharacterLocationType, CharacterRelationshipTy
 import { ImageType } from "./imageTypes";
 
 export interface RelationType {
+  character_relationship_id: string;
   character_a_id: string;
   character_b_id: string;
   relation_type_id: string;
@@ -24,6 +25,7 @@ export interface CharacterRelatedType {
   relation_type_id: string;
   relation_type?: CharacterRelationshipType;
   portrait_id?: string;
+  character_relationship_id: string;
 }
 
 export interface CharacterType {
@@ -47,8 +49,10 @@ export interface CharacterType {
   locations: CharacterLocationType[];
   documents: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: TagType[];
+
   related_to?: CharacterRelatedType[];
   related_from?: CharacterRelatedType[];
+  related_other?: CharacterRelatedType[];
   siblings?: CharacterRelatedType[];
 }
 

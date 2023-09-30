@@ -14,9 +14,7 @@ import {
   CharacterRelationshipType,
   CharacterType,
   HandleChangePropsType,
-  InputOnChangeValue,
   NotificationType,
-  onChangeValue,
   TagType,
 } from "../../../types";
 import {
@@ -30,7 +28,7 @@ import {
 } from "../../../utils";
 import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import { EntityPreview, ImagePreview, Skeleton } from "../..";
+import { Dropdown, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, TagInput } from "../../Form";
@@ -294,62 +292,30 @@ function CharacterFieldInputs({
 }
 
 function RelationshipRow({
-  relation_type_id,
-  relation_type,
   character_name,
   portrait_id,
   id,
-  handleChange,
   handleRemove,
-  index,
-  relationship_row_type,
-  customRelationshipTypes,
 }: {
   id: string;
   character_name: string;
-  relation_type?: CharacterRelationshipType;
-  relation_type_id: string;
   portrait_id?: string;
-  index: number;
-  relationship_row_type: "related_to" | "related_from";
-  customRelationshipTypes: CharacterRelationshipType[];
-  handleChange: ({ name, value }: InputOnChangeValue | onChangeValue) => void;
   handleRemove: (char_id: string) => void;
 }) {
-  const customOptions = customRelationshipTypes.map((rt) => {
-    const result = { label: "", value: rt.id };
-    if (relationship_row_type === "related_to") {
-      if (rt?.ascendant_title) result.label = `${rt.ascendant_title} (${rt.title})`;
-      else result.label = rt.title;
-    }
-    if (relationship_row_type === "related_from") {
-      if (rt?.descendant_title) result.label = `${rt.descendant_title} (${rt.title})`;
-      else result.label = rt.title;
-    }
-    return result;
-  });
-
   return (
-    <li className="grid grid-cols-12 items-center gap-x-2">
-      <div className="col-span-5 flex items-center justify-between gap-x-2">
-        <EntityPreview hasNoBackground id={id} image_id={portrait_id} title={character_name} type="characters" />
+    <li className="flex items-center gap-x-2">
+      <div className="flex-1">
+        <EntityPreview id={id} image_id={portrait_id} title={character_name} type="characters" />
       </div>
-      <div className="col-span-6">
-        <Select
-          isDisabled={relationship_row_type === "related_from" && relation_type?.id === relation_type_id}
-          name={`${relationship_row_type}[${index}].relation_type_id`}
-          onChange={handleChange}
-          options={customOptions}
-          value={relation_type_id}
-        />
-      </div>
-      <div className="col-span-1">
+      <div className="w-8">
         <Button
           hasNoBackground
           icon={IconEnum.trash}
+          iconSize={24}
           onClick={() => {
             handleRemove(id);
           }}
+          size="lg"
           variant="error"
         />
       </div>
@@ -524,84 +490,6 @@ export function AdditionalFieldsTab({
 }
 // #endregion tabs
 
-export function CharacterRelationshipGroup({
-  character_id,
-  title,
-  relationships,
-  relationshipTypes,
-  relation_type,
-  handleChange,
-}: {
-  character_id?: string;
-  title: string;
-  relationships: CharacterRelatedType[];
-  relationshipTypes: CharacterRelationshipType[];
-  relation_type: "related_from" | "related_to";
-  handleChange: (newData: HandleChangePropsType) => void;
-}) {
-  const createNotification = useNotifications();
-
-  return (
-    <Collapsible label={title}>
-      <div className="mt-0.5 flex flex-col gap-y-2">
-        <div className="flex items-center justify-between gap-x-2">
-          <Search
-            name={relation_type}
-            onChange={({ label, value, image }) => {
-              if (character_id === value) {
-                createNotification({
-                  title: "Cannot add a character to themselves.",
-                  variant: "warning",
-                  timer: 2,
-                  icon: IconEnum.info_circle,
-                });
-                return;
-              }
-              if (value) {
-                const [first_name, last_name] = (label || "").split(" ");
-
-                handleChange({
-                  name: relation_type,
-                  value: (relationships || []).concat({
-                    id: value,
-                    first_name,
-                    last_name,
-                    portrait_id: image,
-                    relation_type_id: "",
-                  }),
-                });
-              }
-            }}
-            placeholder="Press enter to search characters"
-            searchEntity="characters"
-          />
-        </div>
-        {relationships.length ? (
-          <ul className="flex flex-col gap-y-2">
-            {relationships?.map((relationship, index) => (
-              <RelationshipRow
-                key={`${relationship.id}`}
-                character_name={getCharacterFullName(relationship.first_name, "", relationship?.last_name)}
-                customRelationshipTypes={relationshipTypes || []}
-                handleChange={handleChange}
-                handleRemove={(character_b_id: string) =>
-                  handleChange({
-                    name: relation_type,
-                    value: (relationships || []).filter((r) => r.id !== character_b_id),
-                  })
-                }
-                index={index}
-                relationship_row_type={relation_type}
-                {...relationship}
-              />
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </Collapsible>
-  );
-}
-
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Realationships", icon: IconEnum.family_tree },
@@ -659,6 +547,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
   );
 
+  const [relationGroupIds, setRelationGroupIds] = useState<string[]>([]);
+
+  const relationGroups = (relationshipTypes?.data || [])?.filter((rt) => relationGroupIds.includes(rt.id));
+
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
@@ -669,6 +561,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         CharacterFieldValueType[]
       >;
       setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
+      setRelationGroupIds(
+        (character?.related_from || [])
+          .concat(character?.related_to || [])
+          .concat(character?.related_other || [])
+          .map((relation: CharacterRelatedType) => relation.relation_type_id),
+      );
     }
   }, [existingCharacter?.data]);
 
@@ -721,26 +619,187 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {selectedTab === 1 ? (
         <div className="flex flex-col gap-y-2">
+          <div className="flex flex-nowrap items-center justify-between">
+            <span>Insert new type:</span>
+            <Dropdown
+              allowedPlacements={["left", "left-start", "left-end"]}
+              items={(relationshipTypes?.data || []).map((rt) => ({
+                id: rt.id,
+                label: rt.title,
+                isDisabled: relationGroupIds.includes(rt.id),
+                onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
+              }))}>
+              <div className="h-6 w-6">
+                <Button icon={IconEnum.add} onClick={undefined} variant="info" />
+              </div>
+            </Dropdown>
+          </div>
           {isFetchingRelationshipTypes ? (
             <Skeleton type="drawer_form" />
           ) : (
             <>
-              <CharacterRelationshipGroup
-                character_id={character?.id}
-                handleChange={handleChange}
-                relation_type="related_to"
-                relationships={character?.related_to || []}
-                relationshipTypes={relationshipTypes?.data || []}
-                title="Ascendants"
-              />
-              <CharacterRelationshipGroup
-                character_id={character?.id}
-                handleChange={handleChange}
-                relation_type="related_from"
-                relationships={character?.related_from || []}
-                relationshipTypes={relationshipTypes?.data || []}
-                title="Descendants"
-              />
+              {relationGroups.map((rg) => {
+                const isOther = !rg.ascendant_title && !rg.descendant_title;
+                const otherCharactersToShow = isOther
+                  ? (character?.related_other || [])?.filter((char) => char.relation_type_id === rg.id)
+                  : [];
+                return (
+                  <Collapsible key={rg.id} label={rg.title}>
+                    {isOther ? (
+                      <div className="flex flex-col gap-y-1">
+                        <Search
+                          name="related_other"
+                          onChange={({ label, value, image }) => {
+                            if (character.id === value) {
+                              createNotification({
+                                title: "Cannot add a character to themselves.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value) {
+                              const [first_name, last_name] = (label || "").split(" ");
+
+                              handleChange({
+                                name: "related_other",
+                                value: (character?.related_other || []).concat({
+                                  id: value,
+                                  first_name,
+                                  last_name,
+                                  portrait_id: image,
+                                  relation_type_id: rg.id,
+                                  character_relationship_id: "",
+                                }),
+                              });
+                            }
+                          }}
+                          placeholder="Press enter to search characters"
+                          searchEntity="characters"
+                        />
+
+                        <div className="flex flex-col gap-y-2">
+                          {otherCharactersToShow?.map((char) => (
+                            <RelationshipRow
+                              key={char.id}
+                              character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                              handleRemove={(character_b_id: string) =>
+                                handleChange({
+                                  name: "related_other",
+                                  value: (character?.related_other || []).filter((r) => r.id !== character_b_id),
+                                })
+                              }
+                              {...char}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-y-2">
+                        <Search
+                          label="Ascendants"
+                          name="related_to"
+                          onChange={({ label, value, image }) => {
+                            if (character.id === value) {
+                              createNotification({
+                                title: "Cannot add a character to themselves.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value) {
+                              const [first_name, last_name] = (label || "").split(" ");
+
+                              handleChange({
+                                name: "related_to",
+                                value: (character?.related_to || []).concat({
+                                  id: value,
+                                  first_name,
+                                  last_name,
+                                  portrait_id: image,
+                                  relation_type_id: rg.id,
+                                  character_relationship_id: "",
+                                }),
+                              });
+                            }
+                          }}
+                          placeholder="Press enter to search characters"
+                          searchEntity="characters"
+                        />
+                        <div className="flex flex-col gap-y-2">
+                          {character?.related_to
+                            ?.filter((char) => char.relation_type_id === rg.id)
+                            .map((char) => (
+                              <RelationshipRow
+                                key={char.id}
+                                character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                                handleRemove={(character_b_id: string) =>
+                                  handleChange({
+                                    name: "related_to",
+                                    value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
+                                  })
+                                }
+                                {...char}
+                              />
+                            ))}
+                        </div>
+                        <Search
+                          label="Descendants"
+                          name="related_from"
+                          onChange={({ label, value, image }) => {
+                            if (character.id === value) {
+                              createNotification({
+                                title: "Cannot add a character to themselves.",
+                                variant: "warning",
+                                timer: 2,
+                                icon: IconEnum.info_circle,
+                              });
+                              return;
+                            }
+                            if (value) {
+                              const [first_name, last_name] = (label || "").split(" ");
+
+                              handleChange({
+                                name: "related_from",
+                                value: (character?.related_from || []).concat({
+                                  id: value,
+                                  first_name,
+                                  last_name,
+                                  portrait_id: image,
+                                  relation_type_id: rg.id,
+                                  character_relationship_id: "",
+                                }),
+                              });
+                            }
+                          }}
+                          placeholder="Press enter to search characters"
+                          searchEntity="characters"
+                        />
+                        <div className="flex flex-col gap-y-2">
+                          {character?.related_from
+                            ?.filter((char) => char.relation_type_id === rg.id)
+                            .map((char) => (
+                              <RelationshipRow
+                                key={char.id}
+                                character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                                handleRemove={(character_b_id: string) =>
+                                  handleChange({
+                                    name: "related_from",
+                                    value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
+                                  })
+                                }
+                                {...char}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </Collapsible>
+                );
+              })}
             </>
           )}
         </div>
@@ -770,7 +829,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           if (changedData) {
             if (character?.id) {
               const characterToUpdate = { ...(changedData || {}), id: character.id };
-              const { related_to, related_from, tags, character_fields, ...rest } = characterToUpdate;
+              const { related_to, related_from, related_other, tags, character_fields, ...rest } = characterToUpdate;
               const parsedData = UpdateCharacterSchema.parse({
                 data: { ...rest, portrait_id: rest?.portrait?.id },
                 relations: {
@@ -779,6 +838,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     : undefined,
                   related_from,
                   related_to,
+                  related_other,
                   tags,
                 },
               });
