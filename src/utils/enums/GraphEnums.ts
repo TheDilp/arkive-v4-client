@@ -7,6 +7,10 @@ export const FamilyTreeGenerationsCountOptions = [
   { label: "20", value: "20" },
   { label: "25", value: "25" },
   { label: "30", value: "30" },
+  { label: "35", value: "35" },
+  { label: "40", value: "40" },
+  { label: "45", value: "45" },
+  { label: "50", value: "50" },
 ];
 
 export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
