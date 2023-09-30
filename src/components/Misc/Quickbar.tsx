@@ -205,7 +205,7 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
               }
               if (edges?.length) {
                 const edgeUpdateData = {
-                  data: edges.map((n) => ({ data: { id: n.id(), parent_id: item_id as string, background_color: value } })),
+                  data: edges.map((n) => ({ data: { id: n.id(), parent_id: item_id as string, line_color: value } })),
                 };
                 updateManyEdges(edgeUpdateData);
               }
