@@ -56,8 +56,8 @@ const TableClasses = tv({
     subheaderRowTitle: "font-medium",
     bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-t border-zinc-600",
-    rowContainer: "flex flex-col",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] border-b border-zinc-600 transition-all duration-100 font-lato",
+    rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 hover:bg-zinc-800",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem]  transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     contentWrapper: "block truncate",
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
@@ -628,16 +628,17 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   return (
                     <div
                       key={row.id}
+                      className={rowContainer()}
                       style={{
                         height: `${virtualRow.size}px`,
                         transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
                       }}>
-                      <Link className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
+                      <Link to={getLink ? getLink(row.original) : "#"}>
                         <div
                           className={`${rowClasses()} ${
                             config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
                               ? "bg-blue-400 hover:bg-blue-300 hover:text-white"
-                              : "hover:bg-zinc-800"
+                              : ""
                           }
                         ${getLink ? hasLinkRow() : ""}
                         `}>
