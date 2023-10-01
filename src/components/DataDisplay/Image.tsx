@@ -21,7 +21,7 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
   setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
 }
 
-export function Image({ image, isOpenable }: ImageComponentType) {
+export function Image({ image, isOpenable, hasTitle }: ImageComponentType) {
   const { project_id } = useParams();
   const imageUrl = getImageURL(project_id as string, "images", image.id);
   const classes = ImageClasses({ isOpenable });
@@ -29,9 +29,11 @@ export function Image({ image, isOpenable }: ImageComponentType) {
 
   return (
     <div className="group relative h-full w-full overflow-hidden rounded-md">
-      <h2 className="absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
-        {image.title}
-      </h2>
+      {hasTitle ? (
+        <h2 className="absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
+          {image.title}
+        </h2>
+      ) : null}
       <img
         alt={image.title}
         className={classes}
