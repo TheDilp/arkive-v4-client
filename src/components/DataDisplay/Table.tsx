@@ -621,7 +621,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             ) : null}
           </div>
           {data?.length ? (
-            <div ref={bodyRef} className="h-full overflow-auto">
+            <div ref={bodyRef} className="h-full overflow-auto pb-1">
               <div className={body()} style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
                 {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
                   const row = rows[virtualRow.index];
@@ -684,7 +684,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           {pagination ? (
             <div className={paginationContainer()}>
               <div className={pageCountContainer()}>
-                <div className={pageCount()}>Page {(pagination?.page || 0) + 1} |</div>
+                <div className={pageCount()}>
+                  Page {(pagination?.page || 0) + 1} | Current count: {data?.length || ""} |
+                </div>
                 <div className={showPageCount()}>
                   Show:
                   <div className={showPageCountSelectContainer()}>
