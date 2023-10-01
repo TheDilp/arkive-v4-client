@@ -12,7 +12,7 @@ const ImageClasses = tv({
   base: "object-cover h-full w-full rounded object-center",
   variants: {
     isOpenable: {
-      true: "transition-all hover:scale-105 hover:shadow-md cursor-pointer",
+      true: "transition-all group-hover:scale-125 hover:shadow-md cursor-pointer duration-300",
     },
   },
 });
@@ -28,13 +28,18 @@ export function Image({ image, isOpenable }: ImageComponentType) {
   const setDialog = useSetAtom(dialogAtom);
 
   return (
-    <img
-      alt={image.title}
-      className={classes}
-      onClick={() => {
-        if (isOpenable) openImageView(setDialog, imageUrl);
-      }}
-      src={imageUrl}
-    />
+    <div className="group relative h-full w-full overflow-hidden rounded-md">
+      <h2 className="absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
+        {image.title}
+      </h2>
+      <img
+        alt={image.title}
+        className={classes}
+        onClick={() => {
+          if (isOpenable) openImageView(setDialog, imageUrl);
+        }}
+        src={imageUrl}
+      />
+    </div>
   );
 }

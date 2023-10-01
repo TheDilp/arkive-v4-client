@@ -4,7 +4,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
-import { useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
+import { useBreakpoint, useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, ImageType } from "../../types";
 import { dialogAtom, drawerAtom, getAvatarInitials, getImageURL, IconEnum, NameFilters } from "../../utils";
 
@@ -120,6 +120,7 @@ export function AssetView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const { isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">("table");
@@ -143,7 +144,7 @@ export function AssetView() {
     {
       filters,
       pagination: {
-        limit: 12,
+        limit: isLg ? 24 : 12,
       },
       orderBy: [
         {
@@ -236,12 +237,12 @@ export function AssetView() {
       </div>
       {view === "card" ? (
         <div
-          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6"
           onScroll={(e) => {
             const { target } = e;
             if (target) {
               // @ts-ignore
-              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 400;
+              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 650;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
@@ -249,14 +250,16 @@ export function AssetView() {
           }}>
           {(infiniteAssets?.pages || [])?.map((page) =>
             page.data.map((img: ImageType) => (
-              <div className="overflow-hidden">
+              <div
+                key={img.id}
+                className="col-span-1 bg-zinc-950 bg-cover bg-top transition-all duration-300 lg:bg-center [&>*>h2]:opacity-0 [&>*>h2]:hover:opacity-100 [&>*>img]:hover:brightness-75">
                 <Image image={img} isOpenable />
               </div>
             )),
           )}
         </div>
       ) : (
-        <div className="h-full max-h-[85%] w-full overflow-hidden">
+        <div className="h-full max-h-[95%] w-full overflow-hidden">
           <Table
             columns={createColumns(setDrawer, setDialog, downloadImage)}
             config={{
