@@ -488,10 +488,10 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   }, [pagination?.page]);
 
   const rowVirtualizer = useVirtualizer({
-    getScrollElement: () => bodyRef.current,
-    estimateSize: () => 40,
     count: data.length,
-    overscan: 10,
+    getScrollElement: () => bodyRef.current,
+    estimateSize: () => 47,
+    overscan: 15,
   });
   const { rows } = table.getRowModel();
 
@@ -621,53 +621,62 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             ) : null}
           </div>
           {data?.length ? (
-            <div ref={bodyRef} className={body()}>
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const row = rows[virtualRow.index];
-                return (
-                  <Fragment key={row.id}>
-                    <Link className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
-                      <div
-                        className={`${rowClasses()} ${
-                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                            ? "bg-blue-400 hover:bg-blue-300 hover:text-white"
-                            : "hover:bg-zinc-800"
-                        }
+            <div ref={bodyRef} className="h-full overflow-auto">
+              <div className={body()} style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+                {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
+                  const row = rows[virtualRow.index];
+                  return (
+                    <div
+                      key={row.id}
+                      style={{
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+                      }}>
+                      <Link className={rowContainer()} to={getLink ? getLink(row.original) : "#"}>
+                        <div
+                          className={`${rowClasses()} ${
+                            config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                              ? "bg-blue-400 hover:bg-blue-300 hover:text-white"
+                              : "hover:bg-zinc-800"
+                          }
                         ${getLink ? hasLinkRow() : ""}
                         `}>
-                        {row.getVisibleCells().map((cell) => (
-                          <div
-                            key={cell.id}
-                            className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                              (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                            }
-                            `}
-                            onClick={(e) => {
-                              if (
-                                cell.column.id === "select" ||
-                                cell.column.id === "action" ||
-                                cell.column.id === "is_favorite" ||
-                                (cell.column.columnDef.meta as MetaType)?.noLink
-                              ) {
-                                e.preventDefault();
-                                e.stopPropagation();
+                          {row.getVisibleCells().map((cell) => (
+                            <div
+                              key={cell.id}
+                              className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                                (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                               }
-                            }}
-                            style={{
-                              ...getTableColumnWidths(cell.column.id, {
-                                minSize: cell.column.columnDef.minSize,
-                                maxSize: cell.column.columnDef.maxSize,
-                              }),
-                            }}>
-                            <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </Link>
-                    {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
-                  </Fragment>
-                );
-              })}
+                            `}
+                              onClick={(e) => {
+                                if (
+                                  cell.column.id === "select" ||
+                                  cell.column.id === "action" ||
+                                  cell.column.id === "is_favorite" ||
+                                  (cell.column.columnDef.meta as MetaType)?.noLink
+                                ) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }
+                              }}
+                              style={{
+                                ...getTableColumnWidths(cell.column.id, {
+                                  minSize: cell.column.columnDef.minSize,
+                                  maxSize: cell.column.columnDef.maxSize,
+                                }),
+                              }}>
+                              <div className={contentWrapper()}>
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </Link>
+                      {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <Alert label="There's no content." variant="info" />
