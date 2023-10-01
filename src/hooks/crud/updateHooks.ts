@@ -368,3 +368,41 @@ export function useAddToEntity<InsertType extends { data: { id?: string }; relat
     },
   );
 }
+export function useRemoveFromEntity<InsertType extends { data: { [key: string]: string | { data: { id: string } } } }>(
+  type: AvailableEntityType,
+  project_id: string,
+) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/remove/${updateValues?.data?.id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onSettled: (data, _, vars) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+          queryClient.invalidateQueries([type, vars.data.id]);
+
+          createNotification({
+            title: data?.message || "Item successfully removed.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}

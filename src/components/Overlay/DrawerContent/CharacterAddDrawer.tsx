@@ -61,7 +61,7 @@ export function CharacterAddDrawer({ data }: Props) {
             clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
             icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
             id={i.value}
-            image_id={i.value}
+            image_id={data?.type === "images" ? i.value : undefined}
             title={i.label}
             type={data?.type}
           />

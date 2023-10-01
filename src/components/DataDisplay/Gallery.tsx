@@ -32,9 +32,7 @@ export function Gallery({ images, isOpenable, columns = 4 }: GalleryType) {
         gridAutoRows: "36rem",
       }}>
       {images.map((image) => (
-        <div key={image.id} className="overflow-hidden">
-          <Image image={image} isOpenable={isOpenable} />
-        </div>
+        <Image key={image.id} image={image} isOpenable={isOpenable} />
       ))}
     </div>
   );

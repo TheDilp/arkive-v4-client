@@ -92,6 +92,15 @@ export const AddToCharacterSchema = z.object({
   }),
 });
 
+export const RemoveFromCharacterSchema = z.object({
+  data: z.object({
+    id: z.string(),
+    document: z.object({ data: z.object({ id: z.string() }) }).optional(),
+    image: z.object({ data: z.object({ id: z.string() }) }).optional(),
+    tag: z.object({ data: z.object({ id: z.string() }) }).optional(),
+  }),
+});
+
 export type InsertCharacterType = z.infer<typeof InsertCharacterSchema>;
 export type UpdateCharacterType = z.infer<typeof UpdateCharacterSchema>;
 export type AddToCharacterType = z.infer<typeof AddToCharacterSchema>;

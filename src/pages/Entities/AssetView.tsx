@@ -253,7 +253,7 @@ export function AssetView() {
               <div
                 key={img.id}
                 className="col-span-1 bg-zinc-950 bg-cover bg-top transition-all duration-300 lg:bg-center [&>*>h2]:opacity-0 [&>*>h2]:hover:opacity-100 [&>*>img]:hover:brightness-75">
-                <Image image={img} isOpenable />
+                <Image hasTitle image={img} isOpenable />
               </div>
             )),
           )}
@@ -272,7 +272,7 @@ export function AssetView() {
             dispatch={dispatch}
             isLoading={isLoading}
             pagination={pagination}
-            type="characters"
+            type="images"
           />
         </div>
       )}

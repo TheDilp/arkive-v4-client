@@ -1,3 +1,4 @@
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
@@ -13,14 +14,21 @@ import {
   createColumnHelper,
   Dropdown,
   Editor,
+  Gallery,
   Skeleton,
   Table,
   TablePageLayout,
   Tabs,
   Title,
 } from "../../components";
-import { Gallery } from "../../components/DataDisplay";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import {
+  useChangeNavbarTitle,
+  useDownloadImage,
+  useGetEntities,
+  useGetEntity,
+  useRemoveFromEntity,
+  useTable,
+} from "../../hooks";
 import {
   CharacterFieldTemplateType,
   CharacterFieldType,
@@ -29,6 +37,7 @@ import {
   CharacterRelationType,
   CharacterType,
   DocumentType,
+  ImageType,
   MapType,
 } from "../../types";
 import {
@@ -39,12 +48,15 @@ import {
   getImageURL,
   getSentenceCase,
   IconEnum,
+  NameFilters,
   sortEntities,
 } from "../../utils";
+import { RemoveFromCharacterSchema } from "../../validation";
 
 const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
+const assetColumnHelper = createColumnHelper<ImageType>();
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -140,41 +152,64 @@ function disableShowFamilyTree(character: CharacterType | undefined) {
   return false;
 }
 
-const documentsTableColumns = [
-  documentsColumnHelper.display({
-    id: "title",
-    header: "Title",
-    cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
-  }),
-  documentsColumnHelper.display({
-    id: "action",
-    header: "Actions",
-    meta: {
-      centered: true,
+function documentsTableColumns(
+  removeItem: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        [key: string]:
+          | string
+          | {
+              data: {
+                id: string;
+              };
+            };
+      };
     },
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Dropdown
-          allowedPlacements={["left", "left-start", "left-end"]}
-          items={[
-            {
-              id: "expand",
-              label: `${!row.getIsExpanded() ? "Show" : "Hide"} content`,
-              icon: IconEnum.document,
-              onClick: row.getToggleExpandedHandler(),
-            },
-            {
-              id: "2",
-              label: "Unlink document",
-              icon: IconEnum.unlink,
-            },
-          ]}>
-          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-        </Dropdown>
-      </div>
-    ),
-  }),
-];
+    unknown
+  >,
+  character_id: string,
+) {
+  return [
+    documentsColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+    }),
+    documentsColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "expand",
+                label: `${!row.getIsExpanded() ? "Show" : "Hide"} content`,
+                icon: IconEnum.document,
+                onClick: row.getToggleExpandedHandler(),
+              },
+              {
+                id: "2",
+                label: "Remove document",
+                icon: IconEnum.trash,
+                onClick: async () => {
+                  await removeItem({ data: { id: character_id, document: { data: { id: row.original.id } } } });
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 function locationsTableColumns(project_id: string) {
   return [
     locationsColumnHelper.display({
@@ -200,6 +235,108 @@ function locationsTableColumns(project_id: string) {
       id: "title",
       header: "Title",
       cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+    }),
+  ];
+}
+function assetTableColumns(
+  downloadImage: UseMutateAsyncFunction<
+    {
+      data: string;
+    },
+    unknown,
+    {
+      data: {
+        id: string;
+        title: string;
+      };
+    },
+    unknown
+  >,
+  project_id: string | undefined,
+  character_id: string,
+  removeItem: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        [key: string]:
+          | string
+          | {
+              data: {
+                id: string;
+              };
+            };
+      };
+    },
+    unknown
+  >,
+) {
+  return [
+    assetColumnHelper.display({
+      id: "id",
+      header: "Image",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar
+            hasShowImage
+            image={getImageURL(project_id as string, "images", row.original?.id || "")}
+            isBordered
+            isTooltipDisabled
+            label={getAvatarInitials(row.original.title)}
+            size="sm"
+          />
+        </div>
+      ),
+      meta: {
+        noLink: true,
+        centered: true,
+      },
+      minSize: 4.5,
+      maxSize: 4.5,
+    }),
+    assetColumnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+        filterOptions: NameFilters,
+      },
+    }),
+
+    assetColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "2",
+                label: "Download",
+                icon: IconEnum.download,
+                onClick: () => downloadImage({ data: row.original }),
+              },
+              {
+                id: "delete_image",
+                label: "Remove image",
+                icon: IconEnum.trash,
+                onClick: async () => {
+                  const parsedData = RemoveFromCharacterSchema.parse({
+                    data: { id: character_id, image: { data: { id: row.original.id } } },
+                  });
+                  await removeItem(parsedData);
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
     }),
   ];
 }
@@ -263,6 +400,7 @@ function AdditionalFieldDisplay({
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
@@ -275,14 +413,14 @@ export function CharacterProfileView() {
       staleTime: 60 * 1000,
     },
   );
-
+  const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
+  const { mutateAsync: removeItem } = useRemoveFromEntity("characters", project_id as string);
   const navigate = useNavigate();
 
   const relationships = [
     ...(existingCharacter?.data?.related_to || []),
     ...(existingCharacter?.data?.related_from?.map((relation) => ({
       ...relation,
-      relation_type: relation.relation_type === "parent" ? "child" : relation.relation_type,
     })) || []),
     ...(existingCharacter?.data?.siblings?.map((sibling) => ({ ...sibling, relation_type: "sibling" })) || []),
   ];
@@ -355,39 +493,36 @@ export function CharacterProfileView() {
   }
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
-
   return (
     <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:content-stretch">
-      {isFetching ? (
-        <Skeleton type="character_profile" />
-      ) : (
-        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
-          <Avatar
-            hasShowImage
-            image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
-            isBordered
-            isTooltipDisabled
-            label={getCharacterFullName(
-              existingCharacter?.data?.first_name as string,
+      <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
+        <Avatar
+          hasShowImage
+          image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+          isBordered
+          isTooltipDisabled
+          label={
+            getCharacterFullName(
+              existingCharacter?.data?.first_name || "",
               existingCharacter?.data?.nickname || "",
               existingCharacter?.data?.last_name || "",
-            )}
-            size="4xl"
-          />
-          <div className="mt-2 flex flex-col gap-y-1">
-            <h2 className="text-center font-merriweather text-lg">
-              {`${existingCharacter?.data?.first_name} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
-            </h2>
-            {existingCharacter?.data?.nickname ? (
-              <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
-            ) : null}
-          </div>
-
-          <div className="w-full">
-            <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-          </div>
+            ) || ""
+          }
+          size="4xl"
+        />
+        <div className="mt-2 flex flex-col gap-y-1">
+          <h2 className="text-center font-merriweather text-lg">
+            {`${existingCharacter?.data?.first_name || ""} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
+          </h2>
+          {existingCharacter?.data?.nickname ? (
+            <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
+          ) : null}
         </div>
-      )}
+
+        <div className="w-full">
+          <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+        </div>
+      </div>
       <div className="col-span-5 min-h-full rounded-lg bg-zinc-950 p-4 lg:col-span-4">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
@@ -406,113 +541,124 @@ export function CharacterProfileView() {
         </h2>
         {selectedTab === 0 ? (
           <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
-            {isFetching ? (
-              <Skeleton type="character_profile_main" />
-            ) : (
-              <>
-                <Collapsible
-                  actions={[
-                    {
-                      icon: IconEnum.add,
-                      tooltip: "Add document",
-                      onClick: openAddDocumentDrawer,
-                    },
-                  ]}
-                  icon={IconEnum.document}
-                  initialOpen={false}
-                  label="Documents">
-                  {existingCharacter?.data?.documents?.length ? (
-                    <div className="mt-2 animate-in fade-in fill-mode-both">
-                      <Table
-                        columns={documentsTableColumns}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
-                        }}
-                        data={existingCharacter?.data?.documents || []}
-                        dispatch={dispatch}
-                        type="documents"
-                      />
-                    </div>
-                  ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
-                  )}
-                </Collapsible>
+            <Collapsible
+              actions={[
+                {
+                  icon: IconEnum.add,
+                  tooltip: "Add document",
+                  onClick: openAddDocumentDrawer,
+                },
+              ]}
+              icon={IconEnum.document}
+              initialOpen={false}
+              label="Documents">
+              {existingCharacter?.data?.documents?.length ? (
+                <div className="mt-2 animate-in fade-in fill-mode-both">
+                  <Table
+                    columns={documentsTableColumns(removeItem, existingCharacter?.data?.id)}
+                    config={{
+                      expandable: true,
+                      hasNoHeaderGap: true,
+                      getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
+                    }}
+                    data={existingCharacter?.data?.documents || []}
+                    dispatch={dispatch}
+                    type="documents"
+                  />
+                </div>
+              ) : (
+                <div className="mt-2 w-full">
+                  <Alert label="There is no content." variant="info" />
+                </div>
+              )}
+            </Collapsible>
 
-                <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                  <div className="mt-2 animate-in fade-in fill-mode-both">
-                    {existingCharacter?.data?.locations?.length ? (
-                      <Table
-                        columns={locationsTableColumns(project_id as string)}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: CharacterLocationType) =>
-                            `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
-                        }}
-                        data={existingCharacter?.data?.locations || []}
-                        dispatch={dispatch}
-                        type="documents"
-                      />
-                    ) : (
-                      <div className="mt-2 w-full">
-                        <Alert label="There is no content." variant="info" />
-                      </div>
-                    )}
+            <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+              <div className="mt-2 animate-in fade-in fill-mode-both">
+                {existingCharacter?.data?.locations?.length ? (
+                  <Table
+                    columns={locationsTableColumns(project_id as string)}
+                    config={{
+                      expandable: true,
+                      hasNoHeaderGap: true,
+                      getLink: (rowData: CharacterLocationType) =>
+                        `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
+                    }}
+                    data={existingCharacter?.data?.locations || []}
+                    dispatch={dispatch}
+                    type="documents"
+                  />
+                ) : (
+                  <div className="mt-2 w-full">
+                    <Alert label="There is no content." variant="info" />
                   </div>
-                </Collapsible>
-                <Collapsible
-                  actions={[
-                    {
-                      icon: IconEnum.add,
-                      tooltip: "Add assets",
-                      onClick: openAddImageDrawer,
-                    },
-                  ]}
-                  icon={IconEnum.image}
-                  initialOpen={false}
-                  label="Assets">
-                  {existingCharacter?.data?.images?.length ? (
-                    <div className="mt-2 animate-in fade-in fill-mode-both">
-                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
-                    </div>
+                )}
+              </div>
+            </Collapsible>
+            <Collapsible
+              actions={[
+                {
+                  icon: assetView === "card" ? IconEnum.card : IconEnum.table,
+                  tooltip: "Change view",
+                  onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
+                },
+                {
+                  icon: IconEnum.add,
+                  tooltip: "Add assets",
+                  onClick: openAddImageDrawer,
+                },
+              ]}
+              icon={IconEnum.image}
+              initialOpen={false}
+              label="Assets">
+              {existingCharacter?.data?.images?.length ? (
+                <div className="mt-2 animate-in fade-in fill-mode-both">
+                  {assetView === "table" ? (
+                    <Table
+                      columns={assetTableColumns(downloadImage, project_id, existingCharacter?.data?.id, removeItem)}
+                      config={{
+                        hasNoHeaderGap: true,
+                      }}
+                      data={existingCharacter?.data?.images || []}
+                      dispatch={dispatch}
+                      type="images"
+                    />
                   ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
+                    <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
                   )}
-                </Collapsible>
+                </div>
+              ) : (
+                <div className="mt-2 w-full">
+                  <Alert label="There is no content." variant="info" />
+                </div>
+              )}
+            </Collapsible>
 
-                <Collapsible
-                  actions={[
-                    {
-                      icon: IconEnum.edit,
-                      tooltip: "Edit tags",
-                      onClick: openEditTagDrawer,
-                    },
-                  ]}
-                  icon={IconEnum.tags}
-                  initialOpen={false}
-                  label="Tags">
-                  {existingCharacter?.data?.tags?.length ? (
-                    <div className="mt-2 flex flex-wrap gap-2 animate-in fade-in fill-mode-both">
-                      {existingCharacter.data.tags.map((tag) => (
-                        <div key={tag.id}>
-                          <Badge customColor={tag.color} label={tag.title} />
-                        </div>
-                      ))}
+            <Collapsible
+              actions={[
+                {
+                  icon: IconEnum.edit,
+                  tooltip: "Edit tags",
+                  onClick: openEditTagDrawer,
+                },
+              ]}
+              icon={IconEnum.tags}
+              initialOpen={false}
+              label="Tags">
+              {existingCharacter?.data?.tags?.length ? (
+                <div className="mt-2 flex flex-wrap gap-2 animate-in fade-in fill-mode-both">
+                  {existingCharacter.data.tags.map((tag) => (
+                    <div key={tag.id}>
+                      <Badge customColor={tag.color} label={tag.title} />
                     </div>
-                  ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
-                  )}
-                </Collapsible>
-              </>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-2 w-full">
+                  <Alert label="There is no content." variant="info" />
+                </div>
+              )}
+            </Collapsible>
           </div>
         ) : null}
         {selectedTab === 1 ? (
