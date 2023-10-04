@@ -108,7 +108,7 @@ export function TagView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
-  const { data, isFetching } = useGetEntities({ data: { project_id }, orderBy }, "tags");
+  const { data, isFetching } = useGetEntities({ data: { project_id }, pagination, orderBy }, "tags");
 
   return (
     <TablePageLayout>
