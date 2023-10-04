@@ -34,7 +34,7 @@ import {
   CharacterFieldType,
   CharacterFieldValueType,
   CharacterLocationType,
-  CharacterRelationType,
+  CharacterRelatedType,
   CharacterType,
   DocumentType,
   ImageType,
@@ -53,7 +53,7 @@ import {
 } from "../../utils";
 import { RemoveFromCharacterSchema } from "../../validation";
 
-const relationshipColumnHelper = createColumnHelper<CharacterRelationType>();
+const relationshipColumnHelper = createColumnHelper<CharacterRelatedType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
 const assetColumnHelper = createColumnHelper<ImageType>();
@@ -106,20 +106,26 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
       header: "First name",
       cell: ({ row }) => row.original.first_name,
     }),
-    relationshipColumnHelper.display({
-      id: "last_name",
-      header: "Last name",
-      cell: ({ row }) => row.original.last_name,
-    }),
+
     relationshipColumnHelper.display({
       id: "nickname",
       header: "Nickname",
       cell: ({ row }) => row.original?.nickname,
     }),
     relationshipColumnHelper.display({
+      id: "last_name",
+      header: "Last name",
+      cell: ({ row }) => row.original.last_name,
+    }),
+    relationshipColumnHelper.display({
       id: "relation_type",
       header: "Relation",
-      cell: ({ row }) => getSentenceCase(row.original?.relation_type),
+      cell: ({ row }) =>
+        `${
+          row?.original?.relation_title
+            ? `${getSentenceCase(row?.original?.relation_title)} (${row.original?.relation_type_title || ""})`
+            : getSentenceCase(row.original?.relation_type_title || "")
+        }`,
     }),
     relationshipColumnHelper.display({
       id: "action",
@@ -407,7 +413,15 @@ export function CharacterProfileView() {
     item_id,
     "characters",
     {
-      relations: { tags: true, character_fields: true, locations: true, relationships: true, documents: true, images: true },
+      relations: {
+        tags: true,
+        character_fields: true,
+        locations: true,
+        relationships: true,
+        character_relationship_types: true,
+        documents: true,
+        images: true,
+      },
     },
     {
       staleTime: 60 * 1000,
@@ -419,11 +433,9 @@ export function CharacterProfileView() {
 
   const relationships = [
     ...(existingCharacter?.data?.related_to || []),
-    ...(existingCharacter?.data?.related_from?.map((relation) => ({
-      ...relation,
-    })) || []),
-    ...(existingCharacter?.data?.siblings?.map((sibling) => ({ ...sibling, relation_type: "sibling" })) || []),
-  ];
+    ...(existingCharacter?.data?.related_from || []),
+    ...(existingCharacter?.data?.related_other || []),
+  ].filter((r) => !!r);
 
   useChangeNavbarTitle(
     `The Arkive | Characters | ${getCharacterFullName(
@@ -499,15 +511,11 @@ export function CharacterProfileView() {
         <Avatar
           hasShowImage
           image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+          initials={
+            getAvatarInitials(existingCharacter?.data?.first_name || "", existingCharacter?.data?.last_name || "") || ""
+          }
           isBordered
           isTooltipDisabled
-          label={
-            getCharacterFullName(
-              existingCharacter?.data?.first_name || "",
-              existingCharacter?.data?.nickname || "",
-              existingCharacter?.data?.last_name || "",
-            ) || ""
-          }
           size="4xl"
         />
         <div className="mt-2 flex flex-col gap-y-1">
@@ -674,7 +682,15 @@ export function CharacterProfileView() {
                   config={{
                     getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
                   }}
-                  data={relationships}
+                  data={relationships.sort((a, b) => {
+                    if (a.first_name < b.first_name) return -1;
+                    if (a.first_name > b.first_name) return 1;
+                    if (a.id < b.id) return -1;
+                    if (a.id > b.id) return 1;
+                    if ((a.relation_title || "") < (b.relation_title || "")) return -1;
+                    if ((a.relation_title || "") > (b.relation_title || "")) return 1;
+                    return 0;
+                  })}
                   dispatch={dispatch}
                   type="characters"
                 />

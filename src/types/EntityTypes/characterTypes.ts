@@ -25,6 +25,8 @@ export interface CharacterRelatedType {
   relation_type_id: string;
   relation_type?: CharacterRelationshipType;
   portrait_id?: string;
+  relation_title?: string;
+  relation_type_title?: string;
   character_relationship_id: string;
 }
 
@@ -53,14 +55,4 @@ export interface CharacterType {
   related_to?: CharacterRelatedType[];
   related_from?: CharacterRelatedType[];
   related_other?: CharacterRelatedType[];
-  siblings?: CharacterRelatedType[];
-}
-
-export interface CharacterRelationType {
-  id: string;
-  first_name: string;
-  nickname?: string;
-  last_name?: string;
-  portrait_id?: string;
-  relation_type: string;
 }
