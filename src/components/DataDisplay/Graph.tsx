@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject } from "cytoscape";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -24,6 +24,7 @@ import {
   BoardStateAtom,
   breadcrumbsAtom,
   contextMenuAtom,
+  dialogAtom,
   drawerAtom,
   edgesAtom,
   nodesAtom,
@@ -46,6 +47,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
   const { project_id, item_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+  const dialogValue = useAtomValue(dialogAtom);
   const { data: existingGraphData, isFetching } = useGetEntity<GraphType>(
     item_id,
     "graphs",
@@ -603,7 +605,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       cyRef?.current?._cy?.gridGuide?.({
         ...cytoscapeGridOptions,
         snapToGridDuringDrag: boardState.grid,
-        drawGrid: boardState.grid,
+        drawGrid: true,
       });
     }
   }, [boardState.grid, cyRef?.current?._cy]);
@@ -773,7 +775,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 return;
               }
               await generateGraph({
-                data: { project_id: project_id as string, title: "Family tree" },
+                data: { project_id: project_id as string, title: dialogValue?.title || "Family tree" },
                 relations: { nodes: nodesToGenerate, edges: edgesToGenerate },
               });
             }}
@@ -787,7 +789,11 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         cy={(cy: Core) => {
           setBoardRef(cy);
           if (isFamilyTreeView) {
-            cy.layout({ name: "dagre", ...dagreLayoutOptions, ...(layoutOptions || {}) }).run();
+            cy.layout({
+              name: "dagre",
+              ...dagreLayoutOptions,
+              ...(layoutOptions || {}),
+            }).run();
             cy.nodes().lock();
           }
         }}

@@ -19,7 +19,7 @@ function getLayoutDirection(character_relationship_types: CharacterRelationshipD
 
 export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const [relationShipTypeId, setRelationshipTypeId] = useState("");
-  const [generationCount, setGenerationCount] = useState("5");
+  const [generationCount, setGenerationCount] = useState("1");
   const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(
     data?.id,
     "characters",

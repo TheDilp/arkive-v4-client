@@ -1,6 +1,11 @@
 import { CurveStyleType, NodeShape } from "../../types/EntityTypes/graphTypes";
+import { closestDivisibleBy50 } from "../data";
 
 export const FamilyTreeGenerationsCountOptions = [
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
   { label: "5", value: "5" },
   { label: "10", value: "10" },
   { label: "15", value: "15" },
@@ -316,42 +321,34 @@ export const cytoscapeGridOptions = {
 
 export const dagreLayoutOptions = {
   // dagre algo options, uses default value on undefined
-  nodeSep: 150, // the separation between adjacent nodes in the same rank
-  edgeSep: 150, // the separation between adjacent edges in the same rank
-  rankSep: 150, // the separation between each rank in the layout
+  nodeSep: 50, // the separation between adjacent nodes in the same rank
+  edgeSep: 5, // the separation between adjacent edges in the same rank
+  rankSep: undefined, // the separation between each rank in the layout
   rankDir: "TB", // 'TB' for top to bottom flow, 'LR' for left to right,
   align: undefined, // alignment for rank nodes. Can be 'UL', 'UR', 'DL', or 'DR', where U = up, D = down, L = left, and R = right
-  acyclicer: undefined, // If set to 'greedy', uses a greedy heuristic for finding a feedback arc set for a graph.
+  acyclicer: "greedy", // If set to 'greedy', uses a greedy heuristic for finding a feedback arc set for a graph.
   // A feedback arc set is a set of edges that can be removed to make a graph acyclic.
   ranker: "tight-tree", // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
   minLen() {
     return 1;
   }, // number of ranks to keep between the source and target of the edge
-  edgeWeight() {
-    return 1;
-  }, // higher weight edges are generally made shorter and straighter than lower weight edges
 
   // general layout options
   fit: true, // whether to fit to viewport
-  padding: 30, // fit padding
-  spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
-  nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
+  padding: 0, // fit padding
+  spacingFactor: 1, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
+  nodeDimensionsIncludeLabels: true, // whether labels should be included in determining the space used by a node
   animate: false, // whether to transition the node positions
   animateFilter() {
     return true;
   }, // whether to animate specific nodes when animation is on; non-animated nodes immediately go to their final positions
   animationDuration: 500, // duration of animation in ms if enabled
   animationEasing: undefined, // easing of animation if enabled
-  boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+  // boundingBox: { x1: 0, y1: 0, w: 5000, h: 5000 }, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
   transform(_: any, pos: { x: number; y: number }) {
-    return pos;
+    const [x, y] = closestDivisibleBy50(pos.x, pos.y);
+    return { x: x + 25, y: y + 25 };
   }, // a function that applies a transform to the final node position
-  ready() {}, // on layoutready
-  sort: undefined, // a sorting function to order the nodes and edges; e.g. function(a, b){ return a.data('weight') - b.data('weight') }
-  // because cytoscape dagre creates a directed graph, and directed graphs use the node order as a tie breaker when
-  // defining the topology of a graph, this sort function can help ensure the correct order of the nodes/edges.
-  // this feature is most useful when adding and removing the same nodes and edges multiple times in a graph.
-  stop() {}, // on layoutstop
 };
 
 export const DefaultBoardColor = "#595959";

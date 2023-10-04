@@ -24,3 +24,10 @@ export function deleteObjectPropsRecursive(obj: { [key: string]: any }, keys: st
   }
   return obj;
 }
+
+export function closestDivisibleBy50(x: number, y: number): [number, number] {
+  const closestX = Math.round(x / 50) * 50;
+  const closestY = Math.round(y / 50) * 50;
+
+  return [closestX, closestY];
+}
