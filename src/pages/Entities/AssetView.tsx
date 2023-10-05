@@ -1,5 +1,6 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -123,7 +124,7 @@ export function AssetView() {
   const { isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState<"card" | "table">("table");
+  const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
   const [{ orderBy, filters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -210,6 +211,7 @@ export function AssetView() {
             name="view"
             onChange={({ value }) => {
               setView(value as "card" | "table");
+              ls.set("assets_view", value);
             }}
             options={[
               { label: "Card", value: "card", icon: IconEnum.card },
