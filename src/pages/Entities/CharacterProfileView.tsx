@@ -410,7 +410,11 @@ export function CharacterProfileView() {
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
+  const {
+    data: existingCharacter,
+    isLoading,
+    isFetching,
+  } = useGetEntity<CharacterType>(
     item_id,
     "characters",
     {
@@ -473,7 +477,6 @@ export function CharacterProfileView() {
         size: "lg",
       });
   }
-
   function openAddDocumentDrawer() {
     if (existingCharacter?.data?.id) {
       setDrawer((prev) => ({
@@ -508,30 +511,34 @@ export function CharacterProfileView() {
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
     <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:content-stretch">
-      <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
-        <Avatar
-          hasShowImage
-          image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
-          initials={
-            getAvatarInitials(existingCharacter?.data?.first_name || "", existingCharacter?.data?.last_name || "") || ""
-          }
-          isBordered
-          isTooltipDisabled
-          size="4xl"
-        />
-        <div className="mt-2 flex flex-col gap-y-1">
-          <h2 className="text-center font-merriweather text-lg">
-            {`${existingCharacter?.data?.first_name || ""} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
-          </h2>
-          {existingCharacter?.data?.nickname ? (
-            <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
-          ) : null}
-        </div>
+      {isLoading ? (
+        <Skeleton type="character_profile" />
+      ) : (
+        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
+          <Avatar
+            hasShowImage
+            image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+            initials={
+              getAvatarInitials(existingCharacter?.data?.first_name || "", existingCharacter?.data?.last_name || "") || ""
+            }
+            isTooltipDisabled
+            size="4xl"
+          />
 
-        <div className="w-full">
-          <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+          <div className="mt-2 flex flex-col gap-y-1">
+            <h2 className="text-center font-merriweather text-lg">
+              {`${existingCharacter?.data?.first_name || ""} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
+            </h2>
+            {existingCharacter?.data?.nickname ? (
+              <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
+            ) : null}
+          </div>
+
+          <div className="w-full">
+            <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+          </div>
         </div>
-      </div>
+      )}
       <div className="col-span-5 min-h-full rounded-lg bg-zinc-950 p-4 lg:col-span-4">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
