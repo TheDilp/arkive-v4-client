@@ -224,14 +224,17 @@ export function AssetView() {
         <div className="w-52">
           <Button
             icon={IconEnum.add}
-            label="Create new character"
+            label="Upload image"
             onClick={() =>
-              setDrawer((prev) => ({
+              setDialog((prev: DialogAtomType) => ({
                 ...prev,
-                data: { project_id },
-                title: "Create new character",
-                type: "characters",
+                type: "image_upload",
+                title: "Upload images",
                 size: "lg",
+                isOverlay: true,
+                data: {
+                  type: "images",
+                },
               }))
             }
           />

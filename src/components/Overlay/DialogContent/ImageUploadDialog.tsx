@@ -49,7 +49,7 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
             ))
           : null}
       </div>
-      <div>
+      <div className="mt-auto">
         <Button
           icon={IconEnum.upload}
           isDisabled={isMutating}

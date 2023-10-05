@@ -552,6 +552,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const relationGroups = (relationshipTypes?.data || [])?.filter((rt) => relationGroupIds.includes(rt.id));
 
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
+
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
