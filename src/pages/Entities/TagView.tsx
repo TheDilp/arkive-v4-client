@@ -36,8 +36,8 @@ function createColumns(
         noLink: true,
         centered: true,
       },
-      maxSize: 5,
-      minSize: 5,
+      maxSize: 6,
+      minSize: 6,
     }),
 
     columnHelper.display({
