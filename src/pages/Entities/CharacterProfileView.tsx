@@ -681,7 +681,7 @@ export function CharacterProfileView() {
           <TablePageLayout>
             {isFetching ? (
               <div className="pt-10">
-                <Skeleton type="table" />
+                <Skeleton limit={5} type="table" />
               </div>
             ) : (
               <div className="h-full max-h-full w-full overflow-hidden">
