@@ -87,7 +87,7 @@ export function Navbar() {
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       {project_id ? (
-        <div className="ml-auto flex items-center gap-x-2 pr-2">
+        <div className="ml-auto flex items-center gap-x-2 pr-4">
           <div className="w-fit">
             <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
           </div>
