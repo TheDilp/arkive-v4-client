@@ -134,7 +134,7 @@ export function AssetView() {
     project_id as string,
     "images",
     { orderBy, filters, pagination },
-    { enabled: view === "table" },
+    { enabled: view === "table", prefetch: true },
   );
 
   const {

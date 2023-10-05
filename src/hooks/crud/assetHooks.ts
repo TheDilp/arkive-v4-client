@@ -43,19 +43,83 @@ export function useUploadAsset(type: AssetType, project_id: string) {
 export function useGetImages(
   project_id: string,
   type: AssetType,
-  body: RequestBodyType,
-  options?: UseQueryOptions<{ data: ImageType[] }, any, { data: ImageType[] }>,
+  request: RequestBodyType,
+  options?: UseQueryOptions<{ data: ImageType[] }, any, { data: ImageType[] }> & {
+    prefetch?: boolean;
+    queryKeyConcat?: string[];
+    queryKeyOverwrite?: string[];
+  },
 ) {
-  return useQuery<{ data: ImageType[] }, any, { data: ImageType[] }>(
-    ["allEntities", project_id, type, body?.filters, body?.pagination, body?.orderBy],
-    async () =>
-      FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/assets/${project_id}/${type}` }),
-    {
-      enabled: options?.enabled,
-      staleTime: options?.staleTime,
-      select: options?.select,
-    },
-  );
+  const baseQueryKey = [
+    "allEntities",
+    request.data?.project_id,
+    type,
+    request.data?.item_id || request.data?.parent_id,
+    request?.filters,
+    request?.relationFilters,
+    request?.orderBy,
+  ];
+  let mainRequestQueryKey = [...baseQueryKey];
+  async function queryFn(finalRequest: RequestBodyType) {
+    return FetchFunction({
+      method: "POST",
+      body: JSON.stringify(finalRequest),
+      url: `${baseURLS.baseServer}/assets/${project_id}/${type}`,
+    });
+  }
+  const configuredOptions = {
+    enabled: options?.enabled ?? true,
+    staleTime: options?.staleTime || 5 * 1000,
+    select: options?.select,
+  };
+  const queryClient = useQueryClient();
+
+  if (typeof request?.pagination?.page === "number") {
+    mainRequestQueryKey = mainRequestQueryKey.concat(request?.pagination);
+  }
+
+  if (options?.queryKeyConcat) {
+    mainRequestQueryKey = mainRequestQueryKey.concat(options.queryKeyOverwrite);
+  }
+
+  if (options?.queryKeyOverwrite) {
+    mainRequestQueryKey = options.queryKeyOverwrite;
+  }
+
+  const res = useQuery<{ data: ImageType[] }, unknown>(mainRequestQueryKey, async () => queryFn(request), {
+    ...configuredOptions,
+    ...options,
+  });
+
+  if (options?.prefetch && configuredOptions?.enabled && res.data?.data.length === request.pagination?.limit) {
+    queryClient.prefetchQuery({
+      queryKey:
+        typeof request?.pagination?.page === "number"
+          ? [
+              ...baseQueryKey,
+              {
+                ...request.pagination,
+                page: request.pagination.page + 1,
+              },
+            ]
+          : baseQueryKey,
+      queryFn: async () =>
+        queryFn(
+          typeof request?.pagination?.page === "number"
+            ? {
+                ...request,
+                pagination: {
+                  ...request.pagination,
+                  page: request.pagination.page + 1,
+                },
+              }
+            : request,
+        ),
+      ...configuredOptions,
+    });
+  }
+
+  return res;
 }
 
 export function useUpdateImage<InsertType extends { data: { title: string } }>(
