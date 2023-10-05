@@ -396,7 +396,15 @@ export function Search({
                       listRef.current[index] = node;
                     },
                     onClick() {
-                      onChange({ name, value: item.value, label: item.label, color: item?.color, image: item?.image });
+                      onChange({
+                        name,
+                        value: item.value,
+                        label: item.label,
+                        color: item?.color,
+                        image: item?.image,
+                        first_name: item?.first_name,
+                        last_name: item?.last_name,
+                      });
 
                       if (hasShownOption) setDisplayValue(item.label);
                       if (!isMultiple) {

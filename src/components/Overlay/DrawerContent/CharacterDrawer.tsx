@@ -729,6 +729,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
+
                             if (value && first_name) {
                               handleChange({
                                 name: "related_to",
