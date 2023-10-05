@@ -71,6 +71,7 @@ const fieldSizeClass = tv({
       dice_roll: "col-span-6 sm:col-span-3 lg:col-span-1",
       text: "col-span-6 sm:col-span-3 lg:col-span-2",
       select: "col-span-6 sm:col-span-3 lg:col-span-2",
+      select_multiple: "col-span-6 sm:col-span-3 lg:col-span-2",
       number: "col-span-6 sm:col-span-3 lg:col-span-2",
       random_table: "col-span-6 sm:col-span-3 lg:col-span-2",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
