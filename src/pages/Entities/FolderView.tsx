@@ -212,63 +212,65 @@ export function FolderView() {
         <Breadcrumbs />
         {isFetching || isFetchingFolder ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
         {(!item_id || data?.data?.is_folder) && !isFetching ? (
-          <div className="w-52">
-            <Dropdown
-              allowedPlacements={["bottom-end"]}
-              items={[
-                {
-                  id: "1",
-                  label: `Create new ${entityName}`,
-                  icon: getDefaultEntityIcon(type as AvailableEntityType),
-                  onClick: () => {
+          <div className="flex w-fit gap-x-2">
+            <div className="w-52">
+              <Dropdown
+                allowedPlacements={["bottom-end"]}
+                items={[
+                  {
+                    id: "1",
+                    label: `Create new ${entityName}`,
+                    icon: getDefaultEntityIcon(type as AvailableEntityType),
+                    onClick: () => {
+                      setDrawer((prev) => ({
+                        ...prev,
+                        data: { project_id: project_id as string },
+                        title: `Create new ${entityName}`,
+                        type: type as DrawerContentCreateNewType,
+                        size: "lg",
+                      }));
+                    },
+                  },
+                  {
+                    id: "2",
+                    label: "Create new folder",
+                    icon: IconEnum.folder,
+                    onClick: () => {
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: `Create new ${entityName} folder`,
+                        data: { project_id, type: type as AvailableEntityType },
+                        type: "folder",
+                        size: "sm",
+                      }));
+                    },
+                  },
+                ]}>
+                <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
+              </Dropdown>
+            </div>
+            {(item_id || data?.data?.is_folder) && !isFetching ? (
+              <div className="w-fit">
+                <Button
+                  icon={IconEnum.edit}
+                  label={`Edit current ${entityName}`}
+                  onClick={() => {
                     setDrawer((prev) => ({
                       ...prev,
-                      data: { project_id: project_id as string },
-                      title: `Create new ${entityName}`,
-                      type: type as DrawerContentCreateNewType,
                       size: "lg",
+                      title: `Edit ${entityName}`,
+                      type: type as DrawerContentCreateNewType,
+                      data: { id: item_id as string, project_id: project_id as string },
                     }));
-                  },
-                },
-                {
-                  id: "2",
-                  label: "Create new folder",
-                  icon: IconEnum.folder,
-                  onClick: () => {
-                    setDrawer((prev) => ({
-                      ...prev,
-                      title: `Create new ${entityName} folder`,
-                      data: { project_id, type: type as AvailableEntityType },
-                      type: "folder",
-                      size: "sm",
-                    }));
-                  },
-                },
-              ]}>
-              <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
-            </Dropdown>
-          </div>
-        ) : null}
-        {(item_id || data?.data?.is_folder) && !isFetching ? (
-          <div className="w-fit">
-            <Button
-              icon={IconEnum.edit}
-              label={`Edit current ${entityName}`}
-              onClick={() => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  size: "lg",
-                  title: `Edit ${entityName}`,
-                  type: type as DrawerContentCreateNewType,
-                  data: { id: item_id as string, project_id: project_id as string },
-                }));
-              }}
-            />
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
       {!isFetching ? (
-        <div className="grid h-full w-full grid-cols-2 content-start gap-8 px-2 md:grid-cols-4 lg:grid-cols-10">
+        <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && !item_id ? base.data : []).map((item) => (
             <EntityItem
               key={item.id}
