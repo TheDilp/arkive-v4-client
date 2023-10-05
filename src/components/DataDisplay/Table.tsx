@@ -625,7 +625,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           </div>
           {data?.length ? (
             <div ref={bodyRef} className="h-full overflow-auto pb-1">
-              <div className={body()} style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+              <div className={body()} style={{ height: expandable ? "" : `${rowVirtualizer.getTotalSize()}px` }}>
                 {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
                   const row = rows[virtualRow.index];
                   return (
@@ -633,14 +633,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       key={row.id}
                       className={rowContainer()}
                       style={{
-                        height: `${virtualRow.size}px`,
-                        transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+                        height: expandable ? "" : `${virtualRow.size}px`,
+                        transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
                       }}>
                       <Link to={getLink ? getLink(row.original) : "#"}>
                         <div
                           className={`${rowClasses()} ${
                             config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                              ? "border-y border-zinc-200 bg-blue-400 hover:bg-blue-300 hover:text-white"
+                              ? "border-y border-zinc-600 bg-blue-400 hover:bg-blue-300 hover:text-white"
                               : ""
                           }
                         ${getLink ? hasLinkRow() : ""}
@@ -676,7 +676,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                           ))}
                         </div>
                       </Link>
-                      {row.getIsExpanded() ? <ExpandedTableRow data={row.original} type={type} /> : null}
+                      {row.getIsExpanded() ? (
+                        <div className="">
+                          <ExpandedTableRow data={row.original} type={type} />
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -703,25 +707,35 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             payload: { ...pagination, limit: parseInt(value, 10) },
                           });
                       }}
-                      options={[
-                        { label: "10", value: "10" },
-                        { label: "20", value: "20" },
-                        { label: "30", value: "30" },
-                        { label: "40", value: "40" },
-                        { label: "50", value: "50" },
-                        { label: "60", value: "60" },
-                        { label: "70", value: "70" },
-                        { label: "80", value: "80" },
-                        { label: "90", value: "90" },
-                        { label: "100", value: "100" },
-                        { label: "200", value: "200" },
-                        { label: "250", value: "250" },
-                        { label: "300", value: "300" },
-                        { label: "350", value: "350" },
-                        { label: "400", value: "400" },
-                        { label: "450", value: "450" },
-                        { label: "500", value: "500" },
-                      ]}
+                      options={
+                        expandable
+                          ? [
+                              { label: "10", value: "10" },
+                              { label: "20", value: "20" },
+                              { label: "30", value: "30" },
+                              { label: "40", value: "40" },
+                              { label: "50", value: "50" },
+                            ]
+                          : [
+                              { label: "10", value: "10" },
+                              { label: "20", value: "20" },
+                              { label: "30", value: "30" },
+                              { label: "40", value: "40" },
+                              { label: "50", value: "50" },
+                              { label: "60", value: "60" },
+                              { label: "70", value: "70" },
+                              { label: "80", value: "80" },
+                              { label: "90", value: "90" },
+                              { label: "100", value: "100" },
+                              { label: "200", value: "200" },
+                              { label: "250", value: "250" },
+                              { label: "300", value: "300" },
+                              { label: "350", value: "350" },
+                              { label: "400", value: "400" },
+                              { label: "450", value: "450" },
+                              { label: "500", value: "500" },
+                            ]
+                      }
                       size="sm"
                       value={pagination?.limit?.toFixed() || "10"}
                     />
