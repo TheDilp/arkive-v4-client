@@ -303,6 +303,7 @@ export function Search({
             }
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
+
               if ((!value || isMultiple) && activeIndex === null) {
                 refetch();
               } else if ((!value || isMultiple) && typeof activeIndex === "number") {
@@ -330,7 +331,7 @@ export function Search({
             if (e.key === "Backspace") {
               if (value || inputValue || displayValue) {
                 e.preventDefault();
-                if (!isMultiple) onChange({ name, value: "", label: "" });
+                // if (!isMultiple && value) onChange({ name, value: "", label: "" });
                 setInputValue("");
                 setDisplayValue("");
               }
