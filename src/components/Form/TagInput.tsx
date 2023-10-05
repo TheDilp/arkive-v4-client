@@ -9,15 +9,16 @@ type Props = {
   label?: string;
   tags: TagType[];
   handleChange: (newData: HandleChangePropsType) => void;
+  isMultiple?: boolean;
 };
 
-export function TagInput({ tags, label: componentLabel, handleChange }: Props) {
+export function TagInput({ tags, label: componentLabel, handleChange, isMultiple }: Props) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
-        isMultiple
+        isMultiple={isMultiple}
         label={componentLabel || ""}
         name="tags"
         onChange={({ name, label, value, color }) => {
@@ -43,7 +44,7 @@ export function TagInput({ tags, label: componentLabel, handleChange }: Props) {
         }}
         placeholder="Press enter to search tags"
         searchEntity="tags"
-        value={tags.map((t) => t.id)}
+        value={isMultiple ? tags.map((t) => t.id) : undefined}
       />
 
       <div className="flex flex-wrap gap-2">
