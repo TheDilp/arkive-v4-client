@@ -330,7 +330,10 @@ function TableColumnFilter({
 
 function TableTagFilter({ activeTags, dispatch }: { activeTags: string[]; dispatch: TableDispatch }) {
   const { project_id } = useParams();
-  const { data: tags, isFetching } = useGetEntities<TagType>({ data: { project_id } }, "tags");
+  const { data: tags, isFetching } = useGetEntities<TagType>(
+    { data: { project_id }, orderBy: [{ field: "title", sort: "asc" }], pagination: { limit: 5000 } },
+    "tags",
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>(activeTags);
   useEffect(() => {
     if (Array.isArray(activeTags)) setSelectedTags(activeTags);
