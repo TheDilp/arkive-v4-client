@@ -829,7 +829,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {selectedTab === 2 ? (
         <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} isMultiple tags={character?.tags || []} />
+          <TagInput handleChange={handleChange} tags={character?.tags || []} />
         </div>
       ) : null}
       {selectedTab === 3 ? (
