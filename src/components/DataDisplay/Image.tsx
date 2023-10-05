@@ -17,8 +17,8 @@ const ImageClasses = tv({
   },
 });
 
-function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, image: string) {
-  setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
+function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, image: string, title: string) {
+  setDialog((prev) => ({ ...prev, data: { image, title }, type: "image_view", title: "Image view" }));
 }
 
 export function Image({ image, isOpenable, hasTitle }: ImageComponentType) {
@@ -38,7 +38,7 @@ export function Image({ image, isOpenable, hasTitle }: ImageComponentType) {
         alt={image.title}
         className={classes}
         onClick={() => {
-          if (isOpenable) openImageView(setDialog, imageUrl);
+          if (isOpenable) openImageView(setDialog, imageUrl, image.title);
         }}
         src={imageUrl}
       />

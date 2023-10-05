@@ -252,7 +252,7 @@ export function AssetView() {
             page.data.map((img: ImageType) => (
               <div
                 key={img.id}
-                className="col-span-1 bg-zinc-950 bg-cover bg-top transition-all duration-300 lg:bg-center [&>*>h2]:opacity-0 [&>*>h2]:hover:opacity-100 [&>*>img]:hover:brightness-75">
+                className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
                 <Image hasTitle image={img} isOpenable />
               </div>
             )),
