@@ -11,6 +11,8 @@ export const FieldTypesEnum = [
   { value: "documents_multiple", label: "Documents (multiple)" },
   { value: "images_single", label: "Image (single)" },
   { value: "images_multiple", label: "Images (multiple)" },
+  { value: "locations_single", label: "Location (single)" },
+  { value: "locations_multiple", label: "Locations (multiple)" },
 ];
 
 export const BaseCharacterRelationshipOptionsEnum = [
