@@ -98,12 +98,12 @@ export function DocumentView({ editable }: { editable: boolean }) {
   }
   if (isFetching)
     return (
-      <div className="h-[90%] w-full max-w-[93vw] lg:h-full">
+      <div className="h-[90%] w-full max-w-[95.5vw] lg:h-full">
         <Skeleton type="editor" />
       </div>
     );
   return (
-    <div className="h-full w-full max-w-[95vw] lg:h-full">
+    <div className="h-full w-full max-w-[95.5vw] lg:h-full">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification
