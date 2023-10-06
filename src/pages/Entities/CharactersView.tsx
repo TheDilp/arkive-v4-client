@@ -335,29 +335,27 @@ export function CharactersView() {
           )}
         </div>
       ) : (
-        <div className="w-full flex-1 overflow-hidden">
-          <Table
-            columns={createColumns(setDrawer, setDialog)}
-            config={{
-              hasSelect: true,
-              hasFavorite: true,
-              hasTags: true,
-              orderBy,
-              filters,
-              relationFilters,
-              selection,
-              getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
-              setFavorite: async (rowData: any) => {
-                await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
-              },
-            }}
-            data={data?.data || []}
-            dispatch={dispatch}
-            isLoading={isLoading}
-            pagination={pagination}
-            type="characters"
-          />
-        </div>
+        <Table
+          columns={createColumns(setDrawer, setDialog)}
+          config={{
+            hasSelect: true,
+            hasFavorite: true,
+            hasTags: true,
+            orderBy,
+            filters,
+            relationFilters,
+            selection,
+            getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
+            setFavorite: async (rowData: any) => {
+              await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
+            },
+          }}
+          data={data?.data || []}
+          dispatch={dispatch}
+          isLoading={isLoading}
+          pagination={pagination}
+          type="characters"
+        />
       )}
     </TablePageLayout>
   );

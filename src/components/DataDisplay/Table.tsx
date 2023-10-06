@@ -640,7 +640,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         <div
                           className={`${rowClasses()} ${
                             config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                              ? "border-y border-zinc-600 bg-blue-400 hover:bg-blue-300 hover:text-white"
+                              ? "bg-blue-400 hover:bg-blue-300 hover:text-white"
                               : ""
                           }
                         ${getLink ? hasLinkRow() : ""}

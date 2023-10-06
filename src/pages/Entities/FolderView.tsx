@@ -1,11 +1,22 @@
 import { UseMutateFunction } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
-import { MouseEvent, useLayoutEffect } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Alert, Breadcrumbs, Button, Dropdown, Icon, Skeleton } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useUpdateEntity } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, DrawerContentCreateNewType } from "../../types";
+import {
+  Alert,
+  Breadcrumbs,
+  Button,
+  createColumnHelper,
+  Dropdown,
+  Icon,
+  Select,
+  Skeleton,
+  Table,
+  TablePageLayout,
+} from "../../components";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable, useUpdateEntity } from "../../hooks";
+import { AvailableEntityType, BaseEntityType, DialogAtomType, DrawerAtomType, DrawerContentCreateNewType } from "../../types";
 import {
   breadcrumbsAtom,
   capitalizeFirstLetter,
@@ -34,6 +45,71 @@ type EntityItemType = {
   icon?: string | null;
   image_id?: string;
 };
+const columnHelper = createColumnHelper<BaseEntityType>();
+
+function columns(
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  entityName: string,
+  entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+) {
+  return [
+    columnHelper.display({
+      id: "first_name",
+      header: "First name",
+      cell: ({ row }) => row.original.title,
+    }),
+    columnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                label: "Edit character",
+                icon: IconEnum.edit,
+                onClick: () => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: row.original,
+                    title: `Edit ${entityName} - ${row.original.title}`,
+                    size: "lg",
+                    type: entityType,
+                  }));
+                },
+              },
+
+              {
+                id: "delete_entity",
+                label: `Delete ${entityName}`,
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: entityType,
+                    },
+                    title: `Delete ${entityType}`,
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 
 function EntityItem({
   id,
@@ -114,6 +190,10 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
+
+  const [{ selection }, dispatch] = useTable({ selection: [] });
+
+  const [view, setView] = useState<"table" | "folders">("folders");
 
   // IMAGE_ID MUST BE LAST ELEMENT FOR POP
   // !REWORK WITH SMARTER IMPLEMENTATION
@@ -207,12 +287,26 @@ export function FolderView() {
   if (type === "project-settings") return <ProjectSettingsView />;
 
   return (
-    <>
-      <div className="flex h-12 items-center justify-between">
+    <TablePageLayout>
+      <div className="flex h-12 min-h-[3rem] items-center justify-between">
         <Breadcrumbs />
         {isFetching || isFetchingFolder ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
-        {(!item_id || data?.data?.is_folder) && !isFetching ? (
+        {!item_id || data?.data?.is_folder ? (
           <div className="flex w-fit gap-x-2">
+            <div className="w-32">
+              <Select
+                name="view"
+                onChange={({ value }) => {
+                  setView(value as "folders" | "table");
+                }}
+                options={[
+                  { label: "Folders", value: "folders", icon: IconEnum.folder },
+                  { label: "Table", value: "table", icon: IconEnum.table },
+                ]}
+                placeholder="View"
+                value={view}
+              />
+            </div>
             <div className="w-52">
               <Dropdown
                 allowedPlacements={["bottom-end"]}
@@ -269,7 +363,7 @@ export function FolderView() {
           </div>
         ) : null}
       </div>
-      {!isFetching ? (
+      {!isFetching && view === "folders" ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && !item_id ? base.data : []).map((item) => (
             <EntityItem
@@ -393,6 +487,20 @@ export function FolderView() {
           ) : null}
         </div>
       ) : null}
-    </>
+      {!isFetching && view === "table" ? (
+        <Table
+          columns={columns(
+            setDrawer,
+            setDialog,
+            entityName,
+            type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+          )}
+          config={{ hasSelect: true, selection }}
+          data={base?.data || data?.data?.children || []}
+          dispatch={dispatch}
+          type={type as AvailableEntityType}
+        />
+      ) : null}
+    </TablePageLayout>
   );
 }

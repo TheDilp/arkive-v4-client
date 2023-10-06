@@ -1,5 +1,5 @@
 import ls from "localstorage-slim";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntity } from "../../hooks";
@@ -39,6 +39,6 @@ export function ProjectLayout() {
   );
 }
 
-export function TablePageLayout({ children }: { children: JSX.Element | JSX.Element[] }) {
+export function TablePageLayout({ children }: { children: JSX.Element | JSX.Element[] | ReactNode | ReactNode[] | null }) {
   return <div className="flex h-full w-full flex-col gap-y-2 overflow-hidden text-white">{children}</div>;
 }
