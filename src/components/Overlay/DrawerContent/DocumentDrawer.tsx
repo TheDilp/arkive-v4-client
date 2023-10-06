@@ -33,7 +33,7 @@ const tabs = [
   { id: "2", label: "Tags", icon: IconEnum.tags },
 ];
 export function DocumentDrawer({ data }: Props) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -227,6 +227,7 @@ export function DocumentDrawer({ data }: Props) {
                   tags: document?.tags,
                 },
               };
+              dataToParse.data.parent_id = item_id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);
               await create(parsedData, {
                 onSuccess: resetDrawerAtom,
