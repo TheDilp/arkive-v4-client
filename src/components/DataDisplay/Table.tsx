@@ -55,7 +55,7 @@ const TableClasses = tv({
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
     bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
-    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-t border-zinc-600",
+    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden",
     rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 hover:bg-zinc-800",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",

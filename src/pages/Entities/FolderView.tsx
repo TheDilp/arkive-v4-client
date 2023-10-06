@@ -1,5 +1,6 @@
 import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -55,8 +56,20 @@ function columns(
 ) {
   return [
     columnHelper.display({
-      id: "first_name",
-      header: "First name",
+      id: "is_folder",
+      header: "",
+      cell: ({ row }) => (
+        <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon(entityType)} />
+      ),
+      maxSize: 3,
+      minSize: 3,
+      meta: {
+        centered: true,
+      },
+    }),
+    columnHelper.display({
+      id: "title",
+      header: "Title",
       cell: ({ row }) => row.original.title,
     }),
     columnHelper.display({
@@ -190,10 +203,11 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
+  const entityName = getEntityNameFromType(type as AvailableEntityType);
 
   const [{ selection }, dispatch] = useTable({ selection: [] });
 
-  const [view, setView] = useState<"table" | "folders">("folders");
+  const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "folders");
 
   // IMAGE_ID MUST BE LAST ELEMENT FOR POP
   // !REWORK WITH SMARTER IMPLEMENTATION
@@ -264,7 +278,6 @@ export function FolderView() {
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
-  const entityName = getEntityNameFromType(type as AvailableEntityType);
 
   useChangeNavbarTitle(
     `The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "project-settings") || "")} ${
@@ -300,6 +313,7 @@ export function FolderView() {
                 name="view"
                 onChange={({ value }) => {
                   setView(value as "folders" | "table");
+                  ls.set(`${entityName}-table`, value);
                 }}
                 options={[
                   { label: "Folders", value: "folders", icon: IconEnum.folder },
@@ -490,23 +504,25 @@ export function FolderView() {
         </div>
       ) : null}
       {!isFetching && view === "table" ? (
-        <Table
-          columns={columns(
-            setDrawer,
-            setDialog,
-            entityName,
-            type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
-          )}
-          config={{
-            hasSelect: true,
-            selection,
-            getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
-          }}
-          data={base?.data || data?.data?.children || []}
-          dispatch={dispatch}
-          isLoading={isFetching || isFetchingFolder}
-          type={type as AvailableEntityType}
-        />
+        <div className="w-full flex-1 overflow-hidden">
+          <Table
+            columns={columns(
+              setDrawer,
+              setDialog,
+              entityName,
+              type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+            )}
+            config={{
+              hasSelect: true,
+              selection,
+              getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
+            }}
+            data={base?.data || data?.data?.children || []}
+            dispatch={dispatch}
+            isLoading={isFetching || isFetchingFolder}
+            type={type as AvailableEntityType}
+          />
+        </div>
       ) : null}
     </TablePageLayout>
   );

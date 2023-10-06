@@ -40,5 +40,5 @@ export function ProjectLayout() {
 }
 
 export function TablePageLayout({ children }: { children: JSX.Element | JSX.Element[] | ReactNode | ReactNode[] | null }) {
-  return <div className="flex h-full w-full flex-col gap-y-2 overflow-hidden text-white">{children}</div>;
+  return <div className="flex h-full w-full flex-col gap-y-2 text-white">{children}</div>;
 }
