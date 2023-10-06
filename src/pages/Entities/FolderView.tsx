@@ -25,6 +25,7 @@ import {
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
+  getEntityFields,
   getEntityNameFromType,
   getImageURL,
   getNavbarEntityType,
@@ -207,17 +208,7 @@ export function FolderView() {
 
   const [{ selection }, dispatch] = useTable({ selection: [] });
 
-  const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "folders");
-
-  // IMAGE_ID MUST BE LAST ELEMENT FOR POP
-  // !REWORK WITH SMARTER IMPLEMENTATION
-
-  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
-  if (
-    (type === "graphs" || type === "random_tables" || type === "calendars" || type === "dictionaries") &&
-    fields.includes("image_id")
-  )
-    fields.pop();
+  const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
 
   const { data: base, isFetching } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -259,7 +250,7 @@ export function FolderView() {
       data: {
         project_id,
       },
-      fields,
+      fields: getEntityFields(type as AvailableEntityType),
       relations: {
         children: true,
         parents: true,
@@ -298,7 +289,6 @@ export function FolderView() {
   if (type === "character_fields_templates") return <CharacterFieldTemplates />;
   if (type === "assets") return <AssetView />;
   if (type === "project-settings") return <ProjectSettingsView />;
-
   return (
     <TablePageLayout>
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
@@ -307,7 +297,7 @@ export function FolderView() {
           <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
         ) : null}
         {!item_id || data?.data?.is_folder ? (
-          <div className="flex w-fit gap-x-2">
+          <div className="flex min-w-fit gap-x-2">
             <div className="w-32">
               <Select
                 name="view"

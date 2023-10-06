@@ -1,4 +1,3 @@
-import { randPhrase } from "@ngneat/falso";
 import { elementScroll, useVirtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
 import { useSetAtom } from "jotai";
 import { MutableRefObject, useCallback, useRef } from "react";
@@ -35,7 +34,7 @@ for (let i = 0; i <= 250; i += 1) {
     id: i.toString(),
     start_year: randomstart_year,
     end_year: randomend_year,
-    label: randPhrase(),
+    label: "test",
     color: randomColor,
     children: [],
   };

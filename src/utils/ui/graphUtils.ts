@@ -11,7 +11,7 @@ export function changeLockState(
   updateManyNodesLockState: UseMutateFunction<
     any,
     unknown,
-    { data: { data: { [key: string]: any; id: string; parent_id: string } }[] },
+    { data: { data: { [key: string]: any; id: string; parent_id?: string } }[] },
     { old: { data: GraphType } | undefined } | { old: {} }
   >,
   parent_id: string,

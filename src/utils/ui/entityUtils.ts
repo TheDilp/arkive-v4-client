@@ -50,3 +50,15 @@ export function getEntityLinkType(type: AvailableEntityType | AvailableSubEntity
 
   return type;
 }
+
+export function getEntityFields(type: AvailableEntityType): string[] {
+  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
+  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
+  if (
+    (type === "graphs" || type === "random_tables" || type === "calendars" || type === "dictionaries") &&
+    fields.includes("image_id")
+  )
+    fields.pop();
+
+  return fields;
+}

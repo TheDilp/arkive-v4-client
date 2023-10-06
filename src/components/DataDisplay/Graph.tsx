@@ -90,7 +90,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
-  const { addOrUpdateNode } = useBatchUpdateNodePositions();
+  const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
   const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
 
   const styleSheet = useMemo(

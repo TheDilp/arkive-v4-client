@@ -281,7 +281,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
   const setNodes = useSetAtom(nodesAtom);
   const setEdges = useSetAtom(edgesAtom);
   return useMutation(
-    async (updateItemValues: { data: { data: { id: string; parent_id: string; [key: string]: any } }[] }) => {
+    async (updateItemValues: { data: { data: { id: string; parent_id?: string; [key: string]: any } }[] }) => {
       if (updateItemValues.data.length) {
         return FetchFunction({
           url: `${baseURLS.baseServer}/${type}/update`,
