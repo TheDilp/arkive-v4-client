@@ -423,7 +423,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
     </div>
   );
 }
-export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type }: TableType) {
+export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
   const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
@@ -498,7 +498,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   });
   const { rows } = table.getRowModel();
 
-  if (isLoading) return <Skeleton limit={pagination?.limit} type="table" />;
+  if (isLoading) return <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />;
   return (
     <div className={container()}>
       <div className={tableClasses()}>

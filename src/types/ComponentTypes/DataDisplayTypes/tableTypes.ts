@@ -78,6 +78,7 @@ export interface TableType {
     setFavorite?: (rowData: any) => Promise<void>;
   };
   type: AvailableEntityType | "random_table_options" | "icons" | "words" | "context" | "images";
+  skeletonLimit?: number;
 }
 
 export interface TableColumnFilterComponentType {
