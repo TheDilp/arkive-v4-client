@@ -56,7 +56,7 @@ const TableClasses = tv({
     subheaderRowTitle: "font-medium",
     bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
     body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden",
-    rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 hover:bg-zinc-800 last:border-b-0",
+    rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 last:border-b-0",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     contentWrapper: "block truncate",
@@ -631,20 +631,17 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   return (
                     <div
                       key={row.id}
-                      className={rowContainer()}
+                      className={`${rowContainer()} ${
+                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                          ? "group bg-blue-400 hover:text-white"
+                          : "hover:bg-zinc-800"
+                      }`}
                       style={{
                         height: expandable ? "" : `${virtualRow.size}px`,
                         transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
                       }}>
                       <Link to={getLink ? getLink(row.original) : "#"}>
-                        <div
-                          className={`${rowClasses()} ${
-                            config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                              ? "bg-blue-400 hover:bg-blue-300 hover:text-white"
-                              : ""
-                          }
-                        ${getLink ? hasLinkRow() : ""}
-                        `}>
+                        <div className={`${rowClasses()}${getLink ? hasLinkRow() : ""} group-hover:bg-blue-300`}>
                           {row.getVisibleCells().map((cell) => (
                             <div
                               key={cell.id}
