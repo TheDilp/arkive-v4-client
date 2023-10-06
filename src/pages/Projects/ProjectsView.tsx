@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { Button, Drawer, Navbar, ProjectCard } from "../../components";
 import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { drawerAtom, IconEnum } from "../../utils";
+import { drawerAtom, getImageURL, IconEnum } from "../../utils";
 
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
@@ -39,7 +39,14 @@ export function ProjectsView() {
         </div>
         <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 2xl:grid-cols-4">
           {data?.data
-            ? data.data.map((project) => <ProjectCard key={project.id} id={project.id} image="" title={project.title} />)
+            ? data.data.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={project.id}
+                  image={getImageURL(project.id, "images", project.image_id)}
+                  title={project.title}
+                />
+              ))
             : null}
         </div>
       </div>

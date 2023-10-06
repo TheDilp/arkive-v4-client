@@ -1,8 +1,19 @@
 import { SetStateAction, useSetAtom } from "jotai";
+import omit from "lodash.omit";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, ColorPicker, createColumnHelper, Dropdown, Input, Table, TablePageLayout, Tabs } from "../../components";
+import {
+  Button,
+  ColorPicker,
+  createColumnHelper,
+  Dropdown,
+  ImageSelect,
+  Input,
+  Table,
+  TablePageLayout,
+  Tabs,
+} from "../../components";
 import { useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterRelationshipType, DialogAtomType, ProjectType } from "../../types";
 import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum } from "../../utils";
@@ -94,7 +105,7 @@ export function ProjectSettingsView() {
   }, [projectData]);
 
   async function handleSave() {
-    if (project) await updateProject({ data: project });
+    if (project) await updateProject({ data: omit(project, ["character_relationship_types"]) });
   }
   function handleOpenNewRelationshipTypeDrawer() {
     setDrawer((prev) => ({
@@ -135,8 +146,22 @@ export function ProjectSettingsView() {
           ) : null}
         </h2>
         {selectedTab === 0 ? (
-          <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
-            <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
+          <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
+            <div className="flex flex-nowrap gap-x-2">
+              <div className="w-3/4">
+                <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
+              </div>
+              <div className="w-1/4">
+                <ImageSelect
+                  isIconOnly
+                  label="Project image"
+                  name="image_id"
+                  onChange={handleChange}
+                  type="images"
+                  value={project?.image_id || ""}
+                />
+              </div>
+            </div>
             <div className="flex flex-nowrap justify-between">
               <span>Default dice color:</span>
               <ColorPicker
