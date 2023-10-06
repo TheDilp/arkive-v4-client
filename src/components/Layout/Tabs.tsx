@@ -32,7 +32,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical }: TabsTypes) {
             key={tab.id}
             className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""}`}
             onClick={(e) => {
-              if (onChange) onChange(tab, index);
+              if (onChange && selectedTab !== index) onChange(tab, index);
               e.currentTarget.scrollIntoView({ behavior: "smooth" });
             }}
             onKeyDown={() => {}}

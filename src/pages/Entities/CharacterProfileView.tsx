@@ -463,7 +463,6 @@ export function CharacterProfileView() {
     "character_fields_templates",
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
-
   function showRelationshipTree() {
     if (existingCharacter?.data)
       setDialog({
@@ -678,33 +677,35 @@ export function CharacterProfileView() {
           </div>
         ) : null}
         {selectedTab === 1 ? (
-          <TablePageLayout>
-            {isFetching ? (
-              <div className="pt-10">
-                <Skeleton limit={5} type="table" />
-              </div>
-            ) : (
-              <div className="h-full max-h-full w-full overflow-hidden">
-                <Table
-                  columns={columns}
-                  config={{
-                    getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
-                  }}
-                  data={relationships.sort((a, b) => {
-                    if (a.first_name < b.first_name) return -1;
-                    if (a.first_name > b.first_name) return 1;
-                    if (a.id < b.id) return -1;
-                    if (a.id > b.id) return 1;
-                    if ((a.relation_title || "") < (b.relation_title || "")) return -1;
-                    if ((a.relation_title || "") > (b.relation_title || "")) return 1;
-                    return 0;
-                  })}
-                  dispatch={dispatch}
-                  type="characters"
-                />
-              </div>
-            )}
-          </TablePageLayout>
+          <div>
+            <TablePageLayout>
+              {isFetching ? (
+                <div className="pt-10">
+                  <Skeleton limit={5} type="table" />
+                </div>
+              ) : (
+                <div className="h-full max-h-full w-full overflow-hidden">
+                  <Table
+                    columns={columns}
+                    config={{
+                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
+                    }}
+                    data={relationships.sort((a, b) => {
+                      if (a.first_name < b.first_name) return -1;
+                      if (a.first_name > b.first_name) return 1;
+                      if (a.id < b.id) return -1;
+                      if (a.id > b.id) return 1;
+                      if ((a.relation_title || "") < (b.relation_title || "")) return -1;
+                      if ((a.relation_title || "") > (b.relation_title || "")) return 1;
+                      return 0;
+                    })}
+                    dispatch={dispatch}
+                    type="characters"
+                  />
+                </div>
+              )}
+            </TablePageLayout>
+          </div>
         ) : null}
         {selectedTab === 2 ? (
           <ul className="flex flex-col gap-y-2 overflow-hidden animate-in fade-in fill-mode-both">

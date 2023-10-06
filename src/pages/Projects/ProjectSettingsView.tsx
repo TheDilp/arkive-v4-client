@@ -148,14 +148,16 @@ export function ProjectSettingsView() {
           </div>
         ) : null}
         {selectedTab === 1 ? (
-          <TablePageLayout>
-            <Table
-              columns={relationshipTableColumns(setDialog)}
-              data={projectData?.data?.character_relationship_types || []}
-              dispatch={dispatch}
-              type="character_relationship_types"
-            />
-          </TablePageLayout>
+          <div>
+            <TablePageLayout>
+              <Table
+                columns={relationshipTableColumns(setDialog)}
+                data={projectData?.data?.character_relationship_types || []}
+                dispatch={dispatch}
+                type="character_relationship_types"
+              />
+            </TablePageLayout>
+          </div>
         ) : null}
       </div>
     </div>
