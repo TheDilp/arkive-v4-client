@@ -16,10 +16,10 @@ export function EntitiesView() {
 
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
-      <div className="flex h-12 items-center justify-between">
+      <div className="flex h-12 min-h-[3rem] items-center justify-between">
         <Breadcrumbs />
         {item_id ? (
-          <div className="w-52">
+          <div className="w-fit">
             <Button
               icon={IconEnum.edit}
               label={`Edit current ${entityName}`}
@@ -36,7 +36,6 @@ export function EntitiesView() {
           </div>
         ) : null}
       </div>
-
       {!!item_id && type === "characters" ? <CharacterProfileView /> : null}
       {!!item_id && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
