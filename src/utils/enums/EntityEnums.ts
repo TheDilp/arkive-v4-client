@@ -15,6 +15,15 @@ export const FieldTypesEnum = [
   { value: "locations_multiple", label: "Locations (multiple)" },
 ];
 
+export const SearchFieldTypes = [
+  "documents_single",
+  "documents_multiple",
+  "images_single",
+  "images_multiple",
+  "locations_single",
+  "locations_multiple",
+];
+
 export const BaseCharacterRelationshipOptionsEnum = [
   { label: "Parent", value: "parent" },
   { label: "Partner", value: "partner" },

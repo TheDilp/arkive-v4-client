@@ -62,3 +62,13 @@ export function getEntityFields(type: AvailableEntityType): string[] {
 
   return fields;
 }
+
+export function getSearchFieldTypeLabel(type: string) {
+  if (type === "images_single") return "Image";
+  if (type === "images_multiple") return "Images";
+  if (type === "documents_single") return "Document";
+  if (type === "documents_multiple") return "Documents";
+  if (type === "locations_single") return "Location";
+  if (type === "locations_multiple") return "Locations";
+  return "";
+}
