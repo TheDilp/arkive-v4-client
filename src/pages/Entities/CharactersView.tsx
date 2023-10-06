@@ -122,12 +122,7 @@ function createColumns(
                   }));
                 },
               },
-              {
-                id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
-                icon: IconEnum.additional_fields,
-                onClick: row.getToggleExpandedHandler(),
-              },
+
               {
                 id: "2",
                 label: "View relationship tree",
