@@ -153,9 +153,9 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
     }),
   ];
 }
-function disableShowFamilyTree(character: CharacterType | undefined) {
+function disableShowRelationshipTree(character: CharacterType | undefined) {
   if (!character) return true;
-  if (!character?.related_from?.length && !character?.related_to?.length) return true;
+  if (!character?.related_from?.length && !character?.related_to?.length && !character?.related_other?.length) return true;
   return false;
 }
 
@@ -464,7 +464,7 @@ export function CharacterProfileView() {
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
 
-  function showFamilyTree() {
+  function showRelationshipTree() {
     if (existingCharacter?.data)
       setDialog({
         type: "family_tree",
@@ -546,9 +546,9 @@ export function CharacterProfileView() {
             <div className="ml-auto w-min">
               <Button
                 icon={IconEnum.family_tree}
-                isDisabled={disableShowFamilyTree(existingCharacter?.data)}
-                label="Show family tree"
-                onClick={showFamilyTree}
+                isDisabled={disableShowRelationshipTree(existingCharacter?.data)}
+                label="Show relationship tree"
+                onClick={showRelationshipTree}
                 size="sm"
                 variant="info"
               />
