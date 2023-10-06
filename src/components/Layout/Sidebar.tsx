@@ -18,6 +18,7 @@ const SidebarClasses = tv({
     listItem:
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
     listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto",
+    selectedListItem: "text-white sticky left-16 top-16 bg-blue-400 [&>li]:hover:text-white",
     settingsSubitem: "flex items-center gap-x-2 select-none",
     activeSettingsSubItem: "text-blue-400",
     navIcon: "cursor-pointer",
@@ -26,7 +27,8 @@ const SidebarClasses = tv({
 
 export function Sidebar() {
   const { project_id, type } = useParams();
-  const { base, nav, list, sidebarLogo, listItemLink, listItem, listSettingsItem, navIcon } = SidebarClasses();
+  const { base, nav, list, sidebarLogo, listItemLink, listItem, listSettingsItem, selectedListItem, navIcon } =
+    SidebarClasses();
   return (
     <div className={base()}>
       <nav className={nav()}>
@@ -38,7 +40,7 @@ export function Sidebar() {
             return (
               <Link
                 key={item.icon}
-                className={`${listItemLink()} ${item.navigate === type ? "sticky left-16 top-16 bg-blue-400" : ""}
+                className={`${listItemLink()} ${item.navigate === type ? selectedListItem() : ""}
                 
                 ${item.navigate === "project-settings" ? listSettingsItem() : ""}
                 
