@@ -290,7 +290,9 @@ export function FolderView() {
     <TablePageLayout>
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
         <Breadcrumbs />
-        {isFetching || isFetchingFolder ? <Skeleton entity_type={type as AvailableEntityType} type="folder_view" /> : null}
+        {(isFetching || isFetchingFolder) && view === "folders" ? (
+          <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
+        ) : null}
         {!item_id || data?.data?.is_folder ? (
           <div className="flex w-fit gap-x-2">
             <div className="w-32">
@@ -495,9 +497,14 @@ export function FolderView() {
             entityName,
             type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
           )}
-          config={{ hasSelect: true, selection }}
+          config={{
+            hasSelect: true,
+            selection,
+            getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
+          }}
           data={base?.data || data?.data?.children || []}
           dispatch={dispatch}
+          isLoading={isFetching || isFetchingFolder}
           type={type as AvailableEntityType}
         />
       ) : null}
