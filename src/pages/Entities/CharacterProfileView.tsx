@@ -43,6 +43,7 @@ import {
 import {
   dialogAtom,
   drawerAtom,
+  formatDateToString,
   getAvatarInitials,
   getCharacterFullName,
   getImageURL,
@@ -75,6 +76,7 @@ const fieldSizeClass = tv({
       number: "col-span-6 sm:col-span-3 lg:col-span-2",
       random_table: "col-span-6 sm:col-span-3 lg:col-span-2",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
+      date: "col-span-6 sm:col-span-3 lg:col-span-2",
     },
   },
 });
@@ -362,6 +364,7 @@ function AdditionalFieldDisplay({
       <div className="grid grid-cols-6 gap-2">
         {character_fields.map((field) => {
           const fieldData = character_field_data.find((f) => f.id === field.id);
+
           const value =
             fieldData?.value && fieldData?.value?.value
               ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
@@ -377,6 +380,9 @@ function AdditionalFieldDisplay({
           const subOption = randomTable
             ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
             : null;
+
+          const date =
+            field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
 
           return (
             <div key={field?.id} className={fieldClasses}>
@@ -395,6 +401,11 @@ function AdditionalFieldDisplay({
               ) : null}
               {field.field_type === "textarea" && value ? (
                 <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
+              ) : null}
+              {field.field_type === "date" && value ? (
+                <div>
+                  <Title label={formatDateToString(date?.day, date?.year, date?.month, field?.calendar?.months || [])} />
+                </div>
               ) : null}
             </div>
           );

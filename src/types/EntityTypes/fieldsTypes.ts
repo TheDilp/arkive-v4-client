@@ -45,6 +45,6 @@ export type TemplateStateType = Partial<
 
 export interface CharacterFieldValueType {
   id: string;
-  value: { id: string; value: string | number | string[]; subOptionValue?: string };
+  value: { id: string; value: string | number | string[] | null | Record<string, number | string>; subOptionValue?: string };
   template_id: string;
 }

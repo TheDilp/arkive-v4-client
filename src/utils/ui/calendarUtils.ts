@@ -115,3 +115,19 @@ export function getFillerDayNumber(calendarMonths: MonthType[], currentMonthInde
   }
   return 0;
 }
+
+export function formatDateToString(
+  day: number | undefined,
+  year: number | undefined,
+  monthId: string | undefined,
+  months: { id: string; title: string }[] | undefined,
+): string {
+  if (day === undefined) return "";
+  if (year === undefined) return "";
+  if (monthId === undefined) return "";
+  const month = (months || []).find((m) => m.id === monthId);
+  if (month) {
+    return `${day} ${month.title} ${year}`;
+  }
+  return "";
+}
