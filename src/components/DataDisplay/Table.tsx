@@ -45,7 +45,7 @@ const TableClasses = tv({
   slots: {
     container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
     table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
-    head: "border-x border-t pr-1 border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
+    head: "border-x border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
     headerGroup: "flex w-full h-12",
     select: "select-none",
     header: "font-merriweather truncate select-none flex-1 min-h-[2.5rem]",
@@ -55,7 +55,7 @@ const TableClasses = tv({
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
     bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
-    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden pr-1",
+    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden",
     rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 last:border-b-0",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
