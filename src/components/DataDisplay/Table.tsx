@@ -63,7 +63,7 @@ const TableClasses = tv({
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 z-50 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
+      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
@@ -505,136 +505,128 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   return (
     <div className={container()}>
       <div className={tableClasses()}>
-        <div className={bodyContainer()}>
-          <div ref={bodyRef} className="h-full overflow-auto pb-1">
-            <div className={head()}>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <div key={headerGroup.id} className={headerGroupClasses()}>
-                  {headerGroup.headers.map((hdr) => {
-                    const { header, id, meta } = hdr.column.columnDef;
-                    const activeColumnFilters = {
-                      and: (filters?.and || []).filter((filt) => filt.field === id),
-                      or: (filters?.or || []).filter((filt) => filt.field === id),
-                    };
-                    const isRelationFilter = relationFiltersList.includes(id || "");
-                    return (
-                      <div
-                        key={hdr.id}
-                        className={`${contentClasses()} ${headerClasses()}  ${hdr.id === "select" ? selectClasses() : ""}
+        <div className={head()}>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <div key={headerGroup.id} className={headerGroupClasses()}>
+              {headerGroup.headers.map((hdr) => {
+                const { header, id, meta } = hdr.column.columnDef;
+                const activeColumnFilters = {
+                  and: (filters?.and || []).filter((filt) => filt.field === id),
+                  or: (filters?.or || []).filter((filt) => filt.field === id),
+                };
+                const isRelationFilter = relationFiltersList.includes(id || "");
+                return (
+                  <div
+                    key={hdr.id}
+                    className={`${contentClasses()} ${headerClasses()}  ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     `}
-                        style={{
-                          ...getTableColumnWidths(hdr.column.id, {
-                            minSize: hdr.column.columnDef.minSize,
-                            maxSize: hdr.column.columnDef.maxSize,
-                          }),
-                        }}>
-                        {flexRender(header, hdr.getContext())}
-                        {(meta as MetaType)?.filterOptions?.length && dispatch ? (
-                          <Tooltip
-                            allowedPlacements={[
-                              "bottom",
-                              "left",
-                              "left-end",
-                              "left-start",
-                              "right",
-                              "right-start",
-                              "right-end",
-                            ]}
-                            arrowColor="#27272a"
-                            content={
-                              <div
-                                className={baseFilterClasses()}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}>
-                                {isRelationFilter ? null : (
-                                  <TableColumnFilter
-                                    columnId={id}
-                                    dispatch={dispatch}
-                                    filterOptions={(meta as MetaType)?.filterOptions || []}
-                                    filters={activeColumnFilters}
-                                    isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                                  />
-                                )}
-                                {id === "tags" ? (
-                                  <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
-                                ) : null}
-                              </div>
-                            }
-                            customOffset={{ mainAxis: 8 }}
-                            isClickable>
-                            <div
-                              className="flex w-min justify-center pl-0.5"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}>
-                              <Icon
-                                className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
-                                fontSize={20}
-                                icon={IconEnum.filter}
+                    style={{
+                      ...getTableColumnWidths(hdr.column.id, {
+                        minSize: hdr.column.columnDef.minSize,
+                        maxSize: hdr.column.columnDef.maxSize,
+                      }),
+                    }}>
+                    {flexRender(header, hdr.getContext())}
+                    {(meta as MetaType)?.filterOptions?.length && dispatch ? (
+                      <Tooltip
+                        allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
+                        arrowColor="#27272a"
+                        content={
+                          <div
+                            className={baseFilterClasses()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}>
+                            {isRelationFilter ? null : (
+                              <TableColumnFilter
+                                columnId={id}
+                                dispatch={dispatch}
+                                filterOptions={(meta as MetaType)?.filterOptions || []}
+                                filters={activeColumnFilters}
+                                isAndDisabled={["is_favorite"].includes(hdr.column.id)}
                               />
-                            </div>
-                          </Tooltip>
-                        ) : null}
-                        {(meta as MetaType)?.sortable ? (
-                          <OrderByHeaderIcon
-                            id={id}
-                            onClick={() => {
-                              if ((meta as MetaType)?.sortable && dispatch) {
-                                let sortValue;
-                                const column_id = hdr.column.columnDef?.id;
-                                const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
-                                if (columnOrderBy) {
-                                  if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
-                                    sortValue = "desc" as const;
-                                  } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
-                                    sortValue = null;
-                                  } else {
-                                    sortValue = "asc" as const;
-                                  }
-
-                                  dispatch({
-                                    type: "setSort",
-                                    payload: {
-                                      field: id as string,
-                                      sort: sortValue,
-                                    },
-                                  });
-                                } else {
-                                  dispatch({
-                                    type: "setSort",
-                                    payload: {
-                                      field: id as string,
-                                      sort: "asc",
-                                    },
-                                  });
-                                }
-                              }
-                            }}
-                            orderBy={orderBy?.find((ob) => ob.field === id)}
+                            )}
+                            {id === "tags" ? (
+                              <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
+                            ) : null}
+                          </div>
+                        }
+                        customOffset={{ mainAxis: 8 }}
+                        isClickable>
+                        <div
+                          className="flex w-min justify-center pl-0.5"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}>
+                          <Icon
+                            className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
+                            fontSize={20}
+                            icon={IconEnum.filter}
                           />
-                        ) : null}
-                        {hdr.column.getIsSorted() ? (
-                          <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
-                        ) : null}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-              {isSubheaderEnabled ? (
-                <div className={subheaderContainer()}>
-                  <div className={subheaderFiltersRow()}>
-                    <h4 className={subheaderRowTitle()}>Filters:</h4>
-                    <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
+                        </div>
+                      </Tooltip>
+                    ) : null}
+                    {(meta as MetaType)?.sortable ? (
+                      <OrderByHeaderIcon
+                        id={id}
+                        onClick={() => {
+                          if ((meta as MetaType)?.sortable && dispatch) {
+                            let sortValue;
+                            const column_id = hdr.column.columnDef?.id;
+                            const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
+                            if (columnOrderBy) {
+                              if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
+                                sortValue = "desc" as const;
+                              } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
+                                sortValue = null;
+                              } else {
+                                sortValue = "asc" as const;
+                              }
+
+                              dispatch({
+                                type: "setSort",
+                                payload: {
+                                  field: id as string,
+                                  sort: sortValue,
+                                },
+                              });
+                            } else {
+                              dispatch({
+                                type: "setSort",
+                                payload: {
+                                  field: id as string,
+                                  sort: "asc",
+                                },
+                              });
+                            }
+                          }
+                        }}
+                        orderBy={orderBy?.find((ob) => ob.field === id)}
+                      />
+                    ) : null}
+                    {hdr.column.getIsSorted() ? (
+                      <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
+                    ) : null}
                   </div>
-                </div>
-              ) : null}
+                );
+              })}
             </div>
+          ))}
+          {isSubheaderEnabled ? (
+            <div className={subheaderContainer()}>
+              <div className={subheaderFiltersRow()}>
+                <h4 className={subheaderRowTitle()}>Filters:</h4>
+                <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div className={bodyContainer()}>
+          <div ref={bodyRef} className="scrollbar-hidden h-full overflow-auto pb-1">
             {data?.length ? (
               <div className={body()} style={{ height: expandable ? "" : `${rowVirtualizer.getTotalSize()}px` }}>
                 {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
