@@ -113,6 +113,9 @@ export function CharacterFieldTemplates() {
       data: {
         project_id,
       },
+      relations: {
+        tags: true,
+      },
     },
     "character_fields_templates",
   );
@@ -141,6 +144,8 @@ export function CharacterFieldTemplates() {
           config={{
             hasSelect: true,
             expandable: true,
+            hasTags: true,
+            hasTagsWarning: true,
             filters,
             selection,
             orderBy,
