@@ -14,7 +14,7 @@ import {
   WordType,
 } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { getCharacterFullName, getSentenceCase, IconEnum } from "../../../utils";
+import { getCharacterFullName, getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
@@ -60,17 +60,19 @@ function ExpandedRowTagListWrapper({
       </div>
     );
   return (
-    <ul className="mt-2 flex flex-col gap-y-2 overflow-y-auto">
+    <ul className="mt-2 flex max-h-96 flex-col gap-y-2 overflow-y-auto">
       {type === "characters"
-        ? data[type].map((item) => (
-            <EntityPreview
-              id={item.id}
-              image_id={item.portrait_id}
-              link={`/projects/${project_id}/characters/${item.id}`}
-              title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
-              type="characters"
-            />
-          ))
+        ? data[type]
+            .sort(sortCharacters)
+            .map((item) => (
+              <EntityPreview
+                id={item.id}
+                image_id={item.portrait_id}
+                link={`/projects/${project_id}/characters/${item.id}`}
+                title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
+                type="characters"
+              />
+            ))
         : null}
       {type === "nodes" || type === "edges"
         ? data[type].map((item) => (
