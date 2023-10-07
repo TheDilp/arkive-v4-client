@@ -31,7 +31,7 @@ import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, Upda
 import { Dropdown, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, Search, Select, TagInput } from "../../Form";
+import { Button, Checkbox, Input, Search, Select, TagInput, Title } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
@@ -127,7 +127,7 @@ function RandomTableInput({
                 }
               });
             }}
-            tooltip={`Roll ${random_table?.[0]?.title ? `(${random_table?.[0]?.title})` : ""}`}
+            tooltip={`Roll ${random_table?.title ? `(${random_table?.title})` : ""}`}
           />
         </div>
       </div>
@@ -151,12 +151,87 @@ function RandomTableInput({
   );
 }
 
+function DateInput({
+  id,
+  calendar,
+  template_id,
+  currentValue,
+  title,
+  index,
+  handleChange,
+}: Pick<CharacterFieldType, "id" | "calendar" | "calendar_id" | "title"> & {
+  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  currentValue: CurrentValueType;
+  template_id: string;
+  index: number;
+}) {
+  const name = `character_fields[${template_id}][${index}]`;
+
+  const months = calendar?.months.map((m) => ({ label: m.title, value: m.id })) || [];
+  const maxDays = calendar?.months.find((m) => m.id === (currentValue as Record<string, any>)?.month)?.days || 0;
+
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      <div className="col-span-3">
+        <Title isDrawerTitle label={title} />
+      </div>
+      <div className="col-span-1">
+        <Input
+          isDisabled={!maxDays}
+          label="Day"
+          max={maxDays}
+          min={1}
+          name={name}
+          onChange={({ value }) => {
+            handleChange({
+              name,
+              value: { id, value: { value: { ...(currentValue as Record<string, any>), day: value } } },
+            });
+          }}
+          placeholder={!maxDays ? "Select month" : ""}
+          type="number"
+          value={(currentValue as Record<string, any>)?.day}
+        />
+      </div>
+      <div className="col-span-1">
+        <Select
+          label="Month"
+          name={name}
+          onChange={({ value }) => {
+            handleChange({
+              name,
+              value: { id, value: { value: { ...(currentValue as Record<string, any>), month: value } } },
+            });
+          }}
+          options={months}
+          value={(currentValue as Record<string, any>)?.month || undefined}
+        />
+      </div>
+      <div className="col-span-1">
+        <Input
+          label="Year"
+          name={name}
+          onChange={({ value }) => {
+            handleChange({
+              name,
+              value: { id, value: { value: { ...(currentValue as Record<string, any>), year: value } } },
+            });
+          }}
+          type="number"
+          value={(currentValue as Record<string, any>)?.year || undefined}
+        />
+      </div>
+    </div>
+  );
+}
+
 function CharacterFieldInputs({
   id,
   title,
   field_type: fieldType,
   options,
   random_table_options,
+  calendar,
   value: currentValue,
   index,
   formula,
@@ -285,6 +360,19 @@ function CharacterFieldInputs({
         random_table_id={random_table_id}
         random_table_options={random_table_options}
         subOptionValue={subOptionValue}
+        template_id={template_id}
+        title={title}
+      />
+    );
+  }
+  if (fieldType === "date") {
+    return (
+      <DateInput
+        calendar={calendar}
+        currentValue={currentValue}
+        handleChange={handleChange}
+        id={id}
+        index={index}
         template_id={template_id}
         title={title}
       />
@@ -484,7 +572,7 @@ function FieldTemplateRow({
   }, [data?.data]);
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
-      <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
+      <Collapsible actions={collapsibleActions} initialOpen label={title}>
         <div className="flex select-none flex-col gap-y-2 pt-2">
           {character_fields.sort(sortEntities).map((template_field) => {
             const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(

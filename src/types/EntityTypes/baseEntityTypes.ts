@@ -54,6 +54,7 @@ export type SearchableEntities =
   | "random_tables"
   | "events"
   | "images"
+  | "calendars"
   | "map_images"
   | "words"
   | "tags";

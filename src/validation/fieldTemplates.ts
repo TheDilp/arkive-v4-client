@@ -16,6 +16,7 @@ export const InsertTemplateSchema = z.object({
         formula: z.string().optional().nullable(),
         options: z.object({ id: z.string(), value: z.string() }).array().optional(),
         random_table_id: z.string().optional().nullable(),
+        calendar_id: z.string().optional().nullable(),
       })
       .array(),
     tags: z.object({ id: z.string() }).array().min(1),
@@ -40,6 +41,7 @@ export const UpdateTemplateSchema = z
           formula: z.string().optional().nullable(),
           options: z.object({ id: z.string(), value: z.string() }).array().optional(),
           random_table_id: z.string().optional().nullable(),
+          calendar_id: z.string().optional().nullable(),
         })
         .array()
         .optional(),

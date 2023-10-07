@@ -28,7 +28,9 @@ function isSaveDisabled(template: TemplateStateType) {
         !field.title ||
         !field.field_type ||
         ((field.field_type === "select_multiple" || field.field_type === "select") && !field?.options?.length) ||
-        (field.field_type === "dice_roll" && !field?.formula),
+        (field.field_type === "dice_roll" && !field?.formula) ||
+        (field.field_type === "random_table" && !field.random_table_id) ||
+        (field.field_type === "date" && !field.calendar_id),
     )
   )
     return true;
@@ -39,14 +41,16 @@ function isSaveDisabled(template: TemplateStateType) {
 function FieldRow({
   title,
   field_type,
-  random_table_id,
+  calendar_id,
+  calendar,
   options,
   formula,
   index,
-  changeField,
-  deleteField,
+  random_table_id,
   random_table,
   isLoading,
+  changeField,
+  deleteField,
 }: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
@@ -193,18 +197,30 @@ function FieldRow({
       ) : null}
       {field_type === "random_table" ? (
         <div className="flex flex-col gap-y-2 pl-8">
-          <div className="flex flex-col gap-y-2">
-            <Search
-              hasShownOption
-              initialDisplayValue={random_table?.[0]?.title || ""}
-              isDisabled={isLoading}
-              label="Random table"
-              name={`character_fields[${index}].random_table_id`}
-              onChange={changeField}
-              searchEntity="random_tables"
-              value={random_table_id || ""}
-            />
-          </div>
+          <Search
+            hasShownOption
+            initialDisplayValue={random_table?.title || ""}
+            isDisabled={isLoading}
+            label="Random table"
+            name={`character_fields[${index}].random_table_id`}
+            onChange={changeField}
+            searchEntity="random_tables"
+            value={random_table_id || ""}
+          />
+        </div>
+      ) : null}
+      {field_type === "date" ? (
+        <div className="flex flex-col gap-y-2 pl-8">
+          <Search
+            hasShownOption
+            initialDisplayValue={calendar?.title || ""}
+            isDisabled={isLoading}
+            label="Calendar"
+            name={`character_fields[${index}].calendar_id`}
+            onChange={changeField}
+            searchEntity="calendars"
+            value={calendar_id || ""}
+          />
         </div>
       ) : null}
     </div>
@@ -303,7 +319,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                   title: "",
                   project_id: project_id as string,
                   field_type: "text",
-                  sort: 0,
+                  sort: template?.character_fields?.length ?? 0,
                 }),
               })
             }
@@ -350,6 +366,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
                           <FieldRow
                             key={field.id}
+                            calendar={field?.calendar}
+                            calendar_id={field?.calendar_id}
                             changeField={handleChange}
                             deleteField={() =>
                               handleChange({
