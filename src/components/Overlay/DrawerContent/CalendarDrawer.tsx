@@ -223,6 +223,7 @@ export function CalendarDrawer({ data }: Props) {
               name="hours"
               onChange={handleChange}
               placeholder="How many hours in a day?"
+              type="number"
               value={calendar?.hours || ""}
             />
             <Input
@@ -230,6 +231,7 @@ export function CalendarDrawer({ data }: Props) {
               name="minutes"
               onChange={handleChange}
               placeholder="How many minutes per hour?"
+              type="number"
               value={calendar?.minutes || ""}
             />
           </div>
