@@ -45,7 +45,7 @@ const TableClasses = tv({
   slots: {
     container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
     table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
-    head: "border-x border-t border-zinc-600 z-50 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
+    head: "border-x border-t pr-1 border-zinc-600 z-50 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
     headerGroup: "flex w-full h-12",
     select: "select-none",
     header: "font-merriweather truncate select-none flex-1 min-h-[2.5rem]",
@@ -55,7 +55,7 @@ const TableClasses = tv({
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
     bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
-    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden",
+    body: "flex flex-col flex-1 w-full bg-zinc-950 border-x border-y border-zinc-600 overflow-hidden pr-1",
     rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 last:border-b-0",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
@@ -506,128 +506,136 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     <div className={container()}>
       <div className={tableClasses()}>
         <div className={bodyContainer()}>
-          <div className={head()}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <div key={headerGroup.id} className={headerGroupClasses()}>
-                {headerGroup.headers.map((hdr) => {
-                  const { header, id, meta } = hdr.column.columnDef;
-                  const activeColumnFilters = {
-                    and: (filters?.and || []).filter((filt) => filt.field === id),
-                    or: (filters?.or || []).filter((filt) => filt.field === id),
-                  };
-                  const isRelationFilter = relationFiltersList.includes(id || "");
-                  return (
-                    <div
-                      key={hdr.id}
-                      className={`${contentClasses()} ${headerClasses()}  ${hdr.id === "select" ? selectClasses() : ""}
+          <div ref={bodyRef} className="h-full overflow-auto pb-1">
+            <div className={head()}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <div key={headerGroup.id} className={headerGroupClasses()}>
+                  {headerGroup.headers.map((hdr) => {
+                    const { header, id, meta } = hdr.column.columnDef;
+                    const activeColumnFilters = {
+                      and: (filters?.and || []).filter((filt) => filt.field === id),
+                      or: (filters?.or || []).filter((filt) => filt.field === id),
+                    };
+                    const isRelationFilter = relationFiltersList.includes(id || "");
+                    return (
+                      <div
+                        key={hdr.id}
+                        className={`${contentClasses()} ${headerClasses()}  ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     `}
-                      style={{
-                        ...getTableColumnWidths(hdr.column.id, {
-                          minSize: hdr.column.columnDef.minSize,
-                          maxSize: hdr.column.columnDef.maxSize,
-                        }),
-                      }}>
-                      {flexRender(header, hdr.getContext())}
-                      {(meta as MetaType)?.filterOptions?.length && dispatch ? (
-                        <Tooltip
-                          allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
-                          arrowColor="#27272a"
-                          content={
+                        style={{
+                          ...getTableColumnWidths(hdr.column.id, {
+                            minSize: hdr.column.columnDef.minSize,
+                            maxSize: hdr.column.columnDef.maxSize,
+                          }),
+                        }}>
+                        {flexRender(header, hdr.getContext())}
+                        {(meta as MetaType)?.filterOptions?.length && dispatch ? (
+                          <Tooltip
+                            allowedPlacements={[
+                              "bottom",
+                              "left",
+                              "left-end",
+                              "left-start",
+                              "right",
+                              "right-start",
+                              "right-end",
+                            ]}
+                            arrowColor="#27272a"
+                            content={
+                              <div
+                                className={baseFilterClasses()}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}>
+                                {isRelationFilter ? null : (
+                                  <TableColumnFilter
+                                    columnId={id}
+                                    dispatch={dispatch}
+                                    filterOptions={(meta as MetaType)?.filterOptions || []}
+                                    filters={activeColumnFilters}
+                                    isAndDisabled={["is_favorite"].includes(hdr.column.id)}
+                                  />
+                                )}
+                                {id === "tags" ? (
+                                  <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
+                                ) : null}
+                              </div>
+                            }
+                            customOffset={{ mainAxis: 8 }}
+                            isClickable>
                             <div
-                              className={baseFilterClasses()}
+                              className="flex w-min justify-center pl-0.5"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                               }}>
-                              {isRelationFilter ? null : (
-                                <TableColumnFilter
-                                  columnId={id}
-                                  dispatch={dispatch}
-                                  filterOptions={(meta as MetaType)?.filterOptions || []}
-                                  filters={activeColumnFilters}
-                                  isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                                />
-                              )}
-                              {id === "tags" ? (
-                                <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
-                              ) : null}
+                              <Icon
+                                className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
+                                fontSize={20}
+                                icon={IconEnum.filter}
+                              />
                             </div>
-                          }
-                          customOffset={{ mainAxis: 8 }}
-                          isClickable>
-                          <div
-                            className="flex w-min justify-center pl-0.5"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}>
-                            <Icon
-                              className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
-                              fontSize={20}
-                              icon={IconEnum.filter}
-                            />
-                          </div>
-                        </Tooltip>
-                      ) : null}
-                      {(meta as MetaType)?.sortable ? (
-                        <OrderByHeaderIcon
-                          id={id}
-                          onClick={() => {
-                            if ((meta as MetaType)?.sortable && dispatch) {
-                              let sortValue;
-                              const column_id = hdr.column.columnDef?.id;
-                              const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
-                              if (columnOrderBy) {
-                                if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
-                                  sortValue = "desc" as const;
-                                } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
-                                  sortValue = null;
-                                } else {
-                                  sortValue = "asc" as const;
-                                }
+                          </Tooltip>
+                        ) : null}
+                        {(meta as MetaType)?.sortable ? (
+                          <OrderByHeaderIcon
+                            id={id}
+                            onClick={() => {
+                              if ((meta as MetaType)?.sortable && dispatch) {
+                                let sortValue;
+                                const column_id = hdr.column.columnDef?.id;
+                                const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
+                                if (columnOrderBy) {
+                                  if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
+                                    sortValue = "desc" as const;
+                                  } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
+                                    sortValue = null;
+                                  } else {
+                                    sortValue = "asc" as const;
+                                  }
 
-                                dispatch({
-                                  type: "setSort",
-                                  payload: {
-                                    field: id as string,
-                                    sort: sortValue,
-                                  },
-                                });
-                              } else {
-                                dispatch({
-                                  type: "setSort",
-                                  payload: {
-                                    field: id as string,
-                                    sort: "asc",
-                                  },
-                                });
+                                  dispatch({
+                                    type: "setSort",
+                                    payload: {
+                                      field: id as string,
+                                      sort: sortValue,
+                                    },
+                                  });
+                                } else {
+                                  dispatch({
+                                    type: "setSort",
+                                    payload: {
+                                      field: id as string,
+                                      sort: "asc",
+                                    },
+                                  });
+                                }
                               }
-                            }
-                          }}
-                          orderBy={orderBy?.find((ob) => ob.field === id)}
-                        />
-                      ) : null}
-                      {hdr.column.getIsSorted() ? (
-                        <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-            {isSubheaderEnabled ? (
-              <div className={subheaderContainer()}>
-                <div className={subheaderFiltersRow()}>
-                  <h4 className={subheaderRowTitle()}>Filters:</h4>
-                  <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
+                            }}
+                            orderBy={orderBy?.find((ob) => ob.field === id)}
+                          />
+                        ) : null}
+                        {hdr.column.getIsSorted() ? (
+                          <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            ) : null}
-          </div>
-          {data?.length ? (
-            <div ref={bodyRef} className="h-full overflow-auto pb-1">
+              ))}
+              {isSubheaderEnabled ? (
+                <div className={subheaderContainer()}>
+                  <div className={subheaderFiltersRow()}>
+                    <h4 className={subheaderRowTitle()}>Filters:</h4>
+                    <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            {data?.length ? (
               <div className={body()} style={{ height: expandable ? "" : `${rowVirtualizer.getTotalSize()}px` }}>
                 {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
                   const row = rows[virtualRow.index];
@@ -685,10 +693,10 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   );
                 })}
               </div>
-            </div>
-          ) : (
-            <Alert label="There's no content." variant="info" />
-          )}
+            ) : (
+              <Alert label="There's no content." variant="info" />
+            )}
+          </div>
           {pagination ? (
             <div className={paginationContainer()}>
               <div className={pageCountContainer()}>
