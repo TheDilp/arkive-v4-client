@@ -1,3 +1,4 @@
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
@@ -11,11 +12,11 @@ import {
   onChangeValue,
   TemplateStateType,
 } from "../../../types";
-import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum } from "../../../utils";
+import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
-import { Skeleton } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(template: TemplateStateType) {
   if (!template?.title) return true;
@@ -37,7 +38,6 @@ function isSaveDisabled(template: TemplateStateType) {
 
 function FieldRow({
   title,
-  sort,
   field_type,
   random_table_id,
   options,
@@ -57,7 +57,7 @@ function FieldRow({
   isLoading: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex w-full flex-col gap-y-2">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
@@ -78,16 +78,6 @@ function FieldRow({
             options={FieldTypesEnum}
             placeholder="Field type"
             value={field_type}
-          />
-        </div>
-        <div className="h-full w-20">
-          <Input
-            label="Sort weight"
-            name={`character_fields[${index}].sort`}
-            onChange={changeField}
-            placeholder="Eg. 10"
-            type="number"
-            value={sort ?? 0}
           />
         </div>
         {field_type === "select" || field_type === "select_multiple" ? (
@@ -118,36 +108,67 @@ function FieldRow({
         </div>
       </div>
       {field_type === "select" || field_type === "select_multiple" ? (
-        <div className="flex flex-col gap-y-2 pl-8">
-          {options?.map((opt, optIndex) => (
-            <div key={opt.id} className="flex w-full flex-nowrap">
-              <div className="w-[calc(100%-5rem)]">
-                <Input
-                  isDisabled={isLoading}
-                  name={`character_fields[${index}].options[${optIndex}].value`}
-                  onChange={changeField}
-                  value={opt.value}
-                />
+        <DragDropContext
+          onDragEnd={(result) => {
+            if (!result.destination) {
+              return;
+            }
+
+            const newData = reorder(options || [], result.source.index, result.destination.index);
+            changeField({ name: `character_fields[${index}].options`, value: newData });
+          }}>
+          <Droppable droppableId={`droppable_${index}_${field_type}`}>
+            {(providedDroppable) => (
+              <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
+                {options?.map((opt, optIndex) => (
+                  <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
+                    {(provided, draggableSnapshot) => (
+                      <div
+                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                          draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
+                        }`}
+                        {...provided.draggableProps}
+                        ref={provided.innerRef}
+                        style={{
+                          ...provided.draggableProps.style,
+                          left: 16,
+                        }}>
+                        <div {...provided.dragHandleProps} className="self-center">
+                          <Icon fontSize={24} icon={IconEnum.menu} />
+                        </div>
+                        <div className="w-full">
+                          <Input
+                            isDisabled={isLoading}
+                            name={`character_fields[${index}].options[${optIndex}].value`}
+                            onChange={changeField}
+                            value={opt.value}
+                          />
+                        </div>
+                        <div className="flex flex-1 justify-end">
+                          <div className="h-10 w-8">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.trash}
+                              isDisabled={isLoading}
+                              onClick={() =>
+                                changeField({
+                                  name: `character_fields[${index}].options`,
+                                  value: (options || []).filter((o) => o.id !== opt.id),
+                                })
+                              }
+                              variant="error"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {providedDroppable.placeholder}
               </div>
-              <div className="flex flex-1 justify-end">
-                <div className="h-10 w-8">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.trash}
-                    isDisabled={isLoading}
-                    onClick={() =>
-                      changeField({
-                        name: `character_fields[${index}].options`,
-                        value: (options || []).filter((o) => o.id !== opt.id),
-                      })
-                    }
-                    variant="error"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       ) : null}
       {field_type === "dice_roll" ? (
         <div className="flex flex-col gap-y-2 pl-8">
@@ -225,7 +246,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const isLoading = isFetching || isCreating || isUpdating;
 
   useLayoutEffect(() => {
-    if (existingTemplate?.data) {
+    if (existingTemplate?.data && !template?.title) {
       setTemplate(existingTemplate?.data);
     }
   }, [existingTemplate]);
@@ -233,7 +254,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-auto text-white">
+    <div className="flex h-screen max-h-screen flex-col gap-y-4 text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex-1">
           <Input
@@ -285,33 +306,74 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto">
-        {template.character_fields?.length
-          ? template.character_fields.map((field, index) => (
-              <FieldRow
-                key={field.id}
-                changeField={handleChange}
-                deleteField={() =>
-                  handleChange({
-                    name: "character_fields",
-                    value: template?.character_fields?.filter((f) => f.id !== field.id),
-                  })
-                }
-                field_type={field.field_type}
-                formula={field?.formula}
-                id={field.id}
-                index={index}
-                isLoading={isLoading}
-                options={field?.options || []}
-                project_id={field?.project_id}
-                random_table={field?.random_table}
-                random_table_id={field?.random_table_id}
-                sort={field.sort}
-                title={field.title}
-              />
-            ))
-          : null}
-      </div>
+
+      <DragDropContext
+        onDragEnd={(result) => {
+          if (!result.destination) {
+            return;
+          }
+
+          const newData = reorder(template?.character_fields || [], result.source.index, result.destination.index);
+          setTemplate((prev) => ({
+            ...prev,
+            character_fields: newData.map((char_field, index) => ({ ...char_field, sort: index })),
+          }));
+        }}>
+        <Droppable droppableId="droppable">
+          {(providedDroppable) => (
+            <div
+              className="flex flex-1 flex-col overflow-y-auto"
+              {...providedDroppable.droppableProps}
+              ref={providedDroppable.innerRef}>
+              {template.character_fields?.length
+                ? template.character_fields.map((field, index) => (
+                    <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
+                      {(provided, draggableSnapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                            draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                          }`}
+                          {...provided.draggableProps}
+                          style={{
+                            ...provided.draggableProps.style,
+                            left: 16,
+                          }}>
+                          <div {...provided.dragHandleProps} className="mt-7 self-start">
+                            <Icon fontSize={24} icon={IconEnum.menu} />
+                          </div>
+
+                          <FieldRow
+                            key={field.id}
+                            changeField={handleChange}
+                            deleteField={() =>
+                              handleChange({
+                                name: "character_fields",
+                                value: template?.character_fields?.filter((f) => f.id !== field.id),
+                              })
+                            }
+                            field_type={field.field_type}
+                            formula={field?.formula}
+                            id={field.id}
+                            index={index}
+                            isLoading={isLoading}
+                            options={field?.options || []}
+                            project_id={field?.project_id}
+                            random_table={field?.random_table}
+                            random_table_id={field?.random_table_id}
+                            sort={field.sort}
+                            title={field.title}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))
+                : null}
+              {providedDroppable.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled(template) || isLoading}
