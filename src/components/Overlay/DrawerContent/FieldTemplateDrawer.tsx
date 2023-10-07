@@ -115,7 +115,12 @@ function FieldRow({
             }
 
             const newData = reorder(options || [], result.source.index, result.destination.index);
-            changeField({ name: `character_fields[${index}].options`, value: newData });
+            changeField({
+              name: `character_fields[${index}].options`,
+              // Saving sort field is not required
+              // As the order is preserved in JSON
+              value: newData,
+            });
           }}>
           <Droppable droppableId={`droppable_${index}_${field_type}`}>
             {(providedDroppable) => (
