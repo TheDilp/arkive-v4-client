@@ -22,11 +22,7 @@ import {
   drawerAtom,
   FetchFunction,
   getCharacterFullName,
-  getSearchFieldTypeLabel,
-  getSearchFieldTypeLinkType,
-  getSearchFieldTypeSearchType,
   IconEnum,
-  SearchFieldTypes,
   sortEntities,
   useNotifications,
 } from "../../../utils";
@@ -46,7 +42,7 @@ type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
   character_fields?: CharacterStateCharacterFieldsType;
 };
 
-type CurrentValueType = string | string[] | number | Record<string, any> | undefined;
+type CurrentValueType = string | string[] | number | Record<string, any> | Record<string, any>[] | undefined;
 
 function isSaveDisabled(character: CharacterStateType) {
   if (!character?.first_name) return true;
@@ -169,7 +165,6 @@ function CharacterFieldInputs({
   isRolling,
   subOptionValue,
   template_id,
-  project_id,
   handleChange,
   createNotification,
 }: CharacterFieldType & {
@@ -295,37 +290,70 @@ function CharacterFieldInputs({
       />
     );
   }
-  if (SearchFieldTypes.includes(fieldType)) {
-    return (
-      <div className="flex flex-col">
-        {!currentValue && fieldType?.includes("single") ? (
-          <Search
-            label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-            name={name}
-            onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
-            searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-          />
-        ) : null}
-        {currentValue && fieldType?.includes("single") ? (
-          <EntityPreview
-            clearAction={() => handleChange({ name, value: { id, value: {} } })}
-            id={(currentValue as Record<string, any>)?.value}
-            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-            label={title}
-            link={
-              fieldType === "images_single"
-                ? ""
-                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-                    (currentValue as Record<string, any>)?.value
-                  }`
-            }
-            title={(currentValue as Record<string, any>)?.title}
-            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-          />
-        ) : null}
-      </div>
-    );
-  }
+  // if (SearchFieldTypes.includes(fieldType)) {
+  //   return (
+  //     <div className="flex flex-col">
+  //       {!currentValue && fieldType?.includes("single") ? (
+  //         <Search
+  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
+  //           name={name}
+  //           onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
+  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
+  //         />
+  //       ) : null}
+  //       {currentValue && fieldType?.includes("single") ? (
+  //         <EntityPreview
+  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
+  //           id={(currentValue as Record<string, any>)?.value}
+  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
+  //           label={title}
+  //           link={
+  //             fieldType === "images_single"
+  //               ? ""
+  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
+  //                   (currentValue as Record<string, any>)?.value
+  //                 }`
+  //           }
+  //           title={(currentValue as Record<string, any>)?.title}
+  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+  //         />
+  //       ) : null}
+  //       {fieldType?.includes("multiple") ? (
+  //         <Search
+  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
+  //           name={name}
+  //           onChange={({ label, value }) => {
+  //             handleChange({
+  //               name,
+  //               value: {
+  //                 id,
+  //                 value: ((currentValue as Record<string, any>[]) || []).concat([{ value: { value, title: label } }]),
+  //               },
+  //             });
+  //           }}
+  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
+  //         />
+  //       ) : null}
+  //       {Array.isArray(currentValue) && fieldType?.includes("multiple") ? (
+  //         <EntityPreview
+  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
+  //           id={(currentValue as Record<string, any>)?.value}
+  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
+  //           label={title}
+  //           link={
+  //             fieldType === "images_single"
+  //               ? ""
+  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
+  //                   (currentValue as Record<string, any>)?.value
+  //                 }`
+  //           }
+  //           title={(currentValue as Record<string, any>)?.title}
+  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+  //         />
+  //       ) : null}
+  //     </div>
+  //   );
+  // }
   return null;
 }
 
