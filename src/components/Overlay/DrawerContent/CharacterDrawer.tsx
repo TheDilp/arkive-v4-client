@@ -305,7 +305,8 @@ function CharacterFieldInputs({
             onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
             searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
           />
-        ) : (
+        ) : null}
+        {currentValue && fieldType?.includes("single") ? (
           <EntityPreview
             clearAction={() => handleChange({ name, value: { id, value: {} } })}
             id={(currentValue as Record<string, any>)?.value}
@@ -321,7 +322,7 @@ function CharacterFieldInputs({
             title={(currentValue as Record<string, any>)?.title}
             type={getSearchFieldTypeSearchType(fieldType) || "documents"}
           />
-        )}
+        ) : null}
       </div>
     );
   }
