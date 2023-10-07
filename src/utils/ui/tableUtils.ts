@@ -17,6 +17,7 @@ export function getTableColumns(
     setFavorite,
     dispatch,
     pagination,
+    config,
   }: {
     hasSelect?: boolean;
     hasFavorite?: boolean;
@@ -24,6 +25,9 @@ export function getTableColumns(
     setFavorite?: (data: SetFavoriteType) => Promise<void>;
     dispatch?: TableDispatch;
     pagination?: RequestPaginationType;
+    config?: {
+      hasTagsWarning?: boolean;
+    };
   },
 ) {
   const finalColumns = [...columns];
@@ -35,7 +39,7 @@ export function getTableColumns(
     finalColumns.unshift(SelectColumn(dispatch, pagination));
   }
   if (hasTags) {
-    finalColumns.splice(finalColumns.length - 1, 0, TagColumn);
+    finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
   }
 
   return finalColumns;

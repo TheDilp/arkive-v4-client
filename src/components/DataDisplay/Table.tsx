@@ -478,6 +478,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
       setFavorite: config?.setFavorite,
       dispatch,
       pagination,
+      config: {
+        hasTagsWarning: config?.hasTagsWarning,
+      },
     }),
     getCoreRowModel: getCoreRowModel(),
     getRowCanExpand: () => !!expandable,

@@ -68,6 +68,7 @@ export interface TableType {
     hasFavorite?: boolean;
     hasSelect?: boolean;
     hasTags?: boolean;
+    hasTagsWarning?: boolean;
     hasNoHeaderGap?: boolean;
     orderBy?: RequestOrderByType[];
     selection?: TableSelectionType;

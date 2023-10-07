@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
 import { FavoritesFilters, IconEnum, TagFilters } from "../../../utils";
-import { Badge, Button, Checkbox, Tooltip } from "../..";
+import { Alert, Badge, Button, Checkbox, Tooltip } from "../..";
 
 export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginationType) => ColumnDef<any> = (
   dispatch,
@@ -55,7 +55,7 @@ export const FavoriteColumn: (setFavorite: (data: SetFavoriteType) => Promise<vo
   },
 });
 
-export const TagColumn: ColumnDef<any & { tags: TagType[] }> = {
+export const TagColumn: (hasTagsWarning?: boolean) => ColumnDef<any & { tags: TagType[] }> = (hasTagsWarning) => ({
   id: "tags",
   header: "Tags",
   meta: {
@@ -82,6 +82,9 @@ export const TagColumn: ColumnDef<any & { tags: TagType[] }> = {
           </div>
         </Tooltip>
       ) : null}
+      {row.original?.tags?.length === 0 && hasTagsWarning ? (
+        <Alert label="There are no tags." variant="error-bordered" />
+      ) : null}
     </div>
   ),
-};
+});
