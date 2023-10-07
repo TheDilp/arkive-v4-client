@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants";
 
 import { AlertType } from "../../types";
-import { IconEnum } from "../../utils";
+import { getDefaultAlertVariantIcon } from "../../utils/ui/alertUtils";
 import { Icon } from "./Icon";
 
 const AlertClasses = tv({
@@ -30,7 +30,7 @@ export function Alert({ label, variant = "info" }: AlertType) {
   return (
     <div className={base()} role="alert">
       <div className={iconClasses()}>
-        <Icon icon={IconEnum.info_circle} />
+        <Icon icon={getDefaultAlertVariantIcon(variant)} />
       </div>
       <div className={labelClasses()}>{label}</div>
     </div>
