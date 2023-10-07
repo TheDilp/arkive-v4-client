@@ -86,7 +86,7 @@ function columns(
             items={[
               {
                 id: "1",
-                label: "Edit character",
+                label: `Edit ${entityName}`,
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({

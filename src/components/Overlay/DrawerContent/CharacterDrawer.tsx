@@ -22,7 +22,11 @@ import {
   drawerAtom,
   FetchFunction,
   getCharacterFullName,
+  getSearchFieldTypeLabel,
+  getSearchFieldTypeLinkType,
+  getSearchFieldTypeSearchType,
   IconEnum,
+  SearchFieldTypes,
   sortEntities,
   useNotifications,
 } from "../../../utils";
@@ -41,6 +45,8 @@ type CharacterStateCharacterFieldsType = Record<string, CharacterFieldValueType[
 type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
   character_fields?: CharacterStateCharacterFieldsType;
 };
+
+type CurrentValueType = string | string[] | number | Record<string, any> | undefined;
 
 function isSaveDisabled(character: CharacterStateType) {
   if (!character?.first_name) return true;
@@ -68,7 +74,7 @@ function RandomTableInput({
   handleChange,
 }: Omit<CharacterFieldType, "project_id" | "sort"> & {
   index: number;
-  currentValue: string | string[] | number | undefined;
+  currentValue: CurrentValueType;
   isRolling: boolean;
   template_id: string;
   subOptionValue?: string;
@@ -163,11 +169,12 @@ function CharacterFieldInputs({
   isRolling,
   subOptionValue,
   template_id,
+  project_id,
   handleChange,
   createNotification,
 }: CharacterFieldType & {
   index: number;
-  value: string | string[] | number | undefined;
+  value: CurrentValueType;
   subOptionValue?: string;
   template_id: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
@@ -194,7 +201,7 @@ function CharacterFieldInputs({
         name={name}
         onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
         options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
-        value={currentValue}
+        value={currentValue as string | string[]}
       />
     );
   }
@@ -288,6 +295,36 @@ function CharacterFieldInputs({
       />
     );
   }
+  if (SearchFieldTypes.includes(fieldType)) {
+    return (
+      <div className="flex flex-col">
+        {!currentValue && fieldType?.includes("single") ? (
+          <Search
+            label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
+            name={name}
+            onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
+            searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
+          />
+        ) : (
+          <EntityPreview
+            clearAction={() => handleChange({ name, value: { id, value: {} } })}
+            id={(currentValue as Record<string, any>)?.value}
+            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
+            label={title}
+            link={
+              fieldType === "images_single"
+                ? ""
+                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
+                    (currentValue as Record<string, any>)?.value
+                  }`
+            }
+            title={(currentValue as Record<string, any>)?.title}
+            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+          />
+        )}
+      </div>
+    );
+  }
   return null;
 }
 
@@ -330,9 +367,11 @@ function FieldTemplateRow({
   character_fields_data = {},
   createNotification,
   handleChange,
+  project_id,
 }: {
   template_id: string;
   title: string;
+  project_id: string;
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data?: CharacterStateCharacterFieldsType;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
@@ -432,6 +471,7 @@ function FieldTemplateRow({
                   handleChange={handleChange}
                   index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
                   isRolling={isRolling}
+                  project_id={project_id}
                   subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
                   template_id={template_id}
                   value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
@@ -465,6 +505,7 @@ export function AdditionalFieldsTab({
   isLoading: boolean;
   tags?: TagType[];
 }) {
+  const { project_id } = useParams();
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col overflow-y-auto">
@@ -480,6 +521,7 @@ export function AdditionalFieldsTab({
                 character_fields_data={character_fields}
                 createNotification={createNotification}
                 handleChange={handleChange}
+                project_id={project_id as string}
                 template_id={t?.id}
                 title={t?.title}
               />
