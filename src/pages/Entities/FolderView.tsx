@@ -33,12 +33,20 @@ import {
 } from "../../utils";
 import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
+import { BlueprintView } from "./BlueprintView";
 import { CharactersView } from "./CharactersView";
-import { CharacterFieldTemplates } from "./FieldTemplates";
 import { TagView } from "./TagView";
+import { TemplatesView } from "./TemplatesView";
 
-const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
-const noFetchTypes = ["random_table_options", "tags", "characters", "character_fields_templates", "project-settings", "assets"];
+const noFetchTypes = [
+  "random_table_options",
+  "blueprints",
+  "tags",
+  "characters",
+  "character_fields_templates",
+  "project-settings",
+  "assets",
+];
 
 type EntityItemType = {
   id: string;
@@ -229,7 +237,7 @@ export function FolderView() {
           },
         ],
       },
-      fields,
+      fields: getEntityFields(type as AvailableEntityType),
       orderBy: [
         {
           field: "is_folder",
@@ -285,8 +293,9 @@ export function FolderView() {
   }, [data, type, setBreadcrumbs, item_id]);
 
   if (!item_id && type === "characters") return <CharactersView />;
+  if (!item_id && type === "blueprints") return <BlueprintView />;
   if (type === "tags") return <TagView />;
-  if (type === "character_fields_templates") return <CharacterFieldTemplates />;
+  if (type === "character_fields_templates") return <TemplatesView />;
   if (type === "assets") return <AssetView />;
   if (type === "project-settings") return <ProjectSettingsView />;
   return (

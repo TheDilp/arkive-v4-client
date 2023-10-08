@@ -52,6 +52,7 @@ export type DrawerAtomType = {
   | {
       type:
         | "character_fields_templates"
+        | "blueprints"
         | "documents"
         | "maps"
         | "graphs"

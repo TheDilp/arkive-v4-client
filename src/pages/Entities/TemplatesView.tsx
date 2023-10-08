@@ -91,7 +91,7 @@ function createColumns(
   ];
 }
 
-export function CharacterFieldTemplates() {
+export function TemplatesView() {
   const { project_id } = useParams();
   useChangeNavbarTitle("The Arkive | Field templates");
   const setDrawer = useSetAtom(drawerAtom);
