@@ -42,7 +42,7 @@ type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
   character_fields?: CharacterStateCharacterFieldsType;
 };
 
-type CurrentValueType = string | string[] | number | Record<string, any> | Record<string, any>[] | undefined;
+type CurrentValueType = string | string[] | number | boolean | Record<string, any> | Record<string, any>[] | undefined;
 
 function isSaveDisabled(character: CharacterStateType) {
   if (!character?.first_name) return true;
@@ -100,6 +100,7 @@ function RandomTableInput({
     <div className="flex flex-col gap-y-1">
       <div className="flex flex-nowrap items-center gap-x-2">
         <Select
+          hasSearch
           isClearable
           isDisabled={isRolling}
           label={title}
@@ -378,6 +379,18 @@ function CharacterFieldInputs({
       />
     );
   }
+  if (fieldType === "boolean") {
+    return (
+      <div className="flex flex-nowrap justify-between">
+        <span>{title}</span>
+        <Checkbox
+          name={name}
+          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+          value={currentValue as boolean}
+        />
+      </div>
+    );
+  }
   // if (SearchFieldTypes.includes(fieldType)) {
   //   return (
   //     <div className="flex flex-col">
@@ -572,7 +585,7 @@ function FieldTemplateRow({
   }, [data?.data]);
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
-      <Collapsible actions={collapsibleActions} initialOpen label={title}>
+      <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
         <div className="flex select-none flex-col gap-y-2 pt-2">
           {character_fields.sort(sortEntities).map((template_field) => {
             const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
@@ -806,7 +819,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   ? (character?.related_other || [])?.filter((char) => char.relation_type_id === rg.id)
                   : [];
                 return (
-                  <Collapsible key={rg.id} label={rg.title}>
+                  <Collapsible key={rg.id} initialOpen={false} label={rg.title}>
                     {isOther ? (
                       <div className="flex flex-col gap-y-1">
                         <Search

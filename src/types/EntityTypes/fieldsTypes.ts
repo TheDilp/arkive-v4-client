@@ -9,6 +9,7 @@ export type FieldTypes =
   | "select_multiple"
   | "dice_roll"
   | "date"
+  | "boolean"
   | "random_table"
   | "documents_single"
   | "documents_multiple"
@@ -45,6 +46,10 @@ export type TemplateStateType = Partial<
 
 export interface CharacterFieldValueType {
   id: string;
-  value: { id: string; value: string | number | string[] | null | Record<string, number | string>; subOptionValue?: string };
+  value: {
+    id: string;
+    value: string | number | string[] | boolean | null | Record<string, number | string>;
+    subOptionValue?: string;
+  };
   template_id: string;
 }

@@ -7,6 +7,7 @@ export const FieldTypesEnum = [
   { value: "dice_roll", label: "Dice Roll" },
   { value: "date", label: "Date" },
   { value: "random_table", label: "Random Table" },
+  { value: "boolean", label: "Boolean" },
   // { value: "documents_single", label: "Document (single)" },
   // { value: "documents_multiple", label: "Documents (multiple)" },
   // { value: "images_single", label: "Image (single)" },
