@@ -17,6 +17,7 @@ export type AvailableEntityType =
   | "graphs"
   | "screens"
   | "dictionaries"
+  | "blueprints"
   | "calendars"
   | "timelines"
   | "random_tables"
