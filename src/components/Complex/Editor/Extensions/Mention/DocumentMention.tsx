@@ -24,7 +24,7 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
     { enabled: !!id, queryKeyConcat: ["mention"] },
   );
   return (
-    <Card title={title || "TEST"}>
+    <Card title={title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
         {data?.data?.content && !isLoading ? <StaticRender content={data.data.content as RemirrorJSON} /> : null}
         {isLoading ? <Skeleton type="editor" /> : null}
@@ -61,7 +61,7 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
       delay={{ openDelay: 500 }}
       isDisabled={isDisabledTooltip ?? false}>
       <Link
-        className="un mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+        className="mt-0 box-border inline-block h-full items-center border-none font-lato font-bold text-white underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         to={!project_id ? `/view/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
         <div className="flex items-start">
           <span className="relative top-0.5">

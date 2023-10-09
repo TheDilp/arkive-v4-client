@@ -27,7 +27,7 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
       }
       isDisabled={isLoading || !!data?.data}>
       <Link
-        className="inline-flex font-lato text-sm font-bold text-white underline transition-colors hover:text-sky-400"
+        className="inline-flex font-lato font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
         to={!project_id ? `/view/boards/${nodeId}` : `/projects/${project_id}/boards/${nodeId}`}>
         <div className="flex items-start">
