@@ -36,7 +36,7 @@ export function Collapsible({ label, icon, initialOpen, children, actions }: Col
                 </div>
               ))
             : null}
-          <Icon fontSize={28} icon={IconEnum.chevron_up} />
+          <Icon fontSize={24} icon={IconEnum.chevron_up} />
         </span>
       </summary>
       <div

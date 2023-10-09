@@ -20,9 +20,5 @@ export interface DocumentType extends BaseEntityType {
   image: ImageType;
 }
 
-export interface InsertDocumentType extends Omit<DocumentType, "alter_names"> {
-  alter_names: { title: string }[];
-}
-
 export type UpdateDocumentType = Partial<DocumentType>;
 export type StaticRendererType = { content: RemirrorJSON };

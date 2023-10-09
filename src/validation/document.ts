@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const InsertDocumentSchema = z.object({
   data: z.object({
+    id: z.string().optional(),
     project_id: z.string(),
     title: z.string(),
     content: z.string().nullable().optional(),
@@ -40,3 +41,5 @@ export const UpdateDocumentSchema = z.object({
     })
     .optional(),
 });
+
+export type InsertDocumentType = z.infer<typeof InsertDocumentSchema>;

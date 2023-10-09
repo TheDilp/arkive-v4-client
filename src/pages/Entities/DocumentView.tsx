@@ -7,22 +7,25 @@ import { useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
-import { RemirrorContentType } from "remirror";
+import { getTextContentFromSlice, RemirrorContentType } from "remirror";
 
 import { MentionDropdownComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { Menubar } from "../../components/Complex/Editor/Menubar";
 import { Skeleton } from "../../components/Misc";
 import { Notification } from "../../components/Overlay";
-import { useChangeNavbarTitle, useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
+import { useChangeNavbarTitle, useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
 import { DocumentType } from "../../types";
-import { breadcrumbsAtom, DefaultTagColor, IconEnum, useNotifications } from "../../utils";
+import { breadcrumbsAtom, contextMenuAtom, DefaultTagColor, IconEnum, useNotifications } from "../../utils";
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, editorHooks, onError } from "../../utils/ui/editorUtils";
+import { InsertDocumentType } from "../../validation";
 
 export function DocumentView({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
+  const setContextMenu = useSetAtom(contextMenuAtom);
+
   const {
     data: currentDocument,
     isFetching,
@@ -44,7 +47,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       queryKeyConcat: ["content"],
     },
   );
-
+  const { mutateAsync: createDocument } = useCreateEntity<InsertDocumentType>("documents");
   const { mutate: updateDocument } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
   }>("documents", project_id as string);
@@ -74,10 +77,12 @@ export function DocumentView({ editable }: { editable: boolean }) {
   });
 
   useLayoutEffect(() => {
-    if (currentDocument?.data?.content) {
+    if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
       setTimeout(() => {
-        manager.view.updateState(manager.createState({ content: currentDocument.data.content as RemirrorContentType }));
+        manager.view.updateState(
+          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
+        );
       }, 1);
     }
   }, [currentDocument, isRefetching]);
@@ -166,6 +171,37 @@ export function DocumentView({ editable }: { editable: boolean }) {
           <Menubar />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setContextMenu({
+                // @ts-ignore
+                event: e,
+                items: [
+                  {
+                    title: "Create document with title",
+                    icon: IconEnum.add,
+                    onClick: async () => {
+                      const slice = getContext()?.getState().selection.content();
+                      if (slice) {
+                        const id = crypto.randomUUID();
+                        const title = getTextContentFromSlice(slice);
+                        await createDocument({ data: { id, project_id: project_id as string, title } });
+                        getContext()?.commands?.replaceText({
+                          attrs: {
+                            id,
+                            label: title,
+                            name: "documents",
+                          },
+                          type: "mentionAtom",
+                          content: title,
+                          selection: getContext()?.getState()?.selection,
+                        });
+                      }
+                    },
+                  },
+                ],
+              });
+            }}
             onDrop={(e) => {
               const stringData = e.dataTransfer.getData("Text");
               if (!stringData) return;

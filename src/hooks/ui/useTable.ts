@@ -79,7 +79,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
     }
     case "setRelationFilters": {
       if (action.payload) {
-        return { ...state, relationFilters: action.payload };
+        return { ...state, relationFilters: action.payload, pagination: { limit: state.pagination?.limit || 10, page: 0 } };
       }
       return state;
     }
