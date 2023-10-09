@@ -358,8 +358,9 @@ export function FolderView() {
                 <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
               </Dropdown>
             </div>
+
             {(item_id || data?.data?.is_folder) && !isFetching ? (
-              <div className="w-fit">
+              <div className="w-52 max-w-[208px]">
                 <Button
                   icon={IconEnum.edit}
                   label={`Edit current ${entityName}`}
@@ -502,7 +503,7 @@ export function FolderView() {
           ) : null}
         </div>
       ) : null}
-      {!isFetching && view === "table" ? (
+      {view === "table" ? (
         <div className="w-full flex-1 overflow-hidden">
           <Table
             columns={columns(

@@ -10,7 +10,7 @@ import { BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
 import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
-import { Button, Input, Search, Select } from "../../Form";
+import { Button, Input, Search, Select, Title } from "../../Form";
 import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
@@ -44,6 +44,7 @@ function FieldRow({
   random_table_id,
   random_table,
   isLoading,
+  isMainTitle,
   changeField,
   deleteField,
 }: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; value: string }[] }) & {
@@ -54,6 +55,7 @@ function FieldRow({
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
   deleteField: (i: number) => void;
   isLoading: boolean;
+  isMainTitle?: boolean;
 }) {
   return (
     <div className="flex w-full flex-col gap-y-2">
@@ -70,7 +72,7 @@ function FieldRow({
         </div>
         <div className="h-full flex-1">
           <Select
-            isDisabled={isLoading}
+            isDisabled={isLoading || isMainTitle}
             label="Field type"
             name={`character_fields[${index}].field_type`}
             onChange={changeField}
@@ -79,6 +81,16 @@ function FieldRow({
             value={field_type}
           />
         </div>
+        <div className="w-1/4">
+          <Select
+            label="Width"
+            options={[
+              { label: "Half", value: "half" },
+              { label: "Full", value: "full" },
+            ]}
+          />
+        </div>
+
         {field_type === "select" || field_type === "select_multiple" ? (
           <div className="h-10 w-8 self-end">
             <Button
@@ -96,16 +108,23 @@ function FieldRow({
             />
           </div>
         ) : null}
-        <div className="h-10 w-8 self-end">
-          <Button
-            hasNoBackground
-            icon={IconEnum.trash}
-            isDisabled={isLoading}
-            onClick={() => deleteField(index)}
-            variant="error"
-          />
-        </div>
+        {isMainTitle ? null : (
+          <div className="h-10 w-8 self-end">
+            <Button
+              hasNoBackground
+              icon={IconEnum.trash}
+              isDisabled={isLoading}
+              onClick={() => deleteField(index)}
+              variant="error"
+            />
+          </div>
+        )}
       </div>
+      {isMainTitle ? (
+        <span className="text-sm text-zinc-400">
+          This field is required but can be renamed. It is used to display the blueprint instance in the table.
+        </span>
+      ) : null}
       {field_type === "select" || field_type === "select_multiple" ? (
         <DragDropContext
           onDragEnd={(result) => {
@@ -148,6 +167,7 @@ function FieldRow({
                             value={opt.value}
                           />
                         </div>
+
                         <div className="flex flex-1 justify-end">
                           <div className="h-10 w-8">
                             <Button
@@ -253,7 +273,15 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
     title: "",
     project_id: project_id as string,
-    tags: [],
+    character_fields: [
+      // {
+      //   id: crypto.randomUUID(),
+      //   title: "Title",
+      //   field_type: "text",
+      //   sort: 0,
+      //   project_id: project_id as string,
+      // },
+    ],
   });
 
   const { handleChange } = useHandleChange({ data: blueprint, setData: setBlueprint });
@@ -269,7 +297,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex h-screen max-h-screen flex-col gap-y-4 text-white">
+    <div className="flex h-screen max-h-screen flex-col gap-y-2 text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex-1">
           <Input
@@ -282,7 +310,28 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         </div>
       </div>
 
-      <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
+      <Title isDrawerTitle label="Fields" size="lg" />
+      {/* {blueprint.character_fields?.length ? (
+        <FieldRow
+          key={blueprint.character_fields[0].id}
+          calendar={blueprint.character_fields[0]?.calendar}
+          calendar_id={blueprint.character_fields[0]?.calendar_id}
+          changeField={handleChange}
+          deleteField={() => {}}
+          field_type={blueprint.character_fields[0].field_type}
+          formula={blueprint.character_fields[0]?.formula}
+          id={blueprint.character_fields[0].id}
+          index={0}
+          isLoading={isLoading}
+          isMainTitle
+          options={blueprint.character_fields[0]?.options || []}
+          project_id={blueprint.character_fields[0]?.project_id}
+          random_table={blueprint.character_fields[0]?.random_table}
+          random_table_id={blueprint.character_fields[0]?.random_table_id}
+          sort={blueprint.character_fields[0].sort}
+          title={blueprint.character_fields[0].title}
+        />
+      ) : null} */}
       <div className="flex items-center justify-between">
         <span>Insert new field:</span>
         <div className="h-8 w-8">
@@ -382,11 +431,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (!data?.id) {
-            const { tags, character_fields, ...rest } = blueprint;
+            const { character_fields, ...rest } = blueprint;
             const parsedData = InsertBlueprintSchema.parse({
               data: rest,
               relations: {
-                tags,
                 character_fields: character_fields?.map((field) => ({
                   ...field,
                   project_id,
@@ -402,11 +450,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               },
             });
           } else {
-            const { tags, character_fields, ...rest } = blueprint;
+            const { character_fields, ...rest } = blueprint;
             const parsedData = UpdateBlueprintSchema.parse({
               data: rest,
               relations: {
-                tags,
                 character_fields: character_fields?.map((field) => ({
                   ...field,
                   project_id,

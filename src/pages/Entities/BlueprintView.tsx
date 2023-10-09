@@ -24,17 +24,7 @@ function createColumns(
         filterOptions: NameFilters,
       },
     }),
-    columnHelper.accessor("sort", {
-      id: "sort",
-      header: "Sort",
-      cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-        filterOptions: NameFilters,
-      },
-      maxSize: 10,
-      minSize: 5,
-    }),
+
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -48,36 +38,36 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit field template",
+                label: "Edit blueprint fields",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
                     data: row.original,
-                    title: "Edit field template",
+                    title: "Edit blueprint",
                     size: "lg",
-                    type: "character_fields_templates",
+                    type: "blueprints",
                   }));
                 },
               },
               {
                 id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
+                label: `${!row.getIsExpanded() ? "Show" : "Hide"} blueprint`,
                 icon: IconEnum.additional_fields,
                 onClick: row.getToggleExpandedHandler(),
               },
               {
                 id: "3",
-                label: "Delete field template",
+                label: "Delete blueprint",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "character_fields_templates",
+                      entity_title: "blueprints",
                     },
-                    title: "Delete field template",
+                    title: "Delete blueprint",
                     size: "sm",
                     type: "delete_entity",
                   }));
@@ -145,11 +135,10 @@ export function BlueprintView() {
           config={{
             hasSelect: true,
             expandable: true,
-            hasTags: true,
-            hasTagsWarning: true,
             filters,
             selection,
             orderBy,
+            getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
           }}
           data={data?.data || []}
           dispatch={dispatch}
