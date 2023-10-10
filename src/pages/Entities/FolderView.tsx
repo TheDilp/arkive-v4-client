@@ -6,6 +6,7 @@ import { Link, useParams } from "react-router-dom";
 
 import {
   Alert,
+  Avatar,
   Breadcrumbs,
   Button,
   createColumnHelper,
@@ -62,14 +63,23 @@ function columns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   entityName: string,
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+  project_id: string,
 ) {
   return [
     columnHelper.display({
       id: "is_folder",
       header: "",
-      cell: ({ row }) => (
-        <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon(entityType)} />
-      ),
+      cell: ({ row }) =>
+        "image_id" in row.original && row.original?.image_id ? (
+          <Avatar
+            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
+        ) : (
+          <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon(entityType)} />
+        ),
       maxSize: 3,
       minSize: 3,
       meta: {
@@ -512,6 +522,7 @@ export function FolderView() {
               setDialog,
               entityName,
               type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+              project_id as string,
             )}
             config={{
               hasSelect: true,
