@@ -11,3 +11,7 @@ export function getSearchLink(project_id: string, name: string, item_id: string,
 
   return "#";
 }
+
+export function getLinkToItem(project_id: string, type: string, id: string, is_folder?: boolean) {
+  return `/projects/${project_id}/${type}/${is_folder ? "folder/" : ""}${id}`;
+}

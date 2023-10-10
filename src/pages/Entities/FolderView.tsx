@@ -267,6 +267,7 @@ export function FolderView() {
     {
       enabled: !!item_id && !!type && !noFetchTypes.includes(type),
       staleTime: 5 * 60 * 1000,
+      queryKeyConcat: [item_id as string],
     },
   );
 

@@ -35,7 +35,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     item_id as string,
     "documents",
     {
-      fields: ["id", "title", "content", "dice_color"],
+      fields: ["id", "title", "content", "is_folder", "dice_color"],
       relations: {
         parents: true,
       },
@@ -98,15 +98,18 @@ export function DocumentView({ editable }: { editable: boolean }) {
     }
   }, [currentDocument]);
 
-  if (!currentDocument && !isFetching) {
-    return <Navigate to="../" />;
-  }
   if (isFetching)
     return (
       <div className="h-[90%] w-full max-w-[95.5vw] lg:h-full">
         <Skeleton type="editor" />
       </div>
     );
+  if (!currentDocument && !isFetching) {
+    return <Navigate to="../" />;
+  }
+  if (currentDocument?.data?.is_folder) {
+    return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
+  }
   return (
     <div className="h-full w-full max-w-[95.5vw] lg:h-full">
       {changedData ? (
