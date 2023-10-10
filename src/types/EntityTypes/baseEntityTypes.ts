@@ -24,7 +24,9 @@ export type AvailableEntityType =
   | "character_fields_templates"
   | "generators"
   | "character_relationship_types"
-  | "tags";
+  | "tags"
+  | "conversations";
+
 export type AvailableSubEntityType =
   | "alter_names"
   | "map_pins"

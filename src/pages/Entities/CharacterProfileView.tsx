@@ -63,6 +63,7 @@ const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
   { id: "2", label: "Relationships", icon: IconEnum.family_tree },
   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "4", label: "Conversations", icon: IconEnum.conversation },
 ];
 
 const fieldSizeClass = tv({
@@ -109,7 +110,6 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
       header: "First name",
       cell: ({ row }) => row.original.first_name,
     }),
-
     relationshipColumnHelper.display({
       id: "nickname",
       header: "Nickname",
@@ -144,7 +144,13 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
               {
                 id: "1",
                 label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
-                icon: IconEnum.edit,
+                icon: IconEnum.character,
+                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+              },
+              {
+                id: "2",
+                label: `View dialogs with ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+                icon: IconEnum.conversation,
                 onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
               },
             ]}>
@@ -517,6 +523,15 @@ export function CharacterProfileView() {
       }));
     }
   }
+  function openConversationDrawer() {
+    if (existingCharacter?.data)
+      setDrawer({
+        type: "conversation",
+        title: "Start new conversation",
+        data: { id: existingCharacter?.data.id },
+        size: "lg",
+      });
+  }
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
@@ -559,6 +574,17 @@ export function CharacterProfileView() {
                 isDisabled={disableShowRelationshipTree(existingCharacter?.data)}
                 label="Show relationship tree"
                 onClick={showRelationshipTree}
+                size="sm"
+                variant="info"
+              />
+            </div>
+          ) : null}
+          {selectedTab === 3 ? (
+            <div className="ml-auto w-min">
+              <Button
+                icon={IconEnum.conversation}
+                label="New conversation"
+                onClick={openConversationDrawer}
                 size="sm"
                 variant="info"
               />
@@ -740,6 +766,37 @@ export function CharacterProfileView() {
               <Alert label="There are no templates available." variant="info" />
             ) : null}
           </ul>
+        ) : null}
+        {selectedTab === 3 ? (
+          <div className="grid h-full grid-cols-10">
+            <div className="col-span-5 overflow-hidden lg:col-span-3">
+              <div className="flex h-full flex-col overflow-y-auto bg-zinc-900">
+                {[...Array(0).keys()].map((k) => (
+                  <div key={k} className="grid grid-cols-8 bg-opacity-40 even:bg-zinc-800">
+                    <div className="col-span-1 flex items-center justify-center">
+                      <Avatar
+                        hasShowImage
+                        image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
+                        initials={
+                          getAvatarInitials(
+                            existingCharacter?.data?.first_name || "",
+                            existingCharacter?.data?.last_name || "",
+                          ) || ""
+                        }
+                        isTooltipDisabled
+                        size="sm"
+                      />
+                    </div>
+                    <div className="col-span-7 flex h-16 flex-col p-2">
+                      <h4 className="font-merriweather text-lg">Chat A</h4>
+                      <p className="truncate font-lato text-sm text-zinc-300">Test</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="col-span-5 px-4 lg:col-span-7"> </div>
+          </div>
         ) : null}
       </div>
     </div>

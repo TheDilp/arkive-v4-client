@@ -3,6 +3,7 @@ export * from "./CalendarDrawer";
 export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
 export * from "./CharacterRelationshipTypeDrawer";
+export * from "./ConversationDrawer";
 export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
 export * from "./EdgeDrawer";
