@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 
 import {
   Button,
+  Checkbox,
   ColorPicker,
   createColumnHelper,
   Dropdown,
@@ -14,7 +15,7 @@ import {
   TablePageLayout,
   Tabs,
 } from "../../components";
-import { useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
+import { useBreakpoint, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterRelationshipType, DialogAtomType, ProjectType } from "../../types";
 import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum } from "../../utils";
 import { UpdateProjectType } from "../../validation";
@@ -22,8 +23,6 @@ import { UpdateProjectType } from "../../validation";
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings },
   { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree },
-  // { id: "2", label: "Relationships", icon: IconEnum.family_tree },
-  // { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
@@ -85,6 +84,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
 
 export function ProjectSettingsView() {
   const { project_id } = useParams();
+  const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
   const setDialog = useSetAtom(dialogAtom);
@@ -92,13 +92,16 @@ export function ProjectSettingsView() {
   const [, dispatch] = useTable({});
   const setDrawer = useSetAtom(drawerAtom);
   const { data: projectData } = useGetEntity<ProjectType>(project_id as string, "projects", {
-    fields: ["id", "title", "image_id", "default_dice_color"],
+    fields: ["id", "title", "image_id", "default_dice_color", "show_image_table_view", "show_image_folder_view"],
     relations: {
       character_relationship_types: true,
     },
   });
 
-  const { mutateAsync: updateProject } = useUpdateEntity<UpdateProjectType>("projects", project_id as string);
+  const { mutateAsync: updateProject, isLoading: isUpdating } = useUpdateEntity<UpdateProjectType>(
+    "projects",
+    project_id as string,
+  );
 
   useLayoutEffect(() => {
     if (projectData?.data) setProject(projectData.data);
@@ -130,7 +133,15 @@ export function ProjectSettingsView() {
           {tabs[selectedTab].label}
           {selectedTab === 0 ? (
             <div className="ml-auto w-min">
-              <Button icon={IconEnum.save} label="Save" onClick={handleSave} size="sm" variant="success" />
+              <Button
+                icon={IconEnum.save}
+                isDisabled={isUpdating}
+                isLoading={isUpdating}
+                label="Save"
+                onClick={handleSave}
+                size="sm"
+                variant="success"
+              />
             </div>
           ) : null}
           {selectedTab === 1 ? (
@@ -147,13 +158,13 @@ export function ProjectSettingsView() {
         </h2>
         {selectedTab === 0 ? (
           <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
-            <div className="flex flex-nowrap gap-x-2">
-              <div className="w-3/4">
+            <div className=" grid grid-cols-12 gap-2">
+              <div className="col-span-12 lg:col-span-9">
                 <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
               </div>
-              <div className="w-1/4">
+              <div className="col-span-12 lg:col-span-3">
                 <ImageSelect
-                  isIconOnly
+                  isIconOnly={isLg}
                   label="Project image"
                   name="image_id"
                   onChange={handleChange}
@@ -162,13 +173,32 @@ export function ProjectSettingsView() {
                 />
               </div>
             </div>
-            <div className="flex flex-nowrap justify-between">
-              <span>Default dice color:</span>
-              <ColorPicker
-                name="default_dice_color"
-                onChange={handleChange}
-                value={project?.default_dice_color || DefaultTagColor}
-              />
+
+            <div className="flex flex-col gap-y-2">
+              <div className="flex flex-nowrap items-center justify-between border-zinc-700">
+                <span>Default dice color:</span>
+                <ColorPicker
+                  name="default_dice_color"
+                  onChange={handleChange}
+                  value={project?.default_dice_color || DefaultTagColor}
+                />
+              </div>
+              <div className="flex flex-nowrap items-center justify-between border-t border-zinc-700 pt-2">
+                <span>Show images in folder view:</span>
+                <Checkbox
+                  name="show_image_folder_view"
+                  onChange={handleChange}
+                  value={project?.show_image_folder_view ?? false}
+                />
+              </div>
+              <div className="flex flex-nowrap items-center justify-between border-t border-zinc-700 pt-2">
+                <span>Show images in table folder view:</span>
+                <Checkbox
+                  name="show_image_table_view"
+                  onChange={handleChange}
+                  value={project?.show_image_table_view ?? false}
+                />
+              </div>
             </div>
           </div>
         ) : null}
