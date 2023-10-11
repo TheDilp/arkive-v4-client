@@ -30,10 +30,11 @@ import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
-import { useUpdateEntity } from "../../hooks";
+import { useCreateSubEntity, useUpdateEntity } from "../../hooks";
 import { DocumentType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
+import { InsertMessageType } from "../../validation";
 
 export const DefaultEditorExtensions: (
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
@@ -173,7 +174,7 @@ export function onError({ json, invalidContent, transformers }: InvalidContentHa
   // Automatically remove all invalid nodes and marks.
   return transformers.remove(json, invalidContent);
 }
-export const editorHooks = (
+export const documentEditorHooks = (
   changedData: any,
   resetChanges: () => void,
   refetch: (options?: (RefetchOptions & RefetchQueryFilters<unknown>) | undefined) => Promise<
@@ -231,6 +232,32 @@ export const editorHooks = (
     useKeymap("Mod-s", handleSaveShortcut);
     useKeymap("Mod-k", handleCancelSaveShortcut);
     useKeymap("Mod-e", handleExportShortcut);
+  },
+];
+
+export const messageEditorHooks = (id: string, selectedCharacter: string | undefined) => [
+  () => {
+    const { getJSON } = useHelpers();
+    const { project_id } = useParams();
+    const { mutate } = useCreateSubEntity<InsertMessageType>("messages", project_id);
+
+    const handleSendMessage = useCallback(
+      (args) => {
+        console.log(args);
+        mutate({
+          data: {
+            parent_id: id,
+            content: JSON.stringify(getJSON()),
+            type: "character",
+            sender_id: selectedCharacter,
+          },
+        });
+        return true;
+      },
+      [selectedCharacter],
+    );
+
+    useKeymap("Mod-Enter", handleSendMessage);
   },
 ];
 

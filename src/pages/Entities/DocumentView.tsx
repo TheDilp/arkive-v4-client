@@ -17,7 +17,7 @@ import { useChangeNavbarTitle, useCreateEntity, useGetEntity, useHandleChange, u
 import { DocumentType } from "../../types";
 import { breadcrumbsAtom, contextMenuAtom, DefaultTagColor, IconEnum, useNotifications } from "../../utils";
 import { Dice } from "../../utils/ui/diceRollerUtils";
-import { DefaultEditorExtensions, editorHooks, onError } from "../../utils/ui/editorUtils";
+import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
 import { InsertDocumentType } from "../../validation";
 
 export function DocumentView({ editable }: { editable: boolean }) {
@@ -158,7 +158,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       ) : null}
       <Remirror
         editable
-        hooks={editorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
+        hooks={documentEditorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
         initialContent={state}
         manager={manager}
         onChange={(params) => {

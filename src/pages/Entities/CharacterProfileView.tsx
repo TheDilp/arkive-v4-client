@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useMemo, useState } from "react";
@@ -36,6 +38,7 @@ import {
   CharacterLocationType,
   CharacterRelatedType,
   CharacterType,
+  ConversationType,
   DocumentType,
   ImageType,
   MapType,
@@ -53,6 +56,7 @@ import {
   sortEntities,
 } from "../../utils";
 import { RemoveFromCharacterSchema } from "../../validation";
+import { ConversationView } from "./ConversationView";
 
 const relationshipColumnHelper = createColumnHelper<CharacterRelatedType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
@@ -406,7 +410,7 @@ function AdditionalFieldDisplay({
                 </div>
               ) : null}
               {field.field_type === "textarea" && value ? (
-                <Editor initialContent={value || ""} isReadOnly name={field.title} onChange={() => {}} />
+                <Editor initialContent={(value as string) || undefined} isReadOnly name={field.title} onChange={() => {}} />
               ) : null}
               {field.field_type === "date" && value ? (
                 <div>
@@ -425,6 +429,7 @@ export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const [assetView, setAssetView] = useState<"table" | "card">("table");
+  const [selectedConversation, setSelectedConversation] = useState("");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const {
@@ -479,6 +484,19 @@ export function CharacterProfileView() {
     },
     "character_fields_templates",
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
+  );
+  const { data: existingConversations, isFetching: isFetchingConversations } = useGetEntities<ConversationType>(
+    {
+      data: {
+        project_id,
+      },
+      fields: ["id", "title"],
+      relations: {
+        characters: true,
+      },
+    },
+    "conversations",
+    { enabled: selectedTab === 3 && !!existingCharacter?.data },
   );
   function showRelationshipTree() {
     if (existingCharacter?.data)
@@ -774,33 +792,40 @@ export function CharacterProfileView() {
         ) : null}
         {selectedTab === 3 ? (
           <div className="grid h-full max-h-[calc(100%-3rem)]  grid-cols-10 overflow-hidden">
-            <div className="col-span-5 h-full overflow-hidden lg:col-span-3">
+            <div className="col-span-5 h-full overflow-hidden border border-zinc-700 lg:col-span-3">
               <div className="flex h-full flex-col overflow-y-auto bg-zinc-900">
-                {[...Array(0).keys()].map((k) => (
-                  <div key={k} className="grid grid-cols-8 bg-opacity-40 even:bg-zinc-800">
-                    <div className="col-span-1 flex items-center justify-center border-r">
-                      <Avatar
-                        hasShowImage
-                        image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
-                        initials={
-                          getAvatarInitials(
-                            existingCharacter?.data?.first_name || "",
-                            existingCharacter?.data?.last_name || "",
-                          ) || ""
-                        }
-                        isTooltipDisabled
-                        size="sm"
-                      />
+                {!isFetchingConversations && existingConversations?.data?.length ? (
+                  existingConversations?.data.map((convo) => (
+                    <div
+                      key={convo.id}
+                      className="grid cursor-pointer grid-cols-8 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
+                      onClick={() => setSelectedConversation(convo.id)}>
+                      <div className="col-span-2 flex items-center justify-center overflow-hidden border-r border-zinc-700 xl:col-span-1">
+                        {convo.characters.slice(0, 3).map((char) => (
+                          <div key={char.id} className="transition-all hover:z-10 [&:not(:first-child)]:-ml-3">
+                            <Avatar
+                              image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                              initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                              label={getCharacterFullName(char.first_name, undefined, char.last_name)}
+                              size="xs"
+                            />
+                          </div>
+                        ))}
+                        {convo.characters.length > 3 ? <Badge label={`+${convo.characters.length - 3}`} /> : null}
+                      </div>
+                      <div className="col-span-6 flex h-14 flex-col justify-center px-2 py-1 xl:col-span-7">
+                        <h4 className="truncate font-merriweather text-lg">{convo.title}</h4>
+                      </div>
                     </div>
-                    <div className="col-span-7 flex h-16 flex-col p-2">
-                      <h4 className="font-merriweather text-lg">Chat A</h4>
-                      <p className="truncate font-lato text-sm text-zinc-300">Test</p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <Alert label="There is no content." />
+                )}
               </div>
             </div>
-            <div className="col-span-5 px-4 lg:col-span-7"> </div>
+            <div className="col-span-5 pl-4 lg:col-span-7">
+              {selectedConversation ? <ConversationView id={selectedConversation} /> : null}
+            </div>
           </div>
         ) : null}
       </div>

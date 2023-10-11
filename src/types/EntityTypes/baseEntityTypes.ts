@@ -40,7 +40,8 @@ export type AvailableSubEntityType =
   | "months"
   | "events"
   | "random_table_options"
-  | "character_fields";
+  | "character_fields"
+  | "messages";
 
 export type SearchableEntities =
   | "all"

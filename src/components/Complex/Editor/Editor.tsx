@@ -5,18 +5,26 @@ import { DefaultEditorExtensions, onError, useNotifications } from "../../../uti
 import { MentionDropdownComponent } from ".";
 import { Menubar } from "./Menubar";
 
-export function Editor({ initialContent, name, onChange, isReadOnly }: EditorType) {
+export function Editor({
+  initialContent,
+  name,
+  onChange,
+  isReadOnly,
+  isMenubarDisabled,
+  onChangePlainText,
+  hooks,
+}: EditorType) {
   const createNotification = useNotifications();
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),
     selection: "start",
     onError,
-    content: initialContent ? JSON.parse(initialContent || "{}") : undefined,
+    content: initialContent || undefined,
   });
   return (
     <Remirror
       editable={!isReadOnly}
-      hooks={[]}
+      hooks={hooks ?? []}
       initialContent={state}
       manager={manager}
       onChange={(params) => {
@@ -24,11 +32,19 @@ export function Editor({ initialContent, name, onChange, isReadOnly }: EditorTyp
         if (params.firstRender) {
           return;
         }
+        // if (onKeyDown) {
+        //   console.log(params, args);
+        //   // onKeyDown();
+        // }
         if (params.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
           onChange({ name, value: params.state.toJSON()?.doc });
+
+        if (onChangePlainText) {
+          onChangePlainText({ name, value: getContext()?.helpers?.getText() });
+        }
       }}>
       <div className="editor-component relative flex h-full w-full max-w-full flex-1 flex-col rounded border border-zinc-800 bg-zinc-900 py-0">
-        {isReadOnly ? null : <Menubar />}
+        {isReadOnly || isMenubarDisabled ? null : <Menubar />}
         <div
           className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {

@@ -31,3 +31,9 @@ export const BaseCharacterRelationshipOptionsEnum = [
 ];
 
 export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", "graphs", "nodes", "edges", "events"];
+
+export const MessageTypeOptions = [
+  { label: "Character", value: "character" },
+  { label: "Narration", value: "narration" },
+  { label: "Place", value: "Place" },
+];
