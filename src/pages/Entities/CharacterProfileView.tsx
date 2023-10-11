@@ -528,7 +528,12 @@ export function CharacterProfileView() {
       setDrawer({
         type: "conversation",
         title: "Start new conversation",
-        data: { id: existingCharacter?.data.id },
+        data: {
+          id: existingCharacter?.data.id,
+          first_name: existingCharacter?.data?.first_name,
+          last_name: existingCharacter?.data?.last_name,
+          image_id: existingCharacter?.data?.portrait_id,
+        },
         size: "lg",
       });
   }
@@ -768,12 +773,12 @@ export function CharacterProfileView() {
           </ul>
         ) : null}
         {selectedTab === 3 ? (
-          <div className="grid h-full grid-cols-10">
-            <div className="col-span-5 overflow-hidden lg:col-span-3">
+          <div className="grid h-full max-h-[calc(100%-3rem)]  grid-cols-10 overflow-hidden">
+            <div className="col-span-5 h-full overflow-hidden lg:col-span-3">
               <div className="flex h-full flex-col overflow-y-auto bg-zinc-900">
                 {[...Array(0).keys()].map((k) => (
                   <div key={k} className="grid grid-cols-8 bg-opacity-40 even:bg-zinc-800">
-                    <div className="col-span-1 flex items-center justify-center">
+                    <div className="col-span-1 flex items-center justify-center border-r">
                       <Avatar
                         hasShowImage
                         image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
