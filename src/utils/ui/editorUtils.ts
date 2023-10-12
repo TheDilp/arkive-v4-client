@@ -31,10 +31,10 @@ import { MentionReactComponent } from "../../components/Complex/Editor/Extension
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useCreateSubEntity, useUpdateEntity } from "../../hooks";
-import { DocumentType, NotificationType } from "../../types";
+import { DocumentType, MessageKindType, NotificationType } from "../../types";
+import { InsertMessageType } from "../../validation";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
-import { InsertMessageType } from "../../validation";
 
 export const DefaultEditorExtensions: (
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
@@ -235,27 +235,23 @@ export const documentEditorHooks = (
   },
 ];
 
-export const messageEditorHooks = (id: string, selectedCharacter: string | undefined) => [
+export const messageEditorHooks = (id: string, selectedCharacter: string | undefined, selectedType: MessageKindType) => [
   () => {
     const { getJSON } = useHelpers();
     const { project_id } = useParams();
     const { mutate } = useCreateSubEntity<InsertMessageType>("messages", project_id);
 
-    const handleSendMessage = useCallback(
-      (args) => {
-        console.log(args);
-        mutate({
-          data: {
-            parent_id: id,
-            content: JSON.stringify(getJSON()),
-            type: "character",
-            sender_id: selectedCharacter,
-          },
-        });
-        return true;
-      },
-      [selectedCharacter],
-    );
+    const handleSendMessage = useCallback(() => {
+      mutate({
+        data: {
+          parent_id: id,
+          content: JSON.stringify(getJSON()),
+          type: selectedType,
+          sender_id: selectedCharacter,
+        },
+      });
+      return true;
+    }, [selectedCharacter, selectedType]);
 
     useKeymap("Mod-Enter", handleSendMessage);
   },

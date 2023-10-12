@@ -82,6 +82,7 @@ const fieldSizeClass = tv({
       random_table: "col-span-6 sm:col-span-3 lg:col-span-2",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
       date: "col-span-6 sm:col-span-3 lg:col-span-2",
+      boolean: "col-span-6 sm:col-span-3 lg:col-span-2",
     },
   },
 });
@@ -558,11 +559,11 @@ export function CharacterProfileView() {
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
-    <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:content-stretch">
+    <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 pt-0 lg:content-stretch">
       {isLoading ? (
         <Skeleton type="character_profile" />
       ) : (
-        <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full lg:overflow-hidden">
+        <div className="col-span-5 flex max-h-[33.3vh] flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:max-h-fit">
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -587,7 +588,7 @@ export function CharacterProfileView() {
           </div>
         </div>
       )}
-      <div className="col-span-5 min-h-full rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+      <div className="col-span-5 max-h-[67.7vh] flex-1 rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:max-h-full">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
@@ -791,9 +792,9 @@ export function CharacterProfileView() {
           </ul>
         ) : null}
         {selectedTab === 3 ? (
-          <div className="grid h-full max-h-[calc(100%-3rem)]  grid-cols-10 overflow-hidden">
-            <div className="col-span-5 h-full overflow-hidden border border-zinc-700 lg:col-span-3">
-              <div className="flex h-full flex-col overflow-y-auto bg-zinc-900">
+          <div className="grid h-[calc(67.7vh-14rem)] grid-cols-10 lg:h-[calc(100%-17rem)] ">
+            <div className="col-span-3 border border-zinc-700">
+              <div className="flex flex-col overflow-y-auto bg-zinc-900">
                 {!isFetchingConversations && existingConversations?.data?.length ? (
                   existingConversations?.data.map((convo) => (
                     <div
@@ -823,7 +824,7 @@ export function CharacterProfileView() {
                 )}
               </div>
             </div>
-            <div className="col-span-5 pl-4 lg:col-span-7">
+            <div className="col-span-7 h-[calc(100%)] overflow-y-auto pl-4">
               {selectedConversation ? <ConversationView id={selectedConversation} /> : null}
             </div>
           </div>

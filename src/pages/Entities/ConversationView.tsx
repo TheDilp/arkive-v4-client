@@ -17,7 +17,7 @@ import {
 export function ConversationView({ id }: { id: string }) {
   const { project_id } = useParams();
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
-  const [selectedCharacter, setSelectedCharacter] = useState("");
+  const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
   const { data: existingConversation } = useGetEntity<ConversationType>(id, "conversations", {
@@ -30,10 +30,23 @@ export function ConversationView({ id }: { id: string }) {
     },
   });
   return (
-    <div className="flex h-full w-full flex-col justify-between gap-y-2 overflow-hidden">
+    <div className="flex h-full max-h-full flex-col overflow-hidden">
       <div className="flex flex-1 flex-col gap-y-2 overflow-y-auto">
         {existingConversation?.data?.messages?.length ? (
           existingConversation?.data?.messages.map((m) => {
+            if (m.type === "narration")
+              return (
+                <div
+                  className="flex flex-col text-center text-xl
+                  italic text-zinc-300 [&>.staticRendererContainer]:p-0
+                [&>.staticRendererContainer]:py-2
+                [&_span:has(svg)]:hidden ">
+                  <hr className="relative top-1/2 z-0" />
+                  <div className="z-10 max-w-[90%] self-center bg-zinc-950">
+                    <StaticRender content={m?.content} />
+                  </div>
+                </div>
+              );
             const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
             return (
               <div key={m?.id} className="flex flex-nowrap">
@@ -59,52 +72,53 @@ export function ConversationView({ id }: { id: string }) {
           <Alert label="This is the start of this conversation." />
         )}
       </div>
-      <div className="flex flex-nowrap justify-end gap-x-2">
-        <div className="w-32">
-          <Select
-            label="Message type"
-            name="messageType"
-            onChange={({ value }) => setSelectedType(value as MessageKindType)}
-            options={MessageTypeOptions}
-            value={selectedType}
-          />
+      <div className="flex flex-col gap-y-2">
+        <div className="flex w-full flex-nowrap justify-end gap-x-2">
+          <div className="w-32">
+            <Select
+              label="Message type"
+              name="messageType"
+              onChange={({ value }) => setSelectedType(value as MessageKindType)}
+              options={MessageTypeOptions}
+              value={selectedType}
+            />
+          </div>
+          <div className={`transition-all ${selectedType === "character" ? "w-52" : "w-0 opacity-0"}`}>
+            <Select
+              label="As"
+              name="selectedCharacter"
+              onChange={({ value }) => setSelectedCharacter(value as string)}
+              options={(existingConversation?.data?.characters || []).map((char) => ({
+                image: {
+                  link: getImageURL(project_id as string, "images", char.portrait_id),
+                  shape: "circle",
+                },
+                label: getCharacterFullName(char.first_name, undefined, char.last_name),
+                value: char.id,
+              }))}
+              value={selectedCharacter}
+            />
+          </div>
         </div>
-        <div className={`transition-all ${selectedType === "character" ? "w-52" : "w-0 opacity-0"}`}>
-          <Select
-            label="As"
-            name="selectedCharacter"
-            onChange={({ value }) => setSelectedCharacter(value as string)}
-            options={(existingConversation?.data?.characters || []).map((char) => ({
-              image: {
-                link: getImageURL(project_id as string, "images", char.portrait_id),
-                shape: "circle",
-              },
-              label: getCharacterFullName(char.first_name, undefined, char.last_name),
-              value: char.id,
-            }))}
-            value={selectedCharacter}
+        <div className="flex flex-nowrap gap-x-2 ">
+          <Editor
+            hooks={messageEditorHooks(id, selectedCharacter, selectedType)}
+            initialContent={message}
+            isMenubarDisabled
+            name="message"
+            onChange={({ value }) => setMessage(value)}
+            onChangePlainText={({ value }) => setMessageLength(value?.length || 0)}
           />
-        </div>
-      </div>
 
-      <div className="flex flex-nowrap gap-x-2">
-        <Editor
-          hooks={messageEditorHooks(id, selectedCharacter)}
-          initialContent={message}
-          isMenubarDisabled
-          name="message"
-          onChange={({ value }) => setMessage(value)}
-          onChangePlainText={({ value }) => setMessageLength(value?.length || 0)}
-        />
-
-        <div className="mt-auto">
-          <Button
-            icon={IconEnum.send}
-            isDisabled={messageLength === 0 || (selectedType === "character" && !selectedCharacter)}
-            label="Send"
-            onClick={undefined}
-            variant="info"
-          />
+          <div className="mt-auto">
+            <Button
+              icon={IconEnum.send}
+              isDisabled={messageLength === 0 || (selectedType === "character" && !selectedCharacter)}
+              label="Send"
+              onClick={undefined}
+              variant="info"
+            />
+          </div>
         </div>
       </div>
     </div>
