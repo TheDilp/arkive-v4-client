@@ -11,7 +11,7 @@ const AvatarClasses = tv({
   slots: {
     base: "relative group inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-600 shadow ",
     image: "h-full w-full object-cover",
-    text: "font-lato font-bold text-white",
+    text: "font-lato font-bold text-white absolute",
   },
   variants: {
     size: {
