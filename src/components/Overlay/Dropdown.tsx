@@ -33,12 +33,13 @@ import { Icon } from "../Misc";
 const DropdownClasses = tv({
   slots: {
     base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 z-40 font-lato",
-    floatingBase: "max-h-[40rem] overflow-y-auto rounded divide-y border-zinc-700 border h-fit z-[60] font-lato shadow-lg",
-    baseItem: "h-10 items-center gap-x-2 text-white border-zinc-600",
+    floatingBase: "max-h-[40rem] overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0 ",
+    baseItem:
+      "h-10 items-center gap-x-2 text-white border-zinc-600 bg-clip-content border-b first:border-t border-x first:rounded-t overflow-hidden last:rounded-b",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  base: "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700 ",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -116,7 +117,6 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
       tree.events.emit("menuopen", { parentId, nodeId });
     }
   }, [tree, isOpen, nodeId, parentId]);
-
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, click, role, dismiss, listNavigation]);
   const item = useListItem();
   return (
@@ -133,7 +133,11 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
         {isOpen ? (
           <FloatingPortal>
             <FloatingFocusManager context={context} initialFocus={isNested ? -1 : 0} modal={false} returnFocus={!isNested}>
-              <div ref={refs.setFloating} className={floatingBase()} style={floatingStyles} {...getFloatingProps()}>
+              <div
+                ref={refs.setFloating}
+                className={floatingBase()}
+                style={{ transform: floatingStyles.transform }}
+                {...getFloatingProps()}>
                 {items && isOpen
                   ? items.map((dropdownItem) => (
                       <DropdownItem
@@ -171,7 +175,7 @@ function DropdownItem({ id, label, icon, onClick, subItems, iconColor, isDisable
   return (
     <Dropdown key={id} items={subItems || []}>
       <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
-        {label && !child ? <div className="select-none truncate pr-2">{label}</div> : null}
+        {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
         {child ?? null}
         {icon && !subItems?.length ? (
           <div className="ml-auto flex min-w-[22px] justify-end">
