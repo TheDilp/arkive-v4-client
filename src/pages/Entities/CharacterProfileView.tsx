@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { uniqueBy } from "remirror";
 import { tv } from "tailwind-variants";
@@ -439,7 +439,7 @@ function AdditionalFieldDisplay({
 
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
-  const { isLg } = useBreakpoint();
+  const { isSm, isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(0);
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const [selectedConversation, setSelectedConversation] = useState("");
@@ -568,6 +568,10 @@ export function CharacterProfileView() {
         size: "lg",
       });
   }
+
+  useLayoutEffect(() => {
+    setSelectedConversation("");
+  }, [selectedTab]);
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
@@ -808,18 +812,18 @@ export function CharacterProfileView() {
           </ul>
         ) : null}
         {selectedTab === 3 ? (
-          <div className="flex-1 ">
+          <div className="flex-1">
             {selectedConversation ? null : (
-              <div className="border border-zinc-700 lg:col-span-3">
-                <div className="flex max-h-full flex-col overflow-y-auto bg-zinc-900">
+              <div className="border border-zinc-700">
+                <div className="col-span-3 flex max-h-full flex-col overflow-y-auto bg-zinc-900">
                   {!isFetchingConversations && existingConversations?.data?.length ? (
                     existingConversations?.data.map((convo) => (
                       <div
                         key={convo.id}
-                        className="grid cursor-pointer grid-cols-8 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
+                        className="grid cursor-pointer grid-cols-12 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
                         onClick={() => setSelectedConversation(convo.id)}>
                         <div className="col-span-2 flex items-center justify-center overflow-hidden border-r border-zinc-700 xl:col-span-1">
-                          {convo.characters.slice(0, 3).map((char) => (
+                          {convo.characters.slice(0, isSm ? 3 : 1).map((char) => (
                             <div key={char.id} className="transition-all hover:z-10 [&:not(:first-child)]:-ml-3">
                               <Avatar
                                 image={getImageURL(project_id as string, "images", char?.portrait_id)}
@@ -829,7 +833,11 @@ export function CharacterProfileView() {
                               />
                             </div>
                           ))}
-                          {convo.characters.length > 3 ? <Badge label={`+${convo.characters.length - 3}`} /> : null}
+                          {convo.characters.length > (isSm ? 3 : 1) ? (
+                            <div>
+                              <Badge label={`+${convo.characters.length - (isSm ? 3 : 1)}`} />
+                            </div>
+                          ) : null}
                         </div>
                         <div className="col-span-6 flex h-14 flex-col justify-center px-2 py-1 xl:col-span-7">
                           <h4 className="truncate font-merriweather text-lg">{convo.title}</h4>
@@ -842,7 +850,7 @@ export function CharacterProfileView() {
                 </div>
               </div>
             )}
-            <div className="h-full max-h-[100%] overflow-hidden pl-4">
+            <div className="h-full max-h-[100%] overflow-hidden">
               {selectedConversation ? <ConversationView id={selectedConversation} /> : null}
             </div>
           </div>

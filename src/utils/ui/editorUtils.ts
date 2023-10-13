@@ -1,8 +1,9 @@
-import { PlaceholderExtension, useHelpers, useKeymap } from "@remirror/react";
+import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
 import {
   BlockquoteExtension,
@@ -30,9 +31,8 @@ import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions
 import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
-import { useCreateSubEntity, useUpdateEntity } from "../../hooks";
+import { useUpdateEntity } from "../../hooks";
 import { DocumentType, MessageKindType, NotificationType } from "../../types";
-import { InsertMessageType } from "../../validation";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
@@ -235,14 +235,20 @@ export const documentEditorHooks = (
   },
 ];
 
-export const messageEditorHooks = (id: string, selectedCharacter: string | undefined, selectedType: MessageKindType) => [
+export const messageEditorHooks = (
+  id: string,
+  selectedCharacter: string | undefined,
+  selectedType: MessageKindType,
+  sendJsonMessage: SendJsonMessage,
+) => [
   () => {
     const { getJSON } = useHelpers();
-    const { project_id } = useParams();
-    const { mutate } = useCreateSubEntity<InsertMessageType>("messages", project_id);
+    const getContext = useRemirrorContext();
+    // const { project_id } = useParams();
+    // const { mutate } = useCreateSubEntity<InsertMessageType>("messages", project_id);
 
     const handleSendMessage = useCallback(() => {
-      mutate({
+      sendJsonMessage({
         data: {
           parent_id: id,
           content: JSON.stringify(getJSON()),
@@ -250,6 +256,16 @@ export const messageEditorHooks = (id: string, selectedCharacter: string | undef
           sender_id: selectedCharacter,
         },
       });
+
+      getContext.clearContent();
+      // mutate({
+      //   data: {
+      //     parent_id: id,
+      //     content: JSON.stringify(getJSON()),
+      //     type: selectedType,
+      //     sender_id: selectedCharacter,
+      //   },
+      // });
       return true;
     }, [selectedCharacter, selectedType]);
 

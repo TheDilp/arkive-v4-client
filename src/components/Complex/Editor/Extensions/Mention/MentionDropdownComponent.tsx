@@ -75,7 +75,7 @@ export function MentionDropdownComponent() {
   }, [state?.query?.full]);
   return (
     <FloatingWrapper
-      containerClass="commandMenu overflow-hidden"
+      containerClass="commandMenu"
       enabled={Boolean(state)}
       placement="auto-end"
       positioner="always"

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
 import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { ConversationType, MessageKindType } from "../../types";
+import { ConversationType, MessageKindType, MessageType } from "../../types";
 import {
   getAvatarInitials,
   getCharacterFullName,
@@ -20,6 +22,7 @@ export function ConversationView({ id }: { id: string }) {
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
+
   const { data: existingConversation } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
@@ -29,12 +32,52 @@ export function ConversationView({ id }: { id: string }) {
       messages: true,
     },
   });
+
+  const queryClient = useQueryClient();
+
+  const [connect, setConnection] = useState(true);
+
+  const { sendJsonMessage } = useWebSocket(
+    `ws://localhost:5174/ws/conversation/${id}`,
+    {
+      onMessage: (e) => {
+        try {
+          const parsedData: { event_type: string; message: string } = JSON.parse(e.data);
+          const parsedMessage: Omit<MessageType, "content"> & { content: string } = JSON.parse(parsedData.message);
+          if (parsedMessage) {
+            try {
+              const parsedContent: RemirrorJSON = JSON.parse(parsedMessage.content);
+              queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+                if (old)
+                  return {
+                    ...old,
+                    data: {
+                      ...old?.data,
+                      messages: [...(old?.data?.messages || []), { ...parsedMessage, content: parsedContent }],
+                    },
+                  };
+                return old;
+              });
+            } catch (error) {
+              // console.error("ERROR PARSING MESSAGE CONTENT.");
+            }
+          }
+        } catch (error) {
+          // console.error("ERROR PARSING MESSAGE.");
+        }
+      },
+    },
+    connect,
+  );
+  useEffect(() => {
+    if (!id) setConnection(false);
+  }, [id]);
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-20rem)]">
       <div className="flex max-h-[96%] flex-col gap-y-2 overflow-y-auto">
-        <div className="overflow-y-auto">
+        <div className="flex flex-col gap-y-2 overflow-y-auto">
           {existingConversation?.data?.messages?.length ? (
-            existingConversation?.data?.messages.map((m) => {
+            existingConversation?.data?.messages.toReversed().map((m) => {
               if (m.type === "narration")
                 return (
                   <div
@@ -105,12 +148,14 @@ export function ConversationView({ id }: { id: string }) {
         </div>
         <div className="flex flex-nowrap gap-x-2">
           <Editor
-            hooks={messageEditorHooks(id, selectedCharacter, selectedType)}
+            hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage)}
             initialContent={message}
             isMenubarDisabled
             name="message"
             onChange={({ value }) => setMessage(value)}
-            onChangePlainText={({ value }) => setMessageLength(value?.length || 0)}
+            onChangePlainText={({ value }) => {
+              setMessageLength(value?.length || 0);
+            }}
           />
 
           <div className="mt-auto">
