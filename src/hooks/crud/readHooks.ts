@@ -62,7 +62,11 @@ export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOp
 export function useGetEntities<ReturnType>(
   request: RequestBodyType,
   type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean; queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
+  options?: UseQueryOptions<any> & {
+    prefetch?: boolean;
+    queryKeyOverwrite?: (string | number | Record<any, any>)[];
+    queryKeyConcat?: (string | number | Record<any, any>)[];
+  },
 ) {
   const baseQueryKey = [
     "allEntities",

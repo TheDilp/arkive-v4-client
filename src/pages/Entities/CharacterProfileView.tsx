@@ -24,6 +24,7 @@ import {
   Title,
 } from "../../components";
 import {
+  useBreakpoint,
   useChangeNavbarTitle,
   useDownloadImage,
   useGetEntities,
@@ -114,16 +115,22 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
       id: "first_name",
       header: "First name",
       cell: ({ row }) => row.original.first_name,
+      // minSize: 15,
+      // maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "nickname",
       header: "Nickname",
       cell: ({ row }) => row.original?.nickname,
+      minSize: 15,
+      maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "last_name",
       header: "Last name",
       cell: ({ row }) => row.original.last_name,
+      // minSize: 15,
+      // maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "relation_type",
@@ -134,6 +141,8 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
             ? `${getSentenceCase(row?.original?.relation_title)} (${row.original?.relation_type_title || ""})`
             : getSentenceCase(row.original?.relation_type_title || "")
         }`,
+      minSize: 10,
+      maxSize: 10,
     }),
     relationshipColumnHelper.display({
       id: "action",
@@ -163,6 +172,8 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
           </Dropdown>
         </div>
       ),
+      minSize: 5,
+      maxSize: 5,
     }),
   ];
 }
@@ -428,6 +439,7 @@ function AdditionalFieldDisplay({
 
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
+  const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(0);
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const [selectedConversation, setSelectedConversation] = useState("");
@@ -497,7 +509,7 @@ export function CharacterProfileView() {
       },
     },
     "conversations",
-    { enabled: selectedTab === 3 && !!existingCharacter?.data },
+    { enabled: selectedTab === 3 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] },
   );
   function showRelationshipTree() {
     if (existingCharacter?.data)
@@ -559,11 +571,10 @@ export function CharacterProfileView() {
 
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
-    <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 pt-0 lg:content-stretch">
-      {isLoading ? (
-        <Skeleton type="character_profile" />
-      ) : (
-        <div className="col-span-5 flex max-h-[33.3vh] flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:max-h-fit">
+    <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      {isLoading ? <Skeleton type="character_profile" /> : null}
+      {!isLoading && isLg ? (
+        <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -587,8 +598,13 @@ export function CharacterProfileView() {
             <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
           </div>
         </div>
-      )}
-      <div className="col-span-5 max-h-[67.7vh] flex-1 rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:max-h-full">
+      ) : null}
+      {!isLoading && !isLg ? (
+        <div className="w-full">
+          <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+        </div>
+      ) : null}
+      <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
           {tabs[selectedTab].label}
           {selectedTab === 1 ? (
@@ -792,39 +808,41 @@ export function CharacterProfileView() {
           </ul>
         ) : null}
         {selectedTab === 3 ? (
-          <div className="grid h-[calc(67.7vh-14rem)] grid-cols-10 lg:h-[calc(100%-17rem)] ">
-            <div className="col-span-3 border border-zinc-700">
-              <div className="flex flex-col overflow-y-auto bg-zinc-900">
-                {!isFetchingConversations && existingConversations?.data?.length ? (
-                  existingConversations?.data.map((convo) => (
-                    <div
-                      key={convo.id}
-                      className="grid cursor-pointer grid-cols-8 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
-                      onClick={() => setSelectedConversation(convo.id)}>
-                      <div className="col-span-2 flex items-center justify-center overflow-hidden border-r border-zinc-700 xl:col-span-1">
-                        {convo.characters.slice(0, 3).map((char) => (
-                          <div key={char.id} className="transition-all hover:z-10 [&:not(:first-child)]:-ml-3">
-                            <Avatar
-                              image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                              initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                              label={getCharacterFullName(char.first_name, undefined, char.last_name)}
-                              size="xs"
-                            />
-                          </div>
-                        ))}
-                        {convo.characters.length > 3 ? <Badge label={`+${convo.characters.length - 3}`} /> : null}
+          <div className="flex-1 ">
+            {selectedConversation ? null : (
+              <div className="border border-zinc-700 lg:col-span-3">
+                <div className="flex max-h-full flex-col overflow-y-auto bg-zinc-900">
+                  {!isFetchingConversations && existingConversations?.data?.length ? (
+                    existingConversations?.data.map((convo) => (
+                      <div
+                        key={convo.id}
+                        className="grid cursor-pointer grid-cols-8 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
+                        onClick={() => setSelectedConversation(convo.id)}>
+                        <div className="col-span-2 flex items-center justify-center overflow-hidden border-r border-zinc-700 xl:col-span-1">
+                          {convo.characters.slice(0, 3).map((char) => (
+                            <div key={char.id} className="transition-all hover:z-10 [&:not(:first-child)]:-ml-3">
+                              <Avatar
+                                image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                                initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                                label={getCharacterFullName(char.first_name, undefined, char.last_name)}
+                                size="xs"
+                              />
+                            </div>
+                          ))}
+                          {convo.characters.length > 3 ? <Badge label={`+${convo.characters.length - 3}`} /> : null}
+                        </div>
+                        <div className="col-span-6 flex h-14 flex-col justify-center px-2 py-1 xl:col-span-7">
+                          <h4 className="truncate font-merriweather text-lg">{convo.title}</h4>
+                        </div>
                       </div>
-                      <div className="col-span-6 flex h-14 flex-col justify-center px-2 py-1 xl:col-span-7">
-                        <h4 className="truncate font-merriweather text-lg">{convo.title}</h4>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <Alert label="There is no content." />
-                )}
+                    ))
+                  ) : (
+                    <Alert label="There is no content." />
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="col-span-7 h-[calc(100%)] overflow-y-auto pl-4">
+            )}
+            <div className="h-full max-h-[100%] overflow-hidden pl-4">
               {selectedConversation ? <ConversationView id={selectedConversation} /> : null}
             </div>
           </div>

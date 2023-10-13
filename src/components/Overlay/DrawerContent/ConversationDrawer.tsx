@@ -15,6 +15,7 @@ type Props = {
 };
 
 function isSaveDisabled(conversation: InsertConversationType, characters: BaseCharacterInfoType[]): boolean {
+  if (!conversation.data.title) return true;
   if (characters.length === 0) return true;
   return false;
 }
@@ -40,7 +41,7 @@ export function ConversationDrawer({ data }: Props) {
     <div className="flex flex-col gap-y-2">
       <Input
         isDisabled={isCreating}
-        label="Title"
+        label="Title (required)"
         name="data.title"
         onChange={handleChange}
         value={conversation.data.title || ""}
@@ -54,6 +55,7 @@ export function ConversationDrawer({ data }: Props) {
           if (!first_name) return;
           setCharacters((prev) => prev.concat({ id: value, first_name, last_name, image_id: image }));
         }}
+        placeholder="Press enter to search and add a character."
         searchEntity="characters"
       />
       <EntityPreview

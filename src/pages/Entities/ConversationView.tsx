@@ -30,50 +30,53 @@ export function ConversationView({ id }: { id: string }) {
     },
   });
   return (
-    <div className="flex h-full max-h-full flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col gap-y-2 overflow-y-auto">
-        {existingConversation?.data?.messages?.length ? (
-          existingConversation?.data?.messages.map((m) => {
-            if (m.type === "narration")
-              return (
-                <div
-                  className="flex flex-col text-center text-xl
-                  italic text-zinc-300 [&>.staticRendererContainer]:p-0
+    <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-20rem)]">
+      <div className="flex max-h-[96%] flex-col gap-y-2 overflow-y-auto">
+        <div className="overflow-y-auto">
+          {existingConversation?.data?.messages?.length ? (
+            existingConversation?.data?.messages.map((m) => {
+              if (m.type === "narration")
+                return (
+                  <div
+                    className="flex flex-col text-center text-xl
+                  italic text-zinc-300 [&>.staticRendererContainer]:inline
+                [&>.staticRendererContainer]:p-0
                 [&>.staticRendererContainer]:py-2
                 [&_span:has(svg)]:hidden ">
-                  <hr className="relative top-1/2 z-0" />
-                  <div className="z-10 max-w-[90%] self-center bg-zinc-950">
+                    <hr className="relative top-1/2 z-0" />
+                    <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
+                      <StaticRender content={m?.content} />
+                    </div>
+                  </div>
+                );
+              const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
+              return (
+                <div key={m?.id} className="flex flex-nowrap">
+                  {char ? (
+                    <div className="flex items-start gap-x-1 px-1">
+                      <Avatar
+                        hasShowImage
+                        image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                        initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                        isTooltipDisabled
+                        size="sm"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="flex flex-col [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+                    {char ? <span className="font-bold">{char?.first_name}:</span> : null}
                     <StaticRender content={m?.content} />
                   </div>
                 </div>
               );
-            const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
-            return (
-              <div key={m?.id} className="flex flex-nowrap">
-                {char ? (
-                  <div className="flex items-start gap-x-1 px-1">
-                    <Avatar
-                      hasShowImage
-                      image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                      initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                      isTooltipDisabled
-                      size="sm"
-                    />
-                  </div>
-                ) : null}
-                <div className="flex flex-col [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                  {char ? <span className="font-bold">{char?.first_name}:</span> : null}
-                  <StaticRender content={m?.content} />
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <Alert label="This is the start of this conversation." />
-        )}
+            })
+          ) : (
+            <Alert label="This is the start of this conversation." />
+          )}
+        </div>
       </div>
-      <div className="flex flex-col gap-y-2">
-        <div className="flex w-full flex-nowrap justify-end gap-x-2">
+      <div className="flex flex-col gap-y-2 pt-2 lg:h-[4%] lg:max-h-[4%]">
+        <div className="flex w-full flex-nowrap justify-end gap-x-2 ">
           <div className="w-32">
             <Select
               label="Message type"
@@ -100,7 +103,7 @@ export function ConversationView({ id }: { id: string }) {
             />
           </div>
         </div>
-        <div className="flex flex-nowrap gap-x-2 ">
+        <div className="flex flex-nowrap gap-x-2">
           <Editor
             hooks={messageEditorHooks(id, selectedCharacter, selectedType)}
             initialContent={message}
