@@ -73,8 +73,8 @@ export function ConversationView({ id }: { id: string }) {
     if (!id) setConnection(false);
   }, [id]);
   return (
-    <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-20rem)]">
-      <div className="flex max-h-[96%] flex-col gap-y-2 overflow-y-auto">
+    <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
+      <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
         <div className="flex flex-col gap-y-2 overflow-y-auto">
           {existingConversation?.data?.messages?.length ? (
             existingConversation?.data?.messages.toReversed().map((m) => {
@@ -118,8 +118,8 @@ export function ConversationView({ id }: { id: string }) {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-y-2 pt-2 lg:h-[4%] lg:max-h-[4%]">
-        <div className="flex w-full flex-nowrap justify-end gap-x-2 ">
+      <div className="flex min-h-fit flex-col gap-y-2 pt-2">
+        <div className="flex w-full flex-nowrap justify-end gap-x-2">
           <div className="w-32">
             <Select
               label="Message type"
@@ -146,7 +146,10 @@ export function ConversationView({ id }: { id: string }) {
             />
           </div>
         </div>
-        <div className="flex flex-nowrap gap-x-2 [&>.editor-component]:overflow-visible">
+        <div
+          className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end
+        [&>.editor-component]:overflow-y-auto
+        ">
           <Editor
             hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage)}
             initialContent={message}

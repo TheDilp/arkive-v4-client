@@ -43,10 +43,10 @@ export function Editor({
           onChangePlainText({ name, value: getContext()?.helpers?.getText() });
         }
       }}>
-      <div className="editor-component relative flex h-full w-full max-w-full flex-1 flex-col rounded border border-zinc-800 bg-zinc-900 py-0">
+      <div className="editor-component flex w-full max-w-full flex-col rounded border border-zinc-800 bg-zinc-900">
         {isReadOnly || isMenubarDisabled ? null : <Menubar />}
         <div
-          className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
+          className="flex w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {
             if (isReadOnly) return;
             const stringData = e.dataTransfer.getData("Text");
