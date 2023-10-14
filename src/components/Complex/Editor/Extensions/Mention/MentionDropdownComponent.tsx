@@ -77,7 +77,7 @@ export function MentionDropdownComponent() {
     <FloatingWrapper
       containerClass="commandMenu"
       enabled={Boolean(state)}
-      placement="auto-end"
+      placement="right-start"
       positioner="always"
       renderOutsideEditor>
       <ul className="remirror-mention-atom-popup-wrapper" {...getMenuProps()}>
