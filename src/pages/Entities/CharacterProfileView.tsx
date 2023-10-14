@@ -421,7 +421,7 @@ function conversationTableColumns(project_id: string, setDialog: Dispatch<SetSta
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "conversation",
+                      entity_title: "conversations",
                     },
                     title: "Delete conversation",
                     size: "sm",
@@ -892,7 +892,7 @@ export function CharacterProfileView() {
         {selectedTab === 3 ? (
           <div className="flex-1">
             {selectedConversation ? null : (
-              <div className="col-span-3 flex max-h-full flex-col overflow-y-auto bg-zinc-900">
+              <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
                 <Table
                   columns={conversationTableColumns(project_id as string, setDialog)}
                   config={{
