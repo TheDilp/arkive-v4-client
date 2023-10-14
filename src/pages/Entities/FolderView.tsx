@@ -228,7 +228,11 @@ export function FolderView() {
 
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
 
-  const { data: base, isFetching } = useGetEntities<BaseEntityType & { image_id?: string }>(
+  const {
+    data: base,
+    isFetching,
+    isLoading,
+  } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,
@@ -261,7 +265,11 @@ export function FolderView() {
       staleTime: 5 * 60 * 1000,
     },
   );
-  const { data, isFetching: isFetchingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
+  const {
+    data,
+    isFetching: isFetchingFolder,
+    isLoading: isLoadingFolder,
+  } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
     {
@@ -313,7 +321,7 @@ export function FolderView() {
     <TablePageLayout>
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
         <Breadcrumbs />
-        {(isFetching || isFetchingFolder) && view === "folders" ? (
+        {(isLoading || isLoadingFolder) && view === "folders" ? (
           <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
         ) : null}
         {!item_id || data?.data?.is_folder ? (

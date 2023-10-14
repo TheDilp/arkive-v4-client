@@ -66,3 +66,5 @@ export type DiceRollType = {
   }[];
   ops: ("+" | "-" | "/" | "*")[];
 };
+
+export type WebsocketEventType = "NEW_MESSAGE" | "NEW_NOTIFICATION";

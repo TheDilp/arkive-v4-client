@@ -1,10 +1,20 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import useWebSocket from "react-use-websocket";
 
-import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum, navbarTitleAtom, useNotifications } from "../../utils";
+import { AllAvailableEntities, WebsocketEventType } from "../../types";
+import {
+  DefaultTagColor,
+  dialogAtom,
+  drawerAtom,
+  getDefaultEntityIcon,
+  IconEnum,
+  navbarTitleAtom,
+  useNotifications,
+} from "../../utils";
 import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { IndeterminateProgressBar } from "../Misc";
@@ -58,7 +68,7 @@ function DiceRoller() {
 export function Navbar() {
   const { project_id } = useParams();
   const isMutating = useIsMutating();
-
+  const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -79,6 +89,23 @@ export function Navbar() {
       },
     }));
   }
+
+  const { lastJsonMessage } = useWebSocket<{ event_type: WebsocketEventType; message: string; entity: AllAvailableEntities }>(
+    `ws://localhost:5174/ws/notifications/${project_id}`,
+  );
+
+  useLayoutEffect(() => {
+    if (lastJsonMessage) {
+      if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
+        createNotification({
+          icon: getDefaultEntityIcon(lastJsonMessage.entity),
+          title: lastJsonMessage.message,
+          variant: "info",
+          timer: 5,
+        });
+      }
+    }
+  }, [lastJsonMessage]);
 
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
