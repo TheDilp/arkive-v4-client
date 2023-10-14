@@ -225,7 +225,7 @@ export function ProjectSettingsView() {
           </div>
         ) : null}
         {selectedTab === 2 ? (
-          <div className="flex flex-col gap-y-0">
+          <div className="flex max-h-[94.75%] flex-col gap-y-0 overflow-y-auto pb-6">
             <Title label="Notifications from other project members" size="xl" />
             {AllEntities.map((entity) => (
               <div key={entity} className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0">

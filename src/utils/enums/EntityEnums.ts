@@ -14,6 +14,7 @@ export const AllEntities = [
   "screens",
   "character_fields_templates",
   "character_fields",
+  "conversations",
   "tags",
 ];
 
