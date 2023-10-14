@@ -14,15 +14,25 @@ import {
   Table,
   TablePageLayout,
   Tabs,
+  Title,
 } from "../../components";
 import { useBreakpoint, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterRelationshipType, DialogAtomType, ProjectType } from "../../types";
-import { DefaultTagColor, dialogAtom, drawerAtom, IconEnum } from "../../utils";
+import {
+  AllEntities,
+  capitalizeFirstLetter,
+  DefaultTagColor,
+  dialogAtom,
+  drawerAtom,
+  getSentenceCase,
+  IconEnum,
+} from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings },
   { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree },
+  { id: "3", label: "User settings", icon: IconEnum.user_settings },
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
@@ -212,6 +222,39 @@ export function ProjectSettingsView() {
                 type="character_relationship_types"
               />
             </TablePageLayout>
+          </div>
+        ) : null}
+        {selectedTab === 2 ? (
+          <div className="flex flex-col gap-y-0">
+            <Title label="Notifications from other project members" size="xl" />
+            {AllEntities.map((entity) => (
+              <div key={entity} className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0">
+                <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
+                <div className="flex w-52 items-center justify-between gap-x-2 text-center">
+                  <Checkbox
+                    isDisabled
+                    label="Create"
+                    name={`${entity}_create_notification`}
+                    onChange={() => {}}
+                    value={false}
+                  />
+                  <Checkbox
+                    isDisabled
+                    label="Update"
+                    name={`${entity}_update_notification`}
+                    onChange={() => {}}
+                    value={false}
+                  />
+                  <Checkbox
+                    isDisabled
+                    label="Delete"
+                    name={`${entity}_delete_notification`}
+                    onChange={() => {}}
+                    value={false}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         ) : null}
       </div>

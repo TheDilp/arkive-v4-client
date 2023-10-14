@@ -1,3 +1,22 @@
+export const AllEntities = [
+  "characters",
+  "documents",
+  "maps",
+  "map_pins",
+  "map_layers",
+  "graphs",
+  "nodes",
+  "edges",
+  "calendars",
+  "events",
+  "dictionaries",
+  "words",
+  "screens",
+  "character_fields_templates",
+  "character_fields",
+  "tags",
+];
+
 export const FieldTypesEnum = [
   { value: "text", label: "Text" },
   { value: "textarea", label: "Textarea" },
