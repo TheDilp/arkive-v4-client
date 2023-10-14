@@ -102,6 +102,7 @@ export function Navbar() {
           title: lastJsonMessage.message,
           variant: "info",
           timer: 5,
+          hasNoTruncate: true,
         });
       }
     }
