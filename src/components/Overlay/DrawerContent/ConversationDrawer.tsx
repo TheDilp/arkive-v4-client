@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useHandleChange } from "../../../hooks";
-import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
+import { drawerAtom, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
 import { InsertConversationType } from "../../../validation/conversations";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
@@ -27,6 +27,7 @@ function isSaveDisabled(conversation: InsertConversationType, characters: BaseCh
 export function ConversationDrawer({ data }: Props) {
   const { project_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
+  const createNotification = useNotifications();
   const [conversation, setConversation] = useState<InsertConversationType>({
     data: { title: "", project_id: project_id as string },
     relations: { characters: [] },
@@ -63,7 +64,24 @@ export function ConversationDrawer({ data }: Props) {
         label="Members"
         name="characters"
         onChange={({ first_name, last_name, image, value }) => {
-          if (characters.some((c) => c.id === value)) return;
+          if (data?.character?.id === value) {
+            createNotification({
+              title: "Cannot add same character more than once.",
+              timer: 3,
+              variant: "warning",
+              icon: IconEnum.warning,
+            });
+            return;
+          }
+          if (characters.some((c) => c.id === value)) {
+            createNotification({
+              title: "Cannot add same character more than once.",
+              timer: 3,
+              variant: "warning",
+              icon: IconEnum.warning,
+            });
+            return;
+          }
           if (!first_name) return;
           setCharacters((prev) => prev.concat({ id: value, first_name, last_name, image_id: image }));
         }}
@@ -80,6 +98,7 @@ export function ConversationDrawer({ data }: Props) {
       )}
       {characters.map((char) => (
         <EntityPreview
+          clearAction={(id) => setCharacters((prev) => prev.filter((c) => c.id !== id))}
           id={char.id}
           image_id={char.image_id}
           title={getCharacterFullName(char.first_name, undefined, char.last_name)}
