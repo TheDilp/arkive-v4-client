@@ -1,12 +1,13 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { DiceRollType, NotificationType } from "../../types";
-import { IconEnum, notificationsAtom, removeNotification } from "../../utils";
+import { getImageURL, IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
-import { Icon } from "../Misc";
+import { Avatar, Icon } from "../Misc";
 
 const NotificationClasses = tv({
   slots: {
@@ -129,6 +130,7 @@ export function Notification({
   description,
   timer = 3,
   icon,
+  image_id,
   variant = "primary",
   actions,
   position = "top-right",
@@ -137,6 +139,7 @@ export function Notification({
   type,
   data,
 }: NotificationType) {
+  const { project_id } = useParams();
   const setNotificationAtom = useSetAtom(notificationsAtom);
   const [timeRemaining, setTimeRemaining] = useState<boolean>(true);
   useEffect(() => {
@@ -174,9 +177,14 @@ export function Notification({
       {!type ? (
         <div className="flex w-fit flex-col items-center justify-between">
           <div className={titleContainer()}>
-            {icon ? (
+            {icon && !image_id ? (
               <div className={iconContainer()}>
                 <Icon fontSize={22} icon={icon} />
+              </div>
+            ) : null}
+            {image_id ? (
+              <div className={iconContainer()}>
+                <Avatar image={getImageURL(project_id as string, "images", image_id)} />
               </div>
             ) : null}
             <div className={titleClasses()}>{title}</div>

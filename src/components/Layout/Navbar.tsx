@@ -90,9 +90,12 @@ export function Navbar() {
     }));
   }
 
-  const { lastJsonMessage } = useWebSocket<{ event_type: WebsocketEventType; message: string; entity: AllAvailableEntities }>(
-    `ws://localhost:5174/ws/notifications/${project_id}`,
-  );
+  const { lastJsonMessage } = useWebSocket<{
+    event_type: WebsocketEventType;
+    message: string;
+    image_id?: string;
+    entity: AllAvailableEntities;
+  }>(`ws://localhost:5174/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {
@@ -100,6 +103,7 @@ export function Navbar() {
         createNotification({
           icon: getDefaultEntityIcon(lastJsonMessage.entity),
           title: lastJsonMessage.message,
+          image_id: lastJsonMessage.image_id,
           variant: "info",
           timer: 5,
           hasNoTruncate: true,
