@@ -33,13 +33,13 @@ import { Icon } from "../Misc";
 const DropdownClasses = tv({
   slots: {
     base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 z-40 font-lato",
-    floatingBase: "max-h-[40rem] overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0 ",
+    floatingBase: "max-h-[40rem] overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0 rounded",
     baseItem:
-      "h-10 items-center gap-x-2 text-white border-zinc-600 bg-clip-content border-b first:border-t border-x first:rounded-t overflow-hidden last:rounded-b",
+      " items-center gap-x-2 text-white border-zinc-600 bg-clip-content border-b first:border-t border-x first:rounded-t overflow-hidden last:rounded-b",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-no-wrap justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700 ",
+  base: "flex flex-nowrap h-10 min-h-[2.5rem] first:border-t last:border-b border-x [&:nth-child(2)]:border-y last:rounded-b first:rounded-t border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700 ",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -119,10 +119,12 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   }, [tree, isOpen, nodeId, parentId]);
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, click, role, dismiss, listNavigation]);
   const item = useListItem();
+  const mergedRefs = useMergeRefs([refs.setReference, item.ref]);
+  if (items.length === 0) return null;
   return (
     <FloatingNode id={nodeId}>
       <div
-        ref={useMergeRefs([refs.setReference, item.ref])}
+        ref={mergedRefs}
         className={isNested ? baseItem() : base()}
         role={isNested ? "menuitem" : undefined}
         tabIndex={!isNested ? 0 : -1}
@@ -170,21 +172,19 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   );
 }
 
-function DropdownItem({ id, label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
+function DropdownItem({ label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
   const dropdownItemClasses = DropdownItemClasses({ isDisabled });
   return (
-    <Dropdown key={id} items={subItems || []}>
-      <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
-        {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
-        {child ?? null}
-        {icon && !subItems?.length ? (
-          <div className="ml-auto flex min-w-[22px] justify-end">
-            <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
-          </div>
-        ) : null}
-        {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
-      </div>
-    </Dropdown>
+    <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+      {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
+      {child ?? null}
+      {icon && !subItems?.length ? (
+        <div className="ml-auto flex min-w-[22px] justify-end">
+          <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
+        </div>
+      ) : null}
+      {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
+    </div>
   );
 }
 
