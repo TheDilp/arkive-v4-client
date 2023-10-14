@@ -76,6 +76,7 @@ export interface TableType {
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     relationFilters?: Record<string, string[]>;
     getLink?: (rowData: any) => string;
+    onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => Promise<void>;
   };
   type: AvailableEntityType | "random_table_options" | "icons" | "words" | "context" | "images";

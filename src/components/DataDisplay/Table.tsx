@@ -59,6 +59,7 @@ const TableClasses = tv({
     rowContainer: "flex flex-col first:border-t-0 border-b border-zinc-600 last:border-b-0",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
+    hasRowAction: "cursor-pointer",
     contentWrapper: "block truncate",
     content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
@@ -424,7 +425,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
   );
 }
 export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
-  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink } = config || {};
+  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink, onRowClick } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
   const isSubheaderEnabled = areFiltersActive;
@@ -445,6 +446,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     rowContainer,
     row: rowClasses,
     hasLinkRow,
+    hasRowAction,
     contentWrapper,
     content: contentClasses,
     centeredContent,
@@ -643,8 +645,19 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         height: expandable ? "" : `${virtualRow.size}px`,
                         transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
                       }}>
-                      <Link to={getLink ? getLink(row.original) : "#"}>
-                        <div className={`${rowClasses()}${getLink ? hasLinkRow() : ""} group-hover:bg-blue-300`}>
+                      <Link
+                        onClick={(e) => {
+                          if (onRowClick) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onRowClick(row.original);
+                          }
+                        }}
+                        to={getLink ? getLink(row.original) : "#"}>
+                        <div
+                          className={`${rowClasses()}${getLink ? hasLinkRow() : ""}
+                        ${onRowClick ? hasRowAction() : ""}
+                        group-hover:bg-blue-300`}>
                           {row.getVisibleCells().map((cell) => (
                             <div
                               key={cell.id}
