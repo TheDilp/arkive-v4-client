@@ -1,9 +1,10 @@
+import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useHandleChange } from "../../../hooks";
-import { getCharacterFullName, IconEnum } from "../../../utils";
+import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
 import { InsertConversationType } from "../../../validation/conversations";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
@@ -22,6 +23,7 @@ function isSaveDisabled(conversation: InsertConversationType, characters: BaseCh
 
 export function ConversationDrawer({ data }: Props) {
   const { project_id } = useParams();
+  const resetDrawer = useResetAtom(drawerAtom);
   const [conversation, setConversation] = useState<InsertConversationType>({
     data: { title: "", project_id: project_id as string },
     relations: { characters: [] },
@@ -31,10 +33,12 @@ export function ConversationDrawer({ data }: Props) {
   const { handleChange } = useHandleChange({ data: conversation, setData: setConversation });
   const { mutateAsync: createConversation, isLoading: isCreating } = useCreateEntity<InsertConversationType>("conversations");
 
-  function handleSave() {
+  async function handleSave() {
     const dataToSend = { ...conversation };
     set(dataToSend, "relations.characters", [{ id: data.id }].concat(characters.map((char) => ({ id: char.id }))));
-    createConversation(conversation);
+    await createConversation(conversation);
+
+    resetDrawer();
   }
 
   return (
