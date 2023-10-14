@@ -1,8 +1,6 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useLayoutEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { uniqueBy } from "remirror";
 import { tv } from "tailwind-variants";
@@ -40,6 +38,7 @@ import {
   CharacterRelatedType,
   CharacterType,
   ConversationType,
+  DialogAtomType,
   DocumentType,
   ImageType,
   MapType,
@@ -63,6 +62,7 @@ const relationshipColumnHelper = createColumnHelper<CharacterRelatedType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
 const assetColumnHelper = createColumnHelper<ImageType>();
+const conversationColumnHelper = createColumnHelper<ConversationType>();
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -371,7 +371,74 @@ function assetTableColumns(
     }),
   ];
 }
-
+function conversationTableColumns(project_id: string, setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+  return [
+    conversationColumnHelper.display({
+      id: "characters",
+      header: "Members",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center -space-x-4">
+          {row.original.characters.map((char) => (
+            <Avatar
+              key={char.id}
+              image={getImageURL(project_id, "images", char?.portrait_id || "")}
+              initials={getAvatarInitials(char.first_name, char?.last_name || "")}
+              isBordered
+              isTooltipDisabled
+              label={getCharacterFullName(char.first_name, char?.last_name || "")}
+              size="sm"
+            />
+          ))}
+        </div>
+      ),
+      minSize: 6,
+      maxSize: 6,
+    }),
+    conversationColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => row.original.title,
+      // minSize: 15,
+      // maxSize: 15,
+    }),
+    conversationColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "delete_conversation",
+                label: "Delete conversation",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "conversation",
+                    },
+                    title: "Delete conversation",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+      minSize: 5,
+      maxSize: 5,
+    }),
+  ];
+}
 function AdditionalFieldDisplay({
   character_fields,
   character_field_data,
@@ -439,7 +506,7 @@ function AdditionalFieldDisplay({
 
 export function CharacterProfileView() {
   const { project_id, item_id } = useParams();
-  const { isSm, isLg } = useBreakpoint();
+  const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(0);
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const [selectedConversation, setSelectedConversation] = useState("");
@@ -498,9 +565,10 @@ export function CharacterProfileView() {
     "character_fields_templates",
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
-  const { data: existingConversations, isFetching: isFetchingConversations } = useGetEntities<ConversationType>(
+  const { data: existingConversations, isLoading: isLoadingConversations } = useGetEntities<ConversationType>(
     {
       data: {
+        character_id: item_id,
         project_id,
       },
       fields: ["id", "title"],
@@ -610,7 +678,16 @@ export function CharacterProfileView() {
       ) : null}
       <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
         <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
-          {tabs[selectedTab].label}
+          <span className="flex">
+            {/* {selectedTab === 3 ? (
+              <div className="ml-auto flex w-min items-center pr-2 text-sm">
+                <Button hasNoBackground icon={IconEnum.chevron_left} isIconOnly onClick={openConversationDrawer} size="sm" />
+                <span>Back</span>
+              </div>
+            ) : null} */}
+            {tabs[selectedTab].label} {selectedConversation ? "-" : ""}
+            {existingConversations?.data?.find((convo) => convo?.id === selectedConversation)?.title}
+          </span>
           {selectedTab === 1 ? (
             <div className="ml-auto w-min">
               <Button
@@ -623,6 +700,7 @@ export function CharacterProfileView() {
               />
             </div>
           ) : null}
+
           {selectedTab === 3 ? (
             <div className="ml-auto w-min">
               <Button
@@ -814,40 +892,17 @@ export function CharacterProfileView() {
         {selectedTab === 3 ? (
           <div className="flex-1">
             {selectedConversation ? null : (
-              <div className="border border-zinc-700">
-                <div className="col-span-3 flex max-h-full flex-col overflow-y-auto bg-zinc-900">
-                  {!isFetchingConversations && existingConversations?.data?.length ? (
-                    existingConversations?.data.map((convo) => (
-                      <div
-                        key={convo.id}
-                        className="grid cursor-pointer grid-cols-12 border-b border-zinc-700 bg-opacity-40 even:bg-zinc-800"
-                        onClick={() => setSelectedConversation(convo.id)}>
-                        <div className="col-span-2 flex items-center justify-center overflow-hidden border-r border-zinc-700 xl:col-span-1">
-                          {convo.characters.slice(0, isSm ? 3 : 1).map((char) => (
-                            <div key={char.id} className="transition-all hover:z-10 [&:not(:first-child)]:-ml-3">
-                              <Avatar
-                                image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                                initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                                label={getCharacterFullName(char.first_name, undefined, char.last_name)}
-                                size="xs"
-                              />
-                            </div>
-                          ))}
-                          {convo.characters.length > (isSm ? 3 : 1) ? (
-                            <div>
-                              <Badge label={`+${convo.characters.length - (isSm ? 3 : 1)}`} />
-                            </div>
-                          ) : null}
-                        </div>
-                        <div className="col-span-6 flex h-14 flex-col justify-center px-2 py-1 xl:col-span-7">
-                          <h4 className="truncate font-merriweather text-lg">{convo.title}</h4>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <Alert label="There is no content." />
-                  )}
-                </div>
+              <div className="col-span-3 flex max-h-full flex-col overflow-y-auto bg-zinc-900">
+                <Table
+                  columns={conversationTableColumns(project_id as string, setDialog)}
+                  config={{
+                    onRowClick: (rowData: ConversationType) => setSelectedConversation(rowData.id),
+                  }}
+                  data={existingConversations?.data || []}
+                  dispatch={dispatch}
+                  isLoading={isLoadingConversations}
+                  type="conversations"
+                />
               </div>
             )}
             <div className="h-full max-h-[100%] overflow-hidden">

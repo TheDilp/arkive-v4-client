@@ -84,6 +84,11 @@ const TableClasses = tv({
         head: "mb-0 border-b-0",
       },
     },
+    hasNoData: {
+      true: {
+        head: "mb-0",
+      },
+    },
   },
 });
 
@@ -456,7 +461,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     showPageCount,
     showPageCountSelectContainer,
     paginationButtonsContainer,
-  } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap });
+  } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap, hasNoData: data?.length === 0 });
 
   const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
 
@@ -699,7 +704,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 })}
               </div>
             ) : (
-              <Alert label="There's no content." variant="info" />
+              <div className="my-2">
+                <Alert label="There's no content." variant="info" />
+              </div>
             )}
           </div>
           {pagination ? (
