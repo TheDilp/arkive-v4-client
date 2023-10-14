@@ -17,7 +17,7 @@ import {
 } from "../../utils";
 
 export function ConversationView({ id }: { id: string }) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
@@ -94,20 +94,19 @@ export function ConversationView({ id }: { id: string }) {
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               return (
-                <div key={m?.id} className="flex flex-nowrap">
+                <div key={m?.id} className={`flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
                   {char ? (
-                    <div className="flex items-start gap-x-1 px-1">
+                    <div className="flex items-start gap-x-1 self-end px-1">
                       <Avatar
-                        hasShowImage
                         image={getImageURL(project_id as string, "images", char?.portrait_id)}
                         initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                        isTooltipDisabled
-                        size="sm"
+                        label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
+                        size="xxs"
                       />
                     </div>
                   ) : null}
-                  <div className="flex flex-col [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                    {char ? <span className="font-bold">{char?.first_name}:</span> : null}
+                  <div className="flex flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+                    {/* {char ? <span className="font-bold">{char?.first_name}:</span> : null} */}
                     <StaticRender content={m?.content} />
                   </div>
                 </div>
