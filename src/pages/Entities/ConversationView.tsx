@@ -53,7 +53,7 @@ export function ConversationView({ id }: { id: string }) {
                     ...old,
                     data: {
                       ...old?.data,
-                      messages: [...(old?.data?.messages || []), { ...parsedMessage, content: parsedContent }],
+                      messages: [{ ...parsedMessage, content: parsedContent }, ...(old?.data?.messages || [])],
                     },
                   };
                 return old;
@@ -146,7 +146,7 @@ export function ConversationView({ id }: { id: string }) {
             />
           </div>
         </div>
-        <div className="flex flex-nowrap gap-x-2">
+        <div className="flex flex-nowrap gap-x-2 [&>.editor-component]:overflow-visible">
           <Editor
             hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage)}
             initialContent={message}
