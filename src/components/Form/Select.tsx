@@ -31,7 +31,7 @@ const SelectClasses = tv({
     label: "text-sm font-medium truncate block w-full font-lato",
     helperText: "text-xs truncate block px-2",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
     placeholder: "text-zinc-500 font-lato",
     displayItem: "truncate",
   },
@@ -92,7 +92,7 @@ const SelectClasses = tv({
     {
       slots: ["select"],
       isOpen: true,
-      class: "rounded-b-none bg-zinc-800",
+      class: "bg-zinc-800",
     },
     {
       slots: ["helperText"],
