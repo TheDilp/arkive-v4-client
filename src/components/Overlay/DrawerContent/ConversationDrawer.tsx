@@ -9,10 +9,13 @@ import { InsertConversationType } from "../../../validation/conversations";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
 
-type BaseCharacterInfoType = { id: string; first_name: string; last_name?: string; image_id?: string };
+type BaseCharacterInfoType = { id: string; first_name: string; last_name?: string | null; image_id?: string | null };
 
 type Props = {
-  data: BaseCharacterInfoType;
+  data: {
+    conversation_id?: string;
+    character?: BaseCharacterInfoType;
+  };
 };
 
 function isSaveDisabled(conversation: InsertConversationType, characters: BaseCharacterInfoType[]): boolean {
@@ -35,10 +38,15 @@ export function ConversationDrawer({ data }: Props) {
 
   async function handleSave() {
     const dataToSend = { ...conversation };
-    set(dataToSend, "relations.characters", [{ id: data.id }].concat(characters.map((char) => ({ id: char.id }))));
+    set(dataToSend, "relations.characters", [{ id: data?.character?.id }].concat(characters.map((char) => ({ id: char.id }))));
     await createConversation(conversation);
 
     resetDrawer();
+  }
+
+  if (!data?.character?.first_name) {
+    resetDrawer();
+    return null;
   }
 
   return (
@@ -62,12 +70,14 @@ export function ConversationDrawer({ data }: Props) {
         placeholder="Press enter to search and add a character."
         searchEntity="characters"
       />
-      <EntityPreview
-        id={data.id}
-        image_id={data.image_id}
-        title={getCharacterFullName(data.first_name, undefined, data.last_name)}
-        type="characters"
-      />
+      {data?.conversation_id ? null : (
+        <EntityPreview
+          id={data.character.id}
+          image_id={data.character.image_id}
+          title={getCharacterFullName(data.character.first_name, undefined, data.character.last_name)}
+          type="characters"
+        />
+      )}
       {characters.map((char) => (
         <EntityPreview
           id={char.id}

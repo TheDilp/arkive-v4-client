@@ -159,7 +159,7 @@ export function Drawer() {
         {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
         {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
         {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
-        {drawer.type === "conversation" ? <ConversationDrawer data={drawer?.data} /> : null}
+        {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );

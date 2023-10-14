@@ -40,6 +40,7 @@ import {
   ConversationType,
   DialogAtomType,
   DocumentType,
+  DrawerAtomType,
   ImageType,
   MapType,
 } from "../../types";
@@ -371,7 +372,12 @@ function assetTableColumns(
     }),
   ];
 }
-function conversationTableColumns(project_id: string, setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+function conversationTableColumns(
+  project_id: string,
+  item_id: string,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+) {
   return [
     conversationColumnHelper.display({
       id: "characters",
@@ -412,6 +418,22 @@ function conversationTableColumns(project_id: string, setDialog: Dispatch<SetSta
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
+              {
+                id: "edit_conversation",
+                label: `Edit conversation ${row.original.title}`,
+                icon: IconEnum.edit,
+                onClick: () => {
+                  const char = row.original.characters.find((c) => c.id === item_id);
+                  if (char) {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      data: { character: char, conversation_id: row.original.id },
+                      title: `Edit conversation - ${row.original.title}`,
+                      type: "conversations",
+                    }));
+                  }
+                },
+              },
               {
                 id: "delete_conversation",
                 label: "Delete conversation",
@@ -625,13 +647,15 @@ export function CharacterProfileView() {
   function openConversationDrawer() {
     if (existingCharacter?.data)
       setDrawer({
-        type: "conversation",
+        type: "conversations",
         title: "Start new conversation",
         data: {
-          id: existingCharacter?.data.id,
-          first_name: existingCharacter?.data?.first_name,
-          last_name: existingCharacter?.data?.last_name,
-          image_id: existingCharacter?.data?.portrait_id,
+          character: {
+            id: existingCharacter?.data.id,
+            first_name: existingCharacter?.data?.first_name,
+            last_name: existingCharacter?.data?.last_name,
+            image_id: existingCharacter?.data?.portrait_id,
+          },
         },
         size: "lg",
       });
@@ -894,7 +918,7 @@ export function CharacterProfileView() {
             {selectedConversation ? null : (
               <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
                 <Table
-                  columns={conversationTableColumns(project_id as string, setDialog)}
+                  columns={conversationTableColumns(project_id as string, item_id as string, setDialog, setDrawer)}
                   config={{
                     onRowClick: (rowData: ConversationType) => setSelectedConversation(rowData.id),
                   }}

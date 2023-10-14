@@ -77,7 +77,13 @@ export type DrawerAtomType = {
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } } }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number } }
   | { type: "words"; data: { id?: string } }
-  | { type: "conversation"; data: { id: string; first_name: string; last_name?: string | null; image_id?: string | null } }
+  | {
+      type: "conversations";
+      data: {
+        character?: { id: string; first_name: string; last_name?: string | null; image_id?: string | null };
+        conversation_id?: string;
+      };
+    }
   | { type: null; data: null }
 );
 
