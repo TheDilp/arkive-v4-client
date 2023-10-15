@@ -1,13 +1,15 @@
 import { FloatingWrapper, useMentionAtom } from "@remirror/react";
+import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
-import { baseURLS, FetchFunction, getImageURL } from "../../../../../utils";
+import { baseURLS, FetchFunction, getImageURL, mentionDropdownAtom } from "../../../../../utils";
 import { Avatar, Spinner } from "../../../../Misc";
 
 export function MentionDropdownComponent() {
   const { project_id } = useParams();
+  const setMentionDropdownAtom = useSetAtom(mentionDropdownAtom);
   const [options, setOptions] = useState<
     { key: string; id: string; label: string; displayLabel?: string; portrait_id?: string }[]
   >([]);
@@ -68,11 +70,17 @@ export function MentionDropdownComponent() {
 
   useEffect(() => {
     if (state && state?.query?.full?.length >= 3) {
+      setMentionDropdownAtom(true);
+
       search();
     } else {
       setOptions([]);
     }
+    if (!state) {
+      setMentionDropdownAtom(false);
+    }
   }, [state?.query?.full]);
+
   return (
     <FloatingWrapper
       containerClass="commandMenu"

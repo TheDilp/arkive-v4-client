@@ -1,6 +1,7 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
+import { useAtomValue } from "jotai";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
@@ -33,6 +34,7 @@ import { SecretExtension } from "../../components/Complex/Editor/Extensions/Secr
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useUpdateEntity } from "../../hooks";
 import { ConversationType, DocumentType, MessageKindType, NotificationType } from "../../types";
+import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
@@ -53,6 +55,7 @@ export const DefaultEditorExtensions: (
         toDOM: () => ["data-projectId"],
       },
     },
+
     matchers: [
       {
         char: "@",
@@ -248,38 +251,45 @@ export const messageEditorHooks = (
     const getContext = useRemirrorContext();
     const { project_id } = useParams();
 
-    const handleSendMessage = useCallback(() => {
-      const jsonContent = getJSON();
-      const messageData = {
-        id: crypto.randomUUID(),
-        parent_id: id,
-        content: JSON.stringify(jsonContent),
-        type: selectedType,
-        sender_id: selectedCharacter,
-      };
-      queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-        if (old)
-          return {
-            ...old,
-            data: {
-              ...old?.data,
-              messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
-            },
+    const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
+
+    const handleSendMessage = useCallback(
+      ({ next }: { next: any }) => {
+        if (!isMentionDropdownOpen) {
+          const jsonContent = getJSON();
+          const messageData = {
+            id: crypto.randomUUID(),
+            parent_id: id,
+            content: JSON.stringify(jsonContent),
+            type: selectedType,
+            sender_id: selectedCharacter,
           };
-        return old;
-      });
-      sendJsonMessage({
-        data: messageData,
-        project_id,
-        conversation,
-      });
+          queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+            if (old)
+              return {
+                ...old,
+                data: {
+                  ...old?.data,
+                  messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
+                },
+              };
+            return old;
+          });
+          sendJsonMessage({
+            data: messageData,
+            project_id,
+            conversation,
+          });
 
-      getContext.clearContent();
+          getContext.clearContent();
+          return true;
+        }
+        return next();
+      },
+      [selectedCharacter, selectedType, isMentionDropdownOpen],
+    );
 
-      return true;
-    }, [selectedCharacter, selectedType]);
-
-    useKeymap("Mod-Enter", handleSendMessage);
+    useKeymap("Enter", handleSendMessage);
   },
 ];
 

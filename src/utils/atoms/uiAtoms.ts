@@ -10,3 +10,4 @@ export const drawerAtom = atomWithReset<DrawerAtomType>({ size: "md", title: "",
 export const dialogAtom = atomWithReset<DialogAtomType>({ position: "center", data: null, title: "", type: null, size: "md" });
 export const contextMenuAtom = atomWithReset<ContextMenuAtomType>({ event: null, items: null });
 export const notificationsAtom = atom<NotificationType[]>([]);
+export const mentionDropdownAtom = atom<boolean>(false);
