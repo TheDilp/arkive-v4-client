@@ -253,41 +253,38 @@ export const messageEditorHooks = (
 
     const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
 
-    const handleSendMessage = useCallback(
-      ({ next }: { next: any }) => {
-        if (!isMentionDropdownOpen) {
-          const jsonContent = getJSON();
-          const messageData = {
-            id: crypto.randomUUID(),
-            parent_id: id,
-            content: JSON.stringify(jsonContent),
-            type: selectedType,
-            sender_id: selectedCharacter,
-          };
-          queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-            if (old)
-              return {
-                ...old,
-                data: {
-                  ...old?.data,
-                  messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
-                },
-              };
-            return old;
-          });
-          sendJsonMessage({
-            data: messageData,
-            project_id,
-            conversation,
-          });
+    const handleSendMessage = useCallback(() => {
+      if (!isMentionDropdownOpen) {
+        const jsonContent = getJSON();
+        const messageData = {
+          id: crypto.randomUUID(),
+          parent_id: id,
+          content: JSON.stringify(jsonContent),
+          type: selectedType,
+          sender_id: selectedCharacter,
+        };
+        queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+          if (old)
+            return {
+              ...old,
+              data: {
+                ...old?.data,
+                messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
+              },
+            };
+          return old;
+        });
+        sendJsonMessage({
+          data: messageData,
+          project_id,
+          conversation,
+        });
 
-          getContext.clearContent();
-          return true;
-        }
-        return next();
-      },
-      [selectedCharacter, selectedType, isMentionDropdownOpen],
-    );
+        getContext.clearContent();
+        return true;
+      }
+      return false;
+    }, [selectedCharacter, selectedType, isMentionDropdownOpen]);
 
     useKeymap("Enter", handleSendMessage);
   },

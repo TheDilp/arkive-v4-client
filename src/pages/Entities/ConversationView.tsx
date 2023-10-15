@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
@@ -18,11 +18,11 @@ import {
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
+  const messageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
-
   const { data: existingConversation } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
@@ -63,6 +63,7 @@ export function ConversationView({ id }: { id: string }) {
                     };
                   return old;
                 });
+                messageContainerRef.current.scrollIntoView({ behavior: "smooth" });
               } catch (error) {
                 // console.error("ERROR PARSING MESSAGE CONTENT.");
               }
@@ -78,6 +79,11 @@ export function ConversationView({ id }: { id: string }) {
   useEffect(() => {
     if (!id) setConnection(false);
   }, [id]);
+
+  useLayoutEffect(() => {
+    if (existingConversation?.data?.messages?.length) messageContainerRef.current.scrollIntoView();
+  }, [existingConversation?.data?.messages]);
+
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
       <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
@@ -120,6 +126,7 @@ export function ConversationView({ id }: { id: string }) {
           ) : (
             <Alert label="This is the start of this conversation." />
           )}
+          <div ref={messageContainerRef} className="h-0 w-0" />
         </div>
       </div>
       <div className="flex min-h-fit flex-col gap-y-2 pt-2">
