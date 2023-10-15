@@ -1,5 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from "@tanstack/react-query";
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -32,7 +32,7 @@ import { MentionReactComponent } from "../../components/Complex/Editor/Extension
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useUpdateEntity } from "../../hooks";
-import { DocumentType, MessageKindType, NotificationType } from "../../types";
+import { ConversationType, DocumentType, MessageKindType, NotificationType } from "../../types";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
@@ -240,32 +240,42 @@ export const messageEditorHooks = (
   selectedCharacter: string | undefined,
   selectedType: MessageKindType,
   sendJsonMessage: SendJsonMessage,
+  conversation: Partial<ConversationType> | undefined,
 ) => [
   () => {
+    const queryClient = useQueryClient();
     const { getJSON } = useHelpers();
     const getContext = useRemirrorContext();
-    // const { project_id } = useParams();
-    // const { mutate } = useCreateSubEntity<InsertMessageType>("messages", project_id);
+    const { project_id } = useParams();
 
     const handleSendMessage = useCallback(() => {
+      const jsonContent = getJSON();
+      const messageData = {
+        id: crypto.randomUUID(),
+        parent_id: id,
+        content: JSON.stringify(jsonContent),
+        type: selectedType,
+        sender_id: selectedCharacter,
+      };
+      queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+        if (old)
+          return {
+            ...old,
+            data: {
+              ...old?.data,
+              messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
+            },
+          };
+        return old;
+      });
       sendJsonMessage({
-        data: {
-          parent_id: id,
-          content: JSON.stringify(getJSON()),
-          type: selectedType,
-          sender_id: selectedCharacter,
-        },
+        data: messageData,
+        project_id,
+        conversation,
       });
 
       getContext.clearContent();
-      // mutate({
-      //   data: {
-      //     parent_id: id,
-      //     content: JSON.stringify(getJSON()),
-      //     type: selectedType,
-      //     sender_id: selectedCharacter,
-      //   },
-      // });
+
       return true;
     }, [selectedCharacter, selectedType]);
 

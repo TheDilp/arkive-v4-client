@@ -6,7 +6,7 @@ import { RemirrorJSON } from "remirror";
 
 import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { ConversationType, MessageKindType, MessageType } from "../../types";
+import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
   getAvatarInitials,
   getCharacterFullName,
@@ -19,7 +19,7 @@ import {
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
-  const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(undefined);
+  const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
 
@@ -42,24 +42,30 @@ export function ConversationView({ id }: { id: string }) {
     {
       onMessage: (e) => {
         try {
-          const parsedData: { event_type: string; message: string } = JSON.parse(e.data);
-          const parsedMessage: Omit<MessageType, "content"> & { content: string } = JSON.parse(parsedData.message);
-          if (parsedMessage) {
-            try {
-              const parsedContent: RemirrorJSON = JSON.parse(parsedMessage.content);
-              queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-                if (old)
-                  return {
-                    ...old,
-                    data: {
-                      ...old?.data,
-                      messages: [{ ...parsedMessage, content: parsedContent }, ...(old?.data?.messages || [])],
-                    },
-                  };
-                return old;
-              });
-            } catch (error) {
-              // console.error("ERROR PARSING MESSAGE CONTENT.");
+          const parsedData: { event_type: WebsocketEventType; message: string } = JSON.parse(e.data);
+          if (parsedData.event_type === "NEW_MESSAGE") {
+            const parsedMessage: Omit<MessageType, "content"> & { content: string } = JSON.parse(parsedData.message);
+
+            if (parsedMessage) {
+              try {
+                const parsedContent: RemirrorJSON = JSON.parse(parsedMessage.content);
+                const existingMessages = queryClient.getQueryData<{ data: ConversationType }>(["conversations", id]);
+                const hasMessage = (existingMessages?.data?.messages || []).at(-1)?.id === parsedMessage.id;
+                if (hasMessage) return;
+                queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+                  if (old)
+                    return {
+                      ...old,
+                      data: {
+                        ...old?.data,
+                        messages: [...(old?.data?.messages || []), { ...parsedMessage, content: parsedContent }],
+                      },
+                    };
+                  return old;
+                });
+              } catch (error) {
+                // console.error("ERROR PARSING MESSAGE CONTENT.");
+              }
             }
           }
         } catch (error) {
@@ -77,7 +83,7 @@ export function ConversationView({ id }: { id: string }) {
       <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
         <div className="flex flex-col gap-y-2 overflow-y-auto">
           {existingConversation?.data?.messages?.length ? (
-            existingConversation?.data?.messages.toReversed().map((m) => {
+            existingConversation?.data?.messages?.map((m) => {
               if (m.type === "narration")
                 return (
                   <div
@@ -106,7 +112,6 @@ export function ConversationView({ id }: { id: string }) {
                     </div>
                   ) : null}
                   <div className="flex flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                    {/* {char ? <span className="font-bold">{char?.first_name}:</span> : null} */}
                     <StaticRender content={m?.content} />
                   </div>
                 </div>
@@ -150,7 +155,10 @@ export function ConversationView({ id }: { id: string }) {
         [&>.editor-component]:overflow-y-auto
         ">
           <Editor
-            hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage)}
+            hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage, {
+              id: existingConversation?.data?.id,
+              title: existingConversation?.data?.title,
+            })}
             initialContent={message}
             isMenubarDisabled
             name="message"

@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
-import { EntitiesView } from "./pages/Entities";
+import { CharacterProfileView, EntitiesView } from "./pages/Entities";
 import { FolderView } from "./pages/Entities/FolderView";
 import { ProjectsView } from "./pages/Projects";
 
@@ -30,7 +30,9 @@ export default function App() {
             <Route element={<ProjectsView />} path="*" />
             <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<FolderView />} path=":type" />
-              <Route element={<EntitiesView />} path=":type/:item_id/*" />
+              <Route element={<CharacterProfileView />} path="characters/:item_id/*" />
+              <Route element={<CharacterProfileView />} path="characters/:item_id/:type/:subitem_id/*" />
+              <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
               <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
               <Route element={<FolderView />} path=":type/folder/:item_id/*" />
             </Route>
