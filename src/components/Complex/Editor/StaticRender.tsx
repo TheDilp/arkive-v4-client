@@ -6,7 +6,8 @@ import { ComponentType, ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { deleteObjectPropsRecursive, dialogAtom } from "../../../utils";
+import { deleteObjectPropsRecursive, dialogAtom, IconEnum } from "../../../utils";
+import { Collapsible } from "../../Layout";
 import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
 // import WordMention from "../Mention/WordMention";
@@ -47,6 +48,13 @@ const typeMap = (project_id: string): MarkMap => ({
   callout: Callout,
   horizontalRule: "hr",
   tableofcontents: "p",
+  secret: (data) => {
+    return (
+      <Collapsible icon={IconEnum.eye} initialOpen={false} label="Secret">
+        {data?.children}
+      </Collapsible>
+    );
+  },
   image: (data) => StaticRenderImage({ data }),
   table: (...props: any) => {
     return (
@@ -103,7 +111,6 @@ const typeMap = (project_id: string): MarkMap => ({
     }
     return null;
   },
-  secret: () => null,
 });
 
 const markMap: MarkMap = {

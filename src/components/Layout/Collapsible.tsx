@@ -6,7 +6,7 @@ import { Button, Icon } from "..";
 
 export function Collapsible({ label, icon, initialOpen, children, actions }: CollapsibleType) {
   return (
-    <details className="cursor-default select-none" open={initialOpen}>
+    <details className="cursor-default select-none" open={initialOpen ?? false}>
       <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1">
         <span className="flex select-none items-center gap-x-2 text-xl">
           {icon ? (
