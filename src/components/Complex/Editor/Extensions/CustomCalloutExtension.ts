@@ -71,10 +71,10 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
 
       contentDOM.setAttribute(
         "style",
-        `background-color: ${getCalloutColor(type, customColor)}; 
+        `background-color: ${getCalloutColor(type, customColor)}50; 
         border-style: solid;
         border-color:${getCalloutBorderColor(type, customColor)};
-        border-width: 0 0 0 ${type === "custom" ? 0 : 4}px;
+        border-width: 0 0 0 4px;
         padding: 8px;
         border-top-left-radius: 0.25rem; 
         border-bottom-left-radius: 0.25rem;

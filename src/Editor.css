@@ -129,6 +129,21 @@
       }
     }
   }
+  div[data-callout-type="custom"] {
+    @apply rounded border-l-4 p-2;
+  }
+  div[data-callout-type="info"] {
+    @apply rounded border-l-4 border-[#3298dc] bg-[#eef6fc] p-2;
+  }
+  div[data-callout-type="error"] {
+    @apply rounded border-l-4 border-[#f14668] bg-[#feecf0] p-2;
+  }
+  div[data-callout-type="warning"] {
+    @apply rounded border-l-4 border-[#ffdd57] bg-[#fffbeb] p-2;
+  }
+  div[data-callout-type="success"] {
+    @apply rounded border-l-4 border-[#48c774] bg-[#effaf3] p-2;
+  }
 
   .remirror-list-item-with-custom-mark {
     &[data-checked] {

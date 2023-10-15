@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-import { Callout, Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
+import { Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
 import { useSetAtom } from "jotai";
 import { ComponentType, ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -45,7 +45,18 @@ const typeMap = (project_id: string): MarkMap => ({
   orderedList: "ol",
   text: TextHandler,
   blockquote: "blockquote",
-  callout: Callout,
+  callout: (data) => {
+    return (
+      <div
+        data-callout-type={data?.node?.attrs?.type ?? "custom"}
+        style={{
+          backgroundColor: `${data?.node?.attrs?.customcolor}50`,
+          borderColor: `${data?.node?.attrs?.customcolor}`,
+        }}>
+        {data?.children ?? null}
+      </div>
+    );
+  },
   horizontalRule: "hr",
   tableofcontents: "p",
   secret: (data) => {
