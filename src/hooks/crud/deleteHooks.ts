@@ -6,10 +6,12 @@ import {
   AllAvailableEntities,
   AvailableEntityType,
   AvailableSubEntityType,
+  ConversationType,
   DictionaryType,
   MapLayers,
   MapPinType,
   MapType,
+  MessageType,
   WordType,
 } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
@@ -73,6 +75,22 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
                 temp,
                 `data.${type}`,
                 ((temp?.data?.[type] as (MapLayers | MapPinType)[]) || [])?.filter((item) => item?.id !== vars.data.id),
+              );
+              return temp;
+            }
+            return oldData;
+          });
+          return { old };
+        }
+        if (type === "messages") {
+          const old = queryClient.getQueryData<ConversationType>(["conversations", vars.data.parent_id]);
+          queryClient.setQueryData<{ data: ConversationType }>(["conversations", vars.data.parent_id], (oldData) => {
+            if (oldData) {
+              const temp = cloneDeep(oldData);
+              set(
+                temp,
+                `data.${type}`,
+                ((temp?.data?.[type] as MessageType[]) || [])?.filter((item) => item?.id !== vars.data.id),
               );
               return temp;
             }

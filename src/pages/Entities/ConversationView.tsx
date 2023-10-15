@@ -4,10 +4,17 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Editor, Select, StaticRender } from "../../components";
-import { useGetEntity } from "../../hooks";
+import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../components";
+import { useDeleteSubEntity, useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
-import { getAvatarInitials, getCharacterFullName, getImageURL, messageEditorHooks, MessageTypeOptions } from "../../utils";
+import {
+  getAvatarInitials,
+  getCharacterFullName,
+  getImageURL,
+  IconEnum,
+  messageEditorHooks,
+  MessageTypeOptions,
+} from "../../utils";
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
@@ -25,6 +32,7 @@ export function ConversationView({ id }: { id: string }) {
       messages: true,
     },
   });
+  const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string);
 
   const queryClient = useQueryClient();
 
@@ -99,9 +107,19 @@ export function ConversationView({ id }: { id: string }) {
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               return (
-                <div key={m?.id} className={`flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
+                <div key={m?.id} className={`group flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
                   {char ? (
-                    <div className="flex items-start gap-x-1 self-end px-1">
+                    <div className="flex flex-col items-end gap-x-1 self-end px-1">
+                      <div className="w-0 transition-all group-hover:w-4">
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.close}
+                          isIconOnly
+                          onClick={async () => {
+                            await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                          }}
+                        />
+                      </div>
                       <Avatar
                         image={getImageURL(project_id as string, "images", char?.portrait_id)}
                         initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
@@ -176,44 +194,6 @@ export function ConversationView({ id }: { id: string }) {
               setMessageLength(value?.length || 0);
             }}
           />
-
-          {/* <div className="mt-auto">
-            <Button
-              icon={IconEnum.send}
-              isDisabled={messageLength === 0 || (selectedType === "character" && !selectedCharacter)}
-              label="Send"
-              onClick={() => {
-                if (!isMentionDropdownOpen) {
-                  const messageData = {
-                    id: crypto.randomUUID(),
-                    parent_id: id,
-                    content: JSON.stringify(message),
-                    type: selectedType,
-                    sender_id: selectedCharacter,
-                  };
-                  queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-                    if (old)
-                      return {
-                        ...old,
-                        data: {
-                          ...old?.data,
-                          messages: [...(old?.data?.messages || []), { ...messageData, content: message }],
-                        },
-                      };
-                    return old;
-                  });
-                  sendJsonMessage({
-                    data: messageData,
-                    project_id,
-                    conversation: { id: existingConversation?.data?.id, title: existingConversation?.data?.title },
-                  });
-
-                  getContext.clearContent();
-                }
-              }}
-              variant="info"
-            />
-          </div> */}
         </div>
       </div>
     </div>
