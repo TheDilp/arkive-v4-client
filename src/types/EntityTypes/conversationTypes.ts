@@ -9,10 +9,11 @@ export interface MessageType {
   sender_id?: string;
   type: MessageKindType;
 }
+
 export interface ConversationType {
   id: string;
   title: string;
   project_id: string;
-  characters: CharacterType[];
+  characters: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
   messages: MessageType[];
 }

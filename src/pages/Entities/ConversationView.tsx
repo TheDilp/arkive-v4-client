@@ -107,19 +107,21 @@ export function ConversationView({ id }: { id: string }) {
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               return (
-                <div key={m?.id} className={`group flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
+                <div key={m?.id} className={` flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
                   {char ? (
-                    <div className="flex flex-col items-end gap-x-1 self-end px-1">
-                      <div className="w-0 transition-all group-hover:w-4">
-                        <Button
-                          hasNoBackground
-                          icon={IconEnum.close}
-                          isIconOnly
-                          onClick={async () => {
-                            await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                          }}
-                        />
-                      </div>
+                    <div className="group flex flex-col items-end gap-x-1 self-end px-1">
+                      {item_id === char?.id ? (
+                        <div className="w-0 transition-all group-hover:w-4">
+                          <Button
+                            hasNoBackground
+                            icon={IconEnum.close}
+                            isIconOnly
+                            onClick={async () => {
+                              await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                            }}
+                          />
+                        </div>
+                      ) : null}
                       <Avatar
                         image={getImageURL(project_id as string, "images", char?.portrait_id)}
                         initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}

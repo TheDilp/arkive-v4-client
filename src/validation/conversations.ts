@@ -16,4 +16,21 @@ export const InsertConversationSchema = z.object({
   }),
 });
 
+export const UpdateConversationSchema = z.object({
+  data: z.object({
+    id: z.string(),
+    title: z.string().optional(),
+  }),
+  relations: z.object({
+    characters: z
+      .array(
+        z.object({
+          id: z.string(),
+        }),
+      )
+      .optional(),
+  }),
+});
+
 export type InsertConversationType = z.infer<typeof InsertConversationSchema>;
+export type UpdateConversationType = z.infer<typeof UpdateConversationSchema>;

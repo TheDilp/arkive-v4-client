@@ -425,7 +425,7 @@ function conversationTableColumns(
             items={[
               {
                 id: "edit_conversation",
-                label: `Edit conversation ${row.original.title}`,
+                label: `Edit conversation "${row.original.title}"`,
                 icon: IconEnum.edit,
                 onClick: () => {
                   const char = row.original.characters.find((c) => c.id === item_id);

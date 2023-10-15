@@ -1,26 +1,31 @@
 import { useResetAtom } from "jotai/utils";
-import set from "lodash.set";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { CharacterType, ConversationType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
-import { InsertConversationType } from "../../../validation/conversations";
+import {
+  InsertConversationSchema,
+  InsertConversationType,
+  UpdateConversationSchema,
+  UpdateConversationType,
+} from "../../../validation/conversations";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
+import { Skeleton } from "../../Misc";
 
-type BaseCharacterInfoType = { id: string; first_name: string; last_name?: string | null; image_id?: string | null };
-
+type ConversationCharacterType = Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
 type Props = {
   data: {
     conversation_id?: string;
-    character?: BaseCharacterInfoType;
+    character?: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
   };
 };
 
-function isSaveDisabled(conversation: InsertConversationType, characters: BaseCharacterInfoType[]): boolean {
-  if (!conversation.data.title) return true;
-  if (characters.length === 0) return true;
+function isSaveDisabled(conversation: Partial<ConversationType>, characters: ConversationCharacterType[]): boolean {
+  if (!conversation.title) return true;
+  if (characters.length <= 1) return true;
   return false;
 }
 
@@ -28,39 +33,79 @@ export function ConversationDrawer({ data }: Props) {
   const { project_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
-  const [conversation, setConversation] = useState<InsertConversationType>({
-    data: { title: "", project_id: project_id as string },
-    relations: { characters: [] },
-  });
-  const [characters, setCharacters] = useState<BaseCharacterInfoType[]>([]);
+  const [conversation, setConversation] = useState<Partial<ConversationType>>({ project_id });
 
-  const { handleChange } = useHandleChange({ data: conversation, setData: setConversation });
+  const { changedData, handleChange } = useHandleChange({ data: conversation, setData: setConversation });
   const { mutateAsync: createConversation, isLoading: isCreating } = useCreateEntity<InsertConversationType>("conversations");
-
+  const { mutateAsync: updateConversation, isLoading: isUpdating } = useUpdateEntity<UpdateConversationType>(
+    "conversations",
+    project_id as string,
+  );
+  const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(
+    data?.conversation_id,
+    "conversations",
+    {
+      data: {
+        id: data?.conversation_id,
+      },
+      relations: {
+        characters: true,
+      },
+    },
+    {
+      enabled: !!data?.conversation_id,
+    },
+  );
   async function handleSave() {
-    const dataToSend = { ...conversation };
-    set(dataToSend, "relations.characters", [{ id: data?.character?.id }].concat(characters.map((char) => ({ id: char.id }))));
-    await createConversation(conversation);
+    if (conversation?.id) {
+      const conversationToUpdate = { ...(changedData || {}), id: conversation.id };
+
+      const parsedData = UpdateConversationSchema.parse({
+        data: conversationToUpdate,
+        relations: {
+          characters: conversation.characters,
+        },
+      });
+      await updateConversation(parsedData);
+    } else {
+      const conversationToUpdate = { ...(changedData || {}), id: conversation.id };
+
+      const parsedData = InsertConversationSchema.parse({
+        data: conversationToUpdate,
+        relations: {
+          characters: conversation.characters,
+        },
+      });
+      await createConversation(parsedData);
+    }
 
     resetDrawer();
   }
+
+  useLayoutEffect(() => {
+    if (existingConversation?.data && !conversation?.title) {
+      setConversation(existingConversation?.data);
+    }
+  }, [existingConversation?.data]);
 
   if (!data?.character?.first_name) {
     resetDrawer();
     return null;
   }
 
+  if (isLoading) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col gap-y-2">
       <Input
-        isDisabled={isCreating}
+        isDisabled={isCreating || isUpdating}
         label="Title (required)"
-        name="data.title"
+        name="title"
         onChange={handleChange}
-        value={conversation.data.title || ""}
+        value={conversation.title || ""}
       />
       <Search
-        isDisabled={isCreating}
+        isDisabled={isCreating || isUpdating}
         label="Members"
         name="characters"
         onChange={({ first_name, last_name, image, value }) => {
@@ -73,7 +118,7 @@ export function ConversationDrawer({ data }: Props) {
             });
             return;
           }
-          if (characters.some((c) => c.id === value)) {
+          if (conversation?.characters?.some((c) => c.id === value)) {
             createNotification({
               title: "Cannot add same character more than once.",
               timer: 3,
@@ -83,7 +128,10 @@ export function ConversationDrawer({ data }: Props) {
             return;
           }
           if (!first_name) return;
-          setCharacters((prev) => prev.concat({ id: value, first_name, last_name, image_id: image }));
+          setConversation((prev) => ({
+            ...prev,
+            characters: (prev.characters || [])?.concat([{ id: value, first_name, last_name, portrait_id: image }]),
+          }));
         }}
         placeholder="Press enter to search and add a character."
         searchEntity="characters"
@@ -91,25 +139,27 @@ export function ConversationDrawer({ data }: Props) {
       {data?.conversation_id ? null : (
         <EntityPreview
           id={data.character.id}
-          image_id={data.character.image_id}
+          image_id={data.character.portrait_id}
           title={getCharacterFullName(data.character.first_name, undefined, data.character.last_name)}
           type="characters"
         />
       )}
-      {characters.map((char) => (
+      {conversation?.characters?.map((char) => (
         <EntityPreview
-          clearAction={(id) => setCharacters((prev) => prev.filter((c) => c.id !== id))}
+          clearAction={(id) =>
+            setConversation((prev) => ({ ...prev, characters: prev?.characters?.filter((c) => c.id !== id) }))
+          }
           id={char.id}
-          image_id={char.image_id}
+          image_id={char?.portrait_id}
           title={getCharacterFullName(char.first_name, undefined, char.last_name)}
           type="characters"
         />
       ))}
       <Button
         icon={IconEnum.conversation}
-        isDisabled={isCreating || isSaveDisabled(conversation, characters)}
-        isLoading={isCreating}
-        label="Start conversation"
+        isDisabled={isCreating || isUpdating || isSaveDisabled(conversation, conversation?.characters || [])}
+        isLoading={isCreating || isUpdating}
+        label={`${data?.conversation_id ? "Update" : "Start"} conversation`}
         onClick={handleSave}
         variant="success"
       />
