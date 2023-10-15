@@ -66,7 +66,7 @@ function DiceRoller() {
 }
 
 export function Navbar() {
-  const { project_id } = useParams();
+  const { project_id, subitem_id } = useParams();
   const isMutating = useIsMutating();
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
@@ -94,12 +94,15 @@ export function Navbar() {
     event_type: WebsocketEventType;
     message: string;
     image_id?: string;
+    conversation_id?: string;
     entity: AllAvailableEntities;
   }>(`ws://localhost:5174/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
+        // Don't create a notification if this is a conversation message
+        if (subitem_id === lastJsonMessage.conversation_id) return;
         createNotification({
           icon: getDefaultEntityIcon(lastJsonMessage.entity),
           title: lastJsonMessage.message,
