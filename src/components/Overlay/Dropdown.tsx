@@ -174,6 +174,21 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
 
 function DropdownItem({ label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
   const dropdownItemClasses = DropdownItemClasses({ isDisabled });
+  if (subItems?.length)
+    return (
+      <Dropdown items={subItems}>
+        <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+          {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
+          {child ?? null}
+          {icon && !subItems?.length ? (
+            <div className="ml-auto flex min-w-[22px] justify-end">
+              <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
+            </div>
+          ) : null}
+          {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
+        </div>
+      </Dropdown>
+    );
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
       {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
