@@ -245,12 +245,12 @@ export function Menubar({ size }: { size: Size }) {
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
-            <Dropdown items={item?.subItems}>
+            <Dropdown allowedPlacements={["top", "bottom"]} items={item?.subItems}>
               <div className="flex items-center">
                 <Button
                   hasNoBackground
                   icon={item.icon}
-                  iconSize={16}
+                  iconSize={size === "md" ? 20 : 16}
                   isIconOnly
                   onClick={undefined}
                   variant={item?.variant || ("primary" as Variant)}
@@ -262,7 +262,7 @@ export function Menubar({ size }: { size: Size }) {
             <Button
               hasNoBackground
               icon={item.icon}
-              iconSize={16}
+              iconSize={size === "md" ? 20 : 16}
               isIconOnly
               onClick={item.onClick}
               variant={item?.variant || ("primary" as Variant)}
