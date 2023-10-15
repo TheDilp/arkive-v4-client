@@ -114,6 +114,7 @@ export function ConversationView({ id }: { id: string }) {
                         initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
                         label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
                         size="xxs"
+                        tooltipAllowedPlacements={["left", "right"]}
                       />
                     </div>
                   ) : null}
@@ -167,7 +168,7 @@ export function ConversationView({ id }: { id: string }) {
               title: existingConversation?.data?.title,
             })}
             initialContent={message}
-            menubarSize
+            menubarSize="sm"
             name="message"
             onChange={({ value }) => setMessage(value)}
             onChangePlainText={({ value }) => {
