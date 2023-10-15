@@ -31,6 +31,7 @@ export default function App() {
             <Route element={<ProjectLayout />} path=":project_id/*">
               <Route element={<FolderView />} path=":type" />
               <Route element={<CharacterProfileView />} path="characters/:item_id/*" />
+              <Route element={<CharacterProfileView />} path="characters/:item_id/:type/*" />
               <Route element={<CharacterProfileView />} path="characters/:item_id/:type/:subitem_id/*" />
               <Route element={<EntitiesView />} path=":type/:item_id/*" />
               <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />

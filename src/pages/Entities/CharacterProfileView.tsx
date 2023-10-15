@@ -161,13 +161,17 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
                 id: "1",
                 label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
                 icon: IconEnum.character,
-                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}/resources`),
               },
               {
                 id: "2",
-                label: `View dialogs with ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+                label: `View conversations of ${getCharacterFullName(
+                  row.original.first_name,
+                  undefined,
+                  row.original?.last_name,
+                )}`,
                 icon: IconEnum.conversation,
-                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}`),
+                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}/conversations`),
               },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
@@ -528,7 +532,7 @@ function AdditionalFieldDisplay({
 }
 
 export function CharacterProfileView() {
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, type, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(0);
   const [assetView, setAssetView] = useState<"table" | "card">("table");
@@ -726,16 +730,23 @@ export function CharacterProfileView() {
         <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">
-              {/* {selectedTab === 3 ? (
-              <div className="ml-auto flex w-min items-center pr-2 text-sm">
-                <Button hasNoBackground icon={IconEnum.chevron_left} isIconOnly onClick={openConversationDrawer} size="sm" />
-                <span>Back</span>
-              </div>
-            ) : null} */}
+              {selectedTab === 3 && selectedConversation ? (
+                <div className="ml-auto flex w-min items-center pr-2 text-sm">
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.chevron_left}
+                    isIconOnly
+                    onClick={() => {
+                      navigate(`/projects/${project_id}/characters/${item_id}/conversations`);
+                    }}
+                    size="sm"
+                  />
+                </div>
+              ) : null}
               {tabs[selectedTab].label} {selectedConversation ? "-" : ""}
               {existingConversations?.data?.find((convo) => convo?.id === selectedConversation)?.title}
             </span>
-            {selectedTab === 1 ? (
+            {type === "relationships" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.family_tree}
@@ -748,7 +759,7 @@ export function CharacterProfileView() {
               </div>
             ) : null}
 
-            {selectedTab === 3 ? (
+            {type === "conversations" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.conversation}
@@ -760,7 +771,7 @@ export function CharacterProfileView() {
               </div>
             ) : null}
           </h2>
-          {selectedTab === 0 ? (
+          {type === "resources" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
                 actions={[
@@ -882,7 +893,7 @@ export function CharacterProfileView() {
               </Collapsible>
             </div>
           ) : null}
-          {selectedTab === 1 ? (
+          {type === "relationships" ? (
             <div>
               <TablePageLayout>
                 {isFetching ? (
@@ -894,7 +905,7 @@ export function CharacterProfileView() {
                     <Table
                       columns={columns}
                       config={{
-                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}`,
+                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
                       }}
                       data={relationships.sort((a, b) => {
                         if (a.first_name < b.first_name) return -1;
@@ -913,7 +924,7 @@ export function CharacterProfileView() {
               </TablePageLayout>
             </div>
           ) : null}
-          {selectedTab === 2 ? (
+          {type === "additional fields" ? (
             <ul className="flex flex-col gap-y-2 overflow-hidden animate-in fade-in fill-mode-both">
               {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
               {existingTemplates?.data?.length && !isFetchingTemplates
@@ -936,7 +947,7 @@ export function CharacterProfileView() {
               ) : null}
             </ul>
           ) : null}
-          {selectedTab === 3 ? (
+          {type === "conversations" ? (
             <div className="flex-1">
               {selectedConversation ? null : (
                 <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
@@ -956,7 +967,7 @@ export function CharacterProfileView() {
                 </div>
               )}
               <div className="h-full max-h-[100%] overflow-hidden">
-                {selectedConversation ? <ConversationView id={selectedConversation} /> : null}
+                {subitem_id ? <ConversationView id={subitem_id} /> : null}
               </div>
             </div>
           ) : null}
