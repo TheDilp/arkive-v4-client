@@ -1,14 +1,37 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import { Callout, Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
+import { useSetAtom } from "jotai";
 import { ComponentType, ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { deleteObjectPropsRecursive } from "../../../utils";
+import { deleteObjectPropsRecursive, dialogAtom } from "../../../utils";
 import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
 // import WordMention from "../Mention/WordMention";
 
 export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
+
+function StaticRenderImage({ data }: { data: any }) {
+  const setDialog = useSetAtom(dialogAtom);
+  if (data?.node?.attrs)
+    return (
+      <img
+        {...data.node.attrs}
+        alt={data.node.attrs.title}
+        className="cursor-pointer"
+        onClick={() =>
+          setDialog({
+            title: data.node.attrs.title,
+            type: "image_view",
+            data: { title: data.node.attrs.title, image: data.node.attrs.src },
+          })
+        }
+      />
+    );
+  return null;
+}
 
 const typeMap = (project_id: string): MarkMap => ({
   bulletList: "ul",
@@ -24,7 +47,7 @@ const typeMap = (project_id: string): MarkMap => ({
   callout: Callout,
   horizontalRule: "hr",
   tableofcontents: "p",
-  image: "img",
+  image: (data) => StaticRenderImage({ data }),
   table: (...props: any) => {
     return (
       <div className="h-min w-full">

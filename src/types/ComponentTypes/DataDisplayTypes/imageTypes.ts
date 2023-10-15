@@ -5,4 +5,5 @@ export interface ImageComponentType extends BaseComponentType {
   image: ImageType;
   isOpenable?: boolean;
   hasTitle?: boolean;
+  url?: string;
 }
