@@ -171,7 +171,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <div
           className="relative flex h-full max-h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
-          <Menubar />
+          <Menubar size="md" />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onContextMenu={(e) => {

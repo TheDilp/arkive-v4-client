@@ -4,17 +4,10 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../components";
+import { Alert, Avatar, Editor, Select, StaticRender } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
-import {
-  getAvatarInitials,
-  getCharacterFullName,
-  getImageURL,
-  IconEnum,
-  messageEditorHooks,
-  MessageTypeOptions,
-} from "../../utils";
+import { getAvatarInitials, getCharacterFullName, getImageURL, messageEditorHooks, MessageTypeOptions } from "../../utils";
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
@@ -163,10 +156,18 @@ export function ConversationView({ id }: { id: string }) {
         [&>.editor-component]:overflow-y-auto
         ">
           <Editor
-            hooks={messageEditorHooks(id, selectedCharacter, selectedType, sendJsonMessage, {
-              id: existingConversation?.data?.id,
-              title: existingConversation?.data?.title,
-            })}
+            hooks={messageEditorHooks(
+              id,
+              selectedCharacter,
+              selectedType,
+              sendJsonMessage,
+              {
+                id: existingConversation?.data?.id,
+                title: existingConversation?.data?.title,
+              },
+              messageLength > 0,
+              setMessageLength,
+            )}
             initialContent={message}
             menubarSize="sm"
             name="message"
@@ -176,15 +177,43 @@ export function ConversationView({ id }: { id: string }) {
             }}
           />
 
-          <div className="mt-auto">
+          {/* <div className="mt-auto">
             <Button
               icon={IconEnum.send}
               isDisabled={messageLength === 0 || (selectedType === "character" && !selectedCharacter)}
               label="Send"
-              onClick={undefined}
+              onClick={() => {
+                if (!isMentionDropdownOpen) {
+                  const messageData = {
+                    id: crypto.randomUUID(),
+                    parent_id: id,
+                    content: JSON.stringify(message),
+                    type: selectedType,
+                    sender_id: selectedCharacter,
+                  };
+                  queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+                    if (old)
+                      return {
+                        ...old,
+                        data: {
+                          ...old?.data,
+                          messages: [...(old?.data?.messages || []), { ...messageData, content: message }],
+                        },
+                      };
+                    return old;
+                  });
+                  sendJsonMessage({
+                    data: messageData,
+                    project_id,
+                    conversation: { id: existingConversation?.data?.id, title: existingConversation?.data?.title },
+                  });
+
+                  getContext.clearContent();
+                }
+              }}
               variant="info"
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

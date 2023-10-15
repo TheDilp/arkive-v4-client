@@ -2,7 +2,7 @@ import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from 
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 import { useAtomValue } from "jotai";
-import { useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
@@ -244,6 +244,8 @@ export const messageEditorHooks = (
   selectedType: MessageKindType,
   sendJsonMessage: SendJsonMessage,
   conversation: Partial<ConversationType> | undefined,
+  canSend: boolean,
+  setMessageLength: Dispatch<SetStateAction<number>>,
 ) => [
   () => {
     const queryClient = useQueryClient();
@@ -254,7 +256,7 @@ export const messageEditorHooks = (
     const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
 
     const handleSendMessage = useCallback(() => {
-      if (!isMentionDropdownOpen) {
+      if (!isMentionDropdownOpen && canSend) {
         const jsonContent = getJSON();
         const messageData = {
           id: crypto.randomUUID(),
@@ -281,10 +283,11 @@ export const messageEditorHooks = (
         });
 
         getContext.clearContent();
+        setMessageLength(0);
         return true;
       }
       return false;
-    }, [selectedCharacter, selectedType, isMentionDropdownOpen]);
+    }, [selectedCharacter, selectedType, isMentionDropdownOpen, canSend]);
 
     useKeymap("Enter", handleSendMessage);
   },
