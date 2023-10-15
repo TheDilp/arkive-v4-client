@@ -10,7 +10,7 @@ export function Editor({
   name,
   onChange,
   isReadOnly,
-  isMenubarDisabled,
+  menubarSize = "md",
   onChangePlainText,
   hooks,
 }: EditorType) {
@@ -44,7 +44,7 @@ export function Editor({
         }
       }}>
       <div className="editor-component flex w-full max-w-full flex-col rounded border border-zinc-800 bg-zinc-900">
-        {isReadOnly || isMenubarDisabled ? null : <Menubar />}
+        {isReadOnly ? null : <Menubar size={menubarSize} />}
         <div
           className="flex w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {

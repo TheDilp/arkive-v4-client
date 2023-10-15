@@ -167,7 +167,7 @@ export function ConversationView({ id }: { id: string }) {
               title: existingConversation?.data?.title,
             })}
             initialContent={message}
-            isMenubarDisabled
+            menubarSize
             name="message"
             onChange={({ value }) => setMessage(value)}
             onChangePlainText={({ value }) => {

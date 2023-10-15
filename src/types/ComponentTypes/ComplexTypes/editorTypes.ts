@@ -1,6 +1,8 @@
 import { ReactExtensions, ReactFrameworkOutput } from "@remirror/react";
 import { AnyExtension, RemirrorJSON } from "remirror";
 
+import { Size } from "../../baseTypes";
+
 export type EditorContext = ReactFrameworkOutput<ReactExtensions<AnyExtension>> | undefined;
 
 export interface MenubarType {
@@ -13,6 +15,6 @@ export interface EditorType {
   onChange: ({ name, value }: { name: string; value: any }) => void;
   onChangePlainText?: ({ name, value }: { name: string; value: string }) => void;
   isReadOnly?: boolean;
-  isMenubarDisabled?: boolean;
+  menubarSize?: Size;
   hooks?: any;
 }

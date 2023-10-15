@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { Variant } from "../../../types";
+import { Size, Variant } from "../../../types";
 import { ColorPresets, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
@@ -231,14 +231,17 @@ const menuBarItems = ({
   },
 ];
 
-export function Menubar() {
+export function Menubar({ size }: { size: Size }) {
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
   const setDrawer = useSetAtom(drawerAtom);
   const active = useActive();
   const items = useMemo(() => menuBarItems({ active, chain, setDrawer, getContext }), [chain]);
   return (
-    <ul className="sticky top-0 z-30 mb-1 flex h-10 min-h-[2.5rem] w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3">
+    <ul
+      className={`sticky top-0 z-30 mb-1 flex ${
+        size === "md" ? "h-10 min-h-[2.5rem]" : "h-5 min-h-[1.25rem]"
+      } w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3`}>
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
@@ -247,6 +250,7 @@ export function Menubar() {
                 <Button
                   hasNoBackground
                   icon={item.icon}
+                  iconSize={16}
                   isIconOnly
                   onClick={undefined}
                   variant={item?.variant || ("primary" as Variant)}
@@ -258,6 +262,7 @@ export function Menubar() {
             <Button
               hasNoBackground
               icon={item.icon}
+              iconSize={16}
               isIconOnly
               onClick={item.onClick}
               variant={item?.variant || ("primary" as Variant)}
