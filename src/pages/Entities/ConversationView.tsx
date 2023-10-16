@@ -91,7 +91,7 @@ export function ConversationView({ id }: { id: string }) {
 
   useLayoutEffect(() => {
     if (existingConversation?.data?.messages?.length) messageContainerRef.current.scrollIntoView();
-  }, [existingConversation?.data?.messages]);
+  }, [existingConversation?.data?.messages?.length]);
 
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
