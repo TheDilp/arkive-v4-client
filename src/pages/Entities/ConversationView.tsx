@@ -102,11 +102,26 @@ export function ConversationView({ id }: { id: string }) {
               if (m.type === "narration")
                 return (
                   <div
-                    className="flex flex-col text-center text-xl
-                  italic text-zinc-300 [&>.staticRendererContainer]:inline
+                    className="group relative flex flex-col text-center
+                  text-xl italic text-zinc-300
+                [&>.staticRendererContainer]:inline
                 [&>.staticRendererContainer]:p-0
-                [&>.staticRendererContainer]:py-2
-                [&_span:has(svg)]:hidden ">
+                [&>.staticRendererContainer]:py-2 [&_span:has(svg)]:hidden">
+                    <div className="absolute right-4 z-20 flex h-min w-min flex-nowrap gap-x-1">
+                      <div className="w-0 transition-all group-hover:w-4">
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.close}
+                          isIconOnly
+                          onClick={async () => {
+                            await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                          }}
+                        />
+                      </div>
+                      <div className="w-0 transition-all group-hover:w-4">
+                        <Button hasNoBackground icon={IconEnum.edit} isIconOnly onClick={() => handleEditMessageDrawer(m.id)} />
+                      </div>
+                    </div>
                     <hr className="relative top-1/2 z-0" />
                     <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
                       <StaticRender content={m?.content} />
