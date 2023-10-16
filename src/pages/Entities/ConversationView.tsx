@@ -107,10 +107,27 @@ export function ConversationView({ id }: { id: string }) {
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               return (
-                <div key={m?.id} className={` flex flex-nowrap ${char?.id === item_id ? "flex-row-reverse" : ""}`}>
-                  {char ? (
-                    <div className="group flex flex-col items-end gap-x-1 self-end px-1">
-                      {item_id === char?.id ? (
+                <div key={m?.id} className="flex flex-nowrap">
+                  <div
+                    className={`group flex flex-nowrap ${
+                      char?.id === selectedCharacter ? "ml-auto flex-row-reverse" : ""
+                    } w-fit`}>
+                    {char ? (
+                      <div className=" flex flex-col items-end gap-x-1 self-end px-1">
+                        <Avatar
+                          image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                          initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                          label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
+                          size="xxs"
+                          tooltipAllowedPlacements={["left", "right"]}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="flex max-h-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+                      <StaticRender content={m?.content} />
+                    </div>
+                    {selectedCharacter === char?.id ? (
+                      <div className="left-0 flex flex-nowrap">
                         <div className="w-0 transition-all group-hover:w-4">
                           <Button
                             hasNoBackground
@@ -121,18 +138,18 @@ export function ConversationView({ id }: { id: string }) {
                             }}
                           />
                         </div>
-                      ) : null}
-                      <Avatar
-                        image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                        initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                        label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
-                        size="xxs"
-                        tooltipAllowedPlacements={["left", "right"]}
-                      />
-                    </div>
-                  ) : null}
-                  <div className="flex flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                    <StaticRender content={m?.content} />
+                        <div className="w-0 transition-all group-hover:w-4">
+                          <Button
+                            hasNoBackground
+                            icon={IconEnum.edit}
+                            isIconOnly
+                            onClick={async () => {
+                              await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               );
