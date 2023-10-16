@@ -12,6 +12,7 @@ export * from "./getManyEntitiesTypes";
 export * from "./graphTypes";
 export * from "./imageTypes";
 export * from "./mapTypes";
+export * from "./messageTypes";
 export * from "./projectTypes";
 export * from "./randomTableTypes";
 export * from "./tagTypes";

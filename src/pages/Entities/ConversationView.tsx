@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
@@ -8,6 +9,7 @@ import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../compo
 import { useDeleteSubEntity, useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
+  drawerAtom,
   getAvatarInitials,
   getCharacterFullName,
   getImageURL,
@@ -18,11 +20,14 @@ import {
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
+  const queryClient = useQueryClient();
   const messageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const setDrawer = useSetAtom(drawerAtom);
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
+
   const { data: existingConversation } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
@@ -33,8 +38,6 @@ export function ConversationView({ id }: { id: string }) {
     },
   });
   const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string);
-
-  const queryClient = useQueryClient();
 
   const [connect, setConnection] = useState(true);
 
@@ -77,6 +80,11 @@ export function ConversationView({ id }: { id: string }) {
     },
     connect,
   );
+
+  function handleEditMessageDrawer(message_id: string) {
+    setDrawer((prev) => ({ ...prev, title: "Edit message", data: { id: message_id }, type: "edit_message", size: "lg" }));
+  }
+
   useEffect(() => {
     if (!id) setConnection(false);
   }, [id]);
@@ -127,7 +135,7 @@ export function ConversationView({ id }: { id: string }) {
                       <StaticRender content={m?.content} />
                     </div>
                     {selectedCharacter === char?.id ? (
-                      <div className="left-0 flex flex-nowrap">
+                      <div className="left-0 flex flex-nowrap gap-x-1">
                         <div className="w-0 transition-all group-hover:w-4">
                           <Button
                             hasNoBackground
@@ -143,9 +151,7 @@ export function ConversationView({ id }: { id: string }) {
                             hasNoBackground
                             icon={IconEnum.edit}
                             isIconOnly
-                            onClick={async () => {
-                              await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                            }}
+                            onClick={() => handleEditMessageDrawer(m.id)}
                           />
                         </div>
                       </div>

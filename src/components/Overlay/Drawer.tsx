@@ -35,6 +35,7 @@ import {
   TagsDrawer,
   WordDrawer,
 } from "./DrawerContent";
+import { EditMessageDrawer } from "./DrawerContent/EditMessageDrawer";
 import { ImageDrawer } from "./DrawerContent/ImageDrawer";
 
 const DrawerClasses = tv({
@@ -160,6 +161,7 @@ export function Drawer() {
         {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
         {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
         {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
+        {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );

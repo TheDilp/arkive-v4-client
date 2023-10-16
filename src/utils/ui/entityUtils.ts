@@ -33,6 +33,7 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
   if (type === "random_table_options") return "random_tables";
   if (type === "events") return "calendars";
   if (type === "words") return "dictionaries";
+  if (type === "messages") return "conversations";
 
   return null;
 }
