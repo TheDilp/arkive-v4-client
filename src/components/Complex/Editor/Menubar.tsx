@@ -148,6 +148,12 @@ const menuBarItems = ({
     variant: active.callout() ? ("info" as Variant) : ("primary" as Variant),
     subItems: [
       {
+        id: "clear_callout",
+        icon: IconEnum.callout,
+        onClick: () => chain?.toggleCallout()?.run(),
+        label: "Clear" as Variant,
+      },
+      {
         id: "callout_info",
         icon: IconEnum.info_circle,
         onClick: () => chain?.toggleCallout({ type: "info" as Variant })?.run(),

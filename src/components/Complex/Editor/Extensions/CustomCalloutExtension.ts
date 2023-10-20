@@ -71,7 +71,7 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
 
       contentDOM.setAttribute(
         "style",
-        `background-color: ${getCalloutColor(type, customColor)}50; 
+        `background-color: ${getCalloutColor(type, customColor)}${type === "custom" ? "50" : ""}; 
         border-style: solid;
         border-color:${getCalloutBorderColor(type, customColor)};
         border-width: 0 0 0 4px;
@@ -198,5 +198,10 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
   @command()
   toggleCallout(attributes?: { type: CalloutType; customColor?: string | null }): CommandFunction {
     return toggleWrap(this.type, attributes);
+  }
+
+  @command()
+  clearCallout(): CommandFunction {
+    return toggleWrap("");
   }
 }
