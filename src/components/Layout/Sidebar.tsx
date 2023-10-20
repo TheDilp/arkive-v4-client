@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { IconEnum, navItems } from "../../utils";
@@ -27,6 +27,7 @@ const SidebarClasses = tv({
 });
 
 export function Sidebar() {
+  const { pathname } = useLocation();
   const { project_id, type } = useParams();
   const { base, nav, list, sidebarLogo, listItemLink, listItem, listSettingsItem, selectedListItem, navIcon } =
     SidebarClasses();
@@ -41,7 +42,9 @@ export function Sidebar() {
             return (
               <Link
                 key={item.icon}
-                className={`${listItemLink()} ${item.navigate === type ? selectedListItem() : ""}
+                className={`${listItemLink()} ${
+                  item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
+                } ${item.navigate === type ? selectedListItem() : ""}
                 
                 ${item.navigate === "project-settings" ? listSettingsItem() : ""}
                 
