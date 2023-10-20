@@ -243,3 +243,34 @@ export function useGenerateGraph<
     },
   );
 }
+
+export function useGenerateDocument<
+  InsertType extends { data: { title: string; project_id: string; parent_id?: string; content?: string } },
+>(type: "conversations" | "documents") {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  const navigate = useNavigate();
+  return useMutation(
+    async (newGraph: InsertType) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/documents/generate/${type}`,
+        body: JSON.stringify(newGraph),
+        method: "POST",
+      }),
+
+    {
+      onSuccess: (data: { data: { id: string } }, vars) => {
+        queryClient.invalidateQueries(["allEntities", vars.data.project_id, "documents"]);
+        navigate(`/projects/${vars.data.project_id}/documents/${data.data.id}`);
+      },
+      onError: () => {
+        createNotification({
+          title: "There was an error creating this document.",
+          variant: "error",
+          timer: 3,
+          icon: IconEnum.error,
+        });
+      },
+    },
+  );
+}

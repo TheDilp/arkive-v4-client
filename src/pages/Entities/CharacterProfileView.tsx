@@ -26,6 +26,7 @@ import {
   useBreakpoint,
   useChangeNavbarTitle,
   useDownloadImage,
+  useGenerateDocument,
   useGetEntities,
   useGetEntity,
   useRemoveFromEntity,
@@ -65,6 +66,24 @@ const documentsColumnHelper = createColumnHelper<DocumentType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
 const assetColumnHelper = createColumnHelper<ImageType>();
 const conversationColumnHelper = createColumnHelper<ConversationType>();
+
+type GenerateDocumentType = UseMutateAsyncFunction<
+  {
+    data: {
+      id: string;
+    };
+  },
+  unknown,
+  {
+    data: {
+      title: string;
+      project_id: string;
+      parent_id?: string;
+      content?: string;
+    };
+  },
+  unknown
+>;
 
 const tabs = [
   { id: "1", label: "Resources", icon: IconEnum.document },
@@ -382,6 +401,7 @@ function conversationTableColumns(
   item_id: string,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  generateDocument: GenerateDocumentType,
 ) {
   return [
     conversationColumnHelper.display({
@@ -425,7 +445,7 @@ function conversationTableColumns(
             items={[
               {
                 id: "edit_conversation",
-                label: `Edit conversation "${row.original.title}"`,
+                label: "Edit conversation",
                 icon: IconEnum.edit,
                 onClick: () => {
                   const char = row.original.characters.find((c) => c.id === item_id);
@@ -437,6 +457,20 @@ function conversationTableColumns(
                       type: "conversations",
                     }));
                   }
+                },
+              },
+              {
+                id: "generate_document",
+                label: "Create document from conversation",
+                icon: IconEnum.document,
+                onClick: async () => {
+                  await generateDocument({
+                    data: {
+                      title: row.original.title,
+                      parent_id: row.original.id,
+                      project_id,
+                    },
+                  });
                 },
               },
               {
@@ -563,6 +597,7 @@ export function CharacterProfileView() {
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", project_id as string);
+  const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
   const navigate = useNavigate();
 
   const relationships = [
@@ -952,7 +987,13 @@ export function CharacterProfileView() {
               {selectedConversation ? null : (
                 <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
                   <Table
-                    columns={conversationTableColumns(project_id as string, item_id as string, setDialog, setDrawer)}
+                    columns={conversationTableColumns(
+                      project_id as string,
+                      item_id as string,
+                      setDialog,
+                      setDrawer,
+                      generateDocument,
+                    )}
                     config={{
                       onRowClick: (rowData: ConversationType) => {
                         setSelectedConversation(rowData.id);
