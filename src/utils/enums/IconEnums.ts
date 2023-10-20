@@ -17,7 +17,7 @@ export const IconEnum = {
   character: "ph:user",
   chevron_double_left: "ph:caret-double-left",
   chevron_double_right: "ph:caret-double-right",
-  chevron_down: "ph:cart-down",
+  chevron_down: "ph:caret-down",
   chevron_left: "ph:caret-left",
   chevron_right: "ph:caret-right",
   chevron_up: "ph:caret-up",
