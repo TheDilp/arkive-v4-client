@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -17,6 +17,61 @@ import {
   messageEditorHooks,
   MessageTypeOptions,
 } from "../../utils";
+
+type DeleteMessageType = UseMutateAsyncFunction<
+  any,
+  unknown,
+  {
+    data: {
+      id: string;
+      parent_id: string;
+    };
+  },
+  {
+    old: ConversationType | any | undefined;
+  }
+>;
+
+export function NarrationMessage({
+  id,
+  content,
+  parent_id,
+  handleEditMessageDrawer,
+  deleteMessage,
+}: Pick<MessageType, "id" | "content"> & {
+  parent_id: string;
+  handleEditMessageDrawer: (message_id: string) => void;
+  deleteMessage: DeleteMessageType;
+}) {
+  return (
+    <div
+      className="group relative flex flex-col text-center
+text-xl italic text-zinc-300
+[&>.staticRendererContainer]:inline
+[&>.staticRendererContainer]:p-0
+[&>.staticRendererContainer]:py-2">
+      <div className="absolute right-4 z-20 flex h-min w-min flex-nowrap gap-x-1">
+        <div className="w-0 transition-all group-hover:w-4">
+          <Button
+            hasNoBackground
+            icon={IconEnum.close}
+            isIconOnly
+            onClick={async () => {
+              await deleteMessage({ data: { id, parent_id } });
+            }}
+          />
+        </div>
+        <div className="w-0 transition-all group-hover:w-4">
+          <Button hasNoBackground icon={IconEnum.edit} isIconOnly onClick={() => handleEditMessageDrawer(id)} />
+        </div>
+      </div>
+      <hr className="relative top-1/2 z-0" />
+      <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
+        <StaticRender content={content} />
+      </div>
+    </div>
+  );
+}
 
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
@@ -101,32 +156,14 @@ export function ConversationView({ id }: { id: string }) {
             existingConversation?.data?.messages?.map((m) => {
               if (m.type === "narration")
                 return (
-                  <div
-                    className="group relative flex flex-col text-center
-                  text-xl italic text-zinc-300
-                [&>.staticRendererContainer]:inline
-                [&>.staticRendererContainer]:p-0
-                [&>.staticRendererContainer]:py-2 [&_span:has(svg)]:hidden">
-                    <div className="absolute right-4 z-20 flex h-min w-min flex-nowrap gap-x-1">
-                      <div className="w-0 transition-all group-hover:w-4">
-                        <Button
-                          hasNoBackground
-                          icon={IconEnum.close}
-                          isIconOnly
-                          onClick={async () => {
-                            await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                          }}
-                        />
-                      </div>
-                      <div className="w-0 transition-all group-hover:w-4">
-                        <Button hasNoBackground icon={IconEnum.edit} isIconOnly onClick={() => handleEditMessageDrawer(m.id)} />
-                      </div>
-                    </div>
-                    <hr className="relative top-1/2 z-0" />
-                    <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
-                      <StaticRender content={m?.content} />
-                    </div>
-                  </div>
+                  <NarrationMessage
+                    key={m?.id}
+                    content={m?.content}
+                    deleteMessage={deleteMessage}
+                    handleEditMessageDrawer={handleEditMessageDrawer}
+                    id={m?.id}
+                    parent_id={m?.parent_id}
+                  />
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
               return (
