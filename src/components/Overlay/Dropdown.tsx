@@ -32,14 +32,13 @@ import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "rounded divide-y [&:not(:has(button))]:border border-zinc-600 z-40 font-lato",
-    floatingBase: "max-h-[40rem] overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0 rounded",
-    baseItem:
-      " items-center gap-x-2 text-white border-zinc-600 bg-clip-content border-b first:border-t border-x first:rounded-t overflow-hidden last:rounded-b",
+    base: "divide-y border-zinc-600 z-40 font-lato",
+    floatingBase:
+      "border max-h-[40rem] rounded overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap h-10 min-h-[2.5rem] first:border-t last:border-b border-x [&:nth-child(2)]:border-y last:rounded-b first:rounded-t border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700 ",
+  base: "flex flex-nowrap h-10 min-h-[2.5rem] even:border-y last:border-b-0 first:border-t-0  border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -48,7 +47,7 @@ const DropdownItemClasses = tv({
 });
 
 export function DropdownComponent({ allowedPlacements = [], children, items }: DropdownType) {
-  const { base, floatingBase, baseItem } = DropdownClasses();
+  const { base, floatingBase } = DropdownClasses();
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -121,11 +120,13 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   const item = useListItem();
   const mergedRefs = useMergeRefs([refs.setReference, item.ref]);
   if (items.length === 0) return null;
+  const dropdownItemClasses = DropdownItemClasses({ isRoot: true, hasSubitems: !!items?.length });
+
   return (
     <FloatingNode id={nodeId}>
       <div
         ref={mergedRefs}
-        className={isNested ? baseItem() : base()}
+        className={isNested ? dropdownItemClasses : base()}
         role={isNested ? "menuitem" : undefined}
         tabIndex={!isNested ? 0 : -1}
         {...getReferenceProps()}>
@@ -141,27 +142,51 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                 style={{ transform: floatingStyles.transform }}
                 {...getFloatingProps()}>
                 {items && isOpen
-                  ? items.map((dropdownItem) => (
-                      <DropdownItem
-                        key={dropdownItem.id}
-                        child={dropdownItem?.child}
-                        icon={dropdownItem.icon}
-                        iconColor={dropdownItem?.iconColor}
-                        iconThickness={dropdownItem?.iconThickness}
-                        id={dropdownItem.id}
-                        isDisabled={dropdownItem?.isDisabled}
-                        label={dropdownItem.label}
-                        onClick={() => {
-                          if (dropdownItem?.isDisabled) return;
-                          tree?.events.emit("click");
-                          if (dropdownItem?.onClick) {
-                            dropdownItem.onClick();
-                          }
-                          setIsOpen(false);
-                        }}
-                        subItems={dropdownItem.subItems}
-                      />
-                    ))
+                  ? items.map((dropdownItem) =>
+                      dropdownItem.subItems?.length ? (
+                        <Dropdown items={dropdownItem.subItems}>
+                          <DropdownItem
+                            key={dropdownItem.id}
+                            child={dropdownItem?.child}
+                            icon={dropdownItem.icon}
+                            iconColor={dropdownItem?.iconColor}
+                            iconThickness={dropdownItem?.iconThickness}
+                            id={dropdownItem.id}
+                            isDisabled={dropdownItem?.isDisabled}
+                            label={dropdownItem.label}
+                            onClick={() => {
+                              if (dropdownItem?.isDisabled) return;
+                              tree?.events.emit("click");
+                              if (dropdownItem?.onClick) {
+                                dropdownItem.onClick();
+                              }
+                              setIsOpen(false);
+                            }}
+                            subItems={dropdownItem.subItems}
+                          />
+                        </Dropdown>
+                      ) : (
+                        <DropdownItem
+                          key={dropdownItem.id}
+                          child={dropdownItem?.child}
+                          icon={dropdownItem.icon}
+                          iconColor={dropdownItem?.iconColor}
+                          iconThickness={dropdownItem?.iconThickness}
+                          id={dropdownItem.id}
+                          isDisabled={dropdownItem?.isDisabled}
+                          label={dropdownItem.label}
+                          onClick={() => {
+                            if (dropdownItem?.isDisabled) return;
+                            tree?.events.emit("click");
+                            if (dropdownItem?.onClick) {
+                              dropdownItem.onClick();
+                            }
+                            setIsOpen(false);
+                          }}
+                          subItems={dropdownItem.subItems}
+                        />
+                      ),
+                    )
                   : null}
               </div>
             </FloatingFocusManager>
@@ -173,21 +198,19 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
 }
 
 function DropdownItem({ label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
-  const dropdownItemClasses = DropdownItemClasses({ isDisabled });
+  const dropdownItemClasses = DropdownItemClasses({ isDisabled, hasSubitems: !!subItems?.length });
   if (subItems?.length)
     return (
-      <Dropdown items={subItems}>
-        <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
-          {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
-          {child ?? null}
-          {icon && !subItems?.length ? (
-            <div className="ml-auto flex min-w-[22px] justify-end">
-              <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
-            </div>
-          ) : null}
-          {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
-        </div>
-      </Dropdown>
+      <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+        {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
+        {child ?? null}
+        {icon && !subItems?.length ? (
+          <div className="ml-auto flex min-w-[22px] justify-end">
+            <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
+          </div>
+        ) : null}
+        {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
+      </div>
     );
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
