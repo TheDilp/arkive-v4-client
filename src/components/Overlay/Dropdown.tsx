@@ -32,13 +32,13 @@ import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "divide-y border-zinc-600 z-40 font-lato",
+    base: "border-zinc-600 z-40 font-lato",
     floatingBase:
-      "border max-h-[40rem] rounded overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0",
+      "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[60] font-lato shadow-lg absolute top-0 left-0",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap h-10 min-h-[2.5rem] even:border-y last:border-b-0 first:border-t-0  border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  base: "flex flex-nowrap h-10 min-h-[2.5rem] even:border-y border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -162,7 +162,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                               }
                               setIsOpen(false);
                             }}
-                            subItems={dropdownItem.subItems}
+                            // subItems={dropdownItem.subItems}
                           />
                         </Dropdown>
                       ) : (
@@ -199,19 +199,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
 
 function DropdownItem({ label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
   const dropdownItemClasses = DropdownItemClasses({ isDisabled, hasSubitems: !!subItems?.length });
-  if (subItems?.length)
-    return (
-      <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
-        {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
-        {child ?? null}
-        {icon && !subItems?.length ? (
-          <div className="ml-auto flex min-w-[22px] justify-end">
-            <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
-          </div>
-        ) : null}
-        {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
-      </div>
-    );
+
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
       {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
