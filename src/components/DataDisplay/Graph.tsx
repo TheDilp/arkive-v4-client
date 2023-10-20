@@ -761,10 +761,6 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 const position = n.position();
                 return { data: { id: d.id, character_id: d.character_id, label: d.label, ...position } };
               });
-              const edgesToGenerate = (cyRef?.current?._cy as Core).edges().map((e) => {
-                const d = e.data();
-                return { data: { source_id: d.source, target_id: d.target, curve_style: "taxi", taxi_direction: "vertical" } };
-              });
               if (nodesToGenerate.length <= 1) {
                 createNotification({
                   title: "Tree must contain at least two nodes.",
@@ -774,6 +770,11 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 });
                 return;
               }
+              const edgesToGenerate = (cyRef?.current?._cy as Core).edges().map((e) => {
+                const d = e.data();
+                return { data: { source_id: d.source, target_id: d.target, curve_style: "taxi", taxi_direction: "vertical" } };
+              });
+
               await generateGraph({
                 data: { project_id: project_id as string, title: dialogValue?.title || "Family tree" },
                 relations: { nodes: nodesToGenerate, edges: edgesToGenerate },
