@@ -57,6 +57,7 @@ import {
   getSentenceCase,
   IconEnum,
   NameFilters,
+  sortCharactersByName,
   sortEntities,
 } from "../../utils";
 import { RemoveFromCharacterSchema } from "../../validation";
@@ -208,7 +209,6 @@ function disableShowRelationshipTree(character: CharacterType | undefined) {
   if (!character?.related_from?.length && !character?.related_to?.length && !character?.related_other?.length) return true;
   return false;
 }
-
 function documentsTableColumns(
   removeItem: UseMutateAsyncFunction<
     any,
@@ -950,15 +950,7 @@ export function CharacterProfileView() {
                       config={{
                         getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
                       }}
-                      data={relationships.sort((a, b) => {
-                        if (a.first_name < b.first_name) return -1;
-                        if (a.first_name > b.first_name) return 1;
-                        if (a.id < b.id) return -1;
-                        if (a.id > b.id) return 1;
-                        if ((a.relation_title || "") < (b.relation_title || "")) return -1;
-                        if ((a.relation_title || "") > (b.relation_title || "")) return 1;
-                        return 0;
-                      })}
+                      data={relationships.sort(sortCharactersByName)}
                       dispatch={dispatch}
                       type="characters"
                     />
