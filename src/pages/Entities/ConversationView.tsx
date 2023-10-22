@@ -32,6 +32,18 @@ type DeleteMessageType = UseMutateAsyncFunction<
   }
 >;
 
+function getCharacterSide(
+  item_id: string | undefined,
+  selectedCharacter: string | undefined,
+  character_id: string | undefined,
+): boolean {
+  if (character_id) {
+    if (selectedCharacter) return character_id === selectedCharacter;
+    return item_id === character_id;
+  }
+  return false;
+}
+
 export function NarrationMessage({
   id,
   content,
@@ -148,6 +160,12 @@ export function ConversationView({ id }: { id: string }) {
     if (existingConversation?.data?.messages?.length) messageContainerRef.current.scrollIntoView();
   }, [existingConversation?.data?.messages?.length]);
 
+  useEffect(() => {
+    if (selectedType !== "character") {
+      setSelectedCharacter(undefined);
+    }
+  }, [selectedType]);
+
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
       <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
@@ -170,7 +188,7 @@ export function ConversationView({ id }: { id: string }) {
                 <div key={m?.id} className="flex flex-nowrap">
                   <div
                     className={`group flex flex-nowrap ${
-                      char?.id === selectedCharacter ? "ml-auto flex-row-reverse" : ""
+                      getCharacterSide(item_id, selectedCharacter, char?.id) ? "ml-auto flex-row-reverse" : ""
                     } w-fit`}>
                     {char ? (
                       <div className=" flex flex-col items-end gap-x-1 self-end px-1">
