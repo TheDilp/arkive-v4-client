@@ -11,7 +11,8 @@ export type SkeletonType = {
     | "character_profile"
     | "character_profile_main"
     | "calendar_view"
-    | "expanded_tag";
+    | "expanded_tag"
+    | "conversations";
   limit?: number;
   entity_type?: AvailableEntityType;
 };

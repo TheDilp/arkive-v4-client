@@ -245,6 +245,34 @@ function ExpandedTagSkeleton() {
   );
 }
 
+function ConversationSkeleton() {
+  return (
+    <div className="flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800">
+      <div className="relative flex h-full w-full flex-col content-start focus-visible:outline-none">
+        <div className="flex flex-col gap-y-2 px-4 py-4">
+          <div className="ml-auto h-6 w-[20rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[20rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[34rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[30rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[20rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="ml-auto h-6 w-[25rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="ml-auto h-6 w-[60rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[25rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[24rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="ml-auto h-6 w-[12rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[20rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="ml-auto h-6 w-[26rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[13rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[23rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="ml-auto h-6 w-[24rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[28rem] animate-pulse rounded bg-zinc-700 px-4" />
+          <div className="h-6 w-[30rem] animate-pulse rounded bg-zinc-700 px-4" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
@@ -256,5 +284,6 @@ export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "character_profile_main") return <CharacterProfileMainSkeleton />;
   if (type === "calendar_view") return <CalendarViewSkeleton />;
   if (type === "expanded_tag") return <ExpandedTagSkeleton />;
+  if (type === "conversations") return <ConversationSkeleton />;
   return null;
 }

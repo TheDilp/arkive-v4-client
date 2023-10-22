@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Button, Editor, Select, StaticRender } from "../../components";
+import { Alert, Avatar, Button, Editor, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
@@ -95,7 +95,7 @@ export function ConversationView({ id }: { id: string }) {
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
 
-  const { data: existingConversation } = useGetEntity<ConversationType>(id, "conversations", {
+  const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
       id,
     },
@@ -165,6 +165,8 @@ export function ConversationView({ id }: { id: string }) {
       setSelectedCharacter(undefined);
     }
   }, [selectedType]);
+
+  if (isLoading) return <Skeleton type="conversations" />;
 
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
