@@ -776,7 +776,7 @@ export function CharacterProfileView() {
         <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">
-              {selectedTab === 3 && selectedConversation ? (
+              {type === "conversations" && selectedConversation ? (
                 <div className="ml-auto flex w-min items-center pr-2 text-sm">
                   <Button
                     hasNoBackground
@@ -784,6 +784,7 @@ export function CharacterProfileView() {
                     isIconOnly
                     onClick={() => {
                       navigate(`/projects/${project_id}/characters/${item_id}/conversations`);
+                      setSelectedConversation(null);
                     }}
                     size="sm"
                   />
