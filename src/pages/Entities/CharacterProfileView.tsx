@@ -1,6 +1,6 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch, useLayoutEffect, useMemo, useState } from "react";
+import { Dispatch, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { uniqueBy } from "remirror";
 import { tv } from "tailwind-variants";
@@ -52,6 +52,7 @@ import {
   formatDateToString,
   getAvatarInitials,
   getCharacterFullName,
+  getCharacterProfileTabFromType,
   getImageURL,
   getSentenceCase,
   IconEnum,
@@ -568,9 +569,9 @@ function AdditionalFieldDisplay({
 export function CharacterProfileView() {
   const { project_id, item_id, type, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(getCharacterProfileTabFromType(type));
   const [assetView, setAssetView] = useState<"table" | "card">("table");
-  const [selectedConversation, setSelectedConversation] = useState("");
+  const [selectedConversation, setSelectedConversation] = useState(subitem_id ?? null);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const {
@@ -701,11 +702,6 @@ export function CharacterProfileView() {
       });
   }
 
-  useLayoutEffect(() => {
-    navigate(`/projects/${project_id}/characters/${item_id}/${tabs[selectedTab].label.toLowerCase()}`);
-    setSelectedConversation("");
-  }, [selectedTab]);
-
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
@@ -753,13 +749,28 @@ export function CharacterProfileView() {
             </div>
 
             <div className="w-full">
-              <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+              <Tabs
+                isVertical
+                onChange={(tab, index) => {
+                  navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                  setSelectedTab(index);
+                }}
+                selectedTab={selectedTab}
+                tabs={tabs}
+              />
             </div>
           </div>
         ) : null}
         {!isLoading && !isLg ? (
           <div className="w-full">
-            <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+            <Tabs
+              onChange={(tab, index) => {
+                navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                setSelectedTab(index);
+              }}
+              selectedTab={selectedTab}
+              tabs={tabs}
+            />
           </div>
         ) : null}
         <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
@@ -793,7 +804,6 @@ export function CharacterProfileView() {
                 />
               </div>
             ) : null}
-
             {type === "conversations" ? (
               <div className="ml-auto w-min">
                 <Button
