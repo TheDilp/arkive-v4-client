@@ -180,7 +180,7 @@ export function ConversationView({ id }: { id: string }) {
                     deleteMessage={deleteMessage}
                     handleEditMessageDrawer={handleEditMessageDrawer}
                     id={m?.id}
-                    parent_id={m?.parent_id}
+                    parent_id={existingConversation?.data?.id}
                   />
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
