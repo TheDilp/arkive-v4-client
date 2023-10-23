@@ -32,7 +32,7 @@ const SelectClasses = tv({
     helperText: "text-xs truncate block px-2",
     optionsContainer:
       "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
-    placeholder: "text-zinc-500 font-lato",
+    placeholder: "text-zinc-500 font-lato opacity-65",
     displayItem: "truncate",
   },
   variants: {
@@ -41,31 +41,37 @@ const SelectClasses = tv({
         select: "border-zinc-700 focus:border-zinc-500",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
+        placeholder: "text-zinc-300",
       },
       secondary: {
         select: "border-zinc-400",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
+        placeholder: "text-zinc-300",
       },
       info: {
         select: "border-blue-600",
         label: "text-blue-400",
         helperText: "text-blue-400",
+        placeholder: "text-blue-400",
       },
       success: {
         select: "border-green-600",
         label: "text-green-400",
         helperText: "text-green-400",
+        placeholder: "text-green-400",
       },
       warning: {
         select: "border-orange-400",
         label: "text-orange-400",
         helperText: "text-orange-400",
+        placeholder: "text-orange-400",
       },
       error: {
         select: "border-red-600",
         label: "text-red-500",
         helperText: "text-red-500",
+        placeholder: "text-red-500",
       },
     },
     size: {
