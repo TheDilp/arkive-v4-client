@@ -10,20 +10,22 @@ export function Editor({
   name,
   onChange,
   isReadOnly,
+  isDisabled,
+  customPlaceholder,
   menubarSize = "md",
   onChangePlainText,
   hooks,
 }: EditorType) {
   const createNotification = useNotifications();
   const { manager, state, getContext } = useRemirror({
-    extensions: () => DefaultEditorExtensions(createNotification),
+    extensions: () => DefaultEditorExtensions(createNotification, customPlaceholder),
     selection: "start",
     onError,
     content: initialContent || undefined,
   });
   return (
     <Remirror
-      editable={!isReadOnly}
+      editable={!isReadOnly && !isDisabled}
       hooks={hooks ?? []}
       initialContent={state}
       manager={manager}
@@ -43,12 +45,15 @@ export function Editor({
           onChangePlainText({ name, value: getContext()?.helpers?.getText() });
         }
       }}>
-      <div className="editor-component flex w-full max-w-full flex-col rounded border border-zinc-800 bg-zinc-900">
-        {isReadOnly ? null : <Menubar size={menubarSize} />}
+      <div
+        className={`editor-component flex w-full max-w-full flex-col rounded border border-zinc-800 ${
+          isDisabled ? "bg-zinc-600" : "bg-zinc-900"
+        }`}>
+        {isReadOnly || isDisabled ? null : <Menubar size={menubarSize} />}
         <div
           className="flex w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {
-            if (isReadOnly) return;
+            if (isReadOnly || isDisabled) return;
             const stringData = e.dataTransfer.getData("Text");
             if (!stringData) return;
             if (stringData) {
@@ -58,7 +63,7 @@ export function Editor({
             }
           }}>
           <EditorComponent />
-          {isReadOnly ? null : <MentionDropdownComponent />}
+          {isReadOnly || isDisabled ? null : <MentionDropdownComponent />}
         </div>
       </div>
     </Remirror>

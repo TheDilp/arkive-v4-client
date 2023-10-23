@@ -40,7 +40,8 @@ import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export const DefaultEditorExtensions: (
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
-) => AnyExtension[] = (createNotification) => {
+  customPlaceholder?: string,
+) => AnyExtension[] = (createNotification, customPlaceholder) => {
   const CustomMentionExtension = new MentionAtomExtension({
     priority: 10,
     extraAttributes: {
@@ -122,14 +123,13 @@ export const DefaultEditorExtensions: (
 
     return true;
   });
-
   return [
     new MarkdownExtension({}),
     new SecretExtension({
       secret: true,
     }),
     new PlaceholderExtension({
-      placeholder: "Write something awesome! 📜",
+      placeholder: customPlaceholder ?? "Write something awesome! 📜",
     }),
     CustomMentionExtension,
     new CustomCalloutExtension({

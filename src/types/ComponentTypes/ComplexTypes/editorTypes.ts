@@ -15,6 +15,8 @@ export interface EditorType {
   onChange: ({ name, value }: { name: string; value: any }) => void;
   onChangePlainText?: ({ name, value }: { name: string; value: string }) => void;
   isReadOnly?: boolean;
+  isDisabled?: boolean;
+  customPlaceholder?: string;
   menubarSize?: Size;
   hooks?: any;
 }
