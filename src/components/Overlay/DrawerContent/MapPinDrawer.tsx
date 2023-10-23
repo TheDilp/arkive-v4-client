@@ -56,8 +56,14 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     { data: {} },
     { enabled: !!data?.id },
   );
-  const { mutateAsync: createMapPin } = useCreateSubEntity<InsertMapPinType>("map_pins", item_id as string);
-  const { mutateAsync: updateMapPin } = useUpdateMapSubEntity<UpdateMapPinType>("map_pins", item_id as string);
+  const { mutateAsync: createMapPin, isLoading: isCreating } = useCreateSubEntity<InsertMapPinType>(
+    "map_pins",
+    item_id as string,
+  );
+  const { mutateAsync: updateMapPin, isLoading: isUpdating } = useUpdateMapSubEntity<UpdateMapPinType>(
+    "map_pins",
+    item_id as string,
+  );
   const queryClient = useQueryClient();
   const [character, setCharacter] = useState<Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id"> | null>(
     null,
@@ -212,7 +218,8 @@ export function MapPinDrawer({ data, exceptions }: Props) {
 
       <Button
         icon={IconEnum.save}
-        isDisabled={isSaveDisabled(mapPin, { exceptions })}
+        isDisabled={isSaveDisabled(mapPin, { exceptions }) || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label="Save"
         onClick={async () => {
           if (!("id" in data) || !data?.id) {
