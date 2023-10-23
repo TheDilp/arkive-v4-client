@@ -72,7 +72,11 @@ function columns(
       cell: ({ row }) =>
         "image_id" in row.original && row.original?.image_id ? (
           <Avatar
-            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            image={getImageURL(
+              project_id,
+              entityType === "maps" ? "map_images" : "images",
+              (row.original?.image_id as string) || "",
+            )}
             isBordered
             isTooltipDisabled
             size="sm"
@@ -208,7 +212,7 @@ function EntityItem({
             <img
               alt={title}
               className="object-contain"
-              src={getImageURL(project_id as string, type === "maps" ? "maps" : "images", image_id)}
+              src={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             />
           ) : (
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
