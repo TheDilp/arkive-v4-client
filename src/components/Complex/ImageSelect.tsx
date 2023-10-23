@@ -19,7 +19,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
             name={name}
             onChange={onChange}
             placeholder="Search images"
-            searchEntity={type === "maps" ? "map_images" : "images"}
+            searchEntity={type === "map_images" ? "map_images" : "images"}
             value={value}
           />
         </div>

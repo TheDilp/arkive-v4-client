@@ -55,5 +55,5 @@ export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", 
 export const MessageTypeOptions = [
   { label: "Character", value: "character" },
   { label: "Narration", value: "narration" },
-  { label: "Place", value: "Place" },
+  { label: "Place", value: "place" },
 ];

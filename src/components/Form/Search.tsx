@@ -274,7 +274,7 @@ export function Search({
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
-        {searchEntity === "images" && value && !isMultiple ? (
+        {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (
           <Avatar
             image={getImageURL(project_id as string, imageType || "images", value as string)}
             imageLoading="lazy"
@@ -417,12 +417,12 @@ export function Search({
                   })}
                   isActive={activeIndex === index}
                   isSelected={(value || [])?.includes(item.value)}>
-                  {searchEntity === "images" || searchEntity === "characters" ? (
+                  {searchEntity === "images" || searchEntity === "map_images" || searchEntity === "characters" ? (
                     <Avatar
                       image={getImageURL(
                         project_id as string,
                         imageType || "images",
-                        searchEntity === "images" ? item?.value : item?.image,
+                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
                       )}
                       imageLoading="lazy"
                       isTooltipDisabled

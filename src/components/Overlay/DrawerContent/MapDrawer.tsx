@@ -45,9 +45,9 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: create } = useCreateEntity<InsertMapType>("maps");
+  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertMapType>("maps");
 
-  const { mutateAsync: update } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
   const { handleChange } = useHandleChange({ data: map, setData: setMap });
 
   useLayoutEffect(() => {
@@ -67,7 +67,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             label="Map image (required)"
             name="image_id"
             onChange={handleChange}
-            type="maps"
+            type="map_images"
             value={map?.image_id}
           />
           <div className="flex flex-nowrap justify-between">
@@ -143,7 +143,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                                 clearAction={() => handleChange({ name: `map_layers[${index}].image`, value: null })}
                                 id={item?.image?.id}
                                 title={item.image.title}
-                                url={getImageURL(project_id as string, "maps", item?.image?.id)}
+                                url={getImageURL(project_id as string, "map_images", item?.image?.id)}
                               />
                             </div>
                           ) : (
@@ -154,7 +154,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                               onChange={({ name, label, value }) => {
                                 handleChange({ name, value: { id: value, title: label } });
                               }}
-                              type="maps"
+                              type="map_images"
                             />
                           )}
                           <div className="h-10 self-end">
@@ -231,7 +231,8 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
       ) : null}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isDisabled(map)}
+        isDisabled={isDisabled(map) || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {
           const { tags, map_layers, ...rest } = map;

@@ -12,7 +12,7 @@ export type Variant =
   | "success-bordered"
   | "warning-bordered"
   | "error-bordered";
-export type AssetType = "images" | "maps";
+export type AssetType = "images" | "map_images";
 export type PositionType = (
   | "top"
   | "right"

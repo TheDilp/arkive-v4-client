@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Button, Editor, Select, Skeleton, StaticRender } from "../../components";
+import { Alert, Avatar, Button, Editor, Search, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
@@ -167,7 +167,6 @@ export function ConversationView({ id }: { id: string }) {
   }, [selectedType]);
 
   if (isLoading) return <Skeleton type="conversations" />;
-
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
       <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
@@ -267,36 +266,40 @@ export function ConversationView({ id }: { id: string }) {
             />
           </div>
         </div>
-        <div
-          className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end
+        {selectedType === "place" ? (
+          <Search isAutocomplete onChange={() => {}} searchEntity="places" />
+        ) : (
+          <div
+            className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end
         [&>.editor-component]:overflow-y-auto
         ">
-          <Editor
-            customPlaceholder={
-              selectedType === "character" && !selectedCharacter ? "Please select a character first." : undefined
-            }
-            hooks={messageEditorHooks(
-              id,
-              selectedCharacter,
-              selectedType,
-              sendJsonMessage,
-              {
-                id: existingConversation?.data?.id,
-                title: existingConversation?.data?.title,
-              },
-              messageLength > 0,
-              setMessageLength,
-            )}
-            initialContent={message}
-            isDisabled={selectedType === "character" && !selectedCharacter}
-            menubarSize="sm"
-            name="message"
-            onChange={({ value }) => setMessage(value)}
-            onChangePlainText={({ value }) => {
-              setMessageLength(value?.length || 0);
-            }}
-          />
-        </div>
+            <Editor
+              customPlaceholder={
+                selectedType === "character" && !selectedCharacter ? "Please select a character first." : undefined
+              }
+              hooks={messageEditorHooks(
+                id,
+                selectedCharacter,
+                selectedType,
+                sendJsonMessage,
+                {
+                  id: existingConversation?.data?.id,
+                  title: existingConversation?.data?.title,
+                },
+                messageLength > 0,
+                setMessageLength,
+              )}
+              initialContent={message}
+              isDisabled={selectedType === "character" && !selectedCharacter}
+              menubarSize="sm"
+              name="message"
+              onChange={({ value }) => setMessage(value)}
+              onChangePlainText={({ value }) => {
+                setMessageLength(value?.length || 0);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

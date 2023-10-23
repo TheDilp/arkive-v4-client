@@ -61,7 +61,8 @@ export type SearchableEntities =
   | "calendars"
   | "map_images"
   | "words"
-  | "tags";
+  | "tags"
+  | "places";
 
 export type SearchableMentionEntities = "characters" | "documents" | "maps" | "map_pins" | "boards" | "nodes" | "words";
 
