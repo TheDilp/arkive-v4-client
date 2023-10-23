@@ -263,6 +263,7 @@ export function ConversationView({ id }: { id: string }) {
                 value: char.id,
               }))}
               value={selectedCharacter}
+              variant={selectedType === "character" && !selectedCharacter ? "error" : "primary"}
             />
           </div>
         </div>
@@ -271,6 +272,9 @@ export function ConversationView({ id }: { id: string }) {
         [&>.editor-component]:overflow-y-auto
         ">
           <Editor
+            customPlaceholder={
+              selectedType === "character" && !selectedCharacter ? "Please select a character first." : undefined
+            }
             hooks={messageEditorHooks(
               id,
               selectedCharacter,
@@ -284,6 +288,7 @@ export function ConversationView({ id }: { id: string }) {
               setMessageLength,
             )}
             initialContent={message}
+            isDisabled={selectedType === "character" && !selectedCharacter}
             menubarSize="sm"
             name="message"
             onChange={({ value }) => setMessage(value)}
