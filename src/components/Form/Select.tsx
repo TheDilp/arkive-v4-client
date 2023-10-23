@@ -236,7 +236,7 @@ export function Select({
     },
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset({ mainAxis: -3 }),
+      offset({ mainAxis: 2 }),
       flip(),
       sizeMiddleware({
         apply({ rects, elements }) {
