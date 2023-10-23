@@ -61,7 +61,7 @@ import {
   sortEntities,
 } from "../../utils";
 import { RemoveFromCharacterSchema } from "../../validation";
-import { ConversationView } from "./ConversationView";
+import { ConversationView } from ".";
 
 const relationshipColumnHelper = createColumnHelper<CharacterRelatedType>();
 const documentsColumnHelper = createColumnHelper<DocumentType>();
