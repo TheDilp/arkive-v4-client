@@ -1,4 +1,6 @@
-import { AssetType, BaseFormComponentType, CharacterType, SearchableEntities, SelectOptionType } from "../..";
+import { OffsetOptions } from "@floating-ui/react";
+
+import { AssetType, BaseFormComponentType, CharacterType, PositionType, SearchableEntities, SelectOptionType } from "../..";
 
 export type SearchAllEntitiesType =
   | [
@@ -44,6 +46,8 @@ export type SearchResultType = {
 }[];
 
 export interface SearchType extends BaseFormComponentType {
+  allowedPlacements?: PositionType;
+  offset?: OffsetOptions;
   value?: string | string[] | undefined | null;
   initialOptions?: SelectOptionType[];
   searchEntity: SearchableEntities;

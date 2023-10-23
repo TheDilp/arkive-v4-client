@@ -1,29 +1,9 @@
-// import { useEffect, useState } from "react";
-
-// import { AutocompleteType } from "../../types/ComponentTypes/FormTypes/autocompleteTypes";
-// import { IconEnum } from "../../utils";
-// import { Button, Input } from ".";
-
-// export function Autocomplete({ placeholder, value }: AutocompleteType) {
-//   const [filter, setFilter] = useState("");
-
-//   useEffect(() => {}, [filter]);
-
-//   return (
-//     <div className="flex max-w-fit [&>div>input]:rounded-r-none  [&>div>input]:border-r-0">
-//       <Input placeholder={placeholder} value={value} />
-//       <div className="w-10 [&>button]:rounded-l-none [&>button]:border-y [&>button]:border-r [&>button]:border-zinc-700">
-//         <Button icon={IconEnum.search} variant="info" />
-//       </div>
-//     </div>
-//   );
-// }
-
 import {
+  autoPlacement,
   autoUpdate,
-  flip,
   FloatingFocusManager,
   FloatingPortal,
+  offset,
   size,
   useDismiss,
   useFloating,
@@ -56,7 +36,7 @@ const SearchClasses = tv({
     helperText: "text-xs truncate block",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded-b shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
   },
   variants: {
     variant: {
@@ -165,6 +145,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(
 );
 
 export function Search({
+  allowedPlacements = [],
   initialDisplayValue,
   placeholder,
   label,
@@ -179,6 +160,7 @@ export function Search({
   imageType,
   isOptionsHidden,
   isMultiple,
+  offset: offsetProp,
   onChange,
   onSearch,
 }: SearchType) {
@@ -215,7 +197,8 @@ export function Search({
     open,
     onOpenChange: setOpen,
     middleware: [
-      flip({ padding: 10 }),
+      autoPlacement({ allowedPlacements }),
+      offset(offsetProp || { mainAxis: 2 }),
       size({
         apply({ rects, availableHeight, elements }) {
           Object.assign(elements.floating.style, {
