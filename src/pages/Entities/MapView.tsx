@@ -30,7 +30,7 @@ export function MapView({ isReadOnly }: Props) {
       setLoading(true);
 
       const img = new Image();
-      img.src = getImageURL(project_id as string, "maps", currentMap?.data?.image_id);
+      img.src = getImageURL(project_id as string, "map_images", currentMap?.data?.image_id);
       img.onload = () => {
         setBounds([
           [0, 0],
@@ -72,7 +72,7 @@ export function MapView({ isReadOnly }: Props) {
               isClusteringPins={!!currentMap?.data?.cluster_pins}
               isReadOnly={isReadOnly}
               mapData={currentMap?.data}
-              src={getImageURL(project_id as string, "maps", currentMap?.data?.image_id)}
+              src={getImageURL(project_id as string, "map_images", currentMap?.data?.image_id)}
             />
           </MapContainer>
         </div>
