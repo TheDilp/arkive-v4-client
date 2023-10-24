@@ -205,7 +205,7 @@ export function ConversationView({ id }: { id: string }) {
                     <div className="flex max-h-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
                       <StaticRender content={m?.content} />
                     </div>
-                    {selectedCharacter === char?.id ? (
+                    {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
                       <div className="left-0 flex flex-nowrap gap-x-1">
                         <div className="w-0 transition-all group-hover:w-4">
                           <Button
@@ -248,7 +248,7 @@ export function ConversationView({ id }: { id: string }) {
               value={selectedType}
             />
           </div>
-          <div className={`transition-all ${selectedType === "character" ? "w-52" : "w-0 opacity-0"}`}>
+          <div className={`transition-all ${selectedType === "character" ? "w-52" : "hidden"}`}>
             <Select
               label="As"
               name="selectedCharacter"
@@ -267,7 +267,21 @@ export function ConversationView({ id }: { id: string }) {
           </div>
         </div>
         {selectedType === "place" ? (
-          <Search isAutocomplete onChange={() => {}} searchEntity="places" />
+          <Search
+            allowedPlacements={["top"]}
+            isAutocomplete
+            name="place"
+            onChange={() => {
+              // const messageData = {
+              //   id: crypto.randomUUID(),
+              //   parent_id: id,
+              //   content: JSON.stringify(jsonContent),
+              //   type: selectedType,
+              //   sender_id: selectedCharacter,
+              // };
+            }}
+            searchEntity="places"
+          />
         ) : (
           <div
             className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end
