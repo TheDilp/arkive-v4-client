@@ -43,6 +43,7 @@ export type SearchResultType = {
   parent_id?: string;
   first_name?: string;
   last_name?: string;
+  icon?: string;
 }[];
 
 export interface SearchType extends BaseFormComponentType {

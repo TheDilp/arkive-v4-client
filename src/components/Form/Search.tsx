@@ -187,7 +187,7 @@ export function Search({
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
   const { data, isFetching, remove, refetch } = useSearch<
-    { label: string; value: string; color?: string; image?: string; first_name?: string; last_name?: string }[]
+    { label: string; value: string; color?: string; image?: string; first_name?: string; last_name?: string; icon?: string }[]
   >({ data: { search_term: inputValue }, limit: 5 }, searchEntity, project_id as string, {
     enabled: false,
     queryKeyConcat: [searchTerm, inputValue, name],
@@ -413,6 +413,7 @@ export function Search({
                       size="xs"
                     />
                   ) : null}
+                  {item?.icon ? <Icon icon={item?.icon} /> : null}
                   <span className="truncate">{item.label}</span>
                 </Item>
               ))}
