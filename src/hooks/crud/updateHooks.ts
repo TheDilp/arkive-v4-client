@@ -80,9 +80,7 @@ export function useUpdateEntity<
                         ...old.data,
                         ...vars.data,
                         content:
-                          "content" in vars.data && vars.data?.content
-                            ? JSON.parse(vars.data.content as string)
-                            : old.data.content,
+                          "content" in vars.data && vars.data?.content ? (vars.data.content as RemirrorJSON) : old.data.content,
                       },
                     }
                   : old;
@@ -234,7 +232,7 @@ export function useUpdateMessageSubentity<InsertType extends { data: { id: strin
     async (updateValues: InsertType) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/messages/update/${updateValues?.data?.id}`,
-        body: JSON.stringify({ data: { id: updateValues.data.id, content: JSON.stringify(updateValues.data.content) } }),
+        body: JSON.stringify({ data: { id: updateValues.data.id, content: updateValues.data.content } }),
         method: "POST",
       });
     },

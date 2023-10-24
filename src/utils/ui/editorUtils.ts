@@ -201,7 +201,7 @@ export const documentEditorHooks = (
           {
             data: {
               id: item_id as string,
-              content: JSON.stringify(getJSON(state)),
+              content: getJSON(state),
             },
           },
           {
@@ -261,7 +261,7 @@ export const messageEditorHooks = (
         const messageData = {
           id: crypto.randomUUID(),
           parent_id: id,
-          content: JSON.stringify(jsonContent),
+          content: jsonContent,
           type: selectedType,
           sender_id: selectedCharacter,
         };

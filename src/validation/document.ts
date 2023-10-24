@@ -5,7 +5,7 @@ export const InsertDocumentSchema = z.object({
     id: z.string().optional(),
     project_id: z.string(),
     title: z.string(),
-    content: z.string().nullable().optional(),
+    content: z.object({}).nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
@@ -25,7 +25,7 @@ export const UpdateDocumentSchema = z.object({
   data: z.object({
     id: z.string(),
     title: z.string().optional(),
-    content: z.string().nullable().optional(),
+    content: z.object({}).nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
