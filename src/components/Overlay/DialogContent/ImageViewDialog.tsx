@@ -6,14 +6,16 @@ export function ImageViewDialog({ data }: { data: { title: string; image?: strin
     <div className="flex h-full w-full select-none flex-col items-center justify-center gap-y-2">
       <img
         alt="preview"
-        className="cursor-default object-contain"
+        className="h-[95%] cursor-default object-contain"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
         src={data?.image}
       />
-      <h4 className="bottom-0 font-merriweather text-4xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] ">{data.title}</h4>
+      <h4 className="bottom-0 h-fit font-merriweather text-4xl text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] ">
+        {data.title}
+      </h4>
     </div>
   );
 }
