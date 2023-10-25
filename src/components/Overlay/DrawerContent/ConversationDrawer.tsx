@@ -25,7 +25,7 @@ type Props = {
 
 function isSaveDisabled(conversation: Partial<ConversationType>, characters: ConversationCharacterType[]): boolean {
   if (!conversation.title) return true;
-  if (characters.length <= 1) return true;
+  if (characters.length < 1) return true;
   return false;
 }
 
@@ -41,7 +41,7 @@ export function ConversationDrawer({ data }: Props) {
     "conversations",
     project_id as string,
   );
-  const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(
+  const { data: existingConversation, isFetching } = useGetEntity<ConversationType>(
     data?.conversation_id,
     "conversations",
     {
@@ -60,25 +60,26 @@ export function ConversationDrawer({ data }: Props) {
     if (conversation?.id) {
       const conversationToUpdate = { ...(changedData || {}), id: conversation.id };
 
+      const allCharacters = [data.character, ...(conversation?.characters || [])];
       const parsedData = UpdateConversationSchema.parse({
         data: conversationToUpdate,
         relations: {
-          characters: conversation.characters,
+          characters: allCharacters,
         },
       });
       await updateConversation(parsedData);
     } else {
-      const conversationToUpdate = { ...(changedData || {}), id: conversation.id };
+      const conversationToUpdate = { ...(changedData || {}), id: conversation.id, project_id };
+      const allCharacters = [data.character, ...(conversation?.characters || [])];
 
       const parsedData = InsertConversationSchema.parse({
         data: conversationToUpdate,
         relations: {
-          characters: conversation.characters,
+          characters: allCharacters,
         },
       });
       await createConversation(parsedData);
     }
-
     resetDrawer();
   }
 
@@ -93,7 +94,7 @@ export function ConversationDrawer({ data }: Props) {
     return null;
   }
 
-  if (isLoading) return <Skeleton type="drawer_form" />;
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
