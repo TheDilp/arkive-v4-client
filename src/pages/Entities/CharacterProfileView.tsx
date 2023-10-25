@@ -275,7 +275,7 @@ function locationsTableColumns(project_id: string) {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(project_id, "maps", row.original.image_id)}
+            image={getImageURL(project_id, "map_images", row.original.image_id)}
             isTooltipDisabled
             label={row.original.title}
             size="sm"
