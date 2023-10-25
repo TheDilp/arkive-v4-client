@@ -106,12 +106,12 @@
 
   *[data-node-text-align="left"]:not(blockquote),
   [nodetextalignment="left"]:not(blockquote) {
-    @apply float-left mr-4;
+    @apply mr-4 text-left;
   }
 
   *[data-node-text-align="right"]:not(blockquote),
   *[nodetextalignment="right"]:not(blockquote) {
-    @apply float-right ml-4;
+    @apply ml-4 text-right;
   }
   *[nodetextalignment="center"]:not(blockquote) {
     @apply flex justify-center text-center;
