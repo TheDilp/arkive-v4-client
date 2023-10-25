@@ -81,7 +81,7 @@ export type DrawerAtomType = {
   | {
       type: "conversations";
       data: {
-        character?: { id: string; first_name: string; last_name?: string | null; image_id?: string | null };
+        character?: { id: string; first_name: string; last_name?: string | null; portrait_id?: string | null };
         conversation_id?: string;
       };
     }
