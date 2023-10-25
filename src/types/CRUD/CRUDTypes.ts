@@ -35,11 +35,11 @@ export interface ResponseType<DataType = []> {
   ok: boolean;
 }
 
-export interface RequestBodyType {
+export interface RequestBodyType<InsertType> {
   data?: {
     [key: string]: any;
   };
-  fields?: string[];
+  fields?: (keyof InsertType)[];
   orderBy?: RequestOrderByType[];
   filters?: {
     and?: RequestFilterType[];

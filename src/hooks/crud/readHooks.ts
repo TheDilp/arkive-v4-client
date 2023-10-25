@@ -7,7 +7,7 @@ import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
 export function useGetEntity<EntityType>(
   id: string | undefined,
   type: AvailableEntityType,
-  body: RequestBodyType,
+  body: RequestBodyType<EntityType>,
   options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
   let queryKey = [type, id];
@@ -30,7 +30,7 @@ export function useGetEntity<EntityType>(
 export function useGetSubEntity<EntityType>(
   id: string | undefined,
   type: AvailableSubEntityType,
-  body: RequestBodyType,
+  body: RequestBodyType<EntityType>,
   options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
   return useQuery<{ data: EntityType }>(
@@ -43,7 +43,7 @@ export function useGetSubEntity<EntityType>(
   );
 }
 
-export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOptions) {
+export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
     ["allEntities", "project"],
     async () =>
@@ -60,7 +60,7 @@ export function useGetAllProjects(request: RequestBodyType, options?: UseQueryOp
 }
 
 export function useGetEntities<ReturnType>(
-  request: RequestBodyType,
+  request: RequestBodyType<ReturnType>,
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
@@ -78,7 +78,7 @@ export function useGetEntities<ReturnType>(
     request?.orderBy,
   ];
   let mainRequestQueryKey = [...baseQueryKey];
-  async function queryFn(finalRequest: RequestBodyType) {
+  async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
@@ -141,12 +141,12 @@ export function useGetEntities<ReturnType>(
 }
 
 export function useGetInfiniteEntities<ReturnType>(
-  request: RequestBodyType,
+  request: RequestBodyType<ReturnType>,
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
   const baseQueryKey = ["allEntities", "infinite", request.data?.project_id, type, request.data?.item_id, request?.filters];
-  async function queryFn(finalRequest: RequestBodyType) {
+  async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
