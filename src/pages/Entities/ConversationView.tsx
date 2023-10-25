@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Button, Editor, Search, Select, Skeleton, StaticRender } from "../../components";
+import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
@@ -80,6 +80,59 @@ text-xl italic text-zinc-300
       <hr className="relative top-1/2 z-0" />
       <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
         <StaticRender content={content} />
+      </div>
+    </div>
+  );
+}
+
+export function PlaceMessage({
+  id,
+  content,
+  project_id,
+  parent_id,
+  handleEditMessageDrawer,
+  deleteMessage,
+}: {
+  id: string;
+  project_id: string;
+  parent_id: string;
+  content: { title?: string; image_id?: string; icon?: string };
+  handleEditMessageDrawer: (message_id: string) => void;
+  deleteMessage: DeleteMessageType;
+}) {
+  return (
+    <div className="relative my-2 h-fit w-full">
+      <div className="group relative flex w-full justify-center">
+        <div className=" flex w-full flex-col items-center">
+          <div className="absolute right-4 flex flex-nowrap">
+            <div className="w-0 transition-all group-hover:w-4 ">
+              <Button
+                hasNoBackground
+                icon={IconEnum.close}
+                isIconOnly
+                onClick={async () => {
+                  await deleteMessage({ data: { id, parent_id } });
+                }}
+              />
+            </div>
+            <div className="w-0 transition-all group-hover:w-4">
+              <Button hasNoBackground icon={IconEnum.edit} isIconOnly onClick={() => handleEditMessageDrawer(id)} />
+            </div>
+          </div>
+          <h5 className="text-bold font-merriweather text-lg">{content?.title}</h5>
+          <div className="relative flex w-full justify-center">
+            <hr className="absolute top-1/2 z-0 w-full" />
+
+            {content?.image_id ? (
+              <Avatar image={getImageURL(project_id, "map_images", content?.image_id)} initials="AB" size="2xl" />
+            ) : null}
+            {content?.icon ? (
+              <div className="z-10 h-16 w-16 rounded-full border bg-zinc-700 p-1">
+                <Icon fontSize={56} icon={content?.icon} />
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -185,6 +238,17 @@ export function ConversationView({ id }: { id: string }) {
                   />
                 );
               const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
+              if (m.type === "place")
+                return (
+                  <PlaceMessage
+                    content={m?.content as any}
+                    deleteMessage={deleteMessage}
+                    handleEditMessageDrawer={handleEditMessageDrawer}
+                    id={m.id}
+                    parent_id={existingConversation?.data?.id}
+                    project_id={project_id as string}
+                  />
+                );
               return (
                 <div key={m?.id} className="flex flex-nowrap">
                   <div
@@ -269,16 +333,43 @@ export function ConversationView({ id }: { id: string }) {
         {selectedType === "place" ? (
           <Search
             allowedPlacements={["top"]}
+            imageType="map_images"
             isAutocomplete
             name="place"
-            onChange={() => {
-              // const messageData = {
-              //   id: crypto.randomUUID(),
-              //   parent_id: id,
-              //   content: JSON.stringify(jsonContent),
-              //   type: selectedType,
-              //   sender_id: selectedCharacter,
-              // };
+            onChange={({ value, label, image, parent_id, icon }) => {
+              const content = {
+                id: value,
+                title: label,
+                image_id: image,
+                icon,
+                parent_id,
+              } as any;
+              const messageData = {
+                id: crypto.randomUUID(),
+                parent_id: id,
+                content,
+                type: selectedType,
+                sender_id: selectedCharacter,
+              };
+              queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+                if (old)
+                  return {
+                    ...old,
+                    data: {
+                      ...old?.data,
+                      messages: [...(old?.data?.messages || []), messageData],
+                    },
+                  };
+                return old;
+              });
+              sendJsonMessage({
+                data: messageData,
+                project_id,
+                conversation: {
+                  id: existingConversation?.data?.id,
+                  title: existingConversation?.data?.title,
+                },
+              });
             }}
             searchEntity="places"
           />
