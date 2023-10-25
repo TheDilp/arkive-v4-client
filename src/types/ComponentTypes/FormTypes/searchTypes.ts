@@ -72,6 +72,7 @@ export interface SearchType extends BaseFormComponentType {
     first_name,
     last_name,
     parent_id,
+    icon,
   }: {
     name: string;
     value: string;
@@ -81,5 +82,6 @@ export interface SearchType extends BaseFormComponentType {
     first_name?: string;
     last_name?: string;
     parent_id?: string;
+    icon?: string;
   }) => void;
 }

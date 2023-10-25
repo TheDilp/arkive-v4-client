@@ -187,7 +187,16 @@ export function Search({
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
   const { data, isFetching, remove, refetch } = useSearch<
-    { label: string; value: string; color?: string; image?: string; first_name?: string; last_name?: string; icon?: string }[]
+    {
+      label: string;
+      value: string;
+      color?: string;
+      image?: string;
+      first_name?: string;
+      last_name?: string;
+      icon?: string;
+      parent_id?: string;
+    }[]
   >({ data: { search_term: inputValue }, limit: 5 }, searchEntity, project_id as string, {
     enabled: false,
     queryKeyConcat: [searchTerm, inputValue, name],
@@ -298,8 +307,10 @@ export function Search({
                     label: item.label,
                     color: item?.color,
                     image: item?.image,
+                    parent_id: item?.parent_id,
                     first_name: item?.first_name,
                     last_name: item?.last_name,
+                    icon: item?.icon,
                   });
                   if (hasShownOption) setDisplayValue(item.label);
                   if (!isMultiple) {
@@ -385,8 +396,10 @@ export function Search({
                         label: item.label,
                         color: item?.color,
                         image: item?.image,
+                        parent_id: item?.parent_id,
                         first_name: item?.first_name,
                         last_name: item?.last_name,
+                        icon: item?.icon,
                       });
 
                       if (hasShownOption) setDisplayValue(item.label);
@@ -400,7 +413,11 @@ export function Search({
                   })}
                   isActive={activeIndex === index}
                   isSelected={(value || [])?.includes(item.value)}>
-                  {searchEntity === "images" || searchEntity === "map_images" || searchEntity === "characters" ? (
+                  {(searchEntity === "images" ||
+                    searchEntity === "map_images" ||
+                    searchEntity === "places" ||
+                    searchEntity === "characters") &&
+                  item?.image ? (
                     <Avatar
                       image={getImageURL(
                         project_id as string,
