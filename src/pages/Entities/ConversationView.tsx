@@ -251,7 +251,7 @@ export function ConversationView({ id }: { id: string }) {
               return (
                 <div key={m?.id} className="flex flex-nowrap">
                   <div
-                    className={`group flex flex-nowrap ${
+                    className={`group flex max-w-[50%] flex-nowrap ${
                       getCharacterSide(item_id, selectedCharacter, char?.id) ? "ml-auto flex-row-reverse" : ""
                     } w-fit`}>
                     {char ? (
