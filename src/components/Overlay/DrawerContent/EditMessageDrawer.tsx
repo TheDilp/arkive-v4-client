@@ -1,13 +1,13 @@
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
-import { RemirrorJSON } from "remirror";
+import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
 import { useGetSubEntity, useUpdateMessageSubentity } from "../../../hooks";
-import { MessageType } from "../../../types";
+import { MessagePlaceContentType, MessageType } from "../../../types";
 import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
-import { Button } from "../../Form";
+import { Button, Search } from "../../Form";
 import { Skeleton } from "../../Misc";
 
 type Props = {
@@ -22,6 +22,7 @@ export function EditMessageDrawer({ data }: Props) {
     "messages",
     {
       data: { id: data?.id },
+      fields: ["id", "content", "parent_id", "type"],
       relations: {
         character: true,
       },
@@ -31,7 +32,7 @@ export function EditMessageDrawer({ data }: Props) {
     },
   );
   const resetDrawer = useResetAtom(drawerAtom);
-  const [content, setContent] = useState<RemirrorJSON | null>();
+  const [content, setContent] = useState<RemirrorJSON | MessagePlaceContentType>();
 
   const { mutateAsync: updateMessage, isLoading: isUpdating } = useUpdateMessageSubentity<any>(
     existingMessage?.data?.parent_id as string,
@@ -40,7 +41,7 @@ export function EditMessageDrawer({ data }: Props) {
   async function handleSave() {
     if (content)
       await updateMessage(
-        { data: { id: existingMessage?.data?.id, content } },
+        { data: { id: existingMessage?.data?.id, content, type: existingMessage?.data?.type } },
         {
           onSuccess: resetDrawer,
         },
@@ -71,7 +72,37 @@ export function EditMessageDrawer({ data }: Props) {
           type="characters"
         />
       ) : null}
-      <Editor initialContent={existingMessage?.data?.content ?? undefined} name="message" onChange={handleChange} />
+      {existingMessage?.data?.type === "character" || existingMessage?.data?.type === "narration" ? (
+        <Editor initialContent={existingMessage?.data?.content ?? undefined} name="message" onChange={handleChange} />
+      ) : null}
+
+      {existingMessage?.data?.type === "place" && content && !isRemirrorJSON(content) ? (
+        <>
+          <Search
+            imageType="map_images"
+            isAutocomplete
+            name="place"
+            onChange={({ value, label, image, parent_id, icon }) => {
+              setContent({
+                id: value,
+                title: label,
+                image_id: image,
+                icon,
+                parent_id,
+              } as any);
+            }}
+            searchEntity="places"
+          />
+          <EntityPreview
+            icon={content?.icon}
+            id={content?.id}
+            image_id={content?.image_id}
+            title={content?.title}
+            type={content?.parent_id ? "map_pins" : "maps"}
+          />
+        </>
+      ) : null}
+
       <Button
         icon={IconEnum.save}
         isDisabled={isUpdating}

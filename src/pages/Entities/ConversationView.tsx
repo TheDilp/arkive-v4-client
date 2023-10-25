@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
-import { RemirrorJSON } from "remirror";
+import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
 import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity } from "../../hooks";
@@ -79,7 +79,7 @@ text-xl italic text-zinc-300
       </div>
       <hr className="relative top-1/2 z-0" />
       <div className="z-10 max-w-[90%] self-center whitespace-normal bg-zinc-950">
-        <StaticRender content={content} />
+        {isRemirrorJSON(content) ? <StaticRender content={content} /> : null}
       </div>
     </div>
   );
@@ -168,11 +168,10 @@ export function ConversationView({ id }: { id: string }) {
         try {
           const parsedData: { event_type: WebsocketEventType; message: string } = JSON.parse(e.data);
           if (parsedData.event_type === "NEW_MESSAGE") {
-            const parsedMessage: Omit<MessageType, "content"> & { content: string } = JSON.parse(parsedData.message);
+            const parsedMessage = JSON.parse(parsedData.message);
 
             if (parsedMessage) {
               try {
-                const parsedContent: RemirrorJSON = JSON.parse(parsedMessage.content);
                 const existingMessages = queryClient.getQueryData<{ data: ConversationType }>(["conversations", id]);
                 const hasMessage = (existingMessages?.data?.messages || []).at(-1)?.id === parsedMessage.id;
                 if (hasMessage) return;
@@ -182,7 +181,7 @@ export function ConversationView({ id }: { id: string }) {
                       ...old,
                       data: {
                         ...old?.data,
-                        messages: [...(old?.data?.messages || []), { ...parsedMessage, content: parsedContent }],
+                        messages: [...(old?.data?.messages || []), parsedMessage],
                       },
                     };
                   return old;

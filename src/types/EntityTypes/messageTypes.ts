@@ -3,11 +3,26 @@ import { RemirrorJSON } from "remirror";
 import { CharacterType } from "./characterTypes";
 
 export type MessageKindType = "character" | "narration" | "place";
-export interface MessageType {
+export type MessagePlaceContentType = {
+  id: string;
+  title: string;
+  image_id?: string;
+  icon?: string;
+  parent_id?: string;
+};
+
+export type MessageType = {
   id: string;
   parent_id: string;
-  content: RemirrorJSON;
   sender_id?: string;
-  type: MessageKindType;
   character?: CharacterType;
-}
+} & (
+  | {
+      type: "character" | "narration";
+      content: RemirrorJSON;
+    }
+  | {
+      type: "place";
+      content: MessagePlaceContentType;
+    }
+);

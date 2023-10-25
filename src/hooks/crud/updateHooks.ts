@@ -2,7 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { RemirrorJSON } from "remirror";
 
-import { AvailableEntityType, AvailableSubEntityType, ConversationType, DocumentType, GraphType, MapType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  ConversationType,
+  DocumentType,
+  GraphType,
+  MapType,
+  MessagePlaceContentType,
+} from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import {
   baseURLS,
@@ -222,9 +230,14 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
     },
   );
 }
-export function useUpdateMessageSubentity<InsertType extends { data: { id: string; content: RemirrorJSON } }>(
-  parent_id: string,
-) {
+export function useUpdateMessageSubentity<
+  InsertType extends {
+    data: { id: string } & (
+      | { type: "character" | "narration"; content: RemirrorJSON }
+      | { type: "place"; content: MessagePlaceContentType }
+    );
+  },
+>(parent_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
