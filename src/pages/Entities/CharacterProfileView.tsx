@@ -694,7 +694,7 @@ export function CharacterProfileView() {
             id: existingCharacter?.data.id,
             first_name: existingCharacter?.data?.first_name,
             last_name: existingCharacter?.data?.last_name,
-            image_id: existingCharacter?.data?.portrait_id,
+            portrait_id: existingCharacter?.data?.portrait_id,
           },
         },
         size: "lg",
@@ -802,7 +802,7 @@ export function CharacterProfileView() {
                 />
               </div>
             ) : null}
-            {type === "conversations" ? (
+            {type === "conversations" && !subitem_id ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.conversation}
