@@ -64,7 +64,7 @@ export function useCreateEntity<
       }),
 
     {
-      onSettled: (data, _, vars) => {
+      onSuccess: (data, vars) => {
         if (data?.ok) {
           if (vars?.data?.parent_id) {
             queryClient.invalidateQueries([type, vars.data.parent_id]);
@@ -80,15 +80,16 @@ export function useCreateEntity<
             timer: 2,
             position: "top-right",
           });
-        } else {
-          createNotification({
-            title: "There was an error creating this entity.",
-            variant: "error",
-            icon: IconEnum.error,
-            timer: 5,
-            position: "top-right",
-          });
         }
+      },
+      onError: (error: { message?: string }) => {
+        createNotification({
+          title: error?.message || "There was an error creating this entity.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+          position: "top-right",
+        });
       },
     },
   );
