@@ -70,8 +70,8 @@ const typeMap = (project_id: string): MarkMap => ({
   table: (...props: any) => {
     return (
       <div className="h-min w-full">
-        <table className="">
-          <tbody>{props?.[0]?.children?.map((c: ReactElement) => c)}</tbody>
+        <table className="w-full">
+          <tbody className="w-1/2">{props?.[0]?.children?.map((c: ReactElement) => c)}</tbody>
         </table>
       </div>
     );
