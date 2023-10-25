@@ -5,7 +5,7 @@ import { getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
-export function EntityPreview({ id, title, type, link, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
+export function EntityPreview({ id, title, type, link, icon, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">
@@ -15,13 +15,18 @@ export function EntityPreview({ id, title, type, link, image_id, label, hasNoBac
           link ? "transition-all hover:text-blue-400" : "cursor-default"
         } ${hasNoBackground ? "" : "bg-zinc-700"}`}
         to={link || "#"}>
-        {image_id || type === "images" ? (
-          <Avatar image={getImageURL(project_id as string, "images", image_id)} label={title} size="sm" />
-        ) : (
+        {image_id ? (
+          <Avatar
+            image={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
+            label={title}
+            size="sm"
+          />
+        ) : null}
+        {!image_id && type !== "images" ? (
           <span>
-            <Icon fontSize={32} icon={getDefaultEntityIcon(type)} />
+            <Icon fontSize={32} icon={icon || getDefaultEntityIcon(type)} />
           </span>
-        )}
+        ) : null}
         <span className="truncate">{title}</span>
         {clearAction ? (
           <span className="ml-auto w-min">
