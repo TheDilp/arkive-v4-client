@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView } from "./pages/Entities";
@@ -26,6 +26,7 @@ export default function App() {
         <NotificationContainer />
         <ReactQueryDevtools position="top-left" />
         <Routes>
+          <Route element={<Navigate replace to="/projects" />} path="/" />
           <Route path="/projects/*">
             <Route element={<ProjectsView />} path="*" />
             <Route element={<ProjectLayout />} path=":project_id/*">
