@@ -605,7 +605,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       cyRef?.current?._cy?.gridGuide?.({
         ...cytoscapeGridOptions,
         snapToGridDuringDrag: boardState.grid,
-        drawGrid: true,
+        drawGrid: boardState.grid,
       });
     }
   }, [boardState.grid, cyRef?.current?._cy]);
