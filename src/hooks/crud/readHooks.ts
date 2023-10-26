@@ -145,7 +145,16 @@ export function useGetInfiniteEntities<ReturnType>(
   type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
-  const baseQueryKey = ["allEntities", "infinite", request.data?.project_id, type, request.data?.item_id, request?.filters];
+  const baseQueryKey = [
+    "allEntities",
+    request.data?.project_id,
+    type,
+    request.data?.item_id || request.data?.parent_id,
+    request?.filters,
+    request?.relationFilters,
+    request?.orderBy,
+    "infinite",
+  ];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
     return FetchFunction({
       method: "POST",
@@ -159,7 +168,6 @@ export function useGetInfiniteEntities<ReturnType>(
     select: options?.select,
     keepPreviousData: options?.keepPreviousData,
   };
-
   return useInfiniteQuery<{ data: ReturnType[] }, unknown>(
     baseQueryKey,
     async ({ pageParam = 0 }) => {

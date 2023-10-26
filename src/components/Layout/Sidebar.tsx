@@ -18,8 +18,9 @@ const SidebarClasses = tv({
     listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16 hover:fill-blue-300",
     listItem:
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
-    listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto",
-    selectedListItem: "text-white sticky left-16 top-16 bg-blue-400 [&>li]:hover:text-white",
+    listSettingsItem:
+      "bottom-0 right-0 sticky justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto bg-zinc-900",
+    selectedListItem: "text-white sticky left-16 top-16 bottom-16 bg-blue-400 [&>li]:hover:text-white",
     settingsSubitem: "flex items-center gap-x-2 select-none",
     activeSettingsSubItem: "text-blue-400",
     navIcon: "cursor-pointer",

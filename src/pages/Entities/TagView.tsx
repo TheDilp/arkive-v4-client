@@ -129,7 +129,7 @@ export function TagView() {
           />
         </div>
       </div>
-      <div className="h-[75%] max-h-full w-full overflow-hidden lg:h-[85%]">
+      <div className="max-h-full w-full overflow-hidden">
         <Table
           columns={columns}
           config={{

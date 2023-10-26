@@ -230,7 +230,7 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
     },
   );
 }
-export function useUpdateMessageSubentity<
+export function useUpdateMessageSubEntity<
   InsertType extends {
     data: { id: string } & (
       | { type: "character" | "narration"; content: RemirrorJSON }

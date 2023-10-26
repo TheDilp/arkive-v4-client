@@ -6,7 +6,7 @@ import useWebSocket from "react-use-websocket";
 import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
 import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
-import { useDeleteSubEntity, useGetEntity } from "../../hooks";
+import { useDeleteSubEntity, useGetEntity, useGetInfiniteEntities } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
 import {
   drawerAtom,
@@ -51,7 +51,7 @@ export function NarrationMessage({
   handleEditMessageDrawer,
   deleteMessage,
 }: Pick<MessageType, "id" | "content"> & {
-  parent_id: string;
+  parent_id: string | undefined;
   handleEditMessageDrawer: (message_id: string) => void;
   deleteMessage: DeleteMessageType;
 }) {
@@ -69,7 +69,7 @@ text-xl italic text-zinc-300
             icon={IconEnum.close}
             isIconOnly
             onClick={async () => {
-              await deleteMessage({ data: { id, parent_id } });
+              if (parent_id) await deleteMessage({ data: { id, parent_id } });
             }}
           />
         </div>
@@ -95,7 +95,7 @@ export function PlaceMessage({
 }: {
   id: string;
   project_id: string;
-  parent_id: string;
+  parent_id: string | undefined;
   content: { title?: string; image_id?: string; icon?: string };
   handleEditMessageDrawer: (message_id: string) => void;
   deleteMessage: DeleteMessageType;
@@ -111,7 +111,7 @@ export function PlaceMessage({
                 icon={IconEnum.close}
                 isIconOnly
                 onClick={async () => {
-                  await deleteMessage({ data: { id, parent_id } });
+                  if (parent_id) await deleteMessage({ data: { id, parent_id } });
                 }}
               />
             </div>
@@ -157,6 +157,36 @@ export function ConversationView({ id }: { id: string }) {
       messages: true,
     },
   });
+  const {
+    data: messages,
+    isFetching: isFetchingMessages,
+    fetchNextPage,
+  } = useGetInfiniteEntities<MessageType>(
+    {
+      pagination: {
+        limit: 20,
+      },
+      orderBy: [
+        {
+          field: "created_at",
+          sort: "desc",
+        },
+      ],
+    },
+    "messages",
+    {
+      enabled: !!existingConversation?.data?.id,
+      keepPreviousData: true,
+      getNextPageParam: (_, allPages) => {
+        if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
+        return allPages.length;
+      },
+      select: (data) => {
+        const reversedPages = data?.pages?.toReversed();
+        return { ...data, pages: reversedPages };
+      },
+    },
+  );
   const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string);
 
   const [connect, setConnection] = useState(true);
@@ -209,8 +239,10 @@ export function ConversationView({ id }: { id: string }) {
   }, [id]);
 
   useLayoutEffect(() => {
-    if (existingConversation?.data?.messages?.length) messageContainerRef.current.scrollIntoView();
-  }, [existingConversation?.data?.messages?.length]);
+    if (messages?.pages?.length === 1) {
+      messageContainerRef.current.scrollIntoView();
+    }
+  }, [messages?.pages?.length]);
 
   useEffect(() => {
     if (selectedType !== "character") {
@@ -222,78 +254,92 @@ export function ConversationView({ id }: { id: string }) {
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
       <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
-        <div className="flex flex-col gap-y-2 overflow-y-auto">
-          {existingConversation?.data?.messages?.length ? (
-            existingConversation?.data?.messages?.map((m) => {
-              if (m.type === "narration")
+        <div
+          className="flex flex-col gap-y-2 overflow-y-auto"
+          onScroll={(e) => {
+            const { currentTarget } = e;
+            if (currentTarget) {
+              if (e.currentTarget.scrollTop <= 400 && !isFetchingMessages) {
+                fetchNextPage();
+              }
+            }
+          }}>
+          {messages?.pages?.length ? (
+            messages?.pages
+              ?.flatMap((page) => page?.data)
+              .map((m) => {
+                if (m.type === "narration")
+                  return (
+                    <NarrationMessage
+                      key={m?.id}
+                      content={m?.content}
+                      deleteMessage={deleteMessage}
+                      handleEditMessageDrawer={handleEditMessageDrawer}
+                      id={m?.id}
+                      parent_id={existingConversation?.data?.id}
+                    />
+                  );
+                const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
+                if (m.type === "place")
+                  return (
+                    <PlaceMessage
+                      content={m?.content as any}
+                      deleteMessage={deleteMessage}
+                      handleEditMessageDrawer={handleEditMessageDrawer}
+                      id={m.id}
+                      parent_id={existingConversation?.data?.id}
+                      project_id={project_id as string}
+                    />
+                  );
                 return (
-                  <NarrationMessage
-                    key={m?.id}
-                    content={m?.content}
-                    deleteMessage={deleteMessage}
-                    handleEditMessageDrawer={handleEditMessageDrawer}
-                    id={m?.id}
-                    parent_id={existingConversation?.data?.id}
-                  />
-                );
-              const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
-              if (m.type === "place")
-                return (
-                  <PlaceMessage
-                    content={m?.content as any}
-                    deleteMessage={deleteMessage}
-                    handleEditMessageDrawer={handleEditMessageDrawer}
-                    id={m.id}
-                    parent_id={existingConversation?.data?.id}
-                    project_id={project_id as string}
-                  />
-                );
-              return (
-                <div key={m?.id} className="flex flex-nowrap">
-                  <div
-                    className={`group flex max-w-[50%] flex-nowrap ${
-                      getCharacterSide(item_id, selectedCharacter, char?.id) ? "ml-auto flex-row-reverse" : ""
-                    } w-fit`}>
-                    {char ? (
-                      <div className=" flex flex-col items-end gap-x-1 self-end px-1">
-                        <Avatar
-                          image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                          initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                          label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
-                          size="xxs"
-                          tooltipAllowedPlacements={["left", "right"]}
-                        />
+                  <div key={m?.id} className="flex flex-nowrap">
+                    <div
+                      className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
+                        getCharacterSide(item_id, selectedCharacter, char?.id)
+                          ? "ml-auto max-w-fit flex-row-reverse text-left tracking-tight"
+                          : ""
+                      } w-fit`}>
+                      {char ? (
+                        <div className=" flex flex-col items-end gap-x-1 self-end px-1">
+                          <Avatar
+                            image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                            initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                            label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
+                            size="xxs"
+                            tooltipAllowedPlacements={["left", "right"]}
+                          />
+                        </div>
+                      ) : null}
+                      <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+                        <StaticRender content={m?.content} />
                       </div>
-                    ) : null}
-                    <div className="flex max-h-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                      <StaticRender content={m?.content} />
+                      {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
+                        <div className="left-0 flex flex-nowrap gap-x-1">
+                          <div className="w-0 transition-all group-hover:w-4">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.close}
+                              isIconOnly
+                              onClick={async () => {
+                                if (existingConversation?.data?.id)
+                                  await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                              }}
+                            />
+                          </div>
+                          <div className="w-0 transition-all group-hover:w-4">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.edit}
+                              isIconOnly
+                              onClick={() => handleEditMessageDrawer(m.id)}
+                            />
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
-                    {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
-                      <div className="left-0 flex flex-nowrap gap-x-1">
-                        <div className="w-0 transition-all group-hover:w-4">
-                          <Button
-                            hasNoBackground
-                            icon={IconEnum.close}
-                            isIconOnly
-                            onClick={async () => {
-                              await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                            }}
-                          />
-                        </div>
-                        <div className="w-0 transition-all group-hover:w-4">
-                          <Button
-                            hasNoBackground
-                            icon={IconEnum.edit}
-                            isIconOnly
-                            onClick={() => handleEditMessageDrawer(m.id)}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
-                </div>
-              );
-            })
+                );
+              })
           ) : (
             <Alert label="This is the start of this conversation." />
           )}
