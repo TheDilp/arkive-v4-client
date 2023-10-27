@@ -17,7 +17,6 @@ export type FieldTypes =
   | "images_multiple";
 export interface CharacterFieldType {
   id: string;
-  project_id: string;
   sort: number;
   title: string;
   field_type: FieldTypes;

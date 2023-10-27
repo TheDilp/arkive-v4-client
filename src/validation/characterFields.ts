@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const InsertCharacterFieldsSchema = z.object({
   title: z.string(),
-  project_id: z.string(),
   sort: z.number().optional(),
   field_type: z.string().optional(),
   parent_id: z.string().optional(),
@@ -12,8 +11,6 @@ export const InsertCharacterFieldsSchema = z.object({
 });
 export const UpdateCharacterFieldsSchema = z.object({
   id: z.string(),
-  //! project_id is required
-  project_id: z.string(),
   title: z.string().optional(),
   sort: z.number().optional(),
   field_type: z.string().optional(),

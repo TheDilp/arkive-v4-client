@@ -317,7 +317,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 value: (template.character_fields || []).concat({
                   id: crypto.randomUUID(),
                   title: "",
-                  project_id: project_id as string,
                   field_type: "text",
                   sort: template?.character_fields?.length ?? 0,
                 }),
@@ -381,7 +380,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                             index={index}
                             isLoading={isLoading}
                             options={field?.options || []}
-                            project_id={field?.project_id}
                             random_table={field?.random_table}
                             random_table_id={field?.random_table_id}
                             sort={field.sort}
