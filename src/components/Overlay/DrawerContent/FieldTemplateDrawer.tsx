@@ -16,6 +16,7 @@ import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../.
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
+import { Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(template: TemplateStateType) {
@@ -227,12 +228,17 @@ function FieldRow({
   );
 }
 
+const tabs = [
+  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+  { id: "2", label: "Fields", icon: IconEnum.additional_fields },
+];
+
 export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertTemplateType>("character_fields_templates");
-
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateTemplateType>(
     "character_fields_templates",
     project_id as string,
@@ -276,175 +282,178 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
   return (
     <div className="flex h-screen max-h-screen flex-col gap-y-4 text-white">
-      <div className="flex flex-nowrap items-center gap-x-2">
-        <div className="flex-1">
-          <Input
-            isDisabled={isLoading}
-            label="Template title (required)"
-            name="title"
-            onChange={handleChange}
-            value={template?.title || ""}
-          />
-        </div>
-        <div className="w-20">
-          <Input
-            isDisabled={isLoading}
-            label="Sort"
-            name="sort"
-            onChange={handleChange}
-            type="number"
-            value={template?.sort || 0}
-          />
-        </div>
-      </div>
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {selectedTab === 0 ? (
+        <>
+          <div className="flex flex-nowrap items-center gap-x-2">
+            <div className="flex-1">
+              <Input
+                isDisabled={isLoading}
+                label="Template title (required)"
+                name="title"
+                onChange={handleChange}
+                value={template?.title || ""}
+              />
+            </div>
+            <div className="w-20">
+              <Input
+                isDisabled={isLoading}
+                label="Sort"
+                name="sort"
+                onChange={handleChange}
+                type="number"
+                value={template?.sort || 0}
+              />
+            </div>
+          </div>
+          <div>
+            <TagInput
+              handleChange={handleChange}
+              label="Used for entities with these tags (required)"
+              tags={template?.tags || []}
+            />
+          </div>
+        </>
+      ) : null}
+      {selectedTab === 1 ? (
+        <>
+          <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
+          <div className="flex items-center justify-between">
+            <span>Insert new field:</span>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                isDisabled={isLoading}
+                onClick={() =>
+                  handleChange({
+                    name: "character_fields",
+                    value: (template.character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "",
+                      field_type: "text",
+                      sort: template?.character_fields?.length ?? 0,
+                    }),
+                  })
+                }
+                variant="info"
+              />
+            </div>
+          </div>
+          <div className="flex max-h-[59%] flex-col overflow-y-auto">
+            <DragDropContext
+              onDragEnd={(result) => {
+                if (!result.destination) {
+                  return;
+                }
+
+                const newData = reorder(template?.character_fields || [], result.source.index, result.destination.index);
+                setTemplate((prev) => ({
+                  ...prev,
+                  character_fields: newData.map((char_field, index) => ({ ...char_field, sort: index })),
+                }));
+              }}>
+              <Droppable droppableId="droppable">
+                {(providedDroppable) => (
+                  <div className="flex flex-1 flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
+                    {template.character_fields?.length
+                      ? template.character_fields.map((field, index) => (
+                          <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
+                            {(provided, draggableSnapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                                  draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                                }`}
+                                {...provided.draggableProps}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  left: 16,
+                                }}>
+                                <div {...provided.dragHandleProps} className="mt-7 self-start">
+                                  <Icon fontSize={24} icon={IconEnum.menu} />
+                                </div>
+
+                                <FieldRow
+                                  key={field.id}
+                                  calendar={field?.calendar}
+                                  calendar_id={field?.calendar_id}
+                                  changeField={handleChange}
+                                  deleteField={() =>
+                                    handleChange({
+                                      name: "character_fields",
+                                      value: template?.character_fields?.filter((f) => f.id !== field.id),
+                                    })
+                                  }
+                                  field_type={field.field_type}
+                                  formula={field?.formula}
+                                  id={field.id}
+                                  index={index}
+                                  isLoading={isLoading}
+                                  options={field?.options || []}
+                                  random_table={field?.random_table}
+                                  random_table_id={field?.random_table_id}
+                                  sort={field.sort}
+                                  title={field.title}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))
+                      : null}
+                    {providedDroppable.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </div>
+        </>
+      ) : null}
       <div>
-        <TagInput
-          handleChange={handleChange}
-          label="Used for entities with these tags (required)"
-          tags={template?.tags || []}
+        <Button
+          icon={data?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(template) || isLoading}
+          isLoading={isLoading}
+          label={data?.id ? "Update" : "Create"}
+          onClick={async () => {
+            if (!data?.id) {
+              const { tags, character_fields, ...rest } = template;
+              const parsedData = InsertTemplateSchema.parse({
+                data: rest,
+                relations: {
+                  tags,
+                  character_fields,
+                },
+              });
+              await create(parsedData, {
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                  });
+                  resetDrawerAtom();
+                },
+              });
+            } else {
+              const { tags, character_fields, ...rest } = template;
+              const parsedData = UpdateTemplateSchema.parse({
+                data: rest,
+                relations: {
+                  tags,
+                  character_fields,
+                },
+              });
+              await update(parsedData, {
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("character_fields_templates"),
+                  });
+                  resetDrawerAtom();
+                },
+              });
+            }
+          }}
+          variant="success"
         />
       </div>
-      <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
-      <div className="flex items-center justify-between">
-        <span>Insert new field:</span>
-        <div className="h-8 w-8">
-          <Button
-            icon={IconEnum.add}
-            isDisabled={isLoading}
-            onClick={() =>
-              handleChange({
-                name: "character_fields",
-                value: (template.character_fields || []).concat({
-                  id: crypto.randomUUID(),
-                  title: "",
-                  field_type: "text",
-                  sort: template?.character_fields?.length ?? 0,
-                }),
-              })
-            }
-            variant="info"
-          />
-        </div>
-      </div>
-
-      <DragDropContext
-        onDragEnd={(result) => {
-          if (!result.destination) {
-            return;
-          }
-
-          const newData = reorder(template?.character_fields || [], result.source.index, result.destination.index);
-          setTemplate((prev) => ({
-            ...prev,
-            character_fields: newData.map((char_field, index) => ({ ...char_field, sort: index })),
-          }));
-        }}>
-        <Droppable droppableId="droppable">
-          {(providedDroppable) => (
-            <div
-              className="flex flex-1 flex-col overflow-y-auto"
-              {...providedDroppable.droppableProps}
-              ref={providedDroppable.innerRef}>
-              {template.character_fields?.length
-                ? template.character_fields.map((field, index) => (
-                    <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
-                      {(provided, draggableSnapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
-                            draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
-                          }`}
-                          {...provided.draggableProps}
-                          style={{
-                            ...provided.draggableProps.style,
-                            left: 16,
-                          }}>
-                          <div {...provided.dragHandleProps} className="mt-7 self-start">
-                            <Icon fontSize={24} icon={IconEnum.menu} />
-                          </div>
-
-                          <FieldRow
-                            key={field.id}
-                            calendar={field?.calendar}
-                            calendar_id={field?.calendar_id}
-                            changeField={handleChange}
-                            deleteField={() =>
-                              handleChange({
-                                name: "character_fields",
-                                value: template?.character_fields?.filter((f) => f.id !== field.id),
-                              })
-                            }
-                            field_type={field.field_type}
-                            formula={field?.formula}
-                            id={field.id}
-                            index={index}
-                            isLoading={isLoading}
-                            options={field?.options || []}
-                            random_table={field?.random_table}
-                            random_table_id={field?.random_table_id}
-                            sort={field.sort}
-                            title={field.title}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))
-                : null}
-              {providedDroppable.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-      <Button
-        icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(template) || isLoading}
-        isLoading={isLoading}
-        label={data?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (!data?.id) {
-            const { tags, character_fields, ...rest } = template;
-            const parsedData = InsertTemplateSchema.parse({
-              data: rest,
-              relations: {
-                tags,
-                character_fields: character_fields?.map((field) => ({
-                  ...field,
-                  project_id,
-                })),
-              },
-            });
-            await create(parsedData, {
-              onSuccess: () => {
-                queryClient.invalidateQueries({
-                  predicate: (query) => query.queryKey.includes("character_fields_templates"),
-                });
-                resetDrawerAtom();
-              },
-            });
-          } else {
-            const { tags, character_fields, ...rest } = template;
-            const parsedData = UpdateTemplateSchema.parse({
-              data: rest,
-              relations: {
-                tags,
-                character_fields: character_fields?.map((field) => ({
-                  ...field,
-                  project_id,
-                })),
-              },
-            });
-            await update(parsedData, {
-              onSuccess: () => {
-                queryClient.invalidateQueries({
-                  predicate: (query) => query.queryKey.includes("character_fields_templates"),
-                });
-                resetDrawerAtom();
-              },
-            });
-          }
-        }}
-        variant="success"
-      />
     </div>
   );
 }

@@ -497,7 +497,6 @@ function FieldTemplateRow({
   character_fields_data = {},
   createNotification,
   handleChange,
-  project_id,
 }: {
   template_id: string;
   title: string;
@@ -601,7 +600,6 @@ function FieldTemplateRow({
                   handleChange={handleChange}
                   index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
                   isRolling={isRolling}
-                  project_id={project_id}
                   subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
                   template_id={template_id}
                   value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}

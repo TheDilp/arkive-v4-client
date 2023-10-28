@@ -10,7 +10,6 @@ export const InsertTemplateSchema = z.object({
     character_fields: z
       .object({
         title: z.string(),
-        project_id: z.string(),
         field_type: z.string(),
         sort: z.number().optional(),
         formula: z.string().optional().nullable(),
@@ -36,7 +35,6 @@ export const UpdateTemplateSchema = z
           id: z.string(),
           title: z.string().optional(),
           field_type: z.string().optional(),
-          project_id: z.string(),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),
           options: z.object({ id: z.string(), value: z.string() }).array().optional(),
