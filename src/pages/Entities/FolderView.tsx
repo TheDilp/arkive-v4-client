@@ -251,6 +251,7 @@ export function FolderView() {
           },
         ],
       },
+      // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       orderBy: [
         {
@@ -276,6 +277,7 @@ export function FolderView() {
       data: {
         project_id,
       },
+      // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
         children: true,

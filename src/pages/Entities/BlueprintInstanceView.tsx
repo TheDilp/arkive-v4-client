@@ -3,12 +3,12 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { BlueprintInstanceType, DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, IconEnum } from "../../utils";
 
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<{ id: string; title: string; value: { id: string; value: any }[] }>();
 function createColumns(
   blueprint: BlueprintType,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -17,22 +17,56 @@ function createColumns(
   const fieldColumns = [
     columnHelper.accessor("title", {
       id: "title",
-      header: "TEST",
-      cell: () => "Test cell",
+      header: blueprint?.title_name,
+      cell: ({ row }) => row.original?.title || "",
+      minSize: 15,
     }),
   ];
 
   blueprint.blueprint_fields
-    .filter((field) => !["characters_single", "characters_multiple"].includes(field.field_type))
+    .filter((field) => !["characters_single", "characters_multiple", "textarea"].includes(field.field_type))
+    .slice(0, 4)
     .forEach((field) => {
       fieldColumns.push(
         columnHelper.display({
           id: field.title,
           header: field.title,
-          cell: () => {
-            // if (field.field_type === "text") return info.row.original.
-            return "test";
+          cell: ({ row }) => {
+            const fieldData = row.original?.value?.find((val) => val?.id === field.id);
+            const value =
+              fieldData?.value && fieldData?.value?.value
+                ? `${fieldData?.value?.value} ${
+                    fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""
+                  }`
+                : "";
+            // const randomTable =
+            //   field.field_type === "random_table"
+            //     ? blueprint?.blueprint_fields
+            //         .find((f) => f.id === field?.id)
+            //         ?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
+            //     : null;
+
+            // const subOption = randomTable
+            //   ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+            //   : null;
+
+            // const date =
+            //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
+            if ((field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value)
+              return value;
+            if (field.field_type === "select" || (field.field_type === "select_multiple" && value)) {
+              return fieldData?.value?.value
+                .map((id: string) => {
+                  const opt = field?.options?.find((o) => o.id === id);
+                  return opt?.value || "";
+                })
+                .join(", ");
+            }
+
+            return "";
           },
+          minSize: 15,
+          maxSize: 20,
         }),
       );
     });
@@ -106,7 +140,9 @@ export function BlueprintInstanceView() {
       blueprint_fields: true,
     },
   });
-  useGetEntities<BlueprintInstanceType>(
+  useChangeNavbarTitle(`The Arkive | Blueprints | ${data?.data?.title}`, !!data?.data?.title);
+
+  const { data: instances } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
         project_id: "",
@@ -115,6 +151,7 @@ export function BlueprintInstanceView() {
     },
     "blueprint_instances",
   );
+
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
@@ -142,7 +179,7 @@ export function BlueprintInstanceView() {
             config={{
               hasSelect: true,
             }}
-            data={data?.data?.blueprint_instances || []}
+            data={instances?.data || []}
             dispatch={dispatch}
             //   isLoading={isLoading}
             //   pagination={pagination}
