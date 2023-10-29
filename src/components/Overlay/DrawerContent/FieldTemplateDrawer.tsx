@@ -12,7 +12,7 @@ import {
   onChangeValue,
   TemplateStateType,
 } from "../../../types";
-import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { CharacterFieldTypesEnum, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
@@ -80,7 +80,7 @@ function FieldRow({
             label="Field type"
             name={`character_fields[${index}].field_type`}
             onChange={changeField}
-            options={FieldTypesEnum}
+            options={CharacterFieldTypesEnum}
             placeholder="Field type"
             value={field_type}
           />

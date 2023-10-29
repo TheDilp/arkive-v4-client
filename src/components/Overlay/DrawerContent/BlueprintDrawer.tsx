@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, InputOnChangeValue, onChangeValue } from "../../../types";
 import { BlueprintFieldType, BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
-import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { BlueprintFieldTypesEnum, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
 import { Button, Input, Search, Select, Title } from "../../Form";
@@ -77,7 +77,7 @@ function FieldRow({
             label="Field type"
             name={`blueprint_fields[${index}].field_type`}
             onChange={changeField}
-            options={FieldTypesEnum}
+            options={BlueprintFieldTypesEnum}
             placeholder="Field type"
             value={field_type}
           />
@@ -126,7 +126,8 @@ function FieldRow({
       </div>
       {isMainTitle ? (
         <span className="text-sm text-zinc-400">
-          This field is required but can be renamed. It is used to display the blueprint instance in the table.
+          This field is required but can be renamed. It is used to display the blueprint instance in the table of all instances
+          for this blueprint.
         </span>
       ) : null}
       {field_type === "select" || field_type === "select_multiple" ? (
@@ -295,6 +296,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   useLayoutEffect(() => {
     if (existingBlueprint?.data && !blueprint?.title) {
       setBlueprint(existingBlueprint?.data);
+    } else {
+      setBlueprint({
+        blueprint_fields: [{ id: crypto.randomUUID(), width: "full", field_type: "text", title: "Title", sort: 0 }],
+      });
     }
   }, [existingBlueprint]);
 
@@ -313,9 +318,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
-
       <Title isDrawerTitle label="Fields" size="lg" />
-      {/* {blueprint.blueprint_fields?.length ? (
+      {blueprint.blueprint_fields?.length ? (
         <FieldRow
           key={blueprint.blueprint_fields[0].id}
           calendar={blueprint.blueprint_fields[0]?.calendar}
@@ -329,13 +333,13 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           isLoading={isLoading}
           isMainTitle
           options={blueprint.blueprint_fields[0]?.options || []}
-          project_id={blueprint.blueprint_fields[0]?.project_id}
           random_table={blueprint.blueprint_fields[0]?.random_table}
           random_table_id={blueprint.blueprint_fields[0]?.random_table_id}
           sort={blueprint.blueprint_fields[0].sort}
           title={blueprint.blueprint_fields[0].title}
+          width={blueprint.blueprint_fields[0].width}
         />
-      ) : null} */}
+      ) : null}
       <div className="flex items-center justify-between">
         <span>Insert new field:</span>
         <div className="h-8 w-8">
@@ -378,7 +382,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
-                ? blueprint.blueprint_fields.map((field, index) => (
+                ? blueprint.blueprint_fields.slice(1).map((field, index) => (
                     <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
                       {(provided, draggableSnapshot) => (
                         <div
@@ -409,7 +413,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             field_type={field.field_type}
                             formula={field?.formula}
                             id={field.id}
-                            index={index}
+                            index={index + 1}
                             isLoading={isLoading}
                             options={field?.options || []}
                             random_table={field?.random_table}
@@ -437,7 +441,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           if (!data?.id) {
             const { blueprint_fields, ...rest } = blueprint;
             const parsedData = InsertBlueprintSchema.parse({
-              data: rest,
+              data: { ...rest, project_id },
               relations: {
                 blueprint_fields,
               },

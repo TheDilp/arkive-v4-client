@@ -18,7 +18,7 @@ export const AllEntities = [
   "tags",
 ];
 
-export const FieldTypesEnum = [
+export const CharacterFieldTypesEnum = [
   { value: "text", label: "Text" },
   { value: "textarea", label: "Textarea" },
   { value: "number", label: "Number" },
@@ -34,6 +34,26 @@ export const FieldTypesEnum = [
   // { value: "images_multiple", label: "Images (multiple)" },
   // { value: "locations_single", label: "Location (single)" },
   // { value: "locations_multiple", label: "Locations (multiple)" },
+];
+
+export const BlueprintFieldTypesEnum = [
+  { value: "text", label: "Text" },
+  { value: "textarea", label: "Textarea" },
+  { value: "number", label: "Number" },
+  { value: "select", label: "Select" },
+  { value: "select_multiple", label: "Select (multiple)" },
+  { value: "dice_roll", label: "Dice Roll" },
+  { value: "date", label: "Date" },
+  { value: "random_table", label: "Random Table" },
+  { value: "boolean", label: "Boolean" },
+  { value: "documents_single", label: "Document (single)" },
+  { value: "documents_multiple", label: "Documents (multiple)" },
+  { value: "images_single", label: "Image (single)" },
+  { value: "images_multiple", label: "Images (multiple)" },
+  { value: "locations_single", label: "Location (single)" },
+  { value: "locations_multiple", label: "Locations (multiple)" },
+  { value: "characters_single", label: "Character (single)" },
+  { value: "characters_multiple", label: "Characters (multiple)" },
 ];
 
 export const SearchFieldTypes = [
