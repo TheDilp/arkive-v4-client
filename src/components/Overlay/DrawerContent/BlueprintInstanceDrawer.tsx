@@ -8,6 +8,7 @@ import {
   useCreateSubEntity,
   useGetEntities,
   useGetEntity,
+  useGetImages,
   useGetSubEntity,
   useHandleChange,
   useUpdateSubEntity,
@@ -289,7 +290,22 @@ function BlueprintFieldInputs({
       enabled: (fieldType === "locations_single" || fieldType === "locations_multiple") && !!currentValue,
     },
   );
-
+  const { data: images } = useGetImages(
+    project_id as string,
+    "images",
+    {
+      filters: {
+        and: [
+          {
+            operator: Array.isArray(currentValue) ? "in" : "eq",
+            value: currentValue as string | string[],
+            field: "id",
+          },
+        ],
+      },
+    },
+    { enabled: (fieldType === "images_single" || fieldType === "images_multiple") && !!currentValue },
+  );
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -529,70 +545,52 @@ function BlueprintFieldInputs({
       </div>
     );
   }
-
   if (SearchFieldTypes.includes(fieldType)) {
     return (
       <div className="flex flex-col">
-        {!currentValue && fieldType?.includes("single") ? (
-          <Search
-            label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-            name={name}
-            onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-            searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-          />
-        ) : null}
-        {currentValue && fieldType?.includes("single") ? (
-          <EntityPreview
-            clearAction={() => handleChange({ name, value: { id, value: {} } })}
-            id={(currentValue as Record<string, any>)?.value}
-            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-            label={title}
-            link={
-              fieldType === "images_single"
-                ? ""
-                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-                    (currentValue as Record<string, any>)?.value
-                  }`
-            }
-            title={(currentValue as Record<string, any>)?.title}
-            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-          />
-        ) : null}
-        {fieldType?.includes("multiple") ? (
+        {currentValue && fieldType === "images_single" ? null : (
           <Search
             label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
             name={name}
             onChange={({ value }) => {
-              handleChange({
-                name,
-                value: {
-                  id,
+              if (fieldType.includes("single")) {
+                handleChange({ name, value: { id, value: { value } } });
+              } else {
+                handleChange({
+                  name,
                   value: {
-                    value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
+                    id,
+                    value: {
+                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
+                    },
                   },
-                },
-              });
+                });
+              }
             }}
             searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
           />
-        ) : null}
-        {Array.isArray(currentValue) && fieldType?.includes("multiple") ? (
-          <EntityPreview
-            clearAction={() => handleChange({ name, value: { id, value: {} } })}
-            id={(currentValue as Record<string, any>)?.value}
-            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-            label={title}
-            link={
-              fieldType === "images_single"
-                ? ""
-                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-                    (currentValue as Record<string, any>)?.value
-                  }`
-            }
-            title={(currentValue as Record<string, any>)?.title}
-            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-          />
-        ) : null}
+        )}
+        {images?.data?.length
+          ? images.data.map((img) => (
+              <EntityPreview
+                key={img.id}
+                clearAction={() => {
+                  if (fieldType.includes("single")) handleChange({ name, value: { id, value: {} } });
+                  else handleChange({ name, value: { id, value: (currentValue as string[]).filter((c) => c !== img.id) } });
+                }}
+                id={img.id}
+                image_id={img.id}
+                label={img.title}
+                link={
+                  fieldType === "images_single"
+                    ? ""
+                    : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${img.id}`
+                }
+                title={img?.title}
+                type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+              />
+            ))
+          : null}
       </div>
     );
   }

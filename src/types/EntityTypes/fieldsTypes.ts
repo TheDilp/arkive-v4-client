@@ -32,7 +32,9 @@ export type BlueprintFieldTypes =
   | "characters_single"
   | "characters_multiple"
   | "locations_single"
-  | "locations_multiple";
+  | "locations_multiple"
+  | "blueprints_single"
+  | "blueprints_multiple";
 
 export type FieldWidthType = "half" | "full";
 export interface CharacterFieldType {

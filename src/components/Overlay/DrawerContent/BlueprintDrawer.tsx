@@ -271,7 +271,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
 
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (
-    <div className="flex h-screen max-h-screen flex-col gap-y-2 text-white">
+    <div className="flex h-screen max-h-full flex-col gap-y-2 text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex-1">
           <Input
@@ -354,7 +354,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <Droppable droppableId="droppable">
           {(providedDroppable) => (
             <div
-              className="flex max-h-[65%] flex-1 flex-col overflow-y-auto"
+              className="justift-start flex max-h-[75%] flex-col content-start overflow-y-auto"
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length

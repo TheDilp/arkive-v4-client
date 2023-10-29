@@ -40,10 +40,10 @@ export function useUploadAsset(type: AssetType, project_id: string) {
   );
 }
 
-export function useGetImages(
+export function useGetImages<InsertType>(
   project_id: string,
   type: AssetType,
-  request: RequestBodyType,
+  request: RequestBodyType<InsertType>,
   options?: UseQueryOptions<{ data: ImageType[] }, any, { data: ImageType[] }> & {
     prefetch?: boolean;
     queryKeyConcat?: string[];
@@ -60,7 +60,7 @@ export function useGetImages(
     request?.orderBy,
   ];
   let mainRequestQueryKey = [...baseQueryKey];
-  async function queryFn(finalRequest: RequestBodyType) {
+  async function queryFn(finalRequest: RequestBodyType<InsertType>) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
@@ -199,13 +199,13 @@ export function useDownloadImage(project_id: string | undefined, type: AssetType
   );
 }
 export function useGetInfiniteAssets<ReturnType>(
-  request: RequestBodyType,
+  request: RequestBodyType<ReturnType>,
   type: AssetType,
   project_id: string | undefined,
   options?: UseQueryOptions<any> & { prefetch?: boolean },
 ) {
   const baseQueryKey = ["allEntities", "infinite", project_id, type, request.data?.item_id, request?.filters];
-  async function queryFn(finalRequest: RequestBodyType) {
+  async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),

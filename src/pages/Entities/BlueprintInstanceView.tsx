@@ -115,7 +115,7 @@ function createColumns(
 
   blueprint.blueprint_fields
     .filter((field) => field.field_type !== "textarea")
-    .slice(0, 10)
+    .slice(0, 6)
     .forEach((field) => {
       fieldColumns.push(
         columnHelper.display({
@@ -142,6 +142,11 @@ function createColumns(
                 })
                 .join(", ");
             }
+            if (field.field_type === "images_single") {
+              return (
+                <Avatar hasShowImage image={getImageURL(project_id as string, "images", fieldData?.value?.value)} size="sm" />
+              );
+            }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
               return <CharacterColumn ids={fieldData?.value?.value} />;
             }
@@ -166,8 +171,8 @@ function createColumns(
 
             return "";
           },
-          minSize: 15,
-          maxSize: 20,
+          minSize: 10,
+          maxSize: 15,
         }),
       );
     });

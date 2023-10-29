@@ -54,6 +54,8 @@ export const BlueprintFieldTypesEnum = [
   { value: "locations_multiple", label: "Locations (multiple)" },
   { value: "characters_single", label: "Character (single)" },
   { value: "characters_multiple", label: "Characters (multiple)" },
+  { value: "blueprints_single", label: "Blueprint instances (single )" },
+  { value: "blueprints_multiple", label: "Blueprint instances (multiple)" },
 ];
 
 export const SearchFieldTypes = [
