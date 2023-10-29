@@ -64,7 +64,12 @@ export function Avatar({
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage });
   return (
-    <Tooltip allowedPlacements={tooltipAllowedPlacements} content={label || ""} isDisabled={!label || isTooltipDisabled}>
+    <Tooltip
+      allowedPlacements={tooltipAllowedPlacements}
+      content={label || ""}
+      delay={{ openDelay: 0 }}
+      isDisabled={!label || isTooltipDisabled}
+      isIgnoringHover>
       <div className={base()}>
         {image ? (
           <img

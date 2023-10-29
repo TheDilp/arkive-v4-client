@@ -80,7 +80,7 @@ export function Tooltip({
       enabled: !isClickable ?? true,
       handleClose: isIgnoringHover ? null : safePolygon(),
       delay: {
-        open: delay?.openDelay || 250,
+        open: delay?.openDelay ?? 250,
         close: delay?.closeDelay || 0,
       },
     }),
