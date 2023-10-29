@@ -27,7 +27,9 @@ import {
 } from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
 import { Editor } from "../../Complex";
-import { Button, Checkbox, Input, Select, Title } from "../../Form";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Checkbox, Input, Search, Select, Title } from "../../Form";
+import { Collapsible } from "../../Layout";
 import { Alert } from "../../Misc";
 
 type Props = {
@@ -371,6 +373,61 @@ function BlueprintFieldInputs({
           value={currentValue as boolean}
         />
       </div>
+    );
+  }
+  if (fieldType === "characters_single" || fieldType === "characters_multiple") {
+    return (
+      <Collapsible label={title}>
+        <div className="mt-2 flex flex-col gap-y-2">
+          <Search
+            name={name}
+            onChange={({ label, image, value }) => {
+              if (fieldType === "characters_single") {
+                handleChange({ name, value: { id, value: { value: { label, image, id: value } } } });
+              } else {
+                handleChange({
+                  name,
+                  value: {
+                    id,
+                    value: {
+                      value: Array.isArray(currentValue)
+                        ? [...currentValue, { label, image, id: value }]
+                        : [{ label, image, id: value }],
+                    },
+                  },
+                });
+              }
+            }}
+            placeholder="Press enter to search."
+            searchEntity="characters"
+          />
+          {currentValue && !Array.isArray(currentValue) && typeof currentValue === "object" ? (
+            <EntityPreview
+              clearAction={() => handleChange({ name, value: null })}
+              id={currentValue?.id}
+              image_id={currentValue?.image}
+              title={currentValue?.label}
+              type="characters"
+            />
+          ) : null}
+          {currentValue && Array.isArray(currentValue)
+            ? currentValue.map((v) => {
+                if (typeof v === "object")
+                  return (
+                    <EntityPreview
+                      key={v?.id}
+                      clearAction={() => handleChange({ name, value: null })}
+                      id={v?.id}
+                      image_id={v?.image}
+                      title={v?.label}
+                      type="characters"
+                    />
+                  );
+                return null;
+              })
+            : null}
+        </div>
+      </Collapsible>
     );
   }
   // if (SearchFieldTypes.includes(fieldType)) {

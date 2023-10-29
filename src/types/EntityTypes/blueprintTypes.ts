@@ -1,12 +1,12 @@
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
-import { FieldTypes, FieldWidthType } from "./fieldsTypes";
+import { BlueprintFieldTypes, FieldWidthType } from "./fieldsTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
 
 export interface BlueprintFieldType {
   id: string;
   sort: number;
   title: string;
-  field_type: FieldTypes;
+  field_type: BlueprintFieldTypes;
   width: FieldWidthType;
   formula?: string | null;
   random_table_id?: string | null;

@@ -15,6 +15,22 @@ export type FieldTypes =
   | "documents_multiple"
   | "images_single"
   | "images_multiple";
+export type BlueprintFieldTypes =
+  | "text"
+  | "textarea"
+  | "number"
+  | "select"
+  | "select_multiple"
+  | "dice_roll"
+  | "date"
+  | "boolean"
+  | "random_table"
+  | "documents_single"
+  | "documents_multiple"
+  | "images_single"
+  | "images_multiple"
+  | "characters_single"
+  | "characters_multiple";
 
 export type FieldWidthType = "half" | "full";
 export interface CharacterFieldType {
