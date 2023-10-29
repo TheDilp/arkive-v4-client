@@ -70,7 +70,7 @@ function FieldRow({
             value={title}
           />
         </div>
-        <div className="h-full flex-1">
+        <div className="h-full max-w-[30%] flex-1">
           <Select
             isDisabled={isLoading}
             label="Field type"

@@ -191,7 +191,7 @@ export function BlueprintInstanceView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const [, dispatch] = useTable({});
+  const [{ selection, pagination }, dispatch] = useTable({ selection: {}, pagination: { page: 0, limit: 10 } });
 
   const { data, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
@@ -211,6 +211,7 @@ export function BlueprintInstanceView() {
         project_id,
         parent_id: item_id,
       },
+      pagination,
     },
     "blueprint_instances",
   );
@@ -241,11 +242,13 @@ export function BlueprintInstanceView() {
             columns={createColumns(data?.data, project_id as string, setDrawer, setDialog)}
             config={{
               hasSelect: true,
+              selection,
             }}
             data={instances?.data || []}
             dispatch={dispatch}
             //   isLoading={isLoading}
-            //   pagination={pagination}
+
+            pagination={pagination}
             type="characters"
           />
         ) : null}

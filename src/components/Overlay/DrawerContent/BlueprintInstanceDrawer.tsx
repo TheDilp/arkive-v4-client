@@ -270,6 +270,7 @@ function BlueprintFieldInputs({
         label={title}
         name={name}
         onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+        type={fieldType}
         value={currentValue as string}
       />
     );
