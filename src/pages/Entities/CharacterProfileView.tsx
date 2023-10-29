@@ -16,11 +16,11 @@ import {
   Dropdown,
   Editor,
   Gallery,
+  Input,
   Skeleton,
   Table,
   TablePageLayout,
   Tabs,
-  Title,
 } from "../../components";
 import {
   useBreakpoint,
@@ -95,7 +95,7 @@ const tabs = [
 ];
 
 const fieldSizeClass = tv({
-  base: "flex flex-col justify-center text-center mt-1 bg-zinc-800 rounded shadow-sm p-0.5",
+  base: "flex flex-col justify-center mt-1 p-0.5",
   variants: {
     type: {
       dice_roll: "col-span-6 sm:col-span-3 lg:col-span-1",
@@ -537,17 +537,28 @@ function AdditionalFieldDisplay({
 
           return (
             <div key={field?.id} className={fieldClasses}>
-              <Title label={field.title} size="xl" />
+              {/* <Title isDrawerTitle label={field.title} size="xl" /> */}
               {(field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value ? (
-                <Title label={value || ""} size="lg" />
+                <Input isReadOnly label={field.title} name={field.title} onChange={() => {}} value={value} />
               ) : null}
               {(field.field_type === "select" || field.field_type === "select_multiple") && value ? (
-                <Title label={field?.options?.find((opt) => opt.id === fieldData?.value?.value)?.value || ""} size="lg" />
+                <Input
+                  isReadOnly
+                  label={field.title}
+                  name={field.title}
+                  onChange={() => {}}
+                  value={field?.options?.find((opt) => opt.id === fieldData?.value?.value)?.value || ""}
+                />
               ) : null}
               {field.field_type === "random_table" ? (
                 <div>
-                  <Title label={randomTable?.title || ""} size="lg" />
-                  <Title label={subOption?.title || ""} />
+                  <Input
+                    isReadOnly
+                    label={field.title}
+                    name={field.title}
+                    onChange={() => {}}
+                    value={`${randomTable?.title} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
+                  />
                 </div>
               ) : null}
               {field.field_type === "textarea" && value ? (
@@ -555,7 +566,13 @@ function AdditionalFieldDisplay({
               ) : null}
               {field.field_type === "date" && value ? (
                 <div>
-                  <Title label={formatDateToString(date?.day, date?.year, date?.month, field?.calendar?.months || [])} />
+                  <Input
+                    isReadOnly
+                    label={field.title}
+                    name={field.title}
+                    onChange={() => {}}
+                    value={formatDateToString(date?.day, date?.year, date?.month, field?.calendar?.months || [])}
+                  />
                 </div>
               ) : null}
             </div>
