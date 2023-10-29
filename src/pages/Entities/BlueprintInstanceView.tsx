@@ -1,10 +1,11 @@
+import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
 import { useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { BlueprintInstanceType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { IconEnum } from "../../utils";
+import { drawerAtom, IconEnum } from "../../utils";
 
 const columnHelper = createColumnHelper<any>();
 function createColumns(blueprint: BlueprintType) {
@@ -98,6 +99,7 @@ function createColumns(blueprint: BlueprintType) {
 
 export function BlueprintInstanceView() {
   const { item_id } = useParams();
+  const setDrawer = useSetAtom(drawerAtom);
   const [, dispatch] = useTable({});
 
   const { data } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -125,15 +127,14 @@ export function BlueprintInstanceView() {
           <Button
             icon={IconEnum.add}
             label={`Create (${data?.data?.title})`}
-            onClick={
-              () => {}
-              //   setDrawer((prev) => ({
-              //     ...prev,
-              //     data: {},
-              //     title: "Create new word",
-              //     type: "words",
-              //     size: "lg",
-              //   }))
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: {},
+                title: `Create new ${data?.data?.title}`,
+                type: "blueprint_instances",
+                size: "lg",
+              }))
             }
           />
         </div>

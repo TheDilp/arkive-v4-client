@@ -1,4 +1,5 @@
 export * from "./BlueprintDrawer";
+export * from "./BlueprintInstanceDrawer";
 export * from "./CalendarDrawer";
 export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
@@ -7,6 +8,7 @@ export * from "./ConversationDrawer";
 export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
 export * from "./EdgeDrawer";
+export * from "./EditMessageDrawer";
 export * from "./EditTags";
 export * from "./EventDrawer";
 export * from "./FieldTemplateDrawer";

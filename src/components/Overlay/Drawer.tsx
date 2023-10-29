@@ -9,6 +9,7 @@ import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
   BlueprintDrawer,
+  BlueprintInstanceDrawer,
   CalendarDrawer,
   CharacterAddDrawer,
   CharacterDrawer,
@@ -146,6 +147,7 @@ export function Drawer() {
         {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
         {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
         {drawer.type === "blueprints" ? <BlueprintDrawer data={drawer?.data} /> : null}
+        {drawer.type === "blueprint_instances" ? <BlueprintInstanceDrawer data={drawer?.data} /> : null}
         {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
         {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
         {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
