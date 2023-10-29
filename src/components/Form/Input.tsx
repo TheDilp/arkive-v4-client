@@ -55,6 +55,12 @@ const InputClasses = tv({
         input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
+    isReadOnly: {
+      true: {
+        base: "cursor-not-allowed",
+        input: "cursor-not-allowed pointer-events-none",
+      },
+    },
     isInline: {
       true: {
         input: "rounded-none border-none",
@@ -84,6 +90,7 @@ export function Input({
   onChange,
   onKeyDown,
   isDisabled,
+  isReadOnly,
   placeholder,
   type = "text",
   variant = "primary",
@@ -100,7 +107,7 @@ export function Input({
     input,
     label: labelClasses,
     helperText: helperTextClasses,
-  } = InputClasses({ variant, size, isDisabled, isInline });
+  } = InputClasses({ variant, size, isDisabled, isReadOnly, isInline });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -108,7 +115,7 @@ export function Input({
       <input
         autoComplete="off"
         className={input()}
-        disabled={isDisabled}
+        disabled={isDisabled || isReadOnly}
         max={max}
         min={min}
         name={name}

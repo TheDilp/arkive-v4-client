@@ -15,6 +15,7 @@ export interface InputType extends BaseFormComponentType {
   onChange: ({ name, value }: InputOnChangeValue) => void;
   onKeyDown?: (e: KeyboardEvent) => void;
   value: string | number | undefined;
+  isReadOnly?: boolean;
   helperText?: string;
   min?: number;
   max?: number;
