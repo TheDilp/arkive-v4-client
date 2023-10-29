@@ -4,6 +4,8 @@ export const InsertBlueprintSchema = z.object({
   data: z.object({
     project_id: z.string(),
     title: z.string(),
+    title_name: z.string(),
+    title_width: z.literal("half").or(z.literal("full")),
   }),
   relations: z.object({
     blueprint_fields: z
@@ -27,6 +29,8 @@ export const UpdateBlueprintSchema = z
     data: z.object({
       id: z.string(),
       title: z.string().optional(),
+      title_name: z.string().optional(),
+      title_width: z.literal("half").or(z.literal("full")).optional(),
     }),
     relations: z.object({
       blueprint_fields: z

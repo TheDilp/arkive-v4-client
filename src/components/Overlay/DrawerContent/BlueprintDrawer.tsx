@@ -15,6 +15,7 @@ import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
   if (!blueprint?.title) return true;
+  if (!blueprint?.title_name || !blueprint?.title_width) return true;
   if (!blueprint?.blueprint_fields?.length) return true;
   // if (!blueprint?.tags?.length) return true;
   if (
@@ -45,7 +46,6 @@ function FieldRow({
   random_table_id,
   random_table,
   isLoading,
-  isMainTitle,
   changeField,
   deleteField,
 }: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
@@ -56,7 +56,6 @@ function FieldRow({
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
   deleteField: (i: number) => void;
   isLoading: boolean;
-  isMainTitle?: boolean;
 }) {
   return (
     <div className="flex w-full flex-col gap-y-2">
@@ -73,7 +72,7 @@ function FieldRow({
         </div>
         <div className="h-full flex-1">
           <Select
-            isDisabled={isLoading || isMainTitle}
+            isDisabled={isLoading}
             label="Field type"
             name={`blueprint_fields[${index}].field_type`}
             onChange={changeField}
@@ -112,24 +111,17 @@ function FieldRow({
             />
           </div>
         ) : null}
-        {isMainTitle ? null : (
-          <div className="h-10 w-8 self-end">
-            <Button
-              hasNoBackground
-              icon={IconEnum.trash}
-              isDisabled={isLoading}
-              onClick={() => deleteField(index)}
-              variant="error"
-            />
-          </div>
-        )}
+        <div className="h-10 w-8 self-end">
+          <Button
+            hasNoBackground
+            icon={IconEnum.trash}
+            isDisabled={isLoading}
+            onClick={() => deleteField(index)}
+            variant="error"
+          />
+        </div>
       </div>
-      {isMainTitle ? (
-        <span className="text-sm text-zinc-400">
-          This field is required but can be renamed. It is used to display the blueprint instance in the table of all instances
-          for this blueprint.
-        </span>
-      ) : null}
+
       {field_type === "select" || field_type === "select_multiple" ? (
         <DragDropContext
           onDragEnd={(result) => {
@@ -298,7 +290,9 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       setBlueprint(existingBlueprint?.data);
     } else {
       setBlueprint({
-        blueprint_fields: [{ id: crypto.randomUUID(), width: "full", field_type: "text", title: "Title", sort: 0 }],
+        title_name: "",
+        title_width: "full",
+        blueprint_fields: [],
       });
     }
   }, [existingBlueprint]);
@@ -318,28 +312,50 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
+      <div className="flex flex-col">
+        <div className="flex gap-x-2">
+          <div className="h-full flex-1">
+            <Input
+              isDisabled={isLoading}
+              label="Field title"
+              name="title_name"
+              onChange={handleChange}
+              placeholder="Eg. Name / Title / First name / etc."
+              value={blueprint.title_name}
+            />
+          </div>
+          <div className="h-full w-1/4">
+            <Select
+              isDisabled
+              label="Field type"
+              name="title_type"
+              onChange={() => {}}
+              options={BlueprintFieldTypesEnum}
+              placeholder="Field type"
+              value="text"
+            />
+          </div>
+          <div className="w-1/4">
+            <Select
+              label="Width"
+              name="title_width"
+              onChange={handleChange}
+              options={[
+                { label: "Half", value: "half" },
+                { label: "Full", value: "full" },
+              ]}
+              value={blueprint.title_width}
+            />
+          </div>
+        </div>
+        <span className="text-sm text-zinc-400">
+          This field is required but can be renamed. It is used to display the blueprint instance in the table of all instances
+          for this blueprint, and is used for searching, sorting, etc.
+        </span>
+      </div>
+
       <Title isDrawerTitle label="Fields" size="lg" />
-      {blueprint.blueprint_fields?.length ? (
-        <FieldRow
-          key={blueprint.blueprint_fields[0].id}
-          calendar={blueprint.blueprint_fields[0]?.calendar}
-          calendar_id={blueprint.blueprint_fields[0]?.calendar_id}
-          changeField={handleChange}
-          deleteField={() => {}}
-          field_type={blueprint.blueprint_fields[0].field_type}
-          formula={blueprint.blueprint_fields[0]?.formula}
-          id={blueprint.blueprint_fields[0].id}
-          index={0}
-          isLoading={isLoading}
-          isMainTitle
-          options={blueprint.blueprint_fields[0]?.options || []}
-          random_table={blueprint.blueprint_fields[0]?.random_table}
-          random_table_id={blueprint.blueprint_fields[0]?.random_table_id}
-          sort={blueprint.blueprint_fields[0].sort}
-          title={blueprint.blueprint_fields[0].title}
-          width={blueprint.blueprint_fields[0].width}
-        />
-      ) : null}
+
       <div className="flex items-center justify-between">
         <span>Insert new field:</span>
         <div className="h-8 w-8">
@@ -382,7 +398,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
-                ? blueprint.blueprint_fields.slice(1).map((field, index) => (
+                ? blueprint.blueprint_fields.map((field, index) => (
                     <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
                       {(provided, draggableSnapshot) => (
                         <div
@@ -413,7 +429,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             field_type={field.field_type}
                             formula={field?.formula}
                             id={field.id}
-                            index={index + 1}
+                            index={index}
                             isLoading={isLoading}
                             options={field?.options || []}
                             random_table={field?.random_table}

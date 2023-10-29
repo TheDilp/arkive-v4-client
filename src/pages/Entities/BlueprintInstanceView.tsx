@@ -17,10 +17,13 @@ function createColumns(
   const fieldColumns = blueprint.blueprint_fields
     .filter((field) => !["characters_single", "characters_multiple"].includes(field.field_type))
     .map((field) =>
-      columnHelper.accessor(field.title, {
+      columnHelper.display({
         id: field.title,
         header: field.title,
-        cell: () => "test",
+        cell: () => {
+          // if (field.field_type === "text") return info.row.original.
+          return "test";
+        },
       }),
     );
 

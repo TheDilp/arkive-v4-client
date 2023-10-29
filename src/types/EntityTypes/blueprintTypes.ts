@@ -19,6 +19,8 @@ export interface BlueprintFieldType {
 export interface BlueprintType {
   id: string;
   title: string;
+  title_name: string;
+  title_width: FieldWidthType;
   project_id: string;
   blueprint_instances: BlueprintInstanceType[];
   blueprint_fields: BlueprintFieldType[];
