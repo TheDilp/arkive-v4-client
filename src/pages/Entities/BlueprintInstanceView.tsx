@@ -134,9 +134,9 @@ function createColumns(
             //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
             if ((field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value)
               return value;
-            if (field.field_type === "select" || (field.field_type === "select_multiple" && value)) {
-              return fieldData?.value?.value
-                .map((id: string) => {
+            if ((field.field_type === "select" || field.field_type === "select_multiple") && value) {
+              return (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
+                ?.map((id: string) => {
                   const opt = field?.options?.find((o) => o.id === id);
                   return opt?.value || "";
                 })

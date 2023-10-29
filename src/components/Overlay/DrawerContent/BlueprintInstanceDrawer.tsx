@@ -320,7 +320,7 @@ function BlueprintFieldInputs({
         <Editor
           initialContent={currentValue as string}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value: JSON.stringify(value) } } })}
+          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
         />
         {/* <Textarea
             label={title}

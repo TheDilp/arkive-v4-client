@@ -354,7 +354,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <Droppable droppableId="droppable">
           {(providedDroppable) => (
             <div
-              className="flex flex-1 flex-col overflow-y-auto"
+              className="flex max-h-[65%] flex-1 flex-col overflow-y-auto"
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
@@ -415,6 +415,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         onClick={async () => {
           if (!data?.id) {
             const { blueprint_fields, ...rest } = blueprint;
+
             const parsedData = InsertBlueprintSchema.parse({
               data: { ...rest, project_id },
               relations: {
@@ -431,6 +432,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             });
           } else {
             const { blueprint_fields, ...rest } = blueprint;
+
             const parsedData = UpdateBlueprintSchema.parse({
               data: rest,
               relations: {

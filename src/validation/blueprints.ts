@@ -5,7 +5,7 @@ export const InsertBlueprintSchema = z.object({
     project_id: z.string(),
     title: z.string(),
     title_name: z.string(),
-    title_width: z.literal("half").or(z.literal("full")),
+    // title_width: z.literal("half").or(z.literal("full")),
   }),
   relations: z.object({
     blueprint_fields: z
@@ -13,7 +13,7 @@ export const InsertBlueprintSchema = z.object({
         title: z.string(),
         field_type: z.string(),
         sort: z.number().optional(),
-        width: z.literal("half").or(z.literal("full")),
+        // width: z.literal("half").or(z.literal("full")),
         formula: z.string().optional().nullable(),
         options: z.object({ id: z.string(), value: z.string() }).array().optional(),
         random_table_id: z.string().optional().nullable(),
@@ -30,7 +30,7 @@ export const UpdateBlueprintSchema = z
       id: z.string(),
       title: z.string().optional(),
       title_name: z.string().optional(),
-      title_width: z.literal("half").or(z.literal("full")).optional(),
+      // title_width: z.literal("half").or(z.literal("full")).optional(),
     }),
     relations: z.object({
       blueprint_fields: z
@@ -38,7 +38,7 @@ export const UpdateBlueprintSchema = z
           id: z.string(),
           title: z.string().optional(),
           field_type: z.string().optional(),
-          width: z.literal("half").or(z.literal("full")),
+          // width: z.literal("half").or(z.literal("full")),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),
           options: z.object({ id: z.string(), value: z.string() }).array().optional(),
