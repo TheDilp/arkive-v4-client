@@ -1,4 +1,4 @@
-import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, BlueprintFieldTypes } from "../../types";
 import { IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType) {
@@ -92,4 +92,13 @@ export function getSearchFieldTypeLinkType(type: string) {
   if (type === "locations_single") return "maps";
   if (type === "locations_multiple") return "maps";
   return "";
+}
+
+export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize: number } {
+  if (type === "boolean" || type === "images_single" || type === "characters_single" || type === "number")
+    return { minSize: 5, maxSize: 5 };
+  if (type === "text" || type === "characters_multiple" || type === "select" || type === "dice_roll")
+    return { minSize: 10, maxSize: 15 };
+  if (type === "select_multiple" || type === "random_table") return { minSize: 10, maxSize: 15 };
+  return { minSize: 10, maxSize: 10 };
 }
