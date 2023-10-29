@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { flattenArray } from "remirror";
+import { flattenArray, RemirrorJSON } from "remirror";
 
 import {
   useCreateSubEntity,
@@ -306,6 +306,7 @@ function BlueprintFieldInputs({
     },
     { enabled: (fieldType === "images_single" || fieldType === "images_multiple") && !!currentValue },
   );
+
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -333,14 +334,15 @@ function BlueprintFieldInputs({
   if (fieldType === "textarea") {
     return (
       <div className="flex max-h-[30rem] min-h-[10rem] flex-col">
+        <span className="text-sm text-zinc-300">{title}</span>
         <Editor
-          initialContent={currentValue as string}
+          initialContent={currentValue as RemirrorJSON}
           name={name}
           onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
         />
         {/* <Textarea
             label={title}
-            name={name}
+          name={name}
             onChange={({ value }) => {
               handleChange({ name, value: { id, value } });
             }}
@@ -729,15 +731,9 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     parent_id: string;
     value: InstanceStateBlueprintFieldsType;
     tags: TagType[];
-  }>({
-    id: "",
-    title: "",
-    parent_id: item_id as string,
-    value: {},
-    tags: [],
-  });
+  } | null>(null);
   const { handleChange, changedData } = useHandleChange({ data: instance, setData: setInstance });
-  const { data: blueprint } = useGetEntity<BlueprintType>(
+  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
     item_id,
     "blueprints",
     {
@@ -768,14 +764,22 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     { enabled: !!data?.id },
   );
   useLayoutEffect(() => {
-    if (existingInstance?.data && !instance.id && item_id) {
+    if (existingInstance?.data && !instance && !!data?.id) {
       const { id, parent_id, title, value, tags } = existingInstance.data;
       const fieldsByTemplateId = { [item_id as string]: value } as Record<string, BlueprintFieldValueType[]>;
       setInstance({ id, parent_id, title, value: fieldsByTemplateId, tags });
+    } else if (!data?.id && !instance) {
+      setInstance({
+        id: "",
+        title: "",
+        parent_id: item_id as string,
+        value: {},
+        tags: [],
+      });
     }
-  }, [existingInstance]);
+  }, [existingInstance?.data]);
 
-  if (isFetchingInstance) return <Skeleton type="drawer_form" />;
+  if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
   return (
     <div className="flex w-full flex-col gap-y-2">
       <ul className="flex flex-col overflow-y-auto">
@@ -788,7 +792,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
             value={instance?.title}
           />
         </div>
-        {blueprint?.data ? (
+        {blueprint?.data && !isFetchingInstance && !isFetchingBlueprint ? (
           <FieldTemplateRow
             key={blueprint?.data?.id}
             blueprint_fields={blueprint?.data.blueprint_fields}

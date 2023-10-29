@@ -142,7 +142,7 @@ function createColumns(
                 })
                 .join(", ");
             }
-            if (field.field_type === "images_single") {
+            if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
                 <Avatar hasShowImage image={getImageURL(project_id as string, "images", fieldData?.value?.value)} size="sm" />
               );
