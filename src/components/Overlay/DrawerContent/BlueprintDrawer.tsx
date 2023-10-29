@@ -270,15 +270,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
     title: "",
     project_id: project_id as string,
-    blueprint_fields: [
-      // {
-      //   id: crypto.randomUUID(),
-      //   title: "Title",
-      //   field_type: "text",
-      //   sort: 0,
-      //   project_id: project_id as string,
-      // },
-    ],
+    blueprint_fields: [],
   });
 
   const { handleChange } = useHandleChange({ data: blueprint, setData: setBlueprint });
@@ -308,6 +300,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             label="Blueprint title (required)"
             name="title"
             onChange={handleChange}
+            placeholder="Eg. Organizations"
             value={blueprint?.title || ""}
           />
         </div>
@@ -321,7 +314,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               name="title_name"
               onChange={handleChange}
               placeholder="Eg. Name / Title / First name / etc."
-              value={blueprint.title_name}
+              value={blueprint.title_name || ""}
             />
           </div>
           <div className="h-full w-1/4">
@@ -344,7 +337,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                 { label: "Half", value: "half" },
                 { label: "Full", value: "full" },
               ]}
-              value={blueprint.title_width}
+              value={blueprint.title_width || ""}
             />
           </div>
         </div>

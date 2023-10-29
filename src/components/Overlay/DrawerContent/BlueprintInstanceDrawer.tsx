@@ -4,12 +4,20 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { flattenArray } from "remirror";
 
-import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
+import {
+  useCreateSubEntity,
+  useGetEntities,
+  useGetEntity,
+  useGetSubEntity,
+  useHandleChange,
+  useUpdateSubEntity,
+} from "../../../hooks";
 import {
   BlueprintFieldType,
   BlueprintFieldValueType,
   BlueprintInstanceType,
   BlueprintType,
+  CharacterType,
   HandleChangePropsType,
   NotificationType,
   TagType,
@@ -20,6 +28,7 @@ import {
   DiceRollParser,
   drawerAtom,
   FetchFunction,
+  getCharacterFullName,
   getRollValue,
   IconEnum,
   sortEntities,
@@ -30,7 +39,7 @@ import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select, Title } from "../../Form";
 import { Collapsible } from "../../Layout";
-import { Alert } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
   data: { id?: string };
@@ -41,7 +50,6 @@ type CurrentValueType = string | string[] | number | boolean | Record<string, an
 function RandomTableInput({
   id,
   title,
-  random_table_options,
   currentValue,
   subOptionValue,
   index,
@@ -77,7 +85,7 @@ function RandomTableInput({
 
     enabled: false,
   });
-  const selectedOptionSuboptions = random_table_options?.find((opt) => opt?.id === currentValue)?.suboptions;
+  const selectedOptionSuboptions = random_table?.random_table_options?.find((opt) => opt?.id === currentValue)?.suboptions;
   return (
     <div className="flex flex-col gap-y-1">
       <div className="flex flex-nowrap items-center gap-x-2">
@@ -90,7 +98,7 @@ function RandomTableInput({
           onChange={({ value }) => {
             handleChange({ name, value: { id, value: { value } } });
           }}
-          options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
+          options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">
@@ -213,7 +221,6 @@ function BlueprintFieldInputs({
   title,
   field_type: fieldType,
   options,
-  random_table_options,
   calendar,
   value: currentValue,
   index,
@@ -235,7 +242,28 @@ function BlueprintFieldInputs({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
+  const { project_id } = useParams();
   const name = `value[${template_id}][${index}]`;
+
+  const { data: characters } = useGetEntities<CharacterType>(
+    {
+      data: { project_id },
+      filters: {
+        and: [
+          {
+            operator: Array.isArray(currentValue) ? "in" : "eq",
+            value: currentValue as string | string[],
+            field: "id",
+          },
+        ],
+      },
+    },
+    "characters",
+    {
+      enabled: (fieldType === "characters_single" || fieldType === "characters_multiple") && !!currentValue,
+    },
+  );
+
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -342,7 +370,6 @@ function BlueprintFieldInputs({
         isRolling={isRolling}
         random_table={random_table}
         random_table_id={random_table_id}
-        random_table_options={random_table_options}
         subOptionValue={subOptionValue}
         template_id={template_id}
         title={title}
@@ -381,18 +408,16 @@ function BlueprintFieldInputs({
         <div className="mt-2 flex flex-col gap-y-2">
           <Search
             name={name}
-            onChange={({ label, image, value }) => {
+            onChange={({ value }) => {
               if (fieldType === "characters_single") {
-                handleChange({ name, value: { id, value: { value: { label, image, id: value } } } });
+                handleChange({ name, value: { id, value: { value } } });
               } else {
                 handleChange({
                   name,
                   value: {
                     id,
                     value: {
-                      value: Array.isArray(currentValue)
-                        ? [...currentValue, { label, image, id: value }]
-                        : [{ label, image, id: value }],
+                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
                     },
                   },
                 });
@@ -401,14 +426,28 @@ function BlueprintFieldInputs({
             placeholder="Press enter to search."
             searchEntity="characters"
           />
-          {currentValue && !Array.isArray(currentValue) && typeof currentValue === "object" ? (
+          {characters?.data?.map((char) => (
             <EntityPreview
-              clearAction={() => handleChange({ name, value: null })}
-              id={currentValue?.id}
-              image_id={currentValue?.image}
-              title={currentValue?.label}
+              key={char?.id}
+              clearAction={() =>
+                handleChange({
+                  name,
+                  value: {
+                    id,
+                    value: {
+                      value:
+                        fieldType === "characters_multiple" ? (currentValue as string[]).filter((c) => c !== char?.id) : null,
+                    },
+                  },
+                })
+              }
+              id={char?.id}
+              image_id={char?.portrait_id}
+              title={getCharacterFullName(char?.first_name, undefined, char?.last_name)}
               type="characters"
             />
+          ))}
+          {/* {currentValue && !Array.isArray(currentValue) && typeof currentValue === "object" ? (
           ) : null}
           {currentValue && Array.isArray(currentValue)
             ? currentValue.map((v) => {
@@ -425,7 +464,7 @@ function BlueprintFieldInputs({
                   );
                 return null;
               })
-            : null}
+            : null} */}
         </div>
       </Collapsible>
     );
@@ -593,25 +632,26 @@ function FieldTemplateRow({
   return (
     <li className="flex flex-col gap-y-2 first:mt-0">
       <Title actions={collapsibleActions} isDrawerTitle label={title} size="xl" />
-      <div className="flex select-none flex-col gap-y-2 pt-2">
+      <div className="grid select-none grid-cols-2 gap-2 pt-2">
         {blueprint_fields.sort(sortEntities).map((template_field) => {
           const fieldValueIndex = (blueprint_fields_data[template_id] || [])?.findIndex(
             (field) => template_field?.id === field?.id,
           );
           if (fieldValueIndex !== undefined)
             return (
-              <BlueprintFieldInputs
-                key={template_field.id}
-                {...template_field}
-                createNotification={createNotification}
-                formula={template_field?.formula}
-                handleChange={handleChange}
-                index={fieldValueIndex === -1 ? blueprint_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
-                isRolling={isRolling}
-                subOptionValue={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
-                template_id={template_id}
-                value={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
-              />
+              <div key={template_field.id} className={`${template_field.width === "full" ? "col-span-2" : "col-span-1"}`}>
+                <BlueprintFieldInputs
+                  {...template_field}
+                  createNotification={createNotification}
+                  formula={template_field?.formula}
+                  handleChange={handleChange}
+                  index={fieldValueIndex === -1 ? blueprint_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
+                  isRolling={isRolling}
+                  subOptionValue={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
+                  template_id={template_id}
+                  value={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
+                />
+              </div>
             );
 
           return null;
@@ -646,6 +686,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         id: item_id,
       },
       relations: {
+        random_table_options: true,
         blueprint_fields: true,
       },
     },
@@ -656,7 +697,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
 
-  const { data: existingInstance } = useGetSubEntity<BlueprintInstanceType>(
+  const { data: existingInstance, isFetching: isFetchingInstance } = useGetSubEntity<BlueprintInstanceType>(
     data?.id,
     "blueprint_instances",
     {
@@ -674,6 +715,8 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       setInstance({ id, parent_id, title, value: fieldsByTemplateId, tags });
     }
   }, [existingInstance]);
+
+  if (isFetchingInstance) return <Skeleton type="drawer_form" />;
   return (
     <div className="flex w-full flex-col gap-y-2">
       <ul className="flex flex-col overflow-y-auto">

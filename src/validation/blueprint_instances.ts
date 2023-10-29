@@ -8,7 +8,13 @@ export const InsertBlueprintInstanceSchema = z.object({
       .object({
         id: z.string(),
         value: z.object({
-          value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())),
+          value: z
+            .string()
+            .or(z.string().array())
+            .or(z.number())
+            .or(z.boolean())
+            .or(z.record(z.any()))
+            .or(z.record(z.any()).array()),
           subOptionValue: z.string().optional(),
         }),
       })
@@ -20,6 +26,7 @@ export const InsertBlueprintInstanceSchema = z.object({
 });
 export const UpdateBlueprintInstanceSchema = z.object({
   data: z.object({
+    id: z.string(),
     title: z.string().optional(),
     value: z
       .object({
