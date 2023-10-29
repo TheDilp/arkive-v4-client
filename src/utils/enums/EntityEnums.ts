@@ -61,8 +61,8 @@ export const SearchFieldTypes = [
   "documents_multiple",
   "images_single",
   "images_multiple",
-  // "locations_single",
-  // "locations_multiple",
+  "locations_single",
+  "locations_multiple",
 ];
 
 export const BaseCharacterRelationshipOptionsEnum = [

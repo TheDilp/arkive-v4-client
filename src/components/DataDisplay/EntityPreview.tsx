@@ -8,7 +8,7 @@ import { Avatar, Icon } from "../Misc";
 export function EntityPreview({ id, title, type, link, icon, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
   const { project_id } = useParams();
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col">
       {label ? <div className="block min-h-[20px] truncate text-sm text-zinc-300">{label}</div> : null}
       <Link
         className={`flex max-h-10 items-center gap-x-2 rounded p-2 ${

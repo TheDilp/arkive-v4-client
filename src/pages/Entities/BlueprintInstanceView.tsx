@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
-import { BlueprintInstanceType, CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
+import { BlueprintInstanceType, CharacterType, DialogAtomType, DrawerAtomType, MapPinType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, getAvatarInitials, getCharacterFullName, getImageURL, IconEnum } from "../../utils";
 
@@ -31,7 +31,7 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
     "characters",
     { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
-  if (isFetching) return <Skeleton limit={5} type="avatar" />;
+  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="flex items-center gap-x-2">
       <div className="flex w-full items-center justify-center -space-x-4">
@@ -55,6 +55,42 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
             .join(", ")}>
           <div className="w-min max-w-min">
             <Badge label={`+${characters.data.length - 5}`} size="sm" variant="secondary" />
+          </div>
+        </Tooltip>
+      ) : null}
+    </div>
+  );
+}
+function LocationColumn({ ids }: { ids: string | string[] }) {
+  const { project_id } = useParams();
+  const { data: locations, isFetching } = useGetEntities<MapPinType>(
+    {
+      data: { project_id },
+      fields: ["id", "title", "icon", "image_id"],
+      filters: {
+        and: [
+          { field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" },
+          { field: "character_id", operator: "is", value: null },
+        ],
+      },
+    },
+    "map_pins",
+    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+  );
+  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+  return (
+    <div className="flex items-center gap-x-2">
+      <div className="flex w-full items-center justify-center -space-x-4">
+        {locations?.data?.slice(0, 5)?.map((location) => location?.title)}
+      </div>
+      {locations?.data && locations?.data?.length > 5 ? (
+        <Tooltip
+          content={locations?.data
+            .slice(5)
+            .map((location) => location.title)
+            .join(", ")}>
+          <div className="w-min max-w-min">
+            <Badge label={`+${locations.data.length - 5}`} size="sm" variant="secondary" />
           </div>
         </Tooltip>
       ) : null}
@@ -108,6 +144,9 @@ function createColumns(
             }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
               return <CharacterColumn ids={fieldData?.value?.value} />;
+            }
+            if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
+              return <LocationColumn ids={fieldData?.value?.value} />;
             }
 
             if (field.field_type === "random_table") {

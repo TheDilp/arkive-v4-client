@@ -30,7 +30,11 @@ import {
   FetchFunction,
   getCharacterFullName,
   getRollValue,
+  getSearchFieldTypeLabel,
+  getSearchFieldTypeLinkType,
+  getSearchFieldTypeSearchType,
   IconEnum,
+  SearchFieldTypes,
   sortEntities,
   useNotifications,
 } from "../../../utils";
@@ -448,92 +452,76 @@ function BlueprintFieldInputs({
               type="characters"
             />
           ))}
-          {/* {currentValue && !Array.isArray(currentValue) && typeof currentValue === "object" ? (
-          ) : null}
-          {currentValue && Array.isArray(currentValue)
-            ? currentValue.map((v) => {
-                if (typeof v === "object")
-                  return (
-                    <EntityPreview
-                      key={v?.id}
-                      clearAction={() => handleChange({ name, value: null })}
-                      id={v?.id}
-                      image_id={v?.image}
-                      title={v?.label}
-                      type="characters"
-                    />
-                  );
-                return null;
-              })
-            : null} */}
         </div>
       </Collapsible>
     );
   }
-  // if (SearchFieldTypes.includes(fieldType)) {
-  //   return (
-  //     <div className="flex flex-col">
-  //       {!currentValue && fieldType?.includes("single") ? (
-  //         <Search
-  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-  //           name={name}
-  //           onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
-  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-  //         />
-  //       ) : null}
-  //       {currentValue && fieldType?.includes("single") ? (
-  //         <EntityPreview
-  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
-  //           id={(currentValue as Record<string, any>)?.value}
-  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-  //           label={title}
-  //           link={
-  //             fieldType === "images_single"
-  //               ? ""
-  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-  //                   (currentValue as Record<string, any>)?.value
-  //                 }`
-  //           }
-  //           title={(currentValue as Record<string, any>)?.title}
-  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-  //         />
-  //       ) : null}
-  //       {fieldType?.includes("multiple") ? (
-  //         <Search
-  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-  //           name={name}
-  //           onChange={({ label, value }) => {
-  //             handleChange({
-  //               name,
-  //               value: {
-  //                 id,
-  //                 value: ((currentValue as Record<string, any>[]) || []).concat([{ value: { value, title: label } }]),
-  //               },
-  //             });
-  //           }}
-  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-  //         />
-  //       ) : null}
-  //       {Array.isArray(currentValue) && fieldType?.includes("multiple") ? (
-  //         <EntityPreview
-  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
-  //           id={(currentValue as Record<string, any>)?.value}
-  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-  //           label={title}
-  //           link={
-  //             fieldType === "images_single"
-  //               ? ""
-  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-  //                   (currentValue as Record<string, any>)?.value
-  //                 }`
-  //           }
-  //           title={(currentValue as Record<string, any>)?.title}
-  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-  //         />
-  //       ) : null}
-  //     </div>
-  //   );
-  // }
+  if (SearchFieldTypes.includes(fieldType)) {
+    return (
+      <div className="flex flex-col">
+        {!currentValue && fieldType?.includes("single") ? (
+          <Search
+            label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
+            name={name}
+            onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+            searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
+          />
+        ) : null}
+        {currentValue && fieldType?.includes("single") ? (
+          <EntityPreview
+            clearAction={() => handleChange({ name, value: { id, value: {} } })}
+            id={(currentValue as Record<string, any>)?.value}
+            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
+            label={title}
+            link={
+              fieldType === "images_single"
+                ? ""
+                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
+                    (currentValue as Record<string, any>)?.value
+                  }`
+            }
+            title={(currentValue as Record<string, any>)?.title}
+            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+          />
+        ) : null}
+        {fieldType?.includes("multiple") ? (
+          <Search
+            label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
+            name={name}
+            onChange={({ value }) => {
+              handleChange({
+                name,
+                value: {
+                  id,
+                  value: {
+                    value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
+                  },
+                },
+              });
+            }}
+            searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
+          />
+        ) : null}
+        {Array.isArray(currentValue) && fieldType?.includes("multiple") ? (
+          <EntityPreview
+            clearAction={() => handleChange({ name, value: { id, value: {} } })}
+            id={(currentValue as Record<string, any>)?.value}
+            image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
+            label={title}
+            link={
+              fieldType === "images_single"
+                ? ""
+                : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
+                    (currentValue as Record<string, any>)?.value
+                  }`
+            }
+            title={(currentValue as Record<string, any>)?.title}
+            type={getSearchFieldTypeSearchType(fieldType) || "documents"}
+          />
+        ) : null}
+      </div>
+    );
+  }
   return null;
 }
 
