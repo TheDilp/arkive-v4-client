@@ -1,12 +1,23 @@
 import { useParams } from "react-router-dom";
 
-import { Button, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
 import { useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { BlueprintInstanceType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { IconEnum } from "../../utils";
 
-// const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<any>();
+function createColumns(blueprint: BlueprintType) {
+  return blueprint.blueprint_fields
+    .filter((field) => !["characters_single", "characters_multiple"].includes(field.field_type))
+    .map((field) =>
+      columnHelper.accessor(field.title, {
+        id: field.title,
+        header: field.title,
+        cell: () => "test",
+      }),
+    );
+}
 
 // function createColumns(fields: CharacterFieldType[]) {
 //   return fields.map((field) => {
@@ -102,7 +113,7 @@ export function BlueprintInstanceView() {
     {
       data: {
         project_id: "",
-        blueprint_id: item_id,
+        parent_id: item_id,
       },
     },
     "blueprint_instances",
@@ -128,17 +139,19 @@ export function BlueprintInstanceView() {
         </div>
       </div>
       <div className="w-full flex-1 overflow-hidden">
-        <Table
-          columns={[]}
-          config={{
-            hasSelect: true,
-          }}
-          data={data?.data?.blueprint_instances || []}
-          dispatch={dispatch}
-          //   isLoading={isLoading}
-          //   pagination={pagination}
-          type="characters"
-        />
+        {data?.data ? (
+          <Table
+            columns={createColumns(data?.data)}
+            config={{
+              hasSelect: true,
+            }}
+            data={data?.data?.blueprint_instances || []}
+            dispatch={dispatch}
+            //   isLoading={isLoading}
+            //   pagination={pagination}
+            type="characters"
+          />
+        ) : null}
       </div>
     </TablePageLayout>
   );
