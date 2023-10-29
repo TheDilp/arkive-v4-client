@@ -68,7 +68,7 @@ function RandomTableInput({
   random_table,
   template_id,
   handleChange,
-}: Omit<CharacterFieldType, "project_id" | "sort"> & {
+}: Omit<CharacterFieldType, "sort"> & {
   index: number;
   currentValue: CurrentValueType;
   isRolling: boolean;

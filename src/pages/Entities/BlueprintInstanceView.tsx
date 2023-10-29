@@ -1,15 +1,20 @@
-import { useSetAtom } from "jotai";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useGetEntities, useGetEntity, useTable } from "../../hooks";
-import { BlueprintInstanceType } from "../../types";
+import { BlueprintInstanceType, DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { drawerAtom, IconEnum } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum } from "../../utils";
 
 const columnHelper = createColumnHelper<any>();
-function createColumns(blueprint: BlueprintType) {
-  return blueprint.blueprint_fields
+function createColumns(
+  blueprint: BlueprintType,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+) {
+  const fieldColumns = blueprint.blueprint_fields
     .filter((field) => !["characters_single", "characters_multiple"].includes(field.field_type))
     .map((field) =>
       columnHelper.accessor(field.title, {
@@ -18,88 +23,65 @@ function createColumns(blueprint: BlueprintType) {
         cell: () => "test",
       }),
     );
+
+  fieldColumns.push(
+    columnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                label: "Edit instance",
+                icon: IconEnum.edit,
+                onClick: () => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: row.original,
+                    title: "Edit instance",
+                    size: "lg",
+                    type: "blueprint_instances",
+                  }));
+                },
+              },
+
+              {
+                id: "delete_instance",
+                label: "Delete instance",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "blueprint_instances",
+                    },
+                    title: "Delete instance",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  );
+  return fieldColumns;
 }
-
-// function createColumns(fields: CharacterFieldType[]) {
-//   return fields.map((field) => {
-//     if (field.field_type === "text")
-//       return columnHelper.accessor(field.title, {
-//         id: field.id,
-//         header: capitalizeFirstLetter(field.title),
-//         cell: "Cell",
-//       });
-//   });
-//   // columnHelper.display({
-//   //   id: "action",
-//   //   header: "Actions",
-//   //   meta: {
-//   //     centered: true,
-//   //   },
-//   //   cell: () => (
-//   //     <div className="flex items-center justify-center">
-//   //       <Dropdown
-//   //         allowedPlacements={["left", "left-start", "left-end"]}
-//   //         items={[
-//   //           {
-//   //             id: "1",
-//   //             label: "Edit character",
-//   //             icon: IconEnum.edit,
-//   //             onClick: () => {
-//   //               // setDrawer((prev) => ({
-//   //               //   ...prev,
-//   //               //   data: row.original,
-//   //               //   title: `Edit character - ${getCharacterFullName(row.original.first_name, "", row.original?.last_name)}`,
-//   //               //   size: "lg",
-//   //               //   type: "characters",
-//   //               // }));
-//   //             },
-//   //           },
-
-//   //           {
-//   //             id: "2",
-//   //             label: "View relationship tree",
-//   //             icon: IconEnum.family_tree,
-//   //             onClick: () => {
-//   //               // setDialog({
-//   //               //   type: "family_tree",
-//   //               //   title: `Relationship tree of ${getCharacterFullName(
-//   //               //     row.original.first_name,
-//   //               //     "",
-//   //               //     row.original?.last_name || "",
-//   //               //   )}`,
-//   //               //   data: { id: row.original.id },
-//   //               //   size: "lg",
-//   //               // });
-//   //             },
-//   //           },
-//   //           {
-//   //             id: "delete_character",
-//   //             label: "Delete character",
-//   //             icon: IconEnum.trash,
-//   //             onClick: () => {
-//   //               // setDialog((prev) => ({
-//   //               //   ...prev,
-//   //               //   data: {
-//   //               //     ...row.original,
-//   //               //     entity_title: "characters",
-//   //               //   },
-//   //               //   title: "Delete character",
-//   //               //   size: "sm",
-//   //               //   type: "delete_entity",
-//   //               // }));
-//   //             },
-//   //           },
-//   //         ]}>
-//   //         <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-//   //       </Dropdown>
-//   //     </div>
-//   //   ),
-//   // }),
-// }
 
 export function BlueprintInstanceView() {
   const { item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const [, dispatch] = useTable({});
 
   const { data } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -142,7 +124,7 @@ export function BlueprintInstanceView() {
       <div className="w-full flex-1 overflow-hidden">
         {data?.data ? (
           <Table
-            columns={createColumns(data?.data)}
+            columns={createColumns(data?.data, setDrawer, setDialog)}
             config={{
               hasSelect: true,
             }}

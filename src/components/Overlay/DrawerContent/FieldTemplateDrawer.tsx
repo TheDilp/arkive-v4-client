@@ -52,7 +52,7 @@ function FieldRow({
   isLoading,
   changeField,
   deleteField,
-}: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; value: string }[] }) & {
+}: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
     name,

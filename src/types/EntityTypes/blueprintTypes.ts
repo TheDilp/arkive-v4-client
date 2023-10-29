@@ -29,3 +29,13 @@ export type BlueprintStateType = Partial<
     blueprint_fields: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] })[];
   }
 >;
+
+export interface BlueprintFieldValueType {
+  id: string;
+  value: {
+    id: string;
+    value: string | number | string[] | boolean | null | Record<string, number | string>;
+    subOptionValue?: string;
+  };
+  template_id: string;
+}

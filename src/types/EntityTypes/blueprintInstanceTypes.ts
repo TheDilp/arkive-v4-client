@@ -1,8 +1,15 @@
 import { BlueprintType } from "./blueprintTypes";
+import { TagType } from "./tagTypes";
 
+export type BlueprintInstanceValueType = {
+  id: string;
+  value: string | number | string[] | null | Record<string, number | string>;
+  subOptionValue?: string;
+}[];
 export interface BlueprintInstanceType {
   id: string;
-  blueprint_id: string;
+  parent_id: string;
   blueprint: BlueprintType;
-  value: { id: string; value: string | number | string[] | null | Record<string, number | string>; subOptionValue?: string };
+  value: BlueprintInstanceValueType;
+  tags: TagType[];
 }
