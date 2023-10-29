@@ -110,6 +110,7 @@ export function BlueprintView() {
     },
     "blueprints",
   );
+
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">

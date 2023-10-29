@@ -41,6 +41,7 @@ export type AvailableSubEntityType =
   | "events"
   | "random_table_options"
   | "character_fields"
+  | "blueprint_instances"
   | "messages";
 
 export type SearchableEntities =

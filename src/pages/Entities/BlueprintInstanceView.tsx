@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 
 import { Button, Table, TablePageLayout } from "../../components";
-import { useGetEntity, useTable } from "../../hooks";
+import { useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { BlueprintInstanceType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { IconEnum } from "../../utils";
 
@@ -94,10 +95,18 @@ export function BlueprintInstanceView() {
     },
     relations: {
       blueprint_instances: true,
-      character_fields: true,
+      blueprint_fields: true,
     },
   });
-
+  useGetEntities<BlueprintInstanceType>(
+    {
+      data: {
+        project_id: "",
+        blueprint_id: item_id,
+      },
+    },
+    "blueprint_instances",
+  );
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
