@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { flattenArray } from "remirror";
 
@@ -19,6 +19,7 @@ import {
   BlueprintType,
   CharacterType,
   HandleChangePropsType,
+  MapPinType,
   NotificationType,
   TagType,
 } from "../../../types";
@@ -29,7 +30,6 @@ import {
   drawerAtom,
   FetchFunction,
   getCharacterFullName,
-  getRollValue,
   getSearchFieldTypeLabel,
   getSearchFieldTypeLinkType,
   getSearchFieldTypeSearchType,
@@ -233,7 +233,6 @@ function BlueprintFieldInputs({
   random_table,
   isRolling,
   subOptionValue,
-  width,
   template_id,
   handleChange,
   createNotification,
@@ -265,6 +264,29 @@ function BlueprintFieldInputs({
     "characters",
     {
       enabled: (fieldType === "characters_single" || fieldType === "characters_multiple") && !!currentValue,
+    },
+  );
+  const { data: locations } = useGetEntities<MapPinType>(
+    {
+      data: { project_id },
+      filters: {
+        and: [
+          {
+            operator: Array.isArray(currentValue) ? "in" : "eq",
+            value: currentValue as string | string[],
+            field: "id",
+          },
+          {
+            operator: "is",
+            value: null,
+            field: "character_id",
+          },
+        ],
+      },
+    },
+    "map_pins",
+    {
+      enabled: (fieldType === "locations_single" || fieldType === "locations_multiple") && !!currentValue,
     },
   );
 
@@ -378,7 +400,6 @@ function BlueprintFieldInputs({
         subOptionValue={subOptionValue}
         template_id={template_id}
         title={title}
-        width={width}
       />
     );
   }
@@ -410,7 +431,7 @@ function BlueprintFieldInputs({
   if (fieldType === "characters_single" || fieldType === "characters_multiple") {
     return (
       <Collapsible label={title}>
-        <div className="mt-2 flex flex-col gap-y-2">
+        <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
           <Search
             name={name}
             onChange={({ value }) => {
@@ -456,6 +477,59 @@ function BlueprintFieldInputs({
       </Collapsible>
     );
   }
+  if (fieldType === "locations_single" || fieldType === "locations_multiple") {
+    return (
+      <div className="flex flex-col gap-y-2">
+        {fieldType === "locations_single" && !currentValue ? (
+          <Search
+            label={title}
+            name={name}
+            onChange={({ value }) => {
+              if (fieldType === "locations_single") {
+                handleChange({ name, value: { id, value: { value } } });
+              } else {
+                handleChange({
+                  name,
+                  value: {
+                    id,
+                    value: {
+                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
+                    },
+                  },
+                });
+              }
+            }}
+            placeholder="Press enter to search."
+            searchEntity="map_pins"
+          />
+        ) : null}
+        {locations?.data?.map((location) => (
+          <EntityPreview
+            key={location?.id}
+            clearAction={() =>
+              handleChange({
+                name,
+                value: {
+                  id,
+                  value: {
+                    value:
+                      fieldType === "locations_multiple" ? (currentValue as string[]).filter((c) => c !== location?.id) : null,
+                  },
+                },
+              })
+            }
+            icon={location?.icon}
+            id={location?.id}
+            image_id={location?.image_id}
+            label={location?.title || ""}
+            title={location?.title || ""}
+            type="map_pins"
+          />
+        ))}
+      </div>
+    );
+  }
+
   if (SearchFieldTypes.includes(fieldType)) {
     return (
       <div className="flex flex-col">
@@ -527,7 +601,6 @@ function BlueprintFieldInputs({
 
 function FieldTemplateRow({
   template_id,
-  title,
   blueprint_fields = [],
   blueprint_fields_data = {},
   createNotification,
@@ -541,101 +614,100 @@ function FieldTemplateRow({
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
-  const [isRolling, setIsRolling] = useState(false);
-  const randomTableFields = blueprint_fields
-    .filter((field) => field.field_type === "random_table")
-    .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
+  // const [isRolling, setIsRolling] = useState(false);
+  // const randomTableFields = blueprint_fields
+  //   .filter((field) => field.field_type === "random_table")
+  //   .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
 
-  const diceRollFields = blueprint_fields
-    .filter((field) => field.field_type === "dice_roll")
-    .map((field) => ({ field_id: field.id, formula: field?.formula }));
+  // const diceRollFields = blueprint_fields
+  //   .filter((field) => field.field_type === "dice_roll")
+  //   .map((field) => ({ field_id: field.id, formula: field?.formula }));
 
-  const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
-    ["randomTables", "many", template_id],
-    async () =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/random_table_options/random/many`,
-        body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
-        method: "POST",
-      }),
-    { enabled: false },
-  );
-  const hasRandomTableOrRoll = blueprint_fields.some(
-    (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
-  );
+  // const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
+  //   ["randomTables", "many", template_id],
+  //   async () =>
+  //     FetchFunction({
+  //       url: `${baseURLS.baseServer}/random_table_options/random/many`,
+  //       body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
+  //       method: "POST",
+  //     }),
+  //   { enabled: false },
+  // );
+  // const hasRandomTableOrRoll = blueprint_fields.some(
+  //   (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
+  // );
 
-  const collapsibleActions = hasRandomTableOrRoll
-    ? [
-        {
-          icon: IconEnum.d20,
-          onClick: async (e: Event) => {
-            e.preventDefault();
-            const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
-            for (let i = 0; i < diceRollFields.length; i += 1) {
-              const formula = diceRollFields[i]?.formula;
+  // const collapsibleActions = hasRandomTableOrRoll
+  //   ? [
+  //       {
+  //         icon: IconEnum.d20,
+  //         onClick: async (e: Event) => {
+  //           e.preventDefault();
+  //           const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
+  //           for (let i = 0; i < diceRollFields.length; i += 1) {
+  //             const formula = diceRollFields[i]?.formula;
 
-              if (formula) {
-                if (!isRolling) setIsRolling(true);
-                const idx = blueprint_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
-                if (idx > -1) {
-                  // eslint-disable-next-line no-await-in-loop
-                  const value = await getRollValue(formula, true);
-                  fieldsToChange.push({
-                    name: `blueprint_fields[${template_id}][${idx}]`,
-                    value: { id: diceRollFields[i].field_id, value: { value } },
-                  });
-                }
-              }
-            }
-            handleChange(fieldsToChange);
-            setIsRolling(false);
-            if (randomTableFields.length) await refetch();
-          },
-          tooltip: "Autoroll all random table and dice roll fields in this template.",
-        },
-      ]
-    : [];
+  //             if (formula) {
+  //               if (!isRolling) setIsRolling(true);
+  //               const idx = blueprint_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
+  //               if (idx > -1) {
+  //                 // eslint-disable-next-line no-await-in-loop
+  //                 const value = await getRollValue(formula, true);
+  //                 fieldsToChange.push({
+  //                   name: `blueprint_fields[${template_id}][${idx}]`,
+  //                   value: { id: diceRollFields[i].field_id, value: { value } },
+  //                 });
+  //               }
+  //             }
+  //           }
+  //           handleChange(fieldsToChange);
+  //           setIsRolling(false);
+  //           if (randomTableFields.length) await refetch();
+  //         },
+  //         tooltip: "Autoroll all random table and dice roll fields in this template.",
+  //       },
+  //     ]
+  //   : [];
 
-  useEffect(() => {
-    if (data?.data?.length) {
-      const fieldsToChange = [];
-      for (let i = 0; i < data?.data?.length; i += 1) {
-        const idx = blueprint_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
-        if (idx > -1) {
-          fieldsToChange.push({
-            name: `blueprint_fields[${template_id}][${idx}]`,
-            value: {
-              id: blueprint_fields[idx].id,
-              value: {
-                value: data?.data[i].random_table?.[0]?.id,
-                subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
-              },
-            },
-          });
-        }
-      }
-      handleChange(fieldsToChange);
-    }
-  }, [data?.data]);
+  // useEffect(() => {
+  //   if (data?.data?.length) {
+  //     const fieldsToChange = [];
+  //     for (let i = 0; i < data?.data?.length; i += 1) {
+  //       const idx = blueprint_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
+  //       if (idx > -1) {
+  //         fieldsToChange.push({
+  //           name: `blueprint_fields[${template_id}][${idx}]`,
+  //           value: {
+  //             id: blueprint_fields[idx].id,
+  //             value: {
+  //               value: data?.data[i].random_table?.[0]?.id,
+  //               subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
+  //             },
+  //           },
+  //         });
+  //       }
+  //     }
+  //     handleChange(fieldsToChange);
+  //   }
+  // }, [data?.data]);
 
   return (
-    <li className="flex flex-col gap-y-2 first:mt-0">
-      <Title actions={collapsibleActions} isDrawerTitle label={title} size="xl" />
-      <div className="grid select-none grid-cols-2 gap-2 pt-2">
+    <li className="flex flex-col first:mt-0">
+      <div className="flex select-none flex-col gap-y-2 pt-2">
         {blueprint_fields.sort(sortEntities).map((template_field) => {
           const fieldValueIndex = (blueprint_fields_data[template_id] || [])?.findIndex(
             (field) => template_field?.id === field?.id,
           );
           if (fieldValueIndex !== undefined)
             return (
-              <div key={template_field.id} className={`${template_field.width === "full" ? "col-span-2" : "col-span-1"}`}>
+              <div key={template_field.id} className="w-full">
                 <BlueprintFieldInputs
                   {...template_field}
                   createNotification={createNotification}
                   formula={template_field?.formula}
                   handleChange={handleChange}
                   index={fieldValueIndex === -1 ? blueprint_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
-                  isRolling={isRolling}
+                  isRolling={false}
                   subOptionValue={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
                   template_id={template_id}
                   value={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}

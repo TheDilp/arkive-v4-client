@@ -15,9 +15,8 @@ import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
   if (!blueprint?.title) return true;
-  if (!blueprint?.title_name || !blueprint?.title_width) return true;
+  if (!blueprint?.title_name) return true;
   if (!blueprint?.blueprint_fields?.length) return true;
-  // if (!blueprint?.tags?.length) return true;
   if (
     blueprint.blueprint_fields.some(
       (field) =>
@@ -41,7 +40,6 @@ function FieldRow({
   calendar,
   options,
   formula,
-  width: field_width,
   index,
   random_table_id,
   random_table,
@@ -70,7 +68,7 @@ function FieldRow({
             value={title}
           />
         </div>
-        <div className="h-full max-w-[30%] flex-1">
+        <div className="h-full flex-1">
           <Select
             isDisabled={isLoading}
             label="Field type"
@@ -79,19 +77,6 @@ function FieldRow({
             options={BlueprintFieldTypesEnum}
             placeholder="Field type"
             value={field_type}
-          />
-        </div>
-        <div className="w-1/4">
-          <Select
-            isDisabled={isLoading}
-            label="Width"
-            name={`blueprint_fields[${index}].width`}
-            onChange={changeField}
-            options={[
-              { label: "Half", value: "half" },
-              { label: "Full", value: "full" },
-            ]}
-            value={field_width}
           />
         </div>
 
@@ -322,19 +307,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               value="text"
             />
           </div>
-          <div className="w-1/4">
-            <Select
-              isDisabled={isCreating || isUpdating}
-              label="Width"
-              name="title_width"
-              onChange={handleChange}
-              options={[
-                { label: "Half", value: "half" },
-                { label: "Full", value: "full" },
-              ]}
-              value={blueprint.title_width || ""}
-            />
-          </div>
         </div>
         <span className="text-sm text-zinc-400">
           This field is required but can be renamed. It is used to display the blueprint instance in the table of all instances
@@ -357,7 +329,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   id: crypto.randomUUID(),
                   title: "",
                   field_type: "text",
-                  width: "half",
+                  // width: "half",
                   sort: blueprint?.blueprint_fields?.length ?? 0,
                 }),
               })
@@ -424,7 +396,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             random_table_id={field?.random_table_id}
                             sort={field.sort}
                             title={field.title}
-                            width={field?.width}
                           />
                         </div>
                       )}

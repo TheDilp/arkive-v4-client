@@ -1,5 +1,5 @@
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
-import { BlueprintFieldTypes, FieldWidthType } from "./fieldsTypes";
+import { BlueprintFieldTypes } from "./fieldsTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
 
 export interface BlueprintFieldType {
@@ -7,7 +7,7 @@ export interface BlueprintFieldType {
   sort: number;
   title: string;
   field_type: BlueprintFieldTypes;
-  width: FieldWidthType;
+  // width: FieldWidthType;
   formula?: string | null;
   random_table_id?: string | null;
   calendar_id?: string | null;
@@ -19,7 +19,7 @@ export interface BlueprintType {
   id: string;
   title: string;
   title_name: string;
-  title_width: FieldWidthType;
+  // title_width: FieldWidthType;
   project_id: string;
   blueprint_instances: BlueprintInstanceType[];
   blueprint_fields: BlueprintFieldType[];

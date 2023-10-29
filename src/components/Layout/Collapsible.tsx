@@ -40,6 +40,7 @@ export function Collapsible({ label, icon, initialOpen, children, actions }: Col
         </span>
       </summary>
       <div
+        className="bg-zinc-950 p-2"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
