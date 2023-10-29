@@ -34,6 +34,7 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
   if (type === "events") return "calendars";
   if (type === "words") return "dictionaries";
   if (type === "messages") return "conversations";
+  if (type === "blueprint_instances") return "blueprints";
 
   return null;
 }
