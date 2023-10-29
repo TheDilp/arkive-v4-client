@@ -273,6 +273,22 @@ function ConversationSkeleton() {
   );
 }
 
+function AvatarSkeleton({ limit = 1 }: { limit?: number }) {
+  return (
+    <div className="flex w-full items-center justify-center -space-x-4">
+      {[...Array(limit).keys()].map((key) => (
+        <div
+          key={key}
+          className="h-10 w-10 animate-pulse rounded-full bg-zinc-700 shadow"
+          style={{
+            animationDelay: `${key * 100}ms`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
@@ -285,5 +301,6 @@ export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "calendar_view") return <CalendarViewSkeleton />;
   if (type === "expanded_tag") return <ExpandedTagSkeleton />;
   if (type === "conversations") return <ConversationSkeleton />;
+  if (type === "avatar") return <AvatarSkeleton limit={limit} />;
   return null;
 }
