@@ -181,10 +181,17 @@ function onClick({
       value === null ||
       value === ""
     ) {
-      onChange({
-        name,
-        value: value?.concat(options[index].value),
-      });
+      if (!value) {
+        onChange({
+          name,
+          value: [options[index].value],
+        });
+      } else {
+        onChange({
+          name,
+          value: value?.concat(options[index].value),
+        });
+      }
     }
   } else {
     const selectedItem = options.find((opt) => opt?.value === options[index].value);
