@@ -407,50 +407,52 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           )}
         </Droppable>
       </DragDropContext>
-      <Button
-        icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(blueprint) || isLoading}
-        isLoading={isLoading}
-        label={data?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (!data?.id) {
-            const { blueprint_fields, ...rest } = blueprint;
+      <div className="mt-auto">
+        <Button
+          icon={data?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(blueprint) || isLoading}
+          isLoading={isLoading}
+          label={data?.id ? "Update" : "Create"}
+          onClick={async () => {
+            if (!data?.id) {
+              const { blueprint_fields, ...rest } = blueprint;
 
-            const parsedData = InsertBlueprintSchema.parse({
-              data: { ...rest, project_id },
-              relations: {
-                blueprint_fields,
-              },
-            });
-            await create(parsedData, {
-              onSuccess: () => {
-                queryClient.invalidateQueries({
-                  predicate: (query) => query.queryKey.includes("blueprints"),
-                });
-                resetDrawerAtom();
-              },
-            });
-          } else {
-            const { blueprint_fields, ...rest } = blueprint;
+              const parsedData = InsertBlueprintSchema.parse({
+                data: { ...rest, project_id },
+                relations: {
+                  blueprint_fields,
+                },
+              });
+              await create(parsedData, {
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("blueprints"),
+                  });
+                  resetDrawerAtom();
+                },
+              });
+            } else {
+              const { blueprint_fields, ...rest } = blueprint;
 
-            const parsedData = UpdateBlueprintSchema.parse({
-              data: rest,
-              relations: {
-                blueprint_fields,
-              },
-            });
-            await update(parsedData, {
-              onSuccess: () => {
-                queryClient.invalidateQueries({
-                  predicate: (query) => query.queryKey.includes("blueprints"),
-                });
-                resetDrawerAtom();
-              },
-            });
-          }
-        }}
-        variant="success"
-      />
+              const parsedData = UpdateBlueprintSchema.parse({
+                data: rest,
+                relations: {
+                  blueprint_fields,
+                },
+              });
+              await update(parsedData, {
+                onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey.includes("blueprints"),
+                  });
+                  resetDrawerAtom();
+                },
+              });
+            }
+          }}
+          variant="success"
+        />
+      </div>
     </div>
   );
 }
