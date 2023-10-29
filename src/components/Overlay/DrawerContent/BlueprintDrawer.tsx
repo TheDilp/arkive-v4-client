@@ -83,6 +83,7 @@ function FieldRow({
         </div>
         <div className="w-1/4">
           <Select
+            isDisabled={isLoading}
             label="Width"
             name={`blueprint_fields[${index}].width`}
             onChange={changeField}
@@ -278,19 +279,12 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const isLoading = isFetching || isCreating || isUpdating;
 
   useLayoutEffect(() => {
-    if (existingBlueprint?.data && !blueprint?.title) {
+    if (existingBlueprint?.data && !blueprint.title) {
       setBlueprint(existingBlueprint?.data);
-    } else {
-      setBlueprint({
-        title_name: "",
-        title_width: "full",
-        blueprint_fields: [],
-      });
     }
-  }, [existingBlueprint]);
+  }, [existingBlueprint?.data]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
-
   return (
     <div className="flex h-screen max-h-screen flex-col gap-y-2 text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
@@ -330,6 +324,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           </div>
           <div className="w-1/4">
             <Select
+              isDisabled={isCreating || isUpdating}
               label="Width"
               name="title_width"
               onChange={handleChange}

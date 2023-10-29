@@ -2,15 +2,69 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import {
+  Avatar,
+  Badge,
+  Button,
+  createColumnHelper,
+  Dropdown,
+  Skeleton,
+  Table,
+  TablePageLayout,
+  Tooltip,
+} from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
-import { BlueprintInstanceType, DialogAtomType, DrawerAtomType } from "../../types";
+import { BlueprintInstanceType, CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { dialogAtom, drawerAtom, IconEnum } from "../../utils";
+import { dialogAtom, drawerAtom, getAvatarInitials, getCharacterFullName, getImageURL, IconEnum } from "../../utils";
 
 const columnHelper = createColumnHelper<{ id: string; title: string; value: { id: string; value: any }[] }>();
+
+function CharacterColumn({ ids }: { ids: string | string[] }) {
+  const { project_id } = useParams();
+  const { data: characters, isFetching } = useGetEntities<CharacterType>(
+    {
+      data: { project_id },
+      fields: ["id", "first_name", "last_name", "portrait_id"],
+      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
+    },
+    "characters",
+    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+  );
+  if (isFetching) return <Skeleton limit={5} type="avatar" />;
+  return (
+    <div className="flex items-center gap-x-2">
+      <div className="flex w-full items-center justify-center -space-x-4">
+        {characters?.data?.slice(0, 5)?.map((char) => (
+          <Avatar
+            key={char.id}
+            image={getImageURL(project_id as string, "images", char?.portrait_id || "")}
+            initials={getAvatarInitials(char.first_name, char?.last_name || "")}
+            isBordered
+            label={getCharacterFullName(char.first_name, char?.last_name || "")}
+            size="sm"
+            tooltipAllowedPlacements={["left", "right"]}
+          />
+        ))}
+      </div>
+      {characters?.data && characters?.data?.length > 5 ? (
+        <Tooltip
+          content={characters?.data
+            .slice(5)
+            .map((char) => getCharacterFullName(char?.first_name, undefined, char?.last_name))
+            .join(", ")}>
+          <div className="w-min max-w-min">
+            <Badge label={`+${characters.data.length - 5}`} size="sm" variant="secondary" />
+          </div>
+        </Tooltip>
+      ) : null}
+    </div>
+  );
+}
+
 function createColumns(
   blueprint: BlueprintType,
+  project_id: string,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
 ) {
@@ -24,8 +78,8 @@ function createColumns(
   ];
 
   blueprint.blueprint_fields
-    .filter((field) => !["characters_single", "characters_multiple", "textarea"].includes(field.field_type))
-    .slice(0, 4)
+    .filter((field) => field.field_type !== "textarea")
+    .slice(0, 10)
     .forEach((field) => {
       fieldColumns.push(
         columnHelper.display({
@@ -39,16 +93,6 @@ function createColumns(
                     fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""
                   }`
                 : "";
-            // const randomTable =
-            //   field.field_type === "random_table"
-            //     ? blueprint?.blueprint_fields
-            //         .find((f) => f.id === field?.id)
-            //         ?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
-            //     : null;
-
-            // const subOption = randomTable
-            //   ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
-            //   : null;
 
             // const date =
             //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
@@ -61,6 +105,24 @@ function createColumns(
                   return opt?.value || "";
                 })
                 .join(", ");
+            }
+            if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
+              return <CharacterColumn ids={fieldData?.value?.value} />;
+            }
+
+            if (field.field_type === "random_table") {
+              const randomTable =
+                field.field_type === "random_table"
+                  ? blueprint?.blueprint_fields
+                      .find((f) => f.id === field?.id)
+                      ?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
+                  : null;
+
+              const subOption = randomTable
+                ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+                : null;
+
+              return `${randomTable?.title} ${subOption ? `(${subOption?.title})` : ""}`;
             }
 
             return "";
@@ -126,7 +188,7 @@ function createColumns(
 }
 
 export function BlueprintInstanceView() {
-  const { item_id } = useParams();
+  const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const [, dispatch] = useTable({});
@@ -138,6 +200,7 @@ export function BlueprintInstanceView() {
     relations: {
       blueprint_instances: true,
       blueprint_fields: true,
+      random_table_options: true,
     },
   });
   useChangeNavbarTitle(`The Arkive | Blueprints | ${data?.data?.title}`, !!data?.data?.title);
@@ -145,7 +208,7 @@ export function BlueprintInstanceView() {
   const { data: instances } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
-        project_id: "",
+        project_id,
         parent_id: item_id,
       },
     },
@@ -175,7 +238,7 @@ export function BlueprintInstanceView() {
       <div className="w-full flex-1 overflow-hidden">
         {data?.data ? (
           <Table
-            columns={createColumns(data?.data, setDrawer, setDialog)}
+            columns={createColumns(data?.data, project_id as string, setDrawer, setDialog)}
             config={{
               hasSelect: true,
             }}

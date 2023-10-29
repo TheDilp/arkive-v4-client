@@ -336,6 +336,9 @@ export function useUpdateSubEntity(
       onSuccess: () => {
         const parentEntityType = getParentEntityType(type);
         if (parentEntityType && parentEntityType !== "documents") {
+          if (type === "blueprint_instances") {
+            queryClient.invalidateQueries(["allEntities", project_id, "blueprint_instances"]);
+          }
           queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
           queryClient.invalidateQueries([parentEntityType, parent_id]);
         }
