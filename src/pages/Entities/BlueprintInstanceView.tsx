@@ -16,7 +16,15 @@ import {
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { BlueprintInstanceType, CharacterType, DialogAtomType, DrawerAtomType, MapPinType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { dialogAtom, drawerAtom, getAvatarInitials, getCharacterFullName, getImageURL, IconEnum } from "../../utils";
+import {
+  dialogAtom,
+  drawerAtom,
+  getAvatarInitials,
+  getBlueprintInstanceColumnWidth,
+  getCharacterFullName,
+  getImageURL,
+  IconEnum,
+} from "../../utils";
 
 const columnHelper = createColumnHelper<{ id: string; title: string; value: { id: string; value: any }[] }>();
 
@@ -117,6 +125,7 @@ function createColumns(
     .filter((field) => field.field_type !== "textarea")
     .slice(0, 6)
     .forEach((field) => {
+      const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
       fieldColumns.push(
         columnHelper.display({
           id: field.title,
@@ -171,8 +180,11 @@ function createColumns(
 
             return "";
           },
-          minSize: 10,
-          maxSize: 15,
+          meta: {
+            centered: ["images_single", "characters_single", "locations_single"].includes(field.field_type),
+          },
+          minSize,
+          maxSize,
         }),
       );
     });
