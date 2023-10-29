@@ -6,12 +6,12 @@ export const InsertBlueprintSchema = z.object({
     title: z.string(),
   }),
   relations: z.object({
-    character_fields: z
+    blueprint_fields: z
       .object({
         title: z.string(),
-        project_id: z.string(),
         field_type: z.string(),
         sort: z.number().optional(),
+        width: z.literal("half").or(z.literal("full")),
         formula: z.string().optional().nullable(),
         options: z.object({ id: z.string(), value: z.string() }).array().optional(),
         random_table_id: z.string().optional().nullable(),
@@ -29,12 +29,12 @@ export const UpdateBlueprintSchema = z
       title: z.string().optional(),
     }),
     relations: z.object({
-      character_fields: z
+      blueprint_fields: z
         .object({
           id: z.string(),
           title: z.string().optional(),
           field_type: z.string().optional(),
-          project_id: z.string(),
+          width: z.literal("half").or(z.literal("full")),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),
           options: z.object({ id: z.string(), value: z.string() }).array().optional(),

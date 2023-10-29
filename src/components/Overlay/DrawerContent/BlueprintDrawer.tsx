@@ -5,8 +5,8 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterFieldTemplateType, CharacterFieldType, InputOnChangeValue, onChangeValue } from "../../../types";
-import { BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
+import { CharacterFieldTemplateType, InputOnChangeValue, onChangeValue } from "../../../types";
+import { BlueprintFieldType, BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
 import { drawerAtom, FieldTypesEnum, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
@@ -15,10 +15,10 @@ import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
   if (!blueprint?.title) return true;
-  if (!blueprint?.character_fields?.length) return true;
+  if (!blueprint?.blueprint_fields?.length) return true;
   // if (!blueprint?.tags?.length) return true;
   if (
-    blueprint.character_fields.some(
+    blueprint.blueprint_fields.some(
       (field) =>
         !field.title ||
         !field.field_type ||
@@ -40,6 +40,7 @@ function FieldRow({
   calendar,
   options,
   formula,
+  width: field_width,
   index,
   random_table_id,
   random_table,
@@ -47,7 +48,7 @@ function FieldRow({
   isMainTitle,
   changeField,
   deleteField,
-}: (Omit<CharacterFieldType, "options" | "parentId"> & { options?: { id: string; value: string }[] }) & {
+}: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
     name,
@@ -64,7 +65,7 @@ function FieldRow({
           <Input
             isDisabled={isLoading}
             label="Field title"
-            name={`character_fields[${index}].title`}
+            name={`blueprint_fields[${index}].title`}
             onChange={changeField}
             placeholder="Eg. Location"
             value={title}
@@ -74,7 +75,7 @@ function FieldRow({
           <Select
             isDisabled={isLoading || isMainTitle}
             label="Field type"
-            name={`character_fields[${index}].field_type`}
+            name={`blueprint_fields[${index}].field_type`}
             onChange={changeField}
             options={FieldTypesEnum}
             placeholder="Field type"
@@ -84,10 +85,13 @@ function FieldRow({
         <div className="w-1/4">
           <Select
             label="Width"
+            name={`blueprint_fields[${index}].width`}
+            onChange={changeField}
             options={[
               { label: "Half", value: "half" },
               { label: "Full", value: "full" },
             ]}
+            value={field_width}
           />
         </div>
 
@@ -99,7 +103,7 @@ function FieldRow({
               isDisabled={isLoading}
               onClick={() =>
                 changeField({
-                  name: `character_fields[${index}].options`,
+                  name: `blueprint_fields[${index}].options`,
                   value: (options || []).concat({ id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` }),
                 })
               }
@@ -134,7 +138,7 @@ function FieldRow({
 
             const newData = reorder(options || [], result.source.index, result.destination.index);
             changeField({
-              name: `character_fields[${index}].options`,
+              name: `blueprint_fields[${index}].options`,
               // Saving sort field is not required
               // As the order is preserved in JSON
               value: newData,
@@ -162,7 +166,7 @@ function FieldRow({
                         <div className="w-full">
                           <Input
                             isDisabled={isLoading}
-                            name={`character_fields[${index}].options[${optIndex}].value`}
+                            name={`blueprint_fields[${index}].options[${optIndex}].value`}
                             onChange={changeField}
                             value={opt.value}
                           />
@@ -176,7 +180,7 @@ function FieldRow({
                               isDisabled={isLoading}
                               onClick={() =>
                                 changeField({
-                                  name: `character_fields[${index}].options`,
+                                  name: `blueprint_fields[${index}].options`,
                                   value: (options || []).filter((o) => o.id !== opt.id),
                                 })
                               }
@@ -201,7 +205,7 @@ function FieldRow({
               helperText={formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
               isDisabled={isLoading}
               label="Dice formula"
-              name={`character_fields[${index}].formula`}
+              name={`blueprint_fields[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={formula || ""}
@@ -217,7 +221,7 @@ function FieldRow({
             initialDisplayValue={random_table?.title || ""}
             isDisabled={isLoading}
             label="Random table"
-            name={`character_fields[${index}].random_table_id`}
+            name={`blueprint_fields[${index}].random_table_id`}
             onChange={changeField}
             searchEntity="random_tables"
             value={random_table_id || ""}
@@ -231,7 +235,7 @@ function FieldRow({
             initialDisplayValue={calendar?.title || ""}
             isDisabled={isLoading}
             label="Calendar"
-            name={`character_fields[${index}].calendar_id`}
+            name={`blueprint_fields[${index}].calendar_id`}
             onChange={changeField}
             searchEntity="calendars"
             value={calendar_id || ""}
@@ -261,7 +265,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         id: data?.id,
       },
       relations: {
-        character_fields: true,
+        blueprint_fields: true,
         // tags: true,
       },
     },
@@ -273,7 +277,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
     title: "",
     project_id: project_id as string,
-    character_fields: [
+    blueprint_fields: [
       // {
       //   id: crypto.randomUUID(),
       //   title: "Title",
@@ -311,25 +315,25 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       </div>
 
       <Title isDrawerTitle label="Fields" size="lg" />
-      {/* {blueprint.character_fields?.length ? (
+      {/* {blueprint.blueprint_fields?.length ? (
         <FieldRow
-          key={blueprint.character_fields[0].id}
-          calendar={blueprint.character_fields[0]?.calendar}
-          calendar_id={blueprint.character_fields[0]?.calendar_id}
+          key={blueprint.blueprint_fields[0].id}
+          calendar={blueprint.blueprint_fields[0]?.calendar}
+          calendar_id={blueprint.blueprint_fields[0]?.calendar_id}
           changeField={handleChange}
           deleteField={() => {}}
-          field_type={blueprint.character_fields[0].field_type}
-          formula={blueprint.character_fields[0]?.formula}
-          id={blueprint.character_fields[0].id}
+          field_type={blueprint.blueprint_fields[0].field_type}
+          formula={blueprint.blueprint_fields[0]?.formula}
+          id={blueprint.blueprint_fields[0].id}
           index={0}
           isLoading={isLoading}
           isMainTitle
-          options={blueprint.character_fields[0]?.options || []}
-          project_id={blueprint.character_fields[0]?.project_id}
-          random_table={blueprint.character_fields[0]?.random_table}
-          random_table_id={blueprint.character_fields[0]?.random_table_id}
-          sort={blueprint.character_fields[0].sort}
-          title={blueprint.character_fields[0].title}
+          options={blueprint.blueprint_fields[0]?.options || []}
+          project_id={blueprint.blueprint_fields[0]?.project_id}
+          random_table={blueprint.blueprint_fields[0]?.random_table}
+          random_table_id={blueprint.blueprint_fields[0]?.random_table_id}
+          sort={blueprint.blueprint_fields[0].sort}
+          title={blueprint.blueprint_fields[0].title}
         />
       ) : null} */}
       <div className="flex items-center justify-between">
@@ -340,13 +344,13 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             isDisabled={isLoading}
             onClick={() =>
               handleChange({
-                name: "character_fields",
-                value: (blueprint.character_fields || []).concat({
+                name: "blueprint_fields",
+                value: (blueprint.blueprint_fields || []).concat({
                   id: crypto.randomUUID(),
                   title: "",
-                  project_id: project_id as string,
                   field_type: "text",
-                  sort: blueprint?.character_fields?.length ?? 0,
+                  width: "half",
+                  sort: blueprint?.blueprint_fields?.length ?? 0,
                 }),
               })
             }
@@ -361,10 +365,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             return;
           }
 
-          const newData = reorder(blueprint?.character_fields || [], result.source.index, result.destination.index);
+          const newData = reorder(blueprint?.blueprint_fields || [], result.source.index, result.destination.index);
           setBlueprint((prev) => ({
             ...prev,
-            character_fields: newData.map((char_field, index) => ({ ...char_field, sort: index })),
+            blueprint_fields: newData.map((blue_field, index) => ({ ...blue_field, sort: index })),
           }));
         }}>
         <Droppable droppableId="droppable">
@@ -373,8 +377,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               className="flex flex-1 flex-col overflow-y-auto"
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
-              {blueprint.character_fields?.length
-                ? blueprint.character_fields.map((field, index) => (
+              {blueprint.blueprint_fields?.length
+                ? blueprint.blueprint_fields.map((field, index) => (
                     <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
                       {(provided, draggableSnapshot) => (
                         <div
@@ -398,8 +402,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             changeField={handleChange}
                             deleteField={() =>
                               handleChange({
-                                name: "character_fields",
-                                value: blueprint?.character_fields?.filter((f) => f.id !== field.id),
+                                name: "blueprint_fields",
+                                value: blueprint?.blueprint_fields?.filter((f) => f.id !== field.id),
                               })
                             }
                             field_type={field.field_type}
@@ -408,11 +412,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             index={index}
                             isLoading={isLoading}
                             options={field?.options || []}
-                            project_id={field?.project_id}
                             random_table={field?.random_table}
                             random_table_id={field?.random_table_id}
                             sort={field.sort}
                             title={field.title}
+                            width={field?.width}
                           />
                         </div>
                       )}
@@ -431,14 +435,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         label={data?.id ? "Update" : "Create"}
         onClick={async () => {
           if (!data?.id) {
-            const { character_fields, ...rest } = blueprint;
+            const { blueprint_fields, ...rest } = blueprint;
             const parsedData = InsertBlueprintSchema.parse({
               data: rest,
               relations: {
-                character_fields: character_fields?.map((field) => ({
-                  ...field,
-                  project_id,
-                })),
+                blueprint_fields,
               },
             });
             await create(parsedData, {
@@ -450,14 +451,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               },
             });
           } else {
-            const { character_fields, ...rest } = blueprint;
+            const { blueprint_fields, ...rest } = blueprint;
             const parsedData = UpdateBlueprintSchema.parse({
               data: rest,
               relations: {
-                character_fields: character_fields?.map((field) => ({
-                  ...field,
-                  project_id,
-                })),
+                blueprint_fields,
               },
             });
             await update(parsedData, {

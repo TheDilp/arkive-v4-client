@@ -15,6 +15,8 @@ export type FieldTypes =
   | "documents_multiple"
   | "images_single"
   | "images_multiple";
+
+export type FieldWidthType = "half" | "full";
 export interface CharacterFieldType {
   id: string;
   sort: number;
