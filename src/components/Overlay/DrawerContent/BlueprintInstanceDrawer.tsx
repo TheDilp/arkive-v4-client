@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { flattenArray } from "remirror";
 
-import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange } from "../../../hooks";
+import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
 import {
   BlueprintFieldType,
   BlueprintFieldValueType,
@@ -25,7 +25,7 @@ import {
   sortEntities,
   useNotifications,
 } from "../../../utils";
-import { InsertBlueprintInstanceSchema } from "../../../validation";
+import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
 import { Editor } from "../../Complex";
 import { Button, Checkbox, Input, Select, Title } from "../../Form";
 import { Alert } from "../../Misc";
@@ -569,11 +569,13 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const [instance, setInstance] = useState<{
     id: string;
+    title: string;
     parent_id: string;
     value: InstanceStateBlueprintFieldsType;
     tags: TagType[];
   }>({
     id: "",
+    title: "",
     parent_id: item_id as string,
     value: {},
     tags: [],
@@ -594,7 +596,8 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       queryKeyConcat: ["instance_drawer"],
     },
   );
-  const { mutateAsync: create } = useCreateSubEntity("blueprint_instances", project_id);
+  const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
 
   const { data: existingInstance } = useGetSubEntity<BlueprintInstanceType>(
     data?.id,
@@ -609,37 +612,23 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   );
   useLayoutEffect(() => {
     if (existingInstance?.data && !instance.id && item_id) {
-      const { id, parent_id, value, tags } = existingInstance.data;
+      const { id, parent_id, title, value, tags } = existingInstance.data;
       const fieldsByTemplateId = { [item_id as string]: value } as Record<string, BlueprintFieldValueType[]>;
-      setInstance({ id, parent_id, value: fieldsByTemplateId, tags });
+      setInstance({ id, parent_id, title, value: fieldsByTemplateId, tags });
     }
   }, [existingInstance]);
   return (
     <div className="flex w-full flex-col gap-y-2">
-      {/* {selectedTab === 0 ? (
-        <>
-          <div className="flex flex-nowrap items-center gap-x-2">
-            <div className="flex-1">
-              <Input
-                isDisabled={isLoading}
-                label="Template title (required)"
-                name="title"
-                onChange={handleChange}
-                value={template?.title || ""}
-              />
-            </div>
-          </div>
-          <div>
-            <TagInput
-              handleChange={handleChange}
-              label="Used for entities with these tags (required)"
-              tags={template?.tags || []}
-            />
-          </div>
-        </>
-      ) : null} */}
       <ul className="flex flex-col overflow-y-auto">
         {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
+        <div>
+          <Input
+            label={`${blueprint?.data?.title_name} (required)`}
+            name="title"
+            onChange={handleChange}
+            value={instance?.title}
+          />
+        </div>
         {blueprint?.data ? (
           <FieldTemplateRow
             key={blueprint?.data?.id}
@@ -655,30 +644,29 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       </ul>
       <Button
         icon={instance?.id ? IconEnum.save : IconEnum.add}
-        // isDisabled={isSaveDisabled(character) || isCreating || isUpdating}
-        // isLoading={isCreating || isUpdating}
+        isDisabled={!instance?.title || isCreating || isUpdating}
+        isLoading={isCreating || isUpdating}
         label={instance?.id ? "Update" : "Create"}
         onClick={async () => {
           if (changedData) {
             if (instance?.id) {
-              //   const characterToUpdate = { ...(changedData || {}), id: instance.id };
-              //   const parsedData = UpdateCharacterSchema.parse({
-              //     data: { ...rest, portrait_id: rest?.portrait?.id },
-              //     relations: {
-              //       character_fields: character_fields
-              //         ? flattenArray(Object.values(character?.character_fields || {})) || []
-              //         : undefined,
-              //       related_from,
-              //       related_to,
-              //       related_other,
-              //       tags,
-              //     },
-              //   });
-              //   await update(parsedData, {
-              //     onSuccess: (res) => {
-              //       if (res?.ok) resetDrawerAtom();
-              //     },
-              //   });
+              const dataToParse = {
+                data: {
+                  ...instance,
+                  value: flattenArray(Object.values(instance?.value || {})) || [],
+                  parent_id: item_id,
+                },
+                relations: {
+                  tags: instance?.tags?.map((t) => ({ id: t.id })),
+                },
+              };
+
+              const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
+              await update(parsedData, {
+                onSuccess: (res) => {
+                  if (res?.ok) resetDrawerAtom();
+                },
+              });
             } else {
               const dataToParse = {
                 data: {

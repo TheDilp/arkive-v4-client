@@ -14,18 +14,28 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
 ) {
-  const fieldColumns = blueprint.blueprint_fields
+  const fieldColumns = [
+    columnHelper.accessor("title", {
+      id: "title",
+      header: "TEST",
+      cell: () => "Test cell",
+    }),
+  ];
+
+  blueprint.blueprint_fields
     .filter((field) => !["characters_single", "characters_multiple"].includes(field.field_type))
-    .map((field) =>
-      columnHelper.display({
-        id: field.title,
-        header: field.title,
-        cell: () => {
-          // if (field.field_type === "text") return info.row.original.
-          return "test";
-        },
-      }),
-    );
+    .forEach((field) => {
+      fieldColumns.push(
+        columnHelper.display({
+          id: field.title,
+          header: field.title,
+          cell: () => {
+            // if (field.field_type === "text") return info.row.original.
+            return "test";
+          },
+        }),
+      );
+    });
 
   fieldColumns.push(
     columnHelper.display({
@@ -87,7 +97,7 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const [, dispatch] = useTable({});
 
-  const { data } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+  const { data, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
       id: item_id,
     },
@@ -111,7 +121,8 @@ export function BlueprintInstanceView() {
         <div className="w-52">
           <Button
             icon={IconEnum.add}
-            label={`Create (${data?.data?.title})`}
+            isDisabled={isFetching}
+            label={`Create ${data?.data?.title ? `(${data?.data?.title})` : ""}`}
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,

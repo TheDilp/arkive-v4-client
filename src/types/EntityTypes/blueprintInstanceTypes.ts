@@ -8,6 +8,7 @@ export type BlueprintInstanceValueType = {
 }[];
 export interface BlueprintInstanceType {
   id: string;
+  title: string;
   parent_id: string;
   blueprint: BlueprintType;
   value: BlueprintInstanceValueType;
