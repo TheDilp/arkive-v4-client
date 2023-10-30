@@ -103,7 +103,7 @@ export function CalendarView() {
     { data: { parent_id: item_id } },
     { enabled: !!subitem_id },
   );
-  useChangeNavbarTitle(`The Arkive | Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
+  useChangeNavbarTitle(` Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
   useEffect(() => {
     const timeout = setTimeout(() => {

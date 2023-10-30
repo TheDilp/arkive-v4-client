@@ -23,7 +23,7 @@ export function MapView({ isReadOnly }: Props) {
     data: {},
     relations: { map_pins: true, map_layers: true },
   });
-  useChangeNavbarTitle(`The Arkive | Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
+  useChangeNavbarTitle(` Maps | ${currentMap?.data?.title || ""}`, !!currentMap?.data?.title);
 
   useEffect(() => {
     if (currentMap?.data && currentMap?.data?.image_id && !bounds) {

@@ -300,7 +300,7 @@ export function FolderView() {
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
 
   useChangeNavbarTitle(
-    `The Arkive | ${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "project-settings") || "")} ${
+    `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "project-settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
   );

@@ -68,7 +68,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
 
   const graph = existingGraphData?.data || data;
 
-  useChangeNavbarTitle(`The Arkive | Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
+  useChangeNavbarTitle(` Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{

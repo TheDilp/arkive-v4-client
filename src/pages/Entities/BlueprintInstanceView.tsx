@@ -259,7 +259,7 @@ export function BlueprintInstanceView() {
       random_table_options: true,
     },
   });
-  useChangeNavbarTitle(`The Arkive | Blueprints | ${blueprints?.data?.title}`, !!blueprints?.data?.title);
+  useChangeNavbarTitle(` Blueprints | ${blueprints?.data?.title}`, !!blueprints?.data?.title);
 
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {

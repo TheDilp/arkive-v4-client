@@ -99,7 +99,7 @@ function createColumns(
 
 export function TagView() {
   const { project_id } = useParams();
-  useChangeNavbarTitle("The Arkive | Tags");
+  useChangeNavbarTitle(" Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);

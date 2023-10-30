@@ -93,7 +93,7 @@ function createColumns(
 
 export function TemplatesView() {
   const { project_id } = useParams();
-  useChangeNavbarTitle("The Arkive | Field templates");
+  useChangeNavbarTitle(" Field templates");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);

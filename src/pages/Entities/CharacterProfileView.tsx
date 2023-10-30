@@ -624,7 +624,7 @@ export function CharacterProfileView() {
   ].filter((r) => !!r);
 
   useChangeNavbarTitle(
-    `The Arkive | Characters | ${getCharacterFullName(
+    ` Characters | ${getCharacterFullName(
       existingCharacter?.data?.first_name || "",
       undefined,
       existingCharacter?.data?.last_name,

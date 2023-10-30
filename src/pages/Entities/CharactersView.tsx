@@ -167,7 +167,7 @@ function createColumns(
 }
 
 export function CharactersView() {
-  useChangeNavbarTitle("The Arkive | Characters");
+  useChangeNavbarTitle("Characters");
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();

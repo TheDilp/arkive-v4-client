@@ -118,7 +118,7 @@ export function Navbar() {
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
       {isMutating ? <IndeterminateProgressBar /> : null}
-      <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-3xl text-white">
+      <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       {project_id ? (

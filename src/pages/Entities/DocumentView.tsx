@@ -54,7 +54,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
 
   const [editorData, setEditorData] = useState({ content: undefined });
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-  useChangeNavbarTitle(`The Arkive | Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
+  useChangeNavbarTitle(` Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),

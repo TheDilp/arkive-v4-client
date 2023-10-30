@@ -1,15 +1,15 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
-import { navbarTitleAtom } from "../../utils";
+import { navbarTitleAtom, projectAtom } from "../../utils";
 
 export function useChangeNavbarTitle(title: string, enabled?: boolean) {
   const setNavbarTitleAtom = useSetAtom(navbarTitleAtom);
-
+  const projectData = useAtomValue(projectAtom);
   useEffect(() => {
-    if (title && (enabled || enabled === undefined) && document.title !== title) {
-      setNavbarTitleAtom(title);
-      document.title = title;
+    if (projectData?.title && title && (enabled || enabled === undefined)) {
+      setNavbarTitleAtom(`${projectData?.title} | ${title}`);
+      document.title = `${projectData?.title} | ${title}`;
     }
-  }, [title, setNavbarTitleAtom, enabled]);
+  }, [projectData?.title, title, setNavbarTitleAtom, enabled]);
 }

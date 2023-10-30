@@ -93,7 +93,7 @@ function createColumns(
 
 export function BlueprintView() {
   const { project_id } = useParams();
-  useChangeNavbarTitle("The Arkive | Blueprints");
+  useChangeNavbarTitle(" Blueprints");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
