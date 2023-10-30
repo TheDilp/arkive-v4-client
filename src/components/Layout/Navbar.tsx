@@ -1,3 +1,4 @@
+import { UserButton } from "@clerk/clerk-react";
 import { useIsMutating } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
@@ -140,6 +141,9 @@ export function Navbar() {
           </div>
         </div>
       ) : null}
+      <div className={`mr-4 flex items-center ${project_id ? "" : "ml-auto"}`}>
+        <UserButton />
+      </div>
     </div>
   );
 }

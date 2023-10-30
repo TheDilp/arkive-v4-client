@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 
 import { Button, Drawer, Navbar, ProjectCard } from "../../components";
@@ -8,7 +9,9 @@ import { drawerAtom, getImageURL, IconEnum } from "../../utils";
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
   const ownerId = localStorage.getItem("ownerId");
-  const { data } = useGetAllProjects({ data: { owner_id: ownerId as string } });
+  const { user } = useUser();
+
+  const { data } = useGetAllProjects({ data: { auth_id: user?.id } });
   useChangeNavbarTitle("The Arkive");
   return (
     <div className="flex h-screen w-screen">
