@@ -111,9 +111,10 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                 value={category}
               />
               <Input
+                isDisabled={!category}
                 name="filter"
                 onChange={({ value }) => setFilter(value as string)}
-                placeholder="Search icons."
+                placeholder={category ? "Search icons." : "Please select a category."}
                 value={filter}
               />
             </div>
