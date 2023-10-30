@@ -15,12 +15,7 @@ export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
   const setProjectAtom = useSetAtom(projectAtom);
-  const { data } = useGetEntity<ProjectType>(
-    project_id as string,
-    "projects",
-    { fields: ["title", "default_dice_color"] },
-    { staleTime: Infinity },
-  );
+  const { data } = useGetEntity<ProjectType>(project_id as string, "projects", {}, { staleTime: 60 * 60 * 1 });
   useEffect(() => {
     if (data?.data) {
       setProjectAtom(data.data);

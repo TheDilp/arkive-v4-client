@@ -1,5 +1,5 @@
 import { UseMutateFunction } from "@tanstack/react-query";
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -31,6 +31,7 @@ import {
   getImageURL,
   getNavbarEntityType,
   IconEnum,
+  projectSettingsAtom,
 } from "../../utils";
 import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
@@ -64,13 +65,14 @@ function columns(
   entityName: string,
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
   project_id: string,
+  show_image?: boolean,
 ) {
   return [
     columnHelper.display({
       id: "is_folder",
       header: "",
       cell: ({ row }) =>
-        "image_id" in row.original && row.original?.image_id ? (
+        "image_id" in row.original && row.original?.image_id && show_image ? (
           <Avatar
             image={getImageURL(
               project_id,
@@ -154,10 +156,12 @@ function EntityItem({
   type,
   icon,
   image_id,
+  show_image,
   showContextMenu,
   changeParent,
 }: EntityItemType & {
   type: AvailableEntityType;
+  show_image?: boolean;
   changeParent: UseMutateFunction<
     any,
     unknown,
@@ -208,7 +212,7 @@ function EntityItem({
           showContextMenu(e as any, id);
         }}>
         <div className="pointer-events-none h-24 w-24">
-          {image_id ? (
+          {image_id && show_image ? (
             <img
               alt={title}
               className="h-full w-full object-contain"
@@ -227,7 +231,7 @@ function EntityItem({
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
   const entityName = getEntityNameFromType(type as AvailableEntityType);
-
+  const { show_image_folder_view, show_image_table_view } = useAtomValue(projectSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
 
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
@@ -410,6 +414,7 @@ export function FolderView() {
               id={item.id}
               image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
+              show_image={show_image_folder_view}
               showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                 setContextMenuAtom({
                   event,
@@ -467,6 +472,7 @@ export function FolderView() {
                 id={item.id}
                 image_id={item?.image_id}
                 is_folder={item?.is_folder ?? false}
+                show_image={show_image_folder_view}
                 showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                   setContextMenuAtom({
                     event,
@@ -533,6 +539,7 @@ export function FolderView() {
               entityName,
               type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
               project_id as string,
+              show_image_table_view,
             )}
             config={{
               hasSelect: true,
