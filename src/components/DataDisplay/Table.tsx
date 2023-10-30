@@ -649,7 +649,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       key={row.id}
                       className={`${rowContainer()} ${
                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                          ? "group bg-blue-400 hover:text-white"
+                          ? "group hover:text-white"
                           : "hover:bg-zinc-800"
                       }`}
                       style={{
@@ -668,7 +668,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         <div
                           className={`${rowClasses()}${getLink ? hasLinkRow() : ""}
                         ${onRowClick ? hasRowAction() : ""}
-                        group-hover:bg-blue-300`}>
+                        group-hover:bg-blue-300 ${
+                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                            ? "bg-blue-300"
+                            : ""
+                        }`}>
                           {row.getVisibleCells().map((cell) => (
                             <div
                               key={cell.id}
