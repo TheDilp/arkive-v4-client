@@ -61,7 +61,7 @@ function BreadcrumbsSkeleton() {
 function DrawerFormSkeleton() {
   return (
     <div className="flex flex-col gap-y-2">
-      <div className="flex items-center gap-x-2 border-b border-zinc-400 pb-1">
+      <div className="flex items-center gap-x-2 border-b border-zinc-500 pb-1">
         <div className="h-8 w-full animate-pulse bg-zinc-700" />
         <div className="h-8 w-full animate-pulse bg-zinc-700" />
         <div className="h-8 w-full animate-pulse bg-zinc-700" />

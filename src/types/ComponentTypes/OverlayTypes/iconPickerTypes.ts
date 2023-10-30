@@ -1,7 +1,6 @@
 import { PositionType } from "../../baseTypes";
 import { InputOnChangeValue } from "../FormTypes";
 
-export type IconCategoriesType = "general" | "weather";
 export interface IconPickerType {
   name: string;
 

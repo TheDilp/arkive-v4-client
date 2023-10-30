@@ -3,6 +3,7 @@ import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@ta
 import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
+import { IconCategories } from "../../utils/enums/IconPickerEnums";
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
@@ -181,6 +182,7 @@ export function useGetInfiniteEntities<ReturnType>(
   );
 }
 
+// #region misc
 export function useSearch<ReturnType>(
   request: { data: { search_term: string } | { tag_ids: string[]; match: "all" | "any" }; limit: number },
   type: SearchableEntities,
@@ -198,7 +200,6 @@ export function useSearch<ReturnType>(
     options,
   );
 }
-
 export function useGetCharacterFamily(
   character_id: string | undefined,
   relationship_type_id: string,
@@ -218,3 +219,28 @@ export function useGetCharacterFamily(
     },
   );
 }
+export function useGetIcons(type: IconCategories | null) {
+  return useQuery(
+    ["icons", type],
+    async () => {
+      const res = await fetch(`https://api.iconify.design/collection?prefix=${type}`, {
+        method: "GET",
+      });
+
+      const data = await res.json();
+      if (!data) {
+        throw new Error("There was an error with your request.");
+      }
+      return data;
+    },
+
+    {
+      enabled: !!type,
+      staleTime: Infinity,
+      select: (data: { total: number; uncategorized: string[] }) => {
+        return data;
+      },
+    },
+  );
+}
+// #endregion misc

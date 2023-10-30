@@ -12,6 +12,7 @@ import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
 import { Button, Input, Search, Select, Title } from "../../Form";
 import { Icon, Skeleton } from "../../Misc";
+import { IconPicker } from "../IconPicker";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
   if (!blueprint?.title) return true;
@@ -230,12 +231,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertBlueprintType>("blueprints");
-
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateBlueprintType>(
     "blueprints",
     project_id as string,
   );
-
   const { data: existingBlueprint, isFetching } = useGetEntity<CharacterFieldTemplateType>(
     data?.id,
     "blueprints",
@@ -252,7 +251,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       enabled: !!data?.id,
     },
   );
-
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
     title: "",
     project_id: project_id as string,
@@ -260,7 +258,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   });
 
   const { handleChange } = useHandleChange({ data: blueprint, setData: setBlueprint });
-
   const isLoading = isFetching || isCreating || isUpdating;
 
   useLayoutEffect(() => {
@@ -273,7 +270,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   return (
     <div className="flex h-screen max-h-full flex-col gap-y-2 text-white">
       <div className="flex flex-nowrap items-center gap-x-2">
-        <div className="flex-1">
+        <div className="flex flex-1 flex-nowrap items-center gap-x-2">
           <Input
             isDisabled={isLoading}
             label="Blueprint title (required)"
@@ -282,6 +279,9 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             placeholder="Eg. Organizations"
             value={blueprint?.title || ""}
           />
+          <div className="self-end pb-2.5">
+            <IconPicker name="icon" onChange={handleChange} icon={blueprint?.icon || IconEnum.blueprint} />
+          </div>
         </div>
       </div>
       <div className="flex flex-col">

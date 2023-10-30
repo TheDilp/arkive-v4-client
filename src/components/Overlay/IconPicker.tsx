@@ -14,16 +14,19 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Fragment, useEffect, useState } from "react";
 
+import { useGetIcons } from "../../hooks";
 import { IconPickerType } from "../../types";
-import { iconList } from "../../utils/enums/IconPickerEnums";
-import { Button, Input } from "../Form";
+import { IconCategories, iconCategories } from "../../utils/enums/IconPickerEnums";
+import { Button, Input, Select } from "../Form";
 import { Icon } from "../Misc";
 
 export function IconPicker({ name, onChange, icon, iconColor, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
+  const [category, setCategory] = useState<IconCategories | null>(null);
+  const { data } = useGetIcons(category);
 
-  const [filteredIcons, setFilteredIcons] = useState<string[]>(iconList);
+  const [filteredIcons, setFilteredIcons] = useState<string[]>(data?.uncategorized || []);
 
   const { floatingStyles, refs, context } = useFloating({
     open,
@@ -42,7 +45,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
 
   const rowVirtualizer = useVirtualizer({
     getScrollElement: () => refs.floating.current as any,
-    count: Math.ceil(iconList.filter((ic) => (filter ? ic.includes(filter.toLowerCase()) : true)).length / 6),
+    count: Math.ceil((filter ? filteredIcons?.length || 0 : data?.total || 0) / 6),
     estimateSize: () => 36,
     overscan: 1,
   });
@@ -57,24 +60,24 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
   useEffect(() => {
     if (filter && filter.length >= 3) {
       const timeout = setTimeout(() => {
-        setFilteredIcons(iconList.filter((i) => i.split(":")?.[1]?.includes(filter.toLowerCase())));
+        setFilteredIcons((data?.uncategorized || []).filter((i) => i.includes(filter.toLowerCase())));
       }, 250);
       return () => {
         clearTimeout(timeout);
       };
     }
     if (filter.length === 0) {
-      setFilteredIcons(iconList);
+      setFilteredIcons(data?.uncategorized || []);
     }
     return () => {};
-  }, [filter]);
+  }, [filter, data]);
 
   return (
     <>
       <div {...getReferenceProps({ ref: refs.setReference })}>
         {icon ? (
           <div className="cursor-pointer">
-            <Icon color={iconColor || "#ffffff"} fontSize={24} icon={icon} />
+            <Icon color={iconColor || "#ffffff"} fontSize={32} icon={icon} />
           </div>
         ) : (
           <div className="h-6 w-6 cursor-pointer rounded-full border border-dashed" />
@@ -95,12 +98,21 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
               width: "fit-content",
               overflow: "auto",
             }}>
-            <Input
-              name="filter"
-              onChange={({ value }) => setFilter(value as string)}
-              placeholder="Search icons."
-              value={filter}
-            />
+            <div className="sticky top-0 z-10">
+              <Select
+                name="category"
+                onChange={({ value }) => setCategory(value as IconCategories)}
+                options={iconCategories}
+                placeholder="Choose category"
+                value={category}
+              />
+              <Input
+                name="filter"
+                onChange={({ value }) => setFilter(value as string)}
+                placeholder="Search icons."
+                value={filter}
+              />
+            </div>
             <div
               className="p-2"
               style={{
@@ -124,11 +136,11 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                       }}>
                       <Button
                         hasNoBackground
-                        icon={filteredIcons[virtualRow.index * 6 + virtualColumn.index]}
+                        icon={`${category}:${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}`}
                         iconSize={32}
                         isIconOnly
                         onClick={() => {
-                          onChange({ name, value: filteredIcons[virtualRow.index * 6 + virtualColumn.index] });
+                          onChange({ name, value: `${category}:${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}` });
                           setOpen(false);
                         }}
                         variant="info-bordered"

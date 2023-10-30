@@ -1,3 +1,16 @@
+export type IconCategories = "game-icons" | "ph" | "meteocons";
+export const iconCategories: { label: string; value: IconCategories }[] = [
+  {
+    label: "Game icons",
+    value: "game-icons",
+  },
+  {
+    label: "Phosphor icons",
+    value: "ph",
+  },
+
+  { label: "Meteocons (animated)", value: "meteocons" },
+];
 export const iconList = [
   "game-icons:allied-star",
   "game-icons:ancient-sword",
