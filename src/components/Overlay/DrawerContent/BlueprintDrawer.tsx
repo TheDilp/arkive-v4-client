@@ -280,7 +280,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             value={blueprint?.title || ""}
           />
           <div className="self-end pb-2.5">
-            <IconPicker name="icon" onChange={handleChange} icon={blueprint?.icon || IconEnum.blueprint} />
+            <IconPicker icon={blueprint?.icon || IconEnum.blueprint} name="icon" onChange={handleChange} />
           </div>
         </div>
       </div>

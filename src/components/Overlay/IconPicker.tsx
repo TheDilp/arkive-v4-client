@@ -47,7 +47,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     getScrollElement: () => refs.floating.current as any,
     count: Math.ceil((filter ? filteredIcons?.length || 0 : data?.total || 0) / 6),
     estimateSize: () => 36,
-    overscan: 1,
+    overscan: 10,
   });
   const columnVirtualizer = useVirtualizer({
     horizontal: true,
@@ -56,6 +56,10 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     getScrollElement: () => refs.floating.current as any,
     overscan: 5,
   });
+
+  useEffect(() => {
+    if (!open) setCategory(null);
+  }, [open]);
 
   useEffect(() => {
     if (filter && filter.length >= 3) {
