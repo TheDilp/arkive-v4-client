@@ -46,9 +46,8 @@ const TableClasses = tv({
     container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
     table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
     head: "border-x border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
-    headerGroup: "flex w-full h-12",
+    headerGroup: "flex h-12 font-merriweather select-none truncate",
     select: "select-none",
-    header: "font-merriweather truncate select-none flex-1 min-h-[2.5rem]",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "px-2",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
@@ -442,7 +441,6 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     head,
     select: selectClasses,
     headerGroup: headerGroupClasses,
-    header: headerClasses,
     sortableHeader,
     subheaderContainer,
     subheaderFiltersRow,
@@ -526,7 +524,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 return (
                   <div
                     key={hdr.id}
-                    className={`${contentClasses()} ${headerClasses()}  ${hdr.id === "select" ? selectClasses() : ""}
+                    className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     `}
@@ -536,7 +534,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         maxSize: hdr.column.columnDef.maxSize,
                       }),
                     }}>
-                    {flexRender(header, hdr.getContext())}
+                    <Tooltip
+                      allowedPlacements={["top", "bottom"]}
+                      content={(hdr.getContext().column.columnDef.header as string) || ""}
+                      delay={{ openDelay: 0 }}
+                      isDisabled={hdr.id === "select"}
+                      isIgnoringHover>
+                      <div className="truncate">{flexRender(header, hdr.getContext())}</div>
+                    </Tooltip>
                     {(meta as MetaType)?.filterOptions?.length && dispatch ? (
                       <Tooltip
                         allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
