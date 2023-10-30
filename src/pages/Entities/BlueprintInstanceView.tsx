@@ -249,7 +249,7 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const [{ selection, pagination }, dispatch] = useTable({ selection: {}, pagination: { page: 0, limit: 10 } });
 
-  const { data, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+  const { data: blueprints, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
       id: item_id,
     },
@@ -259,9 +259,9 @@ export function BlueprintInstanceView() {
       random_table_options: true,
     },
   });
-  useChangeNavbarTitle(`The Arkive | Blueprints | ${data?.data?.title}`, !!data?.data?.title);
+  useChangeNavbarTitle(`The Arkive | Blueprints | ${blueprints?.data?.title}`, !!blueprints?.data?.title);
 
-  const { data: instances } = useGetEntities<BlueprintInstanceType>(
+  const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
         project_id,
@@ -279,12 +279,12 @@ export function BlueprintInstanceView() {
           <Button
             icon={IconEnum.add}
             isDisabled={isFetching}
-            label={`Create ${data?.data?.title ? `(${data?.data?.title})` : ""}`}
+            label={`Create ${blueprints?.data?.title ? `(${blueprints?.data?.title})` : ""}`}
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
                 data: {},
-                title: `Create new ${data?.data?.title}`,
+                title: `Create new ${blueprints?.data?.title}`,
                 type: "blueprint_instances",
                 size: "lg",
               }))
@@ -293,17 +293,16 @@ export function BlueprintInstanceView() {
         </div>
       </div>
       <div className="w-full flex-1 overflow-hidden">
-        {data?.data ? (
+        {blueprints?.data ? (
           <Table
-            columns={createColumns(data?.data, project_id as string, setDrawer, setDialog)}
+            columns={createColumns(blueprints?.data, project_id as string, setDrawer, setDialog)}
             config={{
               hasSelect: true,
               selection,
             }}
             data={instances?.data || []}
             dispatch={dispatch}
-            //   isLoading={isLoading}
-
+            isLoading={isLoading}
             pagination={pagination}
             type="characters"
           />
