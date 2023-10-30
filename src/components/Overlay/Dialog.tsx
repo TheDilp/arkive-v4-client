@@ -132,8 +132,13 @@ export function Dialog() {
               <Button
                 icon={dialog?.confirm?.icon || IconEnum.close}
                 label={dialog?.confirm?.label || "Confirm"}
-                onClick={dialog?.confirm?.action}
-                variant={dialog?.confirm?.variant || "error"}
+                onClick={() => {
+                  if (dialog?.confirm?.action && typeof dialog?.confirm?.action === "function") {
+                    dialog?.confirm?.action();
+                  }
+                  resetDialogAtom();
+                }}
+                variant={dialog?.confirm?.variant || "primary"}
               />
             ) : null}
           </div>

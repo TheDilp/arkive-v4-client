@@ -1,5 +1,6 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -7,10 +8,11 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, InputOnChangeValue, onChangeValue } from "../../../types";
 import { BlueprintFieldType, BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
-import { BlueprintFieldTypesEnum, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { BlueprintFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
 import { Button, Input, Search, Select, Title } from "../../Form";
+import { Collapsible } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
@@ -46,14 +48,12 @@ function FieldRow({
   random_table,
   isLoading,
   changeField,
-  deleteField,
 }: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
     name,
     value,
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
-  deleteField: (i: number) => void;
   isLoading: boolean;
 }) {
   return (
@@ -98,15 +98,6 @@ function FieldRow({
             />
           </div>
         ) : null}
-        <div className="h-10 w-8 self-end">
-          <Button
-            hasNoBackground
-            icon={IconEnum.trash}
-            isDisabled={isLoading}
-            onClick={() => deleteField(index)}
-            variant="error"
-          />
-        </div>
       </div>
 
       {field_type === "select" || field_type === "select_multiple" ? (
@@ -131,7 +122,7 @@ function FieldRow({
                   <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
                     {(provided, draggableSnapshot) => (
                       <div
-                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
                           draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                         }`}
                         {...provided.draggableProps}
@@ -230,11 +221,13 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
+  const setDialogAtom = useSetAtom(dialogAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertBlueprintType>("blueprints");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateBlueprintType>(
     "blueprints",
     project_id as string,
   );
+
   const { data: existingBlueprint, isFetching } = useGetEntity<CharacterFieldTemplateType>(
     data?.id,
     "blueprints",
@@ -244,7 +237,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       },
       relations: {
         blueprint_fields: true,
-        // tags: true,
       },
     },
     {
@@ -354,7 +346,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <Droppable droppableId="droppable">
           {(providedDroppable) => (
             <div
-              className="justift-start flex max-h-[75%] flex-col content-start overflow-y-auto"
+              className="flex max-h-[75%] flex-col content-start justify-start overflow-y-auto"
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
@@ -367,36 +359,66 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                             draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                           }`}
                           {...provided.draggableProps}
+                          key={field.id}
                           style={{
                             ...provided.draggableProps.style,
                             left: 16,
                           }}>
-                          <div {...provided.dragHandleProps} className="mt-7 self-start">
+                          <div {...provided.dragHandleProps} className="mt-1 self-start">
                             <Icon fontSize={24} icon={IconEnum.menu} />
                           </div>
-
-                          <FieldRow
-                            key={field.id}
-                            calendar={field?.calendar}
-                            calendar_id={field?.calendar_id}
-                            changeField={handleChange}
-                            deleteField={() =>
-                              handleChange({
-                                name: "blueprint_fields",
-                                value: blueprint?.blueprint_fields?.filter((f) => f.id !== field.id),
-                              })
-                            }
-                            field_type={field.field_type}
-                            formula={field?.formula}
-                            id={field.id}
-                            index={index}
-                            isLoading={isLoading}
-                            options={field?.options || []}
-                            random_table={field?.random_table}
-                            random_table_id={field?.random_table_id}
-                            sort={field.sort}
-                            title={field.title}
-                          />
+                          <div className="w-full">
+                            <Collapsible
+                              actions={[
+                                {
+                                  icon: IconEnum.trash,
+                                  isIconOnly: true,
+                                  variant: "error",
+                                  onClick: () =>
+                                    field?.title
+                                      ? setDialogAtom((prev) => ({
+                                          ...prev,
+                                          title: `Delete field "${field.title}"`,
+                                          cancel: {
+                                            label: "Cancel",
+                                            action: () => {},
+                                          },
+                                          confirm: {
+                                            icon: IconEnum.trash,
+                                            variant: "error",
+                                            label: "Delete",
+                                            action: () =>
+                                              handleChange({
+                                                name: "blueprint_fields",
+                                                value: blueprint?.blueprint_fields?.filter((f) => f.id !== field.id),
+                                              }),
+                                          },
+                                        }))
+                                      : handleChange({
+                                          name: "blueprint_fields",
+                                          value: blueprint?.blueprint_fields?.filter((f) => f.id !== field.id),
+                                        }),
+                                },
+                              ]}
+                              initialOpen={!field.title}
+                              label={field?.title}>
+                              <FieldRow
+                                calendar={field?.calendar}
+                                calendar_id={field?.calendar_id}
+                                changeField={handleChange}
+                                field_type={field.field_type}
+                                formula={field?.formula}
+                                id={field.id}
+                                index={index}
+                                isLoading={isLoading}
+                                options={field?.options || []}
+                                random_table={field?.random_table}
+                                random_table_id={field?.random_table_id}
+                                sort={field.sort}
+                                title={field.title}
+                              />
+                            </Collapsible>
+                          </div>
                         </div>
                       )}
                     </Draggable>
