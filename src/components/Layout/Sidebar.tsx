@@ -20,7 +20,7 @@ const SidebarClasses = tv({
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
     selectedListItem: "text-white sticky left-16 lg:top-16 lg:bottom-16 right-16 bg-blue-400 [&>li]:hover:text-white",
     listSettingsItem:
-      "lg:-bottom-0 -right-0 sticky justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 lg:mt-auto bg-zinc-900",
+      "lg:-bottom-0 -right-0 sticky justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 ml-auto lg:mt-auto",
     navIcon: "cursor-pointer",
   },
 });

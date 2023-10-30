@@ -8,7 +8,7 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
   { icon: IconEnum.calendar, navigate: "calendars", tooltip: "Calendars" },
   // { icon: IconEnum.timeline, navigate: "timelines", tooltip: "Timelines" },
-  { icon: IconEnum.screen, navigate: "screens", tooltip: "Screens" },
+  // { icon: IconEnum.screen, navigate: "screens", tooltip: "Screens" },
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
