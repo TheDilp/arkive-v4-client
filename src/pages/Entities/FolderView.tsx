@@ -211,7 +211,7 @@ function EntityItem({
           {image_id ? (
             <img
               alt={title}
-              className="object-contain"
+              className="h-full w-full object-contain"
               src={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             />
           ) : (
