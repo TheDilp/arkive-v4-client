@@ -5,6 +5,7 @@ export const InsertBlueprintSchema = z.object({
     project_id: z.string(),
     title: z.string(),
     title_name: z.string(),
+    icon: z.string().optional(),
     // title_width: z.literal("half").or(z.literal("full")),
   }),
   relations: z.object({
@@ -30,6 +31,7 @@ export const UpdateBlueprintSchema = z
       id: z.string(),
       title: z.string().optional(),
       title_name: z.string().optional(),
+      icon: z.string().optional(),
       // title_width: z.literal("half").or(z.literal("full")).optional(),
     }),
     relations: z.object({

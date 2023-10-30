@@ -14,7 +14,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "random_tables") return IconEnum.random_table;
   if (type === "character_fields_templates") return IconEnum.additional_fields;
   if (type === "events") return IconEnum.event;
-  if (type === "blueprints") return IconEnum.blueprint;
+  if (type === "blueprints" || type === "blueprint_instances") return IconEnum.blueprint;
 
   return IconEnum.error;
 }

@@ -2,19 +2,28 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
-import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType } from "../../types";
+import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, NameFilters } from "../../utils";
 
-const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
+const columnHelper = createColumnHelper<BlueprintType>();
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
 ) {
   return [
+    columnHelper.display({
+      id: "icon",
+      cell: ({ row }) => <Icon fontSize={24} icon={row.original?.icon || getDefaultEntityIcon("blueprints")} />,
+      maxSize: 2.75,
+      minSize: 2.75,
+      meta: {
+        centered: true,
+      },
+    }),
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
