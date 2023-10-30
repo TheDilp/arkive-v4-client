@@ -1,3 +1,4 @@
+import { StytchProvider } from "@stytch/react";
 import cytoscape from "cytoscape";
 import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
@@ -10,6 +11,7 @@ import App from "./App";
 import { ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import { ProjectsView } from "./pages/Projects";
+import { authClient } from "./utils";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <StytchProvider stytch={authClient}>
+      <RouterProvider router={router} />
+    </StytchProvider>
   </React.StrictMode>,
 );
