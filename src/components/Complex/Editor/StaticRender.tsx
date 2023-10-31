@@ -34,11 +34,13 @@ function StaticRenderImage({ data }: { data: any }) {
   return null;
 }
 
-const typeMap = (project_id: string): MarkMap => ({
+const typeMap = (project_id: string, isPublicView?: boolean): MarkMap => ({
   bulletList: "ul",
   doc: Doc,
   hardBreak: "br",
-  heading: Heading,
+  heading: (args) => {
+    return <div style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>{Heading(args)}</div>;
+  },
   link: "a",
   listItem: "li",
   paragraph: "p",
@@ -60,6 +62,7 @@ const typeMap = (project_id: string): MarkMap => ({
   horizontalRule: "hr",
   tableofcontents: "p",
   secret: (data) => {
+    if (isPublicView) return null;
     return (
       <Collapsible icon={IconEnum.eye} initialOpen={false} label="Secret">
         {data?.children}
@@ -131,13 +134,17 @@ const markMap: MarkMap = {
   link: "a",
 };
 
-export function StaticRender({ content }: { content: RemirrorJSON }) {
+export function StaticRender({ content, isPublicView }: { content: RemirrorJSON; isPublicView?: boolean }) {
   const { project_id } = useParams();
   const parsedContent = deleteObjectPropsRecursive(content, ["style", "closed", "resizable", "nested"]);
   if (!parsedContent) return null;
   return (
     <div className="staticRendererContainer">
-      <RemirrorRenderer json={parsedContent as RemirrorJSON} markMap={markMap} typeMap={typeMap(project_id as string)} />
+      <RemirrorRenderer
+        json={parsedContent as RemirrorJSON}
+        markMap={markMap}
+        typeMap={typeMap(project_id as string, isPublicView)}
+      />
     </div>
   );
 }

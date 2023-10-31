@@ -8,6 +8,8 @@ import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView } from "./pages/Entities";
 import { FolderView } from "./pages/Entities/FolderView";
 import { ProjectsView } from "./pages/Projects";
+import { PublicEntitiesView } from "./pages/Public";
+import { PublicLayout } from "./pages/Public/PublicLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +54,16 @@ export default function App() {
               </Route>
             </Routes>
           </SignedIn>
+          <Routes>
+            <Route path="public/*">
+              {/* <Route path="*" /> */}
+              <Route element={<PublicLayout />} path=":project_id/*">
+                <Route path=":type" />
+                <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
+                <Route path=":type/:item_id/:subitem_id" />
+              </Route>
+            </Route>
+          </Routes>
         </QueryClientProvider>
       </ClerkProvider>
     </main>

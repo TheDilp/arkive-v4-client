@@ -1,14 +1,15 @@
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { RemirrorJSON } from "remirror";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType, UpdateDocumentType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex";
-import { Button, Input, Search } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Button, Checkbox, Input, Search } from "../../Form";
+import { DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 
@@ -48,7 +49,7 @@ export function DocumentDrawer({ data }: Props) {
     {
       data: {},
       relations: { alter_names: true, tags: true },
-      fields: ["id", "title", "image_id", "dice_color"],
+      fields: ["id", "title", "image_id", "dice_color", "is_public"],
     },
     {
       enabled: !!data?.id,
@@ -62,7 +63,6 @@ export function DocumentDrawer({ data }: Props) {
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: UpdateDocumentType;
-    relations?: documentRelationsType;
   }>("documents", project_id as string);
 
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
@@ -81,7 +81,7 @@ export function DocumentDrawer({ data }: Props) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <>
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <div className="flex flex-col gap-y-2">
@@ -152,6 +152,12 @@ export function DocumentDrawer({ data }: Props) {
               <ColorPicker name="dice_color" onChange={handleChange} value={document?.dice_color || DefaultTagColor} />
             </div>
           </div>
+          <div className="flex gap-x-2">
+            <span>Is public:</span>
+            <div className="ml-auto self-end pb-2">
+              <Checkbox name="is_public" onChange={handleChange} value={document?.is_public ?? false} />
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -219,10 +225,12 @@ export function DocumentDrawer({ data }: Props) {
                   alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
                 },
               });
-
-              await update(parsedData, {
-                onSuccess: resetDrawerAtom,
-              });
+              await update(
+                { ...parsedData, data: { ...parsedData.data, content: parsedData.data.content as RemirrorJSON } },
+                {
+                  onSuccess: resetDrawerAtom,
+                },
+              );
             } else {
               const dataToParse = {
                 data: document,
@@ -233,9 +241,12 @@ export function DocumentDrawer({ data }: Props) {
               };
               dataToParse.data.parent_id = item_id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);
-              await create(parsedData, {
-                onSuccess: resetDrawerAtom,
-              });
+              await create(
+                { ...parsedData, data: { ...parsedData.data, content: parsedData.data.content as RemirrorJSON } },
+                {
+                  onSuccess: resetDrawerAtom,
+                },
+              );
             }
           } else {
             createNotification({
@@ -248,6 +259,6 @@ export function DocumentDrawer({ data }: Props) {
         }}
         variant="success"
       />
-    </>
+    </DrawerLayout>
   );
 }
