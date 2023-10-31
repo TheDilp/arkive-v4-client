@@ -4,6 +4,7 @@ import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
+  Avatar,
   Button,
   Checkbox,
   ColorPicker,
@@ -11,6 +12,7 @@ import {
   Dropdown,
   ImageSelect,
   Input,
+  Skeleton,
   Table,
   TablePageLayout,
   Tabs,
@@ -24,6 +26,8 @@ import {
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
+  getFirstLetters,
+  getImageURL,
   getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
@@ -109,7 +113,7 @@ export function ProjectSettingsView() {
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
 
   const [, dispatch] = useTable({});
-  const { data: projectData } = useGetEntity<ProjectType>(
+  const { data: projectData, isLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
     {
@@ -151,15 +155,33 @@ export function ProjectSettingsView() {
 
   return (
     <div className="grid h-full max-h-full w-full grid-cols-5 content-start gap-4 overflow-hidden pt-0 lg:content-stretch">
-      <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
-        <h2 className="text-center font-merriweather text-lg">{`${projectData?.data?.title || ""}`.trimEnd()}</h2>
+      <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 lg:col-span-1 lg:h-full lg:max-h-full">
         <div className="w-full">
-          <Tabs
-            isVertical
-            onChange={(_, index) => setSelectedTab(index)}
-            selectedTab={selectedTab}
-            tabs={isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false)}
-          />
+          {isLoading ? <Skeleton type="character_profile" /> : null}
+          {!isLoading && isLg ? (
+            <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+              <Avatar
+                hasShowImage
+                image={getImageURL(projectData?.data?.id as string, "images", projectData?.data?.image_id)}
+                initials={getFirstLetters(projectData?.data?.title as string)}
+                isTooltipDisabled
+                size="4xl"
+              />
+
+              <div className="mt-2 flex flex-col gap-y-1">
+                <h2 className="text-center font-merriweather text-lg">{`${projectData?.data?.title || ""}`.trimEnd()}</h2>
+              </div>
+
+              <div className="w-full">
+                <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+              </div>
+            </div>
+          ) : null}
+          {!isLoading && !isLg ? (
+            <div className="w-full">
+              <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+            </div>
+          ) : null}
         </div>
       </div>
 
