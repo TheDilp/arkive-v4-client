@@ -82,6 +82,7 @@ const TableClasses = tv({
     hasNoHeaderGap: {
       true: {
         head: "mb-0 border-b-0",
+        body: "mt-0",
       },
     },
     hasNoData: {
