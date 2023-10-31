@@ -15,7 +15,7 @@ const InputClasses = tv({
       primary: {
         input: "border-zinc-700 focus:border-zinc-500",
         label: "text-zinc-300",
-        helperText: "text-zinc-300",
+        helperText: "text-zinc-400",
       },
       secondary: {
         input: "border-zinc-400",
