@@ -125,7 +125,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                     {
                       data: {
                         id: item_id as string,
-                        content: JSON.stringify(editorData.content),
+                        content: editorData.content,
                       },
                     },
                     {
