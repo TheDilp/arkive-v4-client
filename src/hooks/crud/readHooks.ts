@@ -1,9 +1,41 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities } from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities, UserType } from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
 import { IconCategories } from "../../utils/enums/IconPickerEnums";
+
+export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
+  return useQuery<{ data: ProjectType[] }>(
+    ["allEntities", "project"],
+    async () =>
+      FetchFunction({
+        method: "POST",
+        body: JSON.stringify(request),
+        url: `${baseURLS.baseServer}/projects`,
+      }),
+    {
+      enabled: options?.enabled,
+      staleTime: options?.staleTime,
+    },
+  );
+}
+
+export function useGetUser(request: RequestBodyType<UserType> & { data: { auth_id?: string } }, options?: UseQueryOptions) {
+  return useQuery<{ data: UserType }>(
+    ["user", request.data.auth_id],
+    async () =>
+      FetchFunction({
+        method: "POST",
+        body: JSON.stringify(request),
+        url: `${baseURLS.baseServer}/users/${request.data.auth_id}`,
+      }),
+    {
+      enabled: options?.enabled,
+      staleTime: options?.staleTime,
+    },
+  );
+}
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
@@ -37,22 +69,6 @@ export function useGetSubEntity<EntityType>(
   return useQuery<{ data: EntityType }>(
     [type, id],
     async () => FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type}/${id}` }),
-    {
-      enabled: options?.enabled,
-      staleTime: options?.staleTime,
-    },
-  );
-}
-
-export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
-  return useQuery<{ data: ProjectType[] }>(
-    ["allEntities", "project"],
-    async () =>
-      FetchFunction({
-        method: "POST",
-        body: JSON.stringify(request),
-        url: `${baseURLS.baseServer}/projects`,
-      }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
@@ -140,7 +156,6 @@ export function useGetEntities<ReturnType>(
 
   return res;
 }
-
 export function useGetInfiniteEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
   type: AvailableEntityType | AvailableSubEntityType,
