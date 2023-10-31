@@ -19,7 +19,7 @@ type Props = {
 export function CharacterAddDrawer({ data }: Props) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
-  const [items, setItems] = useState<{ label: string; value: string; color?: string }[]>([]);
+  const [items, setItems] = useState<{ label: string; value: string; image?: string; color?: string }[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
     "characters",
@@ -30,7 +30,7 @@ export function CharacterAddDrawer({ data }: Props) {
       <Search
         isMultiple
         name="items"
-        onChange={async ({ label, value, color }) => {
+        onChange={async ({ label, value, image, color }) => {
           if (items.some((i) => i.value === value)) {
             createNotification({
               title: "Cannot add same image more than once.",
@@ -41,7 +41,7 @@ export function CharacterAddDrawer({ data }: Props) {
             return;
           }
 
-          if (label && value) setItems((prev) => (prev || []).concat({ label, value, color }));
+          if (label && value) setItems((prev) => (prev || []).concat({ label, image, value, color }));
         }}
         placeholder={`Press enter to search and add ${data?.type}.`}
         searchEntity={data?.type}
@@ -58,10 +58,11 @@ export function CharacterAddDrawer({ data }: Props) {
       ) : (
         items.map((i) => (
           <EntityPreview
+            key={i.value}
             clearAction={(id) => setItems((prev) => (prev || []).filter((item) => item.value !== id))}
             icon={data?.type === "documents" ? IconEnum.document : IconEnum.image}
             id={i.value}
-            image_id={data?.type === "images" ? i.value : undefined}
+            image_id={data?.type === "images" ? i.value : i?.image}
             title={i.label}
             type={data?.type}
           />
