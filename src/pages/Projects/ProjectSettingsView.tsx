@@ -1,4 +1,4 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import omit from "lodash.omit";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -26,13 +26,15 @@ import {
   drawerAtom,
   getSentenceCase,
   IconEnum,
+  isUserOwnerAtom,
 } from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
 const tabs = [
-  { id: "1", label: "Project settings", icon: IconEnum.settings },
-  { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree },
-  { id: "3", label: "User settings", icon: IconEnum.user_settings },
+  { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
+  { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
+  { id: "3", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
+  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
@@ -95,19 +97,31 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
 export function ProjectSettingsView() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
+
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
-  const setDialog = useSetAtom(dialogAtom);
-  const { handleChange } = useHandleChange({ data: project, setData: setProject });
-  const [, dispatch] = useTable({});
-  const setDrawer = useSetAtom(drawerAtom);
-  const { data: projectData } = useGetEntity<ProjectType>(project_id as string, "projects", {
-    fields: ["id", "title", "image_id", "default_dice_color", "show_image_table_view", "show_image_folder_view"],
-    relations: {
-      character_relationship_types: true,
-    },
-  });
 
+  const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
+
+  const isUserOwner = useAtomValue(isUserOwnerAtom);
+
+  const { handleChange } = useHandleChange({ data: project, setData: setProject });
+
+  const [, dispatch] = useTable({});
+  const { data: projectData } = useGetEntity<ProjectType>(
+    project_id as string,
+    "projects",
+    {
+      fields: ["id", "title", "image_id", "default_dice_color", "owner_id"],
+      relations: {
+        character_relationship_types: true,
+      },
+    },
+    {
+      queryKeyConcat: ["settings"],
+    },
+  );
   const { mutateAsync: updateProject, isLoading: isUpdating } = useUpdateEntity<UpdateProjectType>(
     "projects",
     project_id as string,
@@ -134,7 +148,12 @@ export function ProjectSettingsView() {
       <div className="col-span-5 flex h-full min-h-fit flex-col items-center gap-y-2 overflow-hidden rounded-lg bg-zinc-800 p-4 lg:col-span-1 lg:h-full lg:max-h-full">
         <h2 className="text-center font-merriweather text-lg">{`${projectData?.data?.title || ""}`.trimEnd()}</h2>
         <div className="w-full">
-          <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+          <Tabs
+            isVertical
+            onChange={(_, index) => setSelectedTab(index)}
+            selectedTab={selectedTab}
+            tabs={isUserOwner ? tabs : tabs.filter((t) => t.isOwner === false)}
+          />
         </div>
       </div>
 
@@ -195,19 +214,11 @@ export function ProjectSettingsView() {
               </div>
               <div className="flex flex-nowrap items-center justify-between border-t border-zinc-700 pt-2">
                 <span>Show images in folder view:</span>
-                <Checkbox
-                  name="show_image_folder_view"
-                  onChange={handleChange}
-                  value={project?.show_image_folder_view ?? false}
-                />
+                <Checkbox name="show_image_folder_view" onChange={handleChange} value={false} />
               </div>
               <div className="flex flex-nowrap items-center justify-between border-t border-zinc-700 pt-2">
                 <span>Show images in table folder view:</span>
-                <Checkbox
-                  name="show_image_table_view"
-                  onChange={handleChange}
-                  value={project?.show_image_table_view ?? false}
-                />
+                <Checkbox name="show_image_table_view" onChange={handleChange} value={false} />
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ import {
   getImageURL,
   getNavbarEntityType,
   IconEnum,
-  projectSettingsAtom,
+  userSettingsAtom,
 } from "../../utils";
 import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
@@ -231,7 +231,7 @@ function EntityItem({
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
   const entityName = getEntityNameFromType(type as AvailableEntityType);
-  const { show_image_folder_view, show_image_table_view } = useAtomValue(projectSettingsAtom);
+  const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
 
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");

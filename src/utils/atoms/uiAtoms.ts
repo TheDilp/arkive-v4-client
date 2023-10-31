@@ -5,12 +5,7 @@ import { ContextMenuAtomType, DialogAtomType, DrawerAtomType, NotificationType, 
 import { BreadCrumbsType as BreadcrumbsType } from "../../types/ComponentTypes/LayoutTypes/breadcrumbsTypes";
 
 export const projectAtom = atom<ProjectType | null>(null);
-export const projectSettingsAtom = atom((get) => {
-  return {
-    show_image_folder_view: get(projectAtom)?.show_image_folder_view,
-    show_image_table_view: get(projectAtom)?.show_image_table_view,
-  };
-});
+
 export const navbarTitleAtom = atom<string>("");
 export const breadcrumbsAtom = atom<BreadcrumbsType>({ items: [], type: null });
 export const drawerAtom = atomWithReset<DrawerAtomType>({ size: "md", title: "", position: "right", data: null, type: null });
