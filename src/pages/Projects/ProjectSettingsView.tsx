@@ -217,7 +217,7 @@ export function ProjectSettingsView() {
       data: null,
     }));
   }
-
+  const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
@@ -237,13 +237,13 @@ export function ProjectSettingsView() {
             </div>
 
             <div className="w-full">
-              <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+              <Tabs isVertical onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={finalTabs} />
             </div>
           </div>
         ) : null}
         {!isLoading && !isLg ? (
           <div className="w-full">
-            <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+            <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={finalTabs} />
           </div>
         ) : null}
 

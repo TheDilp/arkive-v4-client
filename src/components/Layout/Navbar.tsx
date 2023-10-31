@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/clerk-react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 import { useIsMutating } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
@@ -71,6 +71,7 @@ export function Navbar() {
   const isMutating = useIsMutating();
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
+  const { user } = useUser();
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -97,13 +98,15 @@ export function Navbar() {
     image_id?: string;
     conversation_id?: string;
     entity: AllAvailableEntities;
+    userId: string;
   }>(`ws://localhost:5174/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
-        if (subitem_id === lastJsonMessage.conversation_id) return;
+        if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
+        if (user?.id && lastJsonMessage.userId && user?.id === lastJsonMessage?.userId) return;
         createNotification({
           icon: getDefaultEntityIcon(lastJsonMessage.entity),
           title: lastJsonMessage.message,

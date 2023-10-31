@@ -28,7 +28,7 @@ import {
 } from "../../../utils";
 import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import { Dropdown, EntityPreview, ImagePreview, Skeleton } from "../..";
+import { DrawerLayout, Dropdown, EntityPreview, ImagePreview, Skeleton } from "../..";
 import { Editor } from "../../Complex/Editor/Editor";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { Button, Checkbox, Input, Search, Select, TagInput, Title } from "../../Form";
@@ -743,7 +743,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
 
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (
-    <>
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
@@ -1070,6 +1070,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         }}
         variant="success"
       />
-    </>
+    </DrawerLayout>
   );
 }
