@@ -85,7 +85,7 @@ export type DrawerAtomType = {
         conversation_id?: string;
       };
     }
-  | { type: null; data: null }
+  | { type: "invite_to_project" | null; data: null }
 );
 
 export interface ContextMenuAtomType {

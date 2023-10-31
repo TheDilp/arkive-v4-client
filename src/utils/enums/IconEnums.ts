@@ -102,6 +102,7 @@ export const IconEnum = {
   upload: "ph:upload",
   user: "ph:user",
   users: "ph:users",
+  user_invite: "ph:user-plus",
   user_settings: "ph:user-gear",
   vertical: "ph:arrows-out-line-vertical",
   warning: "ph:warning",

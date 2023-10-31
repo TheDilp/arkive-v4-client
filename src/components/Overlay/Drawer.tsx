@@ -38,6 +38,7 @@ import {
 } from "./DrawerContent";
 import { EditMessageDrawer } from "./DrawerContent/EditMessageDrawer";
 import { ImageDrawer } from "./DrawerContent/ImageDrawer";
+import MemberAddDrawer from "./DrawerContent/MemberAddDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -164,6 +165,7 @@ export function Drawer() {
         {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
         {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
         {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
+        {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
       </div>
     </div>
   );

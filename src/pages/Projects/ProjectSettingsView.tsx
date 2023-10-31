@@ -120,6 +120,7 @@ export function ProjectSettingsView() {
       fields: ["id", "title", "image_id", "default_dice_color", "owner_id"],
       relations: {
         character_relationship_types: true,
+        members: true,
       },
     },
     {
@@ -150,6 +151,14 @@ export function ProjectSettingsView() {
       title: "Create new relationship type",
       type: "character_relationship_types",
       data: { project_id },
+    }));
+  }
+  function handleOpenInviteToProjectDrawer() {
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Invite to project",
+      type: "invite_to_project",
+      data: null,
     }));
   }
 
@@ -207,6 +216,17 @@ export function ProjectSettingsView() {
                 icon={IconEnum.add}
                 label="Create"
                 onClick={handleOpenNewRelationshipTypeDrawer}
+                size="sm"
+                variant="info"
+              />
+            </div>
+          ) : null}
+          {selectedTab === 3 ? (
+            <div className="ml-auto w-min">
+              <Button
+                icon={IconEnum.user_invite}
+                label="Invite"
+                onClick={handleOpenInviteToProjectDrawer}
                 size="sm"
                 variant="info"
               />
@@ -294,6 +314,20 @@ export function ProjectSettingsView() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : null}
+        {selectedTab === 3 ? (
+          <div className="flex max-h-[94.75%] flex-col gap-y-0 overflow-y-auto pb-6">
+            <div>
+              <TablePageLayout>
+                <Table
+                  columns={relationshipTableColumns(setDialog)}
+                  data={projectData?.data?.character_relationship_types || []}
+                  dispatch={dispatch}
+                  type="character_relationship_types"
+                />
+              </TablePageLayout>
+            </div>
           </div>
         ) : null}
       </div>

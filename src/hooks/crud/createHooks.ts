@@ -213,6 +213,7 @@ export function useCreateSubEntities<InsertType extends { data: { data: { parent
   });
 }
 
+// #region misc
 export function useGenerateGraph<
   InsertType extends { data: { project_id: string }; relations: { nodes: any[]; edges: any[] } },
 >() {
@@ -244,7 +245,6 @@ export function useGenerateGraph<
     },
   );
 }
-
 export function useGenerateDocument<
   InsertType extends { data: { title: string; project_id: string; parent_id?: string; content?: string } },
 >(type: "conversations" | "documents") {
@@ -275,3 +275,35 @@ export function useGenerateDocument<
     },
   );
 }
+export function useInviteUserToProject<InsertType extends { data: { project_id: string; email: string } }>() {
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (newGraph: InsertType) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/users/invite`,
+        body: JSON.stringify(newGraph),
+        method: "POST",
+      }),
+
+    {
+      onSuccess: () => {
+        createNotification({
+          title: "Invitation sent.",
+          variant: "success",
+          timer: 3,
+          icon: IconEnum.send,
+        });
+      },
+      onError: () => {
+        createNotification({
+          title: "There was an error creating this document.",
+          variant: "error",
+          timer: 3,
+          icon: IconEnum.error,
+        });
+      },
+    },
+  );
+}
+// #endregion misc
