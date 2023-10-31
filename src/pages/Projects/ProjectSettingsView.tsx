@@ -1,6 +1,6 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import omit from "lodash.omit";
-import { Dispatch, useLayoutEffect, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -26,7 +26,7 @@ import {
   drawerAtom,
   getSentenceCase,
   IconEnum,
-  isUserOwnerAtom,
+  isProjectOwnerAtom,
 } from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
@@ -104,7 +104,7 @@ export function ProjectSettingsView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
 
-  const isUserOwner = useAtomValue(isUserOwnerAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
 
@@ -131,6 +131,12 @@ export function ProjectSettingsView() {
     if (projectData?.data) setProject(projectData.data);
   }, [projectData]);
 
+  useEffect(() => {
+    if (selectedTab === 3 && !isProjectOwner) {
+      setSelectedTab(0);
+    }
+  }, [selectedTab, isProjectOwner]);
+
   async function handleSave() {
     if (project) await updateProject({ data: omit(project, ["character_relationship_types"]) });
   }
@@ -152,7 +158,7 @@ export function ProjectSettingsView() {
             isVertical
             onChange={(_, index) => setSelectedTab(index)}
             selectedTab={selectedTab}
-            tabs={isUserOwner ? tabs : tabs.filter((t) => t.isOwner === false)}
+            tabs={isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false)}
           />
         </div>
       </div>

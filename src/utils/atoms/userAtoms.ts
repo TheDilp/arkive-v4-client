@@ -11,7 +11,7 @@ export const userSettingsAtom = atom(() => {
   };
 });
 
-export const isUserOwnerAtom = atom((get) => {
+export const isProjectOwnerAtom = atom((get) => {
   const owner_id = get(projectAtom)?.owner_id;
   const user_id = get(userAtom)?.id;
 
