@@ -18,10 +18,10 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props
         <span className="relative top-0.5">
           <Icon fontSize={16} icon={IconEnum.character} />
         </span>
-        <span className="underline">{title || nodeLabel}</span>
+        <span className="text-sm underline">{title || nodeLabel}</span>
       </div>
     </Link>
   ) : (
-    <div className="Lato text-white">{nodeLabel}</div>
+    <div className="Lato text-sm text-white">{nodeLabel}</div>
   );
 }

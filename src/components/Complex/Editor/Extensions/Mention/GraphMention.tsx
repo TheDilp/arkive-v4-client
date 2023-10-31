@@ -34,12 +34,12 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
           <span className="relative top-0.5">
             <Icon fontSize={16} icon={IconEnum.board} />
           </span>
-          <span className="underline">{title || nodeLabel}</span>
+          <span className="text-sm underline">{title || nodeLabel}</span>
         </div>
       </Link>
     </Tooltip>
   ) : (
-    <div className="Lato text-white">
+    <div className="Lato text-sm text-white">
       <Icon icon={IconEnum.edit} />
       {nodeLabel}
     </div>

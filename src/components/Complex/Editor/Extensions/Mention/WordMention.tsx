@@ -31,7 +31,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
 export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
   return (
     <Tooltip content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
-      <span className="cursor-pointer font-light italic">
+      <span className="cursor-pointer text-sm font-light italic">
         {title || label}
         <sup>*</sup>
       </span>
