@@ -103,6 +103,7 @@ export const IconEnum = {
   user: "ph:user",
   users: "ph:users",
   user_invite: "ph:user-plus",
+  user_remove: "ph:user-minus",
   user_settings: "ph:user-gear",
   vertical: "ph:arrows-out-line-vertical",
   warning: "ph:warning",

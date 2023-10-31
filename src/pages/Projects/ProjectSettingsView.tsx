@@ -19,7 +19,7 @@ import {
   Title,
 } from "../../components";
 import { useBreakpoint, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
-import { CharacterRelationshipType, DialogAtomType, ProjectType } from "../../types";
+import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType } from "../../types";
 import {
   AllEntities,
   capitalizeFirstLetter,
@@ -42,6 +42,7 @@ const tabs = [
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
+const membersColumnHelper = createColumnHelper<UserType>();
 
 function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
   return [
@@ -87,6 +88,61 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
                     size: "sm",
                     type: "delete_entity",
                   }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+function membersColumns() {
+  return [
+    membersColumnHelper.display({
+      id: "image",
+      header: "Image",
+      cell: ({ row }) => <b>{row.original.image}</b>,
+      minSize: 5,
+      maxSize: 5,
+    }),
+    membersColumnHelper.display({
+      id: "email",
+      header: "Email",
+      cell: ({ row }) => row.original.email,
+    }),
+    membersColumnHelper.display({
+      id: "nickname",
+      header: "Nickname",
+      cell: ({ row }) => row.original.nickname,
+    }),
+    relationshipTypesColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: () => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "remove_member",
+                label: "Remove member from project",
+                icon: IconEnum.user_remove,
+                onClick: () => {
+                  // setDialog((prev) => ({
+                  //   ...prev,
+                  //   data: {
+                  //     ...row.original,
+                  //     entity_title: "character_relationship_types",
+                  //   },
+                  //   title: "Delete character",
+                  //   size: "sm",
+                  //   type: "delete_entity",
+                  // }));
                 },
               },
             ]}>
@@ -318,8 +374,8 @@ export function ProjectSettingsView() {
               <div>
                 <TablePageLayout>
                   <Table
-                    columns={relationshipTableColumns(setDialog)}
-                    data={projectData?.data?.character_relationship_types || []}
+                    columns={membersColumns()}
+                    data={projectData?.data?.members || []}
                     dispatch={dispatch}
                     type="character_relationship_types"
                   />

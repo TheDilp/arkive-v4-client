@@ -1,3 +1,4 @@
+import { UserType } from "../userTypes";
 import { CharacterRelationshipType } from "./characterRelationshipTypes";
 import { ImageType } from "./imageTypes";
 
@@ -11,4 +12,5 @@ export interface ProjectType {
   // show_image_folder_view?: boolean;
   // show_image_table_view?: boolean;
   character_relationship_types?: CharacterRelationshipType[];
+  members: UserType[];
 }

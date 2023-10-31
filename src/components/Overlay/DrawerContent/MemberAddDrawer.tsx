@@ -1,8 +1,9 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useInviteUserToProject } from "../../../hooks";
-import { IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
@@ -10,7 +11,8 @@ export default function MemberAddDrawer() {
   const { project_id } = useParams();
   const [email, setEmail] = useState("");
   const isEmailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
-  const { mutateAsync: invite } = useInviteUserToProject();
+  const { mutateAsync: invite, isLoading } = useInviteUserToProject();
+  const resetDrawerAtom = useResetAtom(drawerAtom);
   return (
     <DrawerLayout>
       <Input
@@ -24,10 +26,14 @@ export default function MemberAddDrawer() {
       <div>
         <Button
           icon={IconEnum.user_invite}
-          isDisabled={!email || !isEmailValid}
+          isDisabled={!email || !isEmailValid || isLoading}
+          isLoading={isLoading}
           label="Invite"
           onClick={async () => {
-            if (project_id && email && isEmailValid) await invite({ data: { project_id, email } });
+            if (project_id && email && isEmailValid) {
+              await invite({ data: { project_id, email } });
+              resetDrawerAtom();
+            }
           }}
           variant="info"
         />

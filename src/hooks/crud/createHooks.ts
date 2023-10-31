@@ -295,9 +295,9 @@ export function useInviteUserToProject<InsertType extends { data: { project_id: 
           icon: IconEnum.send,
         });
       },
-      onError: () => {
+      onError: (error: { message: string }) => {
         createNotification({
-          title: "There was an error creating this document.",
+          title: error?.message || "There was an error sending this invite.",
           variant: "error",
           timer: 3,
           icon: IconEnum.error,
