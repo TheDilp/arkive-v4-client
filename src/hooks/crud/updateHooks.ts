@@ -95,6 +95,7 @@ export function useUpdateEntity<
               },
             );
           }
+
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
           if (vars.data.id && type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
 
@@ -335,6 +336,7 @@ export function useUpdateSubEntity(
     {
       onSuccess: () => {
         const parentEntityType = getParentEntityType(type);
+
         if (parentEntityType && parentEntityType !== "documents") {
           if (type === "blueprint_instances") {
             queryClient.invalidateQueries(["allEntities", project_id, "blueprint_instances"]);
