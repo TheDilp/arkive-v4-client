@@ -18,9 +18,9 @@ const SidebarClasses = tv({
     listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16 hover:fill-blue-300",
     listItem:
       "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
-    selectedListItem: "text-white sticky left-16 lg:top-16 lg:bottom-16 right-16 bg-blue-400 [&>li]:hover:text-white",
-    listSettingsItem:
-      "lg:-bottom-0 -right-1 lg:-bottom-1 sticky justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mx-0 lg:ml-0 ml-auto lg:mt-auto",
+    selectedListItem: "text-white bg-blue-400 [&>li]:hover:text-white",
+    listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mt-auto",
+    selectedSettingsListItem: "text-white bg-blue-400 [&>li]:hover:text-white",
     navIcon: "cursor-pointer",
   },
 });
@@ -28,8 +28,18 @@ const SidebarClasses = tv({
 export function Sidebar() {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
-  const { base, nav, list, sidebarLogo, listItemLink, listItem, listSettingsItem, selectedListItem, navIcon } =
-    SidebarClasses();
+  const {
+    base,
+    nav,
+    list,
+    sidebarLogo,
+    listItemLink,
+    listItem,
+    listSettingsItem,
+    selectedListItem,
+    selectedSettingsListItem,
+    navIcon,
+  } = SidebarClasses();
   return (
     <div className={base()}>
       <nav className={nav()}>
@@ -43,7 +53,8 @@ export function Sidebar() {
                 key={item.icon}
                 className={`${listItemLink()} ${
                   item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
-                } ${item.navigate === type ? selectedListItem() : ""}
+                } ${item.navigate === type && type !== "project-settings" ? selectedListItem() : ""}
+                 ${item.navigate === "project-settings" && type === "project-settings" ? selectedSettingsListItem() : ""}
                 
                 ${item.navigate === "project-settings" ? listSettingsItem() : ""}
                 
