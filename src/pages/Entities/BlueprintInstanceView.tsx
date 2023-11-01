@@ -299,6 +299,8 @@ export function BlueprintInstanceView() {
             config={{
               hasSelect: true,
               selection,
+              getLink: (rowData: BlueprintInstanceType) =>
+                `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`,
             }}
             data={instances?.data || []}
             dispatch={dispatch}

@@ -6,6 +6,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView } from "./pages/Entities";
+import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
 import { FolderView } from "./pages/Entities/FolderView";
 import { ProjectsView } from "./pages/Projects";
 import { PublicEntitiesView } from "./pages/Public";
@@ -47,6 +48,7 @@ export default function App() {
                   <Route element={<CharacterProfileView />} path="characters/:item_id" />
                   <Route element={<CharacterProfileView />} path="characters/:item_id/:type" />
                   <Route element={<CharacterProfileView />} path="characters/:item_id/:type/:subitem_id" />
+                  <Route element={<BlueprintProfileView />} path="blueprints/:item_id/:subitem_id/:type" />
                   <Route element={<EntitiesView />} path=":type/:item_id/*" />
                   <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
                   <Route element={<FolderView />} path=":type/folder/:item_id/*" />

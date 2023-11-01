@@ -23,7 +23,6 @@ import {
   TablePageLayout,
   Tabs,
 } from "../../components";
-import { EntityPageContent, EntityPageGrid, EntityPageNavigation } from "../../components/Layout/EntityPageView";
 import {
   useBreakpoint,
   useChangeNavbarTitle,
@@ -609,6 +608,7 @@ function AdditionalFieldDisplay({
 
 export function CharacterProfileView() {
   const { project_id, item_id, type, subitem_id } = useParams();
+  const navigate = useNavigate();
   const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(getCharacterProfileTabFromType(type));
   const [assetView, setAssetView] = useState<"table" | "card">("table");
@@ -639,7 +639,6 @@ export function CharacterProfileView() {
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
-  const navigate = useNavigate();
 
   const relationships = [
     ...(existingCharacter?.data?.related_to || []),
@@ -764,10 +763,10 @@ export function CharacterProfileView() {
           </div>
         ) : null}
       </div>
-      <EntityPageGrid>
+      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
-          <EntityPageNavigation>
+          <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
             <Avatar
               hasShowImage
               image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -798,7 +797,7 @@ export function CharacterProfileView() {
                 tabs={tabs}
               />
             </div>
-          </EntityPageNavigation>
+          </div>
         ) : null}
         {!isLoading && !isLg ? (
           <div className="w-full">
@@ -812,7 +811,7 @@ export function CharacterProfileView() {
             />
           </div>
         ) : null}
-        <EntityPageContent>
+        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">
               {type === "conversations" && subitem_id ? (
@@ -1052,8 +1051,8 @@ export function CharacterProfileView() {
               </div>
             </div>
           ) : null}
-        </EntityPageContent>
-      </EntityPageGrid>
+        </div>
+      </div>
     </div>
   );
 }
