@@ -57,6 +57,7 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
   const alter_name = data?.data?.alter_names?.find((an) => an.id === alterId);
   return (
     <Tooltip
+      arrowColor="#3f3f46"
       content={<DocumentMentionTooltip id={id} title={data?.data?.title || title || label} />}
       delay={{ openDelay: 500 }}
       isDisabled={isDisabledTooltip ?? false}>

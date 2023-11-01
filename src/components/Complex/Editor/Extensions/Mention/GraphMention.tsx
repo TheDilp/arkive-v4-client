@@ -31,7 +31,10 @@ function GraphMentionTooltip({ nodeId, project_id }: Pick<Props, "nodeId" | "pro
 
 export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
   return nodeId ? (
-    <Tooltip content={<GraphMentionTooltip nodeId={nodeId} project_id={project_id} />} delay={{ closeDelay: 500 }}>
+    <Tooltip
+      arrowColor="#3f3f46"
+      content={<GraphMentionTooltip nodeId={nodeId} project_id={project_id} />}
+      delay={{ closeDelay: 500 }}>
       <Link
         className="inline-flex font-lato font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
