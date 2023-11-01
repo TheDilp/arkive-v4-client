@@ -106,7 +106,7 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
         </Tooltip>
       ) : null}
       <Dropdown
-        allowedPlacements={["left"]}
+        allowedPlacements={["left-start"]}
         items={(locations?.data || []).map((loc) => ({
           id: loc.id,
           label: loc.title || "",
