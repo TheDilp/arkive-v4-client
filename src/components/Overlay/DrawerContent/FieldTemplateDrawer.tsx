@@ -142,7 +142,8 @@ function FieldRow({
                         ref={provided.innerRef}
                         style={{
                           ...provided.draggableProps.style,
-                          left: 16,
+                          left: "calc(100%-32px)",
+                          right: 16,
                         }}>
                         <div {...provided.dragHandleProps} className="self-center">
                           <Icon fontSize={24} icon={IconEnum.menu} />
@@ -340,7 +341,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               />
             </div>
           </div>
-          <div className="flex max-h-[59%] flex-col overflow-y-auto">
+          <div className="flex max-h-[59%] flex-col">
             <DragDropContext
               onDragEnd={(result) => {
                 if (!result.destination) {
@@ -355,7 +356,10 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               }}>
               <Droppable droppableId="droppable">
                 {(providedDroppable) => (
-                  <div className="flex flex-1 flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
+                  <div
+                    className="relative flex flex-1 flex-col"
+                    {...providedDroppable.droppableProps}
+                    ref={providedDroppable.innerRef}>
                     {template.character_fields?.length
                       ? template.character_fields.map((field, index) => (
                           <Draggable key={field.id} draggableId={field.id || field.title + index} index={index}>
@@ -368,7 +372,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                 {...provided.draggableProps}
                                 style={{
                                   ...provided.draggableProps.style,
-                                  left: 16,
+                                  right: 0,
                                 }}>
                                 <div {...provided.dragHandleProps} className="mt-7 self-start">
                                   <Icon fontSize={24} icon={IconEnum.menu} />
