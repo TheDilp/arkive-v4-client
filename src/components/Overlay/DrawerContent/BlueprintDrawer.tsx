@@ -71,6 +71,7 @@ function FieldRow({
         </div>
         <div className="h-full flex-1">
           <Select
+            hasSearch
             isDisabled={isLoading}
             label="Field type"
             name={`blueprint_fields[${index}].field_type`}
