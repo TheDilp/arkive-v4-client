@@ -1,6 +1,6 @@
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Avatar,
@@ -71,10 +71,11 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
 }
 function LocationColumn({ ids }: { ids: string | string[] }) {
   const { project_id } = useParams();
+  const navigate = useNavigate();
   const { data: locations, isFetching } = useGetEntities<MapPinType>(
     {
       data: { project_id },
-      fields: ["id", "title", "icon", "image_id"],
+      fields: ["id", "title", "icon", "image_id", "parent_id"],
       filters: {
         and: [
           { field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" },
@@ -83,20 +84,42 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
       },
     },
     "map_pins",
-    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="flex items-center gap-x-2">
-      <div className="flex w-full items-center justify-center -space-x-4">
+      <div className="group flex w-full items-center justify-center -space-x-4">
         {locations?.data?.slice(0, 5)?.map((location) => location?.title)}
+        <Dropdown
+          allowedPlacements={[
+            "bottom",
+            "bottom-end",
+            "bottom-start",
+            "left",
+            "left-end",
+            "left-start",
+            "top",
+            "top-end",
+            "top-start",
+          ]}
+          items={(locations?.data || []).map((loc) => ({
+            id: loc?.id,
+            label: `Go to "${loc?.title}"`,
+            icon: loc?.icon,
+            onClick: () => navigate(`/projects/${project_id}/maps/${loc?.parent_id}/${loc?.id}`),
+          }))}>
+          <div className="pointer-events-none opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
+            <Button hasNoBackground icon={IconEnum.chevron_down} isIconOnly onClick={undefined} />
+          </div>
+        </Dropdown>
       </div>
       {locations?.data && locations?.data?.length > 5 ? (
         <Tooltip
           content={locations?.data
-            .slice(5)
-            .map((location) => location.title)
-            .join(", ")}>
+            ?.slice(5)
+            ?.map((location) => location.title)
+            ?.join(", ")}>
           <div className="w-min max-w-min">
             <Badge label={`+${locations.data.length - 5}`} size="sm" variant="secondary" />
           </div>
@@ -182,7 +205,7 @@ function createColumns(
           },
           meta: {
             centered: ["images_single", "characters_single", "locations_single"].includes(field.field_type),
-            noLink: ["images_single", "images_multiple"].includes(field.field_type),
+            noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple"].includes(field.field_type),
           },
           minSize,
           maxSize,
@@ -216,7 +239,6 @@ function createColumns(
                   }));
                 },
               },
-
               {
                 id: "delete_instance",
                 label: "Delete instance",
