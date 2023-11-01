@@ -144,7 +144,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                 {items && isOpen
                   ? items.map((dropdownItem) =>
                       dropdownItem.subItems?.length ? (
-                        <Dropdown items={dropdownItem.subItems}>
+                        <Dropdown allowedPlacements={allowedPlacements} items={dropdownItem.subItems}>
                           <DropdownItem
                             key={dropdownItem.id}
                             child={dropdownItem?.child}
