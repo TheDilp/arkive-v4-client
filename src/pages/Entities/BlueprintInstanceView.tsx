@@ -182,6 +182,7 @@ function createColumns(
           },
           meta: {
             centered: ["images_single", "characters_single", "locations_single"].includes(field.field_type),
+            noLink: ["images_single", "images_multiple"].includes(field.field_type),
           },
           minSize,
           maxSize,
