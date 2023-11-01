@@ -90,10 +90,8 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
   );
   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
-    <div className="group flex items-center gap-x-2">
-      <div className=" flex w-full items-center justify-center -space-x-4">
-        {locations?.data?.slice(0, 1)?.map((location) => location?.title)}
-      </div>
+    <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
+      <div className="w-full truncate">{locations?.data?.slice(0, 1)?.map((location) => location?.title)}</div>
       {locations?.data && locations?.data?.length > 1 ? (
         <Tooltip
           content={locations?.data
@@ -131,8 +129,8 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
             },
           ],
         }))}>
-        <div className="pointer-events-none opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
-          <Button hasNoBackground icon={IconEnum.chevron_down} isIconOnly onClick={undefined} />
+        <div className="pointer-events-none w-min max-w-min opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
+          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="xxs" />
         </div>
       </Dropdown>
     </div>

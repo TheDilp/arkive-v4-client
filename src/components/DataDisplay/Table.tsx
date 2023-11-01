@@ -677,9 +677,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                           {row.getVisibleCells().map((cell) => (
                             <div
                               key={cell.id}
-                              className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                                (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                              }
+                              className={`${contentClasses()} box-border ${
+                                cell.column.id === "select" ? selectClasses() : ""
+                              } ${(cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""}
                             `}
                               onClick={(e) => {
                                 if (

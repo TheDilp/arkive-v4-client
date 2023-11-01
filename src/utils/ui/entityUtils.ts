@@ -95,12 +95,12 @@ export function getSearchFieldTypeLinkType(type: string) {
 }
 
 export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize?: number } {
-  if (type === "text") return { minSize: 10, maxSize: 25 };
+  if (type === "text") return { minSize: 15, maxSize: 15 };
   if (type === "images_single" || type === "characters_single" || type === "number") return { minSize: 7.5, maxSize: 7.5 };
   if (type === "characters_multiple" || type === "select" || type === "dice_roll" || type === "random_table")
-    return { minSize: 10, maxSize: 15 };
+    return { minSize: 12, maxSize: 12 };
   if (type === "boolean") return { minSize: 2.75, maxSize: 2.75 };
-  if (type === "select_multiple") return { minSize: 10, maxSize: 35 };
-  if (type === "locations_multiple") return { minSize: 10, maxSize: 15 };
+  if (type === "select_multiple") return { minSize: 18, maxSize: 18 };
+  if (type === "locations_multiple") return { minSize: 15, maxSize: 15 };
   return { minSize: 10, maxSize: 10 };
 }
