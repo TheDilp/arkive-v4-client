@@ -16,16 +16,31 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
   const { data, isLoading } = useGetEntity<GraphType>(
     nodeId,
     "graphs",
-    { data: {} },
+    {
+      data: {
+        project_id,
+      },
+      relations: {
+        nodes: true,
+        edges: true,
+      },
+    },
     { enabled: !!nodeId, staleTime: 5 * 60 * 1000 },
   );
 
   return nodeId ? (
     <Tooltip
       content={
-        <Card title={data?.data?.title || ""}>{data?.data ? <Graph data={data?.data} isReadOnly isViewOnly /> : null}</Card>
+        <Card title={data?.data?.title || ""}>
+          {data?.data ? (
+            <div className="h-96 w-96">
+              <Graph data={data?.data} isReadOnly isViewOnly />
+            </div>
+          ) : null}
+        </Card>
       }
-      isDisabled={isLoading || !!data?.data}>
+      delay={{ closeDelay: 500 }}
+      isDisabled={isLoading || !data?.data}>
       <Link
         className="inline-flex font-lato font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
