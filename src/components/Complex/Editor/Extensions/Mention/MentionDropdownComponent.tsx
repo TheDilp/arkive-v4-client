@@ -11,7 +11,7 @@ export function MentionDropdownComponent() {
   const { project_id } = useParams();
   const setMentionDropdownAtom = useSetAtom(mentionDropdownAtom);
   const [options, setOptions] = useState<
-    { key: string; id: string; label: string; displayLabel?: string; portrait_id?: string }[]
+    { key: string; id: string; label: string; displayLabel?: string; portrait_id?: string; parent_id?: string }[]
   >([]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -30,6 +30,8 @@ export function MentionDropdownComponent() {
         parentId?: string;
         translation?: string;
         portrait_id?: string;
+        icon?: string;
+        parent_id?: string;
       }[];
     } = await FetchFunction({
       url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
@@ -52,15 +54,19 @@ export function MentionDropdownComponent() {
               id: item?.parentId || item.id,
               searchItem: item.translation,
               label: item.title,
+              icon: item?.icon,
               displayLabel: `${item.title} (${item.translation})`,
               projectId: project_id,
+              parentId: item?.parent_id,
             };
           return {
             key: item.id,
             id: item?.parentId || item.id,
             alterId: item?.parentId ? item.id : null,
             label: item.title,
+            icon: item?.icon,
             projectId: project_id,
+            parentId: item?.parent_id,
             portrait_id: item?.portrait_id,
           };
         })
@@ -104,7 +110,7 @@ export function MentionDropdownComponent() {
                 {item?.portrait_id ? (
                   <Avatar image={getImageURL(project_id as string, "images", item.portrait_id)} label={item.label} size="xs" />
                 ) : null}
-                {item?.displayLabel || item.label}
+                <span className="truncate">{item?.displayLabel || item.label}</span>
               </li>
             );
           })

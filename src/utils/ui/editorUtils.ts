@@ -55,6 +55,16 @@ export const DefaultEditorExtensions: (
         parseDOM: (dom) => dom.getAttribute("data-projectId"),
         toDOM: () => ["data-projectId"],
       },
+      icon: {
+        default: null,
+        parseDOM: (dom) => dom.getAttribute("data-icon"),
+        toDOM: () => ["data-icon"],
+      },
+      parentId: {
+        default: null,
+        parseDOM: (dom) => dom.getAttribute("data-parentId"),
+        toDOM: () => ["data-parentId"],
+      },
     },
 
     matchers: [
@@ -81,6 +91,11 @@ export const DefaultEditorExtensions: (
       {
         char: "^",
         name: "words",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+      },
+      {
+        char: "&",
+        name: "blueprints",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
     ],
@@ -256,7 +271,7 @@ export const messageEditorHooks = (
     const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
 
     const handleSendMessage = useCallback(() => {
-      if (!isMentionDropdownOpen && canSend) {
+      if (!isMentionDropdownOpen && canSend && (selectedType === "character" || selectedType === "narration")) {
         const jsonContent = getJSON();
         const messageData = {
           id: crypto.randomUUID(),
