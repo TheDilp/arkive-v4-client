@@ -49,7 +49,7 @@ export function DocumentDrawer({ data }: Props) {
     {
       data: {},
       relations: { alter_names: true, tags: true },
-      fields: ["id", "title", "image_id", "dice_color", "is_public"],
+      fields: ["id", "title", "parent_id", "image_id", "dice_color", "is_public"],
     },
     {
       enabled: !!data?.id,
@@ -216,7 +216,7 @@ export function DocumentDrawer({ data }: Props) {
         onClick={async () => {
           if (changedData) {
             if (document?.id) {
-              const documentToUpdate = { ...(changedData || {}), id: document.id };
+              const documentToUpdate = { ...(changedData || {}), id: document.id, parent_id: document.parent_id };
               const { alter_names, tags, ...rest } = documentToUpdate;
               const parsedData = UpdateDocumentSchema.parse({
                 data: rest,
