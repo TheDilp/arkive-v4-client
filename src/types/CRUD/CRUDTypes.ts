@@ -1,4 +1,4 @@
-export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "not in" | "ilike" | "is";
+export type RequestFilterTypes = "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "not in" | "ilike" | "is" | "is not";
 
 export interface RequestFilterType {
   field: string;
