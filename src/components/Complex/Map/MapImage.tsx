@@ -16,9 +16,10 @@ type Props = {
   imgRef: any;
   isReadOnly?: boolean;
   isClusteringPins: boolean;
+  center_on?: string;
 };
 
-export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusteringPins }: Props) {
+export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusteringPins, center_on }: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
   const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | "character" | false>(false);
@@ -132,8 +133,8 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
   }, []);
 
   useEffect(() => {
-    if (subitem_id && mapData && firstRender.current) {
-      const pin = mapData?.map_pins?.find((map_pin) => map_pin.id === subitem_id);
+    if ((subitem_id || center_on) && mapData && firstRender.current) {
+      const pin = mapData?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id));
       if (pin) map.panTo([pin.lat, pin.lng], {});
     } else if (bounds && firstRender.current) {
       map.fitBounds(bounds);
@@ -214,7 +215,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isClusterin
                     <ImageOverlay
                       bounds={bounds}
                       className="leafletImageOverlayLayer"
-                      url={getImageURL(project_id as string, "maps", layer.image_id)}
+                      url={getImageURL(project_id as string, "map_images", layer.image_id)}
                       zIndex={9999}
                     />
                   </LayersControl.Overlay>
