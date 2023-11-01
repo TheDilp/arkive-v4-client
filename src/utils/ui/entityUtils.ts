@@ -101,5 +101,6 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
     return { minSize: 10, maxSize: 15 };
   if (type === "boolean") return { minSize: 2.75, maxSize: 2.75 };
   if (type === "select_multiple") return { minSize: 10, maxSize: 35 };
+  if (type === "locations_multiple") return { minSize: 10, maxSize: 15 };
   return { minSize: 10, maxSize: 10 };
 }
