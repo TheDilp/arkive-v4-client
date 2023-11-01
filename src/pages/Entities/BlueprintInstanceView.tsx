@@ -79,6 +79,7 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
       filters: {
         and: [
           { field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" },
+          { field: "title", operator: "is not", value: null },
           { field: "character_id", operator: "is", value: null },
         ],
       },
@@ -88,44 +89,42 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
   );
   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
-    <div className="group flex items-center gap-x-2">
-      <div className=" flex w-full items-center justify-center -space-x-4">
-        {locations?.data?.slice(0, 1)?.map((location) => location?.title)}
-      </div>
-      {locations?.data && locations?.data?.length > 1 ? (
-        <Tooltip
-          content={locations?.data
-            ?.slice(1)
-            ?.map((location) => location.title)
-            .join(", ")}>
-          <div className="w-min max-w-min">
-            <Badge label={`+${locations.data.length - 1}`} size="sm" variant="secondary" />
-          </div>
-        </Tooltip>
-      ) : null}
-      <Dropdown
-        allowedPlacements={[
-          "bottom",
-          "bottom-end",
-          "bottom-start",
-          "left",
-          "left-end",
-          "left-start",
-          "top",
-          "top-end",
-          "top-start",
-        ]}
-        items={(locations?.data || []).map((loc) => ({
-          id: loc?.id,
-          label: `Go to "${loc?.title}"`,
-          icon: loc?.icon,
-          onClick: () => navigate(`/projects/${project_id}/maps/${loc?.parent_id}/${loc?.id}`),
-        }))}>
-        <div className="pointer-events-none opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
-          <Button hasNoBackground icon={IconEnum.chevron_down} isIconOnly onClick={undefined} />
+    <Dropdown
+      allowedPlacements={["left"]}
+      items={(locations?.data || []).map((loc) => ({
+        id: loc.id,
+        label: loc.title || "",
+        icon: loc?.icon,
+        subItems: [
+          {
+            id: `go_to_${loc.id}`,
+            label: `Go to ${loc.title}`,
+            onClick: () => navigate(`/projects/${project_id}/maps/${loc?.parent_id}/${loc?.id}`),
+          },
+          {
+            id: `preview_${loc.id}`,
+            label: `Preview ${loc.title} map`,
+            onClick: () => navigate(`/projects/${project_id}/maps/${loc?.parent_id}/${loc?.id}`),
+          },
+        ],
+      }))}>
+      <div className="group flex items-center gap-x-2">
+        <div className=" flex w-full items-center justify-center -space-x-4">
+          {locations?.data?.slice(0, 1)?.map((location) => location?.title)}
         </div>
-      </Dropdown>
-    </div>
+        {locations?.data && locations?.data?.length > 1 ? (
+          <Tooltip
+            content={locations?.data
+              ?.slice(1)
+              ?.map((location) => location.title)
+              .join(", ")}>
+            <div className="w-min max-w-min">
+              <Badge label={`+${locations.data.length - 1}`} size="sm" variant="secondary" />
+            </div>
+          </Tooltip>
+        ) : null}
+      </div>
+    </Dropdown>
   );
 }
 
@@ -204,9 +203,7 @@ function createColumns(
             return "";
           },
           meta: {
-            centered: ["images_single", "characters_single", "locations_single", "locations_multiple"].includes(
-              field.field_type,
-            ),
+            centered: field.field_type === "images_single",
             noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple"].includes(field.field_type),
           },
           minSize,
