@@ -37,7 +37,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
     data?.id,
     "maps",
     { relations: { map_pins: true, map_layers: true } },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
