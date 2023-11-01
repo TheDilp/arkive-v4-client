@@ -61,7 +61,7 @@ const TableClasses = tv({
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
-    content: "flex flex-1 items-center truncate px-2 box-border border-zinc-600 border-r last:border-r-0",
+    content: "flex flex-1 items-center truncate px-2 box-content border-zinc-600 border-r last:border-r-0",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
       "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottm-0 bg-zinc-950 pb-9 pt-1",

@@ -41,7 +41,7 @@ export function ProjectLayout() {
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
         <Navbar />
-        <div className="h-[calc(100%-6rem)] max-w-full overflow-auto p-4 lg:h-[calc(100%-2rem)] lg:max-w-[calc(100%)]">
+        <div className="h-[calc(100%-6rem)] max-w-full overflow-auto p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
           <Outlet />
         </div>
