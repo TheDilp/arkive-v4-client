@@ -567,7 +567,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
             });
         } else if (!subitem_id && cyRef?.current?._cy) {
           cyRef?.current?._cy?.animate({
-            center: {
+            fit: {
               eles: cyRef?.current?._cy?.nodes(),
             },
           });
@@ -799,7 +799,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
           }
         }}
         elements={CytoscapeComponent.normalizeElements({
-          nodes: mapNodes(nodes || [], project_id as string),
+          nodes: mapNodes(nodes || [], project_id as string, isReadOnly),
           edges: mapEdges(edges || []),
         })}
         maxZoom={5}
