@@ -12,35 +12,26 @@ type Props = {
   title?: string;
   project_id: string | undefined;
 };
-export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
-  const { data, isLoading } = useGetEntity<GraphType>(
-    nodeId,
-    "graphs",
-    {
-      data: {
-        project_id,
-      },
-      relations: {
-        nodes: true,
-        edges: true,
-      },
-    },
-    { enabled: !!nodeId, staleTime: 5 * 60 * 1000 },
-  );
 
+function GraphMentionTooltip({ nodeId, project_id }: Pick<Props, "nodeId" | "project_id">) {
+  const { data } = useGetEntity<GraphType>(
+    nodeId as string,
+    "graphs",
+    { data: { project_id }, fields: ["title"], relations: { nodes: true, edges: true } },
+    { enabled: !!nodeId, queryKeyConcat: ["mention"] },
+  );
+  return (
+    <Card title={data?.data?.title || ""}>
+      <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
+        {data?.data ? <Graph data={data?.data} isReadOnly isViewOnly /> : null}
+      </div>
+    </Card>
+  );
+}
+
+export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
   return nodeId ? (
-    <Tooltip
-      content={
-        <Card title={data?.data?.title || ""}>
-          {data?.data ? (
-            <div className="h-96 w-96">
-              <Graph data={data?.data} isReadOnly isViewOnly />
-            </div>
-          ) : null}
-        </Card>
-      }
-      delay={{ closeDelay: 500 }}
-      isDisabled={isLoading || !data?.data}>
+    <Tooltip content={<GraphMentionTooltip nodeId={nodeId} project_id={project_id} />} delay={{ closeDelay: 500 }}>
       <Link
         className="inline-flex font-lato font-bold text-white underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
