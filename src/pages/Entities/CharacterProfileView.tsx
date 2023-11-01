@@ -16,6 +16,7 @@ import {
   Dropdown,
   Editor,
   Gallery,
+  Icon,
   Input,
   Skeleton,
   Table,
@@ -53,6 +54,7 @@ import {
   getAvatarInitials,
   getCharacterFullName,
   getCharacterProfileTabFromType,
+  getDefaultEntityIcon,
   getImageURL,
   getSentenceCase,
   IconEnum,
@@ -227,8 +229,29 @@ function documentsTableColumns(
     unknown
   >,
   character_id: string,
+  project_id: string,
 ) {
   return [
+    documentsColumnHelper.display({
+      id: "image_id",
+      header: "",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) =>
+        "image_id" in row.original && row.original?.image_id ? (
+          <Avatar
+            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
+        ) : (
+          <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon("documents")} />
+        ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
     documentsColumnHelper.display({
       id: "title",
       header: "Title",
@@ -847,7 +870,7 @@ export function CharacterProfileView() {
                 {existingCharacter?.data?.documents?.length ? (
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     <Table
-                      columns={documentsTableColumns(removeItem, existingCharacter?.data?.id)}
+                      columns={documentsTableColumns(removeItem, existingCharacter?.data?.id, project_id as string)}
                       config={{
                         expandable: true,
                         hasNoHeaderGap: true,
