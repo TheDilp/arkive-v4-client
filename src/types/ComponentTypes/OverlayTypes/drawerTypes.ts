@@ -1,6 +1,7 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { MouseEvent } from "react";
 
+import { Size } from "../../baseTypes";
 import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
@@ -30,7 +31,7 @@ export type DrawerContentCreateNewType =
   | "random_tables"
   | "random_table_option";
 
-export type DrawerSize = "sm" | "md" | "lg";
+export type DrawerSize = Size | "half" | "full";
 export type DrawerPosition = "left" | "right";
 export type DrawerExceptions = {
   fromTemplate?: boolean;
@@ -85,6 +86,7 @@ export type DrawerAtomType = {
         conversation_id?: string;
       };
     }
+  | { type: "entity_preview"; data: { id: string; entity_type: AvailableEntityType } }
   | { type: "invite_to_project" | null; data: null }
 );
 
