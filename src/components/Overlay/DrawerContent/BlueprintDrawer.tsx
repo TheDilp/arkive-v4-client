@@ -319,7 +319,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                 name: "blueprint_fields",
                 value: (blueprint.blueprint_fields || []).concat({
                   id: crypto.randomUUID(),
-                  title: "",
+                  title: "New field",
                   field_type: "text",
                   // width: "half",
                   sort: blueprint?.blueprint_fields?.length ?? 0,
