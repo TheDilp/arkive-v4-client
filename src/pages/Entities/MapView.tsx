@@ -11,10 +11,11 @@ import { getImageURL } from "../../utils";
 type Props = {
   data?: MapType;
   isReadOnly?: boolean;
+  isViewOnly?: boolean;
   center_on?: string;
 };
 
-export function MapView({ data, isReadOnly, center_on }: Props) {
+export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,7 @@ export function MapView({ data, isReadOnly, center_on }: Props) {
               imgRef={imgRef}
               isClusteringPins={!!currentMap?.cluster_pins}
               isReadOnly={isReadOnly}
+              isViewOnly={isViewOnly}
               mapData={currentMap}
               src={getImageURL(project_id as string, "map_images", currentMap?.image_id)}
             />

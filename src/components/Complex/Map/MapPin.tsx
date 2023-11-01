@@ -9,7 +9,17 @@ import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
 import { contextMenuAtom, dialogAtom, drawerAtom, getCharacterFullName, getImageURL, IconEnum } from "../../../utils";
 
-export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: string; pinData: MapPinType; readOnly?: boolean }) {
+export function MapPin({
+  map_id,
+  pinData: markerData,
+  isReadOnly,
+  isViewOnly,
+}: {
+  map_id: string;
+  pinData: MapPinType;
+  isReadOnly?: boolean;
+  isViewOnly?: boolean;
+}) {
   const {
     id,
     icon,
@@ -47,7 +57,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
           //   show: true,
           //   drawerSize: "md",
           //   exceptions: {
-          //     isReadOnly: readOnly,
+          //     isReadOnly: isReadOnly,
           //   },
           //   modal: true,
           // }));
@@ -55,11 +65,11 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
       }
       if (e.originalEvent.shiftKey && map_link) {
         e.originalEvent.preventDefault();
-        if (readOnly) navigate(`/view/maps/${map_link}`);
+        if (isReadOnly) navigate(`/public/maps/${map_link}`);
         else navigate(`/project/${project_id}/maps/${map_link}`);
       } else if (e.originalEvent.altKey && doc_id) {
         e.originalEvent.preventDefault();
-        if (readOnly) navigate(`/view/documents/${doc_id}`);
+        if (isReadOnly) navigate(`/public/documents/${doc_id}`);
         else navigate(`/project/${project_id}/documents/${doc_id}}`);
       } else if (e.originalEvent.metaKey) {
         // setDrawer({
@@ -73,7 +83,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
       }
     },
     contextmenu: (e: any) => {
-      if (!readOnly) {
+      if (!isReadOnly && !isViewOnly) {
         setContextMenu({
           event: e.originalEvent as any,
           items: [
@@ -109,7 +119,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
       }
     },
     dragend(e: any) {
-      if (!readOnly) {
+      if (!isReadOnly && !isViewOnly) {
         setPosition(e.target._latlng);
         updateMapPin({
           data: {
@@ -127,7 +137,7 @@ export function MapPin({ map_id, pinData: markerData, readOnly }: { map_id: stri
   }.svg?color=%23${color ? color.replace("#", "") : ""}') no-repeat`;
   return (
     <Marker
-      draggable={!readOnly}
+      draggable={!isReadOnly && !isViewOnly}
       eventHandlers={eventHandlers}
       icon={L.divIcon({
         className: "relative",
