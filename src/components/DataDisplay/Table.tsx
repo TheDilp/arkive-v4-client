@@ -43,9 +43,9 @@ export { createColumnHelper } from "@tanstack/react-table";
 
 const TableClasses = tv({
   slots: {
-    container: "flex max-h-full h-full overflow-hidden w-full min-h-full",
+    container: "flex max-h-full h-full overflow-hidden min-h-full max-w-full",
     table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
-    head: "border-x border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full flex-col mb-4 w-max mih-h-[3rem] border-b",
+    head: "border-x border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full w-fit flex-col mb-4 mih-h-[3rem] border-b",
     headerGroup: "flex h-12 font-merriweather select-none truncate",
     select: "select-none",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
@@ -53,7 +53,7 @@ const TableClasses = tv({
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
-    bodyContainer: "min-w-full content-start overflow-auto max-h-full w-max flex flex-col justify-start",
+    bodyContainer: "min-w-full content-start overflow-auto max-h-full flex flex-col justify-start w-fit",
     body: "flex flex-col flex-1 w-full border-zinc-600 my-2",
     rowContainer:
       "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3rem] max-h-[3rem] border-x last:border-b  h-[3rem] odd:border-y overflow-hidden",
