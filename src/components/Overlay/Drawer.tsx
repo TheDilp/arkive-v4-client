@@ -18,15 +18,19 @@ import {
   DictionaryDrawer,
   DocumentDrawer,
   EdgeDrawer,
+  EditMessageDrawer,
   EditTags,
+  EntityPreviewDrawer,
   EventDrawer,
   FieldTemplateDrawer,
+  ImageDrawer,
   InsertEditorImageDrawer,
   ManyEdgesDrawer,
   ManyNodesDrawer,
   MapDrawer,
   MapPinDrawer,
   MapPinManagementDrawer,
+  MemberAddDrawer,
   NodeDrawer,
   ProjectDrawer,
   RandomTableDrawer,
@@ -36,9 +40,6 @@ import {
   TagsDrawer,
   WordDrawer,
 } from "./DrawerContent";
-import { EditMessageDrawer } from "./DrawerContent/EditMessageDrawer";
-import { ImageDrawer } from "./DrawerContent/ImageDrawer";
-import MemberAddDrawer from "./DrawerContent/MemberAddDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -51,6 +52,10 @@ const DrawerClasses = tv({
       sm: "w-full md:w-[24rem]",
       md: "w-full md:w-[28rem]",
       lg: "w-full md:w-[32rem]",
+      xl: "w-full md:w-[36rem]",
+      "2xl": "w-full md:w-[40rem]",
+      half: "w-full md:w-1/2",
+      full: "w-full",
     },
     isOpen: {
       true: "translate-x-0 animate-drawer",
@@ -166,6 +171,7 @@ export function Drawer() {
         {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
         {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
         {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
+        {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
       </div>
     </div>
   );

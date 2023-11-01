@@ -7,7 +7,7 @@ import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
-export default function MemberAddDrawer() {
+export function MemberAddDrawer() {
   const { project_id } = useParams();
   const [email, setEmail] = useState("");
   const isEmailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
