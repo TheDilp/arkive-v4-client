@@ -498,7 +498,7 @@ function BlueprintFieldInputs({
   if (fieldType === "locations_single" || fieldType === "locations_multiple") {
     return (
       <div className="flex flex-col gap-y-2">
-        {fieldType === "locations_single" && !currentValue ? (
+        {(fieldType === "locations_single" && !currentValue) || fieldType === "locations_multiple" ? (
           <Search
             label={title}
             name={name}
@@ -521,6 +521,7 @@ function BlueprintFieldInputs({
             searchEntity="map_pins"
           />
         ) : null}
+
         {locations?.data?.map((location) => (
           <EntityPreview
             key={location?.id}
@@ -539,7 +540,6 @@ function BlueprintFieldInputs({
             icon={location?.icon}
             id={location?.id}
             image_id={location?.image_id}
-            label={location?.title || ""}
             title={location?.title || ""}
             type="map_pins"
           />
