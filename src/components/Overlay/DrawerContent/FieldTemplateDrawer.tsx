@@ -345,6 +345,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               />
             </div>
           </div>
+          <div className="text-sm text-zinc-400">Note: a field&apos;s type cannot be changed once the template is saved.</div>
           <div className="flex max-h-[59%] flex-col">
             <DragDropContext
               onDragEnd={(result) => {

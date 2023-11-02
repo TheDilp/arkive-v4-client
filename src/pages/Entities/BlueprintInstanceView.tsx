@@ -26,6 +26,24 @@ import {
   IconEnum,
 } from "../../utils";
 
+function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
+  return (
+    <>
+      <div className="w-full truncate">{titles?.[0]}</div>
+      {titles?.length > 1 ? (
+        <Tooltip
+          content={titles
+            ?.slice(1)
+            ?.map((title) => title)
+            .join(", ")}>
+          <div className="w-min max-w-min">
+            <Badge label={`+${titles.length - 1}`} size="sm" variant="secondary" />
+          </div>
+        </Tooltip>
+      ) : null}
+    </>
+  );
+}
 const columnHelper = createColumnHelper<{ id: string; title: string; value: { id: string; value: any }[] }>();
 
 function CharacterColumn({ ids }: { ids: string | string[] }) {
@@ -69,6 +87,24 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
     </div>
   );
 }
+// function DocumentColumn({ ids }: { ids: string | string[] }) {
+//   const { project_id } = useParams();
+//   const { data: documents, isFetching } = useGetEntities<DocumentType>(
+//     {
+//       data: { project_id },
+//       fields: ["id", "title", "icon", "image_id"],
+//       filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
+//     },
+//     "documents",
+//     { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+//   );
+//   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+//   return (
+//     <div className="flex items-center gap-x-2">
+//       <ShowMultipleWithBadge titles={(documents?.data || []).map((doc) => doc.title)} />
+//     </div>
+//   );
+// }
 function LocationColumn({ ids }: { ids: string | string[] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -86,23 +122,12 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
       },
     },
     "map_pins",
-    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+    { enabled: ids?.length > 0, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <div className="w-full truncate">{locations?.data?.slice(0, 1)?.map((location) => location?.title)}</div>
-      {locations?.data && locations?.data?.length > 1 ? (
-        <Tooltip
-          content={locations?.data
-            ?.slice(1)
-            ?.map((location) => location.title)
-            .join(", ")}>
-          <div className="w-min max-w-min">
-            <Badge label={`+${locations.data.length - 1}`} size="sm" variant="secondary" />
-          </div>
-        </Tooltip>
-      ) : null}
+      <ShowMultipleWithBadge titles={(locations?.data || [])?.map((l) => l?.title || "").filter((l) => !!l)} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(locations?.data || []).map((loc) => ({
@@ -175,12 +200,14 @@ function createColumns(
             if ((field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value)
               return value;
             if ((field.field_type === "select" || field.field_type === "select_multiple") && value) {
-              return (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
-                ?.map((id: string) => {
-                  const opt = field?.options?.find((o) => o.id === id);
-                  return opt?.value || "";
-                })
-                .join(", ");
+              return (
+                (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
+                  ?.map((id: string) => {
+                    const opt = field?.options?.find((o) => o.id === id);
+                    return opt?.value || "";
+                  })
+                  .join(", ") ?? ""
+              );
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
@@ -196,17 +223,18 @@ function createColumns(
 
             if (field.field_type === "random_table") {
               const randomTable =
-                field.field_type === "random_table"
+                field.field_type === "random_table" && fieldData
                   ? blueprint?.blueprint_fields
                       .find((f) => f.id === field?.id)
                       ?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
                   : null;
 
-              const subOption = randomTable
-                ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
-                : null;
+              const subOption =
+                randomTable && fieldData?.value?.subOptionValue
+                  ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+                  : null;
 
-              return `${randomTable?.title} ${subOption ? `(${subOption?.title})` : ""}`;
+              return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
             }
 
             return "";

@@ -130,7 +130,8 @@ function FieldRow({
                         ref={provided.innerRef}
                         style={{
                           ...provided.draggableProps.style,
-                          left: 16,
+                          left: "calc(100%-32px)",
+                          right: 16,
                         }}>
                         <div {...provided.dragHandleProps} className="self-center">
                           <Icon fontSize={24} icon={IconEnum.menu} />
@@ -272,7 +273,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
             placeholder="Eg. Organizations"
             value={blueprint?.title || ""}
           />
-          <div className="self-end pb-2.5">
+          <div className="self-end pb-1.5">
             <IconPicker icon={blueprint?.icon || IconEnum.blueprint} name="icon" onChange={handleChange} />
           </div>
         </div>
@@ -347,7 +348,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <Droppable droppableId="droppable">
           {(providedDroppable) => (
             <div
-              className="flex max-h-[75%] flex-col content-start justify-start overflow-y-auto"
+              className="flex max-h-[75%] flex-col content-start justify-start "
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
@@ -363,7 +364,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                           key={field.id}
                           style={{
                             ...provided.draggableProps.style,
-                            left: 16,
+                            right: 16,
                           }}>
                           <div {...provided.dragHandleProps} className="mt-1 self-start">
                             <Icon fontSize={24} icon={IconEnum.menu} />

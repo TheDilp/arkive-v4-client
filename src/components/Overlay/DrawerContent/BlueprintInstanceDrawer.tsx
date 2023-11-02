@@ -287,7 +287,9 @@ function BlueprintFieldInputs({
     },
     "map_pins",
     {
-      enabled: (fieldType === "locations_single" || fieldType === "locations_multiple") && !!currentValue,
+      enabled:
+        (fieldType === "locations_single" && !Array.isArray(currentValue) && !!currentValue) ||
+        (fieldType === "locations_multiple" && Array.isArray(currentValue) && currentValue?.length > 0),
     },
   );
   const { data: images } = useGetImages(
@@ -761,7 +763,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         tags: true,
       },
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
   useLayoutEffect(() => {
     if (existingInstance?.data && !instance && !!data?.id) {
