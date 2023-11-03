@@ -65,7 +65,7 @@ export type TemplateStateType = Partial<
   }
 >;
 
-export interface CharacterFieldValueType {
+export interface AdditionalFieldValueType {
   id: string;
   value: {
     id: string;

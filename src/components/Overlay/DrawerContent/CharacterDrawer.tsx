@@ -9,7 +9,7 @@ import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpda
 import {
   CharacterFieldTemplateType,
   CharacterFieldType,
-  CharacterFieldValueType,
+  AdditionalFieldValueType,
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
@@ -36,7 +36,7 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
 
-type CharacterStateCharacterFieldsType = Record<string, CharacterFieldValueType[]>;
+type CharacterStateCharacterFieldsType = Record<string, AdditionalFieldValueType[]>;
 
 type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
   character_fields?: CharacterStateCharacterFieldsType;
@@ -729,7 +729,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       // @ts-ignore
       const fieldsByTemplateId = groupBy(existingCharacter?.data?.character_fields || [], "template_id") as Record<
         string,
-        CharacterFieldValueType[]
+        AdditionalFieldValueType[]
       >;
       setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
       setRelationGroupIds(

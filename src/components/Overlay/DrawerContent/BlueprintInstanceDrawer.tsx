@@ -22,7 +22,6 @@ import {
   HandleChangePropsType,
   MapPinType,
   NotificationType,
-  TagType,
 } from "../../../types";
 import {
   baseURLS,
@@ -52,6 +51,10 @@ type Props = {
 type InstanceStateBlueprintFieldsType = Record<string, BlueprintFieldValueType[]>;
 type CurrentValueType = string | string[] | number | boolean | Record<string, any> | Record<string, any>[] | undefined;
 
+type InstanceStateType = Partial<Omit<BlueprintInstanceType, "blueprint_fields">> & {
+  blueprint_fields?: InstanceStateBlueprintFieldsType;
+};
+
 function RandomTableInput({
   id,
   title,
@@ -71,7 +74,7 @@ function RandomTableInput({
   subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `value[${template_id}][${index}]`;
+  const name = `blueprint_fields[${template_id}][${index}]`;
 
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -161,7 +164,7 @@ function DateInput({
   template_id: string;
   index: number;
 }) {
-  const name = `value[${template_id}][${index}]`;
+  const name = `blueprint_fields[${template_id}][${index}]`;
 
   const months = calendar?.months.map((m) => ({ label: m.title, value: m.id })) || [];
   const maxDays = calendar?.months.find((m) => m.id === (currentValue as Record<string, any>)?.month)?.days || 0;
@@ -247,7 +250,7 @@ function BlueprintFieldInputs({
   isRolling: boolean;
 }) {
   const { project_id } = useParams();
-  const name = `value[${template_id}][${index}]`;
+  const name = `blueprint_fields[${template_id}][${index}]`;
 
   const { data: characters } = useGetEntities<CharacterType>(
     {
@@ -727,13 +730,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const [instance, setInstance] = useState<{
-    id: string;
-    title: string;
-    parent_id: string;
-    value: InstanceStateBlueprintFieldsType;
-    tags: TagType[];
-  } | null>(null);
+  const [instance, setInstance] = useState<InstanceStateType | null>(null);
   const { handleChange, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
     item_id,
@@ -767,15 +764,15 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   );
   useLayoutEffect(() => {
     if (existingInstance?.data && !instance && !!data?.id) {
-      const { id, parent_id, title, value, tags } = existingInstance.data;
-      const fieldsByTemplateId = { [item_id as string]: value } as Record<string, BlueprintFieldValueType[]>;
-      setInstance({ id, parent_id, title, value: fieldsByTemplateId, tags });
+      const { id, parent_id, title, blueprint_fields, tags } = existingInstance.data;
+      const fieldsByTemplateId = { [item_id as string]: blueprint_fields } as Record<string, BlueprintFieldValueType[]>;
+      setInstance({ id, parent_id, title, blueprint_fields: fieldsByTemplateId, tags });
     } else if (!data?.id && !instance) {
       setInstance({
         id: "",
         title: "",
         parent_id: item_id as string,
-        value: {},
+        blueprint_fields: {},
         tags: [],
       });
     }
@@ -798,7 +795,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           <FieldTemplateRow
             key={blueprint?.data?.id}
             blueprint_fields={blueprint?.data.blueprint_fields}
-            blueprint_fields_data={instance?.value}
+            blueprint_fields_data={instance?.blueprint_fields}
             createNotification={createNotification}
             handleChange={handleChange}
             project_id={project_id as string}
@@ -818,11 +815,13 @@ export function BlueprintInstanceDrawer({ data }: Props) {
               const dataToParse = {
                 data: {
                   ...instance,
-                  value: flattenArray(Object.values(instance?.value || {})) || [],
                   parent_id: item_id,
                 },
                 relations: {
                   tags: instance?.tags?.map((t) => ({ id: t.id })),
+                  blueprint_fields: instance?.blueprint_fields
+                    ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                    : undefined,
                 },
               };
 
@@ -836,7 +835,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
               const dataToParse = {
                 data: {
                   ...instance,
-                  value: flattenArray(Object.values(instance?.value || {})) || [],
+                  value: flattenArray(Object.values(instance?.blueprint_fields || {})) || [],
                   parent_id: item_id,
                 },
                 relations: {

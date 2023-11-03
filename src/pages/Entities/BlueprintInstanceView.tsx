@@ -44,7 +44,7 @@ function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
     </>
   );
 }
-const columnHelper = createColumnHelper<{ id: string; title: string; value: { id: string; value: any }[] }>();
+const columnHelper = createColumnHelper<BlueprintInstanceType>();
 
 function CharacterColumn({ ids }: { ids: string | string[] }) {
   const { project_id } = useParams();
@@ -187,14 +187,14 @@ function createColumns(
           id: field.title,
           header: field.title,
           cell: ({ row }) => {
-            const fieldData = row.original?.value?.find((val) => val?.id === field.id);
+            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
+
             const value =
               fieldData?.value && fieldData?.value?.value
                 ? `${fieldData?.value?.value} ${
                     fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""
                   }`
                 : "";
-
             // const date =
             //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
             if ((field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value)
@@ -202,7 +202,7 @@ function createColumns(
             if ((field.field_type === "select" || field.field_type === "select_multiple") && value) {
               return (
                 (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
-                  ?.map((id: string) => {
+                  ?.map((id) => {
                     const opt = field?.options?.find((o) => o.id === id);
                     return opt?.value || "";
                   })
@@ -211,14 +211,18 @@ function createColumns(
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
-                <Avatar hasShowImage image={getImageURL(project_id as string, "images", fieldData?.value?.value)} size="sm" />
+                <Avatar
+                  hasShowImage
+                  image={getImageURL(project_id as string, "images", fieldData?.value?.value as string)}
+                  size="sm"
+                />
               );
             }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
-              return <CharacterColumn ids={fieldData?.value?.value} />;
+              return <CharacterColumn ids={fieldData?.value?.value as string | string[]} />;
             }
             if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
-              return <LocationColumn ids={fieldData?.value?.value} />;
+              return <LocationColumn ids={fieldData?.value?.value as string | string[]} />;
             }
 
             if (field.field_type === "random_table") {

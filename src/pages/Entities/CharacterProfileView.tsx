@@ -36,7 +36,7 @@ import {
 import {
   CharacterFieldTemplateType,
   CharacterFieldType,
-  CharacterFieldValueType,
+  AdditionalFieldValueType,
   CharacterLocationType,
   CharacterRelatedType,
   CharacterType,
@@ -530,7 +530,7 @@ function AdditionalFieldDisplay({
   template_title,
 }: {
   character_fields: CharacterFieldType[];
-  character_field_data: CharacterFieldValueType[];
+  character_field_data: AdditionalFieldValueType[];
   template_title: string;
 }) {
   return (

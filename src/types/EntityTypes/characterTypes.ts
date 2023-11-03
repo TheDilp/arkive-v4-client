@@ -1,4 +1,4 @@
-import { CharacterFieldValueType, CharacterLocationType, CharacterRelationshipType, DocumentType, MapType, TagType } from ".";
+import { AdditionalFieldValueType, CharacterLocationType, CharacterRelationshipType, DocumentType, MapType, TagType } from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationType {
@@ -46,7 +46,7 @@ export interface CharacterType {
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
   maps?: MapType | [];
-  character_fields?: CharacterFieldValueType[];
+  character_fields?: AdditionalFieldValueType[];
   character_relationship_types?: CharacterRelationshipDataType[];
   locations: CharacterLocationType[];
   documents: Pick<DocumentType, "id" | "title" | "icon">[];
