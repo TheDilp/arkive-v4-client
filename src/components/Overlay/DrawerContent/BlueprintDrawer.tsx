@@ -469,6 +469,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   queryClient.invalidateQueries({
                     predicate: (query) => query.queryKey.includes("blueprints"),
                   });
+                  queryClient.invalidateQueries(["allEntities", project_id, "blueprint_instances"]);
                   resetDrawerAtom();
                 },
               });
