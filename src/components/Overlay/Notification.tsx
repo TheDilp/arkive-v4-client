@@ -72,53 +72,56 @@ function DiceRollNotification({ id, data }: { id: string; data: DiceRollType }) 
   const setNotificationAtom = useSetAtom(notificationsAtom);
   return (
     <div className="max-w-full">
-      <div className="max-w-full truncate">
-        {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
-          if ("rolls" in die) {
-            if (die?.rolls?.length) {
-              return die.rolls
-                .filter((r) => !r.drop)
-                .map((roll, rIdx) => (
-                  <span key={crypto.randomUUID()}>
-                    {idx > 0 && rIdx === 0 ? <span>{data?.ops?.[idx - 1]}</span> : null}
-                    {rIdx > 0 ? <span>+</span> : null}
-                    <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
-                  </span>
-                ));
-            }
-            return (
-              <span key={crypto.randomUUID()}>
-                {data?.ops?.[idx - 1] || "+"}
-                <span className={getCritColor(die.critical)}>{die.value}</span>
-              </span>
-            );
-          }
-
-          if (data?.ops?.[idx - 1]) {
-            if (!die?.drop)
+      <div className="flex max-w-full flex-nowrap items-center gap-x-2">
+        <div className="max-w-full truncate">
+          {(data?.dice || data?.rolls?.filter((die) => !die.drop) || []).map((die, idx) => {
+            if ("rolls" in die) {
+              if (die?.rolls?.length) {
+                return die.rolls
+                  .filter((r) => !r.drop)
+                  .map((roll, rIdx) => (
+                    <span key={crypto.randomUUID()}>
+                      {idx > 0 && rIdx === 0 ? <span>{data?.ops?.[idx - 1]}</span> : null}
+                      {rIdx > 0 ? <span>+</span> : null}
+                      <span className={getCritColor(roll.critical)}>{roll.value.toString()}</span>
+                    </span>
+                  ));
+              }
               return (
                 <span key={crypto.randomUUID()}>
                   {data?.ops?.[idx - 1] || "+"}
                   <span className={getCritColor(die.critical)}>{die.value}</span>
                 </span>
               );
+            }
+
+            if (data?.ops?.[idx - 1]) {
+              if (!die?.drop)
+                return (
+                  <span key={crypto.randomUUID()}>
+                    {data?.ops?.[idx - 1] || "+"}
+                    <span className={getCritColor(die.critical)}>{die.value}</span>
+                  </span>
+                );
+              return "";
+            }
+            if (!die?.drop)
+              return (
+                <span key={crypto.randomUUID()}>
+                  {idx === 0 ? "" : "+"}
+                  <span className={getCritColor(die.critical)}>{die.value.toString()}</span>
+                </span>
+              );
             return "";
-          }
-          if (!die?.drop)
-            return (
-              <span key={crypto.randomUUID()}>
-                {idx === 0 ? "" : "+"}
-                <span className={getCritColor(die.critical)}>{die.value.toString()}</span>
-              </span>
-            );
-          return "";
-        })}
-      </div>
-      <span className="flex items-center justify-between">
-        <span>= {data.value}</span>
-        <div className=" w-min">
+          })}
+        </div>
+        <div className="w-min">
           <Button hasNoBackground icon={IconEnum.close} onClick={() => removeNotification(setNotificationAtom, id)} />
         </div>
+      </div>
+
+      <span className="flex items-center justify-center">
+        <span className="text-2xl font-bold">= {data.value}</span>
       </span>
     </div>
   );
