@@ -50,7 +50,6 @@ function FieldRow({
   random_table_id,
   random_table,
   isLoading,
-  isNewField,
   changeField,
   deleteField,
 }: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
@@ -61,7 +60,6 @@ function FieldRow({
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
   deleteField: (i: number) => void;
   isLoading: boolean;
-  isNewField: boolean;
 }) {
   return (
     <div className="flex w-full flex-col gap-y-2">
@@ -79,7 +77,7 @@ function FieldRow({
         <div className="h-full flex-1">
           <Select
             hasSearch
-            isDisabled={isLoading || !isNewField}
+            isDisabled={isLoading}
             label="Field type"
             name={`character_fields[${index}].field_type`}
             onChange={changeField}
@@ -282,8 +280,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     }
   }, [existingTemplate]);
 
-  const existingCharacterFieldIds = existingTemplate?.data?.character_fields?.map((field) => field.id);
-
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
@@ -345,7 +341,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               />
             </div>
           </div>
-          <div className="text-sm text-zinc-400">Note: a field&apos;s type cannot be changed once the template is saved.</div>
           <div className="flex max-h-[59%] flex-col">
             <DragDropContext
               onDragEnd={(result) => {
@@ -399,7 +394,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                   id={field.id}
                                   index={index}
                                   isLoading={isLoading}
-                                  isNewField={!existingCharacterFieldIds?.includes(field.id)}
                                   options={field?.options || []}
                                   random_table={field?.random_table}
                                   random_table_id={field?.random_table_id}
