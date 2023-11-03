@@ -14,16 +14,26 @@ import {
   Tooltip,
 } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
-import { BlueprintInstanceType, CharacterType, DialogAtomType, DrawerAtomType, MapPinType } from "../../types";
+import {
+  BlueprintInstanceType,
+  CharacterType,
+  DialogAtomType,
+  DrawerAtomType,
+  MapPinType,
+  NotificationType,
+} from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import {
   dialogAtom,
+  DiceRollRegex,
   drawerAtom,
   getAvatarInitials,
   getBlueprintInstanceColumnWidth,
   getCharacterFullName,
   getImageURL,
   IconEnum,
+  rollDiceWithNotification,
+  useNotifications,
 } from "../../utils";
 
 function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
@@ -168,6 +178,7 @@ function createColumns(
   project_id: string,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  createNotification: (notification: Omit<NotificationType, "id">) => void,
 ) {
   const fieldColumns = [
     columnHelper.accessor("title", {
@@ -242,12 +253,30 @@ function createColumns(
 
               return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
             }
+            if (field.field_type === "dice_roll" && field?.formula) {
+              return (
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.d20}
+                    isIconOnly
+                    onClick={async () => {
+                      if (field?.formula && field.formula.match(DiceRollRegex))
+                        await rollDiceWithNotification(createNotification, field.formula, true);
+                    }}
+                  />
+                  {field.formula}
+                </div>
+              );
+            }
 
             return "";
           },
           meta: {
             centered: field.field_type === "images_single",
-            noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple"].includes(field.field_type),
+            noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
+              field.field_type,
+            ),
           },
           minSize,
           maxSize,
@@ -312,6 +341,7 @@ export function BlueprintInstanceView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const createNotification = useNotifications();
   const [{ selection, pagination }, dispatch] = useTable({ selection: {}, pagination: { page: 0, limit: 10 } });
 
   const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -366,6 +396,7 @@ export function BlueprintInstanceView() {
               project_id as string,
               setDrawer,
               setDialog,
+              createNotification,
             )}
             config={{
               hasSelect: true,

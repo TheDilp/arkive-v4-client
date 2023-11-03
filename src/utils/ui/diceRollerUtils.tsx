@@ -71,11 +71,13 @@ export function parseDiceResults(r: any) {
 export async function rollDiceWithNotification(
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   diceRoll: string,
+  hasNoSimulation?: boolean,
 ) {
   if (diceRoll) {
     try {
       const parsedNotation = DiceRollParser.parseNotation(diceRoll);
-      Dice.roll(parsedNotation)
+      (hasNoSimulation ? DiceNoSim : Dice)
+        .roll(parsedNotation)
         .then((r: any) => {
           const rollData = DiceRollParser.parseFinalResults(r);
           if (rollData?.valid) {
