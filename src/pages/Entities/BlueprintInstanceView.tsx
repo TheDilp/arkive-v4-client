@@ -199,15 +199,14 @@ function createColumns(
           id: field.title,
           header: field.title,
           cell: ({ row }) => {
-            const fieldData = row.original?.blueprint_fields?.find(
-              (instanceField) => instanceField?.value?.id === field.id,
-            )?.value;
+            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.value?.id === field.id);
             const value =
               fieldData?.value && fieldData?.value?.value
                 ? `${fieldData?.value?.value} ${
                     fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""
                   }`
                 : "";
+
             // const date =
             //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
             if ((field.field_type === "text" || field.field_type === "number") && value) return value;
@@ -240,11 +239,8 @@ function createColumns(
             if (field.field_type === "random_table") {
               const randomTable =
                 field.field_type === "random_table" && fieldData
-                  ? blueprint?.blueprint_fields
-                      .find((f) => f.id === field?.id)
-                      ?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
+                  ? fieldData?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
                   : null;
-
               const subOption =
                 randomTable && fieldData?.value?.subOptionValue
                   ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)

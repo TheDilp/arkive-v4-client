@@ -24,7 +24,7 @@ export const InsertCharacterSchema = z.object({
       .object({
         id: z.string(),
         value: z.object({
-          value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())),
+          value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional().nullable(),
           subOptionValue: z.string().optional(),
         }),
       })
@@ -59,10 +59,13 @@ export const UpdateCharacterSchema = z.object({
     character_fields: z
       .object({
         id: z.string(),
-        value: z.object({
-          value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional().nullable(),
-          subOptionValue: z.string().optional(),
-        }),
+        value: z
+          .object({
+            value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional().nullable(),
+            subOptionValue: z.string().optional(),
+          })
+          .optional()
+          .nullable(),
       })
       .array()
       .optional(),

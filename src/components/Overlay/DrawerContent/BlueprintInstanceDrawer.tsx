@@ -64,9 +64,9 @@ function RandomTableInput({
   currentValue: CurrentValueType;
   isRolling: boolean;
   subOptionValue?: string;
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  handleChange: (params: HandleChangePropsType) => void;
 }) {
-  const name = `blueprint_fields[${index}].value`;
+  const name = `blueprint_fields[${index}]`;
 
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -96,7 +96,10 @@ function RandomTableInput({
           label={title}
           name={`${name}`}
           onChange={({ value }) => {
-            handleChange({ name, value: { id, value: { value } } });
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value: { value } },
+            ]);
           }}
           options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
           value={currentValue as string}
@@ -150,11 +153,11 @@ function DateInput({
   index,
   handleChange,
 }: Pick<BlueprintFieldType, "id" | "calendar" | "calendar_id" | "title"> & {
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  handleChange: (params: HandleChangePropsType) => void;
   currentValue: CurrentValueType;
   index: number;
 }) {
-  const name = `blueprint_fields[${index}].value`;
+  const name = `blueprint_fields[${index}]`;
 
   const months = calendar?.months.map((m) => ({ label: m.title, value: m.id })) || [];
   const maxDays = calendar?.months.find((m) => m.id === (currentValue as Record<string, any>)?.month)?.days || 0;
@@ -233,13 +236,12 @@ function BlueprintFieldInputs({
   index: number;
   value: CurrentValueType;
   subOptionValue?: string;
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  handleChange: (params: { name: string; value: any } | { name: string; value: any }[]) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
   const { project_id } = useParams();
-  const name = `blueprint_fields[${index}].value`;
-
+  const name = `blueprint_fields[${index}]`;
   const { data: characters } = useGetEntities<CharacterType>(
     {
       data: { project_id },
@@ -304,7 +306,12 @@ function BlueprintFieldInputs({
       <Input
         label={title}
         name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+        onChange={({ value }) =>
+          handleChange([
+            { name: `${name}.id`, value: id },
+            { name: `${name}.value`, value: { value } },
+          ])
+        }
         type={fieldType}
         value={currentValue as string}
       />
@@ -317,7 +324,12 @@ function BlueprintFieldInputs({
         isMultiple={fieldType === "select_multiple"}
         label={title}
         name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+        onChange={({ value }) =>
+          handleChange([
+            { name: `${name}.id`, value: id },
+            { name: `${name}.value`, value: { value } },
+          ])
+        }
         options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
         value={currentValue as string | string[]}
       />
@@ -330,7 +342,12 @@ function BlueprintFieldInputs({
         <Editor
           initialContent={currentValue as RemirrorJSON}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+          onChange={({ value }) =>
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value: { value } },
+            ])
+          }
         />
         {/* <Textarea
             label={title}
@@ -351,7 +368,12 @@ function BlueprintFieldInputs({
           isLoading={isRolling}
           label={title}
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+          onChange={({ value }) =>
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value: { value } },
+            ])
+          }
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">
@@ -430,7 +452,12 @@ function BlueprintFieldInputs({
         <span>{title}</span>
         <Checkbox
           name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
+          onChange={({ value }) =>
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value: { value } },
+            ])
+          }
           value={currentValue as boolean}
         />
       </div>
@@ -444,7 +471,10 @@ function BlueprintFieldInputs({
             name={name}
             onChange={({ value }) => {
               if (fieldType === "characters_single") {
-                handleChange({ name, value: { id, value: { value } } });
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  { name: `${name}.value`, value: { value } },
+                ]);
               } else {
                 handleChange({
                   name,
@@ -494,15 +524,16 @@ function BlueprintFieldInputs({
             name={name}
             onChange={({ value }) => {
               if (fieldType === "locations_single") {
-                handleChange({ name, value: { id, value: { value } } });
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  { name: `${name}.value`, value: { value } },
+                ]);
               } else {
                 handleChange({
                   name,
                   value: {
                     id,
-                    value: {
-                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
-                    },
+                    value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
                   },
                 });
               }
@@ -520,10 +551,8 @@ function BlueprintFieldInputs({
                 name,
                 value: {
                   id,
-                  value: {
-                    value:
-                      fieldType === "locations_multiple" ? (currentValue as string[]).filter((c) => c !== location?.id) : null,
-                  },
+                  value:
+                    fieldType === "locations_multiple" ? (currentValue as string[]).filter((c) => c !== location?.id) : null,
                 },
               })
             }
@@ -546,15 +575,16 @@ function BlueprintFieldInputs({
             name={name}
             onChange={({ value }) => {
               if (fieldType.includes("single")) {
-                handleChange({ name, value: { id, value: { value } } });
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  { name: `${name}.value`, value: { value } },
+                ]);
               } else {
                 handleChange({
                   name,
                   value: {
                     id,
-                    value: {
-                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
-                    },
+                    value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
                   },
                 });
               }
@@ -567,8 +597,16 @@ function BlueprintFieldInputs({
               <EntityPreview
                 key={img.id}
                 clearAction={() => {
-                  if (fieldType.includes("single")) handleChange({ name, value: { id, value: {} } });
-                  else handleChange({ name, value: { id, value: (currentValue as string[]).filter((c) => c !== img.id) } });
+                  if (fieldType.includes("single"))
+                    handleChange([
+                      { name: `${name}.id`, value: id },
+                      { name: `${name}.value`, value: { value: null } },
+                    ]);
+                  else
+                    handleChange([
+                      { name: `${name}.id`, value: id },
+                      { name: `${name}.value`, value: { value: (currentValue as string[]).filter((c) => c !== img.id) } },
+                    ]);
                 }}
                 id={img.id}
                 image_id={img.id}
@@ -677,7 +715,6 @@ function FieldTemplateRow({
   //     handleChange(fieldsToChange);
   //   }
   // }, [data?.data]);
-
   return (
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
@@ -693,8 +730,8 @@ function FieldTemplateRow({
                   handleChange={handleChange}
                   index={fieldValueIndex === -1 ? blueprint_fields_data?.length ?? 0 : fieldValueIndex}
                   isRolling={false}
-                  subOptionValue={blueprint_fields_data?.[fieldValueIndex]?.value?.value?.subOptionValue}
-                  value={blueprint_fields_data?.[fieldValueIndex]?.value?.value?.value || ""}
+                  subOptionValue={blueprint_fields_data?.[fieldValueIndex]?.value?.subOptionValue}
+                  value={blueprint_fields_data?.[fieldValueIndex]?.value?.value || ""}
                 />
               </div>
             );
@@ -742,6 +779,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
+
   useLayoutEffect(() => {
     if (existingInstance?.data && !!data?.id) {
       setInstance(existingInstance?.data);

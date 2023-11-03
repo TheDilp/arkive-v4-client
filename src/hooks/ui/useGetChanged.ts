@@ -15,7 +15,8 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
     if (Array.isArray(newData)) {
       for (let index = 0; index < newData.length; index += 1) {
         const { name, value } = newData[index];
-        const formattedName = name.includes("[") || name.includes("]") ? name.split("[")[0] : name;
+        const formattedName = name;
+
         if (!changedFields.includes(formattedName)) {
           changedFieldsUpdated.push(formattedName);
         }
