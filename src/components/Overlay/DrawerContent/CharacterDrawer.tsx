@@ -7,9 +7,9 @@ import { flattenArray, uniqueBy } from "remirror";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import {
+  AdditionalFieldValueType,
   CharacterFieldTemplateType,
   CharacterFieldType,
-  AdditionalFieldValueType,
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,

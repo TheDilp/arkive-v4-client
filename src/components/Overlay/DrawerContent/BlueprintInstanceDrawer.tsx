@@ -15,7 +15,6 @@ import {
 } from "../../../hooks";
 import {
   BlueprintFieldType,
-  BlueprintFieldValueType,
   BlueprintInstanceType,
   BlueprintType,
   CharacterType,
@@ -48,12 +47,7 @@ import { Alert, Skeleton } from "../../Misc";
 type Props = {
   data: { id?: string };
 };
-type InstanceStateBlueprintFieldsType = Record<string, BlueprintFieldValueType[]>;
 type CurrentValueType = string | string[] | number | boolean | Record<string, any> | Record<string, any>[] | undefined;
-
-type InstanceStateType = Partial<Omit<BlueprintInstanceType, "blueprint_fields">> & {
-  blueprint_fields?: InstanceStateBlueprintFieldsType;
-};
 
 function RandomTableInput({
   id,
@@ -64,17 +58,15 @@ function RandomTableInput({
   random_table_id,
   isRolling,
   random_table,
-  template_id,
   handleChange,
 }: Omit<BlueprintFieldType, "sort"> & {
   index: number;
   currentValue: CurrentValueType;
   isRolling: boolean;
-  template_id: string;
   subOptionValue?: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
-  const name = `blueprint_fields[${template_id}][${index}]`;
+  const name = `blueprint_fields[${index}].value`;
 
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
@@ -153,7 +145,6 @@ function RandomTableInput({
 function DateInput({
   id,
   calendar,
-  template_id,
   currentValue,
   title,
   index,
@@ -161,10 +152,9 @@ function DateInput({
 }: Pick<BlueprintFieldType, "id" | "calendar" | "calendar_id" | "title"> & {
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   currentValue: CurrentValueType;
-  template_id: string;
   index: number;
 }) {
-  const name = `blueprint_fields[${template_id}][${index}]`;
+  const name = `blueprint_fields[${index}].value`;
 
   const months = calendar?.months.map((m) => ({ label: m.title, value: m.id })) || [];
   const maxDays = calendar?.months.find((m) => m.id === (currentValue as Record<string, any>)?.month)?.days || 0;
@@ -237,20 +227,18 @@ function BlueprintFieldInputs({
   random_table,
   isRolling,
   subOptionValue,
-  template_id,
   handleChange,
   createNotification,
 }: BlueprintFieldType & {
   index: number;
   value: CurrentValueType;
   subOptionValue?: string;
-  template_id: string;
   handleChange: ({ name, value }: { name: string; value: any }) => void;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   isRolling: boolean;
 }) {
   const { project_id } = useParams();
-  const name = `blueprint_fields[${template_id}][${index}]`;
+  const name = `blueprint_fields[${index}].value`;
 
   const { data: characters } = useGetEntities<CharacterType>(
     {
@@ -311,7 +299,6 @@ function BlueprintFieldInputs({
     },
     { enabled: (fieldType === "images_single" || fieldType === "images_multiple") && !!currentValue },
   );
-
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -421,7 +408,6 @@ function BlueprintFieldInputs({
         random_table={random_table}
         random_table_id={random_table_id}
         subOptionValue={subOptionValue}
-        template_id={template_id}
         title={title}
       />
     );
@@ -434,7 +420,6 @@ function BlueprintFieldInputs({
         handleChange={handleChange}
         id={id}
         index={index}
-        template_id={template_id}
         title={title}
       />
     );
@@ -605,17 +590,14 @@ function BlueprintFieldInputs({
 }
 
 function FieldTemplateRow({
-  template_id,
   blueprint_fields = [],
-  blueprint_fields_data = {},
+  blueprint_fields_data,
   createNotification,
   handleChange,
-}: {
-  template_id: string;
+}: { blueprint_fields_data: BlueprintInstanceType["blueprint_fields"] } & {
   title: string;
   project_id: string;
   blueprint_fields?: BlueprintFieldType[] | undefined;
-  blueprint_fields_data?: InstanceStateBlueprintFieldsType;
   createNotification: (notification: Omit<NotificationType, "id">) => void;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
@@ -700,9 +682,7 @@ function FieldTemplateRow({
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
         {blueprint_fields.sort(sortEntities).map((template_field) => {
-          const fieldValueIndex = (blueprint_fields_data[template_id] || [])?.findIndex(
-            (field) => template_field?.id === field?.id,
-          );
+          const fieldValueIndex = (blueprint_fields_data || [])?.findIndex((field) => template_field?.id === field?.id);
           if (fieldValueIndex !== undefined)
             return (
               <div key={template_field.id} className="w-full">
@@ -711,11 +691,10 @@ function FieldTemplateRow({
                   createNotification={createNotification}
                   formula={template_field?.formula}
                   handleChange={handleChange}
-                  index={fieldValueIndex === -1 ? blueprint_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
+                  index={fieldValueIndex === -1 ? blueprint_fields_data?.length ?? 0 : fieldValueIndex}
                   isRolling={false}
-                  subOptionValue={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
-                  template_id={template_id}
-                  value={blueprint_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
+                  subOptionValue={blueprint_fields_data?.[fieldValueIndex]?.value?.value?.subOptionValue}
+                  value={blueprint_fields_data?.[fieldValueIndex]?.value?.value?.value || ""}
                 />
               </div>
             );
@@ -730,8 +709,8 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const [instance, setInstance] = useState<InstanceStateType | null>(null);
-  const { handleChange, changedData } = useHandleChange({ data: instance, setData: setInstance });
+  const [instance, setInstance] = useState<BlueprintInstanceType | null>(null);
+  const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
     item_id,
     "blueprints",
@@ -757,22 +736,22 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     {
       data: { id: data?.id },
       relations: {
+        blueprint_fields: true,
         tags: true,
       },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
   useLayoutEffect(() => {
-    if (existingInstance?.data && !instance && !!data?.id) {
-      const { id, parent_id, title, blueprint_fields, tags } = existingInstance.data;
-      const fieldsByTemplateId = { [item_id as string]: blueprint_fields } as Record<string, BlueprintFieldValueType[]>;
-      setInstance({ id, parent_id, title, blueprint_fields: fieldsByTemplateId, tags });
+    if (existingInstance?.data && !!data?.id) {
+      setInstance(existingInstance?.data);
     } else if (!data?.id && !instance) {
+      // @ts-ignore
       setInstance({
         id: "",
         title: "",
         parent_id: item_id as string,
-        blueprint_fields: {},
+        blueprint_fields: [],
         tags: [],
       });
     }
@@ -799,7 +778,6 @@ export function BlueprintInstanceDrawer({ data }: Props) {
             createNotification={createNotification}
             handleChange={handleChange}
             project_id={project_id as string}
-            template_id={item_id as string}
             title={blueprint?.data?.title}
           />
         ) : null}
@@ -835,11 +813,13 @@ export function BlueprintInstanceDrawer({ data }: Props) {
               const dataToParse = {
                 data: {
                   ...instance,
-                  value: flattenArray(Object.values(instance?.blueprint_fields || {})) || [],
                   parent_id: item_id,
                 },
                 relations: {
                   tags: instance?.tags?.map((t) => ({ id: t.id })),
+                  blueprint_fields: instance?.blueprint_fields
+                    ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                    : undefined,
                 },
               };
 
@@ -850,6 +830,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                 },
               });
             }
+            resetChanges();
           } else {
             createNotification({
               variant: "info",

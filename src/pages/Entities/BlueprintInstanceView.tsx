@@ -164,6 +164,7 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
 
 function createColumns(
   blueprint: BlueprintType,
+  title_name: string,
   project_id: string,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
@@ -171,14 +172,14 @@ function createColumns(
   const fieldColumns = [
     columnHelper.accessor("title", {
       id: "title",
-      header: blueprint?.title_name,
+      header: title_name,
       cell: ({ row }) => row.original?.title || "",
       minSize: 15,
     }),
   ];
 
   blueprint.blueprint_fields
-    .filter((field) => field.field_type !== "textarea")
+    ?.filter((field) => field.field_type !== "textarea")
     .slice(0, 6)
     .forEach((field) => {
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
@@ -187,8 +188,9 @@ function createColumns(
           id: field.title,
           header: field.title,
           cell: ({ row }) => {
-            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
-
+            const fieldData = row.original?.blueprint_fields?.find(
+              (instanceField) => instanceField?.value?.id === field.id,
+            )?.value;
             const value =
               fieldData?.value && fieldData?.value?.value
                 ? `${fieldData?.value?.value} ${
@@ -312,17 +314,16 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const [{ selection, pagination }, dispatch] = useTable({ selection: {}, pagination: { page: 0, limit: 10 } });
 
-  const { data: blueprints, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+  const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
       id: item_id,
     },
     relations: {
-      blueprint_instances: true,
       blueprint_fields: true,
-      random_table_options: true,
     },
+    fields: ["id", "title", "title_name"],
   });
-  useChangeNavbarTitle(` Blueprints | ${blueprints?.data?.title}`, !!blueprints?.data?.title);
+  useChangeNavbarTitle(` Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
 
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
@@ -330,6 +331,7 @@ export function BlueprintInstanceView() {
         project_id,
         parent_id: item_id,
       },
+
       pagination,
     },
     "blueprint_instances",
@@ -342,12 +344,12 @@ export function BlueprintInstanceView() {
           <Button
             icon={IconEnum.add}
             isDisabled={isFetching}
-            label={`Create ${blueprints?.data?.title ? `(${blueprints?.data?.title})` : ""}`}
+            label={`Create ${blueprint?.data?.title ? `(${blueprint?.data?.title})` : ""}`}
             onClick={() =>
               setDrawer((prev) => ({
                 ...prev,
                 data: {},
-                title: `Create new ${blueprints?.data?.title}`,
+                title: `Create new ${blueprint?.data?.title}`,
                 type: "blueprint_instances",
                 size: "lg",
               }))
@@ -356,9 +358,15 @@ export function BlueprintInstanceView() {
         </div>
       </div>
       <div className="w-full flex-1 overflow-hidden">
-        {blueprints?.data ? (
+        {blueprint?.data ? (
           <Table
-            columns={createColumns(blueprints?.data, project_id as string, setDrawer, setDialog)}
+            columns={createColumns(
+              blueprint?.data,
+              blueprint?.data?.title_name || "",
+              project_id as string,
+              setDrawer,
+              setDialog,
+            )}
             config={{
               hasSelect: true,
               selection,

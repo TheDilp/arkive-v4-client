@@ -34,9 +34,9 @@ import {
   useTable,
 } from "../../hooks";
 import {
+  AdditionalFieldValueType,
   CharacterFieldTemplateType,
   CharacterFieldType,
-  AdditionalFieldValueType,
   CharacterLocationType,
   CharacterRelatedType,
   CharacterType,
