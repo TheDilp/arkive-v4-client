@@ -210,8 +210,7 @@ function createColumns(
                 : "";
             // const date =
             //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
-            if ((field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value)
-              return value;
+            if ((field.field_type === "text" || field.field_type === "number") && value) return value;
             if ((field.field_type === "select" || field.field_type === "select_multiple") && value) {
               return (
                 (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
@@ -255,17 +254,21 @@ function createColumns(
             }
             if (field.field_type === "dice_roll" && field?.formula) {
               return (
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2 [&>button]:px-0">
+                  <span>{(fieldData?.value?.value as number) || ""}</span>
+                  (
                   <Button
                     hasNoBackground
                     icon={IconEnum.d20}
-                    isIconOnly
+                    iconPos="left"
+                    isDisabled={!field.formula}
+                    label={field.formula || ""}
                     onClick={async () => {
                       if (field?.formula && field.formula.match(DiceRollRegex))
                         await rollDiceWithNotification(createNotification, field.formula, true);
                     }}
                   />
-                  {field.formula}
+                  )
                 </div>
               );
             }
