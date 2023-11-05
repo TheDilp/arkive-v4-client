@@ -86,8 +86,8 @@ function columns(
         ) : (
           <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon(entityType)} />
         ),
-      maxSize: 3,
-      minSize: 3,
+      maxSize: 3.25,
+      minSize: 3.25,
       meta: {
         centered: true,
       },
@@ -531,7 +531,7 @@ export function FolderView() {
         </div>
       ) : null}
       {view === "table" ? (
-        <div className="w-full flex-1 overflow-hidden">
+        <div className="w-full flex-1">
           <Table
             columns={columns(
               setDrawer,

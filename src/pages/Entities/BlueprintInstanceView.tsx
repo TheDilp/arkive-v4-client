@@ -408,7 +408,7 @@ export function BlueprintInstanceView() {
 
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
+      <div className="flex w-full items-center justify-end gap-x-2">
         <div className="w-52">
           <Button
             icon={IconEnum.add}
@@ -426,7 +426,7 @@ export function BlueprintInstanceView() {
           />
         </div>
       </div>
-      <div className="w-full flex-1 overflow-hidden">
+      <div>
         {blueprint?.data ? (
           <Table
             columns={createColumns(

@@ -2,7 +2,7 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
@@ -116,8 +116,8 @@ export function BlueprintView() {
   );
 
   return (
-    <TablePageLayout>
-      <div className="flex w-full items-center justify-end gap-x-2">
+    <div className="flex flex-col gap-y-2">
+      <div className="flex h-12 w-full items-center justify-end gap-x-2">
         <div className="w-fit">
           <Button
             icon={IconEnum.add}
@@ -134,24 +134,23 @@ export function BlueprintView() {
           />
         </div>
       </div>
-      <div className="h-[75%] max-h-full w-full overflow-hidden lg:h-[85%]">
-        <Table
-          columns={columns}
-          config={{
-            hasSelect: true,
-            expandable: true,
-            filters,
-            selection,
-            orderBy,
-            getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
-          }}
-          data={data?.data || []}
-          dispatch={dispatch}
-          isLoading={isFetching}
-          pagination={pagination}
-          type="blueprints"
-        />
-      </div>
-    </TablePageLayout>
+
+      <Table
+        columns={columns}
+        config={{
+          hasSelect: true,
+          expandable: true,
+          filters,
+          selection,
+          orderBy,
+          getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
+        }}
+        data={data?.data || []}
+        dispatch={dispatch}
+        isLoading={isFetching}
+        pagination={pagination}
+        type="blueprints"
+      />
+    </div>
   );
 }

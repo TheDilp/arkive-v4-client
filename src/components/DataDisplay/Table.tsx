@@ -35,7 +35,7 @@ import {
   removeColumnFilter,
 } from "../../utils";
 import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
-import { Alert, Badge, Icon, Skeleton } from "../Misc";
+import { Badge, Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
 
@@ -43,27 +43,23 @@ export { createColumnHelper } from "@tanstack/react-table";
 
 const TableClasses = tv({
   slots: {
-    container: "flex max-h-full h-full overflow-hidden min-h-full max-w-full",
-    table: "flex flex-col h-full min-h-full w-full overflow-y-hidden relative",
-    head: "border-x border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 sticky top-0 flex min-w-full w-fit flex-col mb-4 mih-h-[3rem] border-b",
-    headerGroup: "flex h-12 font-merriweather select-none truncate",
-    select: "select-none",
+    head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] h-12 sticky top-0 border-b flex",
+    select: "select-none z-20",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "px-2",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
-    bodyContainer: "min-w-full content-start overflow-auto max-h-full flex flex-col justify-start w-fit",
-    body: "flex flex-col flex-1 w-full border-zinc-600 my-2",
-    rowContainer: "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3.05rem] border-x last:border-b relative odd:border-y",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato ",
+    rowContainer:
+      "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3.05rem] border-r border-t last:border-b relative min-w-fit",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
-    content: "flex flex-1 items-center truncate px-2 box-content border-zinc-600 border-r last:border-r-0",
+    content: "flex flex-1 items-center truncate px-2 border-zinc-600 border-r last:border-r-0 first:border-l",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex lg:h-10 h-8 max-h-8 lg:max-h-10 items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottm-0 bg-zinc-950 pb-9 pt-1",
+      "flex h-10 max-h-[2.5rem] min-h-[2.5rem] items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
@@ -436,17 +432,12 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const isSubheaderEnabled = areFiltersActive;
 
   const {
-    container,
-    table: tableClasses,
     head,
     select: selectClasses,
-    headerGroup: headerGroupClasses,
     sortableHeader,
     subheaderContainer,
     subheaderFiltersRow,
     subheaderRowTitle,
-    bodyContainer,
-    body,
     rowContainer,
     row: rowClasses,
     hasLinkRow,
@@ -503,318 +494,300 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const rowVirtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => bodyRef.current,
-    estimateSize: () => 47,
+    estimateSize: () => 48.8,
     overscan: 15,
   });
   const { rows } = table.getRowModel();
 
   if (isLoading) return <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />;
   return (
-    <div className={container()}>
-      <div className={tableClasses()}>
+    <>
+      <div
+        ref={bodyRef}
+        className="scrollbar-hidden mih-h-full h-full max-h-[calc(100%-2.5rem)] overflow-auto  border-b border-zinc-700"
+        style={{
+          height: expandable ? "" : `${rowVirtualizer.getTotalSize() + Number(headerRef?.current?.clientHeight) + 20}px`,
+        }}>
         <div ref={headerRef} className={head()}>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <div key={headerGroup.id} className={headerGroupClasses()}>
-              {headerGroup.headers.map((hdr) => {
-                const { header, id, meta } = hdr.column.columnDef;
-                const activeColumnFilters = {
-                  and: (filters?.and || []).filter((filt) => filt.field === id),
-                  or: (filters?.or || []).filter((filt) => filt.field === id),
-                };
-                const isRelationFilter = relationFiltersList.includes(id || "");
-                return (
-                  <div
-                    key={hdr.id}
-                    className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
+          {table.getFlatHeaders().map((hdr) => {
+            const { header, id, meta } = hdr.column.columnDef;
+            const activeColumnFilters = {
+              and: (filters?.and || []).filter((filt) => filt.field === id),
+              or: (filters?.or || []).filter((filt) => filt.field === id),
+            };
+            const isRelationFilter = relationFiltersList.includes(id || "");
+            return (
+              <div
+                key={hdr.id}
+                className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
+                    ${hdr.id === "select" ? "sticky left-0" : ""}
+                    ${(meta as MetaType)?.pinned ? "sticky left-[2.75rem]" : ""}
+                    bg-zinc-950 first:border-l
                     `}
-                    style={{
-                      ...getTableColumnWidths(hdr.column.id, {
-                        minSize: hdr.column.columnDef.minSize,
-                        maxSize: hdr.column.columnDef.maxSize,
-                      }),
-                    }}>
-                    <Tooltip
-                      allowedPlacements={["top", "bottom"]}
-                      content={(hdr.getContext().column.columnDef.header as string) || ""}
-                      delay={{ openDelay: 0 }}
-                      isDisabled={hdr.id === "select"}
-                      isIgnoringHover>
-                      <div className="truncate">{flexRender(header, hdr.getContext())}</div>
-                    </Tooltip>
-                    {(meta as MetaType)?.filterOptions?.length && dispatch ? (
-                      <Tooltip
-                        allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
-                        arrowColor="#27272a"
-                        content={
-                          <div
-                            className={baseFilterClasses()}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}>
-                            {isRelationFilter ? null : (
-                              <TableColumnFilter
-                                columnId={id}
-                                dispatch={dispatch}
-                                filterOptions={(meta as MetaType)?.filterOptions || []}
-                                filters={activeColumnFilters}
-                                isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                              />
-                            )}
-                            {id === "tags" ? (
-                              <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
-                            ) : null}
-                          </div>
-                        }
-                        customOffset={{ mainAxis: 8 }}
-                        isClickable>
-                        <div
-                          className="flex w-min justify-center pl-0.5"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}>
-                          <Icon
-                            className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
-                            fontSize={20}
-                            icon={IconEnum.filter}
-                          />
-                        </div>
-                      </Tooltip>
-                    ) : null}
-                    {(meta as MetaType)?.sortable ? (
-                      <OrderByHeaderIcon
-                        id={id}
-                        onClick={() => {
-                          if ((meta as MetaType)?.sortable && dispatch) {
-                            let sortValue;
-                            const column_id = hdr.column.columnDef?.id;
-                            const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
-                            if (columnOrderBy) {
-                              if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
-                                sortValue = "desc" as const;
-                              } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
-                                sortValue = null;
-                              } else {
-                                sortValue = "asc" as const;
-                              }
-
-                              dispatch({
-                                type: "setSort",
-                                payload: {
-                                  field: id as string,
-                                  sort: sortValue,
-                                },
-                              });
-                            } else {
-                              dispatch({
-                                type: "setSort",
-                                payload: {
-                                  field: id as string,
-                                  sort: "asc",
-                                },
-                              });
-                            }
-                          }
-                        }}
-                        orderBy={orderBy?.find((ob) => ob.field === id)}
-                      />
-                    ) : null}
-                    {hdr.column.getIsSorted() ? (
-                      <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-          {isSubheaderEnabled ? (
-            <div className={subheaderContainer()}>
-              <div className={subheaderFiltersRow()}>
-                <h4 className={subheaderRowTitle()}>Filters:</h4>
-                <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
-              </div>
-            </div>
-          ) : null}
-        </div>
-        <div
-          className={bodyContainer()}
-          style={
-            data.length
-              ? {}
-              : {
-                  minWidth: Number(headerRef?.current?.clientWidth) + 3,
-                }
-          }>
-          <div ref={bodyRef} className="scrollbar-hidden h-full overflow-auto pb-1">
-            {data?.length ? (
-              <div className={body()} style={{ height: expandable ? "" : `${rowVirtualizer.getTotalSize()}px` }}>
-                {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
-                  const row = rows[virtualRow.index];
-                  return (
-                    <div
-                      key={row.id}
-                      className={`${rowContainer()} ${
-                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                          ? "group hover:text-white"
-                          : "hover:bg-zinc-800"
-                      }`}
-                      style={{
-                        height: expandable ? "" : `${virtualRow.size}px`,
-                        transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
-                      }}>
-                      <Link
+                style={{
+                  ...getTableColumnWidths(hdr.column.id, {
+                    minSize: hdr.column.columnDef.minSize,
+                    maxSize: hdr.column.columnDef.maxSize,
+                  }),
+                }}>
+                <Tooltip
+                  allowedPlacements={["top", "bottom"]}
+                  content={(hdr.getContext().column.columnDef.header as string) || ""}
+                  delay={{ openDelay: 0 }}
+                  isDisabled={hdr.id === "select"}
+                  isIgnoringHover>
+                  <div className="truncate">{flexRender(header, hdr.getContext())}</div>
+                </Tooltip>
+                {(meta as MetaType)?.filterOptions?.length && dispatch ? (
+                  <Tooltip
+                    allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
+                    arrowColor="#27272a"
+                    content={
+                      <div
+                        className={baseFilterClasses()}
                         onClick={(e) => {
-                          if (onRowClick) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onRowClick(row.original);
-                          }
-                        }}
-                        to={getLink ? getLink(row.original) : "#"}>
-                        <div
-                          className={`${rowClasses()}${getLink ? hasLinkRow() : ""}
-                        ${onRowClick ? hasRowAction() : ""}
-                        group-hover:bg-blue-300 ${
-                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                            ? "bg-blue-300"
-                            : ""
-                        }`}>
-                          {row.getVisibleCells().map((cell) => (
-                            <div
-                              key={cell.id}
-                              className={`${contentClasses()} box-border ${
-                                cell.column.id === "select" ? selectClasses() : ""
-                              } ${(cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""}
-                            `}
-                              onClick={(e) => {
-                                if (
-                                  cell.column.id === "select" ||
-                                  cell.column.id === "action" ||
-                                  cell.column.id === "is_favorite" ||
-                                  (cell.column.columnDef.meta as MetaType)?.noLink
-                                ) {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }
-                              }}
-                              style={{
-                                ...getTableColumnWidths(cell.column.id, {
-                                  minSize: cell.column.columnDef.minSize,
-                                  maxSize: cell.column.columnDef.maxSize,
-                                }),
-                              }}>
-                              <div className={contentWrapper()}>
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </Link>
-                      {row.getIsExpanded() ? (
-                        <div className="">
-                          <ExpandedTableRow data={row.original} type={type} />
-                        </div>
-                      ) : null}
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}>
+                        {isRelationFilter ? null : (
+                          <TableColumnFilter
+                            columnId={id}
+                            dispatch={dispatch}
+                            filterOptions={(meta as MetaType)?.filterOptions || []}
+                            filters={activeColumnFilters}
+                            isAndDisabled={["is_favorite"].includes(hdr.column.id)}
+                          />
+                        )}
+                        {id === "tags" ? <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} /> : null}
+                      </div>
+                    }
+                    customOffset={{ mainAxis: 8 }}
+                    isClickable>
+                    <div
+                      className="flex w-min justify-center pl-0.5"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}>
+                      <Icon
+                        className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
+                        fontSize={20}
+                        icon={IconEnum.filter}
+                      />
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="my-2">
-                <Alert label="There's no content." variant="info" />
-              </div>
-            )}
-          </div>
-          {pagination ? (
-            <div className={paginationContainer()}>
-              <div className={pageCountContainer()}>
-                <div className={pageCount()}>
-                  Page {(pagination?.page || 0) + 1} | Current count: {data?.length || ""} |
-                </div>
-                <div className={showPageCount()}>
-                  Show:
-                  <div className={showPageCountSelectContainer()}>
-                    <Select
-                      name="limit"
-                      onChange={({ value }) => {
-                        if (value && !Array.isArray(value))
-                          dispatch({
-                            type: "setPagination",
-                            payload: { ...pagination, limit: parseInt(value, 10) },
-                          });
-                      }}
-                      options={
-                        expandable
-                          ? [
-                              { label: "10", value: "10" },
-                              { label: "20", value: "20" },
-                              { label: "30", value: "30" },
-                              { label: "40", value: "40" },
-                              { label: "50", value: "50" },
-                            ]
-                          : [
-                              { label: "10", value: "10" },
-                              { label: "20", value: "20" },
-                              { label: "30", value: "30" },
-                              { label: "40", value: "40" },
-                              { label: "50", value: "50" },
-                              { label: "60", value: "60" },
-                              { label: "70", value: "70" },
-                              { label: "80", value: "80" },
-                              { label: "90", value: "90" },
-                              { label: "100", value: "100" },
-                              { label: "200", value: "200" },
-                              { label: "250", value: "250" },
-                              { label: "300", value: "300" },
-                              { label: "350", value: "350" },
-                              { label: "400", value: "400" },
-                              { label: "450", value: "450" },
-                              { label: "500", value: "500" },
-                            ]
-                      }
-                      size="sm"
-                      value={pagination?.limit?.toFixed() || "10"}
-                    />
-                  </div>
-                </div>
-              </div>
+                  </Tooltip>
+                ) : null}
+                {(meta as MetaType)?.sortable ? (
+                  <OrderByHeaderIcon
+                    id={id}
+                    onClick={() => {
+                      if ((meta as MetaType)?.sortable && dispatch) {
+                        let sortValue;
+                        const column_id = hdr.column.columnDef?.id;
+                        const columnOrderBy = (orderBy || [])?.find((ob) => ob.field === column_id);
+                        if (columnOrderBy) {
+                          if (columnOrderBy?.sort === "asc" && column_id === columnOrderBy.field) {
+                            sortValue = "desc" as const;
+                          } else if (columnOrderBy?.sort === "desc" && column_id === columnOrderBy.field) {
+                            sortValue = null;
+                          } else {
+                            sortValue = "asc" as const;
+                          }
 
-              <div className={paginationButtonsContainer()}>
-                <ButtonGroup
-                  buttons={[
-                    {
-                      icon: IconEnum.chevron_left,
-                      isDisabled: pagination?.page === 0,
-                      onClick: () => {
-                        if (pagination?.page && pagination?.page > 0) {
                           dispatch({
-                            type: "setPagination",
-                            payload: { ...pagination, page: pagination.page - 1 },
+                            type: "setSort",
+                            payload: {
+                              field: id as string,
+                              sort: sortValue,
+                            },
+                          });
+                        } else {
+                          dispatch({
+                            type: "setSort",
+                            payload: {
+                              field: id as string,
+                              sort: "asc",
+                            },
                           });
                         }
-                      },
-                      variant: "secondary",
-                    },
-                    {
-                      icon: IconEnum.chevron_right,
-                      isDisabled: data.length < (pagination?.limit || 10),
-                      onClick: () =>
-                        dispatch({
-                          type: "setPagination",
-                          payload: { ...pagination, page: (pagination?.page || 0) + 1 },
+                      }
+                    }}
+                    orderBy={orderBy?.find((ob) => ob.field === id)}
+                  />
+                ) : null}
+                {hdr.column.getIsSorted() ? (
+                  <Icon icon={hdr.column.getIsSorted() === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc} />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        {isSubheaderEnabled ? (
+          <div className={subheaderContainer()}>
+            <div className={subheaderFiltersRow()}>
+              <h4 className={subheaderRowTitle()}>Filters:</h4>
+              <TableSubheaderFilterBadges dispatch={dispatch} filters={filters} relationFilters={relationFilters} />
+            </div>
+          </div>
+        ) : null}
+        {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
+          const row = rows[virtualRow.index];
+          return (
+            <div
+              key={row.id}
+              className={`${rowContainer()} ${
+                config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                  ? "group hover:text-white"
+                  : "hover:bg-zinc-800"
+              } `}
+              style={{
+                height: expandable ? "" : `${virtualRow.size}px`,
+                transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+              }}>
+              <Link
+                onClick={(e) => {
+                  if (onRowClick) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onRowClick(row.original);
+                  }
+                }}
+                to={getLink ? getLink(row.original) : "#"}>
+                <div
+                  className={`${rowClasses()}${getLink ? hasLinkRow() : ""}
+                        ${onRowClick ? hasRowAction() : ""}`}>
+                  {row.getVisibleCells().map((cell) => (
+                    <div
+                      key={cell.id}
+                      className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                        (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
+                      } ${cell.column.id === "select" ? "sticky left-0" : ""}
+                      ${(cell.column.columnDef.meta as MetaType).pinned ? "sticky left-[2.75rem] z-10 shadow-lg" : ""}
+                      group-hover:bg-blue-300 ${
+                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                          ? "bg-blue-300"
+                          : "bg-zinc-950"
+                      }
+                      `}
+                      onClick={(e) => {
+                        if (
+                          cell.column.id === "select" ||
+                          cell.column.id === "action" ||
+                          cell.column.id === "is_favorite" ||
+                          (cell.column.columnDef.meta as MetaType)?.noLink
+                        ) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      style={{
+                        ...getTableColumnWidths(cell.column.id, {
+                          minSize: cell.column.columnDef.minSize,
+                          maxSize: cell.column.columnDef.maxSize,
                         }),
-                      variant: "secondary",
-                    },
-                  ]}
+                      }}>
+                      <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+                    </div>
+                  ))}
+                </div>
+              </Link>
+              {row.getIsExpanded() ? (
+                <div className="">
+                  <ExpandedTableRow data={row.original} type={type} />
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+      {pagination ? (
+        <div className={paginationContainer()}>
+          <div className={pageCountContainer()}>
+            <div className={pageCount()}>
+              Page {(pagination?.page || 0) + 1} | Current count: {data?.length || ""} |
+            </div>
+            <div className={showPageCount()}>
+              Show:
+              <div className={showPageCountSelectContainer()}>
+                <Select
+                  name="limit"
+                  onChange={({ value }) => {
+                    if (value && !Array.isArray(value))
+                      dispatch({
+                        type: "setPagination",
+                        payload: { ...pagination, limit: parseInt(value, 10) },
+                      });
+                  }}
+                  options={
+                    expandable
+                      ? [
+                          { label: "10", value: "10" },
+                          { label: "20", value: "20" },
+                          { label: "30", value: "30" },
+                          { label: "40", value: "40" },
+                          { label: "50", value: "50" },
+                        ]
+                      : [
+                          { label: "10", value: "10" },
+                          { label: "20", value: "20" },
+                          { label: "30", value: "30" },
+                          { label: "40", value: "40" },
+                          { label: "50", value: "50" },
+                          { label: "60", value: "60" },
+                          { label: "70", value: "70" },
+                          { label: "80", value: "80" },
+                          { label: "90", value: "90" },
+                          { label: "100", value: "100" },
+                          { label: "200", value: "200" },
+                          { label: "250", value: "250" },
+                          { label: "300", value: "300" },
+                          { label: "350", value: "350" },
+                          { label: "400", value: "400" },
+                          { label: "450", value: "450" },
+                          { label: "500", value: "500" },
+                        ]
+                  }
+                  size="sm"
+                  value={pagination?.limit?.toFixed() || "10"}
                 />
               </div>
             </div>
-          ) : null}
+          </div>
+
+          <div className={paginationButtonsContainer()}>
+            <ButtonGroup
+              buttons={[
+                {
+                  icon: IconEnum.chevron_left,
+                  isDisabled: pagination?.page === 0,
+                  onClick: () => {
+                    if (pagination?.page && pagination?.page > 0) {
+                      dispatch({
+                        type: "setPagination",
+                        payload: { ...pagination, page: pagination.page - 1 },
+                      });
+                    }
+                  },
+                  variant: "secondary",
+                },
+                {
+                  icon: IconEnum.chevron_right,
+                  isDisabled: data.length < (pagination?.limit || 10),
+                  onClick: () =>
+                    dispatch({
+                      type: "setPagination",
+                      payload: { ...pagination, page: (pagination?.page || 0) + 1 },
+                    }),
+                  variant: "secondary",
+                },
+              ]}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      ) : null}
+    </>
   );
 }
