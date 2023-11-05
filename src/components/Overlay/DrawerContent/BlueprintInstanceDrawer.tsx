@@ -344,6 +344,7 @@ function BlueprintFieldInputs({
   if (fieldType === "select" || fieldType === "select_multiple") {
     return (
       <Select
+        hasSearch
         isClearable
         isMultiple={fieldType === "select_multiple"}
         label={title}
