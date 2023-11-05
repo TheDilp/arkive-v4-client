@@ -85,7 +85,9 @@ function RandomTableInput({
 
     enabled: false,
   });
-  const selectedOptionSuboptions = random_table?.random_table_options?.find((opt) => opt?.id === currentValue)?.suboptions;
+  const selectedOptionSuboptions = random_table?.random_table_options?.find(
+    (opt) => opt?.id === currentValue,
+  )?.random_table_suboptions;
   return (
     <div className="flex flex-col gap-y-1">
       <div className="flex flex-nowrap items-center gap-x-2">

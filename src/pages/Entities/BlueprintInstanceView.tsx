@@ -243,7 +243,7 @@ function createColumns(
                   : null;
               const subOption =
                 randomTable && fieldData?.value?.subOptionValue
-                  ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+                  ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
                   : null;
 
               return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
