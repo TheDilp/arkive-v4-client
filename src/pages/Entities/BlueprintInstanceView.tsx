@@ -98,7 +98,7 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
   );
 }
 function BlueprintColumn({ ids }: { ids: string | string[] }) {
-  const { data: blueprint_instances, isFetching } = useGetEntities<BlueprintInstanceType>(
+  const { data: blueprint_instances } = useGetEntities<BlueprintInstanceType>(
     {
       data: {},
       fields: ["id", "title"],
@@ -107,7 +107,7 @@ function BlueprintColumn({ ids }: { ids: string | string[] }) {
     "blueprint_instances",
     { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
-  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
+
   return (
     <div className="flex items-center gap-x-2">
       <div className="flex w-full items-center justify-center -space-x-4">
@@ -214,6 +214,9 @@ function createColumns(
     columnHelper.accessor("title", {
       id: "title",
       header: title_name,
+      meta: {
+        pinned: true,
+      },
       cell: ({ row }) => row.original?.title || "",
       minSize: 15,
     }),
@@ -374,7 +377,11 @@ export function BlueprintInstanceView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const createNotification = useNotifications();
-  const [{ selection, pagination }, dispatch] = useTable({ selection: {}, pagination: { page: 0, limit: 10 } });
+  const [{ selection, pagination, orderBy }, dispatch] = useTable({
+    selection: {},
+    orderBy: [{ field: "title", sort: "asc" }],
+    pagination: { page: 0, limit: 10 },
+  });
 
   const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
@@ -393,7 +400,7 @@ export function BlueprintInstanceView() {
         project_id,
         parent_id: item_id,
       },
-
+      orderBy,
       pagination,
     },
     "blueprint_instances",

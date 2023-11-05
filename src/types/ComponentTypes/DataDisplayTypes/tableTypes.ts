@@ -14,6 +14,7 @@ export interface MetaType {
   sortable?: boolean;
   centered?: boolean;
   noLink?: boolean;
+  pinned?: boolean;
   selection: TableSelectionType;
   filterOptions?: FilterEnumType[];
 }
