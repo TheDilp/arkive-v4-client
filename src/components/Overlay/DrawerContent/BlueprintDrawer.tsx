@@ -201,6 +201,19 @@ function FieldRow({
           />
         </div>
       ) : null}
+      {field_type === "blueprints_single" || field_type === "blueprints_multiple" ? (
+        <div className="flex flex-col gap-y-2 pl-8">
+          <Search
+            hasShownOption
+            isDisabled={isLoading}
+            label="Blueprint"
+            name={`blueprint_fields[${index}].blueprint_id`}
+            onChange={changeField}
+            searchEntity="blueprints"
+            value={random_table_id || ""}
+          />
+        </div>
+      ) : null}
       {field_type === "date" ? (
         <div className="flex flex-col gap-y-2 pl-8">
           <Search

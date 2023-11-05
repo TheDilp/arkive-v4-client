@@ -10,6 +10,7 @@ export interface BlueprintFieldType {
   // width: FieldWidthType;
   formula?: string | null;
   random_table_id?: string | null;
+  blueprint_id?: string | null;
   calendar_id?: string | null;
   options?: { id: string; value: string }[];
   random_table?: { id: string; title: string; random_table_options: RandomTableOptionType[] };

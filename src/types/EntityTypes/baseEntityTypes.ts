@@ -54,6 +54,8 @@ export type SearchableEntities =
   | "character_map_pins"
   | "map_pins"
   | "boards"
+  | "blueprints"
+  | "blueprint_instances"
   | "nodes"
   | "edges"
   | "random_tables"

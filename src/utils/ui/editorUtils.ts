@@ -95,7 +95,7 @@ export const DefaultEditorExtensions: (
       },
       {
         char: "&",
-        name: "blueprints",
+        name: "blueprint_instances",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
     ],

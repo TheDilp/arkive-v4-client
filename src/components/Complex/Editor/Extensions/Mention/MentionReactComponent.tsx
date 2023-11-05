@@ -32,7 +32,7 @@ export function MentionReactComponent({ node }: Props) {
       return <DocumentMention alterId={alterId} id={id} label={label} project_id={project_id} title={label} />;
     if (name === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
     if (name === "boards" || name === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
-    if (name === "blueprints")
+    if (name === "blueprint_instances")
       return (
         <BlueprintMention
           icon={icon}
