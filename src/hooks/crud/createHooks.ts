@@ -133,6 +133,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
           if (type === "edges") setEdges((prev) => [...(prev || []), vars.data as EdgeType]);
           return { old };
         }
+
         return { old: {} };
       },
       onError: (_, vars, context) => {
@@ -146,6 +147,9 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
         if (parentEntityType && parentEntityType !== "documents" && parentEntityType !== "graphs") {
           queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
           queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
+        }
+        if (type === "blueprint_instances") {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
         }
         createNotification({
           title: data?.message || getEntityCRUDNotification(type, "create"),
