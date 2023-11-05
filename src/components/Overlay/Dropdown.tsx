@@ -32,7 +32,7 @@ import { Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "z-40 font-lato w-fit",
+    base: "z-40 font-lato min-w-fit",
     floatingBase:
       "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[60] font-lato shadow-lg absolute top-0 left-0",
   },
