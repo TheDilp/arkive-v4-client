@@ -41,7 +41,7 @@ import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "..
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select, Title } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { Collapsible, DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
@@ -799,8 +799,8 @@ export function BlueprintInstanceDrawer({ data }: Props) {
 
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
   return (
-    <div className="flex w-full flex-col gap-y-2">
-      <ul className="flex flex-col overflow-y-auto">
+    <DrawerLayout>
+      <ul className="flex max-h-[90%] flex-col overflow-y-auto">
         {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
         <div>
           <Input
@@ -822,66 +822,68 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           />
         ) : null}
       </ul>
-      <Button
-        icon={instance?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={!instance?.title || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={instance?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (changedData) {
-            if (instance?.id) {
-              const dataToParse = {
-                data: {
-                  ...instance,
-                  parent_id: item_id,
-                },
-                relations: {
-                  tags: instance?.tags?.map((t) => ({ id: t.id })),
-                  blueprint_fields: instance?.blueprint_fields
-                    ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
-                    : undefined,
-                },
-              };
+      <div className="mt-auto w-full">
+        <Button
+          icon={instance?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={!instance?.title || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={instance?.id ? "Update" : "Create"}
+          onClick={async () => {
+            if (changedData) {
+              if (instance?.id) {
+                const dataToParse = {
+                  data: {
+                    ...instance,
+                    parent_id: item_id,
+                  },
+                  relations: {
+                    tags: instance?.tags?.map((t) => ({ id: t.id })),
+                    blueprint_fields: instance?.blueprint_fields
+                      ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                      : undefined,
+                  },
+                };
 
-              const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
-              await update(parsedData, {
-                onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
-                },
-              });
+                const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
+                await update(parsedData, {
+                  onSuccess: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                });
+              } else {
+                const dataToParse = {
+                  data: {
+                    ...instance,
+                    parent_id: item_id,
+                  },
+                  relations: {
+                    tags: instance?.tags?.map((t) => ({ id: t.id })),
+                    blueprint_fields: instance?.blueprint_fields
+                      ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                      : undefined,
+                  },
+                };
+
+                const parsedData = InsertBlueprintInstanceSchema.parse(dataToParse);
+                await create(parsedData, {
+                  onSuccess: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                });
+              }
+              resetChanges();
             } else {
-              const dataToParse = {
-                data: {
-                  ...instance,
-                  parent_id: item_id,
-                },
-                relations: {
-                  tags: instance?.tags?.map((t) => ({ id: t.id })),
-                  blueprint_fields: instance?.blueprint_fields
-                    ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
-                    : undefined,
-                },
-              };
-
-              const parsedData = InsertBlueprintInstanceSchema.parse(dataToParse);
-              await create(parsedData, {
-                onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
-                },
+              createNotification({
+                variant: "info",
+                icon: IconEnum.info_circle,
+                title: "No data was changed.",
+                timer: 3,
               });
             }
-            resetChanges();
-          } else {
-            createNotification({
-              variant: "info",
-              icon: IconEnum.info_circle,
-              title: "No data was changed.",
-              timer: 3,
-            });
-          }
-        }}
-        variant="success"
-      />
-    </div>
+          }}
+          variant="success"
+        />
+      </div>
+    </DrawerLayout>
   );
 }
