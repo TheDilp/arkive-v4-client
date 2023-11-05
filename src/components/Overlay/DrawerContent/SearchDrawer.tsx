@@ -175,6 +175,7 @@ export function SearchDrawer() {
               if (!item) return null;
               if ("name" in item) {
                 const { name, result } = item;
+                if (result.length === 0) return null;
                 return (
                   <li key={name}>
                     <Title isDrawerTitle label={getSentenceCase(name)} size="xl" />
