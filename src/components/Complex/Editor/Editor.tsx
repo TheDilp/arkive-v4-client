@@ -46,9 +46,9 @@ export function Editor({
         }
       }}>
       <div
-        className={`editor-component flex w-full max-w-full flex-col rounded border border-zinc-800 ${
-          isDisabled ? "bg-zinc-600" : "bg-zinc-900"
-        }`}>
+        className={`editor-component flex w-full max-w-full flex-col rounded-md border border-zinc-700 ${
+          isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-900"
+        } ${isReadOnly ? "cursor-not-allowed" : ""}`}>
         {isReadOnly || isDisabled ? null : <Menubar size={menubarSize} />}
         <div
           className="flex w-full flex-col content-start focus-visible:outline-none"
