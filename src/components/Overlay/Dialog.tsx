@@ -66,6 +66,11 @@ const DialogClasses = tv({
         container: "",
       },
     },
+    hasNoContent: {
+      true: {
+        base: "h-fit",
+      },
+    },
   },
 });
 
@@ -78,6 +83,7 @@ export function Dialog() {
     isOverlay: dialog?.type === "image_view" || dialog?.isOverlay,
     size: dialog?.size || "md",
     isImageView: dialog?.type === "image_view",
+    hasNoContent: !dialog?.type,
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
 
