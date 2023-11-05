@@ -644,7 +644,7 @@ function BlueprintFieldInputs({
   if (SearchFieldTypes.includes(fieldType)) {
     return (
       <div className="flex flex-col">
-        {currentValue && fieldType === "images_single" ? null : (
+        {currentValue && fieldType === "images_single" && images?.data?.length ? null : (
           <Search
             label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
             name={name}
