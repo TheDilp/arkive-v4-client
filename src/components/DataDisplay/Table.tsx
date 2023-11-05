@@ -463,6 +463,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap, hasNoData: data?.length === 0 });
 
   const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const headerRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   const { base: baseFilterClasses } = TableFilterClasses();
 
@@ -511,7 +512,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   return (
     <div className={container()}>
       <div className={tableClasses()}>
-        <div className={head()}>
+        <div ref={headerRef} className={head()}>
           {table.getHeaderGroups().map((headerGroup) => (
             <div key={headerGroup.id} className={headerGroupClasses()}>
               {headerGroup.headers.map((hdr) => {
@@ -638,7 +639,15 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             </div>
           ) : null}
         </div>
-        <div className={bodyContainer()}>
+        <div
+          className={bodyContainer()}
+          style={
+            data.length
+              ? {}
+              : {
+                  minWidth: Number(headerRef?.current?.clientWidth) + 3,
+                }
+          }>
           <div ref={bodyRef} className="scrollbar-hidden h-full overflow-auto pb-1">
             {data?.length ? (
               <div className={body()} style={{ height: expandable ? "" : `${rowVirtualizer.getTotalSize()}px` }}>
