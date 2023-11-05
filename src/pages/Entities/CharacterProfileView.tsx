@@ -1,6 +1,6 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
-import { Dispatch, useMemo, useState } from "react";
+import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { uniqueBy } from "remirror";
 import { tv } from "tailwind-variants";
@@ -693,7 +693,7 @@ export function CharacterProfileView() {
     "character_fields_templates",
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
-  const { data: existingConversations, isLoading: isLoadingConversations } = useGetEntities<ConversationType>(
+  const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
       data: {
         character_id: item_id,
@@ -767,6 +767,10 @@ export function CharacterProfileView() {
       });
   }
   const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
+
+  useEffect(() => {
+    setSelectedTab(getCharacterProfileTabFromType(type));
+  }, [type]);
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
