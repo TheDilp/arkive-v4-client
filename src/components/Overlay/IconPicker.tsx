@@ -30,9 +30,10 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
 
   const { floatingStyles, refs, context } = useFloating({
     open,
-    onOpenChange: (o) => {
-      if (o) setOpen(o);
+    onOpenChange: (o, event) => {
       if (!o) setOpen(true);
+      if (event?.type === "focusout") return;
+      setOpen(o);
     },
     middleware: [inline(), autoPlacement({ allowedPlacements }), offset(customOffset), shift()],
     whileElementsMounted: autoUpdate,
@@ -43,9 +44,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
       enabled: !isDisabled,
     }),
     useRole(context, { role: "tooltip" }),
-    useDismiss(context, {
-      bubbles: false,
-    }),
+    useDismiss(context),
   ]);
 
   const rowVirtualizer = useVirtualizer({
