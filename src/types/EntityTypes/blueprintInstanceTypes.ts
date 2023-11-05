@@ -2,7 +2,7 @@ import { BlueprintFieldType, BlueprintType } from "./blueprintTypes";
 import { AdditionalFieldValueType } from "./fieldsTypes";
 import { TagType } from "./tagTypes";
 
-interface BlueprintInstaceFieldsType extends BlueprintFieldType, AdditionalFieldValueType {}
+export interface BlueprintInstaceFieldsType extends BlueprintFieldType, AdditionalFieldValueType {}
 
 export interface BlueprintInstanceType {
   id: string;

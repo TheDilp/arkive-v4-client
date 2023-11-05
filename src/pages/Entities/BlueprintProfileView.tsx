@@ -1,10 +1,18 @@
+import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { tv } from "tailwind-variants";
 
-import { Tabs } from "../../components";
-import { useGetSubEntity } from "../../hooks";
-import { BlueprintInstanceType } from "../../types";
-import { IconEnum } from "../../utils";
+import { Button, Editor, EntityPreview, Input, Skeleton, Tabs } from "../../components";
+import { useBreakpoint, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import {
+  BlueprintFieldType,
+  BlueprintInstaceFieldsType,
+  BlueprintInstanceType,
+  BlueprintType,
+  RandomTableOptionType,
+} from "../../types";
+import { drawerAtom, formatDateToString, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -13,35 +21,284 @@ const tabs = [
   //   { id: "4", label: "Conversations", icon: IconEnum.conversation },
 ];
 
+function RandomTableField({
+  random_table_id,
+  random_table_option_id,
+  field,
+  suboptionValue,
+}: {
+  random_table_id: string | undefined | null;
+  random_table_option_id: string | undefined;
+  field: BlueprintFieldType;
+  suboptionValue: string | undefined;
+}) {
+  const { data: option, isLoading } = useGetSubEntity<RandomTableOptionType>(random_table_option_id, "random_table_options", {
+    data: { parent_id: random_table_id },
+    fields: ["id", "title"],
+    relations: {
+      random_table_suboptions: true,
+    },
+  });
+  const subOption =
+    option?.data?.random_table_suboptions?.length && suboptionValue
+      ? option?.data?.random_table_suboptions.find((subopt) => subopt.id === suboptionValue)
+      : null;
+  return (
+    <div>
+      <Input
+        isDisabled={isLoading}
+        isLoading={isLoading}
+        isReadOnly
+        label={field.title}
+        name={field.title}
+        onChange={() => {}}
+        value={`${option?.data?.title || ""} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
+      />
+    </div>
+  );
+}
+function BlueprintField({ field, value }: { field: BlueprintFieldType; value: string | string[] }) {
+  const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
+    {
+      data: {},
+      fields: ["id", "title"],
+      filters: {
+        and: [
+          {
+            field: "id",
+            operator: Array.isArray(value) ? "in" : "eq",
+            value: Array.isArray(value) ? value : value,
+          },
+        ],
+      },
+    },
+    "blueprint_instances",
+    {},
+  );
+
+  return (
+    <div>
+      <Input
+        isDisabled={isLoading}
+        isLoading={isLoading}
+        isReadOnly
+        label={field.title}
+        name={field.title}
+        onChange={() => {}}
+        value={instances?.data?.map((instance) => instance.title).join(",") || ""}
+      />
+    </div>
+  );
+}
+
+const fieldSizeClass = tv({
+  base: "flex flex-col justify-center mt-1 p-0.5",
+  variants: {
+    type: {
+      dice_roll: "col-span-6 sm:col-span-3 lg:col-span-1",
+      text: "col-span-6 sm:col-span-3 lg:col-span-1",
+      image: "col-span-6 sm:col-span-3 lg:col-span-1",
+      select: "col-span-6 sm:col-span-3 lg:col-span-1",
+      select_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      blueprints_single: "col-span-6 sm:col-span-3 lg:col-span-1",
+      blueprints_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      images_single: "col-span-6 sm:col-span-3 lg:col-span-1",
+      images_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      number: "col-span-6 sm:col-span-3 lg:col-span-1",
+      random_table: "col-span-6 sm:col-span-3 lg:col-span-1",
+      textarea: "col-span-6 bg-transparent rounded-none shadow-none",
+      date: "col-span-6 sm:col-span-3 lg:col-span-1",
+      boolean: "col-span-6 sm:col-span-3 lg:col-span-1",
+    },
+  },
+});
+
+function AdditionalFieldDisplay({
+  blueprint_field,
+  blueprint_field_data,
+}: {
+  blueprint_field: BlueprintFieldType;
+  blueprint_field_data: BlueprintInstaceFieldsType;
+}) {
+  const fieldData = blueprint_field_data?.value;
+  const value = fieldData?.value
+    ? `${fieldData?.value} ${fieldData?.subOptionValue ? `- ${fieldData?.subOptionValue}` : ""}`
+    : "";
+  const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text" });
+  const date =
+    blueprint_field.field_type === "date" ? (fieldData?.value as { day: number; year: number; month: string }) : null;
+
+  return (
+    <div className={fieldClasses}>
+      {/* <Title isDrawerTitle label={field.title} size="xl" /> */}
+      {(blueprint_field.field_type === "text" ||
+        blueprint_field.field_type === "number" ||
+        blueprint_field.field_type === "dice_roll") &&
+      value ? (
+        <Input isReadOnly label={blueprint_field.title} name={blueprint_field.title} onChange={() => {}} value={value} />
+      ) : null}
+      {(blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple") && value ? (
+        <Input
+          isReadOnly
+          label={blueprint_field.title}
+          name={blueprint_field.title}
+          onChange={() => {}}
+          value={blueprint_field?.options?.find((opt) => opt.id === fieldData?.value)?.value || ""}
+        />
+      ) : null}
+      {(blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple") && value ? (
+        <BlueprintField field={blueprint_field} value={fieldData?.value as string | string[]} />
+      ) : null}
+      {blueprint_field.field_type === "random_table" ? (
+        <RandomTableField
+          field={blueprint_field_data}
+          random_table_id={blueprint_field_data.random_table_id}
+          random_table_option_id={fieldData?.value as string | undefined}
+          suboptionValue={fieldData?.subOptionValue}
+        />
+      ) : null}
+      {blueprint_field.field_type === "textarea" && value ? (
+        <>
+          <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
+          <Editor
+            initialContent={(fieldData?.value || {}) as any}
+            isReadOnly
+            name={blueprint_field.title}
+            onChange={() => {}}
+          />
+        </>
+      ) : null}
+      {blueprint_field.field_type === "images_single" && value ? (
+        <div className="w-full">
+          <EntityPreview
+            id={fieldData.value as string}
+            image_id={fieldData.value as string}
+            label={blueprint_field.title}
+            title={blueprint_field.title}
+            type="images"
+          />
+        </div>
+      ) : null}
+      {blueprint_field.field_type === "date" && value ? (
+        <div>
+          <Input
+            isReadOnly
+            label={blueprint_field.title}
+            name={blueprint_field.title}
+            onChange={() => {}}
+            value={formatDateToString(date?.day, date?.year, date?.month, blueprint_field_data?.calendar?.months || [])}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function BlueprintProfileView() {
   const { project_id, item_id, subitem_id } = useParams();
+  const { isLg } = useBreakpoint();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
+  const setDrawer = useSetAtom(drawerAtom);
 
-  const { data: blueprintInstance } = useGetSubEntity<BlueprintInstanceType>(subitem_id, "blueprint_instances", {
+  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+    data: {
+      id: item_id,
+    },
+    relations: {
+      random_table_options: true,
+      blueprint_fields: true,
+    },
+  });
+
+  const {
+    data: blueprintInstance,
+    isLoading,
+    isFetching,
+  } = useGetSubEntity<BlueprintInstanceType>(subitem_id, "blueprint_instances", {
     data: { id: subitem_id },
+    relations: {
+      blueprint_fields: true,
+    },
   });
 
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
-      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
-        <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
-          <div className="mt-2 flex flex-col gap-y-1">
-            <h2 className="text-center font-merriweather text-lg">{`${blueprintInstance?.data?.title || ""}`.trimEnd()}</h2>
+      <div className="flex h-12 min-h-[3rem] items-center justify-end">
+        {item_id ? (
+          <div className="w-52">
+            <Button
+              icon={IconEnum.edit}
+              label="Edit current blueprint instance"
+              onClick={() => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: "Edit blueprint instance",
+                  type: "blueprint_instances",
+                  data: { id: item_id as string, project_id: project_id as string },
+                }));
+              }}
+            />
           </div>
+        ) : null}
+      </div>
+      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+        {isLoading ? <Skeleton type="character_profile" /> : null}
+        {!isLoading && isLg ? (
+          <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+            <div className="mt-2 flex flex-col gap-y-1">
+              <h2 className="text-center font-merriweather text-lg">{`${blueprintInstance?.data?.title || ""}`.trimEnd()}</h2>
+            </div>
+            <div className="w-full">
+              <Tabs
+                isVertical
+                onChange={(tab, index) => {
+                  navigate(`/projects/${project_id}/blueprints/${item_id}/${subitem_id}/${tab.label.toLowerCase()}`);
+                  setSelectedTab(index);
+                }}
+                selectedTab={selectedTab}
+                tabs={tabs}
+              />
+            </div>
+          </div>
+        ) : null}
+        {!isLoading && !isLg ? (
           <div className="w-full">
             <Tabs
-              isVertical
               onChange={(tab, index) => {
-                navigate(`/projects/${project_id}/blueprints/${item_id}/${subitem_id}/${tab.label.toLowerCase()}`);
+                navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
               tabs={tabs}
             />
           </div>
+        ) : null}
+        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9rem)] lg:max-h-[calc(100vh-9rem)]">
+          <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
+            <span className="flex">{tabs[selectedTab].label}</span>
+          </h2>
+          {isLoading ? (
+            <Skeleton type="character_profile_main" />
+          ) : (
+            <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
+              {blueprintInstance?.data && !isFetching && !isFetchingBlueprint
+                ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
+                    const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
+                    if (!blueprintField) return null;
+                    return (
+                      <AdditionalFieldDisplay
+                        key={blueprint_field.id}
+                        blueprint_field={blueprintField}
+                        blueprint_field_data={blueprint_field}
+                      />
+                    );
+                  })
+                : null}
+            </div>
+          )}
         </div>
-        <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]" />
       </div>
     </div>
   );

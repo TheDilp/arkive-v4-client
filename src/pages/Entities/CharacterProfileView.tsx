@@ -593,6 +593,9 @@ function AdditionalFieldDisplay({
               {(field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value ? (
                 <Input isReadOnly label={field.title} name={field.title} onChange={() => {}} value={value} />
               ) : null}
+              {field.field_type === "images_single" && value ? (
+                <Input isReadOnly label={field.title} name={field.title} onChange={() => {}} value={value} />
+              ) : null}
               {(field.field_type === "select" || field.field_type === "select_multiple") && value ? (
                 <Input
                   isReadOnly
@@ -1030,7 +1033,7 @@ export function CharacterProfileView() {
             </div>
           ) : null}
           {type === "additional fields" ? (
-            <ul className="flex flex-col gap-y-2 overflow-hidden animate-in fade-in fill-mode-both">
+            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
               {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
               {existingTemplates?.data?.length && !isFetchingTemplates
                 ? uniqueBy(existingTemplates?.data, ["id"])
