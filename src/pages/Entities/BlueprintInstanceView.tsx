@@ -97,6 +97,36 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
     </div>
   );
 }
+function BlueprintColumn({ ids }: { ids: string | string[] }) {
+  const { data: blueprint_instances, isFetching } = useGetEntities<BlueprintInstanceType>(
+    {
+      data: {},
+      fields: ["id", "title"],
+      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
+    },
+    "blueprint_instances",
+    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+  );
+  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+  return (
+    <div className="flex items-center gap-x-2">
+      <div className="flex w-full items-center justify-center -space-x-4">
+        {blueprint_instances?.data?.slice(0, 1)?.map((blueprint_instance) => blueprint_instance.title)}
+      </div>
+      {blueprint_instances?.data && blueprint_instances?.data?.length > 5 ? (
+        <Tooltip
+          content={blueprint_instances?.data
+            .slice(1)
+            .map((blueprint_instance) => blueprint_instance.title)
+            .join(", ")}>
+          <div className="w-min max-w-min">
+            <Badge label={`+${blueprint_instances.data.length - 5}`} size="sm" variant="secondary" />
+          </div>
+        </Tooltip>
+      ) : null}
+    </div>
+  );
+}
 // function DocumentColumn({ ids }: { ids: string | string[] }) {
 //   const { project_id } = useParams();
 //   const { data: documents, isFetching } = useGetEntities<DocumentType>(
@@ -267,6 +297,9 @@ function createColumns(
                   )
                 </div>
               );
+            }
+            if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
+              return <BlueprintColumn ids={fieldData?.value.value as string | string[]} />;
             }
 
             return "";
