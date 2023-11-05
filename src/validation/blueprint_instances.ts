@@ -15,10 +15,6 @@ export const InsertBlueprintInstanceSchema = z.object({
             value: z.string().or(z.string().array().min(0)).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional(),
             subOptionValue: z.string().optional(),
           })
-          .transform(({ value }) => {
-            if (value === null) return {};
-            return value;
-          })
           .optional(),
       })
       .array()

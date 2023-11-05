@@ -116,10 +116,13 @@ function RandomTableInput({
             onClick={async () => {
               refetch().then((res) => {
                 if (res?.data?.data?.[0]?.title) {
-                  handleChange({
-                    name,
-                    value: { id, value: { value: res?.data?.data?.[0]?.id, subOptionValue: res?.data?.data?.[0]?.subitem_id } },
-                  });
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.value`,
+                      value: { value: res?.data?.data?.[0]?.id, subOptionValue: res?.data?.data?.[0]?.subitem_id },
+                    },
+                  ]);
                 }
               });
             }}
