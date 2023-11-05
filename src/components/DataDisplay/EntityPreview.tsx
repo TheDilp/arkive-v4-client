@@ -19,6 +19,7 @@ export function EntityPreview({ id, title, type, link, icon, image_id, label, ha
           <Avatar
             hasShowImage
             image={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
+            isTooltipDisabled
             label={title}
             size="sm"
           />
