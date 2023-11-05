@@ -198,6 +198,7 @@ export function SearchDrawer() {
                               />
                             ) : (
                               <EntityPreview
+                                icon={"icon" in result_item ? result_item.icon || "" : ""}
                                 id={result_item.id}
                                 link={getSearchLink(
                                   project_id as string,

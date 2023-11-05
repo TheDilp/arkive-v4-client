@@ -9,13 +9,13 @@ export type SearchAllEntitiesType =
         result: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
       },
       {
-        name: "documents" | "maps" | "boards" | "calendars" | "dictionaries";
+        name: "documents" | "maps" | "boards" | "calendars" | "dictionaries" | "blueprints";
         result: { id: string; title: string; icon?: string }[];
       },
       { name: "alter_names"; result: { id: string; parent_id: string; title: string }[] },
       {
-        name: "map_pins" | "character_map_pins" | "events";
-        result: { id: string; title: string; parent_title: string; parent_id: string }[];
+        name: "map_pins" | "character_map_pins" | "events" | "blueprint_instances";
+        result: { id: string; title: string; parent_title: string; parent_id: string; icon?: string }[];
       },
       { name: "nodes" | "edges"; result: { id: string; label: string; parent_title: string; parent_id: string }[] },
     ]
