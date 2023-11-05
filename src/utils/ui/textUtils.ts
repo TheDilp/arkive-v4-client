@@ -47,7 +47,7 @@ export function getSingularEntityType(type: AvailableEntityType | AvailableSubEn
   if (type === "random_table_options") return "random table option";
   if (type === "random_tables") return "random table";
   if (type === "dictionaries") return "dictionary";
-  return type.slice(0, type.length - 1);
+  return getSentenceCase(type.slice(0, type.length - 1));
 }
 
 export function validateHexCode(hex: string) {

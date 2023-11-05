@@ -324,6 +324,8 @@ export function useUpdateSubEntity(
   project_id: string | undefined,
   parent_id: string | undefined,
 ) {
+  const createNotification = useNotifications();
+
   const queryClient = useQueryClient();
   return useMutation(
     async (updateItemValues: { [key: string]: any }) => {
@@ -344,6 +346,12 @@ export function useUpdateSubEntity(
           queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
           queryClient.invalidateQueries([parentEntityType, parent_id]);
         }
+        createNotification({
+          title: getEntityCRUDNotification("blueprint_instances", "update"),
+          variant: "success",
+          icon: IconEnum.check,
+          timer: 2,
+        });
       },
     },
   );
