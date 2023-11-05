@@ -108,10 +108,10 @@ export function RandomTableView() {
       const option = data?.data?.[optionIdx ?? idx];
 
       if (option) {
-        if (option?.suboptions?.length) {
-          const subOptionRoll = await getRollValue(`1d${option.suboptions.length}`, true);
+        if (option?.random_table_suboptions?.length) {
+          const subOptionRoll = await getRollValue(`1d${option.random_table_suboptions.length}`, true);
           const subIdx = subOptionRoll - 1;
-          const subOption = option.suboptions[subIdx];
+          const subOption = option.random_table_suboptions[subIdx];
           if (subOption) {
             createNotification({
               title: `${option.title} - ${subOption.title}`,

@@ -10,7 +10,7 @@ export interface RandomTableOptionType {
   parent_id: string;
   icon?: string | null;
   icon_color?: string | null;
-  suboptions?: RandomTableSubOptionType[];
+  random_table_suboptions?: RandomTableSubOptionType[];
 }
 
 export interface RandomTableType extends BaseEntityType {

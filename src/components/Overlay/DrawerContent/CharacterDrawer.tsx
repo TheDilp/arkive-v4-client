@@ -15,6 +15,7 @@ import {
   CharacterType,
   HandleChangePropsType,
   NotificationType,
+  RandomTableType,
   TagType,
 } from "../../../types";
 import {
@@ -59,7 +60,6 @@ function isSaveDisabled(character: CharacterStateType) {
 function RandomTableInput({
   id,
   title,
-  random_table_options,
   currentValue,
   subOptionValue,
   index,
@@ -77,7 +77,7 @@ function RandomTableInput({
   handleChange: ({ name, value }: { name: string; value: any }) => void;
 }) {
   const name = `character_fields[${template_id}][${index}]`;
-
+  const { project_id } = useParams();
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
     queryKey: ["allEntities", "random_table_options", "random_roll", random_table_id],
@@ -95,20 +95,43 @@ function RandomTableInput({
 
     enabled: false,
   });
-  const selectedOptionSuboptions = random_table_options?.find((opt) => opt?.id === currentValue)?.suboptions;
+
+  const { data: randomTable, isLoading } = useGetEntity<RandomTableType>(
+    random_table_id as string,
+    "random_tables",
+    {
+      data: {
+        project_id,
+      },
+      fields: ["id", "title"],
+      relations: {
+        random_table_options: true,
+      },
+    },
+    {
+      enabled: !!random_table_id,
+      queryKeyConcat: ["field"],
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const selectedOptionSuboptions = randomTable?.data?.random_table_options?.find(
+    (opt) => opt?.id === currentValue,
+  )?.random_table_suboptions;
   return (
     <div className="flex flex-col gap-y-1">
       <div className="flex flex-nowrap items-center gap-x-2">
         <Select
           hasSearch
           isClearable
-          isDisabled={isRolling}
+          isDisabled={isRolling || isLoading}
+          isLoading={isLoading}
           label={title}
           name={`${name}`}
           onChange={({ value }) => {
             handleChange({ name, value: { id, value: { value } } });
           }}
-          options={(random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
+          options={(randomTable?.data?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
           value={currentValue as string}
         />
         <div className="flex self-end pb-1.5">

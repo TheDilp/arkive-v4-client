@@ -30,6 +30,7 @@ import {
   useGenerateDocument,
   useGetEntities,
   useGetEntity,
+  useGetSubEntity,
   useRemoveFromEntity,
   useTable,
 } from "../../hooks";
@@ -46,6 +47,7 @@ import {
   DrawerAtomType,
   ImageType,
   MapType,
+  RandomTableOptionType,
 } from "../../types";
 import {
   dialogAtom,
@@ -112,6 +114,43 @@ const fieldSizeClass = tv({
     },
   },
 });
+
+function RandomTableField({
+  random_table_id,
+  random_table_option_id,
+  field,
+  suboptionValue,
+}: {
+  random_table_id: string | undefined | null;
+  random_table_option_id: string | undefined;
+  field: CharacterFieldType;
+  suboptionValue: string | undefined;
+}) {
+  const { data: option, isLoading } = useGetSubEntity<RandomTableOptionType>(random_table_option_id, "random_table_options", {
+    data: { parent_id: random_table_id },
+    fields: ["id", "title"],
+    relations: {
+      random_table_suboptions: true,
+    },
+  });
+  const subOption =
+    option?.data?.random_table_suboptions?.length && suboptionValue
+      ? option?.data?.random_table_suboptions.find((subopt) => subopt.id === suboptionValue)
+      : null;
+  return (
+    <div>
+      <Input
+        isDisabled={isLoading}
+        isLoading={isLoading}
+        isReadOnly
+        label={field.title}
+        name={field.title}
+        onChange={() => {}}
+        value={`${option?.data?.title || ""} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
+      />
+    </div>
+  );
+}
 
 function relationshipTableColumns(project_id: string, naivgate: NavigateFunction) {
   return [
@@ -544,16 +583,6 @@ function AdditionalFieldDisplay({
               ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
               : "";
           const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
-          const randomTable =
-            field.field_type === "random_table"
-              ? character_fields
-                  .find((f) => f.id === field?.id)
-                  ?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
-              : null;
-
-          const subOption = randomTable
-            ? randomTable.suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
-            : null;
 
           const date =
             field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
@@ -574,15 +603,12 @@ function AdditionalFieldDisplay({
                 />
               ) : null}
               {field.field_type === "random_table" ? (
-                <div>
-                  <Input
-                    isReadOnly
-                    label={field.title}
-                    name={field.title}
-                    onChange={() => {}}
-                    value={`${randomTable?.title} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
-                  />
-                </div>
+                <RandomTableField
+                  field={field}
+                  random_table_id={field.random_table_id}
+                  random_table_option_id={fieldData?.value.value as string | undefined}
+                  suboptionValue={fieldData?.value.subOptionValue}
+                />
               ) : null}
               {field.field_type === "textarea" && value ? (
                 <Editor initialContent={(value as string) || undefined} isReadOnly name={field.title} onChange={() => {}} />

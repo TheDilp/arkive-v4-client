@@ -84,7 +84,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
                   onClick={() =>
                     handleChange({
                       name: "suboptions",
-                      value: (randomTableOption?.suboptions || []).concat({
+                      value: (randomTableOption?.random_table_suboptions || []).concat({
                         id: crypto.randomUUID(),
                         title: "",
                         description: "",
@@ -97,7 +97,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
               </div>
             </div>
             <div className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
-              {randomTableOption.suboptions?.map((suboption, index) => (
+              {randomTableOption.random_table_suboptions?.map((suboption, index) => (
                 <div key={suboption.id} className="flex flex-col gap-y-1">
                   <div className="flex flex-nowrap items-center gap-x-2 border-t border-zinc-700 pt-2">
                     <div className="flex flex-1 items-center gap-x-2">
@@ -114,7 +114,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
                           onClick={() => {
                             handleChange({
                               name: "suboptions",
-                              value: randomTableOption.suboptions?.filter((subopt) => subopt.id !== suboption.id),
+                              value: randomTableOption.random_table_suboptions?.filter((subopt) => subopt.id !== suboption.id),
                             });
                           }}
                           variant="error"
@@ -142,7 +142,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
             isLoading={isFetching || isUpdating}
             label="Save"
             onClick={async () => {
-              const { suboptions, ...rest } = randomTableOption;
+              const { random_table_suboptions: suboptions, ...rest } = randomTableOption;
               const parsedData = UpdateRandomTableOptionSchema.parse({ data: rest, relations: { suboptions } });
               await update(parsedData, {
                 onSuccess: (d) => {
