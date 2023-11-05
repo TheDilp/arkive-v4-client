@@ -32,7 +32,7 @@ import {
 import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
-import { Button, Quickbar } from "..";
+import { Button, Quickbar, Spinner } from "..";
 
 type Props = {
   data?: Partial<GraphType>;
@@ -655,6 +655,13 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
     }
     return () => {};
   }, [drawer]);
+
+  if (isFetching)
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
 
   return (
     <div
