@@ -65,7 +65,7 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
       filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
     },
     "characters",
-    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
   return (
@@ -83,10 +83,10 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
           />
         ))}
       </div>
-      {characters?.data && characters?.data?.length > 5 ? (
+      {characters?.data && characters?.data?.length && characters?.data?.length > 5 ? (
         <Tooltip
           content={characters?.data
-            .slice(5)
+            ?.slice(5)
             .map((char) => getCharacterFullName(char?.first_name, undefined, char?.last_name))
             .join(", ")}>
           <div className="w-min max-w-min">
@@ -105,9 +105,9 @@ function BlueprintColumn({ ids }: { ids: string | string[] }) {
       filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
     },
     "blueprint_instances",
-    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
-  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="flex items-center gap-x-2">
       <div className="flex w-full items-center justify-center -space-x-4">

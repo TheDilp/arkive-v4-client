@@ -550,13 +550,10 @@ function BlueprintFieldInputs({
                   { name: `${name}.value`, value: { value } },
                 ]);
               } else {
-                handleChange({
-                  name,
-                  value: {
-                    id,
-                    value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
-                  },
-                });
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  { name: `${name}.value`, value: { value: Array.isArray(currentValue) ? [...currentValue, value] : [value] } },
+                ]);
               }
             }}
             placeholder="Press enter to search."
@@ -911,7 +908,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: instance?.blueprint_fields
-                      ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                      ? flattenArray(Object.values(instance?.blueprint_fields.filter((t) => !!t?.value?.value) || {})) || []
                       : undefined,
                   },
                 };
@@ -931,7 +928,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: instance?.blueprint_fields
-                      ? flattenArray(Object.values(instance?.blueprint_fields || {})) || []
+                      ? flattenArray(Object.values(instance?.blueprint_fields.filter((t) => !!t?.value?.value) || {})) || []
                       : undefined,
                   },
                 };
