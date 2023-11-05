@@ -73,6 +73,8 @@ export function getSearchFieldTypeLabel(type: string) {
   if (type === "documents_multiple") return "Documents";
   if (type === "locations_single") return "Location";
   if (type === "locations_multiple") return "Locations";
+  if (type === "blueprints_single") return "Locations";
+  if (type === "blueprints_multiple") return "Locations";
   return "";
 }
 export function getSearchFieldTypeSearchType(type: string) {
@@ -82,6 +84,8 @@ export function getSearchFieldTypeSearchType(type: string) {
   if (type === "documents_multiple") return "documents";
   if (type === "locations_single") return "map_pins";
   if (type === "locations_multiple") return "map_pins";
+  if (type === "blueprints_single") return "blueprint_instances";
+  if (type === "blueprints_multiple") return "blueprint_instances";
   return "";
 }
 export function getSearchFieldTypeLinkType(type: string) {

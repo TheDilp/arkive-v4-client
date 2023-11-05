@@ -47,6 +47,7 @@ function FieldRow({
   random_table_id,
   random_table,
   isLoading,
+  blueprint_id,
   changeField,
 }: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
@@ -210,7 +211,7 @@ function FieldRow({
             name={`blueprint_fields[${index}].blueprint_id`}
             onChange={changeField}
             searchEntity="blueprints"
-            value={random_table_id || ""}
+            value={blueprint_id || ""}
           />
         </div>
       ) : null}

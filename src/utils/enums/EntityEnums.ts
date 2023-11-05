@@ -65,6 +65,8 @@ export const SearchFieldTypes = [
   "images_multiple",
   "locations_single",
   "locations_multiple",
+  "blueprints_single",
+  "blueprints_multiple",
 ];
 
 export const BaseCharacterRelationshipOptionsEnum = [

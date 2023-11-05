@@ -303,6 +303,25 @@ function BlueprintFieldInputs({
     },
     { enabled: (fieldType === "images_single" || fieldType === "images_multiple") && !!currentValue },
   );
+  const { data: blueprint_instances } = useGetEntities<BlueprintInstanceType>(
+    {
+      data: {},
+      fields: ["id", "title"],
+      filters: {
+        and: [
+          {
+            operator: Array.isArray(currentValue) ? "in" : "eq",
+            value: currentValue as string | string[],
+            field: "id",
+          },
+        ],
+      },
+    },
+    "blueprint_instances",
+    {
+      enabled: (fieldType === "blueprints_single" || fieldType === "blueprints_multiple") && !!currentValue,
+    },
+  );
   if (fieldType === "text" || fieldType === "number") {
     return (
       <Input
@@ -339,7 +358,7 @@ function BlueprintFieldInputs({
   }
   if (fieldType === "textarea") {
     return (
-      <div className="flex max-h-[30rem] min-h-[10rem] flex-col">
+      <div className="flex max-h-[30rem] min-h-fit flex-col">
         <span className="text-sm text-zinc-300">{title}</span>
         <Editor
           initialContent={currentValue as RemirrorJSON}
@@ -566,6 +585,59 @@ function BlueprintFieldInputs({
           />
         ))}
       </div>
+    );
+  }
+  if (fieldType === "blueprints_single" || fieldType === "blueprints_multiple") {
+    return (
+      <Collapsible label={title}>
+        <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
+          <Search
+            name={name}
+            onChange={({ value }) => {
+              if (fieldType === "blueprints_single") {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  { name: `${name}.value`, value: { value } },
+                ]);
+              } else {
+                handleChange({
+                  name,
+                  value: {
+                    id,
+                    value: {
+                      value: Array.isArray(currentValue) ? [...currentValue, value] : [value],
+                    },
+                  },
+                });
+              }
+            }}
+            placeholder="Press enter to search."
+            searchEntity="blueprint_instances"
+          />
+          {blueprint_instances?.data?.map((blueprint_instance) => (
+            <EntityPreview
+              key={blueprint_instance?.id}
+              clearAction={() =>
+                handleChange({
+                  name,
+                  value: {
+                    id,
+                    value: {
+                      value:
+                        fieldType === "blueprints_multiple"
+                          ? (currentValue as string[]).filter((c) => c !== blueprint_instance?.id)
+                          : null,
+                    },
+                  },
+                })
+              }
+              id={blueprint_instance?.id}
+              title={blueprint_instance.title}
+              type="blueprint_instances"
+            />
+          ))}
+        </div>
+      </Collapsible>
     );
   }
   if (SearchFieldTypes.includes(fieldType)) {

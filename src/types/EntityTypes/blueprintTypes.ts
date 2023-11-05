@@ -14,6 +14,7 @@ export interface BlueprintFieldType {
   calendar_id?: string | null;
   options?: { id: string; value: string }[];
   random_table?: { id: string; title: string; random_table_options: RandomTableOptionType[] };
+  blueprint?: { id: string; title: string };
   calendar?: { id: string; title: string; days: string[]; months: { id: string; title: string; days: number }[] };
 }
 export interface BlueprintType {
