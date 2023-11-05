@@ -59,14 +59,9 @@ function createColumns(
                   }));
                 },
               },
+
               {
-                id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} blueprint`,
-                icon: IconEnum.additional_fields,
-                onClick: row.getToggleExpandedHandler(),
-              },
-              {
-                id: "3",
+                id: "2",
                 label: "Delete blueprint",
                 icon: IconEnum.trash,
                 onClick: () => {

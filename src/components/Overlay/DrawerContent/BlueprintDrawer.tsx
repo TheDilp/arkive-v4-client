@@ -12,7 +12,7 @@ import { BlueprintFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum,
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
 import { Button, Input, Search, Select, Title } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { Collapsible, DrawerLayout } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
@@ -262,7 +262,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
 
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (
-    <div className="flex h-screen max-h-full flex-col gap-y-2 text-white">
+    <DrawerLayout>
       <div className="flex flex-nowrap items-center gap-x-2">
         <div className="flex flex-1 flex-nowrap items-center gap-x-2">
           <Input
@@ -332,7 +332,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           />
         </div>
       </div>
-
       <DragDropContext
         onDragEnd={(result) => {
           if (!result.destination) {
@@ -348,7 +347,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         <Droppable droppableId="droppable">
           {(providedDroppable) => (
             <div
-              className="flex max-h-[75%] flex-col content-start justify-start "
+              className="flex max-h-[75%] flex-col content-start justify-start overflow-y-auto"
               {...providedDroppable.droppableProps}
               ref={providedDroppable.innerRef}>
               {blueprint.blueprint_fields?.length
@@ -385,6 +384,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                             label: "Cancel",
                                             action: () => {},
                                           },
+                                          isOverlay: true,
                                           confirm: {
                                             icon: IconEnum.trash,
                                             variant: "error",
@@ -431,6 +431,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           )}
         </Droppable>
       </DragDropContext>
+
       <div className="mt-auto">
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
@@ -478,6 +479,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           variant="success"
         />
       </div>
-    </div>
+    </DrawerLayout>
   );
 }
