@@ -236,7 +236,7 @@ export default function BlueprintProfileView() {
                   size: "lg",
                   title: "Edit blueprint instance",
                   type: "blueprint_instances",
-                  data: { id: item_id as string, project_id: project_id as string },
+                  data: { id: subitem_id as string, project_id: project_id as string },
                 }));
               }}
             />
