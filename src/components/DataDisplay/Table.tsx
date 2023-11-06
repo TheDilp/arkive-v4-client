@@ -665,7 +665,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                       } ${cell.column.id === "select" ? "sticky left-0" : ""}
-                      ${(cell.column.columnDef.meta as MetaType).pinned ? "sticky left-[2.75rem] z-10 shadow-lg" : ""}
+                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky left-[2.75rem] z-10 shadow-lg" : ""}
                       group-hover:bg-blue-300 ${
                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
                           ? "bg-blue-300"
