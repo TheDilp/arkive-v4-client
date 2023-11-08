@@ -43,10 +43,10 @@ export { createColumnHelper } from "@tanstack/react-table";
 
 const TableClasses = tv({
   slots: {
-    head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] h-12 sticky top-0 border-b flex",
+    head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] max-h-[3rem] h-12 sticky top-0 border-b",
     select: "select-none z-20",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
-    subheaderContainer: "px-2",
+    subheaderContainer: "px-2 max-h-[2.5rem]",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
@@ -70,7 +70,6 @@ const TableClasses = tv({
   variants: {
     isSubheaderEnabled: {
       true: {
-        head: "max-h-20 h-20",
         headerGroup: "border-b border-zinc-600",
       },
     },
@@ -506,7 +505,13 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
         ref={bodyRef}
         className="scrollbar-hidden mih-h-full h-full max-h-[calc(100%-2.5rem)] overflow-auto  border-b border-zinc-700"
         style={{
-          height: expandable ? "" : `${rowVirtualizer.getTotalSize() + Number(headerRef?.current?.clientHeight) + 20}px`,
+          height: expandable
+            ? ""
+            : `${
+                // 20px added to account for the pagination
+                // 40px added to account for the subheader when it is enabled
+                rowVirtualizer.getTotalSize() + Number(headerRef?.current?.clientHeight) + 20 + (isSubheaderEnabled ? 40 : 0)
+              }px`,
         }}>
         <div ref={headerRef} className={head()}>
           {table.getFlatHeaders().map((hdr) => {
