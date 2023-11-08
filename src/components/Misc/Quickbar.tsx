@@ -56,7 +56,7 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
   const { mutate: deleteManyEdges } = useDeleteMany("edges");
 
   return (
-    <div className="absolute bottom-0 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md lg:bottom-0">
+    <div className="absolute bottom-12 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md ">
       <Button
         hasNoBackground
         icon={IconEnum.add}

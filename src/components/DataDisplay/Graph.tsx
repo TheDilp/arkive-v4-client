@@ -816,7 +816,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         zoom={0.6}
       />
       {isViewOnly || isReadOnly ? null : (
-        <div className="flex w-full justify-center">
+        <div className="relative flex w-full justify-center">
           <Quickbar graphTitle={existingGraphData?.data?.title || ""} isViewOnly={isViewOnly ?? false} />
         </div>
       )}
