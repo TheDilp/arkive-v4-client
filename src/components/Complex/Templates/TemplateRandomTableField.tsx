@@ -46,7 +46,16 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
           onChange={({ value }) => {
             handleChange([
               { name: `${name}.id`, value: id },
-              { name: `${name}.random_table[0].related_id`, value },
+              {
+                name: `${name}.random_table.related_id`,
+                value: random_table?.id,
+                // subOptionValue: res?.data?.data?.[0]?.subitem_id,
+              },
+              {
+                name: `${name}.random_table.option_id`,
+                value,
+                // subOptionValue: res?.data?.data?.[0]?.subitem_id,
+              },
             ]);
           }}
           options={(random_table?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}

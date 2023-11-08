@@ -34,7 +34,18 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
             if (fieldType.includes("single")) {
               handleChange([
                 { name: `${name}.id`, value: id },
-                { name: `${name}.characters[0].related_id`, value },
+                {
+                  name: `${name}.characters[0]`,
+                  value: {
+                    related_id: value,
+                    character: {
+                      id: value,
+                      first_name,
+                      last_name,
+                      portrait_id: image,
+                    },
+                  },
+                },
               ]);
             } else {
               handleChange([

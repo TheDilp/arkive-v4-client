@@ -14,13 +14,13 @@ export const InsertBlueprintInstanceSchema = z.object({
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
-        random_tables: z
+        random_table: z
           .object({
             option_id: z.string().optional().nullable(),
             suboption_id: z.string().optional().nullable(),
             related_id: z.string(),
           })
-          .array()
+
           .optional()
           .nullable(),
         value: z.string().or(z.number()).or(z.string().array()).or(z.number().array()).or(z.null()).optional().nullable(),
@@ -43,13 +43,13 @@ export const UpdateBlueprintInstanceSchema = z.object({
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
-        random_tables: z
+        random_table: z
           .object({
             option_id: z.string().optional().nullable(),
             suboption_id: z.string().optional().nullable(),
             related_id: z.string(),
           })
-          .array()
+
           .optional()
           .nullable(),
         value: z.string().or(z.number()).or(z.string().array()).or(z.number().array()).or(z.null()).optional().nullable(),

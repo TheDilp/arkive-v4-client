@@ -314,7 +314,6 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     blueprint_fields: instance?.blueprint_fields,
                   },
                 };
-
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
                 await update(parsedData, {
                   onSuccess: (res) => {
