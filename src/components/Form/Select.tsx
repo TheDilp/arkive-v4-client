@@ -126,7 +126,7 @@ const SelectOption = tv({
     "flex",
     "items-center",
     "justify-start",
-    "border-zinc-700",
+    "border-zinc-500",
     "border-b",
     "first:border-t",
     "last:border-b-0",

@@ -36,7 +36,7 @@ const SearchClasses = tv({
     helperText: "text-xs truncate block",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-900 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
   },
   variants: {
     variant: {
@@ -111,6 +111,7 @@ const SearchItem = tv({
     "focus-visible:ring-0",
     "hover:cursor-pointer",
     "hover:bg-zinc-700",
+    "hover:bg-zinc-500",
     "flex",
     "items-center",
     "justify-start",
@@ -131,6 +132,13 @@ const SearchItem = tv({
       true: "bg-blue-500",
     },
   },
+  compoundVariants: [
+    {
+      isActive: true,
+      isSelected: true,
+      className: "bg-blue-400",
+    },
+  ],
 });
 
 const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(
