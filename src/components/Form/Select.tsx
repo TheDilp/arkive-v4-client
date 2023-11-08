@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
@@ -246,7 +247,9 @@ export function Select({
     open: isOpen,
     onOpenChange: (o, e) => {
       // @ts-ignore
-      if (options.length !== 0 && !isDisabled && e?.target?.dataset?.option !== "clearable") setIsOpen(o);
+      if (options.length !== 0 && !isDisabled && e?.target?.dataset?.option !== "clearable") {
+        setIsOpen(o);
+      }
     },
     whileElementsMounted: autoUpdate,
     middleware: [
@@ -359,6 +362,8 @@ export function Select({
             <div ref={refs.setFloating} className={optionsContainer()} style={floatingStyles} {...getFloatingProps()}>
               {hasSearch ? (
                 <input
+                  // @ts-ignore
+                  autoFocus="off"
                   className="sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none"
                   onChange={(e) => {
                     if (e.target.value) {

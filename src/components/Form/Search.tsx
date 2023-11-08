@@ -305,8 +305,8 @@ export function Search({
 
               if ((!value || isMultiple) && activeIndex === null) {
                 refetch();
-              } else if ((!value || isMultiple) && typeof activeIndex === "number") {
-                const item = data?.data?.[activeIndex];
+              } else if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
+                const item = data?.data?.[activeIndex || 0];
                 if (item) {
                   onChange({
                     name,
