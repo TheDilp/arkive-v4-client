@@ -2,25 +2,13 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  Avatar,
-  Badge,
-  Button,
-  createColumnHelper,
-  Dropdown,
-  Skeleton,
-  Table,
-  TablePageLayout,
-  Tooltip,
-} from "../../components";
+import { Avatar, Badge, Button, createColumnHelper, Dropdown, Table, TablePageLayout, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import {
+  BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
-  CharacterType,
   DialogAtomType,
-  DocumentType,
   DrawerAtomType,
-  MapPinType,
   NotificationType,
 } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
@@ -57,41 +45,32 @@ function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
 }
 const columnHelper = createColumnHelper<BlueprintInstanceType>();
 
-function CharacterColumn({ ids }: { ids: string | string[] }) {
+function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
   const { project_id } = useParams();
-  const { data: characters, isFetching } = useGetEntities<CharacterType>(
-    {
-      data: { project_id },
-      fields: ["id", "first_name", "last_name", "portrait_id"],
-      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
-    },
-    "characters",
-    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
-  );
-  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
+
   return (
     <div className="flex items-center gap-x-2">
       <div className="flex w-full items-center justify-center -space-x-4">
-        {characters?.data?.slice(0, 5)?.map((char) => (
+        {characters?.slice(0, 5)?.map((char) => (
           <Avatar
-            key={char.id}
-            image={getImageURL(project_id as string, "images", char?.portrait_id || "")}
-            initials={getAvatarInitials(char.first_name, char?.last_name || "")}
+            key={char.related_id}
+            image={getImageURL(project_id as string, "images", char?.character?.portrait_id || "")}
+            initials={getAvatarInitials(char.character.first_name, char.character?.last_name || "")}
             isBordered
-            label={getCharacterFullName(char.first_name, char?.last_name || "")}
+            label={getCharacterFullName(char.character.first_name, char?.character?.last_name || "")}
             size="sm"
             tooltipAllowedPlacements={["left", "right"]}
           />
         ))}
       </div>
-      {characters?.data && characters?.data?.length && characters?.data?.length > 5 ? (
+      {characters && characters?.length && characters?.length > 5 ? (
         <Tooltip
-          content={characters?.data
+          content={characters
             ?.slice(5)
-            .map((char) => getCharacterFullName(char?.first_name, undefined, char?.last_name))
+            .map((char) => getCharacterFullName(char?.character?.first_name, undefined, char?.character?.last_name))
             .join(", ")}>
           <div className="w-min max-w-min">
-            <Badge label={`+${characters.data.length - 5}`} size="sm" variant="secondary" />
+            <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />
           </div>
         </Tooltip>
       ) : null}
@@ -113,64 +92,37 @@ function BlueprintColumn({ ids }: { ids: string | string[] }) {
     <ShowMultipleWithBadge titles={blueprint_instances?.data?.map((blueprint_instance) => blueprint_instance.title) || []} />
   );
 }
-function DocumentColumn({ ids }: { ids: string | string[] }) {
-  const { project_id } = useParams();
-  const { data: documents } = useGetEntities<DocumentType>(
-    {
-      data: { project_id },
-      fields: ["id", "title", "icon", "image_id"],
-      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
-    },
-    "documents",
-    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
-  );
-  return <ShowMultipleWithBadge titles={(documents?.data || []).map((doc) => doc.title)} />;
-}
-function LocationColumn({ ids }: { ids: string | string[] }) {
+
+function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
-  const { data: locations, isFetching } = useGetEntities<MapPinType>(
-    {
-      data: { project_id },
-      fields: ["id", "title", "icon", "image_id", "parent_id"],
-      filters: {
-        and: [
-          { field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" },
-          { field: "title", operator: "is not", value: null },
-          { field: "character_id", operator: "is", value: null },
-        ],
-      },
-    },
-    "map_pins",
-    { enabled: ids?.length > 0, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
-  );
-  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
+
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations?.data || [])?.map((l) => l?.title || "").filter((l) => !!l)} />
+      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.map_pin?.title || "").filter((l) => !!l)} />
       <Dropdown
         allowedPlacements={["left-start"]}
-        items={(locations?.data || []).map((loc) => ({
-          id: loc.id,
-          label: loc.title || "",
-          icon: loc?.icon,
+        items={(locations || []).map(({ map_pin }) => ({
+          id: map_pin.id,
+          label: map_pin.title || "",
+          icon: map_pin?.icon,
           subItems: [
             {
-              id: `go_to_${loc.id}`,
-              label: `Go to ${loc.title}`,
-              onClick: () => navigate(`/projects/${project_id}/maps/${loc?.parent_id}/${loc?.id}`),
+              id: `go_to_${map_pin.id}`,
+              label: `Go to ${map_pin.title}`,
+              onClick: () => navigate(`/projects/${project_id}/maps/${map_pin?.parent_id}/${map_pin?.id}`),
             },
             {
-              id: `preview_${loc.id}`,
-              label: `Preview ${loc.title} map`,
+              id: `preview_${map_pin.id}`,
+              label: `Preview ${map_pin.title} map`,
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
                   type: "entity_preview",
                   size: "half",
                   title: "Preview map",
-                  data: { id: loc.parent_id, subitem_id: loc.id, entity_type: "maps" },
+                  data: { id: map_pin?.parent_id, subitem_id: map_pin.id, entity_type: "maps" },
                 })),
             },
           ],
@@ -213,20 +165,12 @@ function createColumns(
           id: field.title,
           header: field.title,
           cell: ({ row }) => {
-            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.value?.id === field.id);
-            const value =
-              fieldData?.value && fieldData?.value?.value
-                ? `${fieldData?.value?.value} ${
-                    fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""
-                  }`
-                : "";
+            const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
 
-            // const date =
-            //   field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
-            if ((field.field_type === "text" || field.field_type === "number") && value) return value;
-            if ((field.field_type === "select" || field.field_type === "select_multiple") && value) {
+            if (field.field_type === "text" || field.field_type === "number") return fieldData?.value || "";
+            if (field.field_type === "select" || field.field_type === "select_multiple") {
               return (
-                (Array.isArray(fieldData?.value?.value) ? fieldData?.value?.value : [fieldData?.value?.value])
+                (Array.isArray(fieldData?.value) ? fieldData?.value : [fieldData?.value])
                   ?.map((id) => {
                     const opt = field?.options?.find((o) => o.id === id);
                     return opt?.value || "";
@@ -235,40 +179,41 @@ function createColumns(
               );
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
-              return (
+              return fieldData?.images?.map((image) => (
                 <Avatar
+                  key={image.related_id}
                   hasShowImage
-                  image={getImageURL(project_id as string, "images", fieldData?.value?.value as string)}
+                  image={getImageURL(project_id as string, "images", image.related_id)}
                   size="sm"
                 />
-              );
+              ));
             }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
-              return <CharacterColumn ids={fieldData?.value?.value as string | string[]} />;
+              return <CharacterColumn characters={fieldData?.characters || []} />;
             }
             if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
-              return <DocumentColumn ids={fieldData?.value?.value as string | string[]} />;
+              return <ShowMultipleWithBadge titles={(fieldData?.documents || []).map((doc) => doc.document.title)} />;
             }
             if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
-              return <LocationColumn ids={fieldData?.value?.value as string | string[]} />;
+              return <LocationColumn locations={fieldData?.map_pins || []} />;
             }
 
-            if (field.field_type === "random_table") {
-              const randomTable =
-                field.field_type === "random_table" && fieldData
-                  ? fieldData?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value?.value)
-                  : null;
-              const subOption =
-                randomTable && fieldData?.value?.subOptionValue
-                  ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
-                  : null;
+            // if (field.field_type === "random_table") {
+            //   const randomTable =
+            //     field.field_type === "random_table" && fieldData
+            //       ? fieldData?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value)
+            //       : null;
+            //   const subOption =
+            //     randomTable && fieldData?.value?.subOptionValue
+            //       ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
+            //       : null;
 
-              return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
-            }
+            //   return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
+            // }
             if (field.field_type === "dice_roll" && field?.formula) {
               return (
                 <div className="flex items-center gap-x-2 [&>button]:px-0">
-                  <span>{(fieldData?.value?.value as number) || ""}</span>
+                  <span>{(fieldData?.value as number) || ""}</span>
                   (
                   <Button
                     hasNoBackground
@@ -286,7 +231,7 @@ function createColumns(
               );
             }
             if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
-              return <BlueprintColumn ids={fieldData?.value.value as string | string[]} />;
+              return <BlueprintColumn ids={fieldData?.value as string | string[]} />;
             }
 
             return "";
@@ -376,13 +321,16 @@ export function BlueprintInstanceView() {
     },
     fields: ["id", "title", "title_name"],
   });
-  useChangeNavbarTitle(` Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
+  useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
 
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
         project_id,
         parent_id: item_id,
+      },
+      relations: {
+        blueprint_fields: true,
       },
       orderBy,
       pagination,

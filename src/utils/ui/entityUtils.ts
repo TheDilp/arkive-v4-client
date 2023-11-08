@@ -1,3 +1,5 @@
+import { isEqual } from "remirror";
+
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -117,7 +119,14 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
 export function getBlueprintFieldValueFromType(
   type: BlueprintFieldTypes,
 ): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "value" | null {
-  if (type === "text" || type === "number" || type === "select" || type === "select_multiple" || type === "textarea")
+  if (
+    type === "text" ||
+    type === "number" ||
+    type === "select" ||
+    type === "select_multiple" ||
+    type === "textarea" ||
+    type === "dice_roll"
+  )
     return "value";
   if (type === "characters_single" || type === "characters_multiple") return "characters";
   if (type === "documents_single" || type === "documents_multiple") return "documents";
@@ -138,13 +147,15 @@ export function getDifferenceForBlueprintInstance(
     const idx = originalFields.findIndex((original_field) => original_field.id === field.id);
     if (idx === -1) return true;
     const originalField = originalFields[idx];
-    if (typeof originalField.value === "string" && typeof field.value === "string" && originalField.value !== field.value)
-      return true;
-    if (Array.isArray(originalField.value) && Array.isArray(field.value)) {
-      if (!!originalField.value && !field.value.every((v) => (originalField?.value as any[])?.includes(v))) {
-        return true;
-      }
+    if (typeof originalField.value === "string" || typeof field.value === "string")
+      return !isEqual(field.value, originalField.value);
+    if (typeof originalField.value === "number" || typeof field.value === "number")
+      return !isEqual(field.value, originalField.value);
+
+    if (Array.isArray(originalField.value) || Array.isArray(field.value)) {
+      return !isEqual(field.value, originalField.value);
     }
+
     if (originalField.characters.length !== field.characters.length) return true;
     if (originalField.documents.length !== field.documents.length) return true;
     if (originalField.map_pins.length !== field.map_pins.length) return true;

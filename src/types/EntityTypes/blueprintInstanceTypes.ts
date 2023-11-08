@@ -23,7 +23,7 @@ export interface BlueprintInstanceBlueprintFieldType {
     related_id: string;
   }[];
   map_pins: {
-    map_pin: Pick<MapPinType, "id" | "title" | "icon">;
+    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id">;
     related_id: string;
   }[];
   images: {

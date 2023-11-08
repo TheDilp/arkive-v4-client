@@ -19,7 +19,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
 
   return (
     <Collapsible label={title}>
-      <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           name={name}
           onChange={({ value, first_name, last_name, image }) => {

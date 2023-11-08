@@ -21,6 +21,7 @@ import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "..
 import {
   TemplateBooleanField,
   TemplateCharacterField,
+  TemplateDiceRollField,
   TemplateDocumentField,
   TemplateImageField,
   TemplateInputField,
@@ -46,83 +47,6 @@ function FieldTemplateRows({
   blueprint_fields_data: BlueprintInstanceBlueprintFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
 }) {
-  // const [isRolling, setIsRolling] = useState(false);
-  // const randomTableFields = blueprint_fields
-  //   .filter((field) => field.field_type === "random_table")
-  //   .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
-
-  // const diceRollFields = blueprint_fields
-  //   .filter((field) => field.field_type === "dice_roll")
-  //   .map((field) => ({ field_id: field.id, formula: field?.formula }));
-
-  // const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
-  //   ["randomTables", "many", template_id],
-  //   async () =>
-  //     FetchFunction({
-  //       url: `${baseURLS.baseServer}/random_table_options/random/many`,
-  //       body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
-  //       method: "POST",
-  //     }),
-  //   { enabled: false },
-  // );
-  // const hasRandomTableOrRoll = blueprint_fields.some(
-  //   (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
-  // );
-
-  // const collapsibleActions = hasRandomTableOrRoll
-  //   ? [
-  //       {
-  //         icon: IconEnum.d20,
-  //         onClick: async (e: Event) => {
-  //           e.preventDefault();
-  //           const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
-  //           for (let i = 0; i < diceRollFields.length; i += 1) {
-  //             const formula = diceRollFields[i]?.formula;
-
-  //             if (formula) {
-  //               if (!isRolling) setIsRolling(true);
-  //               const idx = blueprint_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
-  //               if (idx > -1) {
-  //                 // eslint-disable-next-line no-await-in-loop
-  //                 const value = await getRollValue(formula, true);
-  //                 fieldsToChange.push({
-  //                   name: `blueprint_fields[${template_id}][${idx}]`,
-  //                   value: { id: diceRollFields[i].field_id, value: { value } },
-  //                 });
-  //               }
-  //             }
-  //           }
-  //           handleChange(fieldsToChange);
-  //           setIsRolling(false);
-  //           if (randomTableFields.length) await refetch();
-  //         },
-  //         tooltip: "Autoroll all random table and dice roll fields in this template.",
-  //       },
-  //     ]
-  //   : [];
-
-  // useEffect(() => {
-  //   if (data?.data?.length) {
-  //     const fieldsToChange = [];
-  //     for (let i = 0; i < data?.data?.length; i += 1) {
-  //       const idx = blueprint_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
-  //       if (idx > -1) {
-  //         fieldsToChange.push({
-  //           name: `blueprint_fields[${template_id}][${idx}]`,
-  //           value: {
-  //             id: blueprint_fields[idx].id,
-  //             value: {
-  //               value: data?.data[i].random_table?.[0]?.id,
-  //               subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
-  //             },
-  //           },
-  //         });
-  //       }
-  //     }
-  //     handleChange(fieldsToChange);
-  //   }
-  // }, [data?.data]);
-
   return (
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
@@ -184,6 +108,21 @@ function FieldTemplateRows({
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.value as boolean | null
                 }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          if (template_field.field_type === "dice_roll")
+            return (
+              <TemplateDiceRollField
+                key={template_field.id}
+                currentValue={
+                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
+                    ?.value as string
+                }
+                formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
                 name={baseName}

@@ -110,7 +110,6 @@ const SearchItem = tv({
     "focus-visible:outline-none",
     "focus-visible:ring-0",
     "hover:cursor-pointer",
-    "hover:bg-zinc-700",
     "hover:bg-zinc-500",
     "flex",
     "items-center",
@@ -126,7 +125,7 @@ const SearchItem = tv({
       sm: "h-8",
     },
     isActive: {
-      true: "bg-zinc-700",
+      true: "bg-zinc-500",
     },
     isSelected: {
       true: "bg-blue-500",
@@ -205,7 +204,7 @@ export function Search({
       icon?: string;
       parent_id?: string;
     }[]
-  >({ data: { search_term: inputValue }, limit: 5 }, searchEntity, project_id as string, {
+  >({ data: { search_term: inputValue }, limit: 10 }, searchEntity, project_id as string, {
     enabled: false,
     queryKeyConcat: [searchTerm, inputValue, name],
   });

@@ -24,10 +24,10 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
         onChange={({ value }) =>
           handleChange([
             { name: `${name}.id`, value: id },
-            { name: `${name}.value`, value: { value } },
+            { name: `${name}.value`, value },
           ])
         }
-        value={currentValue as string}
+        value={currentValue || ""}
       />
       <div className="flex self-end pb-1.5">
         <Button
@@ -44,7 +44,10 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
                 .then((r: any) => {
                   const rollData = DiceRollParser.parseFinalResults(r);
                   if (rollData?.valid) {
-                    handleChange({ name, value: { id, value: { value: rollData.value } } });
+                    handleChange([
+                      { name: `${name}.id`, value: id },
+                      { name: `${name}.value`, value: rollData.value },
+                    ]);
                   }
                 })
                 .catch(() => {
