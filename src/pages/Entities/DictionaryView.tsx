@@ -18,7 +18,7 @@ function createColumns(
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
-      cell: (info) => <div className="italic">{info.getValue()}</div>,
+      cell: (info) => <div className="pr-1 italic">{info.getValue()}</div>,
       meta: {
         sortable: true,
         filterOptions: NameFilters,
