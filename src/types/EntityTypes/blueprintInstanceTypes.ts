@@ -1,14 +1,48 @@
 import { BlueprintFieldType, BlueprintType } from "./blueprintTypes";
+import { CharacterType } from "./characterTypes";
+import { DocumentType } from "./documentTypes";
 import { AdditionalFieldValueType } from "./fieldsTypes";
+import { ImageType } from "./imageTypes";
+import { MapPinType } from "./mapTypes";
+import { RandomTableType } from "./randomTableTypes";
 import { TagType } from "./tagTypes";
 
 export interface BlueprintInstaceFieldsType extends BlueprintFieldType, AdditionalFieldValueType {}
-
+export interface BlueprintInstanceBlueprintFieldType {
+  id: string;
+  title: string;
+  sort: number;
+  parent_id: string;
+  field_type: BlueprintFieldType;
+  characters: {
+    related_id: string;
+    character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
+  }[];
+  documents: {
+    document: Pick<DocumentType, "id" | "title" | "icon">;
+    related_id: string;
+  }[];
+  map_pins: {
+    map_pin: Pick<MapPinType, "id" | "title" | "icon">;
+    related_id: string;
+  }[];
+  images: {
+    image: Pick<ImageType, "id" | "title">;
+    related_id: string;
+  }[];
+  random_table: {
+    option_id?: string;
+    suboption_id?: string;
+    related_id: string;
+  };
+  random_table_data: Pick<RandomTableType, "id" | "title">;
+  value: string | number | null | string[] | number[];
+}
 export interface BlueprintInstanceType {
   id: string;
   title: string;
   parent_id: string;
-  blueprint: BlueprintType;
+  blueprint?: BlueprintType;
   tags: TagType[];
-  blueprint_fields: BlueprintInstaceFieldsType[];
+  blueprint_fields: BlueprintInstanceBlueprintFieldType[];
 }

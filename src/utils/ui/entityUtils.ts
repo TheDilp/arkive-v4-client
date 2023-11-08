@@ -108,3 +108,15 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
   if (type === "locations_multiple") return { minSize: 15, maxSize: 15 };
   return { minSize: 10, maxSize: 10 };
 }
+export function getBlueprintFieldValueFromType(
+  type: BlueprintFieldTypes,
+): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "value" | null {
+  if (type === "text" || type === "number" || type === "select" || type === "select_multiple" || type === "textarea")
+    return "value";
+  if (type === "characters_single" || type === "characters_multiple") return "characters";
+  if (type === "documents_single" || type === "documents_multiple") return "documents";
+  if (type === "locations_single" || type === "locations_multiple") return "map_pins";
+  if (type === "images_single" || type === "images_multiple") return "images";
+  if (type === "random_table") return "random_tables";
+  return null;
+}

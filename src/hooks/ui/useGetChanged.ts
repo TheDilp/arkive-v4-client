@@ -32,9 +32,18 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
       }
       set(updatedData, name, value);
     }
+
     setData(updatedData);
     setChangedFields(changedFieldsUpdated);
-    setChangedData(pick(updatedData, changedFieldsUpdated));
+    setChangedData(
+      pick(
+        updatedData,
+        changedFieldsUpdated.map((field) => {
+          if (field.includes("[") || field.includes("]")) return field.split("[")[1];
+          return field;
+        }),
+      ),
+    );
   };
 
   function resetChanges() {

@@ -18,6 +18,7 @@ import {
   BlueprintInstanceType,
   CharacterType,
   DialogAtomType,
+  DocumentType,
   DrawerAtomType,
   MapPinType,
   NotificationType,
@@ -38,8 +39,8 @@ import {
 
 function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
   return (
-    <>
-      <div className="w-full truncate">{titles?.[0]}</div>
+    <div className="flex max-w-full items-center gap-x-2">
+      <div className="max-w-full truncate">{titles?.[0]}</div>
       {titles?.length > 1 ? (
         <Tooltip
           content={titles
@@ -51,7 +52,7 @@ function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
           </div>
         </Tooltip>
       ) : null}
-    </>
+    </div>
   );
 }
 const columnHelper = createColumnHelper<BlueprintInstanceType>();
@@ -109,42 +110,22 @@ function BlueprintColumn({ ids }: { ids: string | string[] }) {
   );
 
   return (
-    <div className="flex items-center gap-x-2">
-      <div className="flex w-full items-center justify-center -space-x-4">
-        {blueprint_instances?.data?.slice(0, 1)?.map((blueprint_instance) => blueprint_instance.title)}
-      </div>
-      {blueprint_instances?.data && blueprint_instances?.data?.length > 5 ? (
-        <Tooltip
-          content={blueprint_instances?.data
-            .slice(1)
-            .map((blueprint_instance) => blueprint_instance.title)
-            .join(", ")}>
-          <div className="w-min max-w-min">
-            <Badge label={`+${blueprint_instances.data.length - 5}`} size="sm" variant="secondary" />
-          </div>
-        </Tooltip>
-      ) : null}
-    </div>
+    <ShowMultipleWithBadge titles={blueprint_instances?.data?.map((blueprint_instance) => blueprint_instance.title) || []} />
   );
 }
-// function DocumentColumn({ ids }: { ids: string | string[] }) {
-//   const { project_id } = useParams();
-//   const { data: documents, isFetching } = useGetEntities<DocumentType>(
-//     {
-//       data: { project_id },
-//       fields: ["id", "title", "icon", "image_id"],
-//       filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
-//     },
-//     "documents",
-//     { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
-//   );
-//   if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
-//   return (
-//     <div className="flex items-center gap-x-2">
-//       <ShowMultipleWithBadge titles={(documents?.data || []).map((doc) => doc.title)} />
-//     </div>
-//   );
-// }
+function DocumentColumn({ ids }: { ids: string | string[] }) {
+  const { project_id } = useParams();
+  const { data: documents } = useGetEntities<DocumentType>(
+    {
+      data: { project_id },
+      fields: ["id", "title", "icon", "image_id"],
+      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
+    },
+    "documents",
+    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+  );
+  return <ShowMultipleWithBadge titles={(documents?.data || []).map((doc) => doc.title)} />;
+}
 function LocationColumn({ ids }: { ids: string | string[] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -264,6 +245,9 @@ function createColumns(
             }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
               return <CharacterColumn ids={fieldData?.value?.value as string | string[]} />;
+            }
+            if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
+              return <DocumentColumn ids={fieldData?.value?.value as string | string[]} />;
             }
             if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
               return <LocationColumn ids={fieldData?.value?.value as string | string[]} />;

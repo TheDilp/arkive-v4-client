@@ -39,12 +39,12 @@ body {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  @apply z-0 bg-zinc-700;
+  @apply z-0 bg-zinc-600;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  @apply z-0 bg-zinc-600;
+  @apply z-0 bg-zinc-500;
 }
 
 /* Handle on hover */
