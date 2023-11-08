@@ -10,7 +10,13 @@ import {
   BlueprintType,
   HandleChangePropsType,
 } from "../../../types";
-import { drawerAtom, getBlueprintFieldValueFromType, IconEnum, useNotifications } from "../../../utils";
+import {
+  drawerAtom,
+  getBlueprintFieldValueFromType,
+  getDifferenceForBlueprintInstance,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
 import {
   TemplateBooleanField,
@@ -333,7 +339,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           isLoading={isCreating || isUpdating}
           label={instance?.id ? "Update" : "Create"}
           onClick={async () => {
-            if (changedData) {
+            if (changedData && existingInstance?.data) {
               if (instance?.id) {
                 const dataToParse = {
                   data: {
@@ -343,7 +349,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
-                    blueprint_fields: instance?.blueprint_fields,
+                    blueprint_fields: getDifferenceForBlueprintInstance(existingInstance?.data, instance),
                   },
                 };
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);

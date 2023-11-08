@@ -1,4 +1,10 @@
-import { AvailableEntityType, AvailableSubEntityType, BlueprintFieldTypes } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  BlueprintFieldTypes,
+  BlueprintInstanceBlueprintFieldType,
+  BlueprintInstanceType,
+} from "../../types";
 import { IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType) {
@@ -119,4 +125,65 @@ export function getBlueprintFieldValueFromType(
   if (type === "images_single" || type === "images_multiple") return "images";
   if (type === "random_table") return "random_tables";
   return null;
+}
+
+export function getDifferenceForBlueprintInstance(
+  originalInstance: BlueprintInstanceType,
+  updatedInstance: BlueprintInstanceType,
+): BlueprintInstanceBlueprintFieldType[] {
+  const fields = [...updatedInstance.blueprint_fields];
+  const originalFields = originalInstance.blueprint_fields;
+
+  return fields.filter((field) => {
+    const idx = originalFields.findIndex((original_field) => original_field.id === field.id);
+    if (idx === -1) return true;
+    const originalField = originalFields[idx];
+    if (typeof originalField.value === "string" && typeof field.value === "string" && originalField.value !== field.value)
+      return true;
+    if (Array.isArray(originalField.value) && Array.isArray(field.value)) {
+      if (!!originalField.value && !field.value.every((v) => (originalField?.value as any[])?.includes(v))) {
+        return true;
+      }
+    }
+    if (originalField.characters.length !== field.characters.length) return true;
+    if (originalField.documents.length !== field.documents.length) return true;
+    if (originalField.map_pins.length !== field.map_pins.length) return true;
+    if (originalField.images.length !== field.images.length) return true;
+
+    if (originalField.random_table?.related_id !== field.random_table?.related_id) return true;
+    if (originalField.random_table?.option_id !== field.random_table?.option_id) return true;
+    if (originalField.random_table?.suboption_id !== field.random_table?.suboption_id) return true;
+
+    if (
+      !!originalField.characters.length &&
+      !!field.characters.length &&
+      originalField.characters.length === field.characters.length
+    ) {
+      return !field.characters.every((char) =>
+        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id),
+      );
+    }
+    if (
+      !!originalField.documents.length &&
+      !!field.documents.length &&
+      originalField.documents.length === field.documents.length
+    ) {
+      return !field.documents.every((char) =>
+        originalField.documents.some((original_char) => {
+          return original_char?.related_id === char?.related_id;
+        }),
+      );
+    }
+    if (!!originalField.map_pins.length && !!field.map_pins.length && originalField.map_pins.length === field.map_pins.length) {
+      return !field.map_pins.every((char) =>
+        originalField.map_pins.some((original_char) => original_char?.related_id === char?.related_id),
+      );
+    }
+    if (!!originalField.images.length && !!field.images.length && originalField.images.length === field.images.length) {
+      return !field.images.every((char) =>
+        originalField.images.some((original_char) => original_char?.related_id === char?.related_id),
+      );
+    }
+    return false;
+  });
 }
