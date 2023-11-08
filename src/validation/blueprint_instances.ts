@@ -23,7 +23,15 @@ export const InsertBlueprintInstanceSchema = z.object({
 
           .optional()
           .nullable(),
-        value: z.string().or(z.number()).or(z.string().array()).or(z.number().array()).or(z.null()).optional().nullable(),
+        value: z
+          .string()
+          .or(z.number())
+          .or(z.string().array())
+          .or(z.number().array())
+          .or(z.null())
+          .or(z.record(z.string(), z.any()))
+          .optional()
+          .nullable(),
       })
       .array()
       .optional(),
@@ -52,7 +60,15 @@ export const UpdateBlueprintInstanceSchema = z.object({
 
           .optional()
           .nullable(),
-        value: z.string().or(z.number()).or(z.string().array()).or(z.number().array()).or(z.null()).optional().nullable(),
+        value: z
+          .string()
+          .or(z.number())
+          .or(z.string().array())
+          .or(z.number().array())
+          .or(z.null())
+          .or(z.record(z.string(), z.any()))
+          .optional()
+          .nullable(),
       })
       .array()
       .optional(),

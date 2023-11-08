@@ -21,7 +21,7 @@ export function TemplateTextareaField({ title, name, currentValue, handleChange,
         onChange={({ value }) =>
           handleChange([
             { name: `${name}.id`, value: id },
-            { name: `${name}.value`, value: { value } },
+            { name: `${name}.value`, value },
           ])
         }
       />

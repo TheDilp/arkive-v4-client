@@ -1,4 +1,4 @@
-import { isEqual } from "remirror";
+import { isEqual, isRemirrorJSON } from "remirror";
 
 import {
   AvailableEntityType,
@@ -151,7 +151,9 @@ export function getDifferenceForBlueprintInstance(
       return !isEqual(field.value, originalField.value);
     if (typeof originalField.value === "number" || typeof field.value === "number")
       return !isEqual(field.value, originalField.value);
-
+    if (isRemirrorJSON(originalField.value) || isRemirrorJSON(field.value)) {
+      return !isEqual(field.value, originalField.value);
+    }
     if (Array.isArray(originalField.value) || Array.isArray(field.value)) {
       return !isEqual(field.value, originalField.value);
     }
@@ -195,6 +197,7 @@ export function getDifferenceForBlueprintInstance(
         originalField.images.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
+
     return false;
   });
 }
