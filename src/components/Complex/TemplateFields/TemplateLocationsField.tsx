@@ -1,5 +1,5 @@
-import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
+import { HandleChangePropsType, MapPinType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { Collapsible } from "../../Layout";
@@ -9,12 +9,12 @@ type Props = {
   name: string;
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
-  fieldType: "characters_single" | "characters_multiple";
+  fieldType: "locations_single" | "locations_multiple";
 
-  currentValue: BlueprintInstanceBlueprintFieldType["characters"];
+  currentValue: { related_id: string; map_pin: Pick<MapPinType, "id" | "title" | "icon"> }[];
 };
 
-export function TemplateCharacterField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
+export function TemplateLocationsField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
   const createNotification = useNotifications();
 
   return (
@@ -22,11 +22,11 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
       <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
         <Search
           name={name}
-          onChange={({ value, first_name, last_name, image }) => {
+          onChange={({ value, label, icon }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
               createNotification({
                 timer: 3,
-                title: "Cannot add the same character more than once.",
+                title: "Cannot add same map pin more than once.",
                 variant: "warning",
                 icon: IconEnum.warning,
               });
@@ -35,14 +35,13 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
               handleChange([
                 { name: `${name}.id`, value: id },
                 {
-                  name: `${name}.characters[0]`,
+                  name: `${name}.map_pins[0]`,
                   value: {
                     related_id: value,
-                    character: {
+                    map_pin: {
                       id: value,
-                      first_name,
-                      last_name,
-                      portrait_id: image,
+                      title: label,
+                      icon,
                     },
                   },
                 },
@@ -51,14 +50,13 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
               handleChange([
                 { name: `${name}.id`, value: id },
                 {
-                  name: `${name}.characters[${currentValue?.length || 0}]`,
+                  name: `${name}.map_pins[${currentValue.length}]`,
                   value: {
                     related_id: value,
-                    character: {
+                    map_pin: {
                       id: value,
-                      first_name,
-                      last_name,
-                      portrait_id: image,
+                      title: label,
+                      icon,
                     },
                   },
                 },
@@ -66,23 +64,23 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
             }
           }}
           placeholder="Press enter to search."
-          searchEntity="characters"
+          searchEntity="map_pins"
         />
         {(currentValue || [])?.map((val) => (
           <EntityPreview
             key={val.related_id}
-            clearAction={(char_id) => {
+            clearAction={(doc_id) => {
               handleChange([
                 {
-                  name: `${name}.characters`,
-                  value: currentValue.filter((c) => c.related_id !== char_id),
+                  name: `${name}.map_pins`,
+                  value: currentValue.filter((c) => c.related_id !== doc_id),
                 },
               ]);
             }}
+            icon={val?.map_pin?.icon || ""}
             id={val?.related_id}
-            image_id={val?.character?.portrait_id}
-            title={getCharacterFullName(val?.character?.first_name, undefined, val.character?.last_name)}
-            type="characters"
+            title={val?.map_pin?.title || ""}
+            type="map_pins"
           />
         ))}
       </div>
