@@ -68,7 +68,7 @@ function CharacterColumn({ ids }: { ids: string | string[] }) {
     "characters",
     { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
-  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="flex items-center gap-x-2">
       <div className="flex w-full items-center justify-center -space-x-4">
@@ -122,7 +122,7 @@ function DocumentColumn({ ids }: { ids: string | string[] }) {
       filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
     },
     "documents",
-    { enabled: !!ids.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
+    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
   return <ShowMultipleWithBadge titles={(documents?.data || []).map((doc) => doc.title)} />;
 }
@@ -145,7 +145,7 @@ function LocationColumn({ ids }: { ids: string | string[] }) {
     "map_pins",
     { enabled: ids?.length > 0, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
   );
-  if (isFetching) return <Skeleton limit={ids.length > 1 ? 5 : 1} type="avatar" />;
+  if (isFetching) return <Skeleton limit={ids?.length > 1 ? 5 : 1} type="avatar" />;
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
       <ShowMultipleWithBadge titles={(locations?.data || [])?.map((l) => l?.title || "").filter((l) => !!l)} />

@@ -34,7 +34,17 @@ export function TemplateDocumentField({ title, name, handleChange, id, fieldType
             if (fieldType.includes("single")) {
               handleChange([
                 { name: `${name}.id`, value: id },
-                { name: `${name}.documents[0].related_id`, value },
+                {
+                  name: `${name}.documents[0]`,
+                  value: {
+                    related_id: value,
+                    document: {
+                      id: value,
+                      title: label,
+                      icon,
+                    },
+                  },
+                },
               ]);
             } else {
               handleChange([
@@ -67,9 +77,9 @@ export function TemplateDocumentField({ title, name, handleChange, id, fieldType
                 },
               ]);
             }}
-            icon={val?.document.icon || ""}
+            icon={val?.document?.icon || ""}
             id={val?.related_id}
-            title={val.document.title}
+            title={val?.document?.title}
             type="documents"
           />
         ))}

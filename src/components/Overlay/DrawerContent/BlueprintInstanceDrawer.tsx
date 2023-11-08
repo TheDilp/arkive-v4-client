@@ -15,12 +15,13 @@ import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "..
 import {
   TemplateBooleanField,
   TemplateCharacterField,
+  TemplateDocumentField,
   TemplateImageField,
   TemplateInputField,
   TemplateSelectField,
   TemplateTextareaField,
 } from "../../Complex";
-import { TemplateRandomTableField } from "../../Complex/Templates/TemplateRandomTableField";
+import { TemplateRandomTableField } from "../../Complex/TemplateFields/TemplateRandomTableField";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -214,6 +215,22 @@ function FieldTemplateRows({
               />
             );
           }
+          if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
+            return (
+              <TemplateDocumentField
+                key={template_field.id}
+                currentValue={
+                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
+                    ?.documents
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
           if (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") {
             return (
               <TemplateImageField
@@ -230,9 +247,6 @@ function FieldTemplateRows({
               />
             );
           }
-
-          // if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
-          // }
 
           return null;
         })}
