@@ -25,5 +25,5 @@ export const useBreakpoint = () => ({
   isMd: useMediaQuery("(min-width: 768px)"),
   isLg: useMediaQuery("(min-width: 1024px)"),
   isXl: useMediaQuery("(min-width: 1280px)"),
-  isXXl: useMediaQuery("(min-width: 1281px)"),
+  is2Xl: useMediaQuery("(min-width: 1281px)"),
 });

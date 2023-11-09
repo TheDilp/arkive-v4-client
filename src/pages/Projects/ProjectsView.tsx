@@ -1,7 +1,7 @@
 import { useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 
-import { Button, Drawer, Navbar, ProjectCard } from "../../components";
+import { Button, Drawer, Navbar, ProjectCard, Skeleton } from "../../components";
 import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { drawerAtom, getImageURL, IconEnum } from "../../utils";
@@ -11,7 +11,7 @@ export function ProjectsView() {
   const ownerId = localStorage.getItem("ownerId");
   const { user } = useUser();
 
-  const { data } = useGetAllProjects({ data: { auth_id: user?.id } });
+  const { data, isLoading } = useGetAllProjects({ data: { auth_id: user?.id } });
   useChangeNavbarTitle("The Arkive");
   return (
     <div className="flex h-screen w-screen">
@@ -41,6 +41,7 @@ export function ProjectsView() {
           <Navbar />
         </div>
         <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 2xl:grid-cols-4">
+          {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
           {data?.data
             ? data.data.map((project) => (
                 <ProjectCard

@@ -13,7 +13,8 @@ export type SkeletonType = {
     | "calendar_view"
     | "expanded_tag"
     | "conversations"
-    | "avatar";
+    | "avatar"
+    | "project_view";
   limit?: number;
   entity_type?: AvailableEntityType;
 };
