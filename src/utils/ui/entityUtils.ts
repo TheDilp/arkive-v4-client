@@ -118,20 +118,22 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
 }
 export function getBlueprintFieldValueFromType(
   type: BlueprintFieldTypes,
-): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "value" | null {
+): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "blueprint_instances" | "value" | null {
   if (
     type === "text" ||
     type === "number" ||
     type === "select" ||
     type === "select_multiple" ||
     type === "textarea" ||
-    type === "dice_roll"
+    type === "dice_roll" ||
+    type === "boolean"
   )
     return "value";
   if (type === "characters_single" || type === "characters_multiple") return "characters";
   if (type === "documents_single" || type === "documents_multiple") return "documents";
   if (type === "locations_single" || type === "locations_multiple") return "map_pins";
   if (type === "images_single" || type === "images_multiple") return "images";
+  if (type === "blueprints_single" || type === "blueprints_multiple") return "blueprint_instances";
   if (type === "random_table") return "random_tables";
   return null;
 }
@@ -159,6 +161,7 @@ export function getDifferenceForBlueprintInstance(
     }
 
     if (originalField.characters.length !== field.characters.length) return true;
+    if (originalField.blueprint_instances.length !== field.blueprint_instances.length) return true;
     if (originalField.documents.length !== field.documents.length) return true;
     if (originalField.map_pins.length !== field.map_pins.length) return true;
     if (originalField.images.length !== field.images.length) return true;
@@ -174,6 +177,15 @@ export function getDifferenceForBlueprintInstance(
     ) {
       return !field.characters.every((char) =>
         originalField.characters.some((original_char) => original_char?.related_id === char?.related_id),
+      );
+    }
+    if (
+      !!originalField.blueprint_instances.length &&
+      !!field.blueprint_instances.length &&
+      originalField.blueprint_instances.length === field.blueprint_instances.length
+    ) {
+      return !field.blueprint_instances.every((char) =>
+        originalField.blueprint_instances.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
     if (

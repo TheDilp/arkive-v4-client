@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { BlueprintFieldType, BlueprintType } from "./blueprintTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
@@ -16,6 +17,10 @@ export interface BlueprintInstanceBlueprintFieldType {
     related_id: string;
     character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
   }[];
+  blueprint_instances: {
+    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title"> & { icon: string };
+    related_id: string;
+  }[];
   documents: {
     document: Pick<DocumentType, "id" | "title" | "icon">;
     related_id: string;
@@ -28,6 +33,7 @@ export interface BlueprintInstanceBlueprintFieldType {
     image: Pick<ImageType, "id" | "title">;
     related_id: string;
   }[];
+
   random_table: {
     option_id?: string;
     suboption_id?: string;

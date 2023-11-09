@@ -14,6 +14,7 @@ export const InsertBlueprintInstanceSchema = z.object({
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
+        blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
         random_table: z
           .object({
             option_id: z.string().optional().nullable(),
@@ -28,6 +29,7 @@ export const InsertBlueprintInstanceSchema = z.object({
           .or(z.number())
           .or(z.string().array())
           .or(z.number().array())
+          .or(z.boolean())
           .or(z.null())
           .or(z.record(z.string(), z.any()))
           .optional()
@@ -51,6 +53,7 @@ export const UpdateBlueprintInstanceSchema = z.object({
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
+        blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
         random_table: z
           .object({
             option_id: z.string().optional().nullable(),
@@ -65,6 +68,7 @@ export const UpdateBlueprintInstanceSchema = z.object({
           .or(z.number())
           .or(z.string().array())
           .or(z.number().array())
+          .or(z.boolean())
           .or(z.null())
           .or(z.record(z.string(), z.any()))
           .optional()

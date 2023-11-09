@@ -19,6 +19,7 @@ import {
 } from "../../../utils";
 import { InsertBlueprintInstanceSchema, UpdateBlueprintInstanceSchema } from "../../../validation";
 import {
+  TemplateBlueprintField,
   TemplateBooleanField,
   TemplateCharacterField,
   TemplateDiceRollField,
@@ -55,6 +56,7 @@ function FieldTemplateRows({
           if (!blueprintValueKey) return null;
           const blueprintValueIndex = blueprint_fields_data.findIndex((f) => f.id === template_field.id);
           const baseName = `blueprint_fields[${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}]`;
+
           if (template_field.field_type === "text" || template_field.field_type === "number")
             return (
               <TemplateInputField
@@ -152,6 +154,22 @@ function FieldTemplateRows({
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.characters
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
+            return (
+              <TemplateBlueprintField
+                key={template_field.id}
+                currentValue={
+                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
+                    ?.blueprint_instances
                 }
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
