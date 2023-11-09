@@ -30,36 +30,21 @@ export function TemplateImageField({ title, name, handleChange, id, fieldType, c
                 variant: "warning",
                 icon: IconEnum.warning,
               });
+              return;
             }
-            if (fieldType.includes("single")) {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.images[0]`,
-                  value: {
-                    related_id: value,
-                    image: {
-                      id: value,
-                      title: label,
-                    },
+            handleChange([
+              { name: `${name}.id`, value: id },
+              {
+                name: `${name}.images[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                value: {
+                  related_id: value,
+                  image: {
+                    id: value,
+                    title: label,
                   },
                 },
-              ]);
-            } else {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.images[${currentValue.length}]`,
-                  value: {
-                    related_id: value,
-                    image: {
-                      id: value,
-                      title: label,
-                    },
-                  },
-                },
-              ]);
-            }
+              },
+            ]);
           }}
           placeholder="Press enter to search."
           searchEntity="images"

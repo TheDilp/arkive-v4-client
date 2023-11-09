@@ -30,38 +30,22 @@ export function TemplateLocationsField({ title, name, handleChange, id, fieldTyp
                 variant: "warning",
                 icon: IconEnum.warning,
               });
+              return;
             }
-            if (fieldType.includes("single")) {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.map_pins[0]`,
-                  value: {
-                    related_id: value,
-                    map_pin: {
-                      id: value,
-                      title: label,
-                      icon,
-                    },
+            handleChange([
+              { name: `${name}.id`, value: id },
+              {
+                name: `${name}.map_pins[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                value: {
+                  related_id: value,
+                  map_pin: {
+                    id: value,
+                    title: label,
+                    icon,
                   },
                 },
-              ]);
-            } else {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.map_pins[${currentValue.length}]`,
-                  value: {
-                    related_id: value,
-                    map_pin: {
-                      id: value,
-                      title: label,
-                      icon,
-                    },
-                  },
-                },
-              ]);
-            }
+              },
+            ]);
           }}
           placeholder="Press enter to search."
           searchEntity="map_pins"

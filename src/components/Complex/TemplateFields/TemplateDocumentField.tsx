@@ -30,38 +30,22 @@ export function TemplateDocumentField({ title, name, handleChange, id, fieldType
                 variant: "warning",
                 icon: IconEnum.warning,
               });
+              return;
             }
-            if (fieldType.includes("single")) {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.documents[0]`,
-                  value: {
-                    related_id: value,
-                    document: {
-                      id: value,
-                      title: label,
-                      icon,
-                    },
+            handleChange([
+              { name: `${name}.id`, value: id },
+              {
+                name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                value: {
+                  related_id: value,
+                  document: {
+                    id: value,
+                    title: label,
+                    icon,
                   },
                 },
-              ]);
-            } else {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.documents[${currentValue.length}]`,
-                  value: {
-                    related_id: value,
-                    document: {
-                      id: value,
-                      title: label,
-                      icon,
-                    },
-                  },
-                },
-              ]);
-            }
+              },
+            ]);
           }}
           placeholder="Press enter to search."
           searchEntity="documents"

@@ -30,40 +30,23 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
                 variant: "warning",
                 icon: IconEnum.warning,
               });
+              return;
             }
-            if (fieldType.includes("single")) {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.characters[0]`,
-                  value: {
-                    related_id: value,
-                    character: {
-                      id: value,
-                      first_name,
-                      last_name,
-                      portrait_id: image,
-                    },
+            handleChange([
+              { name: `${name}.id`, value: id },
+              {
+                name: `${name}.characters[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                value: {
+                  related_id: value,
+                  character: {
+                    id: value,
+                    first_name,
+                    last_name,
+                    portrait_id: image,
                   },
                 },
-              ]);
-            } else {
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.characters[${currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    character: {
-                      id: value,
-                      first_name,
-                      last_name,
-                      portrait_id: image,
-                    },
-                  },
-                },
-              ]);
-            }
+              },
+            ]);
           }}
           placeholder="Press enter to search."
           searchEntity="characters"

@@ -1,5 +1,6 @@
 import { HandleChangePropsType } from "../../../types";
 import { Checkbox } from "../../Form";
+import { Collapsible } from "../../Layout";
 
 type Props = {
   title: string;
@@ -11,18 +12,19 @@ type Props = {
 
 export function TemplateBooleanField({ title, name, currentValue, handleChange, id }: Props) {
   return (
-    <div className="flex flex-nowrap justify-between">
-      <span>{title}</span>
-      <Checkbox
-        name={name}
-        onChange={({ value }) =>
-          handleChange([
-            { name: `${name}.id`, value: id },
-            { name: `${name}.value`, value: { value } },
-          ])
-        }
-        value={currentValue as boolean}
-      />
-    </div>
+    <Collapsible label={title}>
+      <div className="flex flex-nowrap justify-end">
+        <Checkbox
+          name={name}
+          onChange={({ value }) =>
+            handleChange([
+              { name: `${name}.id`, value: id },
+              { name: `${name}.value`, value: { value } },
+            ])
+          }
+          value={currentValue as boolean}
+        />
+      </div>
+    </Collapsible>
   );
 }

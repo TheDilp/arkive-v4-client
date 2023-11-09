@@ -1,5 +1,6 @@
 import { HandleChangePropsType } from "../../../types";
 import { Input } from "../../Form";
+import { Collapsible } from "../../Layout";
 
 type Props = {
   title: string;
@@ -12,17 +13,18 @@ type Props = {
 
 export function TemplateInputField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
   return (
-    <Input
-      label={title}
-      name={name}
-      onChange={({ value }) =>
-        handleChange([
-          { name: `${name}.id`, value: id },
-          { name: `${name}.value`, value },
-        ])
-      }
-      type={fieldType}
-      value={currentValue || ""}
-    />
+    <Collapsible label={title}>
+      <Input
+        name={name}
+        onChange={({ value }) =>
+          handleChange([
+            { name: `${name}.id`, value: id },
+            { name: `${name}.value`, value },
+          ])
+        }
+        type={fieldType}
+        value={currentValue || ""}
+      />
+    </Collapsible>
   );
 }
