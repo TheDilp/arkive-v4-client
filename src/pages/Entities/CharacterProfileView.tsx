@@ -471,7 +471,7 @@ function conversationTableColumns(
       id: "characters",
       header: "Members",
       cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center -space-x-4">
+        <div className="-ml-4 flex w-full items-center justify-center first:ml-0">
           {row.original.characters.map((char) => (
             <Avatar
               key={char.id}
@@ -972,7 +972,7 @@ export function CharacterProfileView() {
                         type="images"
                       />
                     ) : (
-                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable />
+                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable size="2xl" />
                     )}
                   </div>
                 ) : (

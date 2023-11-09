@@ -3,16 +3,16 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Button, Editor, EntityPreview, Input, Skeleton, Tabs } from "../../components";
+import { Button, Editor, EntityPreview, Gallery, Input, Skeleton, Tabs } from "../../components";
 import { useBreakpoint, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import {
   BlueprintFieldType,
-  BlueprintInstaceFieldsType,
+  BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { drawerAtom, formatDateToString, IconEnum } from "../../utils";
+import { drawerAtom, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -24,12 +24,12 @@ const tabs = [
 function RandomTableField({
   random_table_id,
   random_table_option_id,
-  field,
+  title,
   suboptionValue,
 }: {
   random_table_id: string | undefined | null;
   random_table_option_id: string | undefined;
-  field: BlueprintFieldType;
+  title: string;
   suboptionValue: string | undefined;
 }) {
   const { data: option, isLoading } = useGetSubEntity<RandomTableOptionType>(random_table_option_id, "random_table_options", {
@@ -49,8 +49,8 @@ function RandomTableField({
         isDisabled={isLoading}
         isLoading={isLoading}
         isReadOnly
-        label={field.title}
-        name={field.title}
+        label={title}
+        name={title}
         onChange={() => {}}
         value={`${option?.data?.title || ""} ${subOption?.title ? `(${subOption?.title})` : ""}` || ""}
       />
@@ -103,7 +103,7 @@ const fieldSizeClass = tv({
       blueprints_single: "col-span-6 sm:col-span-3 lg:col-span-1",
       blueprints_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
       images_single: "col-span-6 sm:col-span-3 lg:col-span-1",
-      images_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      images_multiple: "col-span-6 sm:col-span-6 lg:col-span-6",
       number: "col-span-6 sm:col-span-3 lg:col-span-1",
       random_table: "col-span-6 sm:col-span-3 lg:col-span-1",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
@@ -118,68 +118,77 @@ function AdditionalFieldDisplay({
   blueprint_field_data,
 }: {
   blueprint_field: BlueprintFieldType;
-  blueprint_field_data: BlueprintInstaceFieldsType;
+  blueprint_field_data: BlueprintInstanceBlueprintFieldType;
 }) {
-  const fieldData = blueprint_field_data?.value;
-  const value = fieldData?.value
-    ? `${fieldData?.value} ${fieldData?.subOptionValue ? `- ${fieldData?.subOptionValue}` : ""}`
-    : "";
+  const value = blueprint_field_data?.value;
+  const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text" });
-  const date =
-    blueprint_field.field_type === "date" ? (fieldData?.value as { day: number; year: number; month: string }) : null;
 
   return (
     <div className={fieldClasses}>
-      {/* <Title isDrawerTitle label={field.title} size="xl" /> */}
-      {(blueprint_field.field_type === "text" ||
-        blueprint_field.field_type === "number" ||
-        blueprint_field.field_type === "dice_roll") &&
-      value ? (
-        <Input isReadOnly label={blueprint_field.title} name={blueprint_field.title} onChange={() => {}} value={value} />
-      ) : null}
-      {(blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple") && value ? (
+      {blueprint_field.field_type === "text" ||
+      blueprint_field.field_type === "number" ||
+      blueprint_field.field_type === "dice_roll" ? (
         <Input
           isReadOnly
           label={blueprint_field.title}
           name={blueprint_field.title}
           onChange={() => {}}
-          value={blueprint_field?.options?.find((opt) => opt.id === fieldData?.value)?.value || ""}
+          value={(value as string | number | null) || ""}
         />
       ) : null}
-      {(blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple") && value ? (
-        <BlueprintField field={blueprint_field} value={fieldData?.value as string | string[]} />
+      {blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple" ? (
+        <Input
+          isReadOnly
+          label={blueprint_field.title}
+          name={blueprint_field.title}
+          onChange={() => {}}
+          value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
+        />
+      ) : null}
+      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
+        <BlueprintField field={blueprint_field} value={(value as string | string[] | null) || ""} />
       ) : null}
       {blueprint_field.field_type === "random_table" ? (
         <RandomTableField
-          field={blueprint_field_data}
-          random_table_id={blueprint_field_data.random_table_id}
-          random_table_option_id={fieldData?.value as string | undefined}
-          suboptionValue={fieldData?.subOptionValue}
+          random_table_id={blueprint_field_data.random_table.related_id}
+          random_table_option_id={blueprint_field_data.random_table.option_id as string | undefined}
+          suboptionValue={blueprint_field_data.random_table.suboption_id}
+          title={blueprint_field.title}
         />
       ) : null}
-      {blueprint_field.field_type === "textarea" && value ? (
+      {blueprint_field.field_type === "textarea" ? (
         <>
           <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
-          <Editor
-            initialContent={(fieldData?.value || {}) as any}
-            isReadOnly
-            name={blueprint_field.title}
-            onChange={() => {}}
-          />
+          <Editor initialContent={(value || {}) as any} isReadOnly name={blueprint_field.title} onChange={() => {}} />
         </>
       ) : null}
-      {blueprint_field.field_type === "images_single" && value ? (
+      {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
         <div className="w-full">
           <EntityPreview
-            id={fieldData.value as string}
-            image_id={fieldData.value as string}
+            id={blueprint_field_data.images[0].related_id as string}
+            image_id={blueprint_field_data?.images?.[0].image.id}
             label={blueprint_field.title}
-            title={blueprint_field.title}
+            title={blueprint_field_data?.images?.[0].image.title}
             type="images"
           />
         </div>
       ) : null}
-      {blueprint_field.field_type === "date" && value ? (
+
+      {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
+        <Gallery
+          columns={6}
+          images={blueprint_field_data.images.map((img) => ({
+            id: img.image.id,
+            title: img.image.title,
+            project_id: project_id as string,
+            type: "images",
+          }))}
+          isOpenable
+        />
+      ) : null}
+
+      {/* {blueprint_field.field_type === "date" && value ? (
         <div>
           <Input
             isReadOnly
@@ -189,7 +198,7 @@ function AdditionalFieldDisplay({
             value={formatDateToString(date?.day, date?.year, date?.month, blueprint_field_data?.calendar?.months || [])}
           />
         </div>
-      ) : null}
+      ) : null} */}
     </div>
   );
 }
@@ -224,8 +233,23 @@ export default function BlueprintProfileView() {
 
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
-      <div className="flex h-12 min-h-[3rem] items-center justify-end">
-        {item_id ? (
+      {item_id ? (
+        <div className="flex w-full flex-col items-end gap-y-2">
+          <div className="w-52 max-w-[208px]">
+            <Button
+              icon={IconEnum.edit}
+              label="Edit current blueprint"
+              onClick={() => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: "Edit blueprint",
+                  type: "blueprints",
+                  data: { id: item_id as string, project_id: project_id as string },
+                }));
+              }}
+            />
+          </div>
           <div className="w-52">
             <Button
               icon={IconEnum.edit}
@@ -241,8 +265,8 @@ export default function BlueprintProfileView() {
               }}
             />
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
@@ -275,7 +299,7 @@ export default function BlueprintProfileView() {
             />
           </div>
         ) : null}
-        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9rem)] lg:max-h-[calc(100vh-9rem)]">
+        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-12rem)] lg:max-h-[calc(100vh-12rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>

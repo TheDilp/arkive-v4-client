@@ -1,13 +1,11 @@
 import { BlueprintFieldType, BlueprintType } from "./blueprintTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
-import { AdditionalFieldValueType } from "./fieldsTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinType } from "./mapTypes";
 import { RandomTableType } from "./randomTableTypes";
 import { TagType } from "./tagTypes";
 
-export interface BlueprintInstaceFieldsType extends BlueprintFieldType, AdditionalFieldValueType {}
 export interface BlueprintInstanceBlueprintFieldType {
   id: string;
   title: string;

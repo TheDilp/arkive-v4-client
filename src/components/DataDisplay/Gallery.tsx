@@ -1,6 +1,6 @@
 import { tv } from "tailwind-variants";
 
-import { GalleryType } from "../../types";
+import { GalleryType, Size } from "../../types";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
@@ -23,13 +23,19 @@ const GalleryClasses = tv({
   },
 });
 
-export function Gallery({ images, isOpenable, columns = 4 }: GalleryType) {
+function getRowSize(size: Size) {
+  if (size === "md") return "12rem";
+  if (size === "2xl") return "36rem";
+  return "12rem";
+}
+
+export function Gallery({ images, isOpenable, columns = 4, size = "md" }: GalleryType) {
   const classes = GalleryClasses({ columns });
   return (
     <div
       className={classes}
       style={{
-        gridAutoRows: "36rem",
+        gridAutoRows: getRowSize(size),
       }}>
       {images.map((image) => (
         <Image key={image.id} image={image} isOpenable={isOpenable} />

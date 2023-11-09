@@ -182,12 +182,11 @@ function createColumns(
               return (
                 <div className="flex w-full">
                   {fieldData?.images?.map((image) => (
-                    <div key={image.related_id} className="-ml-2 flex items-center first:ml-0 hover:z-10">
+                    <div key={image.related_id} className="-ml-4 flex items-center first:ml-0 hover:z-10">
                       <Avatar
                         hasShowImage
                         image={getImageURL(project_id as string, "images", image.related_id)}
                         label={image.image.title}
-                        shape="rounded"
                         size="sm"
                         tooltipAllowedPlacements={["left", "right"]}
                       />
@@ -344,6 +343,9 @@ export function BlueprintInstanceView() {
       pagination,
     },
     "blueprint_instances",
+    {
+      enabled: !!blueprint?.data,
+    },
   );
 
   return (
