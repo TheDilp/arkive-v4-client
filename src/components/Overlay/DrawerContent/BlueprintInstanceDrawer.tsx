@@ -36,7 +36,7 @@ import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
-  data: { id?: string };
+  data: { id?: string; parent_id?: string };
 };
 
 function FieldTemplateRows({
@@ -241,11 +241,11 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const [instance, setInstance] = useState<BlueprintInstanceType | null>(null);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
-    item_id,
+    data?.parent_id ?? item_id,
     "blueprints",
     {
       data: {
-        id: item_id,
+        id: data?.parent_id ?? item_id,
       },
       relations: {
         random_table_options: true,
@@ -319,7 +319,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   data: {
                     id: instance.id,
                     title: instance.title,
-                    parent_id: item_id,
+                    parent_id: data?.parent_id ?? item_id,
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
@@ -336,7 +336,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                 const dataToParse = {
                   data: {
                     title: instance.title,
-                    parent_id: item_id,
+                    parent_id: data?.parent_id ?? item_id,
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),

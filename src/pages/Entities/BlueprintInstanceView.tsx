@@ -360,7 +360,7 @@ export function BlueprintInstanceView() {
               setDrawer((prev) => ({
                 ...prev,
                 data: {},
-                title: `Create new ${blueprint?.data?.title}`,
+                title: "Create new instance",
                 type: "blueprint_instances",
                 size: "lg",
               }))

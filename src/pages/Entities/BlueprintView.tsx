@@ -59,9 +59,23 @@ function createColumns(
                   }));
                 },
               },
-
               {
                 id: "2",
+                label: "Create instance",
+                icon: IconEnum.add,
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: {
+                      parent_id: row.original.id,
+                    },
+                    title: "Create new instance",
+                    type: "blueprint_instances",
+                    size: "lg",
+                  })),
+              },
+              {
+                id: "3",
                 label: "Delete blueprint",
                 icon: IconEnum.trash,
                 onClick: () => {
