@@ -22,7 +22,7 @@ export function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?:
     },
   );
 
-  if (isLoading) return null;
+  if (isLoading) return <Skeleton limit={2} type="project_view" />;
   return (
     <div className="h-full w-full overflow-hidden">
       <MapView center_on={subitem_id} data={existingMap?.data} isViewOnly />
