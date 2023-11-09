@@ -19,6 +19,7 @@ import {
   getAvatarInitials,
   getBlueprintInstanceColumnWidth,
   getCharacterFullName,
+  getDayOrdinal,
   getImageURL,
   IconEnum,
   rollDiceWithNotification,
@@ -92,7 +93,6 @@ function BlueprintColumn({ ids }: { ids: string | string[] }) {
     <ShowMultipleWithBadge titles={blueprint_instances?.data?.map((blueprint_instance) => blueprint_instance.title) || []} />
   );
 }
-
 function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -216,7 +216,38 @@ function createColumns(
 
               return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
             }
-            // }
+
+            if (field.field_type === "date") {
+              const startMonthIdx =
+                field?.calendar && field.calendar.months.length
+                  ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
+                  : null;
+              const endMonthIdx =
+                field?.calendar && field.calendar.months.length
+                  ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.end_month_id)
+                  : null;
+              const startDayOrdinal = fieldData?.calendar?.start_day ? getDayOrdinal(fieldData?.calendar.start_day) : null;
+              const endDayOrdinal = fieldData?.calendar?.end_day ? getDayOrdinal(fieldData?.calendar.end_day) : null;
+              return (
+                <span>
+                  {fieldData?.calendar?.start_day || ""}
+                  <sup>{startDayOrdinal} </sup>
+                  {typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title : ""}{" "}
+                  {fieldData?.calendar?.start_year || ""}
+                  {fieldData?.calendar?.end_day ? (
+                    <>
+                      {" "}
+                      - {fieldData?.calendar?.end_day}
+                      <sup>{endDayOrdinal} </sup>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                  {typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title : ""}{" "}
+                  {fieldData?.calendar?.end_year || ""}
+                </span>
+              );
+            }
             if (field.field_type === "dice_roll" && field?.formula) {
               return (
                 <div className="flex items-center gap-x-2 [&>button]:px-0">

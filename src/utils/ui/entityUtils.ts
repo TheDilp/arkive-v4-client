@@ -107,7 +107,7 @@ export function getSearchFieldTypeLinkType(type: string) {
 }
 
 export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize?: number } {
-  if (type === "text") return { minSize: 15, maxSize: 15 };
+  if (type === "text" || type === "date") return { minSize: 15, maxSize: 15 };
   if (type === "images_single" || type === "characters_single" || type === "number") return { minSize: 7.5, maxSize: 7.5 };
   if (type === "characters_multiple" || type === "select" || type === "dice_roll" || type === "random_table")
     return { minSize: 12, maxSize: 12 };
@@ -162,45 +162,45 @@ export function getDifferenceForBlueprintInstance(
       return !isEqual(field.value, originalField.value);
     }
 
-    if (originalField.characters.length !== field.characters.length) return true;
-    if (originalField.blueprint_instances.length !== field.blueprint_instances.length) return true;
-    if (originalField.documents.length !== field.documents.length) return true;
-    if (originalField.map_pins.length !== field.map_pins.length) return true;
-    if (originalField.images.length !== field.images.length) return true;
+    if (originalField?.characters?.length !== field?.characters?.length) return true;
+    if (originalField?.blueprint_instances.length !== field?.blueprint_instances?.length) return true;
+    if (originalField?.documents.length !== field?.documents?.length) return true;
+    if (originalField?.map_pins.length !== field?.map_pins?.length) return true;
+    if (originalField?.images?.length !== field?.images?.length) return true;
 
-    if (originalField.random_table?.related_id !== field.random_table?.related_id) return true;
-    if (originalField.random_table?.option_id !== field.random_table?.option_id) return true;
-    if (originalField.random_table?.suboption_id !== field.random_table?.suboption_id) return true;
+    if (originalField?.random_table?.related_id !== field?.random_table?.related_id) return true;
+    if (originalField?.random_table?.option_id !== field?.random_table?.option_id) return true;
+    if (originalField?.random_table?.suboption_id !== field?.random_table?.suboption_id) return true;
 
-    if (originalField.calendar?.related_id !== field.calendar?.related_id) return true;
-    if (originalField.calendar?.start_day !== field.calendar?.start_day) return true;
-    if (originalField.calendar?.start_month_id !== field.calendar?.start_month_id) return true;
-    if (originalField.calendar?.end_day !== field.calendar?.end_day) return true;
-    if (originalField.calendar?.end_month_id !== field.calendar?.end_month_id) return true;
-    if (originalField.calendar?.end_year !== field.calendar?.end_year) return true;
+    if (originalField?.calendar?.related_id !== field.calendar?.related_id) return true;
+    if (originalField?.calendar?.start_day !== field?.calendar?.start_day) return true;
+    if (originalField?.calendar?.start_month_id !== field?.calendar?.start_month_id) return true;
+    if (originalField?.calendar?.end_day !== field?.calendar?.end_day) return true;
+    if (originalField?.calendar?.end_month_id !== field?.calendar?.end_month_id) return true;
+    if (originalField?.calendar?.end_year !== field?.calendar?.end_year) return true;
 
     if (
-      !!originalField.characters.length &&
-      !!field.characters.length &&
-      originalField.characters.length === field.characters.length
+      !!originalField?.characters.length &&
+      !!field?.characters?.length &&
+      originalField?.characters?.length === field?.characters?.length
     ) {
       return !field.characters.every((char) =>
         originalField.characters.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
     if (
-      !!originalField.blueprint_instances.length &&
-      !!field.blueprint_instances.length &&
-      originalField.blueprint_instances.length === field.blueprint_instances.length
+      !!originalField?.blueprint_instances?.length &&
+      !!field?.blueprint_instances?.length &&
+      originalField?.blueprint_instances.length === field.blueprint_instances?.length
     ) {
-      return !field.blueprint_instances.every((char) =>
-        originalField.blueprint_instances.some((original_char) => original_char?.related_id === char?.related_id),
+      return !field?.blueprint_instances?.every((char) =>
+        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
     if (
-      !!originalField.documents.length &&
-      !!field.documents.length &&
-      originalField.documents.length === field.documents.length
+      !!originalField?.documents?.length &&
+      !!field?.documents?.length &&
+      originalField?.documents?.length === field?.documents?.length
     ) {
       return !field.documents.every((char) =>
         originalField.documents.some((original_char) => {
@@ -208,14 +208,18 @@ export function getDifferenceForBlueprintInstance(
         }),
       );
     }
-    if (!!originalField.map_pins.length && !!field.map_pins.length && originalField.map_pins.length === field.map_pins.length) {
-      return !field.map_pins.every((char) =>
-        originalField.map_pins.some((original_char) => original_char?.related_id === char?.related_id),
+    if (
+      !!originalField?.map_pins?.length &&
+      !!field?.map_pins?.length &&
+      originalField?.map_pins?.length === field?.map_pins?.length
+    ) {
+      return !field?.map_pins?.every((char) =>
+        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
-    if (!!originalField.images.length && !!field.images.length && originalField.images.length === field.images.length) {
-      return !field.images.every((char) =>
-        originalField.images.some((original_char) => original_char?.related_id === char?.related_id),
+    if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
+      return !field?.images?.every((char) =>
+        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
 
