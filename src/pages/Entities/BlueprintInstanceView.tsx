@@ -104,25 +104,25 @@ function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFi
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(locations || []).map(({ map_pin }) => ({
-          id: map_pin.id,
-          label: map_pin.title || "",
+          id: map_pin?.id,
+          label: map_pin?.title || "",
           icon: map_pin?.icon,
           subItems: [
             {
-              id: `go_to_${map_pin.id}`,
-              label: `Go to ${map_pin.title}`,
+              id: `go_to_${map_pin?.id}`,
+              label: `Go to ${map_pin?.title}`,
               onClick: () => navigate(`/projects/${project_id}/maps/${map_pin?.parent_id}/${map_pin?.id}`),
             },
             {
-              id: `preview_${map_pin.id}`,
-              label: `Preview ${map_pin.title} map`,
+              id: `preview_${map_pin?.id}`,
+              label: `Preview ${map_pin?.title} map`,
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
                   type: "entity_preview",
                   size: "half",
                   title: "Preview map",
-                  data: { id: map_pin?.parent_id, subitem_id: map_pin.id, entity_type: "maps" },
+                  data: { id: map_pin?.parent_id, subitem_id: map_pin?.id, entity_type: "maps" },
                 })),
             },
           ],
