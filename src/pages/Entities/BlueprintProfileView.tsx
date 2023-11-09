@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { Button, Editor, EntityPreview, Gallery, Input, Skeleton, Tabs } from "../../components";
-import { useBreakpoint, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import {
   BlueprintFieldType,
   BlueprintInstanceBlueprintFieldType,
@@ -146,17 +146,7 @@ function AdditionalFieldDisplay({
           value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
         />
       ) : null}
-      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
-        <BlueprintField field={blueprint_field} value={(value as string | string[] | null) || ""} />
-      ) : null}
-      {blueprint_field.field_type === "random_table" ? (
-        <RandomTableField
-          random_table_id={blueprint_field_data.random_table.related_id}
-          random_table_option_id={blueprint_field_data.random_table.option_id as string | undefined}
-          suboptionValue={blueprint_field_data.random_table.suboption_id}
-          title={blueprint_field.title}
-        />
-      ) : null}
+
       {blueprint_field.field_type === "textarea" ? (
         <>
           <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
@@ -175,6 +165,9 @@ function AdditionalFieldDisplay({
         </div>
       ) : null}
 
+      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
+        <BlueprintField field={blueprint_field} value={(value as string | string[] | null) || ""} />
+      ) : null}
       {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
         <Gallery
           columns={6}
@@ -185,6 +178,14 @@ function AdditionalFieldDisplay({
             type: "images",
           }))}
           isOpenable
+        />
+      ) : null}
+      {blueprint_field.field_type === "random_table" ? (
+        <RandomTableField
+          random_table_id={blueprint_field_data.random_table.related_id}
+          random_table_option_id={blueprint_field_data.random_table.option_id as string | undefined}
+          suboptionValue={blueprint_field_data.random_table.suboption_id}
+          title={blueprint_field.title}
         />
       ) : null}
 
@@ -230,6 +231,11 @@ export default function BlueprintProfileView() {
       blueprint_fields: true,
     },
   });
+
+  useChangeNavbarTitle(
+    `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
+    !!blueprint?.data && !!blueprintInstance?.data,
+  );
 
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
