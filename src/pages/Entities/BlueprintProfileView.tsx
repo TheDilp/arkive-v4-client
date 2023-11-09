@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Button, Editor, EntityPreview, Gallery, Input, Skeleton, Tabs } from "../../components";
+import { Button, CarouselEntityPreview, Editor, EntityPreview, Gallery, Input, Skeleton, Tabs } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import {
   BlueprintFieldType,
@@ -12,7 +12,7 @@ import {
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { drawerAtom, IconEnum } from "../../utils";
+import { drawerAtom, getCharacterFullName, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -100,6 +100,7 @@ const fieldSizeClass = tv({
       image: "col-span-6 sm:col-span-3 lg:col-span-1",
       select: "col-span-6 sm:col-span-3 lg:col-span-1",
       select_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      characters_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
       blueprints_single: "col-span-6 sm:col-span-3 lg:col-span-1",
       blueprints_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
       images_single: "col-span-6 sm:col-span-3 lg:col-span-1",
@@ -123,7 +124,6 @@ function AdditionalFieldDisplay({
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text" });
-
   return (
     <div className={fieldClasses}>
       {blueprint_field.field_type === "text" ||
@@ -153,6 +153,38 @@ function AdditionalFieldDisplay({
           <Editor initialContent={(value || {}) as any} isReadOnly name={blueprint_field.title} onChange={() => {}} />
         </>
       ) : null}
+
+      {blueprint_field.field_type === "characters_single" && blueprint_field_data?.characters?.[0] ? (
+        <div className="w-full">
+          <EntityPreview
+            id={blueprint_field_data.characters[0].related_id as string}
+            image_id={blueprint_field_data?.characters?.[0].character.portrait_id}
+            label={blueprint_field.title}
+            title={getCharacterFullName(
+              blueprint_field_data.characters[0].character.first_name,
+              undefined,
+              blueprint_field_data.characters[0].character?.last_name,
+            )}
+            type="characters"
+          />
+        </div>
+      ) : null}
+
+      {blueprint_field.field_type === "characters_multiple" && blueprint_field_data?.characters ? (
+        <div className="w-full">
+          <CarouselEntityPreview
+            items={(blueprint_field_data.characters || []).map((char) => ({
+              id: char.related_id,
+              title: getCharacterFullName(char.character.first_name, undefined, char.character?.last_name),
+              image_id: char.character.portrait_id,
+              label: blueprint_field.title,
+              type: "characters",
+              link: `/projects/${project_id}/characters/${char.related_id}/resources`,
+            }))}
+          />
+        </div>
+      ) : null}
+
       {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
         <div className="w-full">
           <EntityPreview

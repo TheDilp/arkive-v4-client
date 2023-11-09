@@ -1,3 +1,4 @@
+export * from "./CarouselEntityPreview";
 export * from "./EntityPreview";
 export * from "./Gallery";
 export * from "./Graph";
