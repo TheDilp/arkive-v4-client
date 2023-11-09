@@ -8,6 +8,7 @@ export interface DropdownItemType {
   label?: string;
   child?: ReactNode;
   icon?: string;
+  image?: string;
   iconColor?: string;
   iconThickness?: IconThickness;
   subItems?: DropdownItemType[];
@@ -18,4 +19,5 @@ export interface DropdownType {
   allowedPlacements?: PositionType;
   children: JSX.Element;
   items: DropdownItemType[];
+  isReferenceMaxSize?: boolean;
 }

@@ -10,6 +10,7 @@ import {
   offset,
   safePolygon,
   shift,
+  size,
   useClick,
   useDismiss,
   useFloating,
@@ -28,25 +29,31 @@ import { tv } from "tailwind-variants";
 
 import { DropdownItemType, DropdownType } from "../../types";
 import { IconEnum } from "../../utils";
-import { Icon } from "../Misc";
+import { Avatar, Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "z-40 font-lato min-w-fit",
+    base: "z-40 font-lato min-w-fit outline-none",
     floatingBase:
       "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[60] font-lato shadow-lg absolute top-0 left-0",
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600 justify-between bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600  bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
     },
+    hasIcon: {
+      true: "justify-between",
+    },
+    hasImage: {
+      true: "justify-start gap-x-2",
+    },
   },
 });
 
-export function DropdownComponent({ allowedPlacements = [], children, items }: DropdownType) {
+export function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize }: DropdownType) {
   const { base, floatingBase } = DropdownClasses();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -64,7 +71,21 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
     open: isOpen,
     onOpenChange: setIsOpen,
     placement: isNested ? "right-start" : "bottom-start",
-    middleware: [offset({ mainAxis: isNested ? 8 : 4, alignmentAxis: 0 }), autoPlacement({ allowedPlacements }), shift()],
+    middleware: [
+      offset({ mainAxis: isNested ? 8 : 4, alignmentAxis: 0 }),
+      autoPlacement({ allowedPlacements }),
+      shift(),
+
+      size({
+        apply({ rects, elements }) {
+          Object.assign(elements?.floating?.style, {
+            minWidth: `${rects.reference.width}px`,
+            maxWidth: isReferenceMaxSize ? `${rects.reference.width}px` : "",
+          });
+        },
+        padding: 10,
+      }),
+    ],
     whileElementsMounted: autoUpdate,
   });
 
@@ -152,6 +173,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                             iconColor={dropdownItem?.iconColor}
                             iconThickness={dropdownItem?.iconThickness}
                             id={dropdownItem.id}
+                            image={dropdownItem?.image}
                             isDisabled={dropdownItem?.isDisabled}
                             label={dropdownItem.label}
                             onClick={() => {
@@ -173,6 +195,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
                           iconColor={dropdownItem?.iconColor}
                           iconThickness={dropdownItem?.iconThickness}
                           id={dropdownItem.id}
+                          image={dropdownItem?.image}
                           isDisabled={dropdownItem?.isDisabled}
                           label={dropdownItem.label}
                           onClick={() => {
@@ -197,11 +220,26 @@ export function DropdownComponent({ allowedPlacements = [], children, items }: D
   );
 }
 
-function DropdownItem({ label, icon, onClick, subItems, iconColor, isDisabled, iconThickness, child }: DropdownItemType) {
-  const dropdownItemClasses = DropdownItemClasses({ isDisabled, hasSubitems: !!subItems?.length });
-
+function DropdownItem({
+  label,
+  icon,
+  onClick,
+  subItems,
+  iconColor,
+  isDisabled,
+  image,
+  iconThickness,
+  child,
+}: DropdownItemType) {
+  const dropdownItemClasses = DropdownItemClasses({
+    isDisabled,
+    hasSubitems: !!subItems?.length,
+    hasImage: !!image,
+    hasIcon: !!icon,
+  });
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+      {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
       {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
       {child ?? null}
       {icon && !subItems?.length ? (
