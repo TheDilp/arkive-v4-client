@@ -1010,7 +1010,7 @@ export function CharacterProfileView() {
             </div>
           ) : null}
           {type === "relationships" ? (
-            <div>
+            <div className="h-full">
               <TablePageLayout>
                 {isFetching ? (
                   <div className="pt-10">
