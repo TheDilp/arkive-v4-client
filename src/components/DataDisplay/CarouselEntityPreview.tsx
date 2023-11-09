@@ -1,4 +1,14 @@
-import { autoUpdate, flip, FloatingFocusManager, FloatingPortal, offset, size, useFloating } from "@floating-ui/react";
+import {
+  autoUpdate,
+  flip,
+  FloatingFocusManager,
+  FloatingPortal,
+  offset,
+  size,
+  useDismiss,
+  useFloating,
+  useInteractions,
+} from "@floating-ui/react";
 import { useState } from "react";
 
 import { ItemPreviewType } from "../../types";
@@ -31,6 +41,10 @@ export function CarouselEntityPreview({ items }: Props) {
     ],
   });
 
+  const dismiss = useDismiss(context);
+
+  useInteractions([dismiss]);
+
   return (
     <div className="relative flex w-full items-center">
       {items?.length ? (
@@ -57,7 +71,9 @@ export function CarouselEntityPreview({ items }: Props) {
               className=" z-10 flex max-h-56 w-full max-w-full flex-col gap-y-2 overflow-y-auto shadow"
               style={floatingStyles}>
               {items.slice(1).map((item) => (
-                <EntityPreview key={item.id} {...item} label="" />
+                <div key={item.id} className="w-full">
+                  <EntityPreview {...item} label="" />
+                </div>
               ))}
             </div>
           </FloatingFocusManager>
