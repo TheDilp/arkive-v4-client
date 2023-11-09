@@ -537,14 +537,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                     maxSize: hdr.column.columnDef.maxSize,
                   }),
                 }}>
-                <Tooltip
-                  allowedPlacements={["top", "bottom"]}
-                  content={(hdr.getContext().column.columnDef.header as string) || ""}
-                  delay={{ openDelay: 0 }}
-                  isDisabled={hdr.id === "select"}
-                  isIgnoringHover>
-                  <div className="truncate">{flexRender(header, hdr.getContext())}</div>
-                </Tooltip>
+                <div className="truncate">{flexRender(header, hdr.getContext())}</div>
                 {(meta as MetaType)?.filterOptions?.length && dispatch ? (
                   <Tooltip
                     allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
