@@ -67,7 +67,7 @@ export function useGetSubEntity<EntityType>(
   options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
 ) {
   return useQuery<{ data: EntityType }>(
-    [type, id],
+    options?.queryKeyOverwrite ?? [type, id, ...(options?.queryKeyConcat || [])],
     async () => FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type}/${id}` }),
     {
       enabled: options?.enabled,

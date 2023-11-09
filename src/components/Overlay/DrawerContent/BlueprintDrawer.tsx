@@ -257,6 +257,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     },
     {
       enabled: !!data?.id,
+      queryKeyConcat: ["drawer"],
     },
   );
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
