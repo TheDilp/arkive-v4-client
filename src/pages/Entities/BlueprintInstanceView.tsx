@@ -179,14 +179,22 @@ function createColumns(
               );
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
-              return fieldData?.images?.map((image) => (
-                <Avatar
-                  key={image.related_id}
-                  hasShowImage
-                  image={getImageURL(project_id as string, "images", image.related_id)}
-                  size="sm"
-                />
-              ));
+              return (
+                <div className="flex w-full">
+                  {fieldData?.images?.map((image) => (
+                    <div key={image.related_id} className="-ml-2 flex items-center first:ml-0 hover:z-10">
+                      <Avatar
+                        hasShowImage
+                        image={getImageURL(project_id as string, "images", image.related_id)}
+                        label={image.image.title}
+                        shape="rounded"
+                        size="sm"
+                        tooltipAllowedPlacements={["left", "right"]}
+                      />
+                    </div>
+                  ))}
+                </div>
+              );
             }
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
               return <CharacterColumn characters={fieldData?.characters || []} />;
@@ -198,17 +206,17 @@ function createColumns(
               return <LocationColumn locations={fieldData?.map_pins || []} />;
             }
 
-            // if (field.field_type === "random_table") {
-            //   const randomTable =
-            //     field.field_type === "random_table" && fieldData
-            //       ? fieldData?.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.value)
-            //       : null;
-            //   const subOption =
-            //     randomTable && fieldData?.value?.subOptionValue
-            //       ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.value?.subOptionValue)
-            //       : null;
+            if (field.field_type === "random_table") {
+              const randomTable = fieldData
+                ? field.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.random_table.option_id)
+                : null;
+              const subOption =
+                randomTable && fieldData?.random_table?.suboption_id
+                  ? randomTable.random_table_suboptions?.find((subOpt) => subOpt.id === fieldData?.random_table?.suboption_id)
+                  : null;
 
-            //   return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
+              return `${randomTable?.title ?? ""} ${subOption ? `(${subOption?.title})` : ""}`;
+            }
             // }
             if (field.field_type === "dice_roll" && field?.formula) {
               return (
