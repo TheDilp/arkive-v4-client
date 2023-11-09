@@ -1,7 +1,8 @@
 /* eslint-disable no-use-before-define */
-import { BlueprintFieldType, BlueprintType } from "./blueprintTypes";
+import { BlueprintType } from "./blueprintTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
+import { BlueprintFieldTypes } from "./fieldsTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinType } from "./mapTypes";
 import { RandomTableType } from "./randomTableTypes";
@@ -12,7 +13,7 @@ export interface BlueprintInstanceBlueprintFieldType {
   title: string;
   sort: number;
   parent_id: string;
-  field_type: BlueprintFieldType;
+  field_type: BlueprintFieldTypes;
   characters: {
     related_id: string;
     character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
@@ -38,6 +39,17 @@ export interface BlueprintInstanceBlueprintFieldType {
     option_id?: string;
     suboption_id?: string;
     related_id: string;
+  };
+  calendar: {
+    related_id: string;
+
+    start_day?: number;
+    start_year?: number;
+    start_month_id?: string;
+
+    end_day?: number;
+    end_month_id?: string;
+    end_year?: number;
   };
   random_table_data: Pick<RandomTableType, "id" | "title">;
   value: string | number | null | string[] | number[];

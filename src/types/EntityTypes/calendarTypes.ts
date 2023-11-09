@@ -49,7 +49,7 @@ export interface EventType {
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
 export type DayStateType = { id: string; title: string };
-export type EventStateType = Partial<Omit<EventType, "document">> & { start_month: number };
+export type EventStateType = Partial<Omit<EventType, "document">> & { start_month: number | undefined };
 export interface CurrentDateType {
   month: number;
   year: number;

@@ -125,10 +125,12 @@ export function getBlueprintFieldValueFromType(
     type === "select" ||
     type === "select_multiple" ||
     type === "textarea" ||
-    type === "dice_roll" ||
-    type === "boolean"
+    type === "boolean" ||
+    type === "date" ||
+    type === "dice_roll"
   )
     return "value";
+
   if (type === "characters_single" || type === "characters_multiple") return "characters";
   if (type === "documents_single" || type === "documents_multiple") return "documents";
   if (type === "locations_single" || type === "locations_multiple") return "map_pins";
@@ -169,6 +171,13 @@ export function getDifferenceForBlueprintInstance(
     if (originalField.random_table?.related_id !== field.random_table?.related_id) return true;
     if (originalField.random_table?.option_id !== field.random_table?.option_id) return true;
     if (originalField.random_table?.suboption_id !== field.random_table?.suboption_id) return true;
+
+    if (originalField.calendar?.related_id !== field.calendar?.related_id) return true;
+    if (originalField.calendar?.start_day !== field.calendar?.start_day) return true;
+    if (originalField.calendar?.start_month_id !== field.calendar?.start_month_id) return true;
+    if (originalField.calendar?.end_day !== field.calendar?.end_day) return true;
+    if (originalField.calendar?.end_month_id !== field.calendar?.end_month_id) return true;
+    if (originalField.calendar?.end_year !== field.calendar?.end_year) return true;
 
     if (
       !!originalField.characters.length &&

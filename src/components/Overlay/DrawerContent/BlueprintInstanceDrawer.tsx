@@ -8,9 +8,13 @@ import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   BlueprintType,
+  EventStateType,
   HandleChangePropsType,
 } from "../../../types";
 import {
+  checkIfDayCorrect,
+  checkIfMonthCorrect,
+  checkIfYearCorrect,
   drawerAtom,
   getBlueprintFieldValueFromType,
   getDifferenceForBlueprintInstance,
@@ -29,6 +33,7 @@ import {
   TemplateSelectField,
   TemplateTextareaField,
 } from "../../Complex";
+import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
 import { TemplateLocationsField } from "../../Complex/TemplateFields/TemplateLocationsField";
 import { TemplateRandomTableField } from "../../Complex/TemplateFields/TemplateRandomTableField";
 import { Button, Input } from "../../Form";
@@ -38,6 +43,39 @@ import { Alert, Skeleton } from "../../Misc";
 type Props = {
   data: { id?: string; parent_id?: string };
 };
+
+function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_fields"], blueprint?: BlueprintType) {
+  if (!blueprint) return true;
+  const dateFields = blueprint_fields.filter((field) => field.field_type === "date");
+  if (dateFields.length) {
+    return dateFields.some((field) => {
+      const calendarData = blueprint.blueprint_fields.find((f) => f.id === field.id)?.calendar;
+      if (!calendarData) return true;
+      const startMonthIdx = field?.calendar?.start_month_id
+        ? calendarData?.months?.findIndex((m) => m.id === field?.calendar?.start_month_id) || 0
+        : 0;
+      const endMonthIdx = field?.calendar?.end_month_id
+        ? calendarData?.months?.findIndex((m) => m.id === field?.calendar?.end_month_id)
+        : null;
+      // Not an actual event entity, just used
+      // to calculate whether the date is correct
+      const event: EventStateType = {
+        start_day: field?.calendar?.start_day,
+        start_month: startMonthIdx,
+        start_year: field?.calendar?.start_year,
+        end_day: field?.calendar?.end_day,
+        end_month: endMonthIdx,
+        end_year: field?.calendar?.end_year,
+      };
+
+      const isYearCorrect = checkIfYearCorrect(field?.calendar?.start_year, field?.calendar?.end_year);
+      const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
+      const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
+      return !(isYearCorrect && isMonthCorrect && isDayCorrect);
+    });
+  }
+  return false;
+}
 
 function FieldTemplateRows({
   blueprint_fields = [],
@@ -131,6 +169,22 @@ function FieldTemplateRows({
                 title={template_field.title}
               />
             );
+          if (template_field.field_type === "date") {
+            return (
+              <TemplateDateField
+                key={template_field.id}
+                calendar={template_field.calendar}
+                currentValue={
+                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
+                    ?.calendar
+                }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
           if (template_field.field_type === "random_table")
             return (
               <TemplateRandomTableField
@@ -271,7 +325,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     },
     { enabled: !!data?.id && !!blueprint?.data, queryKeyConcat: ["drawer"] },
   );
-
+  console.log(existingInstance?.data, blueprint);
   useLayoutEffect(() => {
     if (existingInstance?.data && !!data?.id) {
       setInstance(existingInstance?.data);
@@ -309,7 +363,9 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       <div className="mt-auto w-full">
         <Button
           icon={instance?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={!instance?.title || isCreating || isUpdating}
+          isDisabled={
+            !instance?.title || isSaveDisabled(instance?.blueprint_fields || [], blueprint?.data) || isCreating || isUpdating
+          }
           isLoading={isCreating || isUpdating}
           label={instance?.id ? "Update" : "Create"}
           onClick={async () => {

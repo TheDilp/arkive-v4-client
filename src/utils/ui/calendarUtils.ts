@@ -57,6 +57,9 @@ export function checkIfYearCorrect(start_year: number | undefined, end_year: num
     }
     return true;
   }
+  if (!start_year && !!end_year) {
+    return false;
+  }
   return true;
 }
 

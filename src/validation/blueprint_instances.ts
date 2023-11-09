@@ -60,6 +60,18 @@ export const UpdateBlueprintInstanceSchema = z.object({
             suboption_id: z.string().optional().nullable(),
             related_id: z.string(),
           })
+          .optional()
+          .nullable(),
+        calendar: z
+          .object({
+            start_day: z.number().optional().nullable(),
+            start_month_id: z.string().optional().nullable(),
+            start_year: z.number().optional().nullable(),
+            end_day: z.number().optional().nullable(),
+            end_month_id: z.string().optional().nullable(),
+            end_year: z.number().optional().nullable(),
+            related_id: z.string(),
+          })
 
           .optional()
           .nullable(),
