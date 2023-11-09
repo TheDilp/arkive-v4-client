@@ -12,7 +12,7 @@ import {
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { drawerAtom, getCharacterFullName, IconEnum } from "../../utils";
+import { drawerAtom, getCharacterFullName, getDayOrdinal, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -90,6 +90,33 @@ function BlueprintField({ field, value }: { field: BlueprintFieldType; value: st
     </div>
   );
 }
+function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprintFieldType; field: BlueprintFieldType }) {
+  const startMonthIdx =
+    field?.calendar && field.calendar.months.length
+      ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
+      : null;
+  const endMonthIdx =
+    field?.calendar && field.calendar.months.length
+      ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.end_month_id)
+      : null;
+  const startDayOrdinal =
+    typeof fieldData?.calendar?.start_day === "number" ? getDayOrdinal(fieldData.calendar.start_day) : null;
+  const endDayOrdinal = typeof fieldData?.calendar?.end_day === "number" ? getDayOrdinal(fieldData.calendar.end_day) : null;
+  return (
+    <div className="flex flex-col">
+      <span className="block min-h-[20px] truncate text-sm">{field.title}</span>
+      <span className="cursor-not-allowed rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white outline-none">
+        {`${fieldData?.calendar?.start_day || ""}${startDayOrdinal} ${
+          typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title : ""
+        } ${fieldData?.calendar?.start_year || ""} ${
+          fieldData?.calendar?.end_day ? ` - ${fieldData?.calendar?.end_day || ""}${endDayOrdinal}` : ""
+        } ${typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""} ${
+          fieldData?.calendar?.end_year || ""
+        }`}
+      </span>
+    </div>
+  );
+}
 
 const fieldSizeClass = tv({
   base: "flex flex-col justify-center mt-1 p-0.5",
@@ -124,6 +151,7 @@ function AdditionalFieldDisplay({
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text" });
+
   return (
     <div className={fieldClasses}>
       {blueprint_field.field_type === "text" ||
@@ -146,7 +174,6 @@ function AdditionalFieldDisplay({
           value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
         />
       ) : null}
-
       {blueprint_field.field_type === "textarea" ? (
         <>
           <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
@@ -154,21 +181,7 @@ function AdditionalFieldDisplay({
         </>
       ) : null}
 
-      {/* {blueprint_field.field_type === "characters_single" && blueprint_field_data?.characters?.[0] ? (
-        <div className="w-full">
-          <EntityPreview
-            id={blueprint_field_data.characters[0].related_id as string}
-            image_id={blueprint_field_data?.characters?.[0].character.portrait_id}
-            label={blueprint_field.title}
-            title={getCharacterFullName(
-              blueprint_field_data.characters[0].character.first_name,
-              undefined,
-              blueprint_field_data.characters[0].character?.last_name,
-            )}
-            type="characters"
-          />
-        </div>
-      ) : null} */}
+      {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
 
       {(blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple") &&
       blueprint_field_data?.characters ? (

@@ -243,7 +243,7 @@ function createColumns(
                   ) : (
                     ""
                   )}
-                  {typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title : ""}{" "}
+                  {typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""}{" "}
                   {fieldData?.calendar?.end_year || ""}
                 </span>
               );
