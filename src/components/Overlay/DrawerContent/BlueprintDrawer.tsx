@@ -417,7 +417,6 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                         }),
                                 },
                               ]}
-                              initialOpen={!field.title}
                               label={field?.title}>
                               <FieldRow
                                 calendar={field?.calendar}
