@@ -42,7 +42,7 @@ const AvatarClasses = tv({
         base: "rounded-full",
       },
       rounded: {
-        base: "rounded-md",
+        base: "rounded",
       },
       square: {
         base: "rounded-none",
