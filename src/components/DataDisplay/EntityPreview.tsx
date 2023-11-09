@@ -7,6 +7,7 @@ import { Avatar, Icon } from "../Misc";
 
 export function EntityPreview({
   id,
+  parent_id,
   title,
   type,
   link,
@@ -54,7 +55,7 @@ export function EntityPreview({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                previewAction(id);
+                previewAction(id, parent_id);
               }}
             />
           </span>

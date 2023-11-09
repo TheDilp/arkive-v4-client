@@ -62,12 +62,13 @@ export function CarouselEntityPreview({ items }: Props) {
                 : undefined
             }
             otherActionIcon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
-            previewAction={(id) => {
+            previewAction={(id, parent_id) => {
               setDrawer((prev) => ({
                 ...prev,
                 title: "Preview",
-                data: { id, entity_type: items[0].type as AvailableEntityType },
+                data: { id, parent_id, entity_type: items[0].type as AvailableEntityType },
                 type: "entity_preview",
+                size: "half",
               }));
             }}
           />

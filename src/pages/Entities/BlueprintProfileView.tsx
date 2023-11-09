@@ -205,7 +205,8 @@ function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
-              id: map_pin.related_id,
+              id: map_pin.map_pin.id,
+              parent_id: map_pin.map_pin.parent_id,
               title: map_pin.map_pin.title || "",
               icon: map_pin.map_pin.icon || IconEnum.document,
               label: blueprint_field.title,
