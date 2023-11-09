@@ -200,6 +200,21 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
+      {(blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple") &&
+      blueprint_field_data?.characters ? (
+        <div className="w-full">
+          <CarouselEntityPreview
+            items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
+              id: map_pin.related_id,
+              title: map_pin.map_pin.title || "",
+              icon: map_pin.map_pin.icon || IconEnum.document,
+              label: blueprint_field.title,
+              type: "map_pins",
+              link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
+            }))}
+          />
+        </div>
+      ) : null}
 
       {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
         <div className="w-full">
