@@ -325,7 +325,6 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     },
     { enabled: !!data?.id && !!blueprint?.data, queryKeyConcat: ["drawer"] },
   );
-  console.log(existingInstance?.data, blueprint);
   useLayoutEffect(() => {
     if (existingInstance?.data && !!data?.id) {
       setInstance(existingInstance?.data);
