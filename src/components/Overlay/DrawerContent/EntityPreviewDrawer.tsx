@@ -1,9 +1,13 @@
+import { useNavigate } from "react-router-dom";
+
 import { useGetEntity } from "../../../hooks";
 import { MapView } from "../../../pages/Entities";
 import { AvailableEntityType, DocumentType, MapType } from "../../../types";
+import { IconEnum } from "../../../utils";
 import { Editor } from "../../Complex";
+import { Button, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
-import { Alert } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 
 export function MapPreviewDrawer({ id, subitem_id }: { id: string; subitem_id?: string }) {
   const { data: existingMap, isLoading } = useGetEntity<MapType>(
@@ -27,22 +31,33 @@ export function MapPreviewDrawer({ id, subitem_id }: { id: string; subitem_id?: 
 }
 
 export function DocumentPreviewDrawer({ id }: { id: string }) {
+  const navigate = useNavigate();
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
     {
       data: { id },
+      fields: ["title", "content", "project_id"],
     },
     {
       enabled: !!id,
     },
   );
 
-  if (isLoading) return null;
+  if (isLoading) return <Skeleton type="editor" />;
   return (
     <div className="h-full w-full overflow-hidden">
       {existingDocument?.data?.content ? (
-        <Editor initialContent={existingDocument?.data?.content} isReadOnly name="editor" onChange={() => {}} />
+        <div className="flex flex-col gap-y-2">
+          <Title label={existingDocument?.data?.title} size="xl" />
+          <Editor initialContent={existingDocument?.data?.content} isReadOnly name="editor" onChange={() => {}} />
+          <Button
+            icon={IconEnum.edit}
+            label="Edit document (open editor)"
+            onClick={() => navigate(`/projects/${existingDocument?.data?.project_id}/documents/${id}`)}
+            variant="info"
+          />
+        </div>
       ) : (
         <Alert label="This document has no content." />
       )}

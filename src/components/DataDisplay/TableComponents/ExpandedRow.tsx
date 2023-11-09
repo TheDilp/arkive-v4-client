@@ -1,21 +1,12 @@
 import set from "lodash.set";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { RemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
-import { useGetEntities, useGetEntity, useGetSubEntity, useSearch } from "../../../hooks";
-import {
-  CharacterFieldType,
-  CharacterType,
-  DocumentType,
-  SearchAllEntitiesByTagType,
-  TableType,
-  WordType,
-} from "../../../types";
+import { useGetEntities, useGetSubEntity, useSearch } from "../../../hooks";
+import { CharacterFieldType, CharacterType, SearchAllEntitiesByTagType, TableType, WordType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getCharacterFullName, getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
-import { StaticRender } from "../../Complex";
 import { Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -165,27 +156,27 @@ function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOption
     </div>
   );
 }
-function ExpandedDocument({ id }: { id: string }) {
-  const { data, isFetching } = useGetEntity<DocumentType>(
-    id,
-    "documents",
-    {
-      data: {
-        id,
-      },
-      fields: ["id", "content"],
-    },
-    {
-      enabled: !!id,
-    },
-  );
-  if (isFetching) return <Skeleton type="editor" />;
-  return data?.data?.content ? (
-    <div className="w-min min-w-fit">
-      <StaticRender content={data?.data?.content as RemirrorJSON} />
-    </div>
-  ) : null;
-}
+// function ExpandedDocument({ id }: { id: string }) {
+//   const { data, isFetching } = useGetEntity<DocumentType>(
+//     id,
+//     "documents",
+//     {
+//       data: {
+//         id,
+//       },
+//       fields: ["id", "content"],
+//     },
+//     {
+//       enabled: !!id,
+//     },
+//   );
+//   if (isFetching) return <Skeleton type="editor" />;
+//   return data?.data?.content ? (
+//     <div className="w-min min-w-fit">
+//       <StaticRender content={data?.data?.content as RemirrorJSON} />
+//     </div>
+//   ) : null;
+// }
 function ExpandedTag({ id }: { id: string }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
@@ -251,7 +242,7 @@ function ExpandedWord({ id }: { id: string }) {
 export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
   return (
     <div className={ExpandedTableRowClasses()}>
-      {type === "documents" ? <ExpandedDocument id={data?.id} /> : null}
+      {/* {type === "documents" ? <ExpandedDocument id={data?.id} /> : null} */}
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
       {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
       {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}

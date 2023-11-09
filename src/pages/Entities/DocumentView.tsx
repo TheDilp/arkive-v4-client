@@ -111,7 +111,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
   return (
-    <div className="h-[90%] w-full max-w-[95.5vw]">
+    <div className="h-[95%] w-full max-w-[95.5vw]">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification

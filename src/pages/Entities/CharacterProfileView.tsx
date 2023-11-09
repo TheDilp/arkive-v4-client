@@ -267,6 +267,7 @@ function documentsTableColumns(
     },
     unknown
   >,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   character_id: string,
   project_id: string,
 ) {
@@ -308,10 +309,19 @@ function documentsTableColumns(
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
               {
-                id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} content`,
+                id: "preview",
+                label: "Preview content",
                 icon: IconEnum.document,
-                onClick: row.getToggleExpandedHandler(),
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: {
+                      id: row.original.id,
+                      entity_type: "documents",
+                    },
+                    title: "Preview document",
+                    type: "entity_preview",
+                  })),
               },
               {
                 id: "2",
@@ -903,7 +913,7 @@ export function CharacterProfileView() {
                 {existingCharacter?.data?.documents?.length ? (
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     <Table
-                      columns={documentsTableColumns(removeItem, existingCharacter?.data?.id, project_id as string)}
+                      columns={documentsTableColumns(removeItem, setDrawer, existingCharacter?.data?.id, project_id as string)}
                       config={{
                         expandable: true,
                         hasNoHeaderGap: true,

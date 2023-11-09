@@ -194,7 +194,7 @@ function AdditionalFieldDisplay({
               title: doc.document.title,
               icon: doc.document.icon || IconEnum.document,
               label: blueprint_field.title,
-              type: "characters",
+              type: "documents",
               link: `/projects/${project_id}/documents/${doc.related_id}`,
             }))}
           />
