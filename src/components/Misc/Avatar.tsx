@@ -37,6 +37,17 @@ const AvatarClasses = tv({
         base: "w-24 h-24 min-w-[6rem] min-h-[6rem] text-[2.5rem]",
       },
     },
+    shape: {
+      circle: {
+        base: "rounded-full",
+      },
+      rounded: {
+        base: "rounded-md",
+      },
+      square: {
+        base: "rounded-none",
+      },
+    },
     hasShowImage: {
       true: {
         image: "cursor-pointer transition-all",
@@ -59,10 +70,11 @@ export function Avatar({
   isBordered,
   hasShowImage = false,
   tooltipAllowedPlacements = [],
+  shape = "circle",
   size = "md",
 }: AvatarType) {
   const setDialog = useSetAtom(dialogAtom);
-  const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage });
+  const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage, shape });
   return (
     <Tooltip
       allowedPlacements={tooltipAllowedPlacements}
