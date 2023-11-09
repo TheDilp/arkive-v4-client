@@ -154,7 +154,7 @@ function AdditionalFieldDisplay({
         </>
       ) : null}
 
-      {blueprint_field.field_type === "characters_single" && blueprint_field_data?.characters?.[0] ? (
+      {/* {blueprint_field.field_type === "characters_single" && blueprint_field_data?.characters?.[0] ? (
         <div className="w-full">
           <EntityPreview
             id={blueprint_field_data.characters[0].related_id as string}
@@ -168,9 +168,10 @@ function AdditionalFieldDisplay({
             type="characters"
           />
         </div>
-      ) : null}
+      ) : null} */}
 
-      {blueprint_field.field_type === "characters_multiple" && blueprint_field_data?.characters ? (
+      {(blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple") &&
+      blueprint_field_data?.characters ? (
         <div className="w-full">
           <CarouselEntityPreview
             items={(blueprint_field_data.characters || []).map((char) => ({
@@ -180,6 +181,21 @@ function AdditionalFieldDisplay({
               label: blueprint_field.title,
               type: "characters",
               link: `/projects/${project_id}/characters/${char.related_id}/resources`,
+            }))}
+          />
+        </div>
+      ) : null}
+      {(blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple") &&
+      blueprint_field_data?.characters ? (
+        <div className="w-full">
+          <CarouselEntityPreview
+            items={(blueprint_field_data.documents || []).map((doc) => ({
+              id: doc.related_id,
+              title: doc.document.title,
+              icon: doc.document.icon || IconEnum.document,
+              label: blueprint_field.title,
+              type: "characters",
+              link: `/projects/${project_id}/documents/${doc.related_id}`,
             }))}
           />
         </div>
@@ -243,26 +259,36 @@ export default function BlueprintProfileView() {
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
-    data: {
-      id: item_id,
+  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
+    item_id,
+    "blueprints",
+    {
+      data: {
+        id: item_id,
+      },
+      relations: {
+        random_table_options: true,
+        blueprint_fields: true,
+      },
     },
-    relations: {
-      random_table_options: true,
-      blueprint_fields: true,
-    },
-  });
+    { staleTime: 3 * 60 * 1000 },
+  );
 
   const {
     data: blueprintInstance,
     isLoading,
     isFetching,
-  } = useGetSubEntity<BlueprintInstanceType>(subitem_id, "blueprint_instances", {
-    data: { id: subitem_id },
-    relations: {
-      blueprint_fields: true,
+  } = useGetSubEntity<BlueprintInstanceType>(
+    subitem_id,
+    "blueprint_instances",
+    {
+      data: { id: subitem_id },
+      relations: {
+        blueprint_fields: true,
+      },
     },
-  });
+    { enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 },
+  );
 
   useChangeNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,

@@ -5,16 +5,25 @@ import { getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
-export function EntityPreview({ id, title, type, link, icon, image_id, label, hasNoBackground, clearAction }: ItemPreviewType) {
+export function EntityPreview({
+  id,
+  title,
+  type,
+  link,
+  icon,
+  image_id,
+  label,
+  hasNoBackground,
+  otherActionIcon,
+  previewAction,
+  clearAction,
+  otherAction,
+}: ItemPreviewType) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col">
       {label ? <div className="block min-h-[20px] truncate text-sm text-zinc-300">{label}</div> : null}
-      <Link
-        className={`flex max-h-10 items-center gap-x-2 rounded p-2 ${
-          link ? "transition-all hover:text-blue-400" : "cursor-default"
-        } ${hasNoBackground ? "" : "bg-zinc-700"}`}
-        to={link || "#"}>
+      <span className={`flex max-h-10 items-center gap-x-1 rounded p-2  ${hasNoBackground ? "" : "bg-zinc-700"}`}>
         {image_id ? (
           <Avatar
             hasShowImage
@@ -29,7 +38,27 @@ export function EntityPreview({ id, title, type, link, icon, image_id, label, ha
             <Icon fontSize={32} icon={icon || getDefaultEntityIcon(type)} />
           </span>
         ) : null}
-        <span className="truncate">{title}</span>
+        <Link
+          className={`flex max-h-10 items-center gap-x-1 rounded p-2 ${
+            link ? "truncate transition-all hover:text-blue-400" : "cursor-default"
+          } ${hasNoBackground ? "" : "bg-zinc-700"}`}
+          to={link || "#"}>
+          <span className="truncate">{title}</span>
+        </Link>
+        {previewAction ? (
+          <span className="ml-auto w-min">
+            <Button
+              hasNoBackground
+              icon={IconEnum.eye}
+              isIconOnly
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                previewAction(id);
+              }}
+            />
+          </span>
+        ) : null}
         {clearAction ? (
           <span className="ml-auto w-min">
             <Button
@@ -44,7 +73,21 @@ export function EntityPreview({ id, title, type, link, icon, image_id, label, ha
             />
           </span>
         ) : null}
-      </Link>
+        {otherAction ? (
+          <div className="w-min">
+            <Button
+              hasNoBackground
+              icon={otherActionIcon || IconEnum.warning}
+              isIconOnly
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                otherAction(id);
+              }}
+            />
+          </div>
+        ) : null}
+      </span>
     </div>
   );
 }

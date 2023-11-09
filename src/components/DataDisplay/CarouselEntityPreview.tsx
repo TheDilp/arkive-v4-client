@@ -9,11 +9,11 @@ import {
   useFloating,
   useInteractions,
 } from "@floating-ui/react";
+import { useSetAtom } from "jotai";
 import { useState } from "react";
 
-import { ItemPreviewType } from "../../types";
-import { IconEnum } from "../../utils";
-import { Button } from "../Form";
+import { AvailableEntityType, ItemPreviewType } from "../../types";
+import { drawerAtom, IconEnum } from "../../utils";
 import { EntityPreview } from "./EntityPreview";
 
 type Props = {
@@ -21,6 +21,8 @@ type Props = {
 };
 
 export function CarouselEntityPreview({ items }: Props) {
+  const setDrawer = useSetAtom(drawerAtom);
+
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
@@ -49,21 +51,29 @@ export function CarouselEntityPreview({ items }: Props) {
     <div className="relative flex w-full items-center">
       {items?.length ? (
         <div ref={refs.setReference} className="relative w-full">
-          <EntityPreview key={items[0].id} {...items[0]} />
-          <div className="absolute right-2 top-1/2">
-            <Button
-              hasNoBackground
-              icon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
-              onClick={(e: Event) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsOpen((prev) => !prev);
-              }}
-            />
-          </div>
+          <EntityPreview
+            key={items[0].id}
+            {...items[0]}
+            otherAction={
+              items.length > 1
+                ? () => {
+                    setIsOpen((prev) => !prev);
+                  }
+                : undefined
+            }
+            otherActionIcon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
+            previewAction={(id) => {
+              setDrawer((prev) => ({
+                ...prev,
+                title: "Preview",
+                data: { id, entity_type: items[0].type as AvailableEntityType },
+                type: "entity_preview",
+              }));
+            }}
+          />
         </div>
       ) : null}
-      {isOpen ? (
+      {isOpen && items.length > 1 ? (
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
             <div
@@ -72,7 +82,18 @@ export function CarouselEntityPreview({ items }: Props) {
               style={floatingStyles}>
               {items.slice(1).map((item) => (
                 <div key={item.id} className="w-full">
-                  <EntityPreview {...item} label="" />
+                  <EntityPreview
+                    {...item}
+                    label=""
+                    previewAction={(id) => {
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: "Preview",
+                        data: { id, entity_type: items[0].type as AvailableEntityType },
+                        type: "entity_preview",
+                      }));
+                    }}
+                  />
                 </div>
               ))}
             </div>
