@@ -160,7 +160,7 @@ export function RandomTableView() {
 
   return (
     <TablePageLayout>
-      <div className="top-0 flex w-full items-center justify-end gap-x-2">
+      <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
         {/* <div className="w-56">
           <Input
             name="quick_filter"
@@ -198,7 +198,7 @@ export function RandomTableView() {
           <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />
         </div>
       </div>
-      <div className="h-full max-h-[85%] w-full overflow-hidden">
+      <div className=" w-full overflow-hidden">
         <Table
           columns={createColumns(setDrawer, setDialog)}
           config={{

@@ -502,7 +502,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     <>
       <div
         ref={bodyRef}
-        className="mih-h-full scrollbar-hidden h-full max-h-[calc(100%-2.5rem)] overflow-auto border-b border-zinc-700"
+        className="scrollbar-hidden max-h-[calc(100%-2.5rem)] overflow-auto border-b border-zinc-700"
         style={{
           height: expandable
             ? ""

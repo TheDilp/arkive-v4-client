@@ -162,7 +162,7 @@ export function DictionaryView() {
           />
         </div>
       </div>
-      <div className="h-full max-h-[85%] w-full overflow-hidden">
+      <div className="h-fit w-full">
         <Table
           columns={createColumns(setDrawer, setDialog, item_id as string)}
           config={{

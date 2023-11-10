@@ -3,6 +3,7 @@ import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../hooks";
 import { CharacterProfileView, MapView } from "../../../pages/Entities";
+import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, MapType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
@@ -12,6 +13,9 @@ import { Alert, Skeleton } from "../../Misc";
 
 export function CharacterPreviewDrawer({ id }: { id: string }) {
   return <CharacterProfileView id={id} isPreview />;
+}
+export function BlueprintPreviewDrawer({ id, parent_id }: { id: string; parent_id?: string }) {
+  return <BlueprintProfileView id={id} parent_id={parent_id} />;
 }
 export function DocumentPreviewDrawer({ id }: { id: string }) {
   const navigate = useNavigate();
@@ -79,6 +83,7 @@ export function EntityPreviewDrawer({
   return (
     <DrawerLayout>
       {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
+      {data.entity_type === "blueprint_instances" ? <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
       {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
       {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
       {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}

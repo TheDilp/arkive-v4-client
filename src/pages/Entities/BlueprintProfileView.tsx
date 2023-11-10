@@ -119,38 +119,61 @@ const fieldSizeClass = tv({
   base: "flex flex-col justify-center mt-1 p-0.5",
   variants: {
     type: {
-      dice_roll: "col-span-6 sm:col-span-3 lg:col-span-1",
-      text: "col-span-6 sm:col-span-3 lg:col-span-1",
-      image: "col-span-6 sm:col-span-3 lg:col-span-1",
-      select: "col-span-6 sm:col-span-3 lg:col-span-1",
-      select_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
-      characters_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
-      characters_multiple: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
-      locations_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
-      locations_multiple: "col-span-6 sm:col-span-3 mg:col-span-2 xl:col-span-1",
-      blueprints_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
-      blueprints_multiple: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
-      images_single: "col-span-6 sm:col-span-3 lg:col-span-1",
+      dice_roll: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      text: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      select: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      characters_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      characters_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      locations_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      locations_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      blueprints_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      blueprints_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      images_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       images_multiple: "col-span-6 sm:col-span-6 lg:col-span-6",
-      number: "col-span-6 sm:col-span-3 lg:col-span-1",
-      random_table: "col-span-6 sm:col-span-3 lg:col-span-1",
+      number: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      random_table: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       textarea: "col-span-6 bg-transparent rounded-none shadow-none",
-      date: "col-span-6 sm:col-span-3 lg:col-span-1",
-      boolean: "col-span-6 sm:col-span-3 lg:col-span-1",
+      date: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      boolean: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
     },
   },
+  compoundVariants: [
+    {
+      type: [
+        "dice_roll",
+        "text",
+        "select",
+        "select_multiple",
+        "characters_single",
+        "characters_multiple",
+        "locations_single",
+        "locations_multiple",
+        "blueprints_single",
+        "blueprints_multiple",
+        "images_single",
+        "number",
+        "date",
+        "boolean",
+      ],
+      isPreview: true,
+      className: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+    },
+  ],
 });
 
 function AdditionalFieldDisplay({
+  isPreview,
   blueprint_field,
   blueprint_field_data,
 }: {
+  isPreview: boolean;
   blueprint_field: BlueprintFieldType;
   blueprint_field_data: BlueprintInstanceBlueprintFieldType;
 }) {
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
-  const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text" });
+  const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text", isPreview });
 
   return (
     <div className={fieldClasses}>
@@ -289,7 +312,7 @@ function AdditionalFieldDisplay({
   );
 }
 
-export default function BlueprintProfileView() {
+export default function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id?: string }) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isLg } = useBreakpoint();
   const navigate = useNavigate();
@@ -297,11 +320,11 @@ export default function BlueprintProfileView() {
   const setDrawer = useSetAtom(drawerAtom);
 
   const { data: blueprint } = useGetEntity<BlueprintType>(
-    item_id,
+    parent_id || item_id,
     "blueprints",
     {
       data: {
-        id: item_id,
+        id: parent_id || item_id,
       },
       relations: {
         random_table_options: true,
@@ -312,10 +335,10 @@ export default function BlueprintProfileView() {
   );
 
   const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
-    subitem_id,
+    id || subitem_id,
     "blueprint_instances",
     {
-      data: { id: subitem_id },
+      data: { id: id || subitem_id },
       relations: {
         blueprint_fields: true,
       },
@@ -342,7 +365,7 @@ export default function BlueprintProfileView() {
                   size: "lg",
                   title: "Edit blueprint",
                   type: "blueprints",
-                  data: { id: item_id as string, project_id: project_id as string },
+                  data: { id: parent_id || (item_id as string), project_id: project_id as string },
                 }));
               }}
             />
@@ -357,7 +380,7 @@ export default function BlueprintProfileView() {
                   size: "lg",
                   title: "Edit blueprint instance",
                   type: "blueprint_instances",
-                  data: { id: subitem_id as string, project_id: project_id as string },
+                  data: { id: id || (subitem_id as string), project_id: project_id as string },
                 }));
               }}
             />
@@ -367,7 +390,7 @@ export default function BlueprintProfileView() {
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
-          <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+          <div className={`${id ? "" : "p-4"} flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 lg:col-span-1`}>
             <div className="mt-2 flex flex-col gap-y-1">
               <h2 className="text-center font-merriweather text-lg">{`${blueprintInstance?.data?.title || ""}`.trimEnd()}</h2>
             </div>
@@ -375,7 +398,9 @@ export default function BlueprintProfileView() {
               <Tabs
                 isVertical
                 onChange={(tab, index) => {
-                  navigate(`/projects/${project_id}/blueprints/${item_id}/${subitem_id}/${tab.label.toLowerCase()}`);
+                  navigate(
+                    `/projects/${project_id}/blueprints/${parent_id || item_id}/${id || subitem_id}/${tab.label.toLowerCase()}`,
+                  );
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
@@ -396,7 +421,7 @@ export default function BlueprintProfileView() {
             />
           </div>
         ) : null}
-        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-12rem)] lg:max-h-[calc(100vh-12rem)]">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
@@ -411,6 +436,7 @@ export default function BlueprintProfileView() {
                       key={blueprint_field.id}
                       blueprint_field={blueprintField}
                       blueprint_field_data={blueprint_field}
+                      isPreview={!!id}
                     />
                   );
                 })

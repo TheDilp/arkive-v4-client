@@ -531,7 +531,7 @@ export function FolderView() {
         </div>
       ) : null}
       {view === "table" ? (
-        <div className="w-full flex-1">
+        <div className="h-full w-full">
           <Table
             columns={columns(
               setDrawer,

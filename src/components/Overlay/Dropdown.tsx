@@ -33,7 +33,7 @@ import { Avatar, Icon } from "../Misc";
 
 const DropdownClasses = tv({
   slots: {
-    base: "z-40 font-lato min-w-fit outline-none",
+    base: "z-30 font-lato min-w-fit outline-none",
     floatingBase:
       "border max-h-[40rem] rounded overflow-y-auto border-zinc-600 z-[60] font-lato shadow-lg absolute top-0 left-0",
   },
@@ -184,7 +184,6 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                               }
                               setIsOpen(false);
                             }}
-                            // subItems={dropdownItem.subItems}
                           />
                         </Dropdown>
                       ) : (
