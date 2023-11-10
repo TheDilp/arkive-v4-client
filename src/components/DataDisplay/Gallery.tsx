@@ -4,21 +4,48 @@ import { GalleryType, Size } from "../../types";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
-  base: "grid gap-1 grid-cols-1 md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
+  slots: {
+    container: "h-min overflow-y-auto",
+    base: "grid gap-1 grid-cols-1 md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
+  },
   variants: {
     columns: {
-      1: "lg:grid-cols-1",
-      2: "lg:grid-cols-2",
-      3: "lg:grid-cols-3",
-      4: "lg:grid-cols-4",
-      5: "lg:grid-cols-5",
-      6: "lg:grid-cols-6",
-      7: "lg:grid-cols-7",
-      8: "lg:grid-cols-8",
-      9: "lg:grid-cols-9",
-      10: "lg:grid-cols-10",
-      11: "lg:grid-cols-11",
-      12: "lg:grid-cols-12",
+      1: {
+        base: "lg:grid-cols-1",
+      },
+      2: {
+        base: "lg:grid-cols-2",
+      },
+      3: {
+        base: "lg:grid-cols-3",
+      },
+      4: {
+        base: "lg:grid-cols-4",
+      },
+      5: {
+        base: "lg:grid-cols-5",
+      },
+      6: {
+        base: "lg:grid-cols-6",
+      },
+      7: {
+        base: "lg:grid-cols-7",
+      },
+      8: {
+        base: "lg:grid-cols-8",
+      },
+      9: {
+        base: "lg:grid-cols-9",
+      },
+      10: {
+        base: "lg:grid-cols-10",
+      },
+      11: {
+        base: "lg:grid-cols-11",
+      },
+      12: {
+        base: "lg:grid-cols-12",
+      },
     },
   },
 });
@@ -30,11 +57,11 @@ function getRowSize(size: Size) {
 }
 
 export function Gallery({ images, isOpenable, columns = 4, size = "md" }: GalleryType) {
-  const classes = GalleryClasses({ columns });
+  const { container, base } = GalleryClasses({ columns });
   return (
-    <div className={`h-min max-h-[${getRowSize(size)}] overflow-y-auto`}>
+    <div className={container()}>
       <div
-        className={classes}
+        className={base()}
         style={{
           gridAutoRows: getRowSize(size),
         }}>
