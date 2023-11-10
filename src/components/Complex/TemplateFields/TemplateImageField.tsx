@@ -19,7 +19,7 @@ export function TemplateImageField({ title, name, handleChange, id, fieldType, c
 
   return (
     <Collapsible label={title}>
-      <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto p-2">
         <Search
           name={name}
           onChange={({ value, label }) => {

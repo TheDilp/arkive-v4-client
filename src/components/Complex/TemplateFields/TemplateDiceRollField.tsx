@@ -19,7 +19,7 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
   const [isRolling, setIsRolling] = useState(false);
   return (
     <Collapsible label={title}>
-      <div className="flex flex-nowrap items-center gap-x-2">
+      <div className="flex flex-nowrap items-center gap-x-2 p-2">
         <Input
           name={name}
           onChange={({ value }) =>

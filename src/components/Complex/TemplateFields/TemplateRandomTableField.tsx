@@ -37,7 +37,7 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
   )?.random_table_suboptions;
   return (
     <Collapsible label={title}>
-      <div className="flex flex-col gap-y-1">
+      <div className="flex flex-col gap-y-1 p-2">
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select
             hasSearch

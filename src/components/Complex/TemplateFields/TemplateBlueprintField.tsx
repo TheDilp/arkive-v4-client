@@ -19,7 +19,7 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
 
   return (
     <Collapsible label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto p-2">
         <Search
           name={name}
           onChange={({ value, label, icon }) => {

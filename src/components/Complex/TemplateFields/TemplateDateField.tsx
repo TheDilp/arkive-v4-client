@@ -54,7 +54,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
     <Collapsible label={title}>
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-y-2 p-2">
         <div className="flex items-center justify-between gap-x-2">
           <Input
             isDisabled={typeof startMonthIdx !== "number"}
