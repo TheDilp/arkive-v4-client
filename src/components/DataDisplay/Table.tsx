@@ -503,14 +503,17 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     <>
       <div
         ref={bodyRef}
-        className="scrollbar-hidden mih-h-full h-full max-h-[calc(100%-2.5rem)] overflow-auto  border-b border-zinc-700"
+        className="scrollbar-hidden mih-h-full h-full max-h-[calc(100%-2.5rem)] overflow-auto border-b border-zinc-700"
         style={{
           height: expandable
             ? ""
             : `${
                 // 20px added to account for the pagination
                 // 40px added to account for the subheader when it is enabled
-                rowVirtualizer.getTotalSize() + Number(headerRef?.current?.clientHeight) + 20 + (isSubheaderEnabled ? 40 : 0)
+                rowVirtualizer.getTotalSize() +
+                Number(headerRef?.current?.clientHeight) +
+                (pagination ? 20 : 0) +
+                (isSubheaderEnabled ? 40 : 0)
               }px`,
         }}>
         <div ref={headerRef} className={head()}>
