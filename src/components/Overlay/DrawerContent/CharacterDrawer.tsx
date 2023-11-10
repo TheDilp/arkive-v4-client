@@ -609,7 +609,7 @@ function FieldTemplateRow({
   return (
     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
       <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
-        <div className="flex select-none flex-col gap-y-2 pt-2">
+        <div className="flex select-none flex-col gap-y-2 p-2">
           {character_fields.sort(sortEntities).map((template_field) => {
             const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
               (field) => template_field?.id === field?.id,
