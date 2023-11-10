@@ -244,7 +244,6 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
-
       {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
         <div className="w-full">
           <EntityPreview
@@ -256,7 +255,6 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
-
       {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
         <BlueprintField field={blueprint_field} value={(value as string | string[] | null) || ""} />
       ) : null}

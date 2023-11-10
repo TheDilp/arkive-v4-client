@@ -48,6 +48,7 @@ function FieldRow({
   random_table,
   isLoading,
   blueprint_id,
+  blueprint,
   changeField,
 }: (Omit<BlueprintFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
@@ -206,6 +207,7 @@ function FieldRow({
         <div className="flex flex-col gap-y-2 pl-8">
           <Search
             hasShownOption
+            initialDisplayValue={blueprint?.title || ""}
             isDisabled={isLoading}
             label="Blueprint"
             name={`blueprint_fields[${index}].blueprint_id`}
@@ -419,6 +421,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                               ]}
                               label={field?.title}>
                               <FieldRow
+                                blueprint={field?.blueprint}
+                                blueprint_id={field?.blueprint_id}
                                 calendar={field?.calendar}
                                 calendar_id={field?.calendar_id}
                                 changeField={handleChange}

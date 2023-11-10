@@ -47,7 +47,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit blueprint fields",
+                label: "Edit blueprint",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
