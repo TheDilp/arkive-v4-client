@@ -59,7 +59,7 @@ function FieldRow({
   isLoading: boolean;
 }) {
   return (
-    <div className="flex w-full flex-col gap-y-2">
+    <div className="flex w-full flex-col gap-y-2 p-2">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
