@@ -1,8 +1,8 @@
 import { useSetAtom } from "jotai";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
@@ -102,17 +102,55 @@ export function TagView() {
   useChangeNavbarTitle(" Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const [filter, setFilter] = useState("");
   const columns = createColumns(setDrawer, setDialog);
-  const [{ selection, orderBy, pagination }, dispatch] = useTable({
+  const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
-  const { data, isLoading } = useGetEntities({ data: { project_id }, pagination, orderBy }, "tags");
+  const { data, isLoading } = useGetEntities({ data: { project_id }, filters, pagination, orderBy }, "tags");
+
+  useLayoutEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 750);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch]);
 
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">
+        <div className="w-52">
+          <Input
+            name="quick_filter"
+            onChange={({ value }) => setFilter(value as string)}
+            placeholder="Quick search by title"
+            value={filter}
+          />
+        </div>
         <div className="w-fit">
           <Button
             icon={IconEnum.add}
@@ -136,7 +174,7 @@ export function TagView() {
             hasSelect: true,
             expandable: true,
             orderBy,
-            filters: {},
+            filters,
             selection,
           }}
           data={data?.data || []}
