@@ -53,7 +53,9 @@ export function Sidebar() {
                 key={item.icon}
                 className={`${listItemLink()} ${
                   item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
-                } ${item.navigate === type && type !== "project-settings" ? selectedListItem() : ""}
+                }
+                ${item.navigate === "blueprints" && pathname.includes("blueprints") ? selectedListItem() : ""}
+                ${item.navigate === type && type !== "project-settings" ? selectedListItem() : ""}
                  ${item.navigate === "project-settings" && type === "project-settings" ? selectedSettingsListItem() : ""}
                 
                 ${item.navigate === "project-settings" ? listSettingsItem() : ""}
