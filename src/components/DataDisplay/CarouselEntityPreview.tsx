@@ -92,6 +92,7 @@ export function CarouselEntityPreview({ items }: Props) {
                         title: "Preview",
                         data: { id, entity_type: items[0].type as AvailableEntityType },
                         type: "entity_preview",
+                        size: "half",
                       }));
                     }}
                   />

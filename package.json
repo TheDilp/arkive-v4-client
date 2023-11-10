@@ -88,8 +88,7 @@
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "husky install",
-    "pretty": "prettier --write 'src/**/*.{ts,tsx,css,html,json}'",
-    "precommit": "pnpm run lint --fix && pnpm run pretty"
+    "precommit": "bun run lint --fix"
   },
   "type": "module",
   "version": "0.0.0"
