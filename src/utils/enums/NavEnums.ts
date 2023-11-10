@@ -2,10 +2,10 @@ import { IconEnum } from "./IconEnums";
 
 export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
+  { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
   { icon: IconEnum.document, navigate: "documents", tooltip: "Documents" },
   { icon: IconEnum.map, navigate: "maps", tooltip: "Maps" },
   { icon: IconEnum.board, navigate: "graphs", tooltip: "Graphs" },
-  { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
   { icon: IconEnum.calendar, navigate: "calendars", tooltip: "Calendars" },
   // { icon: IconEnum.timeline, navigate: "timelines", tooltip: "Timelines" },
   // { icon: IconEnum.screen, navigate: "screens", tooltip: "Screens" },
