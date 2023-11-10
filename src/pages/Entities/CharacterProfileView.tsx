@@ -513,17 +513,18 @@ function conversationTableColumns(
       id: "characters",
       header: "Members",
       cell: ({ row }) => (
-        <div className="-ml-4 flex w-full items-center justify-center first:ml-0">
+        <div className="flex w-full items-center justify-center">
           {row.original.characters.map((char) => (
-            <Avatar
-              key={char.id}
-              image={getImageURL(project_id, "images", char?.portrait_id || "")}
-              initials={getAvatarInitials(char.first_name, char?.last_name || "")}
-              isBordered
-              isTooltipDisabled
-              label={getCharacterFullName(char.first_name, char?.last_name || "")}
-              size="sm"
-            />
+            <div key={char.id} className="-ml-4 first:ml-0">
+              <Avatar
+                image={getImageURL(project_id, "images", char?.portrait_id || "")}
+                initials={getAvatarInitials(char.first_name, char?.last_name || "")}
+                isBordered
+                isTooltipDisabled
+                label={getCharacterFullName(char.first_name, char?.last_name || "")}
+                size="sm"
+              />
+            </div>
           ))}
         </div>
       ),
@@ -1063,7 +1064,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                   <Skeleton limit={5} type="table" />
                 </div>
               ) : (
-                <div className="h-full max-h-full w-full">
+                <div className="h-fit w-full">
                   <Table
                     columns={columns}
                     config={{

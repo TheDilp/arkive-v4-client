@@ -502,7 +502,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     <>
       <div
         ref={bodyRef}
-        className="scrollbar-hidden mih-h-full h-full max-h-[calc(100%-2.5rem)] overflow-auto border-b border-zinc-700"
+        className="mih-h-full scrollbar-hidden h-full max-h-[calc(100%-2.5rem)] overflow-auto border-b border-zinc-700"
         style={{
           height: expandable
             ? ""
@@ -532,8 +532,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     ${hdr.id === "select" ? "sticky left-0" : ""}
                     ${(meta as MetaType)?.pinned ? "sticky left-[2.75rem]" : ""}
-                    bg-zinc-950 first:border-l
-                    `}
+                    bg-zinc-950 first:border-l`}
                 style={{
                   ...getTableColumnWidths(hdr.column.id, {
                     minSize: hdr.column.columnDef.minSize,
@@ -643,7 +642,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
                   ? "group hover:text-white"
                   : "hover:bg-zinc-800"
-              } `}
+              }`}
               style={{
                 height: expandable ? "" : `${virtualRow.size}px`,
                 transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
