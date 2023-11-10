@@ -23,13 +23,14 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
         <Search
           name={name}
           onChange={({ value, label, icon }) => {
-            if (currentValue?.some((cVal) => cVal.related_id === value)) {
+            if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
               createNotification({
                 timer: 3,
                 title: "Cannot add the same blueprint instance more than once.",
                 variant: "warning",
                 icon: IconEnum.warning,
               });
+              return;
             }
             handleChange([
               { name: `${name}.id`, value: id },
@@ -52,11 +53,11 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
         {(currentValue || [])?.map((val) => (
           <EntityPreview
             key={val.related_id}
-            clearAction={(char_id) => {
+            clearAction={(instance_id) => {
               handleChange([
                 {
                   name: `${name}.blueprint_instances`,
-                  value: currentValue.filter((c) => c.related_id !== char_id),
+                  value: currentValue.filter((c) => c.related_id !== instance_id),
                 },
               ]);
             }}

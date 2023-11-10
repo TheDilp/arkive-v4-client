@@ -37,17 +37,19 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
   const isMonthCorrect = checkIfMonthCorrect(event, isYearCorrect);
   const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
   useEffect(() => {
-    if (!currentValue?.end_month_id) {
-      handleChange([
-        { name: `${name}.calendar.end_day`, value: null },
-        { name: `${name}.calendar.end_year`, value: null },
-      ]);
-    }
-    if (!currentValue?.start_month_id) {
-      handleChange([
-        { name: `${name}.calendar.start_day`, value: null },
-        { name: `${name}.calendar.start_year`, value: null },
-      ]);
+    if (currentValue) {
+      if (!currentValue?.end_month_id) {
+        handleChange([
+          { name: `${name}.calendar.end_day`, value: null },
+          { name: `${name}.calendar.end_year`, value: null },
+        ]);
+      }
+      if (!currentValue?.start_month_id) {
+        handleChange([
+          { name: `${name}.calendar.start_day`, value: null },
+          { name: `${name}.calendar.start_year`, value: null },
+        ]);
+      }
     }
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (

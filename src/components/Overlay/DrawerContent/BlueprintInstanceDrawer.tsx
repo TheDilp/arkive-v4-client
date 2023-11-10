@@ -94,7 +94,7 @@ function FieldTemplateRows({
           if (!blueprintValueKey) return null;
           const blueprintValueIndex = blueprint_fields_data.findIndex((f) => f.id === template_field.id);
           const baseName = `blueprint_fields[${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}]`;
-
+          console.log(blueprint_fields_data);
           if (template_field.field_type === "text" || template_field.field_type === "number")
             return (
               <TemplateInputField
