@@ -1,9 +1,45 @@
 import { Link, useParams } from "react-router-dom";
+import { tv } from "tailwind-variants";
 
 import { ItemPreviewType } from "../../types/ComponentTypes/DataDisplayTypes/itemPreviewTypes";
 import { getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
+
+const EntityPreviewClasses = tv({
+  slots: {
+    container: "flex flex-col",
+    label: "block min-h-[20px] truncate text-sm text-zinc-300",
+    base: "flex max-h-10 min-h-[2.5rem] items-center gap-x-1 rounded p-2",
+    link: "flex max-h-10 items-center gap-x-1 rounded p-2 ",
+    linkTitle: "truncate",
+    action: "ml-auto w-min",
+    otherAction: "w-min",
+  },
+  variants: {
+    variant: {
+      primary: {
+        base: "bg-zinc-900 border-zinc-700 border",
+      },
+      secondary: {
+        base: "bg-zinc-700 border-0",
+      },
+    },
+    hasNoBackground: {
+      true: {
+        base: "bg-transparent",
+      },
+    },
+    hasLink: {
+      true: {
+        link: "truncate transition-all hover:text-blue-400",
+      },
+      false: {
+        link: "cursor-default",
+      },
+    },
+  },
+});
 
 export function EntityPreview({
   id,
@@ -16,15 +52,25 @@ export function EntityPreview({
   label,
   hasNoBackground,
   otherActionIcon,
+  variant = "secondary",
   previewAction,
   clearAction,
   otherAction,
 }: ItemPreviewType) {
   const { project_id } = useParams();
+  const {
+    container,
+    base,
+    label: labelClasses,
+    link: linkClasses,
+    linkTitle,
+    action: actionClasses,
+    otherAction: otherActionClasses,
+  } = EntityPreviewClasses({ hasNoBackground, variant, hasLink: !!link });
   return (
-    <div className="flex flex-col">
-      {label ? <div className="block min-h-[20px] truncate text-sm text-zinc-300">{label}</div> : null}
-      <span className={`flex max-h-10 items-center gap-x-1 rounded p-2  ${hasNoBackground ? "" : "bg-zinc-700"}`}>
+    <div className={container()}>
+      {label ? <div className={labelClasses()}>{label}</div> : null}
+      <span className={base()}>
         {image_id ? (
           <Avatar
             hasShowImage
@@ -34,20 +80,16 @@ export function EntityPreview({
             size="sm"
           />
         ) : null}
-        {!image_id && type !== "images" ? (
+        {!image_id && type !== "images" && icon ? (
           <span>
             <Icon fontSize={32} icon={icon || getDefaultEntityIcon(type)} />
           </span>
         ) : null}
-        <Link
-          className={`flex max-h-10 items-center gap-x-1 rounded p-2 ${
-            link ? "truncate transition-all hover:text-blue-400" : "cursor-default"
-          } ${hasNoBackground ? "" : "bg-zinc-700"}`}
-          to={link || "#"}>
-          <span className="truncate">{title}</span>
+        <Link className={linkClasses()} to={link || "#"}>
+          <span className={linkTitle()}>{title}</span>
         </Link>
         {previewAction ? (
-          <span className="ml-auto w-min">
+          <span className={actionClasses()}>
             <Button
               hasNoBackground
               icon={IconEnum.eye}
@@ -61,7 +103,7 @@ export function EntityPreview({
           </span>
         ) : null}
         {clearAction ? (
-          <span className="ml-auto w-min">
+          <span className={actionClasses()}>
             <Button
               hasNoBackground
               icon={IconEnum.close}
@@ -75,7 +117,7 @@ export function EntityPreview({
           </span>
         ) : null}
         {otherAction ? (
-          <div className="w-min">
+          <div className={otherActionClasses()}>
             <Button
               hasNoBackground
               icon={otherActionIcon || IconEnum.warning}

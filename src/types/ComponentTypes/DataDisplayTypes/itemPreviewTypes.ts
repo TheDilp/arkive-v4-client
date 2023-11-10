@@ -1,3 +1,4 @@
+import { Variant } from "../../baseTypes";
 import { AvailableEntityType, AvailableSubEntityType } from "../../EntityTypes";
 
 export interface ItemPreviewType {
@@ -14,4 +15,5 @@ export interface ItemPreviewType {
   otherAction?: (id: string) => void;
   otherActionIcon?: string;
   type: AvailableEntityType | AvailableSubEntityType | "images";
+  variant?: Variant;
 }

@@ -18,9 +18,10 @@ import { EntityPreview } from "./EntityPreview";
 
 type Props = {
   items: ItemPreviewType[];
+  field_label: string;
 };
 
-export function CarouselEntityPreview({ items }: Props) {
+export function CarouselEntityPreview({ items, field_label }: Props) {
   const setDrawer = useSetAtom(drawerAtom);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -49,31 +50,35 @@ export function CarouselEntityPreview({ items }: Props) {
 
   return (
     <div className="relative flex w-full items-center">
-      {items?.length ? (
-        <div ref={refs.setReference} className="relative w-full">
-          <EntityPreview
-            key={items[0].id}
-            {...items[0]}
-            otherAction={
-              items.length > 1
-                ? () => {
-                    setIsOpen((prev) => !prev);
-                  }
-                : undefined
-            }
-            otherActionIcon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
-            previewAction={(id, parent_id) => {
-              setDrawer((prev) => ({
-                ...prev,
-                title: "Preview",
-                data: { id, parent_id, entity_type: items[0].type as AvailableEntityType },
-                type: "entity_preview",
-                size: "half",
-              }));
-            }}
-          />
-        </div>
-      ) : null}
+      <div ref={refs.setReference} className="relative w-full">
+        <EntityPreview
+          key={items?.[0]?.id}
+          {...(items[0] || {})}
+          icon={items?.[0] ? items?.[0]?.icon : undefined}
+          label={field_label}
+          otherAction={
+            items.length > 1
+              ? () => {
+                  setIsOpen((prev) => !prev);
+                }
+              : undefined
+          }
+          otherActionIcon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
+          previewAction={
+            items.length
+              ? (id, parent_id) => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: "Preview",
+                    data: { id, parent_id, entity_type: items[0].type as AvailableEntityType },
+                    type: "entity_preview",
+                    size: "half",
+                  }));
+                }
+              : undefined
+          }
+        />
+      </div>
       {isOpen && items.length > 1 ? (
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
