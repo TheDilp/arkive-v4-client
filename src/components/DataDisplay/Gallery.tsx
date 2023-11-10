@@ -4,7 +4,7 @@ import { GalleryType, Size } from "../../types";
 import { Image } from "./Image";
 
 const GalleryClasses = tv({
-  base: "grid gap-1 grid-cols-1 md:grid-cols-2 h-full max-h-[48rem] lg:overflow-auto min-h-fit lg:pb-0 pb-48",
+  base: "grid gap-1 grid-cols-1 md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
   variants: {
     columns: {
       1: "lg:grid-cols-1",
@@ -32,14 +32,16 @@ function getRowSize(size: Size) {
 export function Gallery({ images, isOpenable, columns = 4, size = "md" }: GalleryType) {
   const classes = GalleryClasses({ columns });
   return (
-    <div
-      className={classes}
-      style={{
-        gridAutoRows: getRowSize(size),
-      }}>
-      {images.map((image) => (
-        <Image key={image.id} image={image} isOpenable={isOpenable} />
-      ))}
+    <div className={`h-min max-h-[${getRowSize(size)}] overflow-y-auto`}>
+      <div
+        className={classes}
+        style={{
+          gridAutoRows: getRowSize(size),
+        }}>
+        {images.map((image) => (
+          <Image key={image.id} image={image} isOpenable={isOpenable} />
+        ))}
+      </div>
     </div>
   );
 }
