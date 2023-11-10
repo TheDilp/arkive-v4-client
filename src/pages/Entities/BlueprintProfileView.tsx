@@ -1,17 +1,18 @@
 import { useSetAtom } from "jotai";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
   Button,
   CarouselEntityPreview,
-  Editor,
   EntityPreview,
   FormattedDate,
   Gallery,
   Input,
   Skeleton,
+  StaticRender,
   Tabs,
   Tooltip,
 } from "../../components";
@@ -173,15 +174,15 @@ function AdditionalFieldDisplay({
           value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
         />
       ) : null}
-      {blueprint_field.field_type === "textarea" ? (
+      {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
         <>
           <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
-          <Editor initialContent={(value || {}) as any} isReadOnly name={blueprint_field.title} onChange={() => {}} />
+          <div className="rounded-md border border-zinc-700 bg-zinc-900">
+            <StaticRender content={(value || {}) as any} />
+          </div>
         </>
       ) : null}
-
       {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
-
       {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
@@ -252,7 +253,6 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
-
       {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
         <Gallery
           columns={6}
@@ -296,7 +296,7 @@ export default function BlueprintProfileView() {
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
+  const { data: blueprint } = useGetEntity<BlueprintType>(
     item_id,
     "blueprints",
     {
@@ -311,11 +311,7 @@ export default function BlueprintProfileView() {
     { staleTime: 3 * 60 * 1000 },
   );
 
-  const {
-    data: blueprintInstance,
-    isLoading,
-    isFetching,
-  } = useGetSubEntity<BlueprintInstanceType>(
+  const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
     subitem_id,
     "blueprint_instances",
     {
@@ -404,25 +400,22 @@ export default function BlueprintProfileView() {
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
-          {isLoading ? (
-            <Skeleton type="character_profile_main" />
-          ) : (
-            <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
-              {blueprintInstance?.data && !isFetching && !isFetchingBlueprint
-                ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
-                    const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
-                    if (!blueprintField) return null;
-                    return (
-                      <AdditionalFieldDisplay
-                        key={blueprint_field.id}
-                        blueprint_field={blueprintField}
-                        blueprint_field_data={blueprint_field}
-                      />
-                    );
-                  })
-                : null}
-            </div>
-          )}
+
+          <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
+            {blueprintInstance?.data
+              ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
+                  const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
+                  if (!blueprintField) return null;
+                  return (
+                    <AdditionalFieldDisplay
+                      key={blueprint_field.id}
+                      blueprint_field={blueprintField}
+                      blueprint_field_data={blueprint_field}
+                    />
+                  );
+                })
+              : null}
+          </div>
         </div>
       </div>
     </div>

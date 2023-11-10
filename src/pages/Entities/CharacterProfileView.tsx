@@ -720,7 +720,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
   ].filter((r) => !!r);
 
   useChangeNavbarTitle(
-    ` Characters | ${getCharacterFullName(
+    `Characters | ${getCharacterFullName(
       existingCharacter?.data?.first_name || "",
       undefined,
       existingCharacter?.data?.last_name,

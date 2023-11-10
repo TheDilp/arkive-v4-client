@@ -336,15 +336,17 @@ export function useUpdateSubEntity(
       });
     },
     {
-      onSuccess: () => {
+      onSuccess: (_, vars) => {
         const parentEntityType = getParentEntityType(type);
 
         if (parentEntityType && parentEntityType !== "documents") {
           if (type === "blueprint_instances") {
             queryClient.invalidateQueries(["allEntities", project_id, "blueprint_instances"]);
+            queryClient.invalidateQueries(["blueprint_instances", vars.data.id]);
+          } else {
+            queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
+            queryClient.invalidateQueries([parentEntityType, parent_id]);
           }
-          queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
-          queryClient.invalidateQueries([parentEntityType, parent_id]);
         }
         createNotification({
           title: getEntityCRUDNotification("blueprint_instances", "update"),
