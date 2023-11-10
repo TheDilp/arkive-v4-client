@@ -3,7 +3,8 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
+import { HandleChangePropsType } from "../../../types";
+import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
 import {
   InsertRandomTableSchema,
@@ -12,6 +13,7 @@ import {
   UpdateRandomTableType,
 } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
+import { Collapsible, Tabs } from "../../Layout";
 
 type Props = {
   data?: {
@@ -19,9 +21,65 @@ type Props = {
   };
 };
 
+function isSaveDisabled(random_table: Partial<RandomTableType>) {
+  if (!random_table.title) return true;
+  if (!random_table?.random_table_options?.length) return true;
+  return random_table?.random_table_options?.some((opt) => !opt.title);
+}
+
+const tabs = [
+  {
+    id: "1",
+    label: "Basic info",
+    icon: IconEnum.info_circle,
+  },
+  {
+    id: "2",
+    label: "Options",
+    icon: IconEnum.random_table,
+  },
+];
+
+function OptionInput({
+  name,
+  title,
+  description,
+  handleChange,
+  removeSuboption,
+}: {
+  name: string;
+  title: string;
+  description: string;
+  handleChange: (newValue: HandleChangePropsType) => void;
+  removeSuboption?: (newValue: HandleChangePropsType) => void;
+}) {
+  return (
+    <>
+      <div className="flex flex-col items-center gap-x-2 border-zinc-700">
+        <div className="flex w-full items-center gap-x-2">
+          <Input label="Title (required)" name={`${name}.title`} onChange={handleChange} value={title || ""} />
+          {removeSuboption ? (
+            <div className="mb-2 h-6 w-6 self-end">
+              <Button hasNoBackground icon={IconEnum.trash} isIconOnly onClick={removeSuboption} variant="error" />
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div>
+        <Textarea
+          label="Description (optional)"
+          name={`${name}.description`}
+          onChange={handleChange}
+          value={description || ""}
+        />
+      </div>
+    </>
+  );
+}
+
 export function RandomTableDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
-
+  const [selectTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const { data: existingRandomTable } = useGetEntity<RandomTableType>(
@@ -29,6 +87,9 @@ export function RandomTableDrawer({ data }: Props) {
     "random_tables",
     {
       data: { project_id },
+      relations: {
+        random_table_options: true,
+      },
     },
     { enabled: !!data?.id },
   );
@@ -45,47 +106,152 @@ export function RandomTableDrawer({ data }: Props) {
   const { changedData, handleChange } = useHandleChange({ data: randomTable, setData: setRandomTable });
 
   useLayoutEffect(() => {
-    if (existingRandomTable?.data) {
+    if (existingRandomTable?.data && !randomTable?.title) {
       setRandomTable(existingRandomTable?.data);
     }
   }, [existingRandomTable]);
 
   return (
     <div className="flex flex-col gap-y-2">
-      <div className="w-full">
-        <Input
-          label="Random table title (required)"
-          name="title"
-          onChange={handleChange}
-          placeholder="Eg. Family tree"
-          value={randomTable?.title || ""}
-        />
-      </div>
-      <div className="w-full">
-        <Textarea
-          label="Random table description (optional)"
-          name="description"
-          onChange={handleChange}
-          value={randomTable?.description || ""}
-        />
-      </div>
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectTab} tabs={tabs} />
+      {selectTab === 0 ? (
+        <>
+          <div className="w-full">
+            <Input
+              label="Random table title (required)"
+              name="title"
+              onChange={handleChange}
+              placeholder="Eg. Family tree"
+              value={randomTable?.title || ""}
+            />
+          </div>
+          <div className="w-full">
+            <Textarea
+              label="Random table description (optional)"
+              name="description"
+              onChange={handleChange}
+              value={randomTable?.description || ""}
+            />
+          </div>
+        </>
+      ) : null}
+
+      {selectTab === 1 ? (
+        <>
+          <div className="flex w-full items-center justify-between">
+            <span>Insert new option:</span>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: "random_table_options",
+                    value: (randomTable?.random_table_options || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New option",
+                      description: "",
+                      parent_id: randomTable.id,
+                    } as RandomTableOptionType),
+                  })
+                }
+                variant="info"
+              />
+            </div>
+          </div>
+          <div className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
+            {randomTable.random_table_options?.map((option, optionIndex) => (
+              <Collapsible
+                key={option.id}
+                actions={[
+                  {
+                    icon: IconEnum.trash,
+                    variant: "error",
+                    onClick: () => {
+                      handleChange({
+                        name: "random_table_options",
+                        value: randomTable.random_table_options?.filter((opt) => opt.id !== option.id),
+                      });
+                    },
+                    isIconOnly: true,
+                    hasNoBackground: true,
+                  },
+                ]}
+                label={option.title}>
+                <div className="flex flex-col gap-y-2 p-2">
+                  <OptionInput
+                    description={option?.description || ""}
+                    handleChange={handleChange}
+                    name={`random_table_options[${optionIndex}]`}
+                    title={option.title}
+                  />
+                  {/* <Collapsible
+                    actions={[
+                      {
+                        icon: IconEnum.add,
+                        variant: "info",
+                        onClick: () =>
+                          handleChange({
+                            name: `random_table_options[${optionIndex}].random_table_suboptions`,
+                            value: (randomTable?.random_table_options?.[optionIndex]?.random_table_suboptions || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New suboption",
+                              description: "",
+                              parent_id: option.id,
+                            } as RandomTableSubOptionType),
+                          }),
+                        isIconOnly: true,
+                        hasNoBackground: true,
+                      },
+                    ]}
+                    label="Suboptions"
+                    size="lg">
+                    <div className="flex flex-col gap-y-2 pt-2">
+                      {option?.random_table_suboptions?.map((subopt, suboptIndex) => (
+                        <OptionInput
+                          key={subopt.id}
+                          description={subopt?.description || ""}
+                          handleChange={handleChange}
+                          name={`random_table_options[${optionIndex}].random_table_suboptions[${suboptIndex}]`}
+                          removeSuboption={() =>
+                            handleChange({
+                              name: `random_table_options[${optionIndex}].random_table_suboptions`,
+                              value: randomTable.random_table_options?.filter((opt) => opt.id !== subopt.id),
+                            })
+                          }
+                          title={subopt.title}
+                        />
+                      ))}
+                    </div>
+                  </Collapsible> */}
+                </div>
+              </Collapsible>
+            ))}
+          </div>
+        </>
+      ) : null}
 
       <Button
         icon={randomTable?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={!randomTable?.title || isCreating || isUpdating}
+        isDisabled={isSaveDisabled(randomTable) || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={randomTable?.id ? "Save" : "Create"}
         onClick={async () => {
           if (changedData) {
             if (randomTable?.id) {
-              const parsed = UpdateRandomTableSchema.parse({ data: randomTable });
+              const parsed = UpdateRandomTableSchema.parse({
+                data: randomTable,
+                relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
+              });
               await update(parsed, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
                 },
               });
             } else {
-              const parsed = InsertRandomTableSchema.parse({ data: randomTable });
+              const parsed = InsertRandomTableSchema.parse({
+                data: randomTable,
+                relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
+              });
               await create(parsed, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();

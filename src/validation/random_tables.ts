@@ -1,17 +1,5 @@
 import { z } from "zod";
 
-export const InsertRandomTableSchema = z.object({
-  data: z.object({
-    title: z.string(),
-    description: z.string().nullable().optional(),
-    project_id: z.string(),
-    parent_id: z.string().nullable().optional(),
-    icon: z.string().nullable().optional(),
-    is_folder: z.boolean().nullable().optional(),
-    is_public: z.boolean().nullable().optional(),
-  }),
-});
-
 export const UpdateRandomTableSchema = z.object({
   data: z.object({
     id: z.string(),
@@ -22,11 +10,27 @@ export const UpdateRandomTableSchema = z.object({
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
   }),
+  relations: z
+    .object({
+      random_table_options: z
+        .object({
+          data: z.object({
+            id: z.string(),
+            title: z.string(),
+            description: z.string().nullable().optional(),
+            icon: z.string().nullable().optional(),
+            icon_color: z.string().nullable().optional(),
+          }),
+        })
+        .array()
+        .optional(),
+    })
+    .optional(),
 });
 
 export const RandomTableSubOptionSchema = z.object({
   id: z.string(),
-  title: z.string().nonempty(),
+  title: z.string().min(1),
   description: z.string().optional().nullable(),
   parent_id: z.string(),
 });
@@ -52,6 +56,33 @@ export const UpdateRandomTableOptionSchema = z.object({
   relations: z.object({
     suboptions: RandomTableSubOptionSchema.array().optional(),
   }),
+});
+
+export const InsertRandomTableSchema = z.object({
+  data: z.object({
+    title: z.string(),
+    description: z.string().nullable().optional(),
+    project_id: z.string(),
+    parent_id: z.string().nullable().optional(),
+    icon: z.string().nullable().optional(),
+    is_folder: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
+  }),
+  relations: z
+    .object({
+      random_table_options: z
+        .object({
+          data: z.object({
+            title: z.string(),
+            description: z.string().nullable().optional(),
+            icon: z.string().nullable().optional(),
+            icon_color: z.string().nullable().optional(),
+          }),
+        })
+        .array()
+        .optional(),
+    })
+    .optional(),
 });
 
 export type InsertRandomTableType = z.infer<typeof InsertRandomTableSchema>;

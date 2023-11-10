@@ -1,3 +1,4 @@
+import { Size } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
 export interface CollapsibleType {
@@ -6,4 +7,5 @@ export interface CollapsibleType {
   children: JSX.Element | JSX.Element[] | null;
   initialOpen?: boolean;
   actions?: ButtonType[];
+  size?: Size;
 }

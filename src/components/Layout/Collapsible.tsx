@@ -1,14 +1,36 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import { tv } from "tailwind-variants";
+
 import { CollapsibleType } from "../../types";
 import { IconEnum } from "../../utils";
 import { Button, Icon } from "..";
 
-export function Collapsible({ label, icon, initialOpen, children, actions }: CollapsibleType) {
+const CollapsibleClasses = tv({
+  slots: {
+    label: "flex select-none items-center gap-x-2",
+  },
+  variants: {
+    size: {
+      md: {
+        label: "text-base",
+      },
+      lg: {
+        label: "text-lg",
+      },
+      xl: {
+        label: "text-xl",
+      },
+    },
+  },
+});
+
+export function Collapsible({ label, icon, initialOpen, children, actions, size = "xl" }: CollapsibleType) {
+  const { label: labelClasses } = CollapsibleClasses({ size });
   return (
     <details className="cursor-default select-none" open={initialOpen ?? false}>
       <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1 font-lato">
-        <span className="flex select-none items-center gap-x-2 text-xl">
+        <span className={labelClasses()}>
           {icon ? (
             <span className="no-rotate">
               <Icon icon={icon} />
@@ -41,10 +63,11 @@ export function Collapsible({ label, icon, initialOpen, children, actions }: Col
       </summary>
       <div
         className="rounded-b bg-zinc-950"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}>
+        // onClick={(e) => {
+        //   e.preventDefault();
+        //   e.stopPropagation();
+        // }}
+      >
         {children}
       </div>
     </details>
