@@ -77,6 +77,7 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
                 }
               : undefined
           }
+          variant="primary"
         />
       </div>
       {isOpen && items.length > 1 ? (

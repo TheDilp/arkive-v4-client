@@ -19,7 +19,7 @@ export interface BlueprintInstanceBlueprintFieldType {
     character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
   }[];
   blueprint_instances: {
-    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title"> & { icon: string };
+    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string };
     related_id: string;
   }[];
   documents: {

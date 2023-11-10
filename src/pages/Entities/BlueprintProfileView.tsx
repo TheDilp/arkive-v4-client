@@ -15,7 +15,7 @@ import {
   Tabs,
   Tooltip,
 } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useGetEntity, useGetSubEntity } from "../../hooks";
 import {
   BlueprintFieldType,
   BlueprintInstanceBlueprintFieldType,
@@ -68,39 +68,7 @@ function RandomTableField({
     </div>
   );
 }
-function BlueprintField({ field, value }: { field: BlueprintFieldType; value: string | string[] }) {
-  const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
-    {
-      data: {},
-      fields: ["id", "title"],
-      filters: {
-        and: [
-          {
-            field: "id",
-            operator: Array.isArray(value) ? "in" : "eq",
-            value: Array.isArray(value) ? value : value,
-          },
-        ],
-      },
-    },
-    "blueprint_instances",
-    {},
-  );
 
-  return (
-    <div>
-      <Input
-        isDisabled={isLoading}
-        isLoading={isLoading}
-        isReadOnly
-        label={field.title}
-        name={field.title}
-        onChange={() => {}}
-        value={instances?.data?.map((instance) => instance.title).join(",") || ""}
-      />
-    </div>
-  );
-}
 function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprintFieldType; field: BlueprintFieldType }) {
   const startMonthIdx =
     field?.calendar && field.calendar.months.length
@@ -228,6 +196,21 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
+      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
+        <div className="w-full">
+          <CarouselEntityPreview
+            field_label={blueprint_field.title}
+            items={(blueprint_field_data.blueprint_instances || []).map((blueprint_instance) => ({
+              id: blueprint_instance.blueprint_instance.id,
+              parent_id: blueprint_instance.blueprint_instance.parent_id,
+              title: blueprint_instance.blueprint_instance.title || "",
+              icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
+              type: "blueprint_instances",
+              link: `/projects/${project_id}/blueprints/${blueprint_instance.blueprint_instance.parent_id}/${blueprint_instance.related_id}`,
+            }))}
+          />
+        </div>
+      ) : null}
       {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
@@ -265,12 +248,11 @@ function AdditionalFieldDisplay({
             label={blueprint_field.title}
             title={blueprint_field_data?.images?.[0].image.title}
             type="images"
+            variant="primary"
           />
         </div>
       ) : null}
-      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
-        <BlueprintField field={blueprint_field} value={(value as string | string[] | null) || ""} />
-      ) : null}
+
       {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
         <Gallery
           columns={6}
