@@ -6,15 +6,18 @@ export function FormattedDate({ start_day, start_month, start_year, end_day, end
   const endDayOrdinal = typeof end_day === "number" ? getDayOrdinal(end_day) : null;
 
   return (
-    <div className="flex flex-nowrap">
-      {start_day ?? ""}
-      {typeof start_day === "number" ? <sup>{startDayOrdinal}</sup> : null}
-      {start_month ?? ""}
-      {start_year ?? ""}
-      {end_day ?? ""}
-      {typeof end_day === "number" ? <sup>{endDayOrdinal}</sup> : null}
-      {end_month ?? ""}
-      {end_year ?? ""}
+    <div className="flex flex-nowrap gap-x-1">
+      <span>
+        {start_day ?? ""}
+        {typeof start_day === "number" ? <sup className="pt-2">{startDayOrdinal}</sup> : null}
+      </span>
+      <span>{start_month ?? ""}</span>
+      <span>{start_year ?? ""}</span>
+      <span>{end_day ? " - " : ""}</span>
+      <span>{end_day ?? ""}</span>
+      <span>{typeof end_day === "number" ? <sup className="pt-2">{endDayOrdinal}</sup> : null}</span>
+      <span>{end_month ?? ""}</span>
+      <span>{end_year ?? ""}</span>
     </div>
   );
 }

@@ -23,7 +23,7 @@ import {
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { drawerAtom, getCharacterFullName, getDayOrdinal, IconEnum } from "../../utils";
+import { drawerAtom, formatDateToString, getCharacterFullName, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -110,22 +110,27 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
     field?.calendar && field.calendar.months.length
       ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.end_month_id)
       : null;
-  const startDayOrdinal =
-    typeof fieldData?.calendar?.start_day === "number" ? getDayOrdinal(fieldData.calendar.start_day) : null;
-  const endDayOrdinal = typeof fieldData?.calendar?.end_day === "number" ? getDayOrdinal(fieldData.calendar.end_day) : null;
 
-  const date = `${fieldData?.calendar?.start_day || ""}${startDayOrdinal || ""} ${
-    typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title || "" : ""
-  } ${fieldData?.calendar?.start_year || ""} ${
-    fieldData?.calendar?.end_day ? ` - ${fieldData?.calendar?.end_day || ""}${endDayOrdinal || ""}` : ""
-  } ${typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""} ${
-    fieldData?.calendar?.end_year || ""
-  }`;
+  const startStringDate = formatDateToString(
+    fieldData?.calendar?.start_day,
+    fieldData?.calendar?.start_year,
+    fieldData?.calendar?.start_month_id,
+    field?.calendar?.months,
+  );
+  const endStringDate = formatDateToString(
+    fieldData?.calendar?.end_day,
+    fieldData?.calendar?.end_year,
+    fieldData?.calendar?.end_month_id,
+    field?.calendar?.months,
+  );
 
   return (
     <div className="flex flex-col">
       <span className="block min-h-[20px] truncate text-sm">{field.title}</span>
-      <Tooltip content={date} delay={{ openDelay: 500 }} isDisabled={!date.trim()}>
+      <Tooltip
+        content={`${startStringDate}${endStringDate ? ` - ${endStringDate}` : ""}`}
+        delay={{ openDelay: 500 }}
+        isDisabled={!startStringDate.trim() && !endStringDate.trim()}>
         <span className="h-10 cursor-not-allowed truncate rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white outline-none">
           <FormattedDate
             end_day={fieldData?.calendar?.end_day}
