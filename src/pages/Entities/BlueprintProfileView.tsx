@@ -8,6 +8,7 @@ import {
   CarouselEntityPreview,
   Editor,
   EntityPreview,
+  FormattedDate,
   Gallery,
   Input,
   Skeleton,
@@ -124,9 +125,16 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
   return (
     <div className="flex flex-col">
       <span className="block min-h-[20px] truncate text-sm">{field.title}</span>
-      <Tooltip content={date} delay={{ openDelay: 500 }}>
+      <Tooltip content={date} delay={{ openDelay: 500 }} isDisabled={!date.trim()}>
         <span className="h-10 cursor-not-allowed truncate rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white outline-none">
-          {date}
+          <FormattedDate
+            end_day={fieldData?.calendar?.end_day}
+            end_month={typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""}
+            end_year={fieldData?.calendar?.end_year}
+            start_day={fieldData?.calendar?.start_day}
+            start_month={typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title || "" : ""}
+            start_year={fieldData?.calendar?.start_year}
+          />
         </span>
       </Tooltip>
     </div>
@@ -204,11 +212,11 @@ function AdditionalFieldDisplay({
       {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
+            field_label={blueprint_field.title}
             items={(blueprint_field_data.characters || []).map((char) => ({
               id: char.related_id,
               title: getCharacterFullName(char.character.first_name, undefined, char.character?.last_name),
               image_id: char.character.portrait_id,
-              label: blueprint_field.title,
               type: "characters",
               link: `/projects/${project_id}/characters/${char.related_id}/resources`,
             }))}
@@ -218,11 +226,11 @@ function AdditionalFieldDisplay({
       {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
+            field_label={blueprint_field.title}
             items={(blueprint_field_data.documents || []).map((doc) => ({
               id: doc.related_id,
               title: doc.document.title,
               icon: doc.document.icon || IconEnum.document,
-              label: blueprint_field.title,
               type: "documents",
               link: `/projects/${project_id}/documents/${doc.related_id}`,
             }))}
@@ -232,12 +240,12 @@ function AdditionalFieldDisplay({
       {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
+            field_label={blueprint_field.title}
             items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
               id: map_pin.map_pin.id,
               parent_id: map_pin.map_pin.parent_id,
               title: map_pin.map_pin.title || "",
               icon: map_pin.map_pin.icon || IconEnum.document,
-              label: blueprint_field.title,
               type: "map_pins",
               link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
             }))}

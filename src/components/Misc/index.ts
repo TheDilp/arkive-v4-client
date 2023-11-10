@@ -2,6 +2,7 @@ export * from "./Alert";
 export * from "./Avatar";
 export * from "./Badge";
 export * from "./Divider";
+export * from "./FormattedDate";
 export * from "./Icon";
 export * from "./ProgressBar";
 export * from "./Quickbar";
