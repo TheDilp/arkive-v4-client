@@ -11,11 +11,7 @@ import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 export function CharacterPreviewDrawer({ id }: { id: string }) {
-  return (
-    <div className="h-full">
-      <CharacterProfileView id={id} />
-    </div>
-  );
+  return <CharacterProfileView id={id} isPreview />;
 }
 export function DocumentPreviewDrawer({ id }: { id: string }) {
   const navigate = useNavigate();

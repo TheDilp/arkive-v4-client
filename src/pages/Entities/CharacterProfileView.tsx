@@ -20,7 +20,6 @@ import {
   Input,
   Skeleton,
   Table,
-  TablePageLayout,
   Tabs,
 } from "../../components";
 import {
@@ -113,6 +112,13 @@ const fieldSizeClass = tv({
       boolean: "col-span-6 sm:col-span-3 lg:col-span-1",
     },
   },
+  compoundVariants: [
+    {
+      type: ["dice_roll", "text", "select", "select_multiple", "number", "random_table", "date", "boolean"],
+      isPreview: true,
+      className: "col-span-6 sm:col-span-6 lg:col-span-6",
+    },
+  ],
 });
 
 function RandomTableField({
@@ -580,10 +586,12 @@ function AdditionalFieldDisplay({
   character_fields,
   character_field_data,
   template_title,
+  isPreview,
 }: {
   character_fields: CharacterFieldType[];
   character_field_data: AdditionalFieldValueType[];
   template_title: string;
+  isPreview?: boolean;
 }) {
   return (
     <Collapsible initialOpen label={template_title}>
@@ -595,7 +603,7 @@ function AdditionalFieldDisplay({
             fieldData?.value && fieldData?.value?.value
               ? `${fieldData?.value?.value} ${fieldData?.value?.subOptionValue ? `- ${fieldData?.value?.subOptionValue}` : ""}`
               : "";
-          const fieldClasses = fieldSizeClass({ type: field.field_type || "text" });
+          const fieldClasses = fieldSizeClass({ type: field.field_type || "text", isPreview });
 
           const date =
             field.field_type === "date" ? (fieldData?.value?.value as { day: number; year: number; month: string }) : null;
@@ -648,7 +656,7 @@ function AdditionalFieldDisplay({
   );
 }
 
-export function CharacterProfileView({ id }: { id?: string }) {
+export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview?: boolean }) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
@@ -836,7 +844,9 @@ export function CharacterProfileView({ id }: { id?: string }) {
               <Tabs
                 isVertical
                 onChange={(tab, index) => {
-                  navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                  if (!isPreview) {
+                    navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                  }
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
@@ -849,7 +859,9 @@ export function CharacterProfileView({ id }: { id?: string }) {
           <div className="w-full">
             <Tabs
               onChange={(tab, index) => {
-                navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                if (!isPreview) {
+                  navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
+                }
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
@@ -857,7 +869,7 @@ export function CharacterProfileView({ id }: { id?: string }) {
             />
           </div>
         ) : null}
-        <div className="flex h-[calc(100vh-15rem)] max-h-[calc(100vh-15rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-9.5rem)] lg:max-h-[calc(100vh-9.5rem)]">
+        <div className="flex flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">
               {type === "conversations" && subitem_id ? (
@@ -900,7 +912,7 @@ export function CharacterProfileView({ id }: { id?: string }) {
               </div>
             ) : null}
           </h2>
-          {type === "resources" ? (
+          {(isPreview ? selectedTab === 0 : type === "resources") ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
                 actions={[
@@ -1022,30 +1034,28 @@ export function CharacterProfileView({ id }: { id?: string }) {
               </Collapsible>
             </div>
           ) : null}
-          {type === "relationships" ? (
+          {(isPreview ? selectedTab === 1 : type === "relationships") ? (
             <div className="h-full">
-              <TablePageLayout>
-                {isFetching ? (
-                  <div className="pt-10">
-                    <Skeleton limit={5} type="table" />
-                  </div>
-                ) : (
-                  <div className="h-full max-h-full w-full overflow-hidden">
-                    <Table
-                      columns={columns}
-                      config={{
-                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
-                      }}
-                      data={relationships.sort(sortCharactersByName)}
-                      dispatch={dispatch}
-                      type="characters"
-                    />
-                  </div>
-                )}
-              </TablePageLayout>
+              {isFetching ? (
+                <div className="pt-10">
+                  <Skeleton limit={5} type="table" />
+                </div>
+              ) : (
+                <div className="h-full max-h-full w-full">
+                  <Table
+                    columns={columns}
+                    config={{
+                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
+                    }}
+                    data={relationships.sort(sortCharactersByName)}
+                    dispatch={dispatch}
+                    type="characters"
+                  />
+                </div>
+              )}
             </div>
           ) : null}
-          {type === "additional fields" ? (
+          {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
             <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
               {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
               {existingTemplates?.data?.length && !isFetchingTemplates
@@ -1058,6 +1068,7 @@ export function CharacterProfileView({ id }: { id?: string }) {
                             existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
                           }
                           character_fields={t.character_fields}
+                          isPreview={isPreview}
                           template_title={t.title}
                         />
                       </div>
@@ -1068,7 +1079,7 @@ export function CharacterProfileView({ id }: { id?: string }) {
               ) : null}
             </ul>
           ) : null}
-          {type === "conversations" ? (
+          {(isPreview ? selectedTab === 3 : type === "conversations") ? (
             <div className="flex-1">
               {subitem_id ? null : (
                 <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">

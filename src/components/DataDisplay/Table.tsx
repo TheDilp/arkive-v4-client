@@ -50,8 +50,7 @@ const TableClasses = tv({
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
-    rowContainer:
-      "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3.05rem] border-r border-t last:border-b relative min-w-fit",
+    rowContainer: "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3.05rem] border-r border-t relative min-w-fit",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
     hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
     hasRowAction: "cursor-pointer",
@@ -513,6 +512,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 rowVirtualizer.getTotalSize() +
                 Number(headerRef?.current?.clientHeight) +
                 (pagination ? 20 : 0) +
+                (!hasNoHeaderGap && !pagination ? 20 : 0) +
                 (isSubheaderEnabled ? 40 : 0)
               }px`,
         }}>
