@@ -62,7 +62,7 @@ function createColumns(
                     ...prev,
                     data: {
                       ...row.original,
-                      entity_title: "random table options",
+                      entity_title: "random_table_options",
                     },
                     title: "Delete option",
                     size: "sm",
