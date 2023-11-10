@@ -181,6 +181,7 @@ function relationshipTableColumns(
         </div>
       ),
       meta: {
+        pinned: true,
         centered: true,
       },
       minSize: 5,
@@ -190,8 +191,11 @@ function relationshipTableColumns(
       id: "first_name",
       header: "First name",
       cell: ({ row }) => row.original.first_name,
-      // minSize: 15,
-      // maxSize: 15,
+      meta: {
+        pinned: true,
+      },
+      minSize: 15,
+      maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "nickname",

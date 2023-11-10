@@ -26,6 +26,7 @@ import {
   getAreColumnFiltersActive,
   getFilterTooltip,
   getIsApplyColumnFiltersDisabled,
+  getPinnedOffset,
   getSentenceCase,
   getTableColumns,
   getTableColumnWidths,
@@ -498,6 +499,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const { rows } = table.getRowModel();
 
   if (isLoading) return <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />;
+  const pinned = columns.filter((col) => col?.meta?.pinned);
   return (
     <>
       <div
@@ -529,15 +531,18 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 key={hdr.id}
                 className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
+                    ${(meta as MetaType)?.pinned ? "sticky" : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     ${hdr.id === "select" ? "sticky left-0" : ""}
-                    ${(meta as MetaType)?.pinned ? "sticky left-[2.75rem]" : ""}
                     bg-zinc-950 first:border-l`}
                 style={{
                   ...getTableColumnWidths(hdr.column.id, {
                     minSize: hdr.column.columnDef.minSize,
                     maxSize: hdr.column.columnDef.maxSize,
                   }),
+                  left: (meta as MetaType)?.pinned
+                    ? `${getPinnedOffset(pinned, hdr.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
+                    : "",
                 }}>
                 <div className="truncate">{flexRender(header, hdr.getContext())}</div>
                 {(meta as MetaType)?.filterOptions?.length && dispatch ? (
@@ -665,12 +670,12 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                       } ${cell.column.id === "select" ? "sticky left-0" : ""}
-                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky left-[2.75rem] z-10 shadow-lg" : ""}
                       group-hover:bg-blue-300 ${
                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
                           ? "bg-blue-300"
                           : "bg-zinc-950"
                       }
+                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky" : ""}
                       `}
                       onClick={(e) => {
                         if (
@@ -688,6 +693,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                           minSize: cell.column.columnDef.minSize,
                           maxSize: cell.column.columnDef.maxSize,
                         }),
+                        left: (cell.column.columnDef.meta as MetaType)?.pinned
+                          ? `${getPinnedOffset(pinned, cell.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
+                          : "",
                       }}>
                       <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
                     </div>
