@@ -78,21 +78,7 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
     </div>
   );
 }
-function BlueprintColumn({ ids }: { ids: string | string[] }) {
-  const { data: blueprint_instances } = useGetEntities<BlueprintInstanceType>(
-    {
-      data: {},
-      fields: ["id", "title"],
-      filters: { and: [{ field: "id", value: ids, operator: Array.isArray(ids) ? "in" : "eq" }] },
-    },
-    "blueprint_instances",
-    { enabled: !!ids?.length, queryKeyConcat: Array.isArray(ids) ? ids : [ids], staleTime: 3 * 60 * 1000 },
-  );
 
-  return (
-    <ShowMultipleWithBadge titles={blueprint_instances?.data?.map((blueprint_instance) => blueprint_instance.title) || []} />
-  );
-}
 function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -178,6 +164,23 @@ function createColumns(
                   .join(", ") ?? ""
               );
             }
+
+            if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
+              return <CharacterColumn characters={fieldData?.characters || []} />;
+            }
+            if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
+              return (
+                <ShowMultipleWithBadge
+                  titles={(fieldData?.blueprint_instances || []).map((instance) => instance.blueprint_instance.title)}
+                />
+              );
+            }
+            if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
+              return <ShowMultipleWithBadge titles={(fieldData?.documents || []).map((doc) => doc.document.title)} />;
+            }
+            if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
+              return <LocationColumn locations={fieldData?.map_pins || []} />;
+            }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
                 <div className="flex w-full">
@@ -195,16 +198,6 @@ function createColumns(
                 </div>
               );
             }
-            if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
-              return <CharacterColumn characters={fieldData?.characters || []} />;
-            }
-            if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
-              return <ShowMultipleWithBadge titles={(fieldData?.documents || []).map((doc) => doc.document.title)} />;
-            }
-            if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
-              return <LocationColumn locations={fieldData?.map_pins || []} />;
-            }
-
             if (field.field_type === "random_table") {
               const randomTable = fieldData
                 ? field.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.random_table.option_id)
@@ -267,9 +260,6 @@ function createColumns(
                   )
                 </div>
               );
-            }
-            if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
-              return <BlueprintColumn ids={fieldData?.value as string | string[]} />;
             }
 
             return "";
