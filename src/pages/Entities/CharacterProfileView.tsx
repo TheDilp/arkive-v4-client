@@ -158,7 +158,12 @@ function RandomTableField({
   );
 }
 
-function relationshipTableColumns(project_id: string, navigate: NavigateFunction, isPreview?: boolean) {
+function relationshipTableColumns(
+  project_id: string,
+  navigate: NavigateFunction,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  isPreview?: boolean,
+) {
   return [
     relationshipColumnHelper.display({
       id: "portrait_id",
@@ -205,12 +210,13 @@ function relationshipTableColumns(project_id: string, navigate: NavigateFunction
     relationshipColumnHelper.display({
       id: "relation_type",
       header: "Relation",
-      cell: ({ row }) =>
-        `${
-          row?.original?.relation_title
+      cell: ({ row }) => (
+        <div className="truncate">
+          {row?.original?.relation_title
             ? `${getSentenceCase(row?.original?.relation_title)} (${row.original?.relation_type_title || ""})`
-            : getSentenceCase(row.original?.relation_type_title || "")
-        }`,
+            : getSentenceCase(row.original?.relation_type_title || "")}
+        </div>
+      ),
       minSize: 10,
       maxSize: 10,
     }),
@@ -227,6 +233,23 @@ function relationshipTableColumns(project_id: string, navigate: NavigateFunction
             items={[
               {
                 id: "1",
+                label: `Preview profile of ${getCharacterFullName(
+                  row.original.first_name,
+                  undefined,
+                  row.original?.last_name,
+                )}`,
+                icon: IconEnum.eye,
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: "Preview character",
+                    data: { id: row.original.id, entity_type: "characters" },
+                    type: "entity_preview",
+                    size: "half",
+                  })),
+              },
+              {
+                id: "2",
                 label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
                 icon: IconEnum.character,
                 onClick: isPreview
@@ -234,7 +257,7 @@ function relationshipTableColumns(project_id: string, navigate: NavigateFunction
                   : () => navigate(`/projects/${project_id}/characters/${row.original.id}/resources`),
               },
               {
-                id: "2",
+                id: "3",
                 label: `View conversations of ${getCharacterFullName(
                   row.original.first_name,
                   undefined,
@@ -610,7 +633,6 @@ function AdditionalFieldDisplay({
 
           return (
             <div key={field?.id} className={fieldClasses}>
-              {/* <Title isDrawerTitle label={field.title} size="xl" /> */}
               {(field.field_type === "text" || field.field_type === "number" || field.field_type === "dice_roll") && value ? (
                 <Input isReadOnly label={field.title} name={field.title} onChange={() => {}} value={value} />
               ) : null}
@@ -790,7 +812,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
         size: "lg",
       });
   }
-  const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate), []);
+  const columns = useMemo(() => relationshipTableColumns(project_id as string, navigate, setDrawer, isPreview), []);
 
   useEffect(() => {
     setSelectedTab(getCharacterProfileTabFromType(type));
