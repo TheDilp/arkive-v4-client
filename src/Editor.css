@@ -6,14 +6,10 @@
 }
 
 .editor-component {
-  @apply max-h-[30rem] overflow-auto;
+  @apply h-full  max-h-[30rem] overflow-auto;
   .remirror-editor.ProseMirror {
     @apply overflow-hidden !important;
   }
-}
-
-&.editor-component {
-  @apply h-full !important;
 }
 
 .remirror-editor,

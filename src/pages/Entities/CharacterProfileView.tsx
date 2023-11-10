@@ -152,7 +152,7 @@ function RandomTableField({
   );
 }
 
-function relationshipTableColumns(project_id: string, naivgate: NavigateFunction) {
+function relationshipTableColumns(project_id: string, navigate: NavigateFunction, isPreview?: boolean) {
   return [
     relationshipColumnHelper.display({
       id: "portrait_id",
@@ -223,7 +223,9 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
                 id: "1",
                 label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
                 icon: IconEnum.character,
-                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}/resources`),
+                onClick: isPreview
+                  ? () => {}
+                  : () => navigate(`/projects/${project_id}/characters/${row.original.id}/resources`),
               },
               {
                 id: "2",
@@ -233,7 +235,8 @@ function relationshipTableColumns(project_id: string, naivgate: NavigateFunction
                   row.original?.last_name,
                 )}`,
                 icon: IconEnum.conversation,
-                onClick: () => naivgate(`/projects/${project_id}/characters/${row.original.id}/conversations`),
+                onClick: () =>
+                  isPreview ? () => {} : navigate(`/projects/${project_id}/characters/${row.original.id}/conversations`),
               },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
@@ -645,7 +648,7 @@ function AdditionalFieldDisplay({
   );
 }
 
-export function CharacterProfileView() {
+export function CharacterProfileView({ id }: { id?: string }) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
@@ -658,7 +661,7 @@ export function CharacterProfileView() {
     isLoading,
     isFetching,
   } = useGetEntity<CharacterType>(
-    item_id,
+    id || item_id,
     "characters",
     {
       relations: {
@@ -799,7 +802,7 @@ export function CharacterProfileView() {
                   size: "lg",
                   title: "Edit character",
                   type: "characters",
-                  data: { id: item_id as string, project_id: project_id as string },
+                  data: { id: id || (item_id as string), project_id: project_id as string },
                 }));
               }}
             />
