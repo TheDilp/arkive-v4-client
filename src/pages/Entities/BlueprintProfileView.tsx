@@ -3,7 +3,17 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { Button, CarouselEntityPreview, Editor, EntityPreview, Gallery, Input, Skeleton, Tabs } from "../../components";
+import {
+  Button,
+  CarouselEntityPreview,
+  Editor,
+  EntityPreview,
+  Gallery,
+  Input,
+  Skeleton,
+  Tabs,
+  Tooltip,
+} from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import {
   BlueprintFieldType,
@@ -102,18 +112,23 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
   const startDayOrdinal =
     typeof fieldData?.calendar?.start_day === "number" ? getDayOrdinal(fieldData.calendar.start_day) : null;
   const endDayOrdinal = typeof fieldData?.calendar?.end_day === "number" ? getDayOrdinal(fieldData.calendar.end_day) : null;
+
+  const date = `${fieldData?.calendar?.start_day || ""}${startDayOrdinal || ""} ${
+    typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title || "" : ""
+  } ${fieldData?.calendar?.start_year || ""} ${
+    fieldData?.calendar?.end_day ? ` - ${fieldData?.calendar?.end_day || ""}${endDayOrdinal || ""}` : ""
+  } ${typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""} ${
+    fieldData?.calendar?.end_year || ""
+  }`;
+
   return (
     <div className="flex flex-col">
       <span className="block min-h-[20px] truncate text-sm">{field.title}</span>
-      <span className="cursor-not-allowed rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white outline-none">
-        {`${fieldData?.calendar?.start_day || ""}${startDayOrdinal} ${
-          typeof startMonthIdx === "number" ? field.calendar?.months[startMonthIdx]?.title : ""
-        } ${fieldData?.calendar?.start_year || ""} ${
-          fieldData?.calendar?.end_day ? ` - ${fieldData?.calendar?.end_day || ""}${endDayOrdinal}` : ""
-        } ${typeof endMonthIdx === "number" ? field.calendar?.months[endMonthIdx]?.title || "" : ""} ${
-          fieldData?.calendar?.end_year || ""
-        }`}
-      </span>
+      <Tooltip content={date} delay={{ openDelay: 500 }}>
+        <span className="h-10 cursor-not-allowed truncate rounded-md border border-zinc-700 bg-zinc-900 p-2 text-white outline-none">
+          {date}
+        </span>
+      </Tooltip>
     </div>
   );
 }
@@ -127,9 +142,12 @@ const fieldSizeClass = tv({
       image: "col-span-6 sm:col-span-3 lg:col-span-1",
       select: "col-span-6 sm:col-span-3 lg:col-span-1",
       select_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
-      characters_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
-      blueprints_single: "col-span-6 sm:col-span-3 lg:col-span-1",
-      blueprints_multiple: "col-span-6 sm:col-span-3 lg:col-span-1",
+      characters_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
+      characters_multiple: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
+      locations_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
+      locations_multiple: "col-span-6 sm:col-span-3 mg:col-span-2 xl:col-span-1",
+      blueprints_single: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
+      blueprints_multiple: "col-span-6 sm:col-span-3  mg:col-span-2 xl:col-span-1",
       images_single: "col-span-6 sm:col-span-3 lg:col-span-1",
       images_multiple: "col-span-6 sm:col-span-6 lg:col-span-6",
       number: "col-span-6 sm:col-span-3 lg:col-span-1",
@@ -183,8 +201,7 @@ function AdditionalFieldDisplay({
 
       {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
 
-      {(blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple") &&
-      blueprint_field_data?.characters ? (
+      {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
             items={(blueprint_field_data.characters || []).map((char) => ({
@@ -198,8 +215,7 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
-      {(blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple") &&
-      blueprint_field_data?.characters ? (
+      {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
             items={(blueprint_field_data.documents || []).map((doc) => ({
@@ -213,8 +229,7 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
-      {(blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple") &&
-      blueprint_field_data?.characters ? (
+      {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
         <div className="w-full">
           <CarouselEntityPreview
             items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
