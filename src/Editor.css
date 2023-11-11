@@ -123,10 +123,7 @@
 
   p {
     .remirror-resizable-view {
-      @apply float-left select-all !important;
-      div {
-        @apply bg-transparent;
-      }
+      @apply inline-block;
       > * {
         @apply select-all;
       }
@@ -143,19 +140,12 @@
 
   *[data-node-text-align="left"]:not(blockquote),
   [nodetextalignment="left"]:not(blockquote) {
-    .remirror-resizable-view {
-      @apply float-left;
-    }
-
     @apply mr-4 text-left;
   }
 
   *[data-node-text-align="right"]:not(blockquote),
   *[nodetextalignment="right"]:not(blockquote) {
     @apply ml-4 text-right;
-    .remirror-resizable-view {
-      @apply float-right;
-    }
   }
   *[nodetextalignment="center"]:not(blockquote) {
     @apply flex justify-center text-center;
