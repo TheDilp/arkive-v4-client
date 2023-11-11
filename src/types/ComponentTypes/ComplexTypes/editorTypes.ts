@@ -23,20 +23,7 @@ export interface EditorType {
 
 export type slashMenuItem = {
   name: string;
-  type:
-    | "heading"
-    | "list"
-    | "quote"
-    | "callout"
-    | "image"
-    | "divider"
-    | "columns_select"
-    | "columns"
-    | "secret"
-    | "map_select"
-    | "map"
-    | "board_select"
-    | "board";
+  type: "heading" | "list" | "quote" | "callout" | "image" | "divider" | "secret" | "table";
   icon: string;
   map_id?: string;
   board_id?: string;

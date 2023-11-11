@@ -96,6 +96,10 @@
     th {
       @apply h-10 p-0 text-xl;
 
+      img {
+        @apply py-2;
+      }
+
       p {
         @apply m-0 -mt-px flex h-full items-center justify-center text-center;
       }

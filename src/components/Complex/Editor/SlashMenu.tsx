@@ -1,13 +1,16 @@
 import { Icon } from "@iconify/react";
-import { FloatingWrapper, useChainedCommands, useMenuNavigation, useSuggest } from "@remirror/react";
+import { FloatingWrapper, useChainedCommands, useMenuNavigation, useRemirrorContext, useSuggest } from "@remirror/react";
+import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 
 import { slashMenuItem } from "../../../types";
-import { defaultSlashItems } from "../../../utils";
+import { defaultSlashItems, drawerAtom } from "../../../utils";
 
 export function SlashMenu() {
   const chain = useChainedCommands();
-  const [itemsType, setItemsType] = useState<"commands" | "columns" | "maps" | "boards">("commands");
+  const setDrawer = useSetAtom(drawerAtom);
+  const context = useRemirrorContext();
+  const [itemsType, setItemsType] = useState<"commands">("commands");
   const { change, exit } = useSuggest({
     char: "/",
     name: "command",
@@ -27,6 +30,8 @@ export function SlashMenu() {
         } else if (cmd.name === "Task List") {
           chain.delete(range).toggleTaskList().run();
         }
+      } else if (cmd.type === "table") {
+        chain.delete(range).createTable({ columnsCount: 3, rowsCount: 3 }).run();
       } else if (cmd.type === "quote") {
         chain.delete(range).toggleBlockquote().run();
       } else if (cmd.type === "callout") {
@@ -34,7 +39,13 @@ export function SlashMenu() {
       } else if (cmd.type === "secret") {
         chain.delete(range).toggleSecret().run();
       } else if (cmd.type === "image") {
-        // chain.delete(range).toggleSecret().run();
+        chain.delete(range).run();
+        setDrawer({
+          data: { getContext: context },
+          type: "insert_image",
+          title: "Insert image",
+          size: "md",
+        });
       } else if (cmd.type === "divider") {
         chain.delete(range).insertHorizontalRule().run();
       }
