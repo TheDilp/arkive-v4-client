@@ -11,7 +11,6 @@ import {
   MapType,
   MessagePlaceContentType,
 } from "../../types";
-import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -287,33 +286,6 @@ export function useUpdateMessageSubEntity<
           icon: IconEnum.check,
           timer: 2,
         });
-      },
-    },
-  );
-}
-
-export function useUpdateRandomTableOption(parent_id: string | undefined, project_id: string) {
-  const queryClient = useQueryClient();
-  const createNotification = useNotifications();
-
-  return useMutation(
-    async (updateValues: { data: Partial<RandomTableOptionType> }) => {
-      return FetchFunction({
-        url: `${baseURLS.baseServer}/random_table_options/update/${updateValues?.data?.id}`,
-        body: JSON.stringify(updateValues),
-        method: "POST",
-      });
-    },
-    {
-      onSettled: (data) => {
-        queryClient.invalidateQueries(["allEntities", project_id, "random_table_options", parent_id]);
-        if (data?.ok)
-          createNotification({
-            title: getEntityCRUDNotification("random_table_options", "update"),
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-          });
       },
     },
   );
