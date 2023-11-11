@@ -123,7 +123,7 @@
 
   p {
     .remirror-resizable-view {
-      @apply float-left select-all;
+      @apply float-left select-all !important;
       div {
         @apply bg-transparent;
       }

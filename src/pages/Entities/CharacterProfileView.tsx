@@ -357,6 +357,7 @@ function documentsTableColumns(
                     },
                     title: "Preview document",
                     type: "entity_preview",
+                    size: "half",
                   })),
               },
               {
