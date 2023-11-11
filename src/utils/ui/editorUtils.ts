@@ -171,8 +171,14 @@ export const DefaultEditorExtensions: (
     DiceRollerExtension,
     new CustomImageExtension({
       enableResizing: true,
-      uploadHandler: () => {
-        return [];
+      extraAttributes: {
+        test: {
+          default: "ABC",
+          toDOM: () => ["data-test"],
+        },
+      },
+      nodeOverride: {
+        selectable: true,
       },
     }),
     new HorizontalRuleExtension({}),

@@ -14,7 +14,7 @@
 
 .remirror-editor,
 .staticRendererContainer {
-  @apply p-4 font-lato focus-visible:outline-none;
+  @apply p-4 text-justify font-lato focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;
@@ -88,9 +88,13 @@
   blockquote {
     @apply my-2 border-0 px-0 italic;
   }
+  img {
+    @apply p-1 !important;
+  }
   blockquote > * {
     @apply border-l-[3px] pl-2 font-merriweather text-2xl font-normal text-zinc-300 !important;
   }
+
   table {
     @apply table-fixed overflow-visible font-lato !important;
     th {
@@ -119,8 +123,12 @@
 
   p {
     .remirror-resizable-view {
+      @apply float-left select-all;
       div {
         @apply bg-transparent;
+      }
+      > * {
+        @apply select-all;
       }
     }
   }
@@ -135,12 +143,19 @@
 
   *[data-node-text-align="left"]:not(blockquote),
   [nodetextalignment="left"]:not(blockquote) {
+    .remirror-resizable-view {
+      @apply float-left;
+    }
+
     @apply mr-4 text-left;
   }
 
   *[data-node-text-align="right"]:not(blockquote),
   *[nodetextalignment="right"]:not(blockquote) {
     @apply ml-4 text-right;
+    .remirror-resizable-view {
+      @apply float-right;
+    }
   }
   *[nodetextalignment="center"]:not(blockquote) {
     @apply flex justify-center text-center;

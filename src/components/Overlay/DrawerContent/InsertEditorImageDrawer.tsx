@@ -48,6 +48,7 @@ export function InsertEditorImageDrawer({ getContext }: Props) {
                 src: getImageURL(project_id as string, "images", image.value),
                 alt: image.label,
                 title: image.label,
+                align: "right",
               })
               ?.run();
           }

@@ -80,11 +80,9 @@ export function DocumentView({ editable }: { editable: boolean }) {
   useLayoutEffect(() => {
     if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
-      setTimeout(() => {
-        manager.view.updateState(
-          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
-        );
-      }, 1);
+      manager.view.updateState(
+        manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
+      );
     }
   }, [currentDocument, isRefetching]);
 
@@ -99,6 +97,13 @@ export function DocumentView({ editable }: { editable: boolean }) {
     }
   }, [currentDocument]);
 
+  useEffect(() => {
+    if (item_id) {
+      resetChanges();
+      if (manager) manager?.view?.updateState(manager?.createState({ content: undefined }));
+    }
+  }, [item_id]);
+
   if (isFetching)
     return (
       <div className="h-[90%] w-full max-w-[95.5vw] lg:h-full">
@@ -112,7 +117,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
   return (
-    <div className="max-h-full w-full max-w-[95.5vw] flex-1">
+    <div className="max-h-full min-h-full w-full max-w-[95.5vw]">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification
@@ -172,7 +177,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <SlashMenu />
 
         <div
-          className="relative flex max-h-[95%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
+          className="relative flex h-full max-h-[95%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
           <Menubar size="md" />
           <div
@@ -190,18 +195,22 @@ export function DocumentView({ editable }: { editable: boolean }) {
                       const slice = getContext()?.getState().selection.content();
                       if (slice) {
                         const id = crypto.randomUUID();
-                        const title = getTextContentFromSlice(slice);
-                        await createDocument({ data: { id, project_id: project_id as string, title } });
-                        getContext()?.commands?.replaceText({
-                          attrs: {
-                            id,
-                            label: title,
-                            name: "documents",
-                          },
-                          type: "mentionAtom",
-                          content: title,
-                          selection: getContext()?.getState()?.selection,
-                        });
+                        const title = getTextContentFromSlice(slice).trim();
+                        if (title.length) {
+                          await createDocument({ data: { id, project_id: project_id as string, title } });
+                          getContext()?.commands?.replaceText({
+                            attrs: {
+                              id,
+                              label: title,
+                              name: "documents",
+                            },
+                            type: "mentionAtom",
+                            content: title,
+                            selection: getContext()?.getState()?.selection,
+                          });
+                        } else {
+                          createNotification({ title: "No text selected.", variant: "error", icon: IconEnum.error, timer: 3 });
+                        }
                       }
                     },
                   },
