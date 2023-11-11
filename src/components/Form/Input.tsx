@@ -80,7 +80,11 @@ function handleNumberChange({
 } & Pick<InputType, "onChange" | "min" | "max" | "name">) {
   if (max && newValue > max) return;
   if (min && newValue < min) return;
-  if (Number.isNaN(newValue)) onChange({ name, value: 0 });
+
+  if (Number.isNaN(newValue)) {
+    onChange({ name, value: null });
+    return;
+  }
   onChange({ name, value: newValue });
 }
 

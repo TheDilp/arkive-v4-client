@@ -4,7 +4,7 @@ import { BaseFormComponentType } from "../../baseTypes";
 
 export interface InputOnChangeValue {
   name: string;
-  value: string | number | undefined;
+  value: string | number | undefined | null;
 }
 export interface InputType extends BaseFormComponentType {
   name: string;
