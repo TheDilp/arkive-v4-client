@@ -9,6 +9,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import { ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
+import { ErrorPage } from "./pages/Misc";
 import { ProjectsView } from "./pages/Projects";
 
 cytoscape.use(edgehandles);
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
   {
     path: "/*",
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "projects/*",

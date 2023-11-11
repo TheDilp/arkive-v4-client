@@ -270,7 +270,6 @@ export function CharactersView() {
     }
     return () => {};
   }, [filter, dispatch, view]);
-
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
