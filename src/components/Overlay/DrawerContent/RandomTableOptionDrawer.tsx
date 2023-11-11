@@ -7,7 +7,7 @@ import { RandomTableOptionType, RandomTableSubOptionType } from "../../../types/
 import { drawerAtom, IconEnum } from "../../../utils";
 import { UpdateRandomTableOptionSchema } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Collapsible, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
@@ -99,39 +99,43 @@ export function RandomTableOptionDrawer({ data }: Props) {
             </div>
             <div className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
               {randomTableOption.random_table_suboptions?.map((suboption, index) => (
-                <div key={suboption.id} className="flex flex-col gap-y-1">
-                  <div className="flex flex-nowrap items-center gap-x-2 border-t border-zinc-700 pt-2">
-                    <div className="flex flex-1 items-center gap-x-2">
-                      <Input
-                        label="Title (required)"
-                        name={`random_table_suboptions[${index}].title`}
-                        onChange={handleChange}
-                        value={suboption?.title || ""}
-                      />
-                      <div className="h-10 w-min self-end">
-                        <Button
-                          hasNoBackground
-                          icon={IconEnum.trash}
-                          onClick={() => {
-                            handleChange({
-                              name: "random_table_suboptions",
-                              value: randomTableOption.random_table_suboptions?.filter((subopt) => subopt.id !== suboption.id),
-                            });
-                          }}
-                          variant="error"
+                <Collapsible key={suboption.id} label={suboption.title}>
+                  <div key={suboption.id} className="flex flex-col gap-y-1   p-2">
+                    <div className="flex flex-nowrap items-center gap-x-2 border-zinc-700">
+                      <div className="flex flex-1 items-center gap-x-2">
+                        <Input
+                          label="Title (required)"
+                          name={`random_table_suboptions[${index}].title`}
+                          onChange={handleChange}
+                          value={suboption?.title || ""}
                         />
+                        <div className="h-10 w-min self-end">
+                          <Button
+                            hasNoBackground
+                            icon={IconEnum.trash}
+                            onClick={() => {
+                              handleChange({
+                                name: "random_table_suboptions",
+                                value: randomTableOption.random_table_suboptions?.filter(
+                                  (subopt) => subopt.id !== suboption.id,
+                                ),
+                              });
+                            }}
+                            variant="error"
+                          />
+                        </div>
                       </div>
                     </div>
+                    <div>
+                      <Textarea
+                        label="Description (optional)"
+                        name={`random_table_suboptions[${index}].description`}
+                        onChange={handleChange}
+                        value={suboption?.description || ""}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Textarea
-                      label="Description (optional)"
-                      name={`random_table_suboptions[${index}].description`}
-                      onChange={handleChange}
-                      value={suboption?.description || ""}
-                    />
-                  </div>
-                </div>
+                </Collapsible>
               ))}
             </div>
           </>
