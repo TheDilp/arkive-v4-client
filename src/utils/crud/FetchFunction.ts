@@ -14,7 +14,8 @@ export async function FetchFunction({
   method: "GET" | "POST" | "DELETE";
   body?: string | FormData;
 }) {
-  const token = getCookie("__session");
+  // @ts-ignore
+  const token = await window.Clerk.session.getToken({ template: "ArkiveJWT" });
   const res = await fetch(url, {
     method,
     body,

@@ -15,7 +15,8 @@ const NotificationClasses = tv({
     titleContainer: "text-sm font-normal truncate h-fit text-center flex items-center gap-x-2 max-w-[25rem] justify-between ",
     title: "text-base truncate",
     description: "text-center text-sm mt-1 flex-1",
-    iconContainer: "flex mr-2 h-8 w-8 min-w-[2rem] min-h-[2rem] max-w-fit items-center justify-center rounded",
+    iconContainer: "flex items-center justify-center rounded",
+    userImage: "absolute top-10 left-6",
     progress: "absolute left-0 top-0 h-1 transition-all",
   },
   variants: {
@@ -52,6 +53,14 @@ const NotificationClasses = tv({
       },
       center: {
         base: "animate-in zoom-in m-auto",
+      },
+    },
+    hasImage: {
+      true: {
+        iconContainer: "bg-transparent",
+      },
+      false: {
+        iconContainer: "w-8 h-8 min-h-[2rem] min-w-[2rem]",
       },
     },
     hasTitleBorder: {
@@ -134,6 +143,7 @@ export function Notification({
   timer = 3,
   icon,
   image_id,
+  image_url,
   variant = "primary",
   actions,
   position = "top-right",
@@ -166,8 +176,9 @@ export function Notification({
     title: titleClasses,
     description: descriptionClasses,
     progress,
+    userImage,
     iconContainer,
-  } = NotificationClasses({ variant, position, hasTitleBorder, hasNoTruncate });
+  } = NotificationClasses({ variant, position, hasTitleBorder, hasNoTruncate, hasImage: !!image_id || !!image_url });
   return (
     <div className={base()} role="alert">
       <div
@@ -180,7 +191,7 @@ export function Notification({
       {!type ? (
         <div className="flex w-fit flex-col items-center justify-between">
           <div className={titleContainer()}>
-            {icon && !image_id ? (
+            {icon && !image_id && !image_url ? (
               <div className={iconContainer()}>
                 <Icon fontSize={22} icon={icon} />
               </div>
@@ -188,6 +199,11 @@ export function Notification({
             {image_id ? (
               <div className={iconContainer()}>
                 <Avatar image={getImageURL(project_id as string, "images", image_id)} />
+              </div>
+            ) : null}
+            {image_url ? (
+              <div className={userImage()}>
+                <Avatar image={image_url} size="xs" />
               </div>
             ) : null}
             <div className={titleClasses()}>{title}</div>

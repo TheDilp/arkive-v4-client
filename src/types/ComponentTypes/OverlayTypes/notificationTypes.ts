@@ -18,6 +18,7 @@ export interface NotificationType {
   timer: number;
   icon?: string;
   image_id?: string;
+  image_url?: string;
   variant?: Variant;
   position?: NotificationPositionsType;
   hasTitleBorder?: boolean;
