@@ -114,7 +114,7 @@ export function Navbar() {
           title: lastJsonMessage.message,
           image_id: lastJsonMessage.image_id,
           variant: "info",
-          timer: 50,
+          timer: 5,
           image_url: lastJsonMessage.userImageUrl,
           hasNoTruncate: true,
         });
