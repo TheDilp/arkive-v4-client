@@ -649,7 +649,6 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         onClick={() => {
                           if (action.onClick) {
                             action.onClick();
-                            dispatch({ type: "clearSelection" });
                           }
                         }}
                         tooltip="Delete selected rows"

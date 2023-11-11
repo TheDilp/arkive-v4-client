@@ -1,5 +1,6 @@
 import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -30,6 +31,7 @@ import {
   getEntityNameFromType,
   getImageURL,
   getNavbarEntityType,
+  getPluralEntityType,
   IconEnum,
   userSettingsAtom,
 } from "../../utils";
@@ -300,6 +302,8 @@ export function FolderView() {
   const setDialog = useSetAtom(dialogAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
+  const resetDialogAtom = useResetAtom(dialogAtom);
+
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
@@ -550,10 +554,35 @@ export function FolderView() {
                   hasNoBackground: true,
                   isIconOnly: true,
                   tooltip: "Delete selected rows.",
-                  onClick: async () => {
+                  onClick: () => {
                     const ids = Object.values(selection || {}).flatMap((id) => id);
                     if (ids.length) {
-                      await deleteMany({ data: { ids } });
+                      setDialog((prev) => ({
+                        ...prev,
+                        title: "Delete many",
+                        description: `Are you sure you want to delete ${ids.length} ${getPluralEntityType(
+                          type as AvailableEntityType,
+                        )}?`,
+                        warning: "This action cannot be undone.",
+                        isOverlay: true,
+                        cancel: {
+                          label: "Cancel",
+                          variant: "primary",
+                          action: resetDialogAtom,
+                        },
+                        confirm: {
+                          label: "Delete",
+                          icon: IconEnum.trash,
+                          action: async () =>
+                            deleteMany(
+                              { data: { ids } },
+                              {
+                                onSuccess: () => dispatch({ type: "clearSelection" }),
+                              },
+                            ),
+                          variant: "error",
+                        },
+                      }));
                     }
                   },
                 },

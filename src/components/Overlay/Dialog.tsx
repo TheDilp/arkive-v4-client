@@ -119,6 +119,8 @@ export function Dialog() {
         ) : null}
         {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} /> : null}
         {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
+        {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
+        {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
         {dialog?.cancel || dialog?.confirm ? (
           <div className="mt-auto flex items-center justify-center gap-x-2">
             {dialog?.cancel ? (

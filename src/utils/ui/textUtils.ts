@@ -49,6 +49,9 @@ export function getSingularEntityType(type: AvailableEntityType | AvailableSubEn
   if (type === "dictionaries") return "dictionary";
   return getSentenceCase(type.slice(0, type.length - 1));
 }
+export function getPluralEntityType(type: AvailableEntityType | AvailableSubEntityType | AssetType) {
+  return type.replaceAll("_", " ");
+}
 
 export function validateHexCode(hex: string) {
   return /^#[0-9A-F]{6}$/i.test(hex);

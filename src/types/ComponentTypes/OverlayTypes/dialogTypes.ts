@@ -12,6 +12,8 @@ export type DialogContentType =
 export interface DialogAtomType {
   data: any | null;
   title: string;
+  description?: string;
+  warning?: string;
   type: DialogContentType;
   isOverlay?: boolean;
   position?: DialogPosition;
