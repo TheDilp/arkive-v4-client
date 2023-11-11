@@ -23,6 +23,7 @@ export function Editor({
     onError,
     content: initialContent || undefined,
   });
+
   return (
     <Remirror
       editable={!isReadOnly && !isDisabled}

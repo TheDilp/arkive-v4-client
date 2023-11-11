@@ -56,6 +56,35 @@
   ul:not(.tableOfContentsList) {
     @apply ml-1 list-disc;
   }
+  ul[data-task-list] {
+    li {
+      @apply outline-none;
+
+      > * {
+        @apply outline-none;
+      }
+    }
+
+    label input {
+      @apply mt-1 h-4 w-4 appearance-none rounded border bg-zinc-700 text-white outline-none;
+      &:checked {
+        @apply bg-zinc-400;
+
+        &:after {
+          content: "\2713";
+          color: #fff;
+
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          -webkit-transform: translate(-50%, -50%);
+          -moz-transform: translate(-50%, -50%);
+          -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
+  }
   blockquote {
     @apply my-2 border-0 px-0 italic;
   }
