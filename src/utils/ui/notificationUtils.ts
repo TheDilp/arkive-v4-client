@@ -19,6 +19,7 @@ export function removeNotification(setNotificationAtom: any, id: string) {
 export function getEntityCRUDNotification(
   type: AllAvailableEntities | AssetType,
   action_type: "create" | "update" | "archive" | "delete",
+  bulk?: boolean,
 ) {
   let action = "";
   if (action_type === "create") {
@@ -32,6 +33,6 @@ export function getEntityCRUDNotification(
   if (action_type === "delete") {
     action = "deleted";
   }
-  const singularName = capitalizeFirstLetter(getSingularEntityType(type));
-  return `${singularName} successfully ${action}.`;
+  const name = capitalizeFirstLetter(bulk ? type.replaceAll("_", " ") : getSingularEntityType(type));
+  return `${name} successfully ${action}.`;
 }

@@ -44,7 +44,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
           });
         } else
           createNotification({
-            title: data?.message || "There was an error updating this item.",
+            title: data?.message || "There was an error deleting this item.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,
@@ -131,12 +131,41 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
     },
   );
 }
-export function useDeleteMany(type: AllAvailableEntities) {
-  return useMutation(async (vars: { data: { ids: string[] } }) => {
-    return FetchFunction({
-      url: `${baseURLS.baseServer}/bulk/delete/${type.toLowerCase()}`,
-      body: JSON.stringify(vars),
-      method: "DELETE",
-    });
-  });
+export function useDeleteMany(type: AllAvailableEntities, project_id?: string | undefined, parent_id?: string | undefined) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (vars: { data: { ids: string[] } }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/bulk/delete/${type.toLowerCase()}`,
+        body: JSON.stringify(vars),
+        method: "DELETE",
+      });
+    },
+
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          if (parent_id) {
+            queryClient.invalidateQueries([type, parent_id]);
+          } else {
+            queryClient.invalidateQueries(["allEntities", project_id, type]);
+          }
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "delete", true),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 5,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error deleting this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
 }

@@ -639,14 +639,19 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   return accumulator;
                 }, 0)}
               </b>
-              <span>rows |</span>
+              <span className="border-r border-zinc-500 pr-2">rows </span>
               {selectedActions?.length
                 ? selectedActions.map((action) => (
                     <div key={action?.label || action?.icon} className="">
                       <Button
                         hasNoBackground
                         icon={action.icon}
-                        onClick={action.onClick}
+                        onClick={() => {
+                          if (action.onClick) {
+                            action.onClick();
+                            dispatch({ type: "clearSelection" });
+                          }
+                        }}
                         tooltip="Delete selected rows"
                         variant={action.variant}
                       />

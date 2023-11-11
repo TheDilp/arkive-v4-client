@@ -294,7 +294,7 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     },
   );
-  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType);
+  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
