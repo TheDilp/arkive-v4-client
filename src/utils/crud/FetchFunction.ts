@@ -15,7 +15,7 @@ export async function FetchFunction({
   body?: string | FormData;
 }) {
   // @ts-ignore
-  const token = await window.Clerk.session.getToken({ template: "ArkiveJWT" });
+  const token = await window.Clerk.session.getToken();
   const res = await fetch(url, {
     method,
     body,
