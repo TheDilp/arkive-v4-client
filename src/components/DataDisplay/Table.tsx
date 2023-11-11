@@ -672,7 +672,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             <div
               key={row.id}
               className={`${rowContainer()} ${
-                config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                   ? "group hover:text-white"
                   : "hover:bg-zinc-800"
               }`}
@@ -696,14 +696,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                       } ${cell.column.id === "select" ? "sticky left-0" : ""}
-                      ${config?.selection?.[pagination?.page || 0]?.includes(row.index) ? "group-hover:bg-blue-300" : ""}
+                      ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
                        ${
-                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                            ? "bg-blue-300"
                            : "bg-zinc-950"
                        }
                       ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky" : ""}
-                      ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.index) ? hasLinkRow() : ""}
+                      ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""}
                     
                       `}
                       onClick={(e) => {

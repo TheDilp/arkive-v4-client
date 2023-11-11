@@ -319,7 +319,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                           // @ts-ignore
                           const ids: string[] = selected.map((el) => el.id());
                           deleteManyNodes(
-                            { data: ids.map((i) => ({ id: i })) },
+                            { data: { ids: ids.map((i) => i) } },
                             {
                               onSuccess: () => {
                                 setEdges((prev) =>
@@ -377,7 +377,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         onClick: () => {
                           if (edges) {
                             const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
-                            deleteManyEdges({ data: ids.map((i) => ({ id: i })) });
+                            deleteManyEdges({ data: { ids: ids.map((i) => i) } });
                             setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
                           }
                         },
@@ -407,7 +407,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         onClick: () => {
                           if (edges) {
                             const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
-                            deleteManyEdges({ data: ids.map((i) => ({ id: i })) });
+                            deleteManyEdges({ data: { ids: ids.map((i) => i) } });
                             setEdges((prev) => prev.filter((e) => !ids.includes(e.id)));
                           }
                         },

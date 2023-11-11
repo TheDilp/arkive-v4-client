@@ -14,7 +14,10 @@ export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginat
       name="selectAll"
       onChange={({ value }) => {
         if (value) {
-          dispatch({ type: "selectAll", payload: { rows: table.getPaginationRowModel().flatRows.map((_, i) => i) } });
+          dispatch({
+            type: "selectAll",
+            payload: { rows: table.getPaginationRowModel().flatRows.map((row) => row.original.id) },
+          });
         } else {
           dispatch({ type: "clearSelection" });
         }
@@ -28,8 +31,8 @@ export const SelectColumn: (dispatch: TableDispatch, pagination?: RequestPaginat
   cell: ({ table, row }) => (
     <Checkbox
       name={row.id}
-      onChange={() => dispatch({ type: "setSelection", payload: { row: row.index } })}
-      value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.index)}
+      onChange={() => dispatch({ type: "setSelection", payload: { row: row.original.id } })}
+      value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.original.id)}
     />
   ),
   meta: {

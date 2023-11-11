@@ -5,7 +5,7 @@ import { AvailableEntityType } from "../../EntityTypes";
 import { ButtonType } from "../FormTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
-export type TableSelectionType = { [key: number]: number[] };
+export type TableSelectionType = { [key: number]: string[] };
 
 export interface FilterEnumType extends SelectOptionType {
   type: "boolean" | "text" | "number";
@@ -55,8 +55,8 @@ export type TableActionType =
       type: "setSort";
       payload: { field: string; sort: SortType };
     }
-  | { type: "setSelection"; payload: { row: number } }
-  | { type: "selectAll"; payload: { rows: number[] } }
+  | { type: "setSelection"; payload: { row: string } }
+  | { type: "selectAll"; payload: { rows: string[] } }
   | { type: "clearSelection" };
 
 export interface TableSelectedAction extends ButtonType {}

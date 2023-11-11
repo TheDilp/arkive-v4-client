@@ -132,9 +132,9 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
   );
 }
 export function useDeleteMany(type: AllAvailableEntities) {
-  return useMutation(async (vars: { data: { id: string }[] }) => {
+  return useMutation(async (vars: { data: { ids: string[] } }) => {
     return FetchFunction({
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
+      url: `${baseURLS.baseServer}/bulk/delete/${type.toLowerCase()}`,
       body: JSON.stringify(vars),
       method: "DELETE",
     });

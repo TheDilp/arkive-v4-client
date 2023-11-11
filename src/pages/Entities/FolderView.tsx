@@ -17,7 +17,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable, useUpdateEntity } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable, useUpdateEntity } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DialogAtomType, DrawerAtomType, DrawerContentCreateNewType } from "../../types";
 import {
   breadcrumbsAtom,
@@ -294,6 +294,7 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     },
   );
+  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -549,7 +550,12 @@ export function FolderView() {
                   hasNoBackground: true,
                   isIconOnly: true,
                   tooltip: "Delete selected rows.",
-                  onClick: () => {},
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    if (ids.length) {
+                      await deleteMany({ data: { ids } });
+                    }
+                  },
                 },
               ],
               hasSelect: true,
