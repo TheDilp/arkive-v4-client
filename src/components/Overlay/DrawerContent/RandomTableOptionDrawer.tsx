@@ -2,7 +2,7 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetSubEntity, useHandleChange, useUpdateRandomTableOption } from "../../../hooks";
+import { useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
 import { RandomTableOptionType, RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { UpdateRandomTableOptionSchema } from "../../../validation/random_tables";
@@ -29,7 +29,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
     "random_table_options",
     {
       data: {},
-      relations: { suboptions: true },
+      relations: { random_table_suboptions: true },
     },
     {
       enabled: !!data?.id,
@@ -39,9 +39,10 @@ export function RandomTableOptionDrawer({ data }: Props) {
   const [randomTableOption, setRandomTableOption] = useState<Partial<RandomTableOptionType>>(
     existingOption?.data || { id: data?.id },
   );
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateRandomTableOption(
-    randomTableOption?.parent_id,
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity(
+    "random_table_options",
     project_id as string,
+    randomTableOption?.parent_id,
   );
 
   const { handleChange } = useHandleChange({ data: randomTableOption, setData: setRandomTableOption });
@@ -83,10 +84,10 @@ export function RandomTableOptionDrawer({ data }: Props) {
                   icon={IconEnum.add}
                   onClick={() =>
                     handleChange({
-                      name: "suboptions",
+                      name: "random_table_suboptions",
                       value: (randomTableOption?.random_table_suboptions || []).concat({
                         id: crypto.randomUUID(),
-                        title: "",
+                        title: "New suboption",
                         description: "",
                         parent_id: data.id,
                       } as RandomTableSubOptionType),
@@ -103,7 +104,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
                     <div className="flex flex-1 items-center gap-x-2">
                       <Input
                         label="Title (required)"
-                        name={`suboptions[${index}].title`}
+                        name={`random_table_suboptions[${index}].title`}
                         onChange={handleChange}
                         value={suboption?.title || ""}
                       />
@@ -113,7 +114,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
                           icon={IconEnum.trash}
                           onClick={() => {
                             handleChange({
-                              name: "suboptions",
+                              name: "random_table_suboptions",
                               value: randomTableOption.random_table_suboptions?.filter((subopt) => subopt.id !== suboption.id),
                             });
                           }}
@@ -125,7 +126,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
                   <div>
                     <Textarea
                       label="Description (optional)"
-                      name={`suboptions[${index}].description`}
+                      name={`random_table_suboptions[${index}].description`}
                       onChange={handleChange}
                       value={suboption?.description || ""}
                     />
@@ -142,8 +143,11 @@ export function RandomTableOptionDrawer({ data }: Props) {
             isLoading={isFetching || isUpdating}
             label="Save"
             onClick={async () => {
-              const { random_table_suboptions: suboptions, ...rest } = randomTableOption;
-              const parsedData = UpdateRandomTableOptionSchema.parse({ data: rest, relations: { suboptions } });
+              const { random_table_suboptions, ...rest } = randomTableOption;
+              const parsedData = UpdateRandomTableOptionSchema.parse({
+                data: rest,
+                relations: { random_table_suboptions: (random_table_suboptions || [])?.map((subopt) => ({ data: subopt })) },
+              });
               await update(parsedData, {
                 onSuccess: (d) => {
                   if (d.ok) resetDrawer();

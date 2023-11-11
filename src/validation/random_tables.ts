@@ -51,10 +51,19 @@ export const UpdateRandomTableOptionSchema = z.object({
     description: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
-    suboptions: RandomTableSubOptionSchema.array().optional(),
   }),
   relations: z.object({
-    suboptions: RandomTableSubOptionSchema.array().optional(),
+    random_table_suboptions: z
+      .object({
+        data: z.object({
+          id: z.string(),
+          parent_id: z.string(),
+          title: z.string(),
+          description: z.string().optional().nullable(),
+        }),
+      })
+      .array()
+      .optional(),
   }),
 });
 

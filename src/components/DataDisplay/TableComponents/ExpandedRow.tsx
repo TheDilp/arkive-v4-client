@@ -135,10 +135,10 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
     </div>
   );
 }
-function ExpandedRandomOption({ suboptions }: { suboptions: RandomTableSubOptionType[] }) {
+function ExpandedRandomOption({ random_table_suboptions }: { random_table_suboptions: RandomTableSubOptionType[] }) {
   return (
     <div className="flex flex-col gap-y-2">
-      {suboptions?.map((suboption) => (
+      {random_table_suboptions?.map((suboption) => (
         <div key={suboption.id} className="flex flex-col font-lato">
           <div className="flex w-full max-w-full items-center gap-x-2">
             <span>
@@ -246,7 +246,9 @@ export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType,
       {type === "character_fields_templates" ? <ExpandedTemplateFields templateId={data?.id} /> : null}
       {/* Random table options have suboptions fetched with them in order to use the "Roll on table" feature */}
       {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}
-      {type === "random_table_options" ? <ExpandedRandomOption suboptions={data?.suboptions || []} /> : null}
+      {type === "random_table_options" ? (
+        <ExpandedRandomOption random_table_suboptions={data?.random_table_suboptions || []} />
+      ) : null}
       {type === "words" ? <ExpandedWord id={data?.id} /> : null}
       {type === "tags" ? <ExpandedTag id={data?.id} /> : null}
     </div>

@@ -90,7 +90,7 @@ export function RandomTableView() {
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id: project_id as string },
-      relations: { suboptions: true },
+      relations: { random_table_suboptions: true },
     },
     "random_table_options",
     {
@@ -198,7 +198,7 @@ export function RandomTableView() {
           <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />
         </div>
       </div>
-      <div className=" w-full overflow-hidden">
+      <div className="h-full w-full overflow-hidden">
         <Table
           columns={createColumns(setDrawer, setDialog)}
           config={{

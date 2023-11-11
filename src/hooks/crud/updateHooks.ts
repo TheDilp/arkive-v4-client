@@ -312,9 +312,9 @@ export function useUpdateSubEntity(
         const parentEntityType = getParentEntityType(type);
 
         if (parentEntityType && parentEntityType !== "documents") {
-          if (type === "blueprint_instances") {
-            queryClient.invalidateQueries(["allEntities", project_id, "blueprint_instances"]);
-            queryClient.invalidateQueries(["blueprint_instances", vars.data.id]);
+          if (type === "blueprint_instances" || type === "random_table_options") {
+            queryClient.invalidateQueries(["allEntities", project_id, type]);
+            queryClient.invalidateQueries([type, vars.data.id]);
           } else {
             queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
             queryClient.invalidateQueries([parentEntityType, parent_id]);
