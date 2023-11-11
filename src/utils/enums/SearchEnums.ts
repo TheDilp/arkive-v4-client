@@ -7,7 +7,7 @@ export const SearchCategories: { label: string; value: SearchableEntities }[] = 
   { label: "Maps", value: "maps" },
   // { label: "Character map pins", value: "character_map_pins" },
   { label: "Map pins", value: "map_pins" },
-  { label: "Graphs", value: "boards" },
+  { label: "Graphs", value: "graphs" },
   { label: "Nodes", value: "nodes" },
   { label: "Edges", value: "edges" },
   { label: "Events", value: "events" },

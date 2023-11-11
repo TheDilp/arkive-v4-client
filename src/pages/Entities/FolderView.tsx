@@ -542,13 +542,22 @@ export function FolderView() {
               show_image_table_view,
             )}
             config={{
+              selectedActions: [
+                {
+                  icon: IconEnum.trash,
+                  variant: "error",
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Delete selected rows.",
+                  onClick: () => {},
+                },
+              ],
               hasSelect: true,
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
             }}
             data={base?.data || data?.data?.children || []}
             dispatch={dispatch}
-            isLoading={isFetching || isFetchingFolder}
             type={type as AvailableEntityType}
           />
         </div>

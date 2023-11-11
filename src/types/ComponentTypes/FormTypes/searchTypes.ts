@@ -9,7 +9,7 @@ export type SearchAllEntitiesType =
         result: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
       },
       {
-        name: "documents" | "maps" | "boards" | "calendars" | "dictionaries" | "blueprints";
+        name: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints";
         result: { id: string; title: string; icon?: string }[];
       },
       { name: "alter_names"; result: { id: string; parent_id: string; title: string }[] },
@@ -27,7 +27,7 @@ export type SearchAllEntitiesByTagType =
         result: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
       },
       {
-        name: "documents" | "maps" | "boards" | "calendars";
+        name: "documents" | "maps" | "graphs" | "calendars";
         result: { id: string; title: string; icon?: string }[];
       },
       { name: "map_pins" | "character_map_pins"; result: { id: string; title: string; parent_id: string }[] },

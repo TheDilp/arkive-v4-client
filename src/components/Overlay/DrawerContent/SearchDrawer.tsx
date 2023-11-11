@@ -213,7 +213,7 @@ export function SearchDrawer() {
                                     ? `(${result_item.parent_title})`
                                     : ""
                                 }`}
-                                type={name === "boards" ? "graphs" : name}
+                                type={name}
                               />
                             )}
                           </li>
@@ -251,11 +251,7 @@ export function SearchDrawer() {
                         "parent_id" in item ? item?.parent_id : undefined,
                       )}
                       title={`${item.label} ${"parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""}`}
-                      type={
-                        searchCategory === "boards"
-                          ? "graphs"
-                          : (searchCategory as AvailableEntityType | AvailableSubEntityType)
-                      }
+                      type={searchCategory as AvailableEntityType | AvailableSubEntityType}
                     />
                   )}
                 </li>

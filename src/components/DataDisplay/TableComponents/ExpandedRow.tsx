@@ -32,7 +32,7 @@ type FormattedTagEntitiesSearch = Record<
   "characters",
   Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[]
 > &
-  Record<"documents" | "maps" | "boards" | "calendars" | "dictionaries", { id: string; title: string; icon?: string }[]> &
+  Record<"documents" | "maps" | "graphs" | "calendars" | "dictionaries", { id: string; title: string; icon?: string }[]> &
   Record<"nodes" | "edges", { id: string; label: string; parent_id: string }[]>;
 
 function ExpandedRowTagListWrapper({
@@ -78,12 +78,7 @@ function ExpandedRowTagListWrapper({
 
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
-            <EntityPreview
-              id={item.id}
-              link={`/projects/${project_id}/${type}/${item.id}`}
-              title={item.title}
-              type={type === "boards" ? "graphs" : type}
-            />
+            <EntityPreview id={item.id} link={`/projects/${project_id}/${type}/${item.id}`} title={item.title} type={type} />
           ))
         : null}
     </ul>
@@ -192,7 +187,7 @@ function ExpandedTag({ id }: { id: string }) {
       set(accumulator, curr.name, curr.result);
       return accumulator;
     },
-    { characters: [], documents: [], maps: [], boards: [], nodes: [], edges: [], calendars: [], dictionaries: [] },
+    { characters: [], documents: [], maps: [], graphs: [], nodes: [], edges: [], calendars: [], dictionaries: [] },
   );
 
   if (isFetching) return <Skeleton type="expanded_tag" />;
@@ -208,7 +203,7 @@ function ExpandedTag({ id }: { id: string }) {
       ) : null}
       {selectedTab === 2 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="maps" /> : null}
       {selectedTab === 3 ? (
-        <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="boards" />
+        <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="graphs" />
       ) : null}
       {selectedTab === 4 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="nodes" /> : null}
       {selectedTab === 5 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="edges" /> : null}

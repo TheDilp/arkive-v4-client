@@ -111,7 +111,6 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
           selection,
           pagination: { page },
         } = state;
-
         if (selection?.[page]) {
           if (!selection[page].includes(action.payload.row)) {
             return {

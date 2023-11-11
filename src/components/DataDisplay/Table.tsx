@@ -53,7 +53,7 @@ const TableClasses = tv({
     subheaderRowTitle: "font-medium",
     rowContainer: "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3.05rem] border-r border-t relative min-w-fit",
     row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
-    hasLinkRow: "hover:text-blue-400 transition-all cursor-pointer",
+    hasLinkRow: "group-hover:bg-zinc-800 cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
     content: "flex flex-1 items-center truncate px-2 border-zinc-600 border-r last:border-r-0 first:border-l",
@@ -425,7 +425,8 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
   );
 }
 export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
-  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, getLink, onRowClick } = config || {};
+  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, selection, selectedActions, getLink, onRowClick } =
+    config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
   const isSubheaderEnabled = areFiltersActive;
@@ -493,7 +494,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const rowVirtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => bodyRef.current,
-    estimateSize: () => 48.8,
+    estimateSize: () => 48,
     overscan: 15,
   });
   const { rows } = table.getRowModel();
@@ -628,6 +629,32 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
               </div>
             );
           })}
+          {Object.entries(selection || {}).some(([, selectedRows]) => selectedRows.length) ? (
+            <div className="absolute left-[2.75rem] z-20 flex h-full w-[calc(100%-2.75rem)] items-center gap-x-1 bg-zinc-800 px-2">
+              <span>Selected:</span>
+              <b>
+                {Object.values(selection || {}).reduce((accumulator, curr) => {
+                  // eslint-disable-next-line no-param-reassign
+                  accumulator += curr.length;
+                  return accumulator;
+                }, 0)}
+              </b>
+              <span>rows |</span>
+              {selectedActions?.length
+                ? selectedActions.map((action) => (
+                    <div key={action?.label || action?.icon} className="">
+                      <Button
+                        hasNoBackground
+                        icon={action.icon}
+                        onClick={action.onClick}
+                        tooltip="Delete selected rows"
+                        variant={action.variant}
+                      />
+                    </div>
+                  ))
+                : null}
+            </div>
+          ) : null}
         </div>
 
         {isSubheaderEnabled ? (
@@ -638,6 +665,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             </div>
           </div>
         ) : null}
+
         {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
           const row = rows[virtualRow.index];
           return (
@@ -661,21 +689,22 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   }
                 }}
                 to={getLink ? getLink(row.original) : "#"}>
-                <div
-                  className={`${rowClasses()}${getLink ? hasLinkRow() : ""}
-                        ${onRowClick ? hasRowAction() : ""}`}>
+                <div className={`${rowClasses()} ${onRowClick ? hasRowAction() : ""} group`}>
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                       } ${cell.column.id === "select" ? "sticky left-0" : ""}
-                      group-hover:bg-blue-300 ${
-                        config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
-                          ? "bg-blue-300"
-                          : "bg-zinc-950"
-                      }
+                      ${config?.selection?.[pagination?.page || 0]?.includes(row.index) ? "group-hover:bg-blue-300" : ""}
+                       ${
+                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.index)
+                           ? "bg-blue-300"
+                           : "bg-zinc-950"
+                       }
                       ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky" : ""}
+                      ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.index) ? hasLinkRow() : ""}
+                    
                       `}
                       onClick={(e) => {
                         if (

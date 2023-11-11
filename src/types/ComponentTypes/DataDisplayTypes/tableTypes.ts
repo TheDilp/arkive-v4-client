@@ -2,6 +2,7 @@ import { Dispatch } from "react";
 
 import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType } from "../../CRUD/CRUDTypes";
 import { AvailableEntityType } from "../../EntityTypes";
+import { ButtonType } from "../FormTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
 export type TableSelectionType = { [key: number]: number[] };
@@ -58,6 +59,8 @@ export type TableActionType =
   | { type: "selectAll"; payload: { rows: number[] } }
   | { type: "clearSelection" };
 
+export interface TableSelectedAction extends ButtonType {}
+
 export interface TableDispatch extends Dispatch<TableActionType> {}
 export interface TableType {
   columns: any[];
@@ -76,6 +79,7 @@ export interface TableType {
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     relationFilters?: Record<string, string[]>;
+    selectedActions?: TableSelectedAction[];
     getLink?: (rowData: any) => string;
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => Promise<void>;

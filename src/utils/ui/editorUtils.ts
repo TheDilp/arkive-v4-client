@@ -85,7 +85,7 @@ export const DefaultEditorExtensions: (
       },
       {
         char: "%",
-        name: "boards",
+        name: "graphs",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {

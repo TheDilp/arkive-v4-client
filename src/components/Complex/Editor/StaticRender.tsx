@@ -112,8 +112,7 @@ const typeMap = (project_id: string, isPublicView?: boolean): MarkMap => ({
 
         if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
 
-        if (type === "boards" || type === "graphs")
-          return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
+        if (type === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
         // if (type === "words") return <WordMention id={id} label={label} title={label} />;
 
         return (
