@@ -196,12 +196,12 @@ export function Notification({
                 <Icon fontSize={22} icon={icon} />
               </div>
             ) : null}
-            {image_id ? (
+            {image_id || (!image_id && image_url) ? (
               <div className={iconContainer()}>
-                <Avatar image={getImageURL(project_id as string, "images", image_id)} />
+                <Avatar image={image_id ? getImageURL(project_id as string, "images", image_id) : image_url} />
               </div>
             ) : null}
-            {image_url ? (
+            {image_id && image_url ? (
               <div className={userImage()}>
                 <Avatar image={image_url} size="xs" />
               </div>
