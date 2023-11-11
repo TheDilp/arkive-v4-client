@@ -171,6 +171,9 @@ export const DefaultEditorExtensions: (
     DiceRollerExtension,
     new CustomImageExtension({
       enableResizing: true,
+      uploadHandler: () => {
+        return [];
+      },
     }),
     new HorizontalRuleExtension({}),
 
@@ -361,7 +364,7 @@ export const defaultSlashItems: slashMenuItem[] = [
     color: "lightskyblue",
   },
   {
-    name: "Callout Error",
+    name: "Callout Erro",
     type: "callout",
     callout_type: "error",
     icon: IconEnum.error,
@@ -381,7 +384,8 @@ export const defaultSlashItems: slashMenuItem[] = [
     icon: IconEnum.check_circle,
     color: "#0f0",
   },
-  { name: "Image", type: "image", icon: "mdi:image" },
-  { name: "Divider", type: "divider", icon: "mdi:minus" },
-  { name: "Secret", type: "secret", icon: "mdi:eye-off-outline" },
+  { name: "Image", type: "image", icon: IconEnum.image },
+  { name: "Divider", type: "divider", icon: IconEnum.divider },
+  { name: "Secret", type: "secret", icon: IconEnum.eye },
+  { name: "Table", type: "table", icon: IconEnum.table },
 ];
