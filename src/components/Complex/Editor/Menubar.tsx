@@ -1,9 +1,9 @@
 import { ReactFrameworkOutput, Remirror, useActive, useChainedCommands, useRemirrorContext } from "@remirror/react";
-import { useSetAtom } from "jotai";
-import { useMemo } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { Size, Variant } from "../../../types";
+import { DrawerAtomType, Size, Variant } from "../../../types";
 import { ColorPresets, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
@@ -14,11 +14,15 @@ const menuBarItems = ({
   chain,
   setDrawer,
   getContext,
+  title,
+  id,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
-  setDrawer: (props: any) => void;
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
   getContext: ReactFrameworkOutput<Remirror.Extensions>;
+  title: string;
+  id: string;
 }) => [
   {
     id: "text_bold",
@@ -235,14 +239,21 @@ const menuBarItems = ({
     variant: active.secret() ? ("info" as Variant) : ("primary" as Variant),
     onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
   },
+  {
+    id: "autolinker",
+    icon: IconEnum.link,
+    onClick: () => setDrawer((prev) => ({ ...prev, size: "lg", type: "autolinker", data: { getContext, title, id } })),
+    tooltip: "Automention",
+  },
 ];
 
-export function Menubar({ size }: { size: Size }) {
+export function Menubar({ size, title, id }: { size: Size; title: string; id: string }) {
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
   const setDrawer = useSetAtom(drawerAtom);
   const active = useActive();
-  const items = useMemo(() => menuBarItems({ active, chain, setDrawer, getContext }), [chain]);
+  const items = useMemo(() => menuBarItems({ active, chain, setDrawer, getContext, title, id }), [chain]);
+
   return (
     <ul
       className={`sticky top-0 z-30 mb-1 flex ${
@@ -269,8 +280,8 @@ export function Menubar({ size }: { size: Size }) {
               hasNoBackground
               icon={item.icon}
               iconSize={size === "md" ? 20 : 16}
-              isIconOnly
               onClick={item.onClick}
+              tooltip={item?.tooltip}
               variant={item?.variant || ("primary" as Variant)}
             />
           )}

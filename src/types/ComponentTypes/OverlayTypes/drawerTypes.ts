@@ -20,7 +20,8 @@ export type DrawerContentType =
   | "swatches"
   | "content_preview"
   | "map_pin_management"
-  | "search";
+  | "search"
+  | "autolinker";
 
 export type DrawerContentCreateNewType =
   | "characters"
@@ -72,6 +73,7 @@ export type DrawerAtomType = {
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType | { project_id: string } }
   | { type: "insert_image"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
+  | { type: "autolinker"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string; title: string } }
   | { type: "map_pin_management"; data: { map_id: string } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }

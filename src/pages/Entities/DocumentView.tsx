@@ -80,9 +80,11 @@ export function DocumentView({ editable }: { editable: boolean }) {
   useLayoutEffect(() => {
     if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
-      manager.view.updateState(
-        manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
-      );
+      setTimeout(() => {
+        manager.view.updateState(
+          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
+        );
+      }, 1);
     }
   }, [currentDocument, isRefetching]);
 
@@ -179,7 +181,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <div
           className="relative flex h-full max-h-[95%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
-          <Menubar size="md" />
+          <Menubar id={currentDocument?.data?.id || ""} size="md" title={currentDocument?.data?.title || ""} />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onContextMenu={(e) => {

@@ -7,10 +7,12 @@ import { ImagePreview } from "../../DataDisplay";
 import { Button, Search, Title } from "../../Form";
 
 type Props = {
-  getContext: ReactFrameworkOutput<Remirror.Extensions>;
+  data: {
+    getContext: ReactFrameworkOutput<Remirror.Extensions>;
+  };
 };
 
-export function InsertEditorImageDrawer({ getContext }: Props) {
+export function InsertEditorImageDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedImages, setSelectedImages] = useState<{ label: string; value: string }[]>([]);
   return (
@@ -43,7 +45,7 @@ export function InsertEditorImageDrawer({ getContext }: Props) {
         onClick={() => {
           for (let index = 0; index < selectedImages.length; index += 1) {
             const image = selectedImages[index];
-            getContext?.chain
+            data?.getContext?.chain
               ?.insertImage({
                 src: getImageURL(project_id as string, "images", image.value),
                 alt: image.label,

@@ -8,7 +8,6 @@ import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView } from "./pages/Entities";
 import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
 import { FolderView } from "./pages/Entities/FolderView";
-import { ErrorPage } from "./pages/Misc";
 import { ProjectsView } from "./pages/Projects";
 import { PublicEntitiesView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
@@ -42,7 +41,7 @@ export default function App() {
           </SignedOut>
           <SignedIn>
             <Routes>
-              <Route errorElement={<ErrorPage />} path="projects/*">
+              <Route path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
                 <Route element={<ProjectLayout />} path=":project_id/*">
                   <Route element={<FolderView />} path=":type" />

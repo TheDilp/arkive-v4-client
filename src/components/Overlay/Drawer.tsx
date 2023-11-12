@@ -9,6 +9,7 @@ import { drawerAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
+  AutolinkerDrawer,
   BlueprintDrawer,
   BlueprintInstanceDrawer,
   CalendarDrawer,
@@ -130,7 +131,7 @@ export function Drawer() {
           {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
           {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
           {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
-          {drawer.type === "insert_image" ? <InsertEditorImageDrawer getContext={drawer?.data?.getContext} /> : null}
+          {drawer.type === "insert_image" ? <InsertEditorImageDrawer data={drawer?.data} /> : null}
           {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
           {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
           {drawer.type === "search" ? <SearchDrawer /> : null}
@@ -141,6 +142,7 @@ export function Drawer() {
           {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
           {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
           {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
+          {drawer.type === "autolinker" ? <AutolinkerDrawer data={drawer?.data} /> : null}
         </div>
       </div>
     );

@@ -4,7 +4,7 @@ import { RemirrorJSON } from "remirror";
 import { useGetEntity } from "../../../../../hooks";
 import { DocumentType } from "../../../../../types";
 import { IconEnum } from "../../../../../utils";
-import { Card, Icon, Skeleton, Tooltip } from "../../../..";
+import { Card, Icon, Spinner, Tooltip } from "../../../..";
 import { StaticRender } from "../..";
 
 type Props = {
@@ -25,9 +25,13 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
   );
   return (
     <Card title={title || ""}>
-      <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
+      <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto overflow-x-hidden whitespace-pre-line">
         {data?.data?.content && !isLoading ? <StaticRender content={data.data.content as RemirrorJSON} /> : null}
-        {isLoading ? <Skeleton type="editor" /> : null}
+        {isLoading ? (
+          <div className="flex max-h-[24rem] max-w-[24rem] items-center justify-center">
+            <Spinner />
+          </div>
+        ) : null}
       </div>
     </Card>
   );
