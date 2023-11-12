@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-control-regex */
 /* eslint-disable no-restricted-syntax */
@@ -35,15 +37,26 @@ function gatherFindResults(
     return [];
   }
 
-  const re = new RegExp(`\\b(${matchWords})\\b`, "gim");
+  const re = new RegExp(`\\b(${matchWords})\\b`, "gui");
   const ranges: matchResult[] = [];
   doc.descendants((node, pos) => {
     if (!node.isTextblock) {
       return true;
     }
+    let tc = "";
 
+    node.content.forEach((child) => {
+      if (child.type.name === "mentionAtom") {
+        const textContent = child.attrs.label;
+        if (textContent) {
+          tc += " ";
+        }
+      } else {
+        tc = tc.concat(child.textContent);
+      }
+    });
     const start = pos + 1;
-    for (const match of node.textContent.matchAll(re)) {
+    for (const match of tc.matchAll(re)) {
       const from = start + (match.index ?? 0);
       const to = from + match[0].length;
 
@@ -62,15 +75,12 @@ function gatherFindResults(
 }
 
 function createMentions(
-  matchedItems: matchItem[],
+  initialRanges: matchResult[],
   getContext: ReactFrameworkOutput<Remirror.Extensions>,
   selectedEntity: SearchableMentionEntities | null,
   project_id: string,
 ) {
   if (!selectedEntity) return;
-  const matchWords = matchedItems.flatMap((res) => res.title).join("|");
-
-  const initialRanges = gatherFindResults(getContext.getState().doc, matchWords, matchedItems, selectedEntity);
 
   const initialRangesCount = initialRanges.length;
   let count = initialRangesCount;
@@ -123,7 +133,7 @@ export function AutolinkerDrawer({ data }: Props) {
       formattedText = text
         .replaceAll(/\u0000/g, "")
         .replaceAll(".", "")
-        .replaceAll(/(\r\n|\n|\r)/gm, " ")
+        .replaceAll(/(\r\n|\n|\r)/giu, "  ")
         .trim();
       return FetchFunction({
         method: "POST",
@@ -154,7 +164,6 @@ export function AutolinkerDrawer({ data }: Props) {
       setRanges(gatherFindResults(data.getContext.getState().doc, matchWords, links.data, selectedEntity));
     }
   }, [links?.data, selectedEntity]);
-
   return (
     <DrawerLayout>
       <Select
@@ -164,40 +173,51 @@ export function AutolinkerDrawer({ data }: Props) {
         options={MentionEntityOptions}
         value={selectedEntity}
       />
-      {ranges?.length
-        ? ranges.map((potentialMatch) => (
-            <div
-              key={`${potentialMatch.from}-${potentialMatch.id}-${potentialMatch.to}`}
-              className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
-              onMouseOut={() => {
-                data.getContext.commands.setAnnotations([]);
-              }}
-              onMouseOver={() => {
-                data.getContext.commands.setAnnotations([
-                  {
-                    id: potentialMatch.id,
-                    from: potentialMatch.from,
-                    to: potentialMatch.to,
-                    className: "annotation",
-                  },
-                ]);
-              }}>
-              <Checkbox
-                name={potentialMatch.id}
-                onChange={({ value }) =>
-                  setSelectedLinks((prev) =>
-                    value ? prev.concat(potentialMatch.id) : prev.filter((id) => id !== potentialMatch.id),
-                  )
-                }
-                value={selectedLinks.includes(potentialMatch.id)}
-              />
-              {selectedEntity === "characters" && potentialMatch.image_id ? (
-                <Avatar image={getImageURL(project_id as string, "images", potentialMatch.image_id)} size="xs" />
-              ) : null}
-              {potentialMatch.title}
-            </div>
-          ))
-        : null}
+      <ul className="flex flex-col gap-y-2">
+        {ranges?.length
+          ? ranges.map((potentialMatch) => {
+              const idWithRange = `${potentialMatch.from}-${potentialMatch.id}-${potentialMatch.to}`;
+              return (
+                <li
+                  key={idWithRange}
+                  className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
+                  onMouseOut={() => {
+                    data.getContext.commands.setAnnotations([]);
+                  }}
+                  onMouseOver={() => {
+                    data.getContext.commands.setAnnotations([
+                      {
+                        id: idWithRange,
+                        from: potentialMatch.from,
+                        to: potentialMatch.to,
+                        className: "annotation",
+                      },
+                    ]);
+                  }}>
+                  <Checkbox
+                    name={potentialMatch.id}
+                    onChange={({ value }) =>
+                      setSelectedLinks((prev) => (value ? prev.concat(idWithRange) : prev.filter((id) => id !== idWithRange)))
+                    }
+                    value={selectedLinks.includes(idWithRange)}
+                  />
+                  {selectedEntity === "characters" && potentialMatch.image_id ? (
+                    <Avatar image={getImageURL(project_id as string, "images", potentialMatch.image_id)} size="xs" />
+                  ) : null}
+                  <span
+                    onClick={() =>
+                      setSelectedLinks((prev) =>
+                        prev.includes(idWithRange) ? prev.filter((id) => id !== idWithRange) : prev.concat(idWithRange),
+                      )
+                    }>
+                    {potentialMatch.title}
+                  </span>
+                </li>
+              );
+            })
+          : null}
+      </ul>
+
       {links?.data && !links?.data?.length ? <Alert label="No matches found." variant="info" /> : null}
       <div>
         <Button
@@ -206,7 +226,7 @@ export function AutolinkerDrawer({ data }: Props) {
           label="Create mentions"
           onClick={() =>
             createMentions(
-              ranges?.filter((link) => selectedLinks.includes(link.id)) || [],
+              ranges?.filter((link) => selectedLinks.includes(`${link.from}-${link.id}-${link.to}`)) || [],
               data.getContext,
               selectedEntity,
               project_id as string,

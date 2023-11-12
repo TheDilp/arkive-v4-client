@@ -44,6 +44,9 @@ export const DefaultEditorExtensions: (
   customPlaceholder?: string,
 ) => AnyExtension[] = (createNotification, customPlaceholder) => {
   const CustomMentionExtension = new MentionAtomExtension({
+    nodeOverride: {
+      inline: true,
+    },
     priority: 10,
     extraAttributes: {
       alterId: {
@@ -184,7 +187,6 @@ export const DefaultEditorExtensions: (
       },
     }),
     new HorizontalRuleExtension({}),
-
     new NodeFormattingExtension({}),
     new HardBreakExtension({}),
     new GapCursorExtension({}),
