@@ -120,6 +120,9 @@
   .remirror-table-controller-wrapper {
     @apply hidden !important;
   }
+  .annotation {
+    @apply bg-transparent text-blue-300 !important;
+  }
 
   p {
     .remirror-resizable-view {

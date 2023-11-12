@@ -70,6 +70,7 @@ export const IconEnum = {
   map_pin: "ph:map-pin-light",
   menu: "mdi:menu",
   menu_open: "mdi:menu-open",
+  mention: "ph:at",
   moon: "ph:moon",
   node: "ph:graph-light",
   numbered_list: "ph:list-numbers",

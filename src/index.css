@@ -69,6 +69,10 @@ details[open] > summary :not(.no-rotate) div * {
   @apply rotate-0;
 }
 
+details:not([open]) div {
+  @apply hidden;
+}
+
 input[type="color"] {
   -webkit-appearance: none;
   @apply h-6 w-6 appearance-none rounded-full border-none bg-transparent;

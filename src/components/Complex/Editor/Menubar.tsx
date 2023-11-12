@@ -241,8 +241,9 @@ const menuBarItems = ({
   },
   {
     id: "autolinker",
-    icon: IconEnum.link,
-    onClick: () => setDrawer((prev) => ({ ...prev, size: "lg", type: "autolinker", data: { getContext, title, id } })),
+    icon: IconEnum.mention,
+    onClick: () =>
+      setDrawer((prev) => ({ ...prev, title: "Automention", size: "lg", type: "autolinker", data: { getContext, title, id } })),
     tooltip: "Automention",
   },
 ];

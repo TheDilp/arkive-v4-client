@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
 import {
+  AnnotationExtension,
   BlockquoteExtension,
   BoldExtension,
   BulletListExtension,
@@ -140,6 +141,7 @@ export const DefaultEditorExtensions: (
   });
   return [
     new MarkdownExtension({}),
+    new AnnotationExtension(),
     new SecretExtension({
       secret: true,
     }),
