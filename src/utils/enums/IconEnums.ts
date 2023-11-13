@@ -71,6 +71,7 @@ export const IconEnum = {
   menu: "mdi:menu",
   menu_open: "mdi:menu-open",
   mention: "ph:at",
+  mentioned_in_document: "fluent:document-mention-16-regular",
   moon: "ph:moon",
   node: "ph:graph-light",
   numbered_list: "ph:list-numbers",

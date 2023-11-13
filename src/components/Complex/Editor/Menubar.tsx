@@ -255,8 +255,9 @@ const menuBarItems = ({
     },
     {
       id: "show_connected",
-      icon: IconEnum.graph,
-      tooltip: "Show mentioned entities",
+      icon: IconEnum.mentioned_in_document,
+      tooltip: "Show entities mentioned in this document",
+
       onClick: () =>
         setDrawer((prev) => ({
           ...prev,
