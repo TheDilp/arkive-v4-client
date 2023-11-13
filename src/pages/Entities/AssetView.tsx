@@ -121,7 +121,7 @@ export function AssetView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const { isLg } = useBreakpoint();
+  const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
@@ -221,7 +221,7 @@ export function AssetView() {
             value={view}
           />
         </div>
-        <div className="w-52">
+        <div className="lg:w-52">
           <Button
             icon={IconEnum.add}
             label="Upload image"
@@ -237,6 +237,7 @@ export function AssetView() {
                 },
               }))
             }
+            tooltip={isMd ? undefined : "Upload image"}
           />
         </div>
       </div>
