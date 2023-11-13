@@ -155,10 +155,7 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
             value={graph?.default_edge_color || DefaultBoardColor}
           />
         </div>
-        <div className="flex w-full items-center justify-between">
-          <span>Is folder:</span>
-          <Checkbox name="is_folder" onChange={handleChange} value={graph?.is_folder ?? false} />
-        </div>
+
         <div className="flex w-full items-center justify-between">
           <span>Is public:</span>
           <Checkbox name="is_public" onChange={handleChange} value={graph?.is_public ?? false} />

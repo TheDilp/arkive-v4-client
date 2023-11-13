@@ -7,9 +7,10 @@ import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from 
 import { CalendarType, DayStateType, MonthStateType } from "../../../types";
 import { drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
-import { Button, Input, TagInput } from "../../Form";
+import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
+import { IconPicker } from "../IconPicker";
 
 type Props = {
   data: { id?: string };
@@ -27,8 +28,8 @@ function isSaveDisabled(calendar: Partial<CalendarType>, months: MonthStateType[
 function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths: Dispatch<SetStateAction<MonthStateType[]>> }) {
   const { handleChange } = useHandleChange({ data: months, setData: setMonths });
   return (
-    <div className="mt-2 flex flex-col gap-y-2 pr-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
+    <div className="mt-2 flex flex-col gap-y-2 p-2">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between ">
         <span>Insert new month:</span>
         <div className="h-8 w-8">
           <Button
@@ -102,8 +103,8 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
 function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<SetStateAction<DayStateType[]>> }) {
   const { handleChange } = useHandleChange({ data: days, setData: setDays });
   return (
-    <div className="mt-2 flex flex-col gap-y-2 pr-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-800">
+    <div className="mt-2 flex flex-col gap-y-2 p-2">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between">
         <span>Insert new day:</span>
         <div className="h-8 w-8">
           <Button
@@ -170,7 +171,10 @@ export function CalendarDrawer({ data }: Props) {
   const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
     data?.id,
     "calendars",
-    { relations: { months: true, tags: true } },
+    {
+      fields: ["id", "title", "icon", "hours", "days", "is_folder", "is_public"],
+      relations: { months: true, tags: true },
+    },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
 
@@ -215,7 +219,13 @@ export function CalendarDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
-          <Input label="Title (required)" name="title" onChange={handleChange} value={calendar?.title || ""} />
+          <div className="flex flex-nowrap gap-x-2">
+            <Input label="Title (required)" name="title" onChange={handleChange} value={calendar?.title || ""} />
+
+            <div className="self-end pb-1.5">
+              <IconPicker icon={calendar?.icon || IconEnum.calendar} name="icon" onChange={handleChange} />
+            </div>
+          </div>
 
           <div className="flex flex-nowrap items-center gap-x-2">
             <Input
@@ -234,6 +244,11 @@ export function CalendarDrawer({ data }: Props) {
               type="number"
               value={calendar?.minutes || ""}
             />
+          </div>
+
+          <div className="flex w-full items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox name="is_public" onChange={handleChange} value={calendar?.is_public ?? false} />
           </div>
 
           <Collapsible icon={IconEnum.moon} label="Months (required)">

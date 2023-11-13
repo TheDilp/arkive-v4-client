@@ -11,7 +11,7 @@ import {
   UpdateDictionarySchema,
   UpdateDictionaryType,
 } from "../../../validation";
-import { Button, Input } from "../../Form";
+import { Button, Checkbox, Input } from "../../Form";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -23,7 +23,7 @@ export function DictionaryDrawer({ data }: Props) {
   const { data: existingDictionary } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
-    { data },
+    { data, fields: ["title", "is_public", "is_folder", "parent_id"] },
     { enabled: !!data?.id },
   );
   const { mutateAsync: createDictionary, isLoading: isCreating } = useCreateEntity<{ data: InsertDictionaryType }>(
@@ -64,6 +64,11 @@ export function DictionaryDrawer({ data }: Props) {
         <span className="h-8 self-end">
           <IconPicker icon={dictionary?.icon || ""} name="icon" onChange={handleChange} />
         </span>
+      </div>
+
+      <div className="flex w-full items-center justify-between">
+        <span>Is public:</span>
+        <Checkbox name="is_public" onChange={handleChange} value={dictionary?.is_public ?? false} />
       </div>
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}

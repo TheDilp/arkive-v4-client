@@ -12,7 +12,7 @@ import {
   UpdateRandomTableSchema,
   UpdateRandomTableType,
 } from "../../../validation/random_tables";
-import { Button, Input, Textarea } from "../../Form";
+import { Button, Checkbox, Input, Textarea } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
 
 type Props = {
@@ -133,6 +133,10 @@ export function RandomTableDrawer({ data }: Props) {
               value={randomTable?.description || ""}
             />
           </div>
+          <div className="flex w-full items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox name="is_public" onChange={handleChange} value={randomTable?.is_public ?? false} />
+          </div>
         </>
       ) : null}
 
@@ -184,45 +188,6 @@ export function RandomTableDrawer({ data }: Props) {
                     name={`random_table_options[${optionIndex}]`}
                     title={option.title}
                   />
-                  {/* <Collapsible
-                    actions={[
-                      {
-                        icon: IconEnum.add,
-                        variant: "info",
-                        onClick: () =>
-                          handleChange({
-                            name: `random_table_options[${optionIndex}].random_table_suboptions`,
-                            value: (randomTable?.random_table_options?.[optionIndex]?.random_table_suboptions || []).concat({
-                              id: crypto.randomUUID(),
-                              title: "New suboption",
-                              description: "",
-                              parent_id: option.id,
-                            } as RandomTableSubOptionType),
-                          }),
-                        isIconOnly: true,
-                        hasNoBackground: true,
-                      },
-                    ]}
-                    label="Suboptions"
-                    size="lg">
-                    <div className="flex flex-col gap-y-2 pt-2">
-                      {option?.random_table_suboptions?.map((subopt, suboptIndex) => (
-                        <OptionInput
-                          key={subopt.id}
-                          description={subopt?.description || ""}
-                          handleChange={handleChange}
-                          name={`random_table_options[${optionIndex}].random_table_suboptions[${suboptIndex}]`}
-                          removeSuboption={() =>
-                            handleChange({
-                              name: `random_table_options[${optionIndex}].random_table_suboptions`,
-                              value: randomTable.random_table_options?.filter((opt) => opt.id !== subopt.id),
-                            })
-                          }
-                          title={subopt.title}
-                        />
-                      ))}
-                    </div>
-                  </Collapsible> */}
                 </div>
               </Collapsible>
             ))}

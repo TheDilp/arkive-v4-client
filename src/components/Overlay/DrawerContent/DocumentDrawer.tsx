@@ -158,11 +158,10 @@ export function DocumentDrawer({ data }: Props) {
               <ColorPicker name="dice_color" onChange={handleChange} value={document?.dice_color || DefaultTagColor} />
             </div>
           </div>
-          <div className="flex gap-x-2">
+
+          <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
-            <div className="ml-auto self-end pb-2">
-              <Checkbox name="is_public" onChange={handleChange} value={document?.is_public ?? false} />
-            </div>
+            <Checkbox name="is_public" onChange={handleChange} value={document?.is_public ?? false} />
           </div>
         </div>
       ) : null}

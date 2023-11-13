@@ -74,7 +74,8 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             <span>Cluster pins:</span>
             <Checkbox name="cluster_pins" onChange={handleChange} value={map?.cluster_pins ?? false} />
           </div>
-          <div className="flex flex-nowrap justify-between">
+
+          <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox name="is_public" onChange={handleChange} value={map?.is_public ?? false} />
           </div>
