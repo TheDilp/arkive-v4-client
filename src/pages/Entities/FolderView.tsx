@@ -18,7 +18,15 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable, useUpdateEntity } from "../../hooks";
+import {
+  useBreakpoint,
+  useChangeNavbarTitle,
+  useDeleteMany,
+  useGetEntities,
+  useGetEntity,
+  useTable,
+  useUpdateEntity,
+} from "../../hooks";
 import { AvailableEntityType, BaseEntityType, DialogAtomType, DrawerAtomType, DrawerContentCreateNewType } from "../../types";
 import {
   breadcrumbsAtom,
@@ -235,6 +243,7 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
+  const { isMd } = useBreakpoint();
   const entityName = getEntityNameFromType(type as AvailableEntityType);
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
@@ -355,7 +364,7 @@ export function FolderView() {
                 value={view}
               />
             </div>
-            <div className="w-52">
+            <div className="lg:w-52">
               <Dropdown
                 allowedPlacements={["bottom-end"]}
                 items={[
@@ -388,7 +397,14 @@ export function FolderView() {
                     },
                   },
                 ]}>
-                <Button icon={IconEnum.add} label={`Create new ${entityName}`} onClick={undefined} />
+                <div className="lg:w-52">
+                  <Button
+                    icon={IconEnum.add}
+                    label={`Create new ${entityName}`}
+                    onClick={undefined}
+                    tooltip={isMd ? undefined : `Create new ${entityName}`}
+                  />
+                </div>
               </Dropdown>
             </div>
 
