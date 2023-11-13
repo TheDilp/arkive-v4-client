@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -93,6 +93,7 @@ function createColumns(
 
 export function TemplatesView() {
   const { project_id } = useParams();
+  const { isMd } = useBreakpoint();
   useChangeNavbarTitle(" Field templates");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -122,7 +123,7 @@ export function TemplatesView() {
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">
-        <div className="w-fit">
+        <div className="w-fit lg:w-52">
           <Button
             icon={IconEnum.add}
             label="Create new field template"
@@ -135,6 +136,7 @@ export function TemplatesView() {
                 size: "lg",
               }))
             }
+            tooltip={isMd ? undefined : "Create new field template"}
           />
         </div>
       </div>
