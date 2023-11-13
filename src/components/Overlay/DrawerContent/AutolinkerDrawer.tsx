@@ -54,6 +54,8 @@ function gatherFindResults(
           // take up space in text (in order to get correct pos of text)
           tc += " ";
         }
+      } else if (child.type.name === "image") {
+        tc += " ";
       } else {
         tc = tc.concat(child.textContent);
       }
