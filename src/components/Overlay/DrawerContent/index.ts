@@ -24,6 +24,7 @@ export * from "./MapDrawer";
 export * from "./MapPinDrawer";
 export * from "./MapPinManagementDrawer";
 export * from "./MemberAddDrawer";
+export * from "./MentionedInDocumentDrawer";
 export * from "./NodeDrawer";
 export * from "./ProjectDrawer";
 export * from "./RandomTableDrawer";

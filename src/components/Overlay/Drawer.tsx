@@ -33,6 +33,7 @@ import {
   MapPinDrawer,
   MapPinManagementDrawer,
   MemberAddDrawer,
+  MentionedInDocumentDrawer,
   NodeDrawer,
   ProjectDrawer,
   RandomTableDrawer,
@@ -143,6 +144,7 @@ export function Drawer() {
           {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
           {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
           {drawer.type === "autolinker" ? <AutolinkerDrawer data={drawer?.data} /> : null}
+          {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
         </div>
       </div>
     );

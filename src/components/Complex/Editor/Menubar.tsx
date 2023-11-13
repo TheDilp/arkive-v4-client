@@ -153,7 +153,6 @@ const menuBarItems = ({
       variant: active.orderedList() ? ("info" as Variant) : ("primary" as Variant),
       tooltip: "Insert numbered list",
     },
-
     {
       id: "callout",
       icon: IconEnum.callout,
@@ -254,10 +253,22 @@ const menuBarItems = ({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
+    {
+      id: "show_connected",
+      icon: IconEnum.graph,
+      tooltip: "Show mentioned entities",
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          title: "Mentioned entities",
+          data: { getContext },
+          type: "mentioned_in_document",
+          size: "lg",
+        })),
+    },
   ];
-
   if (!isEditorMenubar) {
-    options.push({
+    options.splice(-1, 0, {
       id: "autolinker",
       icon: IconEnum.mention,
       onClick: () =>
