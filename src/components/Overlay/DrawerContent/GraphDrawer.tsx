@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotifications } from "../../../utils";
-import { Badge, Button, Checkbox, Input, Search, Select } from "../..";
+import { Badge, Button, Checkbox, IconPicker, Input, Search, Select, Skeleton } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type insertGraphType = Partial<GraphType> & { parent_id?: string | null; project_id: string };
@@ -26,15 +26,25 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const createNotification = useNotifications();
 
-  const { data: existingGraph } = useGetEntity<GraphType>(
+  const { data: existingGraph, isFetching } = useGetEntity<GraphType>(
     data?.id,
     "graphs",
     {
       data: { project_id },
-
       relations: {
         tags: true,
       },
+      fields: [
+        "id",
+        "title",
+        "icon",
+        "parent_id",
+        "default_node_shape",
+        "default_node_color",
+        "default_edge_color",
+        "is_folder",
+        "is_public",
+      ],
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
@@ -58,9 +68,11 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
     }
   }, [existingGraph]);
 
+  if (isFetching) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col gap-y-2">
-      <div className="w-full">
+      <div className="flex w-full flex-nowrap gap-x-2">
         <Input
           label="Graph title (required)"
           name="title"
@@ -68,6 +80,9 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
           placeholder="Eg. Family tree"
           value={graph?.title || ""}
         />
+        <div className="self-end pb-1.5">
+          <IconPicker icon={graph?.icon || IconEnum.graph} name="icon" onChange={handleChange} />
+        </div>
       </div>
 
       <div className="w-full">
