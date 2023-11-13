@@ -1,6 +1,8 @@
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 
+import { useGetEntity } from "../../../../../hooks";
+import { CharacterType } from "../../../../../types";
 import { IconEnum } from "../../../../../utils";
 
 type Props = {
@@ -10,6 +12,15 @@ type Props = {
   project_id: string | undefined;
 };
 export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props) {
+  const { data } = useGetEntity<CharacterType>(
+    nodeId,
+    "characters",
+    {
+      fields: ["id", "full_name"],
+    },
+    { enabled: !!nodeId, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
+  );
+
   return nodeId ? (
     <Link
       className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
@@ -18,7 +29,7 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props
         <span className="relative">
           <Icon fontSize={14} icon={IconEnum.character} />
         </span>
-        <span className="text-sm underline">{title || nodeLabel}</span>
+        <span className="text-sm underline">{data?.data?.full_name || title || nodeLabel}</span>
       </div>
     </Link>
   ) : (

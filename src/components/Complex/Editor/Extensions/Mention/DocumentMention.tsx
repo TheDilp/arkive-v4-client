@@ -56,7 +56,7 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
           : false,
       },
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000 },
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
   );
   const alter_name = data?.data?.alter_names?.find((an) => an.id === alterId);
   return (
