@@ -254,7 +254,7 @@ const menuBarItems = ({
       tooltip: "Secret block",
     },
     {
-      id: "show_connected",
+      id: "show_mentioned",
       icon: IconEnum.mentioned_in_document,
       tooltip: "Show entities mentioned in this document",
 
@@ -269,7 +269,26 @@ const menuBarItems = ({
     },
   ];
   if (!isEditorMenubar) {
-    options.splice(-1, 0, {
+    options.splice(
+      options.length,
+      0,
+
+      {
+        id: "show_connected",
+        icon: IconEnum.graph,
+        tooltip: "Show where this document is mentioned",
+
+        onClick: () =>
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Document mentioned in",
+            data: { getContext, id: id || "" },
+            type: "mentioned_in",
+            size: "lg",
+          })),
+      },
+    );
+    options.splice(-2, 0, {
       id: "autolinker",
       icon: IconEnum.mention,
       onClick: () =>
@@ -304,7 +323,7 @@ export function Menubar({
   const active = useActive();
   const items = useMemo(
     () => menuBarItems({ active, chain, setDrawer, getContext, title, id, isEditorMenubar }),
-    [chain, isEditorMenubar],
+    [chain, isEditorMenubar, id, title],
   );
 
   return (
