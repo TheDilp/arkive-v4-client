@@ -121,7 +121,7 @@
     @apply hidden !important;
   }
   .annotation {
-    @apply bg-transparent text-blue-300 !important;
+    @apply animate-pulse bg-transparent text-blue-400 !important;
   }
 
   p {

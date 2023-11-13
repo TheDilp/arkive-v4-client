@@ -49,6 +49,8 @@ function gatherFindResults(
       if (child.type.name === "mentionAtom") {
         const textContent = child.attrs.label;
         if (textContent) {
+          // Must use as replacement for mentions as they
+          // take up space in text (in order to get correct pos of text)
           tc += " ";
         }
       } else {
@@ -156,7 +158,27 @@ export function AutolinkerDrawer({ data }: Props) {
 
   useEffect(() => {
     data.getContext.commands.setAnnotations([]);
+    setRanges([]);
   }, [selectedEntity]);
+
+  useEffect(() => {
+    if (selectedLinks.length) {
+      const selectedItemsAnnotations = [];
+      for (let index = 0; index < selectedLinks.length; index += 1) {
+        const selectedIdx = ranges.findIndex((r) => `${r.from}-${r.id}-${r.to}` === selectedLinks[index]);
+        if (selectedIdx > -1) {
+          const idWithRange = `${ranges[selectedIdx].from}-${ranges[selectedIdx].id}-${ranges[selectedIdx].to}`;
+          selectedItemsAnnotations.push({
+            id: idWithRange,
+            from: ranges[selectedIdx].from,
+            to: ranges[selectedIdx].to,
+            className: "annotation",
+          });
+        }
+      }
+      data.getContext.commands.setAnnotations(selectedItemsAnnotations);
+    }
+  }, [selectedLinks]);
 
   useEffect(() => {
     if (links?.data && selectedEntity) {
@@ -182,17 +204,19 @@ export function AutolinkerDrawer({ data }: Props) {
                   key={idWithRange}
                   className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
                   onMouseOut={() => {
-                    data.getContext.commands.setAnnotations([]);
+                    if (!selectedLinks.includes(idWithRange)) data.getContext.commands.removeAnnotations([idWithRange]);
                   }}
                   onMouseOver={() => {
-                    data.getContext.commands.setAnnotations([
-                      {
-                        id: idWithRange,
-                        from: potentialMatch.from,
-                        to: potentialMatch.to,
-                        className: "annotation",
-                      },
-                    ]);
+                    if (!selectedLinks.includes(idWithRange))
+                      data.getContext.commands.setAnnotations([
+                        ...(data.getContext.helpers.getAnnotations() || []),
+                        {
+                          id: idWithRange,
+                          from: potentialMatch.from,
+                          to: potentialMatch.to,
+                          className: "annotation",
+                        },
+                      ]);
                   }}>
                   <Checkbox
                     name={potentialMatch.id}
@@ -222,7 +246,7 @@ export function AutolinkerDrawer({ data }: Props) {
       <div>
         <Button
           icon={IconEnum.mention}
-          isDisabled={!links?.data?.length || !selectedEntity}
+          isDisabled={!links?.data?.length || !selectedEntity || !text.length}
           label="Create mentions"
           onClick={() =>
             createMentions(
