@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -99,7 +99,8 @@ function createColumns(
 
 export function TagView() {
   const { project_id } = useParams();
-  useChangeNavbarTitle(" Tags");
+  const { isMd } = useBreakpoint();
+  useChangeNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const [filter, setFilter] = useState("");
@@ -142,7 +143,7 @@ export function TagView() {
 
   return (
     <TablePageLayout>
-      <div className="flex w-full items-center justify-end gap-x-2">
+      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
         <div className="w-52">
           <Input
             name="quick_filter"
@@ -151,7 +152,7 @@ export function TagView() {
             value={filter}
           />
         </div>
-        <div className="w-fit">
+        <div className="w-fit lg:w-52">
           <Button
             icon={IconEnum.add}
             label="Create new tags"
@@ -164,6 +165,7 @@ export function TagView() {
                 size: "lg",
               }))
             }
+            tooltip={isMd ? undefined : "Create new tags"}
           />
         </div>
       </div>
