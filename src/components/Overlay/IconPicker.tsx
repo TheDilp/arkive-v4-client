@@ -23,9 +23,8 @@ import { Icon } from "../Misc";
 export function IconPicker({ name, onChange, icon, iconColor, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
-  const [category, setCategory] = useState<IconCategories | null>(null);
+  const [category, setCategory] = useState<IconCategories | null>("game-icons");
   const { data } = useGetIcons(category);
-
   const [filteredIcons, setFilteredIcons] = useState<string[]>(data?.uncategorized || []);
 
   const { floatingStyles, refs, context } = useFloating({
@@ -60,10 +59,6 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     getScrollElement: () => refs.floating.current as any,
     overscan: 5,
   });
-
-  useEffect(() => {
-    if (!open) setCategory(null);
-  }, [open]);
 
   useEffect(() => {
     if (filter && filter.length >= 3) {
