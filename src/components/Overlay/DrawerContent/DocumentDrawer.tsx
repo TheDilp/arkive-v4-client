@@ -12,6 +12,7 @@ import { Button, Checkbox, Input, Search } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
+import { IconPicker } from "../IconPicker";
 
 interface InsertDocumentType extends Omit<DocumentType, "alter_names"> {
   alter_names: { title: string }[];
@@ -49,7 +50,7 @@ export function DocumentDrawer({ data }: Props) {
     {
       data: {},
       relations: { alter_names: true, tags: true },
-      fields: ["id", "title", "parent_id", "image_id", "dice_color", "is_public"],
+      fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public"],
     },
     {
       enabled: !!data?.id,
@@ -85,13 +86,18 @@ export function DocumentDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <div className="flex flex-col gap-y-2">
-          <Input
-            label="Document title (required)"
-            name="title"
-            onChange={handleChange}
-            placeholder="E.g. Important document"
-            value={document?.title || ""}
-          />
+          <div className="flex flex-nowrap gap-x-2">
+            <Input
+              label="Document title (required)"
+              name="title"
+              onChange={handleChange}
+              placeholder="E.g. Important document"
+              value={document?.title || ""}
+            />
+            <div className="self-end pb-1.5">
+              <IconPicker icon={document?.icon || IconEnum.document} name="icon" onChange={handleChange} />
+            </div>
+          </div>
           <ImageSelect
             isIconOnly
             label="Document image (optional)"

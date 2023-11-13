@@ -86,7 +86,10 @@ function columns(
             size="sm"
           />
         ) : (
-          <Icon fontSize={24} icon={row.original.is_folder ? IconEnum.folder : getDefaultEntityIcon(entityType)} />
+          <Icon
+            fontSize={24}
+            icon={row.original.is_folder ? IconEnum.folder : row.original.icon || getDefaultEntityIcon(entityType)}
+          />
         ),
       maxSize: 3.25,
       minSize: 3.25,
