@@ -28,12 +28,8 @@ type Props = {
 type matchItem = { id: string; title: string; image_id?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
 
-function gatherFindResults(
-  doc: Node,
-  matchWords: string,
-  potentialMatches: matchItem[],
-  selectedEntity: SearchableMentionEntities | null,
-): matchResult[] {
+function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: SearchableMentionEntities | null): matchResult[] {
+  const matchWords = potentialMatches.flatMap((res) => res.title).join("|");
   if (!matchWords || !selectedEntity) {
     return [];
   }
@@ -206,14 +202,14 @@ export function AutolinkerDrawer({ data }: Props) {
 
   useEffect(() => {
     if (links?.data && selectedEntity) {
-      const matchWords = links.data.flatMap((res) => res.title).join("|");
-      setRanges(gatherFindResults(data.getContext.getState().doc, matchWords, links.data, selectedEntity));
+      setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity));
     }
   }, [links?.data, selectedEntity]);
 
   return (
     <DrawerLayout>
       <Select
+        hasSearch
         isLoading={isFetching}
         name="selectedEntity"
         onChange={({ value }) => setSelectedEntity(value as SearchableMentionEntities)}
@@ -292,6 +288,12 @@ export function AutolinkerDrawer({ data }: Props) {
               selectedEntity,
               project_id as string,
             );
+
+            if (links?.data) {
+              setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity));
+              setSelectedLinks([]);
+            }
+
             const activeAnnotations = data.getContext.helpers.getAnnotations();
             if (activeAnnotations.length) data.getContext.commands.removeAnnotations(activeAnnotations.map((a) => a.id));
           }}
