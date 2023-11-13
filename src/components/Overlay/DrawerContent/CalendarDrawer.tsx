@@ -51,13 +51,14 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
-                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
-                        draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
+                        draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
                       {...provided.draggableProps}
                       style={{
                         ...provided.draggableProps.style,
-                        left: 16,
+                        left: "calc(100%-1px)",
+                        right: 24,
                       }}>
                       <div {...provided.dragHandleProps} className="self-end pb-2">
                         <Icon fontSize={24} icon={IconEnum.menu} />
@@ -124,13 +125,14 @@ function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<Se
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
-                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
-                        draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
+                        draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
                       {...provided.draggableProps}
                       style={{
                         ...provided.draggableProps.style,
-                        left: 16,
+                        left: "calc(100%-1px)",
+                        right: 24,
                       }}>
                       <div {...provided.dragHandleProps} className="self-end pb-2">
                         <Icon fontSize={24} icon={IconEnum.menu} />

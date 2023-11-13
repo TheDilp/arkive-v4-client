@@ -132,8 +132,8 @@ function FieldRow({
                         ref={provided.innerRef}
                         style={{
                           ...provided.draggableProps.style,
-                          left: "calc(100%-32px)",
-                          right: 16,
+                          left: "calc(100%-1px)",
+                          right: 24,
                         }}>
                         <div {...provided.dragHandleProps} className="self-center">
                           <Icon fontSize={24} icon={IconEnum.menu} />
