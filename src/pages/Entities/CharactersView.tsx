@@ -16,6 +16,7 @@ import {
   TablePageLayout,
 } from "../../components";
 import {
+  useBreakpoint,
   useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
@@ -176,6 +177,7 @@ function createColumns(
 
 export function CharactersView() {
   useChangeNavbarTitle("Characters");
+  const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
@@ -296,7 +298,7 @@ export function CharactersView() {
             value={view}
           />
         </div>
-        <div className="w-52">
+        <div className="lg:w-52">
           <Button
             icon={IconEnum.add}
             label="Create new character"
@@ -309,6 +311,7 @@ export function CharactersView() {
                 size: "lg",
               }))
             }
+            tooltip={isMd ? undefined : "Create new character"}
           />
         </div>
       </div>
