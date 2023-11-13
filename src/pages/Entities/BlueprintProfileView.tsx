@@ -1,10 +1,11 @@
 import { useSetAtom } from "jotai";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
+  Breadcrumbs,
   Button,
   CarouselEntityPreview,
   EntityPreview,
@@ -24,7 +25,7 @@ import {
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { drawerAtom, formatDateToString, getCharacterFullName, IconEnum } from "../../utils";
+import { breadcrumbsAtom, drawerAtom, formatDateToString, getCharacterFullName, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -314,7 +315,7 @@ function AdditionalFieldDisplay({
 
 export default function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id?: string }) {
   const { project_id, item_id, subitem_id } = useParams();
-  const { isLg } = useBreakpoint();
+  const { isMd, isLg } = useBreakpoint();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
@@ -345,6 +346,16 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
     },
     { enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 },
   );
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+
+  useLayoutEffect(() => {
+    if (blueprint?.data) {
+      setBreadcrumbs({
+        items: [{ id: blueprint.data.id, title: blueprint.data.title, is_folder: false, parent_id: null }],
+        type: "blueprints",
+      });
+    }
+  }, [blueprint?.data]);
 
   useChangeNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
@@ -354,36 +365,41 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       {item_id ? (
-        <div className="flex w-full flex-col items-end gap-y-2">
-          <div className="w-52 max-w-[208px]">
-            <Button
-              icon={IconEnum.edit}
-              label="Edit current blueprint"
-              onClick={() => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  size: "lg",
-                  title: "Edit blueprint",
-                  type: "blueprints",
-                  data: { id: parent_id || (item_id as string), project_id: project_id as string },
-                }));
-              }}
-            />
-          </div>
-          <div className="w-52">
-            <Button
-              icon={IconEnum.edit}
-              label="Edit current blueprint instance"
-              onClick={() => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  size: "lg",
-                  title: "Edit blueprint instance",
-                  type: "blueprint_instances",
-                  data: { id: id || (subitem_id as string), project_id: project_id as string },
-                }));
-              }}
-            />
+        <div className="flex h-12 min-h-[3rem] items-center justify-between">
+          <Breadcrumbs />
+          <div className="flex flex-nowrap gap-x-2">
+            <div className="max-w-[208px] lg:w-52">
+              <Button
+                icon={IconEnum.edit}
+                label="Edit current blueprint"
+                onClick={() => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: "Edit blueprint",
+                    type: "blueprints",
+                    data: { id: parent_id || (item_id as string), project_id: project_id as string },
+                  }));
+                }}
+                tooltip={isMd ? undefined : "Edit current blueprint"}
+              />
+            </div>
+            <div className="lg:w-52">
+              <Button
+                icon={IconEnum.edit}
+                label="Edit current blueprint instance"
+                onClick={() => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: "Edit blueprint instance",
+                    type: "blueprint_instances",
+                    data: { id: id || (subitem_id as string), project_id: project_id as string },
+                  }));
+                }}
+                tooltip={isMd ? undefined : "Edit current blueprint instance"}
+              />
+            </div>
           </div>
         </div>
       ) : null}
