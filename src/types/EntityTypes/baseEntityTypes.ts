@@ -67,6 +67,14 @@ export type SearchableEntities =
   | "tags"
   | "places";
 
-export type SearchableMentionEntities = "characters" | "documents" | "maps" | "map_pins" | "grapsh" | "nodes" | "words";
+export type SearchableMentionEntities =
+  | "characters"
+  | "blueprint_instances"
+  | "documents"
+  | "maps"
+  | "map_pins"
+  | "grapsh"
+  | "nodes"
+  | "words";
 
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;

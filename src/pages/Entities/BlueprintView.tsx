@@ -1,9 +1,10 @@
 import { SetStateAction, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, NameFilters } from "../../utils";
@@ -106,7 +107,8 @@ export function BlueprintView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
-
+  const resetDialogAtom = useResetAtom(dialogAtom);
+  const { mutateAsync: deleteMany } = useDeleteMany("blueprints", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     filters: {},
@@ -121,9 +123,6 @@ export function BlueprintView() {
       pagination,
       data: {
         project_id,
-      },
-      relations: {
-        // tags: true,
       },
     },
     "blueprints",
@@ -158,6 +157,46 @@ export function BlueprintView() {
           selection,
           orderBy,
           getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
+          selectedActions: [
+            {
+              icon: IconEnum.trash,
+              variant: "error",
+              hasNoBackground: true,
+              isIconOnly: true,
+              tooltip: "Delete selected rows.",
+              onClick: () => {
+                const ids = Object.values(selection || {}).flatMap((id) => id);
+                if (ids.length) {
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: "Delete many",
+                    description: `Are you sure you want to delete ${ids.length} ${
+                      ids.length === 1 ? "blueprint" : "blueprints"
+                    }?`,
+                    warning: "This action cannot be undone.",
+                    isOverlay: true,
+                    cancel: {
+                      label: "Cancel",
+                      variant: "primary",
+                      action: resetDialogAtom,
+                    },
+                    confirm: {
+                      label: "Delete",
+                      icon: IconEnum.trash,
+                      action: async () =>
+                        deleteMany(
+                          { data: { ids } },
+                          {
+                            onSuccess: () => dispatch({ type: "clearSelection" }),
+                          },
+                        ),
+                      variant: "error",
+                    },
+                  }));
+                }
+              },
+            },
+          ],
         }}
         data={data?.data || []}
         dispatch={dispatch}

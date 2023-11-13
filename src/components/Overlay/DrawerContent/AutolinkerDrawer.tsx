@@ -7,12 +7,13 @@
 import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useResetAtom } from "jotai/utils";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FromToProps } from "remirror";
 
 import { SearchableMentionEntities } from "../../../types";
-import { baseURLS, FetchFunction, getImageURL, IconEnum } from "../../../utils";
+import { baseURLS, drawerAtom, FetchFunction, getImageURL, IconEnum } from "../../../utils";
 import { Button, Checkbox, Select } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Avatar } from "../../Misc";
@@ -24,7 +25,7 @@ type Props = {
     getContext: ReactFrameworkOutput<Remirror.Extensions>;
   };
 };
-type matchItem = { id: string; title: string; image_id?: string };
+type matchItem = { id: string; title: string; image_id?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
 
 function gatherFindResults(
@@ -104,9 +105,9 @@ function createMentions(
         label: range.title,
         name: selectedEntity,
         projectId: project_id,
+        parent_id: range.parent_id,
       },
     );
-    // initialRanges = gatherFindResults(getContext.getState().doc, matchWords, matchedItems);
   }
 }
 
@@ -117,14 +118,25 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
     icon: IconEnum.document,
   },
   {
+    label: "Blueprints",
+    value: "blueprint_instances",
+    icon: IconEnum.blueprint,
+  },
+  {
     label: "Characters",
     value: "characters",
     icon: IconEnum.character,
   },
+  // {
+  //   label: "Map pins",
+  //   value: "map_pins",
+  //   icon: IconEnum.blueprint,
+  // },
 ];
 
 export function AutolinkerDrawer({ data }: Props) {
   const { project_id } = useParams();
+  const resetAtomDrawer = useResetAtom(drawerAtom);
   const text = data?.getContext.helpers.getText();
   const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
   const [selectedEntity, setSelectedEntity] = useState<SearchableMentionEntities | null>(null);
@@ -156,7 +168,7 @@ export function AutolinkerDrawer({ data }: Props) {
   );
   const [ranges, setRanges] = useState<matchResult[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     data.getContext.commands.setAnnotations([]);
     setRanges([]);
   }, [selectedEntity]);
@@ -186,6 +198,7 @@ export function AutolinkerDrawer({ data }: Props) {
       setRanges(gatherFindResults(data.getContext.getState().doc, matchWords, links.data, selectedEntity));
     }
   }, [links?.data, selectedEntity]);
+
   return (
     <DrawerLayout>
       <Select
@@ -195,7 +208,7 @@ export function AutolinkerDrawer({ data }: Props) {
         options={MentionEntityOptions}
         value={selectedEntity}
       />
-      <ul className="flex flex-col gap-y-2">
+      <ul className="flex max-h-full flex-col gap-y-2 overflow-y-auto">
         {ranges?.length
           ? ranges.map((potentialMatch) => {
               const idWithRange = `${potentialMatch.from}-${potentialMatch.id}-${potentialMatch.to}`;
@@ -204,7 +217,11 @@ export function AutolinkerDrawer({ data }: Props) {
                   key={idWithRange}
                   className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
                   onMouseOut={() => {
-                    if (!selectedLinks.includes(idWithRange)) data.getContext.commands.removeAnnotations([idWithRange]);
+                    const highlighted = data.getContext.helpers.getAnnotations();
+                    const notSelected = highlighted.filter((highlight) => !selectedLinks.includes(highlight.id));
+                    const notSelectedIds = notSelected.map((s) => s.id);
+                    if (!selectedLinks.includes(idWithRange))
+                      data.getContext.commands.removeAnnotations([...notSelectedIds, idWithRange]);
                   }}
                   onMouseOver={() => {
                     if (!selectedLinks.includes(idWithRange))
@@ -243,19 +260,29 @@ export function AutolinkerDrawer({ data }: Props) {
       </ul>
 
       {links?.data && !links?.data?.length ? <Alert label="No matches found." variant="info" /> : null}
-      <div>
+      <div className="flex flex-col-reverse gap-2 lg:flex-row lg:flex-nowrap">
+        <Button
+          label="Close"
+          onClick={() => {
+            const activeAnnotations = data.getContext.helpers.getAnnotations();
+            if (activeAnnotations.length) data.getContext.commands.removeAnnotations(activeAnnotations.map((a) => a.id));
+            resetAtomDrawer();
+          }}
+        />
         <Button
           icon={IconEnum.mention}
           isDisabled={!links?.data?.length || !selectedEntity || !text.length}
           label="Create mentions"
-          onClick={() =>
+          onClick={() => {
             createMentions(
               ranges?.filter((link) => selectedLinks.includes(`${link.from}-${link.id}-${link.to}`)) || [],
               data.getContext,
               selectedEntity,
               project_id as string,
-            )
-          }
+            );
+            const activeAnnotations = data.getContext.helpers.getAnnotations();
+            if (activeAnnotations.length) data.getContext.commands.removeAnnotations(activeAnnotations.map((a) => a.id));
+          }}
           variant="info"
         />
       </div>

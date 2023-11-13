@@ -3,7 +3,7 @@ import "../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
@@ -16,7 +16,7 @@ import { Skeleton } from "../../components/Misc";
 import { Notification } from "../../components/Overlay";
 import { useChangeNavbarTitle, useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
 import { DocumentType } from "../../types";
-import { breadcrumbsAtom, contextMenuAtom, DefaultTagColor, IconEnum, useNotifications } from "../../utils";
+import { breadcrumbsAtom, contextMenuAtom, DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../utils";
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
 import { InsertDocumentType } from "../../validation";
@@ -25,6 +25,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
+  const drawer = useAtomValue(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const {
@@ -105,6 +106,13 @@ export function DocumentView({ editable }: { editable: boolean }) {
       if (manager) manager?.view?.updateState(manager?.createState({ content: undefined }));
     }
   }, [item_id]);
+
+  useEffect(() => {
+    if (!drawer.type) {
+      // console.log(getContext());
+      getContext()?.commands.setAnnotations([]);
+    }
+  }, [drawer.type]);
 
   if (isFetching)
     return (
