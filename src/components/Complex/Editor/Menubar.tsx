@@ -253,26 +253,36 @@ const menuBarItems = ({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
-    {
-      id: "show_mentioned",
-      icon: IconEnum.mentioned_in_document,
-      tooltip: "Show entities mentioned in this document",
-
-      onClick: () =>
-        setDrawer((prev) => ({
-          ...prev,
-          title: "Mentioned entities",
-          data: { getContext },
-          type: "mentioned_in_document",
-          size: "lg",
-        })),
-    },
   ];
   if (!isEditorMenubar) {
-    options.splice(
-      options.length,
-      0,
+    options.push(
+      {
+        id: "autolinker",
+        icon: IconEnum.mention,
+        onClick: () =>
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Automention",
+            size: "lg",
+            type: "autolinker",
+            data: { getContext, title: title || "", id: id || "" },
+          })),
+        tooltip: "Automention",
+      },
+      {
+        id: "show_mentioned",
+        icon: IconEnum.mentioned_in_document,
+        tooltip: "Show entities mentioned in this document",
 
+        onClick: () =>
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Mentioned entities",
+            data: { getContext },
+            type: "mentioned_in_document",
+            size: "lg",
+          })),
+      },
       {
         id: "show_connected",
         icon: IconEnum.graph,
@@ -288,19 +298,6 @@ const menuBarItems = ({
           })),
       },
     );
-    options.splice(-2, 0, {
-      id: "autolinker",
-      icon: IconEnum.mention,
-      onClick: () =>
-        setDrawer((prev) => ({
-          ...prev,
-          title: "Automention",
-          size: "lg",
-          type: "autolinker",
-          data: { getContext, title: title || "", id: id || "" },
-        })),
-      tooltip: "Automention",
-    });
   }
 
   return options;
@@ -329,7 +326,7 @@ export function Menubar({
   return (
     <ul
       className={`sticky top-0 z-30 mb-1 flex ${
-        size === "md" ? "h-10 min-h-[2.5rem]" : "h-5 min-h-[1.25rem]"
+        size === "md" ? "h-10 min-h-[2.5rem]" : "h-6 min-h-[1.25rem]"
       } w-full flex-nowrap items-center gap-x-4 overflow-auto bg-zinc-900 px-3`}>
       {items.map((item) => (
         <div key={item.icon}>
