@@ -1,6 +1,6 @@
 import { useGetSubEntity } from "../../../../../hooks";
 import { WordType } from "../../../../../types";
-import { Tooltip } from "../../../..";
+import { Spinner, Tooltip } from "../../../..";
 
 type Props = {
   title: string;
@@ -19,7 +19,11 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow">
       <div className="flex flex-col whitespace-pre-line font-lato font-light">
-        {isLoading ? <div className="">LOADING...</div> : null}
+        {isLoading ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Spinner />
+          </div>
+        ) : null}
         <span className="italic">
           {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation})` : null}
         </span>
