@@ -24,7 +24,12 @@ export function WordDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
   const [word, setWord] = useState<WordStateType>({ parent_id: item_id });
-  const { data: existingWord } = useGetSubEntity(data?.id, "words", { data: { id: data?.id } }, { enabled: !!data?.id });
+  const { data: existingWord } = useGetSubEntity(
+    data?.id,
+    "words",
+    { fields: ["id", "title", "description", "translation", "parent_id"] },
+    { enabled: !!data?.id },
+  );
   const { mutateAsync: createWord, isLoading: isCreating } = useCreateSubEntity<InsertWordType>("words", project_id);
   const { mutateAsync: updateWord, isLoading: isUpdating } = useUpdateSubEntity("words", project_id, item_id);
   const { handleChange } = useHandleChange({ data: word, setData: setWord });

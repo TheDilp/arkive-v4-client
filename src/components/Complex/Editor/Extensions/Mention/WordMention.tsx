@@ -13,15 +13,15 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
     id as string,
     "words",
-    { fields: ["id", "title", "translation"] },
-    { enabled: !!id, queryKeyConcat: ["mention"] },
+    { fields: ["id", "title", "translation", "description"] },
+    { enabled: !!id, queryKeyConcat: ["mention"], staleTime: 5 * 60 * 1000 },
   );
   return (
-    <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-800 bg-black p-2 shadow">
-      <div className="whitespace-pre-line font-lato font-light">
+    <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow">
+      <div className="flex flex-col whitespace-pre-line font-lato font-light">
         {isLoading ? <div className="">LOADING...</div> : null}
         <span className="italic">
-          {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation}) ` : null}
+          {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation})` : null}
         </span>
         {existingWord?.data?.description && !isLoading ? existingWord?.data.description : null}
       </div>
@@ -30,7 +30,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
 }
 export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
   return (
-    <Tooltip content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
+    <Tooltip arrowColor="#3f3f46" content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
       <span className="cursor-pointer text-sm font-light italic">
         {title || label}
         <sup>*</sup>
