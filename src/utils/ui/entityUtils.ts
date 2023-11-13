@@ -13,7 +13,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "characters") return IconEnum.character;
   if (type === "documents") return IconEnum.document;
   if (type === "maps") return IconEnum.map;
-  if (type === "graphs") return IconEnum.board;
+  if (type === "graphs") return IconEnum.graph;
   if (type === "calendars") return IconEnum.calendar;
   if (type === "timelines") return IconEnum.timeline;
   if (type === "dictionaries") return IconEnum.dictionary;

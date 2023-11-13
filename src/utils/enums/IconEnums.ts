@@ -6,7 +6,7 @@ export const IconEnum = {
   add_calendar: "ph:calendar-plus-light",
   additional_fields: "ph:textbox",
   archive: "ph:archive",
-  board: "ph:graph-light",
+  graph: "ph:graph-light",
   blueprint: "ph:compass-tool",
   brush: "ph:paint-brush",
   bullet_list: "ph:list-dashes",

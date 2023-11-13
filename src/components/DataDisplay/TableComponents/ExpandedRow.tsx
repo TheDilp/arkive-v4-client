@@ -21,7 +21,7 @@ const expandedTagRowTabs = [
   { id: "1", label: "Characters", icon: IconEnum.character },
   { id: "2", label: "Documents", icon: IconEnum.document },
   { id: "3", label: "Maps", icon: IconEnum.map },
-  { id: "4", label: "Graphs", icon: IconEnum.board },
+  { id: "4", label: "Graphs", icon: IconEnum.graph },
   { id: "5", label: "Nodes", icon: IconEnum.node },
   { id: "6", label: "Edges", icon: IconEnum.edge },
   { id: "8", label: "Calendars", icon: IconEnum.calendar },

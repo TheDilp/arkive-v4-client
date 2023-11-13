@@ -73,7 +73,7 @@ export type SearchableMentionEntities =
   | "documents"
   | "maps"
   | "map_pins"
-  | "grapsh"
+  | "graphs"
   | "nodes"
   | "words";
 

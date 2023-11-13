@@ -41,7 +41,7 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
         to={!project_id ? `/view/graphs/${nodeId}` : `/projects/${project_id}/graphs/${nodeId}`}>
         <div className="flex items-start">
           <span className="relative top-0.5">
-            <Icon fontSize={16} icon={IconEnum.board} />
+            <Icon fontSize={16} icon={IconEnum.graph} />
           </span>
           <span className="text-sm underline">{title || nodeLabel}</span>
         </div>

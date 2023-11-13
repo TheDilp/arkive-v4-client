@@ -247,7 +247,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                       },
                       {
                         title: "Highlight connected nodes",
-                        icon: IconEnum.board,
+                        icon: IconEnum.graph,
                         onClick: () => {
                           const incomers = evt.target.incomers();
                           const outgoers = evt.target.outgoers();
@@ -362,7 +362,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                       },
                       {
                         title: "Highlight connected nodes",
-                        icon: IconEnum.board,
+                        icon: IconEnum.graph,
                         onClick: () => {
                           if (edges) {
                             evt.target.sources().flashClass("incomingNodeHighlight", 2000);

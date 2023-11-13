@@ -129,11 +129,21 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
     value: "characters",
     icon: IconEnum.character,
   },
-  // {
-  //   label: "Map pins",
-  //   value: "map_pins",
-  //   icon: IconEnum.blueprint,
-  // },
+  {
+    label: "Maps",
+    value: "maps",
+    icon: IconEnum.map,
+  },
+  {
+    label: "Graph",
+    value: "graphs",
+    icon: IconEnum.graph,
+  },
+  {
+    label: "Words",
+    value: "words",
+    icon: IconEnum.word,
+  },
 ];
 
 export function AutolinkerDrawer({ data }: Props) {
@@ -186,7 +196,7 @@ export function AutolinkerDrawer({ data }: Props) {
             id: idWithRange,
             from: ranges[selectedIdx].from,
             to: ranges[selectedIdx].to,
-            className: "annotation",
+            className: "selectedAnnotation",
           });
         }
       }
