@@ -7,7 +7,7 @@ import { Icon, Tooltip } from "..";
 const ButtonClasses = tv({
   slots: {
     base: "font-lato cursor-pointer font-medium h-10 rounded border border-transparent active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate ",
-    label: "hidden xs:block select-none truncate",
+    label: "hidden sm:block select-none truncate",
   },
   variants: {
     variant: {
@@ -96,7 +96,7 @@ export function Button({
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({ variant, size, isDisabled, hasNoBackground, hasNoLabel: !label });
   return (
-    <Tooltip content={tooltip || ""} isDisabled={!tooltip || isIconOnly} isIgnoringHover>
+    <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
       <button className={base()} disabled={isDisabled} onClick={onClick} type="button">
         {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} thickness={iconThickness} /> : null}
         {label && !isIconOnly ? <span className={labelClasses()}>{label}</span> : null}
