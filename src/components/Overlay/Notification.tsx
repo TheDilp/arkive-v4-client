@@ -219,7 +219,13 @@ export function Notification({
         <div className="flex min-w-fit gap-x-2">
           {actions.map((action) => (
             <div key={action.label}>
-              <Button icon={action?.icon} label={action?.label} onClick={action?.onClick} variant={action?.variant} />
+              <Button
+                icon={action?.icon}
+                isDisabled={action?.isDisabled}
+                label={action?.label}
+                onClick={action?.onClick}
+                variant={action?.variant}
+              />
             </div>
           ))}
         </div>

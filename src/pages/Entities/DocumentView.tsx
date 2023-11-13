@@ -50,7 +50,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     },
   );
   const { mutateAsync: createDocument } = useCreateEntity<InsertDocumentType>("documents");
-  const { mutate: updateDocument } = useUpdateEntity<{
+  const { mutate: updateDocument, isLoading: isUpdating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
   }>("documents", project_id as string);
 
@@ -136,6 +136,8 @@ export function DocumentView({ editable }: { editable: boolean }) {
                 icon: IconEnum.save,
                 label: "Save",
                 variant: "success",
+                isDisabled: isUpdating,
+                isLoading: isUpdating,
                 onClick: () => {
                   updateDocument(
                     {

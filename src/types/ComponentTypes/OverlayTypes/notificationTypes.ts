@@ -1,4 +1,5 @@
 import { Variant } from "../../baseTypes";
+import { ButtonType } from "../FormTypes";
 
 export type NotificationPositionsType =
   | "top"
@@ -25,11 +26,5 @@ export interface NotificationType {
   hasNoTruncate?: boolean;
   type?: NotificationContentType;
   data?: any;
-  actions?: {
-    label?: string;
-    onClick: () => void;
-    icon?: string;
-    variant?: Variant;
-    isDismiss?: boolean;
-  }[];
+  actions?: ButtonType[];
 }
