@@ -38,7 +38,7 @@ export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
       <Link
         className="inline-flex font-lato font-bold underline transition-colors hover:text-sky-400"
         id={`link-${nodeId}`}
-        to={!project_id ? `/view/graphs/${nodeId}` : `/projects/${project_id}/graphs/${nodeId}`}>
+        to={!project_id ? `/public/graphs/${nodeId}` : `/projects/${project_id}/graphs/${nodeId}`}>
         <div className="relative -top-[0.0625rem] flex items-start">
           <span className="relative">
             <Icon fontSize={14} icon={IconEnum.graph} />
