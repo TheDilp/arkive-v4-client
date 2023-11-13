@@ -35,10 +35,7 @@ export function Editor({
         if (params.firstRender) {
           return;
         }
-        // if (onKeyDown) {
-        //   console.log(params, args);
-        //   // onKeyDown();
-        // }
+
         if (params.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
           onChange({ name, value: params.state.toJSON()?.doc });
 
@@ -50,7 +47,7 @@ export function Editor({
         className={`editor-component flex w-full max-w-full flex-col rounded-md border border-zinc-700 ${
           isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-900"
         } ${isReadOnly ? "cursor-not-allowed" : ""}`}>
-        {isReadOnly || isDisabled ? null : <Menubar size={menubarSize} />}
+        {isReadOnly || isDisabled ? null : <Menubar isEditorMenubar size={menubarSize} />}
         <div
           className="flex w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {
