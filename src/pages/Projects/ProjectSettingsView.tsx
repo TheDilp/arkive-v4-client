@@ -14,7 +14,6 @@ import {
   Input,
   Skeleton,
   Table,
-  TablePageLayout,
   Tabs,
   Title,
 } from "../../components";
@@ -325,15 +324,15 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
           {selectedTab === 1 ? (
-            <div>
-              <TablePageLayout>
+            <div className="h-full">
+              <div className="h-fit w-full">
                 <Table
                   columns={relationshipTableColumns(setDialog)}
                   data={projectData?.data?.character_relationship_types || []}
                   dispatch={dispatch}
                   type="character_relationship_types"
                 />
-              </TablePageLayout>
+              </div>
             </div>
           ) : null}
           {selectedTab === 2 ? (
@@ -370,16 +369,14 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
           {selectedTab === 3 ? (
-            <div className="flex max-h-[94.75%] flex-col gap-y-0 overflow-y-auto pb-6">
-              <div>
-                <TablePageLayout>
-                  <Table
-                    columns={membersColumns()}
-                    data={projectData?.data?.members || []}
-                    dispatch={dispatch}
-                    type="character_relationship_types"
-                  />
-                </TablePageLayout>
+            <div className="h-full">
+              <div className="h-fit w-full">
+                <Table
+                  columns={membersColumns()}
+                  data={projectData?.data?.members || []}
+                  dispatch={dispatch}
+                  type="character_relationship_types"
+                />
               </div>
             </div>
           ) : null}
