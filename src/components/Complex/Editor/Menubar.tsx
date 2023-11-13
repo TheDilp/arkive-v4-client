@@ -29,25 +29,28 @@ const menuBarItems = ({
     icon: IconEnum.text_bold,
     onClick: () => chain?.toggleBold()?.run(),
     variant: active.bold() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Bold",
   },
   {
     id: "text_italic",
     icon: IconEnum.text_italic,
     onClick: () => chain?.toggleItalic()?.run(),
     variant: active.italic() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Italic",
   },
   {
     id: "text_underline",
     icon: IconEnum.text_underline,
     onClick: () => chain?.toggleUnderline()?.run(),
     variant: active.underline() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Underline",
   },
   {
     id: "heading",
     icon: IconEnum.heading,
     onClick: undefined,
     variant: active.heading() ? ("info" as Variant) : ("primary" as Variant),
-
+    tooltip: "Heading",
     subItems: [
       {
         id: "heading_1",
@@ -101,6 +104,7 @@ const menuBarItems = ({
     icon: IconEnum.text_align_justify,
     onClick: undefined,
     label: "Align text",
+    tooltip: "Align text",
     subItems: [
       {
         id: "align_text_left",
@@ -137,12 +141,14 @@ const menuBarItems = ({
     icon: IconEnum.bullet_list,
     onClick: () => chain?.toggleBulletList()?.run(),
     variant: active.bulletList() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Insert bullet list",
   },
   {
     id: "numbered_list",
     icon: IconEnum.numbered_list,
     onClick: () => chain?.toggleOrderedList()?.run(),
     variant: active.orderedList() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Insert numbered list",
   },
 
   {
@@ -202,6 +208,7 @@ const menuBarItems = ({
         })),
       },
     ],
+    tooltip: "Insert callout",
   },
   {
     id: "insert_image",
@@ -213,12 +220,15 @@ const menuBarItems = ({
         title: "Insert image",
         size: "md",
       }),
+    tooltip: "Insert image",
   },
   {
     id: "table",
     icon: IconEnum.table,
     onClick: undefined,
     variant: active.table() ? ("info" as Variant) : ("primary" as Variant),
+    tooltip: "Table",
+
     subItems: [
       {
         id: "create_basic_table",
@@ -232,12 +242,14 @@ const menuBarItems = ({
     id: "divider",
     icon: IconEnum.divider,
     onClick: () => chain?.insertHorizontalRule()?.run(),
+    tooltip: "Divider",
   },
   {
     id: "secret",
     icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
     variant: active.secret() ? ("info" as Variant) : ("primary" as Variant),
     onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
+    tooltip: "Secret block",
   },
   {
     id: "autolinker",
@@ -269,8 +281,8 @@ export function Menubar({ size, title, id }: { size: Size; title: string; id: st
                   hasNoBackground
                   icon={item.icon}
                   iconSize={size === "md" ? 20 : 16}
-                  isIconOnly
                   onClick={undefined}
+                  tooltip={item?.tooltip}
                   variant={item?.variant || ("primary" as Variant)}
                 />
                 <Icon icon={IconEnum.chevron_down} />
