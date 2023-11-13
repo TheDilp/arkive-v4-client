@@ -4,7 +4,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, NameFilters } from "../../utils";
@@ -103,7 +103,8 @@ function createColumns(
 
 export function BlueprintView() {
   const { project_id } = useParams();
-  useChangeNavbarTitle(" Blueprints");
+  const { isMd } = useBreakpoint();
+  useChangeNavbarTitle("Blueprints");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
@@ -144,6 +145,7 @@ export function BlueprintView() {
                 size: "lg",
               }))
             }
+            tooltip={isMd ? undefined : "Create new blueprint"}
           />
         </div>
       </div>
