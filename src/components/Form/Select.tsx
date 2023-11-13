@@ -32,9 +32,11 @@ const SelectClasses = tv({
     label: "text-sm font-medium truncate block w-full font-lato",
     helperText: "text-xs block",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-56 bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-[12.5rem] bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
     placeholder: "text-zinc-500 font-lato opacity-40",
     displayItem: "truncate",
+    search:
+      "sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none",
   },
   variants: {
     variant: {
@@ -89,6 +91,11 @@ const SelectClasses = tv({
         select: "h-fit",
       },
     },
+    hasSearch: {
+      true: {
+        optionsContainer: "max-h-[14.5rem]",
+      },
+    },
   },
   compoundSlots: [
     {
@@ -129,7 +136,6 @@ const SelectOption = tv({
     "justify-start",
     "border-zinc-500",
     "border-b",
-    "first:border-t",
     "last:border-b-0",
     "gap-x-2",
   ],
@@ -241,7 +247,8 @@ export function Select({
     helperText: helperTextClasses,
     placeholder: placeholderClasses,
     displayItem: displayItemClasses,
-  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen, isExpandingToNewRow });
+    search,
+  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen, isExpandingToNewRow, hasSearch });
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
     open: isOpen,
@@ -364,7 +371,7 @@ export function Select({
                 <input
                   // @ts-ignore
                   autoFocus="off"
-                  className="sticky top-0 z-50 h-8 w-full border-y border-zinc-700 bg-zinc-800 pl-2 placeholder:text-sm placeholder:text-zinc-600 focus:outline-none focus-visible:outline-none"
+                  className={search()}
                   onChange={(e) => {
                     if (e.target.value) {
                       setFilteredItems(options.filter((opt) => opt.label.toLowerCase().includes(e.target.value.toLowerCase())));
