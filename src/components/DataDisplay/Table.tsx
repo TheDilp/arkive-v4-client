@@ -514,7 +514,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 // 40px added to account for the subheader when it is enabled
                 rowVirtualizer.getTotalSize() +
                 Number(headerRef?.current?.clientHeight) +
-                (pagination ? 28 : 0) +
+                (pagination ? 20 : 0) +
                 (!hasNoHeaderGap && !pagination ? 20 : 0) +
                 (isSubheaderEnabled && !pagination ? 40 : 0) +
                 (isSubheaderEnabled && pagination ? 32 : 0)

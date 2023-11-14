@@ -123,7 +123,7 @@ function columns(
             items={[
               {
                 id: "1",
-                label: `Edit ${entityName}`,
+                label: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -138,7 +138,7 @@ function columns(
 
               {
                 id: "delete_entity",
-                label: `Delete ${entityName}`,
+                label: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({
