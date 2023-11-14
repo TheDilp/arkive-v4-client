@@ -225,7 +225,13 @@ export function ConversationView({ id }: { id: string }) {
   );
 
   function handleEditMessageDrawer(message_id: string) {
-    setDrawer((prev) => ({ ...prev, title: "Edit message", data: { id: message_id }, type: "edit_message", size: "lg" }));
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Edit message",
+      data: { id: message_id, setFlatMessages },
+      type: "edit_message",
+      size: "lg",
+    }));
   }
 
   useEffect(() => {

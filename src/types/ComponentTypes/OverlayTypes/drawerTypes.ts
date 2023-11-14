@@ -1,8 +1,8 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
-import { MouseEvent } from "react";
+import { Dispatch, MouseEvent, SetStateAction } from "react";
 
 import { Size } from "../../baseTypes";
-import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, TagType } from "../../EntityTypes";
+import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, MessageType, TagType } from "../../EntityTypes";
 import { ContextMenuItemType } from "./contextMenuTypes";
 
 export type DrawerContentType =
@@ -81,7 +81,13 @@ export type DrawerAtomType = {
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } } }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number } }
   | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
-  | { type: "edit_message"; data: { id: string } }
+  | {
+      type: "edit_message";
+      data: {
+        id: string;
+        setFlatMessages: Dispatch<SetStateAction<MessageType[]>>;
+      };
+    }
   | {
       type: "conversations";
       data: {

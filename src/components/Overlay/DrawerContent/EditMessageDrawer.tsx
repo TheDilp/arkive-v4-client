@@ -1,5 +1,5 @@
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
 import { useGetSubEntity, useUpdateMessageSubEntity } from "../../../hooks";
@@ -13,6 +13,7 @@ import { Skeleton } from "../../Misc";
 type Props = {
   data: {
     id: string;
+    setFlatMessages: Dispatch<SetStateAction<MessageType[]>>;
   };
 };
 
@@ -43,7 +44,26 @@ export function EditMessageDrawer({ data }: Props) {
       await updateMessage(
         { data: { id: existingMessage?.data?.id, content, type: existingMessage?.data?.type } },
         {
-          onSuccess: resetDrawer,
+          onSuccess: () => {
+            if (existingMessage?.data?.type)
+              data.setFlatMessages((prev) => {
+                const idx = prev.findIndex((msg) => msg.id === data.id);
+                if (idx > -1) {
+                  const temp = [...prev];
+                  if (
+                    isRemirrorJSON(content) &&
+                    (existingMessage?.data?.type === "character" || existingMessage?.data?.type === "narration")
+                  ) {
+                    temp[idx] = { ...temp[idx], content, type: existingMessage?.data?.type };
+                  } else if (!isRemirrorJSON(content) && existingMessage?.data?.type === "place") {
+                    temp[idx] = { ...temp[idx], content, type: existingMessage?.data?.type };
+                  }
+                  return temp;
+                }
+                return prev;
+              });
+            resetDrawer();
+          },
         },
       );
   }
@@ -102,15 +122,16 @@ export function EditMessageDrawer({ data }: Props) {
           />
         </>
       ) : null}
-
-      <Button
-        icon={IconEnum.save}
-        isDisabled={isUpdating}
-        isLoading={isUpdating}
-        label="Update"
-        onClick={handleSave}
-        variant="success"
-      />
+      <div>
+        <Button
+          icon={IconEnum.save}
+          isDisabled={isUpdating}
+          isLoading={isUpdating}
+          label="Update"
+          onClick={handleSave}
+          variant="success"
+        />
+      </div>
     </div>
   );
 }
