@@ -1,8 +1,7 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { SetStateAction, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { Dispatch, Fragment, MutableRefObject, useLayoutEffect, useRef, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
@@ -130,7 +129,6 @@ export function AssetView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
-  const cardListRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
@@ -167,20 +165,6 @@ export function AssetView() {
       },
     },
   );
-  const flatGalleryImages = infiniteAssets?.pages?.length ? infiniteAssets.pages.flatMap((p) => p.data) : [];
-  const rowVirtualizer = useVirtualizer({
-    getScrollElement: () => cardListRef.current as any,
-    count: Math.ceil((flatGalleryImages?.length || 0) / 6),
-    estimateSize: () => 400,
-    overscan: 0,
-  });
-  const columnVirtualizer = useVirtualizer({
-    horizontal: true,
-    estimateSize: () => 262,
-    count: 6,
-    getScrollElement: () => cardListRef.current as any,
-    overscan: 2,
-  });
 
   useLayoutEffect(() => {
     if (!filter || view === "card") {
@@ -259,8 +243,7 @@ export function AssetView() {
       </div>
       {view === "card" ? (
         <div
-          ref={cardListRef}
-          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 md:grid-cols-2 lg:grid-cols-6"
+          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6"
           onScroll={(e) => {
             const { target } = e;
             if (target) {
@@ -271,44 +254,15 @@ export function AssetView() {
               }
             }
           }}>
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: `${columnVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}>
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-              <Fragment key={virtualRow.index}>
-                {columnVirtualizer.getVirtualItems().map((virtualColumn) =>
-                  flatGalleryImages[virtualRow.index * 6 + virtualColumn.index] ? (
-                    <div
-                      key={virtualColumn.index}
-                      className="relative flex flex-col items-center justify-center overflow-hidden rounded bg-cover p-1.5 shadow"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: `${virtualColumn.size}px`,
-                        height: `${virtualRow.size}px`,
-                        transform: `translateX(${virtualColumn.start}px) translateY(${virtualRow.start}px)`,
-                      }}>
-                      <Image hasTitle image={flatGalleryImages[virtualRow.index * 6 + virtualColumn.index]} isOpenable />
-                    </div>
-                  ) : null,
-                )}
-              </Fragment>
-            ))}
-
-            {/* {(infiniteAssets?.pages || [])?.map((page) =>
-              page.data.map((img: ImageType) => (
-                <div
-                  key={img.id}
-                  className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
-                  <Image hasTitle image={img} isOpenable />
-                </div>
-              )),
-            )} */}
-          </div>
+          {(infiniteAssets?.pages || [])?.map((page) =>
+            page.data.map((img: ImageType) => (
+              <div
+                key={img.id}
+                className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
+                <Image hasTitle image={img} isOpenable />
+              </div>
+            )),
+          )}
         </div>
       ) : (
         <div className="h-full max-h-[95%] w-full overflow-hidden">
