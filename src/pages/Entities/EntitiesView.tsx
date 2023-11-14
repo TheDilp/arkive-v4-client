@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph } from "../../components";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
-import { drawerAtom, getEntityNameFromType, IconEnum } from "../../utils";
+import { drawerAtom, getSingularEntityType, IconEnum } from "../../utils";
 import { DocumentView, MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
@@ -11,7 +11,7 @@ import { DictionaryView } from "./DictionaryView";
 
 export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
-  const entityName = getEntityNameFromType(type as AvailableEntityType);
+  const entityName = getSingularEntityType(type as AvailableEntityType);
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
