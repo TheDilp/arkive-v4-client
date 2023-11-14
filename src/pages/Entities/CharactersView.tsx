@@ -322,7 +322,7 @@ export function CharactersView() {
             const { target } = e;
             if (target) {
               // @ts-ignore
-              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 400;
+              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 600;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
