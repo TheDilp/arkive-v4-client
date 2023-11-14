@@ -50,14 +50,14 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     getScrollElement: () => refs.floating.current as any,
     count: Math.ceil((filter ? filteredIcons?.length || 0 : data?.total || 0) / 6),
     estimateSize: () => 36,
-    overscan: 10,
+    overscan: 0,
   });
   const columnVirtualizer = useVirtualizer({
     horizontal: true,
     estimateSize: () => 36,
     count: 6,
     getScrollElement: () => refs.floating.current as any,
-    overscan: 5,
+    overscan: 2,
   });
 
   useEffect(() => {
@@ -91,9 +91,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
           <div
             ref={refs.setFloating}
             className="border border-zinc-700 bg-zinc-900"
-            {...getFloatingProps({
-              ref: refs.setFloating,
-            })}
+            {...getFloatingProps()}
             style={{
               ...floatingStyles,
               zIndex: 99999,
@@ -147,7 +145,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                           onChange({ name, value: `${category}:${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}` });
                           setOpen(false);
                         }}
-                        variant="info-bordered"
+                        variant="primary"
                       />
                     </div>
                   ))}
