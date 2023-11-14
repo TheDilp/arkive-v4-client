@@ -52,7 +52,7 @@ export function useGetImages<InsertType>(
 ) {
   const baseQueryKey = [
     "allEntities",
-    request.data?.project_id,
+    project_id,
     type,
     request.data?.item_id || request.data?.parent_id,
     request?.filters,
