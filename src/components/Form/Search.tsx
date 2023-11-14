@@ -110,7 +110,7 @@ const SearchItem = tv({
     "focus-visible:outline-none",
     "focus-visible:ring-0",
     "hover:cursor-pointer",
-    "hover:bg-zinc-500",
+    // "hover:bg-zinc-500",
     "flex",
     "items-center",
     "justify-start",

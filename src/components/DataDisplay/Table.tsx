@@ -517,7 +517,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 (pagination ? 20 : 0) +
                 (!hasNoHeaderGap && !pagination ? 20 : 0) +
                 (isSubheaderEnabled && !pagination ? 40 : 0) +
-                (isSubheaderEnabled && pagination ? 32 : 0)
+                (isSubheaderEnabled && pagination ? 40 : 0)
               }px`,
         }}>
         <div ref={headerRef} className={head()}>
