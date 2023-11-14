@@ -214,7 +214,7 @@ export function AssetView() {
               ls.set("assets_view", value);
             }}
             options={[
-              { label: "Card", value: "card", icon: IconEnum.card },
+              { label: "Gallery", value: "card", icon: IconEnum.image },
               { label: "Table", value: "table", icon: IconEnum.table },
             ]}
             placeholder="View"
@@ -248,7 +248,7 @@ export function AssetView() {
             const { target } = e;
             if (target) {
               // @ts-ignore
-              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 650;
+              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 1000;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
