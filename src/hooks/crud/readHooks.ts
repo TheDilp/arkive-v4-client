@@ -159,9 +159,13 @@ export function useGetEntities<ReturnType>(
 export function useGetInfiniteEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
   type: AvailableEntityType | AvailableSubEntityType,
-  options?: UseQueryOptions<any> & { prefetch?: boolean },
+  options?: UseQueryOptions<any> & {
+    prefetch?: boolean;
+    queryKeyOverwrite?: (string | number | Record<any, any>)[];
+    queryKeyConcat?: (string | number | Record<any, any>)[];
+  },
 ) {
-  const baseQueryKey = [
+  let baseQueryKey = [
     "allEntities",
     request.data?.project_id,
     type,
@@ -171,6 +175,15 @@ export function useGetInfiniteEntities<ReturnType>(
     request?.orderBy,
     "infinite",
   ];
+
+  if (options?.queryKeyConcat) {
+    baseQueryKey = baseQueryKey.concat(options.queryKeyOverwrite);
+  }
+
+  if (options?.queryKeyOverwrite) {
+    baseQueryKey = options.queryKeyOverwrite;
+  }
+
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
     return FetchFunction({
       method: "POST",

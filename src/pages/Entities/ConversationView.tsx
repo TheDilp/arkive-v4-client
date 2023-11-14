@@ -142,11 +142,13 @@ export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const messageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const messageBottomRef = useRef() as MutableRefObject<HTMLDivElement>;
   const setDrawer = useSetAtom(drawerAtom);
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
   const [message, setMessage] = useState<RemirrorJSON | undefined>(undefined);
   const [messageLength, setMessageLength] = useState(0);
+  const [flatMessages, setFlatMessages] = useState<MessageType[]>([]);
 
   const { data: existingConversation, isLoading } = useGetEntity<ConversationType>(id, "conversations", {
     data: {
@@ -159,10 +161,14 @@ export function ConversationView({ id }: { id: string }) {
   });
   const {
     data: messages,
-    isFetching: isFetchingMessages,
+    // isFetching: isFetchingMessages,
     fetchNextPage,
   } = useGetInfiniteEntities<MessageType>(
     {
+      data: {
+        conversation_id: id,
+        project_id,
+      },
       pagination: {
         limit: 20,
       },
@@ -177,13 +183,11 @@ export function ConversationView({ id }: { id: string }) {
     {
       enabled: !!existingConversation?.data?.id,
       keepPreviousData: true,
+      queryKeyOverwrite: ["messages", id],
+
       getNextPageParam: (_, allPages) => {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
         return allPages.length;
-      },
-      select: (data) => {
-        const reversedPages = data?.pages?.toReversed();
-        return { ...data, pages: reversedPages };
       },
     },
   );
@@ -202,21 +206,11 @@ export function ConversationView({ id }: { id: string }) {
 
             if (parsedMessage) {
               try {
-                const existingMessages = queryClient.getQueryData<{ data: ConversationType }>(["conversations", id]);
-                const hasMessage = (existingMessages?.data?.messages || []).at(-1)?.id === parsedMessage.id;
+                const hasMessage = (flatMessages || []).at(-1)?.id === parsedMessage.id;
                 if (hasMessage) return;
-                queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-                  if (old)
-                    return {
-                      ...old,
-                      data: {
-                        ...old?.data,
-                        messages: [...(old?.data?.messages || []), parsedMessage],
-                      },
-                    };
-                  return old;
-                });
-                messageContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                setFlatMessages((prev) => [parsedMessage, ...prev]);
+
+                messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
               } catch (error) {
                 // console.error("ERROR PARSING MESSAGE CONTENT.");
               }
@@ -240,6 +234,8 @@ export function ConversationView({ id }: { id: string }) {
 
   useLayoutEffect(() => {
     if (messages?.pages?.length === 1) {
+      const flattenedMessages = messages?.pages?.flatMap((page) => page?.data || []);
+      if (flattenedMessages.length) setFlatMessages(flattenedMessages);
       messageContainerRef.current.scrollIntoView();
     }
   }, [messages?.pages?.length]);
@@ -253,97 +249,98 @@ export function ConversationView({ id }: { id: string }) {
   if (isLoading) return <Skeleton type="conversations" />;
   return (
     <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
-      <div className="flex h-max flex-col gap-y-2 overflow-y-auto">
+      <div className="flex flex-1 flex-col gap-y-2 overflow-auto">
+        <div className="h-10">
+          <Button
+            label="Load more"
+            onClick={async () => {
+              await fetchNextPage();
+            }}
+            variant="info-bordered"
+          />
+        </div>
         <div
-          className="flex flex-col gap-y-2 overflow-y-auto"
-          onScroll={(e) => {
-            const { currentTarget } = e;
-            if (currentTarget) {
-              if (e.currentTarget.scrollTop <= 400 && !isFetchingMessages) {
-                fetchNextPage();
-              }
-            }
-          }}>
-          {messages?.pages?.length ? (
-            messages?.pages
-              ?.flatMap((page) => page?.data)
-              .map((m) => {
-                if (m.type === "narration")
-                  return (
-                    <NarrationMessage
-                      key={m?.id}
-                      content={m?.content}
-                      deleteMessage={deleteMessage}
-                      handleEditMessageDrawer={handleEditMessageDrawer}
-                      id={m?.id}
-                      parent_id={existingConversation?.data?.id}
-                    />
-                  );
-                const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
-                if (m.type === "place")
-                  return (
-                    <PlaceMessage
-                      content={m?.content as any}
-                      deleteMessage={deleteMessage}
-                      handleEditMessageDrawer={handleEditMessageDrawer}
-                      id={m.id}
-                      parent_id={existingConversation?.data?.id}
-                      project_id={project_id as string}
-                    />
-                  );
+          ref={messageContainerRef}
+          className="sticky flex flex-col-reverse gap-y-2 overflow-y-auto"
+          style={{ overflowAnchor: "none" }}>
+          {flatMessages?.length ? (
+            flatMessages.map((m) => {
+              if (m.type === "narration")
                 return (
-                  <div key={m?.id} className="flex flex-nowrap">
-                    <div
-                      className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
-                        getCharacterSide(item_id, selectedCharacter, char?.id)
-                          ? "ml-auto max-w-fit flex-row-reverse text-left tracking-tight"
-                          : ""
-                      } w-fit`}>
-                      {char ? (
-                        <div className=" flex flex-col items-end gap-x-1 self-end px-1">
-                          <Avatar
-                            image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                            initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                            label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
-                            size="xxs"
-                            tooltipAllowedPlacements={["left", "right"]}
+                  <NarrationMessage
+                    key={m?.id}
+                    content={m?.content}
+                    deleteMessage={deleteMessage}
+                    handleEditMessageDrawer={handleEditMessageDrawer}
+                    id={m?.id}
+                    parent_id={existingConversation?.data?.id}
+                  />
+                );
+              const char = existingConversation?.data?.characters?.find((c) => c?.id === m?.sender_id);
+              if (m.type === "place")
+                return (
+                  <PlaceMessage
+                    content={m?.content as any}
+                    deleteMessage={deleteMessage}
+                    handleEditMessageDrawer={handleEditMessageDrawer}
+                    id={m.id}
+                    parent_id={existingConversation?.data?.id}
+                    project_id={project_id as string}
+                  />
+                );
+              return (
+                <div key={m?.id} className="flex flex-nowrap">
+                  <div
+                    className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
+                      getCharacterSide(item_id, selectedCharacter, char?.id)
+                        ? "ml-auto max-w-fit flex-row-reverse text-left tracking-tight"
+                        : ""
+                    } w-fit`}>
+                    {char ? (
+                      <div className=" flex flex-col items-end gap-x-1 self-end px-1">
+                        <Avatar
+                          image={getImageURL(project_id as string, "images", char?.portrait_id)}
+                          initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
+                          label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
+                          size="xxs"
+                          tooltipAllowedPlacements={["left", "right"]}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
+                      <StaticRender content={m?.content} />
+                    </div>
+                    {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
+                      <div className="left-0 flex flex-nowrap gap-x-1">
+                        <div className="w-0 transition-all group-hover:w-4">
+                          <Button
+                            hasNoBackground
+                            icon={IconEnum.close}
+                            isIconOnly
+                            onClick={async () => {
+                              if (existingConversation?.data?.id)
+                                await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                            }}
                           />
                         </div>
-                      ) : null}
-                      <div className="flex max-h-fit w-max max-w-fit flex-col rounded-md bg-zinc-800 p-2 shadow [&>.staticRendererContainer>*]:w-fit [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:text-sm">
-                        <StaticRender content={m?.content} />
-                      </div>
-                      {getCharacterSide(item_id, selectedCharacter, char?.id) ? (
-                        <div className="left-0 flex flex-nowrap gap-x-1">
-                          <div className="w-0 transition-all group-hover:w-4">
-                            <Button
-                              hasNoBackground
-                              icon={IconEnum.close}
-                              isIconOnly
-                              onClick={async () => {
-                                if (existingConversation?.data?.id)
-                                  await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
-                              }}
-                            />
-                          </div>
-                          <div className="w-0 transition-all group-hover:w-4">
-                            <Button
-                              hasNoBackground
-                              icon={IconEnum.edit}
-                              isIconOnly
-                              onClick={() => handleEditMessageDrawer(m.id)}
-                            />
-                          </div>
+                        <div className="w-0 transition-all group-hover:w-4">
+                          <Button
+                            hasNoBackground
+                            icon={IconEnum.edit}
+                            isIconOnly
+                            onClick={() => handleEditMessageDrawer(m.id)}
+                          />
                         </div>
-                      ) : null}
-                    </div>
+                      </div>
+                    ) : null}
                   </div>
-                );
-              })
+                </div>
+              );
+            })
           ) : (
             <Alert label="This is the start of this conversation." />
           )}
-          <div ref={messageContainerRef} className="h-0 w-0" />
+          <div ref={messageBottomRef} className="h-0 w-0" />
         </div>
       </div>
       <div className="flex min-h-fit flex-col gap-y-2 pt-2">
