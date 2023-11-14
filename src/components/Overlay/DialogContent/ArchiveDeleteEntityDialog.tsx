@@ -8,10 +8,10 @@ import {
   dialogAtom,
   getCharacterFullName,
   getImageURL,
+  getSingularEntityType,
   IconEnum,
   useNotifications,
 } from "../../../utils";
-import { getEntityNameFromType } from "../../../utils/ui/entityUtils";
 import { Button } from "../../Form";
 import { Avatar } from "../../Misc";
 
@@ -31,7 +31,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {getEntityNameFromType(data?.entity_title) || "entity"} -{" "}
+        {getSingularEntityType(data?.entity_title) || "entity"} -{" "}
         {data?.entity_title === "characters"
           ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
           : data?.title}

@@ -13,7 +13,7 @@ type Props = {
     type: AvailableEntityType;
   };
 };
-type ExistingFolderType = { id?: string; project_id: string; is_folder: boolean; title: string; tags: TagType[] };
+type ExistingFolderType = { id?: string; project_id: string; is_folder: boolean; title: string; tags?: TagType[] };
 
 export function FolderDrawer({ data }: Props) {
   const { project_id } = useParams();
@@ -27,7 +27,7 @@ export function FolderDrawer({ data }: Props) {
   const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity(data.type);
   const { mutateAsync: updateFolder, isLoading: isUpdating } = useUpdateEntity<{
     data: { id: string; title: string };
-    relations: { tags: { id: string }[] };
+    relations?: { tags: { id: string }[] };
   }>(data.type, project_id as string);
   const { data: existingFolder } = useGetEntity<ExistingFolderType>(
     data?.id,
@@ -35,7 +35,7 @@ export function FolderDrawer({ data }: Props) {
     {
       data: {},
       fields: ["id", "is_folder", "title"],
-      relations: { tags: true },
+      relations: data.type === "random_tables" ? {} : { tags: true },
     },
     {
       enabled: !!data?.id,
@@ -62,22 +62,21 @@ export function FolderDrawer({ data }: Props) {
           if (changedData) {
             if (data?.id) {
               await updateFolder(
-                {
-                  data: { id: data.id, title: folder.title },
-                  relations: { tags: folder.tags },
-                },
+                data.type === "random_tables"
+                  ? { data: { id: data.id, title: folder.title } }
+                  : {
+                      data: { id: data.id, title: folder.title },
+                      relations: { tags: folder.tags || [] },
+                    },
                 {
                   onSuccess: resetDrawerAtom,
                 },
               );
             } else {
               const { tags, ...rest } = folder;
-              await createFolder(
-                { data: rest, relations: { tags } },
-                {
-                  onSuccess: resetDrawerAtom,
-                },
-              );
+              await createFolder(data.type === "random_tables" ? { data: rest } : { data: rest, relations: { tags } }, {
+                onSuccess: resetDrawerAtom,
+              });
             }
           }
         }}

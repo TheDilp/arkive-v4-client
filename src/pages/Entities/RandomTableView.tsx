@@ -104,8 +104,7 @@ export function RandomTableView() {
     const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
     const idx = value - 1;
     if (idx > -1) {
-      const optionIdx = selectedItems?.[idx];
-      const option = data?.data?.[optionIdx ?? idx];
+      const option = data?.data?.[idx];
 
       if (option) {
         if (option?.random_table_suboptions?.length) {

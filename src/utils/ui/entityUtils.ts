@@ -26,14 +26,6 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
 
   return IconEnum.error;
 }
-export function getEntityNameFromType(type: AvailableEntityType | AvailableSubEntityType) {
-  if (type === "dictionaries") return "dictionary";
-  if (type === "random_tables") return "random table";
-  if (type === "character_fields_templates") return "field template";
-  if (type === "map_pins") return "map pin";
-  if (type === "character_relationship_types") return "character relationship type";
-  return type.substring(0, type.length - 1);
-}
 
 export function getParentEntityType(type: AvailableSubEntityType): AvailableEntityType | null {
   if (type === "map_pins" || type === "map_layers") return "maps";

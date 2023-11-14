@@ -36,10 +36,10 @@ import {
   drawerAtom,
   getDefaultEntityIcon,
   getEntityFields,
-  getEntityNameFromType,
   getImageURL,
   getNavbarEntityType,
   getPluralEntityType,
+  getSingularEntityType,
   IconEnum,
   userSettingsAtom,
 } from "../../utils";
@@ -147,7 +147,7 @@ function columns(
                       ...row.original,
                       entity_title: entityType,
                     },
-                    title: `Delete ${entityType}`,
+                    title: `Delete ${getSingularEntityType(entityType)}`,
                     size: "sm",
                     type: "delete_entity",
                   }));
@@ -244,7 +244,7 @@ function EntityItem({
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
   const { isMd } = useBreakpoint();
-  const entityName = getEntityNameFromType(type as AvailableEntityType);
+  const entityName = getSingularEntityType(type as AvailableEntityType);
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
 
