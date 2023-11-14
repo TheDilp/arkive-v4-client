@@ -320,6 +320,10 @@ export function ConversationView({ id }: { id: string }) {
                             onClick={async () => {
                               if (existingConversation?.data?.id)
                                 await deleteMessage({ data: { id: m.id, parent_id: existingConversation?.data?.id } });
+                              const idx = flatMessages?.findIndex((flatMsg) => flatMsg.id === m.id);
+                              if (idx > -1) {
+                                setFlatMessages((prev) => prev.toSpliced(idx, 1));
+                              }
                             }}
                           />
                         </div>
