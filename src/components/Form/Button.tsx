@@ -20,6 +20,9 @@ const ButtonClasses = tv({
       info: {
         base: "bg-blue-600 text-white focus:border-blue-400",
       },
+      "info-bordered": {
+        base: "text-blue-400 border-blue-400",
+      },
       success: {
         base: "bg-green-600 text-white focus:border-green-400",
       },
