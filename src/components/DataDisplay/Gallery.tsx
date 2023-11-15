@@ -5,8 +5,8 @@ import { Image } from "./Image";
 
 const GalleryClasses = tv({
   slots: {
-    container: "h-min overflow-y-auto",
-    base: "grid gap-1 grid-cols-1 md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
+    container: "overflow-y-auto",
+    base: "grid gap-1 grid-cols-1  md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
   },
   variants: {
     columns: {
@@ -50,20 +50,22 @@ const GalleryClasses = tv({
   },
 });
 
-function getRowSize(size: Size) {
-  if (size === "md") return "12rem";
-  if (size === "2xl") return "36rem";
-  return "12rem";
+function getRowSize(size: Size): number {
+  if (size === "md") return 12;
+  if (size === "2xl") return 36;
+  return 12;
 }
 
 export function Gallery({ images, isOpenable, columns = 4, size = "md" }: GalleryType) {
   const { container, base } = GalleryClasses({ columns });
+  const rowSize = getRowSize(size);
   return (
     <div className={container()}>
       <div
         className={base()}
         style={{
-          gridAutoRows: getRowSize(size),
+          height: `${rowSize - 6}rem`,
+          gridAutoRows: `${rowSize}rem`,
         }}>
         {images.map((image) => (
           <Image key={image.id} image={image} isOpenable={isOpenable} />
