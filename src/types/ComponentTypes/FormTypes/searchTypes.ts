@@ -63,6 +63,7 @@ export interface SearchType extends BaseFormComponentType {
   isMultiple?: boolean;
   initialDisplayValue?: string;
   imageType?: AssetType;
+  limit?: number;
   onSearch?: (result: any) => void;
   onChange: ({
     name,

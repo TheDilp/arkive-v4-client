@@ -16,6 +16,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
             helperText={helperText}
             imageType={type}
             isAutocomplete
+            limit={100}
             name={name}
             onChange={onChange}
             placeholder="Search images"

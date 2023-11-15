@@ -167,6 +167,7 @@ export function Search({
   imageType,
   isOptionsHidden,
   isMultiple,
+  limit,
   offset: offsetProp,
   onChange,
   onSearch,
@@ -204,7 +205,7 @@ export function Search({
       icon?: string;
       parent_id?: string;
     }[]
-  >({ data: { search_term: inputValue }, limit: 10 }, searchEntity, project_id as string, {
+  >({ data: { search_term: inputValue }, limit: limit ?? 0 }, searchEntity, project_id as string, {
     enabled: false,
     queryKeyConcat: [searchTerm, inputValue, name],
   });
