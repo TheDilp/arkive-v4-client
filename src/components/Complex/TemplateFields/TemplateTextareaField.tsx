@@ -1,8 +1,8 @@
 import { RemirrorJSON } from "remirror";
 
 import { HandleChangePropsType } from "../../../types";
-import { Collapsible } from "../../Layout";
 import { Editor } from "../Editor";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,12 +10,13 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   currentValue: RemirrorJSON;
+  isCollapsible?: boolean;
 };
 
-export function TemplateTextareaField({ title, name, currentValue, handleChange, id }: Props) {
+export function TemplateTextareaField({ title, name, currentValue, handleChange, id, isCollapsible }: Props) {
   return (
-    <Collapsible label={title}>
-      <div className="flex max-h-[30rem] min-h-fit flex-col p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex max-h-[30rem] min-h-fit flex-col">
         <span className="text-sm text-zinc-300">{title}</span>
         <Editor
           initialContent={currentValue as any}
@@ -28,6 +29,6 @@ export function TemplateTextareaField({ title, name, currentValue, handleChange,
           }
         />
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

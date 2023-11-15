@@ -3,18 +3,22 @@ import { TagType } from "./tagTypes";
 
 export type FieldTypes =
   | "text"
-  | "textarea"
-  | "number"
   | "select"
   | "select_multiple"
   | "dice_roll"
-  | "date"
   | "boolean"
+  | "date"
   | "random_table"
   | "documents_single"
   | "documents_multiple"
   | "images_single"
-  | "images_multiple";
+  | "images_multiple"
+  | "locations_single"
+  | "locations_multiple"
+  | "number"
+  | "textarea"
+  | "blueprints_single"
+  | "blueprints_multiple";
 export type BlueprintFieldTypes =
   | "text"
   | "textarea"
@@ -64,13 +68,3 @@ export type TemplateStateType = Partial<
     character_fields: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] })[];
   }
 >;
-
-export interface AdditionalFieldValueType {
-  id: string;
-  value: {
-    id: string;
-    value: string | number | string[] | boolean | null | Record<string, number | string>;
-    subOptionValue?: string;
-  };
-  template_id: string;
-}

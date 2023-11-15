@@ -2,7 +2,7 @@ import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../.
 import { IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,17 +10,18 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "blueprints_single" | "blueprints_multiple";
-
+  isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
 };
 
-export function TemplateBlueprintField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
+export function TemplateBlueprintField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
 
   return (
-    <Collapsible label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
+          label={isCollapsible ? "" : title}
           name={name}
           onChange={({ value, label, icon }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
@@ -68,6 +69,6 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
           />
         ))}
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

@@ -105,6 +105,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -120,6 +121,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -135,6 +137,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -149,6 +152,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -164,6 +168,7 @@ function FieldTemplateRows({
                 formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -179,6 +184,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -194,6 +200,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -211,6 +218,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -227,6 +235,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -243,6 +252,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -259,6 +269,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />
@@ -275,6 +286,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isCollapsible
                 name={baseName}
                 title={template_field.title}
               />

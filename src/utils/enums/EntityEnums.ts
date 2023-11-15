@@ -28,12 +28,14 @@ export const CharacterFieldTypesEnum = [
   { value: "date", label: "Date" },
   { value: "random_table", label: "Random Table" },
   { value: "boolean", label: "Boolean" },
-  // { value: "documents_single", label: "Document (single)" },
-  // { value: "documents_multiple", label: "Documents (multiple)" },
-  // { value: "images_single", label: "Image (single)" },
-  // { value: "images_multiple", label: "Images (multiple)" },
-  // { value: "locations_single", label: "Location (single)" },
-  // { value: "locations_multiple", label: "Locations (multiple)" },
+  { value: "documents_single", label: "Document (single)" },
+  { value: "documents_multiple", label: "Documents (multiple)" },
+  { value: "images_single", label: "Image (single)" },
+  { value: "images_multiple", label: "Images (multiple)" },
+  { value: "locations_single", label: "Location (single)" },
+  { value: "locations_multiple", label: "Locations (multiple)" },
+  { value: "blueprints_single", label: "Blueprint instances (single )" },
+  { value: "blueprints_multiple", label: "Blueprint instances (multiple)" },
 ];
 
 export const BlueprintFieldTypesEnum = [

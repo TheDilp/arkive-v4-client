@@ -2,7 +2,7 @@ import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../.
 import { IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,17 +10,18 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "images_single" | "images_multiple";
-
+  isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
 };
 
-export function TemplateImageField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
+export function TemplateImageField({ title, name, handleChange, id, fieldType, isCollapsible, currentValue }: Props) {
   const createNotification = useNotifications();
 
   return (
-    <Collapsible label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
+          label={isCollapsible ? "" : title}
           name={name}
           onChange={({ value, label }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
@@ -67,6 +68,6 @@ export function TemplateImageField({ title, name, handleChange, id, fieldType, c
           />
         ))}
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

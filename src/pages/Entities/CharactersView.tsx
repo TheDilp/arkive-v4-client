@@ -163,6 +163,7 @@ function createColumns(
                     title: "Delete character",
                     size: "sm",
                     type: "delete_entity",
+                    isOverlay: true,
                   }));
                 },
               },

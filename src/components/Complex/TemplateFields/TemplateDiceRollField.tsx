@@ -3,7 +3,7 @@ import { useState } from "react";
 import { HandleChangePropsType } from "../../../types";
 import { DiceNoSim, DiceRollParser, IconEnum, useNotifications } from "../../../utils";
 import { Button, Input } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -12,14 +12,15 @@ type Props = {
   id: string;
   formula: string;
   currentValue: string | number | null;
+  isCollapsible?: boolean;
 };
 
-export function TemplateDiceRollField({ title, name, formula, handleChange, id, currentValue }: Props) {
+export function TemplateDiceRollField({ title, name, formula, handleChange, id, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
   const [isRolling, setIsRolling] = useState(false);
   return (
-    <Collapsible label={title}>
-      <div className="flex flex-nowrap items-center gap-x-2 p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex flex-nowrap items-center gap-x-2">
         <Input
           name={name}
           onChange={({ value }) =>
@@ -75,6 +76,6 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
           />
         </div>
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

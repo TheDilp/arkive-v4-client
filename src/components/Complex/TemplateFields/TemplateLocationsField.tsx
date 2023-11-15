@@ -2,7 +2,7 @@ import { HandleChangePropsType, MapPinType } from "../../../types";
 import { IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,17 +10,18 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "locations_single" | "locations_multiple";
-
+  isCollapsible?: boolean;
   currentValue: { related_id: string; map_pin: Pick<MapPinType, "id" | "title" | "icon"> }[];
 };
 
-export function TemplateLocationsField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
+export function TemplateLocationsField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
 
   return (
-    <Collapsible label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
         <Search
+          label={isCollapsible ? "" : title}
           name={name}
           onChange={({ value, label, icon }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
@@ -68,6 +69,6 @@ export function TemplateLocationsField({ title, name, handleChange, id, fieldTyp
           />
         ))}
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

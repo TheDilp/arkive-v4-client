@@ -1,6 +1,6 @@
 import { HandleChangePropsType } from "../../../types";
 import { Checkbox } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -8,11 +8,12 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   currentValue: boolean | null;
+  isCollapsible?: boolean;
 };
 
-export function TemplateBooleanField({ title, name, currentValue, handleChange, id }: Props) {
+export function TemplateBooleanField({ title, name, currentValue, handleChange, id, isCollapsible }: Props) {
   return (
-    <Collapsible label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex flex-nowrap justify-end">
         <Checkbox
           name={name}
@@ -25,6 +26,6 @@ export function TemplateBooleanField({ title, name, currentValue, handleChange, 
           value={currentValue as boolean}
         />
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+const BlueprintFieldTypeSchema = z.union([
+  z.literal("text"),
+  z.literal("textarea"),
+  z.literal("boolean"),
+  z.literal("number"),
+  z.literal("select"),
+  z.literal("select_multiple"),
+  z.literal("dice_roll"),
+  z.literal("date"),
+  z.literal("random_table"),
+  z.literal("documents_single"),
+  z.literal("documents_multiple"),
+  z.literal("images_single"),
+  z.literal("images_multiple"),
+  z.literal("locations_single"),
+  z.literal("locations_multiple"),
+  z.literal("characters_single"),
+  z.literal("characters_multiple"),
+  z.literal("blueprints_single"),
+  z.literal("blueprints_multiple"),
+]);
+
 export const InsertBlueprintSchema = z.object({
   data: z.object({
     project_id: z.string(),
@@ -12,7 +34,7 @@ export const InsertBlueprintSchema = z.object({
     blueprint_fields: z
       .object({
         title: z.string(),
-        field_type: z.string(),
+        field_type: BlueprintFieldTypeSchema,
         sort: z.number().optional(),
         // width: z.literal("half").or(z.literal("full")),
         formula: z.string().optional().nullable(),
@@ -40,7 +62,7 @@ export const UpdateBlueprintSchema = z
         .object({
           id: z.string(),
           title: z.string().optional(),
-          field_type: z.string().optional(),
+          field_type: BlueprintFieldTypeSchema.optional(),
           // width: z.literal("half").or(z.literal("full")),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),

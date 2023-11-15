@@ -23,10 +23,29 @@ export const InsertCharacterSchema = z.object({
     character_fields: z
       .object({
         id: z.string(),
-        value: z.object({
-          value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional().nullable(),
-          subOptionValue: z.string().optional(),
-        }),
+        documents: z.object({ related_id: z.string() }).array().optional().nullable(),
+        map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
+        images: z.object({ related_id: z.string() }).array().optional().nullable(),
+        blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
+        random_table: z
+          .object({
+            option_id: z.string().optional().nullable(),
+            suboption_id: z.string().optional().nullable(),
+            related_id: z.string(),
+          })
+
+          .optional()
+          .nullable(),
+        value: z
+          .string()
+          .or(z.number())
+          .or(z.string().array())
+          .or(z.number().array())
+          .or(z.boolean())
+          .or(z.null())
+          .or(z.record(z.string(), z.any()))
+          .optional()
+          .nullable(),
       })
       .array()
       .optional(),
@@ -59,11 +78,27 @@ export const UpdateCharacterSchema = z.object({
     character_fields: z
       .object({
         id: z.string(),
-        value: z
+        documents: z.object({ related_id: z.string() }).array().optional().nullable(),
+        map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
+        images: z.object({ related_id: z.string() }).array().optional().nullable(),
+        blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
+        random_table: z
           .object({
-            value: z.string().or(z.string().array()).or(z.number()).or(z.boolean()).or(z.record(z.any())).optional().nullable(),
-            subOptionValue: z.string().optional(),
+            option_id: z.string().optional().nullable(),
+            suboption_id: z.string().optional().nullable(),
+            related_id: z.string(),
           })
+
+          .optional()
+          .nullable(),
+        value: z
+          .string()
+          .or(z.number())
+          .or(z.string().array())
+          .or(z.number().array())
+          .or(z.boolean())
+          .or(z.null())
+          .or(z.record(z.string(), z.any()))
           .optional()
           .nullable(),
       })

@@ -34,7 +34,6 @@ import {
   useTable,
 } from "../../hooks";
 import {
-  AdditionalFieldValueType,
   CharacterFieldTemplateType,
   CharacterFieldType,
   CharacterLocationType,
@@ -618,7 +617,7 @@ function AdditionalFieldDisplay({
   isPreview,
 }: {
   character_fields: CharacterFieldType[];
-  character_field_data: AdditionalFieldValueType[];
+  character_field_data: any[];
   template_title: string;
   isPreview?: boolean;
 }) {
@@ -1093,7 +1092,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                       <div key={t.id} className="flex flex-col">
                         <AdditionalFieldDisplay
                           character_field_data={
-                            existingCharacter?.data?.character_fields?.filter((field) => field.template_id === t.id) || []
+                            existingCharacter?.data?.character_fields?.filter((field: any) => field.template_id === t.id) || []
                           }
                           character_fields={t.character_fields}
                           isPreview={isPreview}

@@ -1,4 +1,14 @@
-import { AdditionalFieldValueType, CharacterLocationType, CharacterRelationshipType, DocumentType, MapType, TagType } from ".";
+import {
+  BlueprintInstanceType,
+  CharacterLocationType,
+  CharacterRelationshipType,
+  DocumentType,
+  FieldTypes,
+  MapPinType,
+  MapType,
+  RandomTableType,
+  TagType,
+} from ".";
 import { ImageType } from "./imageTypes";
 
 export interface RelationType {
@@ -30,6 +40,50 @@ export interface CharacterRelatedType {
   character_relationship_id: string;
 }
 
+export interface CharacterCharacterFieldType {
+  id: string;
+  title: string;
+  sort: number;
+  parent_id: string;
+  field_type: FieldTypes;
+
+  blueprint_instances: {
+    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string };
+    related_id: string;
+  }[];
+  documents: {
+    document: Pick<DocumentType, "id" | "title" | "icon">;
+    related_id: string;
+  }[];
+  map_pins: {
+    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id">;
+    related_id: string;
+  }[];
+  images: {
+    image: Pick<ImageType, "id" | "title">;
+    related_id: string;
+  }[];
+
+  random_table: {
+    option_id?: string;
+    suboption_id?: string;
+    related_id: string;
+  };
+  calendar: {
+    related_id: string;
+
+    start_day?: number;
+    start_year?: number;
+    start_month_id?: string;
+
+    end_day?: number;
+    end_month_id?: string;
+    end_year?: number;
+  };
+  random_table_data: Pick<RandomTableType, "id" | "title">;
+  value: string | number | null | string[] | number[];
+}
+
 export interface CharacterType {
   id: string;
   project_id: string;
@@ -37,7 +91,7 @@ export interface CharacterType {
   first_name: string;
   last_name?: string | null;
   nickname?: string | null;
-  full_name: string;
+  full_name?: string;
   images?: ImageType[];
   portrait_id?: string | null;
   portrait?: ImageType;
@@ -47,10 +101,10 @@ export interface CharacterType {
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
   maps?: MapType | [];
-  character_fields?: AdditionalFieldValueType[];
+  character_fields?: CharacterCharacterFieldType[];
   character_relationship_types?: CharacterRelationshipDataType[];
-  locations: CharacterLocationType[];
-  documents: Pick<DocumentType, "id" | "title" | "icon">[];
+  locations?: CharacterLocationType[];
+  documents?: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: TagType[];
 
   related_to?: CharacterRelatedType[];

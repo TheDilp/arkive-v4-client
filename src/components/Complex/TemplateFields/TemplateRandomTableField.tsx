@@ -3,18 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { baseURLS, FetchFunction, IconEnum } from "../../../utils";
 import { Button, Select } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
   name: string;
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
+  isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
 };
 
-export function TemplateRandomTableField({ title, name, id, currentValue, handleChange, random_table }: Props) {
+export function TemplateRandomTableField({ title, name, id, currentValue, handleChange, random_table, isCollapsible }: Props) {
   const { refetch, isFetching } = useQuery({
     // @ts-ignore
     queryKey: ["allEntities", "random_table_options", "random_roll", random_table?.id],
@@ -36,8 +37,8 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
     (opt) => opt?.id === currentValue?.option_id,
   )?.random_table_suboptions;
   return (
-    <Collapsible label={title}>
-      <div className="flex flex-col gap-y-1 p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex flex-col gap-y-1">
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select
             hasSearch
@@ -114,6 +115,6 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
           ) : null}
         </div>
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

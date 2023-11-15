@@ -2,7 +2,7 @@ import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../.
 import { getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -10,16 +10,16 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "characters_single" | "characters_multiple";
-
+  isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
 
-export function TemplateCharacterField({ title, name, handleChange, id, fieldType, currentValue }: Props) {
+export function TemplateCharacterField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
 
   return (
-    <Collapsible label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           name={name}
           onChange={({ value, first_name, last_name, image }) => {
@@ -69,6 +69,6 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
           />
         ))}
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

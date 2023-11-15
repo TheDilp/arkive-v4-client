@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, EventStateType, HandleChangePropsType } from "../../../types";
 import { checkIfDayCorrect, checkIfMonthCorrect, checkIfYearCorrect } from "../../../utils";
 import { Input, Select } from "../../Form";
-import { Collapsible } from "../../Layout";
+import { TemplateFieldContainer } from ".";
 
 type Props = {
   title: string;
@@ -12,9 +12,10 @@ type Props = {
   id: string;
   currentValue: BlueprintInstanceBlueprintFieldType["calendar"] | null;
   calendar?: BlueprintFieldType["calendar"];
+  isCollapsible?: boolean;
 };
 
-export function TemplateDateField({ title, name, handleChange, id, currentValue, calendar }: Props) {
+export function TemplateDateField({ title, name, handleChange, id, currentValue, calendar, isCollapsible }: Props) {
   const startMonthIdx = currentValue?.start_month_id
     ? calendar?.months?.findIndex((m) => m.id === currentValue?.start_month_id) ?? undefined
     : undefined;
@@ -53,8 +54,8 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
     }
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
-    <Collapsible label={title}>
-      <div className="flex flex-col gap-y-2 p-2">
+    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <div className="flex flex-col gap-y-2">
         <div className="flex items-center justify-between gap-x-2">
           <Input
             isDisabled={typeof startMonthIdx !== "number"}
@@ -158,6 +159,6 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
           />
         </div>
       </div>
-    </Collapsible>
+    </TemplateFieldContainer>
   );
 }

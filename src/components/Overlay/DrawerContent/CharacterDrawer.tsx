@@ -1,51 +1,47 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
-import groupBy from "lodash.groupby";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { flattenArray, uniqueBy } from "remirror";
+import { uniqueBy } from "remirror";
 
 import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import {
-  AdditionalFieldValueType,
+  CharacterCharacterFieldType,
   CharacterFieldTemplateType,
   CharacterFieldType,
   CharacterRelatedType,
   CharacterRelationshipType,
   CharacterType,
   HandleChangePropsType,
-  NotificationType,
-  RandomTableType,
   TagType,
 } from "../../../types";
-import {
-  baseURLS,
-  drawerAtom,
-  FetchFunction,
-  getCharacterFullName,
-  IconEnum,
-  sortEntities,
-  useNotifications,
-} from "../../../utils";
-import { DiceNoSim, DiceRollParser, getRollValue } from "../../../utils/ui/diceRollerUtils";
+import { drawerAtom, getBlueprintFieldValueFromType, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
-import { DrawerLayout, Dropdown, EntityPreview, ImagePreview, Skeleton } from "../..";
-import { Editor } from "../../Complex/Editor/Editor";
+import {
+  DrawerLayout,
+  Dropdown,
+  EntityPreview,
+  ImagePreview,
+  Skeleton,
+  TemplateBlueprintField,
+  TemplateBooleanField,
+  TemplateDiceRollField,
+  TemplateDocumentField,
+  TemplateImageField,
+  TemplateInputField,
+  TemplateLocationsField,
+  TemplateSelectField,
+  TemplateTextareaField,
+} from "../..";
 import { ImageSelect } from "../../Complex/ImageSelect";
-import { Button, Checkbox, Input, Search, Select, TagInput, Title } from "../../Form";
+import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
+import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
 import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
 
-type CharacterStateCharacterFieldsType = Record<string, AdditionalFieldValueType[]>;
-
-type CharacterStateType = Partial<Omit<CharacterType, "character_fields">> & {
-  character_fields?: CharacterStateCharacterFieldsType;
-};
-
-type CurrentValueType = string | string[] | number | boolean | Record<string, any> | Record<string, any>[] | undefined;
-
-function isSaveDisabled(character: CharacterStateType) {
+function isSaveDisabled(character: CharacterType | null) {
+  if (!character) return true;
   if (!character?.first_name) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
@@ -55,431 +51,6 @@ function isSaveDisabled(character: CharacterStateType) {
   }
 
   return false;
-}
-
-function RandomTableInput({
-  id,
-  title,
-  currentValue,
-  subOptionValue,
-  index,
-  random_table_id,
-  isRolling,
-  random_table,
-  template_id,
-  handleChange,
-}: Omit<CharacterFieldType, "sort"> & {
-  index: number;
-  currentValue: CurrentValueType;
-  isRolling: boolean;
-  template_id: string;
-  subOptionValue?: string;
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
-}) {
-  const name = `character_fields[${template_id}][${index}]`;
-  const { project_id } = useParams();
-  const { refetch, isFetching } = useQuery({
-    // @ts-ignore
-    queryKey: ["allEntities", "random_table_options", "random_roll", random_table_id],
-
-    queryFn: async () =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/random_table_options/random/${random_table_id}`,
-        body: JSON.stringify({
-          data: {
-            count: 1,
-          },
-        }),
-        method: "POST",
-      }),
-
-    enabled: false,
-  });
-
-  const { data: randomTable, isLoading } = useGetEntity<RandomTableType>(
-    random_table_id as string,
-    "random_tables",
-    {
-      data: {
-        project_id,
-      },
-      fields: ["id", "title"],
-      relations: {
-        random_table_options: true,
-      },
-    },
-    {
-      enabled: !!random_table_id,
-      queryKeyConcat: ["field"],
-      staleTime: 5 * 60 * 1000,
-    },
-  );
-
-  const selectedOptionSuboptions = randomTable?.data?.random_table_options?.find(
-    (opt) => opt?.id === currentValue,
-  )?.random_table_suboptions;
-  return (
-    <div className="flex flex-col gap-y-1">
-      <div className="flex flex-nowrap items-center gap-x-2">
-        <Select
-          hasSearch
-          isClearable
-          isDisabled={isRolling || isLoading}
-          isLoading={isLoading}
-          label={title}
-          name={`${name}`}
-          onChange={({ value }) => {
-            handleChange({ name, value: { id, value: { value } } });
-          }}
-          options={(randomTable?.data?.random_table_options || []).map((opt) => ({ label: opt.title, value: opt.id }))}
-          value={currentValue as string}
-        />
-        <div className="flex self-end pb-1.5">
-          <Button
-            hasNoBackground
-            icon={IconEnum.d20}
-            iconSize={24}
-            isIconOnly
-            isLoading={isFetching}
-            onClick={async () => {
-              refetch().then((res) => {
-                if (res?.data?.data?.[0]?.title) {
-                  handleChange({
-                    name,
-                    value: { id, value: { value: res?.data?.data?.[0]?.id, subOptionValue: res?.data?.data?.[0]?.subitem_id } },
-                  });
-                }
-              });
-            }}
-            tooltip={`Roll ${random_table?.title ? `(${random_table?.title})` : ""}`}
-          />
-        </div>
-      </div>
-      <div className="flex flex-col pl-4 pr-[1.55rem]">
-        {selectedOptionSuboptions?.length ? (
-          <div className="flex flex-nowrap gap-x-2">
-            <Select
-              isClearable
-              name={name}
-              onChange={({ value }) =>
-                handleChange({ name, value: { id, value: { value: currentValue, subOptionValue: value } } })
-              }
-              options={selectedOptionSuboptions.map((subopt) => ({ label: subopt.title, value: subopt.id }))}
-              value={subOptionValue}
-            />
-            <div className="flex self-end pb-1.5" />
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function DateInput({
-  id,
-  calendar,
-  template_id,
-  currentValue,
-  title,
-  index,
-  handleChange,
-}: Pick<CharacterFieldType, "id" | "calendar" | "calendar_id" | "title"> & {
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
-  currentValue: CurrentValueType;
-  template_id: string;
-  index: number;
-}) {
-  const name = `character_fields[${template_id}][${index}]`;
-
-  const months = calendar?.months.map((m) => ({ label: m.title, value: m.id })) || [];
-  const maxDays = calendar?.months.find((m) => m.id === (currentValue as Record<string, any>)?.month)?.days || 0;
-
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      <div className="col-span-3">
-        <Title isDrawerTitle label={title} />
-      </div>
-      <div className="col-span-1">
-        <Input
-          isDisabled={!maxDays}
-          label="Day"
-          max={maxDays}
-          min={1}
-          name={name}
-          onChange={({ value }) => {
-            handleChange({
-              name,
-              value: { id, value: { value: { ...(currentValue as Record<string, any>), day: value } } },
-            });
-          }}
-          placeholder={!maxDays ? "Select month" : ""}
-          type="number"
-          value={(currentValue as Record<string, any>)?.day}
-        />
-      </div>
-      <div className="col-span-1">
-        <Select
-          label="Month"
-          name={name}
-          onChange={({ value }) => {
-            handleChange({
-              name,
-              value: { id, value: { value: { ...(currentValue as Record<string, any>), month: value } } },
-            });
-          }}
-          options={months}
-          value={(currentValue as Record<string, any>)?.month || undefined}
-        />
-      </div>
-      <div className="col-span-1">
-        <Input
-          label="Year"
-          name={name}
-          onChange={({ value }) => {
-            handleChange({
-              name,
-              value: { id, value: { value: { ...(currentValue as Record<string, any>), year: value } } },
-            });
-          }}
-          type="number"
-          value={(currentValue as Record<string, any>)?.year || undefined}
-        />
-      </div>
-    </div>
-  );
-}
-
-function CharacterFieldInputs({
-  id,
-  title,
-  field_type: fieldType,
-  options,
-  random_table_options,
-  calendar,
-  value: currentValue,
-  index,
-  formula,
-  random_table_id,
-  random_table,
-  isRolling,
-  subOptionValue,
-  template_id,
-  handleChange,
-  createNotification,
-}: CharacterFieldType & {
-  index: number;
-  value: CurrentValueType;
-  subOptionValue?: string;
-  template_id: string;
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
-  createNotification: (notification: Omit<NotificationType, "id">) => void;
-  isRolling: boolean;
-}) {
-  const name = `character_fields[${template_id}][${index}]`;
-  if (fieldType === "text" || fieldType === "number") {
-    return (
-      <Input
-        label={title}
-        name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-        type={fieldType}
-        value={currentValue as string}
-      />
-    );
-  }
-  if (fieldType === "select" || fieldType === "select_multiple") {
-    return (
-      <Select
-        isClearable
-        isMultiple={fieldType === "select_multiple"}
-        label={title}
-        name={name}
-        onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-        options={options?.map((opt) => ({ label: opt.value, value: opt.id })) || []}
-        value={currentValue as string | string[]}
-      />
-    );
-  }
-  if (fieldType === "textarea") {
-    return (
-      <div className="flex max-h-[30rem] min-h-[10rem] flex-col">
-        <Editor
-          initialContent={currentValue as string}
-          name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value: JSON.stringify(value) } } })}
-        />
-        {/* <Textarea
-          label={title}
-          name={name}
-          onChange={({ value }) => {
-            handleChange({ name, value: { id, value } });
-          }}
-          value={currentValue as string}
-        /> */}
-      </div>
-    );
-  }
-  if (fieldType === "dice_roll") {
-    return (
-      <div className="flex flex-nowrap items-center gap-x-2">
-        <Input
-          isDisabled={isRolling}
-          isLoading={isRolling}
-          label={title}
-          name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-          value={currentValue as string}
-        />
-        <div className="flex self-end pb-1.5">
-          <Button
-            hasNoBackground
-            icon={IconEnum.d20}
-            iconSize={24}
-            isDisabled={isRolling}
-            isLoading={isRolling}
-            onClick={() => {
-              try {
-                const parsedNotation = DiceRollParser.parseNotation(formula);
-                DiceNoSim.roll(parsedNotation)
-                  .then((r: any) => {
-                    const rollData = DiceRollParser.parseFinalResults(r);
-                    if (rollData?.valid) {
-                      handleChange({ name, value: { id, value: { value: rollData.value } } });
-                    }
-                  })
-                  .catch(() => {
-                    createNotification({
-                      timer: 2,
-                      title: "The dice roll notation is not valid.",
-                      icon: IconEnum.warning,
-                      variant: "error",
-                      position: "top",
-                    });
-                  });
-              } catch (error) {
-                createNotification({
-                  timer: 2,
-                  title: "The dice roll notation is not valid.",
-                  icon: IconEnum.warning,
-                  variant: "error",
-                  position: "top",
-                });
-              }
-            }}
-            tooltip={`Roll (${formula})`}
-          />
-        </div>
-      </div>
-    );
-  }
-  if (fieldType === "random_table") {
-    return (
-      <RandomTableInput
-        currentValue={currentValue}
-        field_type={fieldType}
-        handleChange={handleChange}
-        id={id}
-        index={index}
-        isRolling={isRolling}
-        random_table={random_table}
-        random_table_id={random_table_id}
-        random_table_options={random_table_options}
-        subOptionValue={subOptionValue}
-        template_id={template_id}
-        title={title}
-      />
-    );
-  }
-  if (fieldType === "date") {
-    return (
-      <DateInput
-        calendar={calendar}
-        currentValue={currentValue}
-        handleChange={handleChange}
-        id={id}
-        index={index}
-        template_id={template_id}
-        title={title}
-      />
-    );
-  }
-  if (fieldType === "boolean") {
-    return (
-      <div className="flex flex-nowrap justify-between">
-        <span>{title}</span>
-        <Checkbox
-          name={name}
-          onChange={({ value }) => handleChange({ name, value: { id, value: { value } } })}
-          value={currentValue as boolean}
-        />
-      </div>
-    );
-  }
-  // if (SearchFieldTypes.includes(fieldType)) {
-  //   return (
-  //     <div className="flex flex-col">
-  //       {!currentValue && fieldType?.includes("single") ? (
-  //         <Search
-  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-  //           name={name}
-  //           onChange={({ label, value }) => handleChange({ name, value: { id, value: { value: { value, title: label } } } })}
-  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-  //         />
-  //       ) : null}
-  //       {currentValue && fieldType?.includes("single") ? (
-  //         <EntityPreview
-  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
-  //           id={(currentValue as Record<string, any>)?.value}
-  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-  //           label={title}
-  //           link={
-  //             fieldType === "images_single"
-  //               ? ""
-  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-  //                   (currentValue as Record<string, any>)?.value
-  //                 }`
-  //           }
-  //           title={(currentValue as Record<string, any>)?.title}
-  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-  //         />
-  //       ) : null}
-  //       {fieldType?.includes("multiple") ? (
-  //         <Search
-  //           label={`${title} (${getSearchFieldTypeLabel(fieldType)})`}
-  //           name={name}
-  //           onChange={({ label, value }) => {
-  //             handleChange({
-  //               name,
-  //               value: {
-  //                 id,
-  //                 value: ((currentValue as Record<string, any>[]) || []).concat([{ value: { value, title: label } }]),
-  //               },
-  //             });
-  //           }}
-  //           searchEntity={getSearchFieldTypeSearchType(fieldType) || "images"}
-  //         />
-  //       ) : null}
-  //       {Array.isArray(currentValue) && fieldType?.includes("multiple") ? (
-  //         <EntityPreview
-  //           clearAction={() => handleChange({ name, value: { id, value: {} } })}
-  //           id={(currentValue as Record<string, any>)?.value}
-  //           image_id={fieldType === "images_single" ? (currentValue as Record<string, any>)?.value : ""}
-  //           label={title}
-  //           link={
-  //             fieldType === "images_single"
-  //               ? ""
-  //               : `/projects/${project_id}/${getSearchFieldTypeLinkType(fieldType)}/${
-  //                   (currentValue as Record<string, any>)?.value
-  //                 }`
-  //           }
-  //           title={(currentValue as Record<string, any>)?.title}
-  //           type={getSearchFieldTypeSearchType(fieldType) || "documents"}
-  //         />
-  //       ) : null}
-  //     </div>
-  //   );
-  // }
-  return null;
 }
 
 function RelationshipRow({
@@ -514,125 +85,319 @@ function RelationshipRow({
   );
 }
 
-function FieldTemplateRow({
-  template_id,
-  title,
+// function FieldTemplateRow({
+//   template_id,
+//   title,
+//   character_fields = [],
+//   character_fields_data = {},
+//   createNotification,
+//   handleChange,
+// }: {
+//   template_id: string;
+//   title: string;
+//   project_id: string;
+//   character_fields?: CharacterFieldType[] | undefined;
+//   character_fields_data?: CharacterStateCharacterFieldsType;
+//   createNotification: (notification: Omit<NotificationType, "id">) => void;
+//   handleChange: (props: HandleChangePropsType) => void;
+// }) {
+//   const [isRolling, setIsRolling] = useState(false);
+//   const randomTableFields = character_fields
+//     .filter((field) => field.field_type === "random_table")
+//     .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
+
+//   const diceRollFields = character_fields
+//     .filter((field) => field.field_type === "dice_roll")
+//     .map((field) => ({ field_id: field.id, formula: field?.formula }));
+
+//   const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
+//     ["randomTables", "many", template_id],
+//     async () =>
+//       FetchFunction({
+//         url: `${baseURLS.baseServer}/random_table_options/random/many`,
+//         body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
+//         method: "POST",
+//       }),
+//     { enabled: false },
+//   );
+//   const hasRandomTableOrRoll = character_fields.some(
+//     (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
+//   );
+
+//   const collapsibleActions = hasRandomTableOrRoll
+//     ? [
+//         {
+//           icon: IconEnum.d20,
+//           onClick: async (e: Event) => {
+//             e.preventDefault();
+//             const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
+//             for (let i = 0; i < diceRollFields.length; i += 1) {
+//               const formula = diceRollFields[i]?.formula;
+
+//               if (formula) {
+//                 if (!isRolling) setIsRolling(true);
+//                 const idx = character_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
+//                 if (idx > -1) {
+//                   // eslint-disable-next-line no-await-in-loop
+//                   const value = await getRollValue(formula, true);
+//                   fieldsToChange.push({
+//                     name: `character_fields[${template_id}][${idx}]`,
+//                     value: { id: diceRollFields[i].field_id, value: { value } },
+//                   });
+//                 }
+//               }
+//             }
+//             handleChange(fieldsToChange);
+//             setIsRolling(false);
+//             if (randomTableFields.length) await refetch();
+//           },
+//           tooltip: "Autoroll all random table and dice roll fields in this template.",
+//         },
+//       ]
+//     : [];
+
+//   useEffect(() => {
+//     if (data?.data?.length) {
+//       const fieldsToChange = [];
+//       for (let i = 0; i < data?.data?.length; i += 1) {
+//         const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
+//         if (idx > -1) {
+//           fieldsToChange.push({
+//             name: `character_fields[${template_id}][${idx}]`,
+//             value: {
+//               id: character_fields[idx].id,
+//               value: {
+//                 value: data?.data[i].random_table?.[0]?.id,
+//                 subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
+//               },
+//             },
+//           });
+//         }
+//       }
+//       handleChange(fieldsToChange);
+//     }
+//   }, [data?.data]);
+//   return (
+//     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
+//       <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
+//         <div className="flex select-none flex-col gap-y-2 p-2">
+//           {character_fields.sort(sortEntities).map((template_field) => {
+//             const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
+//               (field) => template_field?.id === field?.id,
+//             );
+//             if (fieldValueIndex !== undefined)
+//               return (
+//                 <CharacterFieldInputs
+//                   key={template_field.id}
+//                   {...template_field}
+//                   createNotification={createNotification}
+//                   formula={template_field?.formula}
+//                   handleChange={handleChange}
+//                   index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
+//                   isRolling={isRolling}
+//                   subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
+//                   template_id={template_id}
+//                   value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
+//                 />
+//               );
+//             return null;
+//           })}
+//         </div>
+//       </Collapsible>
+//     </li>
+//   );
+// }
+
+function FieldTemplateRows({
   character_fields = [],
-  character_fields_data = {},
-  createNotification,
+  character_fields_data = [],
   handleChange,
 }: {
-  template_id: string;
-  title: string;
-  project_id: string;
   character_fields?: CharacterFieldType[] | undefined;
-  character_fields_data?: CharacterStateCharacterFieldsType;
-  createNotification: (notification: Omit<NotificationType, "id">) => void;
+  character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
 }) {
-  const [isRolling, setIsRolling] = useState(false);
-  const randomTableFields = character_fields
-    .filter((field) => field.field_type === "random_table")
-    .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
-
-  const diceRollFields = character_fields
-    .filter((field) => field.field_type === "dice_roll")
-    .map((field) => ({ field_id: field.id, formula: field?.formula }));
-
-  const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
-    ["randomTables", "many", template_id],
-    async () =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/random_table_options/random/many`,
-        body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
-        method: "POST",
-      }),
-    { enabled: false },
-  );
-  const hasRandomTableOrRoll = character_fields.some(
-    (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
-  );
-
-  const collapsibleActions = hasRandomTableOrRoll
-    ? [
-        {
-          icon: IconEnum.d20,
-          onClick: async (e: Event) => {
-            e.preventDefault();
-            const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
-            for (let i = 0; i < diceRollFields.length; i += 1) {
-              const formula = diceRollFields[i]?.formula;
-
-              if (formula) {
-                if (!isRolling) setIsRolling(true);
-                const idx = character_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
-                if (idx > -1) {
-                  // eslint-disable-next-line no-await-in-loop
-                  const value = await getRollValue(formula, true);
-                  fieldsToChange.push({
-                    name: `character_fields[${template_id}][${idx}]`,
-                    value: { id: diceRollFields[i].field_id, value: { value } },
-                  });
-                }
-              }
-            }
-            handleChange(fieldsToChange);
-            setIsRolling(false);
-            if (randomTableFields.length) await refetch();
-          },
-          tooltip: "Autoroll all random table and dice roll fields in this template.",
-        },
-      ]
-    : [];
-
-  useEffect(() => {
-    if (data?.data?.length) {
-      const fieldsToChange = [];
-      for (let i = 0; i < data?.data?.length; i += 1) {
-        const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
-        if (idx > -1) {
-          fieldsToChange.push({
-            name: `character_fields[${template_id}][${idx}]`,
-            value: {
-              id: character_fields[idx].id,
-              value: {
-                value: data?.data[i].random_table?.[0]?.id,
-                subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
-              },
-            },
-          });
-        }
-      }
-      handleChange(fieldsToChange);
-    }
-  }, [data?.data]);
   return (
-    <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
-      <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
-        <div className="flex select-none flex-col gap-y-2 p-2">
-          {character_fields.sort(sortEntities).map((template_field) => {
-            const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
-              (field) => template_field?.id === field?.id,
+    <li className="flex flex-col first:mt-0">
+      <div className="flex select-none flex-col gap-y-2 pt-2">
+        {character_fields.map((template_field) => {
+          const templateValueKey = getBlueprintFieldValueFromType(template_field.field_type);
+          if (!templateValueKey) return null;
+          const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
+          const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
+          if (template_field.field_type === "text" || template_field.field_type === "number")
+            return (
+              <TemplateInputField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.value as string | number | null
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
             );
-            if (fieldValueIndex !== undefined)
-              return (
-                <CharacterFieldInputs
-                  key={template_field.id}
-                  {...template_field}
-                  createNotification={createNotification}
-                  formula={template_field?.formula}
-                  handleChange={handleChange}
-                  index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
-                  isRolling={isRolling}
-                  subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
-                  template_id={template_id}
-                  value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
-                />
-              );
-            return null;
-          })}
-        </div>
-      </Collapsible>
+          if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
+            return (
+              <TemplateSelectField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.value as string | string[] | null
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                options={template_field.options || []}
+                title={template_field.title}
+              />
+            );
+          if (template_field.field_type === "textarea")
+            return (
+              <TemplateTextareaField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.value as any
+                }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          if (template_field.field_type === "boolean")
+            return (
+              <TemplateBooleanField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.value as boolean | null
+                }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          if (template_field.field_type === "dice_roll")
+            return (
+              <TemplateDiceRollField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.value as string
+                }
+                formula={template_field.formula as string}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          if (template_field.field_type === "date") {
+            return (
+              <TemplateDateField
+                key={template_field.id}
+                calendar={template_field.calendar}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.calendar
+                }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          // if (template_field.field_type === "random_table")
+          //   return (
+          //     <TemplateRandomTableField
+          //       key={template_field.id}
+          //       currentValue={
+          //         character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+          //           ?.random_table
+          //       }
+          //       handleChange={handleChange}
+          //       id={template_field.id}
+          //       name={baseName}
+          //       random_table={template_field.random_table}
+          //       title={template_field.title}
+          //     />
+          //   );
+
+          if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
+            return (
+              <TemplateBlueprintField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.blueprint_instances
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
+            return (
+              <TemplateDocumentField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.documents
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") {
+            return (
+              <TemplateLocationsField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.map_pins
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") {
+            return (
+              <TemplateImageField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.images
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+
+          return null;
+        })}
+      </div>
     </li>
   );
 }
@@ -640,7 +405,6 @@ function FieldTemplateRow({
 // #region tabs
 export function AdditionalFieldsTab({
   templates,
-  createNotification,
   handleChange,
   character_fields,
   isLoading,
@@ -651,34 +415,32 @@ export function AdditionalFieldsTab({
         data: CharacterFieldTemplateType[];
       }
     | undefined;
-  character_fields?: CharacterStateCharacterFieldsType | undefined;
-  createNotification: (notification: Omit<NotificationType, "id">) => void;
+  character_fields?: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   tags?: TagType[];
 }) {
-  const { project_id } = useParams();
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col overflow-y-auto">
       {!tags?.length ? <Alert label="Please select tags first." variant="info" /> : null}
       {!templates?.data?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
-      {templates?.data?.length && tags?.length
-        ? templates?.data
-            ?.sort(sortEntities)
-            ?.map((t) => (
-              <FieldTemplateRow
-                key={t?.id}
+
+      {(templates?.data || []).map((t) => {
+        const templateFieldIds = t.character_fields.map((f) => f.id);
+        const character_fields_data = (character_fields || [])?.filter((field) => templateFieldIds.includes(field.id));
+        return (
+          <Collapsible key={t.id} label={t.title}>
+            <div className="p-2">
+              <FieldTemplateRows
                 character_fields={t.character_fields}
-                character_fields_data={character_fields}
-                createNotification={createNotification}
+                character_fields_data={character_fields_data}
                 handleChange={handleChange}
-                project_id={project_id as string}
-                template_id={t?.id}
-                title={t?.title}
               />
-            ))
-        : null}
+            </div>
+          </Collapsible>
+        );
+      })}
     </ul>
   );
 }
@@ -712,7 +474,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
   );
 
-  const [character, setCharacter] = useState<CharacterStateType>({ project_id: project_id as string });
+  const [character, setCharacter] = useState<CharacterType | null>(null);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
@@ -748,20 +510,24 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { handleChange, changedData } = useHandleChange({ data: character, setData: setCharacter });
 
   useLayoutEffect(() => {
-    if (existingCharacter?.data) {
-      queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
-      // @ts-ignore
-      const fieldsByTemplateId = groupBy(existingCharacter?.data?.character_fields || [], "template_id") as Record<
-        string,
-        AdditionalFieldValueType[]
-      >;
-      setCharacter({ ...existingCharacter?.data, character_fields: fieldsByTemplateId });
+    queryClient.removeQueries({ predicate: (query) => query.queryKey.includes("character_fields_templates") });
+
+    if (existingCharacter?.data && !!data?.id) {
+      setCharacter(existingCharacter?.data);
       setRelationGroupIds(
         (existingCharacter?.data?.related_from || [])
           .concat(existingCharacter?.data?.related_to || [])
           .concat(existingCharacter?.data?.related_other || [])
           .map((relation: CharacterRelatedType) => relation.relation_type_id),
       );
+    } else if (!data?.id && !character) {
+      setCharacter({
+        id: "",
+        first_name: "",
+        project_id: project_id as string,
+        character_fields: [],
+        tags: [],
+      });
     }
   }, [existingCharacter?.data]);
 
@@ -847,7 +613,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         <Search
                           name="related_other"
                           onChange={({ first_name, last_name, value, image }) => {
-                            if (character.id === value) {
+                            if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
                                 variant: "warning",
@@ -905,7 +671,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                           label="Ascendants"
                           name="related_to"
                           onChange={({ value, image, first_name, last_name }) => {
-                            if (character.id === value) {
+                            if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
                                 variant: "warning",
@@ -962,7 +728,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                           label="Descendants"
                           name="related_from"
                           onChange={({ first_name, last_name, value, image }) => {
-                            if (character.id === value) {
+                            if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
                                 variant: "warning",
@@ -1030,8 +796,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {selectedTab === 3 ? (
         <AdditionalFieldsTab
-          character_fields={character?.character_fields}
-          createNotification={createNotification}
+          character_fields={character?.character_fields || []}
           handleChange={handleChange}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
@@ -1046,22 +811,15 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         label={character?.id ? "Update" : "Create"}
         onClick={async () => {
           if (changedData) {
-            if (character?.id) {
-              const characterToUpdate = { ...(changedData || {}), id: character.id };
-              const { related_to, related_from, related_other, tags, character_fields, ...rest } = characterToUpdate;
-              const parsedData = UpdateCharacterSchema.parse({
-                data: { ...rest, portrait_id: rest?.portrait?.id },
+            if (character?.id && existingCharacter?.data) {
+              const dataToParse = {
+                data: character,
                 relations: {
-                  character_fields: character_fields
-                    ? flattenArray(Object.values(character?.character_fields || {})) || []
-                    : undefined,
-                  related_from,
-                  related_to,
-                  related_other,
-                  tags,
+                  tags: character?.tags?.map((t) => ({ id: t.id })),
+                  character_fields: character?.character_fields || [],
                 },
-              });
-
+              };
+              const parsedData = UpdateCharacterSchema.parse(dataToParse);
               await update(parsedData, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
@@ -1069,11 +827,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               });
             } else {
               const dataToParse = {
-                data: { ...character, portrait_id: character?.portrait?.id },
+                data: character,
                 relations: {
-                  character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
-                  related_to: character?.related_to,
-                  tags: character?.tags,
+                  tags: character?.tags?.map((t) => ({ id: t.id })),
+                  character_fields: character?.character_fields || [],
                 },
               };
               const parsedData = InsertCharacterSchema.parse(dataToParse);
@@ -1083,14 +840,54 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 },
               });
             }
-          } else {
-            createNotification({
-              variant: "info",
-              icon: IconEnum.info_circle,
-              title: "No data was changed.",
-              timer: 3,
-            });
           }
+
+          // if (changedData) {
+          //   if (character?.id) {
+          //     const characterToUpdate = { ...(changedData || {}), id: character.id };
+          //     const { related_to, related_from, related_other, tags, character_fields, ...rest } = characterToUpdate;
+          //     const parsedData = UpdateCharacterSchema.parse({
+          //       data: { ...rest, portrait_id: rest?.portrait?.id },
+          //       relations: {
+          //         character_fields: character_fields
+          //           ? flattenArray(Object.values(character?.character_fields || {})) || []
+          //           : undefined,
+          //         related_from,
+          //         related_to,
+          //         related_other,
+          //         tags,
+          //       },
+          //     });
+
+          //     await update(parsedData, {
+          //       onSuccess: (res) => {
+          //         if (res?.ok) resetDrawerAtom();
+          //       },
+          //     });
+          //   } else {
+          //     const dataToParse = {
+          //       data: { ...character, portrait_id: character?.portrait?.id },
+          //       relations: {
+          //         character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
+          //         related_to: character?.related_to,
+          //         tags: character?.tags,
+          //       },
+          //     };
+          //     const parsedData = InsertCharacterSchema.parse(dataToParse);
+          //     await create(parsedData, {
+          //       onSuccess: (res) => {
+          //         if (res?.ok) resetDrawerAtom();
+          //       },
+          //     });
+          //   }
+          // } else {
+          //   createNotification({
+          //     variant: "info",
+          //     icon: IconEnum.info_circle,
+          //     title: "No data was changed.",
+          //     timer: 3,
+          //   });
+          // }
         }}
         variant="success"
       />
