@@ -941,7 +941,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
             ) : null}
           </h2>
           {(isPreview ? selectedTab === 0 : type === "resources") ? (
-            <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
+            <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
                 actions={[
                   {
@@ -1013,7 +1013,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                 initialOpen={false}
                 label="Assets">
                 {existingCharacter?.data?.images?.length ? (
-                  <div className="mt-2 animate-in fade-in fill-mode-both">
+                  <div className="mt-2 h-[calc(100%-10rem)] animate-in fade-in fill-mode-both">
                     {assetView === "table" ? (
                       <Table
                         columns={assetTableColumns(downloadImage, project_id, existingCharacter?.data?.id, removeItem)}
