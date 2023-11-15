@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAddToEntity } from "../../../hooks";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
@@ -18,7 +18,6 @@ type Props = {
 
 export function CharacterAddDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const createNotification = useNotifications();
   const [items, setItems] = useState<{ label: string; value: string; image?: string; color?: string }[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
@@ -32,12 +31,8 @@ export function CharacterAddDrawer({ data }: Props) {
         name="items"
         onChange={async ({ label, value, image, color }) => {
           if (items.some((i) => i.value === value)) {
-            createNotification({
-              title: "Cannot add same image more than once.",
-              variant: "warning",
-              timer: 3,
-              icon: IconEnum.warning,
-            });
+            setItems((prev) => prev.filter((i) => i.value !== value));
+
             return;
           }
 
