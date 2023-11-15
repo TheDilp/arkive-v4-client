@@ -410,6 +410,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   },
                 };
                 const parsedData = InsertBlueprintInstanceSchema.parse(dataToParse);
+
                 await create(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) resetDrawerAtom();

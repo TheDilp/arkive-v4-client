@@ -51,7 +51,7 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
 
   return (
     <div className="flex items-center gap-x-2">
-      <div className="flex w-full items-center justify-center -space-x-4">
+      <div className="z-0 flex w-full items-center justify-center -space-x-4">
         {characters?.slice(0, 5)?.map((char) => (
           <Avatar
             key={char.related_id}
@@ -200,7 +200,7 @@ function createColumns(
             }
             if (field.field_type === "random_table") {
               const randomTable = fieldData
-                ? field.random_table?.random_table_options?.find((opt) => opt.id === fieldData?.random_table.option_id)
+                ? field.random_table?.random_table_options?.find((opt) => opt?.id === fieldData?.random_table?.option_id)
                 : null;
               const subOption =
                 randomTable && fieldData?.random_table?.suboption_id
