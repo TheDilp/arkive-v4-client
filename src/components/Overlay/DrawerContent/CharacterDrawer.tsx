@@ -15,7 +15,14 @@ import {
   HandleChangePropsType,
   TagType,
 } from "../../../types";
-import { drawerAtom, getBlueprintFieldValueFromType, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
+import {
+  drawerAtom,
+  getBlueprintFieldValueFromType,
+  getCharacterFullName,
+  getDifferenceForCharacterFields,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
 import {
   DrawerLayout,
@@ -816,7 +823,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 data: character,
                 relations: {
                   tags: character?.tags?.map((t) => ({ id: t.id })),
-                  character_fields: character?.character_fields || [],
+                  character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
                 },
               };
               const parsedData = UpdateCharacterSchema.parse(dataToParse);

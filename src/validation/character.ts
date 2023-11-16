@@ -36,6 +36,19 @@ export const InsertCharacterSchema = z.object({
 
           .optional()
           .nullable(),
+        calendar: z
+          .object({
+            start_day: z.number().optional().nullable(),
+            start_month_id: z.string().optional().nullable(),
+            start_year: z.number().optional().nullable(),
+            end_day: z.number().optional().nullable(),
+            end_month_id: z.string().optional().nullable(),
+            end_year: z.number().optional().nullable(),
+            related_id: z.string(),
+          })
+
+          .optional()
+          .nullable(),
         value: z
           .string()
           .or(z.number())
@@ -86,6 +99,19 @@ export const UpdateCharacterSchema = z.object({
           .object({
             option_id: z.string().optional().nullable(),
             suboption_id: z.string().optional().nullable(),
+            related_id: z.string(),
+          })
+
+          .optional()
+          .nullable(),
+        calendar: z
+          .object({
+            start_day: z.number().optional().nullable(),
+            start_month_id: z.string().optional().nullable(),
+            start_year: z.number().optional().nullable(),
+            end_day: z.number().optional().nullable(),
+            end_month_id: z.string().optional().nullable(),
+            end_year: z.number().optional().nullable(),
             related_id: z.string(),
           })
 

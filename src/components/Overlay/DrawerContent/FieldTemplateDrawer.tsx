@@ -341,7 +341,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               />
             </div>
           </div>
-          <div className="flex max-h-[59%] flex-col">
+          <div className="flex max-h-[65%] flex-col overflow-y-auto">
             <DragDropContext
               onDragEnd={(result) => {
                 if (!result.destination) {

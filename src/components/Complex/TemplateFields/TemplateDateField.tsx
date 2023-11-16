@@ -46,10 +46,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
         ]);
       }
       if (!currentValue?.start_month_id) {
-        handleChange([
-          { name: `${name}.calendar.start_day`, value: null },
-          { name: `${name}.calendar.start_year`, value: null },
-        ]);
+        handleChange([{ name: `${name}.calendar.start_day`, value: null }]);
       }
     }
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
@@ -89,7 +86,6 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
             value={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx].id : undefined}
           />
           <Input
-            isDisabled={typeof startMonthIdx !== "number"}
             label="Start year "
             name="start_year"
             onChange={({ value }) =>
@@ -99,7 +95,6 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
                 { name: `${name}.calendar.start_year`, value },
               ])
             }
-            placeholder={typeof startMonthIdx !== "number" ? "Select a month." : ""}
             type="number"
             value={currentValue?.start_year || ""}
           />
