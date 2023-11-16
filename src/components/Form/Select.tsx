@@ -345,7 +345,7 @@ export function Select({
           <div className={placeholderClasses()}>{options.length === 0 ? "No options available." : placeholder || "Select"}</div>
         )}
 
-        {isClearable && !!value ? (
+        {isClearable && !!value && !isDisabled ? (
           <div
             className="ml-auto"
             data-option="clearable"
@@ -355,7 +355,7 @@ export function Select({
               onChange({ name, value: undefined });
             }}>
             <span className="pointer-events-none">
-              <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={undefined} />
+              <Button hasNoBackground icon={IconEnum.close} isDisabled={isDisabled} isIconOnly onClick={undefined} />
             </span>
           </div>
         ) : null}
