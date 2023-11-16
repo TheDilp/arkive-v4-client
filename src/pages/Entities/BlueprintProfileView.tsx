@@ -297,18 +297,6 @@ function AdditionalFieldDisplay({
           title={blueprint_field.title}
         />
       ) : null}
-
-      {/* {blueprint_field.field_type === "date" && value ? (
-        <div>
-          <Input
-            isReadOnly
-            label={blueprint_field.title}
-            name={blueprint_field.title}
-            onChange={() => {}}
-            value={formatDateToString(date?.day, date?.year, date?.month, blueprint_field_data?.calendar?.months || [])}
-          />
-        </div>
-      ) : null} */}
     </div>
   );
 }
