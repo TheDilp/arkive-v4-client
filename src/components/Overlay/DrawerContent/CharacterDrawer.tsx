@@ -37,6 +37,7 @@ import {
   TemplateImageField,
   TemplateInputField,
   TemplateLocationsField,
+  TemplateRandomTableField,
   TemplateSelectField,
   TemplateTextareaField,
 } from "../..";
@@ -322,21 +323,22 @@ function FieldTemplateRows({
               />
             );
           }
-          // if (template_field.field_type === "random_table")
-          //   return (
-          //     <TemplateRandomTableField
-          //       key={template_field.id}
-          //       currentValue={
-          //         character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-          //           ?.random_table
-          //       }
-          //       handleChange={handleChange}
-          //       id={template_field.id}
-          //       name={baseName}
-          //       random_table={template_field.random_table}
-          //       title={template_field.title}
-          //     />
-          //   );
+          if (template_field.field_type === "random_table") {
+            return (
+              <TemplateRandomTableField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.random_table
+                }
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                random_table={template_field.random_table}
+                title={template_field.title}
+              />
+            );
+          }
 
           if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
             return (

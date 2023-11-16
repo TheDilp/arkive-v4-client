@@ -8,6 +8,7 @@ import {
   BlueprintInstanceType,
   CharacterCharacterFieldType,
   CharacterType,
+  RandomTableOptionType,
 } from "../../types";
 import { IconEnum } from "..";
 
@@ -296,4 +297,33 @@ export function getDifferenceForCharacterFields(
 
     return false;
   });
+}
+
+export function chooseRandomItems(
+  arr: RandomTableOptionType[],
+  M: number,
+): { id: string; subitem_id?: string; title: string }[] {
+  if (M > arr.length) {
+    return [];
+  }
+  const copiedArr = [...arr];
+  const randomItems: { id: string; subitem_id?: string; title: string }[] = [];
+
+  for (let i = 0; i < M; i += 1) {
+    const randomIndex = Math.floor(Math.random() * copiedArr.length);
+    const selectedItem = copiedArr.splice(randomIndex, 1)[0];
+    if (selectedItem?.random_table_suboptions?.length) {
+      const randomSubIndex = Math.floor(Math.random() * selectedItem.random_table_suboptions.length);
+      const seletedSubItem = selectedItem.random_table_suboptions.splice(randomSubIndex)[0];
+      randomItems.push({
+        id: selectedItem.id,
+        subitem_id: seletedSubItem.id,
+        title: `${selectedItem.title} - ${seletedSubItem.title}`,
+      });
+    } else {
+      randomItems.push({ id: selectedItem.id, title: selectedItem.title });
+    }
+  }
+
+  return randomItems;
 }

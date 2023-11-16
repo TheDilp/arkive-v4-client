@@ -51,7 +51,7 @@ export interface CharacterFieldType {
   calendar_id?: string | null;
   options?: { id: string; value: string }[];
   random_table_options?: RandomTableOptionType[];
-  random_table?: { id: string; title: string };
+  random_table?: { id: string; title: string; random_table_options: RandomTableOptionType[] };
   calendar?: { id: string; title: string; days: string[]; months: { id: string; title: string; days: number }[] };
 }
 export interface CharacterFieldTemplateType {

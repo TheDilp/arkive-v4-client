@@ -1,7 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { baseURLS, FetchFunction, IconEnum } from "../../../utils";
+import { chooseRandomItems, IconEnum } from "../../../utils";
 import { Button, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
@@ -16,26 +14,10 @@ type Props = {
 };
 
 export function TemplateRandomTableField({ title, name, id, currentValue, handleChange, random_table, isCollapsible }: Props) {
-  const { refetch, isFetching } = useQuery({
-    // @ts-ignore
-    queryKey: ["allEntities", "random_table_options", "random_roll", random_table?.id],
-
-    queryFn: async () =>
-      FetchFunction({
-        url: `${baseURLS.baseServer}/random_table_options/random/${random_table?.id || ""}`,
-        body: JSON.stringify({
-          data: {
-            count: 1,
-          },
-        }),
-        method: "POST",
-      }),
-
-    enabled: false,
-  });
   const availableSuboptions = random_table?.random_table_options?.find(
     (opt) => opt?.id === currentValue?.option_id,
   )?.random_table_suboptions;
+
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex flex-col gap-y-1">
@@ -43,7 +25,6 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
           <Select
             hasSearch
             isClearable
-            isDisabled={isFetching}
             name={`${name}`}
             onChange={({ value }) => {
               handleChange([
@@ -69,25 +50,23 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
               icon={IconEnum.d20}
               iconSize={24}
               isIconOnly
-              isLoading={isFetching}
-              onClick={async () => {
-                refetch().then((res) => {
-                  if (res?.data?.data?.[0]?.title) {
-                    handleChange([
-                      { name: `${name}.id`, value: id },
-                      {
-                        name: `${name}.random_table.related_id`,
-                        value: random_table?.id,
-                        // subOptionValue: res?.data?.data?.[0]?.subitem_id,
-                      },
-                      {
-                        name: `${name}.random_table.option_id`,
-                        value: res?.data?.data?.[0]?.id,
-                        // subOptionValue: res?.data?.data?.[0]?.subitem_id,
-                      },
-                    ]);
-                  }
-                });
+              onClick={() => {
+                const items = chooseRandomItems(random_table?.random_table_options || [], 1);
+                if (items?.[0]) {
+                  const { id: option_id } = items[0];
+
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.random_table.related_id`,
+                      value: random_table?.id,
+                    },
+                    {
+                      name: `${name}.random_table.option_id`,
+                      value: option_id,
+                    },
+                  ]);
+                }
               }}
               tooltip={`Roll ${random_table?.title ? `(${random_table?.title})` : ""}`}
             />
