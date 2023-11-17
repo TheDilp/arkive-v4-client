@@ -72,7 +72,14 @@ export type DrawerAtomType = {
   | { type: "map_pins"; data: { lat: number; lng: number } & Partial<MapPinType> }
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType | { project_id: string } }
-  | { type: "insert_image" | "mentioned_in_document"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions> } }
+  | {
+      type: "insert_image";
+      data: { getContext: ReactFrameworkOutput<Remirror.Extensions> };
+    }
+  | {
+      type: "mentioned_in_document";
+      data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string };
+    }
   | {
       type: "mentioned_in";
       data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string; title: string; icon?: string };

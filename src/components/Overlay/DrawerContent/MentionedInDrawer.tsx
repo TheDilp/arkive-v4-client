@@ -34,7 +34,7 @@ type Props = {
 };
 export function MentionedInDrawer({ data }: Props) {
   const { data: mentionsData, isFetching } = useQuery<{ data: Pick<DocumentType, "id" | "title" | "icon">[] }>(
-    ["document_mentioned_in", data.id],
+    ["documents", data.id, "document_mentioned_in"],
     async () =>
       FetchFunction({
         method: "GET",

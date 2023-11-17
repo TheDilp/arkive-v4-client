@@ -280,7 +280,7 @@ const menuBarItems = ({
           setDrawer((prev) => ({
             ...prev,
             title: "Mentioned entities",
-            data: { getContext },
+            data: { getContext, id: id || "" },
             type: "mentioned_in_document",
             size: "lg",
           })),
