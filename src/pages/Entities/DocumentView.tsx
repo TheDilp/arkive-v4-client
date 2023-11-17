@@ -37,7 +37,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     item_id as string,
     "documents",
     {
-      fields: ["id", "title", "content", "is_folder", "dice_color"],
+      fields: ["id", "title", "icon", "content", "is_folder", "dice_color"],
       relations: {
         parents: true,
       },
@@ -191,7 +191,12 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <div
           className="relative flex h-full max-h-[95%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
-          <Menubar id={currentDocument?.data?.id || ""} size="md" title={currentDocument?.data?.title || ""} />
+          <Menubar
+            icon={currentDocument?.data?.icon ?? undefined}
+            id={currentDocument?.data?.id || ""}
+            size="md"
+            title={currentDocument?.data?.title || ""}
+          />
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
             onContextMenu={(e) => {

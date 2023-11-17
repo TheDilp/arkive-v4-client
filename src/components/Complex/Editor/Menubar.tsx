@@ -16,6 +16,7 @@ const menuBarItems = ({
   getContext,
   title,
   id,
+  icon,
   isEditorMenubar,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
@@ -24,6 +25,7 @@ const menuBarItems = ({
   getContext: ReactFrameworkOutput<Remirror.Extensions>;
   title?: string;
   id?: string;
+  icon?: string;
   isEditorMenubar?: boolean;
 }) => {
   const options = [
@@ -292,7 +294,7 @@ const menuBarItems = ({
           setDrawer((prev) => ({
             ...prev,
             title: "Document mentioned in",
-            data: { getContext, id: id || "", title: title || "" },
+            data: { getContext, id: id || "", title: title || "", icon },
             type: "mentioned_in",
             size: "half",
           })),
@@ -307,11 +309,13 @@ export function Menubar({
   size,
   title,
   id,
+  icon,
   isEditorMenubar,
 }: {
   size: Size;
   title?: string;
   id?: string;
+  icon?: string;
   isEditorMenubar?: boolean;
 }) {
   const chain = useChainedCommands();
@@ -319,7 +323,7 @@ export function Menubar({
   const setDrawer = useSetAtom(drawerAtom);
   const active = useActive();
   const items = useMemo(
-    () => menuBarItems({ active, chain, setDrawer, getContext, title, id, isEditorMenubar }),
+    () => menuBarItems({ active, chain, setDrawer, getContext, title, id, icon, isEditorMenubar }),
     [chain, isEditorMenubar, id, title],
   );
   return (
