@@ -142,7 +142,7 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
   },
 ];
 
-export function AutolinkerDrawer({ data }: Props) {
+export function AutomentionDrawer({ data }: Props) {
   const { project_id } = useParams();
   const resetAtomDrawer = useResetAtom(drawerAtom);
   const text = data?.getContext.helpers.getText();

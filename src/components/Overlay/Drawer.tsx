@@ -9,7 +9,7 @@ import { drawerAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
-  AutolinkerDrawer,
+  AutomentionDrawer,
   BlueprintDrawer,
   BlueprintInstanceDrawer,
   CalendarDrawer,
@@ -144,7 +144,7 @@ export function Drawer() {
           {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
           {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
           {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
-          {drawer.type === "autolinker" ? <AutolinkerDrawer data={drawer?.data} /> : null}
+          {drawer.type === "autolinker" ? <AutomentionDrawer data={drawer?.data} /> : null}
           {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
           {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
         </div>

@@ -1,4 +1,4 @@
-export * from "./AutolinkerDrawer";
+export * from "./AutomentionDrawer";
 export * from "./BlueprintDrawer";
 export * from "./BlueprintInstanceDrawer";
 export * from "./CalendarDrawer";
