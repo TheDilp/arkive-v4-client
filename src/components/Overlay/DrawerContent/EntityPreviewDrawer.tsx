@@ -4,9 +4,10 @@ import { RemirrorJSON } from "remirror";
 import { useGetEntity } from "../../../hooks";
 import { CharacterProfileView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
-import { AvailableEntityType, AvailableSubEntityType, DocumentType, MapType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
+import { Graph } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -74,6 +75,28 @@ export function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?:
     </div>
   );
 }
+export function GraphPreviewDrawer({ id }: { id?: string }) {
+  const { data: graph, isLoading } = useGetEntity<GraphType>(
+    id,
+    "graphs",
+    {
+      data: {},
+      relations: { nodes: true, edges: true },
+    },
+    {
+      enabled: !!id,
+    },
+  );
+
+  if (isLoading) return <Skeleton limit={2} type="project_view" />;
+  if (graph?.data)
+    return (
+      <div className="h-full w-full overflow-hidden">
+        <Graph data={graph?.data} isReadOnly isViewOnly />
+      </div>
+    );
+  if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
+}
 
 export function EntityPreviewDrawer({
   data,
@@ -87,7 +110,7 @@ export function EntityPreviewDrawer({
       {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
       {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
       {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
-      {data.entity_type === "graphs" ? <MapPreviewDrawer id={data.id} /> : null}
+      {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
     </DrawerLayout>
   );
 }
