@@ -51,8 +51,9 @@ const TableClasses = tv({
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
     subheaderRowTitle: "font-medium",
-    rowContainer: "flex flex-col bg-zinc-950 border-zinc-600 min-h-[3rem] relative min-w-fit last:border-b border-r border-t",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato",
+    rowContainer:
+      "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.04rem] border-zinc-600",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-600",
     hasLinkRow: "group-hover:bg-zinc-800 cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
@@ -681,7 +682,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                   ? "group hover:text-white"
                   : "hover:bg-zinc-800"
-              } box-content`}
+              }`}
               style={{
                 height: expandable ? "" : `${virtualRow.size}px`,
                 transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
