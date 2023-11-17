@@ -13,3 +13,4 @@ export const dialogAtom = atomWithReset<DialogAtomType>({ position: "center", da
 export const contextMenuAtom = atomWithReset<ContextMenuAtomType>({ event: null, items: null });
 export const notificationsAtom = atom<NotificationType[]>([]);
 export const mentionDropdownAtom = atom<boolean>(false);
+export const mentionPositionAtom = atom<null | "above" | "below">(null);

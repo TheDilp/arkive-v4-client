@@ -12,3 +12,4 @@ export * from "./notificationUtils";
 export * from "./tableUtils";
 export * from "./tabUtils";
 export * from "./textUtils";
+export * from "./viewportUtils";

@@ -1,11 +1,20 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
 import { useParams } from "react-router-dom";
 import { findChildren, findElementAtPosition } from "remirror";
 
-import { baseURLS, FetchFunction, getImageURL, getSingularEntityType, IconEnum } from "../../../utils";
+import {
+  baseURLS,
+  FetchFunction,
+  getElementPosition,
+  getImageURL,
+  getSingularEntityType,
+  IconEnum,
+  mentionPositionAtom,
+} from "../../../utils";
 import { Button } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Avatar, Skeleton } from "../../Misc";
@@ -27,6 +36,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
   const { project_id } = useParams();
   const { doc } = data.getContext.getState();
   const mentions = findChildren({ node: doc, predicate: (child) => child.node.type.name === "mentionAtom", descend: true });
+  const setMentionPosition = useSetAtom(mentionPositionAtom);
   const formattedMentions = mentions.map((mention) => ({
     id: mention.node.attrs.id,
     idWithPosition: `${mention.pos}-${mention.node.attrs.id}`,
@@ -70,6 +80,12 @@ export function MentionedInDocumentDrawer({ data }: Props) {
                   data.getContext.commands.setAnnotations([]);
                 }}
                 onMouseOver={() => {
+                  const domN = findElementAtPosition(mention.from, data.getContext.view);
+                  if (domN) {
+                    const position = getElementPosition(domN);
+                    setMentionPosition(position);
+                  }
+
                   data.getContext.commands.setAnnotations([
                     {
                       id: mention.idWithPosition,
@@ -93,6 +109,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
                       const domN = findElementAtPosition(mention.from, data.getContext.view);
                       if (domN) {
                         domN.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+                        setMentionPosition(null);
                       }
                     }}
                     tooltip="Go to mention"
