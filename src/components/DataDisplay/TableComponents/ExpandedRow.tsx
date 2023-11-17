@@ -57,9 +57,10 @@ function ExpandedRowTagListWrapper({
             .sort(sortCharacters)
             .map((item) => (
               <EntityPreview
+                key={item.id}
                 id={item.id}
                 image_id={item.portrait_id}
-                link={`/projects/${project_id}/characters/${item.id}`}
+                link={`/projects/${project_id}/characters/${item.id}/resources`}
                 title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
                 type="characters"
               />
@@ -68,6 +69,7 @@ function ExpandedRowTagListWrapper({
       {type === "nodes" || type === "edges"
         ? data[type].map((item) => (
             <EntityPreview
+              key={item.id}
               id={item.id}
               link={`/projects/${project_id}/graphs/${item.parent_id}/${item.id}`}
               title={item.label}
@@ -78,7 +80,13 @@ function ExpandedRowTagListWrapper({
 
       {type !== "characters" && type !== "nodes" && type !== "edges"
         ? data[type].map((item) => (
-            <EntityPreview id={item.id} link={`/projects/${project_id}/${type}/${item.id}`} title={item.title} type={type} />
+            <EntityPreview
+              key={item.id}
+              id={item.id}
+              link={`/projects/${project_id}/${type}/${item.id}`}
+              title={item.title}
+              type={type}
+            />
           ))
         : null}
     </ul>
@@ -104,9 +112,8 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
     },
     "character_fields",
   );
-
   return (
-    <div className="flex flex-col divide-y divide-zinc-700">
+    <div className="flex min-h-[5rem] flex-col divide-y divide-zinc-700">
       {data?.data?.map((field) => (
         <div key={field.id} className="flex flex-col py-2 font-lato">
           <div className="flex gap-x-2">
@@ -151,27 +158,7 @@ function ExpandedRandomOption({ random_table_suboptions }: { random_table_subopt
     </div>
   );
 }
-// function ExpandedDocument({ id }: { id: string }) {
-//   const { data, isFetching } = useGetEntity<DocumentType>(
-//     id,
-//     "documents",
-//     {
-//       data: {
-//         id,
-//       },
-//       fields: ["id", "content"],
-//     },
-//     {
-//       enabled: !!id,
-//     },
-//   );
-//   if (isFetching) return <Skeleton type="editor" />;
-//   return data?.data?.content ? (
-//     <div className="w-min min-w-fit">
-//       <StaticRender content={data?.data?.content as RemirrorJSON} />
-//     </div>
-//   ) : null;
-// }
+
 function ExpandedTag({ id }: { id: string }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
