@@ -136,7 +136,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
   return (
-    <div className="max-h-full min-h-full w-full">
+    <div className="h-[calc(100%-3rem)] max-h-full w-full">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification
@@ -211,7 +211,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <SlashMenu />
 
         <div
-          className="relative flex h-full max-h-[95%] max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
+          className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
           <Menubar
             icon={currentDocument?.data?.icon ?? undefined}
