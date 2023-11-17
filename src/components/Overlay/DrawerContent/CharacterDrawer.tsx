@@ -431,7 +431,7 @@ export function AdditionalFieldsTab({
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
-    <ul className="flex flex-col overflow-y-auto">
+    <ul className="flex flex-col gap-y-2 overflow-y-auto">
       {!tags?.length ? <Alert label="Please select tags first." variant="info" /> : null}
       {!templates?.data?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
 

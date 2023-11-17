@@ -590,7 +590,7 @@ function RandomTableField({
   );
 }
 
-function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldType; field: CharacterFieldType }) {
+function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldType | null; field: CharacterFieldType }) {
   const startMonthIdx =
     field?.calendar && field.calendar.months.length
       ? field.calendar.months.findIndex((m) => m.id === fieldData?.calendar?.start_month_id)
@@ -687,7 +687,7 @@ function AdditionalFieldDisplay({
 }: {
   isPreview: boolean;
   character_field: CharacterFieldType;
-  character_field_data: CharacterCharacterFieldType;
+  character_field_data: CharacterCharacterFieldType | null;
 }) {
   const value = character_field_data?.value;
   const { project_id } = useParams();
@@ -712,7 +712,7 @@ function AdditionalFieldDisplay({
           label={character_field.title}
           name={character_field.title}
           onChange={() => {}}
-          value={character_field?.options?.find((opt) => opt.id === character_field_data.id)?.value || ""}
+          value={character_field?.options?.find((opt) => opt.id === character_field_data?.id)?.value || ""}
         />
       ) : null}
       {character_field.field_type === "textarea" && isRemirrorJSON(value) ? (
@@ -729,7 +729,7 @@ function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
-            items={(character_field_data.blueprint_instances || []).map((blueprint_instance) => ({
+            items={(character_field_data?.blueprint_instances || []).map((blueprint_instance) => ({
               id: blueprint_instance.blueprint_instance.id,
               parent_id: blueprint_instance.blueprint_instance.parent_id,
               title: blueprint_instance.blueprint_instance.title || "",
@@ -744,7 +744,7 @@ function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
-            items={(character_field_data.documents || []).map((doc) => ({
+            items={(character_field_data?.documents || []).map((doc) => ({
               id: doc.related_id,
               title: doc.document.title,
               icon: doc.document.icon || IconEnum.document,
@@ -758,7 +758,7 @@ function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
-            items={(character_field_data.map_pins || []).map((map_pin) => ({
+            items={(character_field_data?.map_pins || []).map((map_pin) => ({
               id: map_pin.map_pin.id,
               parent_id: map_pin.map_pin.parent_id,
               title: map_pin.map_pin.title || "",
@@ -795,9 +795,9 @@ function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "random_table" ? (
         <RandomTableField
-          random_table_id={character_field_data.random_table.related_id}
-          random_table_option_id={character_field_data.random_table.option_id as string | undefined}
-          suboptionValue={character_field_data.random_table.suboption_id}
+          random_table_id={character_field_data?.random_table.related_id}
+          random_table_option_id={character_field_data?.random_table.option_id as string | undefined}
+          suboptionValue={character_field_data?.random_table.suboption_id}
           title={character_field.title}
         />
       ) : null}
@@ -1215,12 +1215,11 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                         const characterField = existingCharacter?.data?.character_fields?.find(
                           (f) => f.id === template_field.id,
                         );
-                        if (!characterField) return null;
                         return (
                           <AdditionalFieldDisplay
                             key={template_field.id}
                             character_field={template_field}
-                            character_field_data={characterField}
+                            character_field_data={characterField ?? null}
                             isPreview={!!id}
                           />
                         );
