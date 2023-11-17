@@ -15,8 +15,8 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Fragment, useEffect, useState } from "react";
 
 import { useGetIcons } from "../../hooks";
-import { IconPickerType } from "../../types";
-import { IconCategories, iconCategories } from "../../utils/enums/IconPickerEnums";
+import { IconCategories, IconPickerType } from "../../types";
+import { iconCategories } from "../../utils/enums/IconPickerEnums";
 import { Button, Input, Select } from "../Form";
 import { Icon } from "../Misc";
 

@@ -17,3 +17,5 @@ export interface IconPickerType {
   passCloseTooltip?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };
 }
+
+export type IconCategories = "game-icons" | "ph" | "meteocons";

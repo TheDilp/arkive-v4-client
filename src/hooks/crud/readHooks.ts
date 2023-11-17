@@ -1,9 +1,15 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
-import { AvailableEntityType, AvailableSubEntityType, RequestBodyType, SearchableEntities, UserType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  IconCategories,
+  RequestBodyType,
+  SearchableEntities,
+  UserType,
+} from "../../types";
 import { ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
-import { IconCategories } from "../../utils/enums/IconPickerEnums";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
