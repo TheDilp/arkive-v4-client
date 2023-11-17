@@ -332,10 +332,10 @@ export function Search({
             }
             if (e.key === "Backspace") {
               if (value || inputValue || displayValue) {
-                e.preventDefault();
+                // e.preventDefault();
                 // if (!isMultiple && value) onChange({ name, value: "", label: "" });
-                setInputValue("");
-                setDisplayValue("");
+                // setInputValue("");
+                // setDisplayValue("");
               }
               remove();
               if (displayValue) {
