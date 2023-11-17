@@ -83,3 +83,5 @@ export const MessageTypeOptions = [
   { label: "Narration", value: "narration" },
   { label: "Place", value: "place" },
 ];
+
+export const MentionableEntites = ["characters", "blueprint_instances", "documents", "maps", "graphs", "words"];

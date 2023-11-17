@@ -18,6 +18,7 @@ import {
   getEntityCRUDNotification,
   getParentEntityType,
   IconEnum,
+  MentionableEntites,
   nodesAtom,
   useNotifications,
 } from "../../utils";
@@ -97,6 +98,11 @@ export function useUpdateEntity<
 
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
           if (vars.data.id && type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
+
+          // Invalidate mentions queries if this is a mentionable entity being updated
+          if (MentionableEntites.includes(type)) {
+            queryClient.invalidateQueries([type, vars.data.id, "mention"]);
+          }
 
           createNotification({
             title: getEntityCRUDNotification(type, "update"),
