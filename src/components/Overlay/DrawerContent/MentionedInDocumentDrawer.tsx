@@ -78,6 +78,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
                 className="flex items-center gap-x-2 border-b border-zinc-700 py-2 last:border-b-0"
                 onMouseOut={() => {
                   data.getContext.commands.setAnnotations([]);
+                  setMentionPosition(null);
                 }}
                 onMouseOver={() => {
                   const domN = findElementAtPosition(mention.from, data.getContext.view);

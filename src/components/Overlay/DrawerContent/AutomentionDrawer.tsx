@@ -7,13 +7,22 @@
 import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { FromToProps } from "remirror";
+import { findElementAtPosition, FromToProps } from "remirror";
 
 import { SearchableMentionEntities } from "../../../types";
-import { baseURLS, drawerAtom, FetchFunction, getImageURL, IconEnum } from "../../../utils";
+import {
+  baseURLS,
+  drawerAtom,
+  FetchFunction,
+  getElementPosition,
+  getImageURL,
+  IconEnum,
+  mentionPositionAtom,
+} from "../../../utils";
 import { Button, Checkbox, Select } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Avatar } from "../../Misc";
@@ -145,6 +154,7 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
 export function AutomentionDrawer({ data }: Props) {
   const { project_id } = useParams();
   const resetAtomDrawer = useResetAtom(drawerAtom);
+  const setMentionPosition = useSetAtom(mentionPositionAtom);
   const text = data?.getContext.helpers.getText();
   const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
   const [selectedEntity, setSelectedEntity] = useState<SearchableMentionEntities | null>(null);
@@ -230,6 +240,8 @@ export function AutomentionDrawer({ data }: Props) {
                     const notSelectedIds = notSelected.map((s) => s.id);
                     if (!selectedLinks.includes(idWithRange))
                       data.getContext.commands.removeAnnotations([...notSelectedIds, idWithRange]);
+
+                    setMentionPosition(null);
                   }}
                   onMouseOver={() => {
                     if (!selectedLinks.includes(idWithRange))
@@ -242,6 +254,11 @@ export function AutomentionDrawer({ data }: Props) {
                           className: "annotation",
                         },
                       ]);
+                    const domN = findElementAtPosition(potentialMatch.from, data.getContext.view);
+                    if (domN) {
+                      const position = getElementPosition(domN);
+                      setMentionPosition(position);
+                    }
                   }}>
                   <Checkbox
                     name={potentialMatch.id}
@@ -261,6 +278,21 @@ export function AutomentionDrawer({ data }: Props) {
                     }>
                     {potentialMatch.title}
                   </span>
+                  <div className="ml-auto">
+                    <Button
+                      hasNoBackground
+                      icon={IconEnum.eye}
+                      onClick={() => {
+                        // mention.from is equal to the mentions pos
+                        const domN = findElementAtPosition(potentialMatch.from, data.getContext.view);
+                        if (domN) {
+                          domN.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+                          setMentionPosition(null);
+                        }
+                      }}
+                      tooltip="Go to mention"
+                    />
+                  </div>
                 </li>
               );
             })
