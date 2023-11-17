@@ -1,4 +1,3 @@
-import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { DocumentType } from "../../../types";
@@ -26,7 +25,6 @@ function docToNode(doc: Pick<DocumentType, "id" | "title" | "icon">) {
 
 type Props = {
   data: {
-    getContext: ReactFrameworkOutput<Remirror.Extensions>;
     id: string;
     title: string;
     icon?: string;
@@ -53,6 +51,8 @@ export function MentionedInDrawer({ data }: Props) {
     font_size: 8,
     target_arrow_shape: "triangle" as const,
   }));
+
+  if (mentionsData?.data?.length === 0 && !isFetching) return <Alert label="This document isn't mentioned anywhere." />;
 
   return (
     <DrawerLayout>
@@ -88,7 +88,6 @@ export function MentionedInDrawer({ data }: Props) {
         />
       ) : null}
 
-      {mentionsData?.data?.length === 0 && !isFetching ? <Alert label="This document isn't mentioned anywhere." /> : null}
       {isFetching ? <Skeleton type="drawer_form" /> : null}
     </DrawerLayout>
   );

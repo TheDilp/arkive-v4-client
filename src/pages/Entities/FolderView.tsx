@@ -135,7 +135,24 @@ function columns(
                   }));
                 },
               },
-
+              ...(entityType === "documents"
+                ? [
+                    {
+                      id: "mentioned_in",
+                      label: "Mentioned in",
+                      icon: IconEnum.graph,
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          title: "Mentioned in",
+                          data: { id: row.original.id, title: row.original.title, icon: row.original.icon ?? undefined },
+                          type: "mentioned_in",
+                          size: "half",
+                        }));
+                      },
+                    },
+                  ]
+                : []),
               {
                 id: "delete_entity",
                 label: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
