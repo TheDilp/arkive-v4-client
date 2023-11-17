@@ -292,9 +292,9 @@ const menuBarItems = ({
           setDrawer((prev) => ({
             ...prev,
             title: "Document mentioned in",
-            data: { getContext, id: id || "" },
+            data: { getContext, id: id || "", title: title || "" },
             type: "mentioned_in",
-            size: "lg",
+            size: "half",
           })),
       },
     );
@@ -322,7 +322,6 @@ export function Menubar({
     () => menuBarItems({ active, chain, setDrawer, getContext, title, id, isEditorMenubar }),
     [chain, isEditorMenubar, id, title],
   );
-
   return (
     <ul
       className={`sticky top-0 z-30 mb-1 flex ${

@@ -327,3 +327,10 @@ export function chooseRandomItems(
 
   return randomItems;
 }
+
+export function getIconUrlFromIconEnum(icon: string, color?: string) {
+  const iconComponents = icon.split(":");
+  return `https://api.iconify.design/${iconComponents[0]}/${iconComponents[1]}.svg${
+    color ? `?color=${color.replace("#", "%23")}` : ""
+  }`;
+}

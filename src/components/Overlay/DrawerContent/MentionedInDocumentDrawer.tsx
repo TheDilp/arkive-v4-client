@@ -46,7 +46,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
             mentions: groupedMentions,
           },
         }),
-        url: `${baseURLS.baseServer}/documents/mentions`,
+        url: `${baseURLS.baseServer}/documents/mentions_in_document`,
       }),
     {
       staleTime: 5 * 60 * 1000,

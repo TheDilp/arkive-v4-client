@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
-import { Collection, Core, EventObject } from "cytoscape";
+import { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
@@ -40,7 +40,7 @@ type Props = {
   isViewOnly?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
-  layoutOptions?: Record<string, any>;
+  layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
 export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
@@ -798,11 +798,15 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
           setBoardRef(cy);
           if (isFamilyTreeView) {
             cy.layout({
-              name: "dagre",
-              ...dagreLayoutOptions,
               ...(layoutOptions || {}),
+              ...dagreLayoutOptions,
+              name: "dagre",
             }).run();
             cy.nodes().lock();
+          }
+          if (!isFamilyTreeView && layoutOptions) {
+            // @ts-ignore
+            cy.layout(layoutOptions).run();
           }
         }}
         elements={CytoscapeComponent.normalizeElements({

@@ -3,7 +3,7 @@ import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
 import { CurveStyleType, EdgeType, GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { getCharacterFullName, getImageURL } from "..";
+import { getCharacterFullName, getIconUrlFromIconEnum, getImageURL } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -137,6 +137,10 @@ export function getNodeImage(node: NodeType, project_id: string) {
   }
   if (node?.character?.portrait_id) {
     return getImageURL(project_id as string, "images", node.character.portrait_id, true);
+  }
+
+  if (node?.icon) {
+    return getIconUrlFromIconEnum(node.icon, "#ffffff");
   }
 
   return [];

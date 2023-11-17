@@ -1,9 +1,9 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
 
 import { DocumentType } from "../../../types";
 import { baseURLS, FetchFunction } from "../../../utils";
+import { Graph } from "../../DataDisplay";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
@@ -11,38 +11,74 @@ type Props = {
   data: {
     getContext: ReactFrameworkOutput<Remirror.Extensions>;
     id: string;
+    title: string;
   };
 };
 export function MentionedInDrawer({ data }: Props) {
-  const { project_id } = useParams();
-  const { data: mentionsData, isFetching } = useQuery<{ data: DocumentType[] }>(
+  const { data: mentionsData, isFetching } = useQuery<{ data: Pick<DocumentType, "id" | "title" | "icon">[] }>(
     ["document_mentioned_in", data.id],
     async () =>
       FetchFunction({
-        method: "POST",
-        body: JSON.stringify({
-          data: {
-            project_id,
-            id: data.id,
-          },
-        }),
-        url: `${baseURLS.baseServer}/documents/mentioned_in`,
+        method: "GET",
+        url: `${baseURLS.baseServer}/documents/mentioned_in/${data.id}`,
       }),
     {
       staleTime: 5 * 60 * 1000,
     },
   );
+  const nodes: any[] = (mentionsData?.data || []).map((doc) => ({
+    id: doc.id,
+    label: doc.title,
+    icon: doc?.icon,
+    type: "rectangle",
+    width: 50,
+    height: 50,
+    font_size: 16,
+    font_color: "#ffffff",
+    font_family: "Lato",
+    text_h_align: "center",
+    text_v_align: "top",
+  }));
+  const edges = (mentionsData?.data || []).map((doc) => ({
+    id: `${data.id}-${doc.id}`,
+    source_id: data.id,
+    target_id: doc.id,
+    label: "Mentioned in",
+    target_arrow_shape: "triangle" as const,
+  }));
+
   return (
     <DrawerLayout>
-      <ul className="flex max-h-full flex-col gap-y-1 overflow-y-auto">
-        {mentionsData?.data?.map((item) => (
-          <li key={item.id} className="flex items-center gap-x-2 border-b border-zinc-700 py-2 last:border-b-0">
-            <Link className="transition-all hover:text-blue-400" to={`/projects/${project_id}/documents/${item.id}`}>
-              {item.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {!isFetching ? (
+        <Graph
+          data={{
+            nodes: [
+              {
+                id: data.id,
+                label: data.title,
+                type: "rectangle",
+                width: 50,
+                height: 50,
+                font_size: 16,
+                font_color: "#ffffff",
+                font_family: "Lato",
+                text_v_align: "top",
+                text_h_align: "center",
+                x: 0,
+                y: 0,
+                is_locked: true,
+              },
+              ...nodes,
+            ],
+            edges,
+          }}
+          isViewOnly
+          layoutOptions={{
+            name: "concentric",
+          }}
+        />
+      ) : null}
+
       {mentionsData?.data?.length === 0 && !isFetching ? <Alert label="This document isn't mentioned anywhere." /> : null}
       {isFetching ? <Skeleton type="drawer_form" /> : null}
     </DrawerLayout>
