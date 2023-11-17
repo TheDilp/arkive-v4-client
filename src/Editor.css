@@ -207,6 +207,10 @@
   .tableOfContentsList {
     @apply rounded bg-zinc-800 p-2 shadow;
   }
+
+  .ProseMirror-selectednode {
+    @apply outline-none;
+  }
 }
 .staticRendererContainer {
   p {

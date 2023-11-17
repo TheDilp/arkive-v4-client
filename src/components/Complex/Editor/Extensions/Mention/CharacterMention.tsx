@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 
@@ -24,17 +26,19 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props
 
   return nodeId ? (
     <Link
-      className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
+      className="inline-flex items-center font-lato font-bold underline transition-colors"
       to={!project_id ? `/public/characters/${nodeId}/resources` : `/projects/${project_id}/characters/${nodeId}/resources`}>
       <div className="relative -top-[0.0625rem] flex items-start">
-        <span className="characterMentionImage relative">
+        <span className=" relative">
           {data?.data?.portrait_id ? (
-            <Avatar image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="xxs" />
+            <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
+              <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="xxs" />
+            </span>
           ) : (
             <Icon fontSize={14} icon={IconEnum.character} />
           )}
         </span>
-        <span className="text-sm underline">{data?.data?.full_name || title || nodeLabel}</span>
+        <span className="text-sm underline hover:text-sky-400">{data?.data?.full_name || title || nodeLabel}</span>
       </div>
     </Link>
   ) : (
