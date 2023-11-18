@@ -6,7 +6,7 @@ export type SearchAllEntitiesType =
   | [
       {
         name: "characters";
-        result: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
+        result: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
       },
       {
         name: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints";
@@ -24,7 +24,7 @@ export type SearchAllEntitiesByTagType =
   | [
       {
         name: "characters";
-        result: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
+        result: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
       },
       {
         name: "documents" | "maps" | "graphs" | "calendars";
@@ -41,8 +41,7 @@ export type SearchResultType = {
   color?: string;
   image?: string;
   parent_id?: string;
-  first_name?: string;
-  last_name?: string;
+  full_name?: string;
   icon?: string;
 }[];
 

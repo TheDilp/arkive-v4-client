@@ -12,7 +12,7 @@ import {
   SearchResultType,
   TagType,
 } from "../../../types";
-import { drawerAtom, getCharacterFullName, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
@@ -183,12 +183,12 @@ export function SearchDrawer() {
                       {result?.length ? (
                         result.map((result_item) => (
                           <li key={result_item.id}>
-                            {"first_name" in result_item && (name === "characters" || name === "nodes") ? (
+                            {"full_name" in result_item && (name === "characters" || name === "nodes") ? (
                               <EntityPreview
                                 id={result_item.id}
                                 image_id={result_item?.portrait_id}
                                 link={getSearchLink(project_id as string, name, result_item.id, undefined)}
-                                title={`${getCharacterFullName(result_item.first_name, undefined, result_item?.last_name)}
+                                title={`${result_item.full_name}
                                 ${
                                   "parent_title" in result_item && result_item?.parent_title
                                     ? `(${result_item.parent_title})`
