@@ -39,7 +39,7 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
       style={{
         backgroundColor: customColor,
       }}
-      tabIndex={0}>
+      tabIndex={-1}>
       <span className="w-full truncate">{label}</span>
       {clearAction ? (
         <div className="w-min">
