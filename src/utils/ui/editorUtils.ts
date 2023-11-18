@@ -73,7 +73,7 @@ export const DefaultEditorExtensions: (
 
     matchers: [
       {
-        char: "@:",
+        char: "@",
         name: "characters",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
