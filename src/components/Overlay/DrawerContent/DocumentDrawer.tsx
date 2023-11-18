@@ -8,7 +8,7 @@ import { DocumentType, UpdateDocumentType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex";
-import { Button, Checkbox, Input, Search } from "../../Form";
+import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
@@ -168,49 +168,7 @@ export function DocumentDrawer({ data }: Props) {
 
       {selectedTab === 1 ? (
         <div className="flex flex-col gap-y-2">
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((document?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-
-              handleChange({
-                name,
-                value: (document?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags"
-            searchEntity="tags"
-          />
-
-          <div className="flex flex-wrap gap-2">
-            {document?.tags?.length
-              ? document.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (document?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
+          <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} />
         </div>
       ) : null}
       <Button
