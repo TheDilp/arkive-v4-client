@@ -12,7 +12,7 @@ import {
   SearchResultType,
   TagType,
 } from "../../../types";
-import { drawerAtom, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, getDefaultEntityIcon, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getSearchLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
@@ -88,9 +88,12 @@ export function SearchDrawer() {
         {selectedTab <= 1 ? (
           <>
             <Search
+              helperText={selectedTab === 0 ? "Shows the top 5 results per category." : ""}
+              isAutocomplete
               isDisabled={isSearchDisabled(selectedTab, searchCategory)}
               isOptionsHidden
               label="Search"
+              limit={500}
               name="searchTerm"
               onChange={() => {}}
               onSearch={(res) => setResults(res)}
@@ -185,6 +188,7 @@ export function SearchDrawer() {
                           <li key={result_item.id}>
                             {"full_name" in result_item && (name === "characters" || name === "nodes") ? (
                               <EntityPreview
+                                icon={IconEnum.character}
                                 id={result_item.id}
                                 image_id={result_item?.portrait_id}
                                 link={getSearchLink(project_id as string, name, result_item.id, undefined)}
@@ -198,7 +202,11 @@ export function SearchDrawer() {
                               />
                             ) : (
                               <EntityPreview
-                                icon={"icon" in result_item ? result_item.icon || "" : ""}
+                                icon={
+                                  "icon" in result_item
+                                    ? result_item.icon || getDefaultEntityIcon(name)
+                                    : getDefaultEntityIcon(name)
+                                }
                                 id={result_item.id}
                                 link={getSearchLink(
                                   project_id as string,
