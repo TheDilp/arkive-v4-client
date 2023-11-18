@@ -13,15 +13,16 @@ type Props = {
   label: string;
   isDisabledTooltip?: boolean;
   project_id: string | undefined;
+  isPublic?: boolean;
   title?: string;
 };
 
-function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
+function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "title" | "isPublic">) {
   const { data, isLoading } = useGetEntity<DocumentType>(
     id as string,
     "documents",
     { fields: ["id", "title", "content"] },
-    { enabled: !!id, queryKeyConcat: ["mention"] },
+    { enabled: !!id && !isPublic, queryKeyConcat: ["mention"] },
   );
   return (
     <Card title={title || ""}>
@@ -36,12 +37,12 @@ function DocumentMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
     </Card>
   );
 }
-export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, project_id }: Props) {
+export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, project_id, isPublic }: Props) {
   const { data } = useGetEntity<DocumentType>(
     id as string,
     "documents",
     {
-      fields: ["id", "title"],
+      fields: ["id", "title", "is_public"],
       relations: {
         alter_names: alterId
           ? {
@@ -59,22 +60,25 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
   );
   const alter_name = data?.data?.alter_names?.find((an) => an.id === alterId);
-  return (
-    <Tooltip
-      arrowColor="#3f3f46"
-      content={<DocumentMentionTooltip id={id} title={data?.data?.title || title || label} />}
-      delay={{ openDelay: 500 }}
-      isDisabled={isDisabledTooltip ?? false}>
-      <Link
-        className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
-        to={!project_id ? `/public/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
-        <div className="relative -top-[0.0625rem] flex items-start">
-          <span className="relative">
-            <Icon fontSize={14} icon={IconEnum.document} />
-          </span>
-          <span className="underline">{alter_name?.title || data?.data?.title || title || label}</span>
-        </div>
-      </Link>
-    </Tooltip>
-  );
+  if (data?.data?.is_public || !isPublic)
+    return (
+      <Tooltip
+        arrowColor="#3f3f46"
+        content={<DocumentMentionTooltip id={id} isPublic={isPublic} title={data?.data?.title || title || label} />}
+        delay={{ openDelay: 500 }}
+        isDisabled={(isDisabledTooltip || isPublic) ?? false}>
+        <Link
+          className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+          to={isPublic ? `/public/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
+          <div className="relative -top-[0.0625rem] flex items-start">
+            <span className="relative">
+              <Icon fontSize={14} icon={IconEnum.document} />
+            </span>
+            <span className="underline">{alter_name?.title || data?.data?.title || title || label}</span>
+          </div>
+        </Link>
+      </Tooltip>
+    );
+
+  return alter_name?.title || data?.data?.title || title || label;
 }

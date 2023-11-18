@@ -104,10 +104,20 @@ const typeMap = (project_id: string, isPublicView?: boolean): MarkMap => ({
       if (attrs) {
         const { id, label, alterId, name: type } = attrs;
         if (type === "characters")
-          return <CharacterMention nodeId={id} nodeLabel={label} project_id={project_id} title={label} />;
+          return (
+            <CharacterMention isPublic={isPublicView} nodeId={id} nodeLabel={label} project_id={project_id} title={label} />
+          );
         if (type === "documents")
           return (
-            <DocumentMention alterId={alterId} id={id} isDisabledTooltip label={label} project_id={project_id} title={label} />
+            <DocumentMention
+              alterId={alterId}
+              id={id}
+              isDisabledTooltip
+              isPublic={isPublicView}
+              label={label}
+              project_id={project_id}
+              title={label}
+            />
           );
 
         if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;

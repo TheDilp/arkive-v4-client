@@ -1,5 +1,6 @@
 export const baseURLS = {
   baseServer: `http://localhost:${import.meta.env.VITE_SERVER_PORT}/api/v1`,
+  basePublicServer: `http://localhost:${import.meta.env.VITE_SERVER_PORT}/public/api/v1`,
 };
 
 export const ResponseMessageEnum = {

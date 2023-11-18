@@ -47,7 +47,7 @@ export function useGetEntity<EntityType>(
   id: string | undefined,
   type: AvailableEntityType,
   body: RequestBodyType<EntityType>,
-  options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
+  options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[]; isPublic?: boolean },
 ) {
   let queryKey = [type, id];
   if (options?.queryKeyConcat) {
@@ -59,7 +59,11 @@ export function useGetEntity<EntityType>(
   return useQuery<{ data: EntityType }>(
     queryKey,
     async () =>
-      FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type.toLowerCase()}/${id}` }),
+      FetchFunction({
+        method: "POST",
+        body: JSON.stringify(body),
+        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
+      }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,

@@ -3,7 +3,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, NavigateFunction, useNavigate, useParams } from "react-router-dom";
 
 import {
   Alert,
@@ -76,6 +76,7 @@ function columns(
   entityName: string,
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
   project_id: string,
+  navigate: NavigateFunction,
   show_image?: boolean,
 ) {
   return [
@@ -151,6 +152,11 @@ function columns(
                           size: "half",
                         }));
                       },
+                    },
+                    {
+                      id: "view_public",
+                      label: "View public page",
+                      onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
                     },
                   ]
                 : []),
@@ -266,7 +272,7 @@ export function FolderView() {
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
-
+  const navigate = useNavigate();
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
 
   const {
@@ -593,6 +599,7 @@ export function FolderView() {
               entityName,
               type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
               project_id as string,
+              navigate,
               show_image_table_view,
             )}
             config={{

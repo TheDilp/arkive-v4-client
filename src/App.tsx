@@ -5,9 +5,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Route, Routes, useNavigate } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
-import { CharacterProfileView, EntitiesView } from "./pages/Entities";
+import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
 import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
-import { FolderView } from "./pages/Entities/FolderView";
 import { ProjectsView } from "./pages/Projects";
 import { PublicEntitiesView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";

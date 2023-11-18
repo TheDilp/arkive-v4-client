@@ -13,8 +13,9 @@ type Props = {
   nodeId: string | undefined;
   nodeLabel: string;
   project_id: string | undefined;
+  isPublic?: boolean;
 };
-export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props) {
+export function CharacterMention({ nodeId, project_id, title, nodeLabel, isPublic }: Props) {
   const { data } = useGetEntity<CharacterType>(
     nodeId,
     "characters",
@@ -27,8 +28,8 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel }: Props
   return nodeId ? (
     <Link
       className="inline-flex items-center font-lato font-bold underline transition-colors"
-      to={!project_id ? `/public/characters/${nodeId}/resources` : `/projects/${project_id}/characters/${nodeId}/resources`}>
-      <div className="relative top-[0.035rem] flex items-start">
+      to={isPublic ? `/public/characters/${nodeId}/resources` : `/projects/${project_id}/characters/${nodeId}/resources`}>
+      <div className={`relative ${isPublic ? "top-[0.175rem]" : "top-[0.0375rem]"} flex items-start`}>
         <span className=" relative">
           {data?.data?.portrait_id ? (
             <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
