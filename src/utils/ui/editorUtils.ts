@@ -73,33 +73,34 @@ export const DefaultEditorExtensions: (
 
     matchers: [
       {
-        char: "@",
+        char: "@:",
         name: "characters",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {
-        char: "#",
+        char: "@b:",
+        name: "blueprint_instances",
+
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+      },
+      {
+        char: "@d:",
         name: "documents",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {
-        char: "$",
+        char: "@m:",
         name: "maps",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {
-        char: "%",
+        char: "@g:",
         name: "graphs",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {
-        char: "^",
+        char: "@w:",
         name: "words",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "&",
-        name: "blueprint_instances",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
     ],
