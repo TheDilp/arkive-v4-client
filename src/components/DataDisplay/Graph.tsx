@@ -55,7 +55,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       fields: ["default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { enabled: !data },
+    { enabled: !data, queryKeyOverwrite: ["graph_view"] },
   );
 
   useLayoutEffect(() => {

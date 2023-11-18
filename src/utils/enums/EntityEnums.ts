@@ -76,7 +76,18 @@ export const BaseCharacterRelationshipOptionsEnum = [
   { label: "Partner", value: "partner" },
 ];
 
-export const EntitiesWithTags = ["characters", "documents", "maps", "map_pins", "graphs", "nodes", "edges", "events"];
+export const EntitiesWithTags = [
+  "characters",
+  "blueprint_instances",
+  "documents",
+  "calendars",
+  "maps",
+  "map_pins",
+  "graphs",
+  "nodes",
+  "edges",
+  "events",
+];
 
 export const MessageTypeOptions = [
   { label: "Character", value: "character" },

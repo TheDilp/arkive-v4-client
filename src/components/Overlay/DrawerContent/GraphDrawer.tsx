@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
-import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum, useNotifications } from "../../../utils";
-import { Badge, Button, Checkbox, IconPicker, Input, Search, Select, Skeleton } from "../..";
+import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
+import { Button, Checkbox, DrawerLayout, IconPicker, Input, Select, Skeleton, Tabs, TagInput } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type insertGraphType = Partial<GraphType> & { parent_id?: string | null; project_id: string };
@@ -21,10 +21,15 @@ function isSaveDisabled(graph: Partial<GraphType>) {
   return false;
 }
 
+const tabs = [
+  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+  { id: "2", label: "Tags", icon: IconEnum.tags },
+];
+
 export function GraphDrawer({ data }: { data: { id?: string } }) {
   const { project_id, item_id } = useParams();
+  const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const createNotification = useNotifications();
 
   const { data: existingGraph, isFetching } = useGetEntity<GraphType>(
     data?.id,
@@ -71,135 +76,102 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex flex-col gap-y-2">
-      <div className="flex w-full flex-nowrap gap-x-2">
-        <Input
-          label="Graph title (required)"
-          name="title"
-          onChange={handleChange}
-          placeholder="Eg. Family tree"
-          value={graph?.title || ""}
-        />
-        <div className="self-end pb-1.5">
-          <IconPicker icon={graph?.icon || IconEnum.graph} name="icon" onChange={handleChange} />
-        </div>
-      </div>
+    <DrawerLayout>
+      <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
+      {selectedTab === 0 ? (
+        <>
+          <div className="flex w-full flex-nowrap gap-x-2">
+            <Input
+              label="Graph title (required)"
+              name="title"
+              onChange={handleChange}
+              placeholder="Eg. Family tree"
+              value={graph?.title || ""}
+            />
+            <div className="self-end pb-1.5">
+              <IconPicker icon={graph?.icon || IconEnum.graph} name="icon" onChange={handleChange} />
+            </div>
+          </div>
 
-      <div className="w-full">
-        <Select
-          label="Default node shape"
-          name="default_node_shape"
-          onChange={handleChange}
-          options={NodeShapesEnum}
-          value={graph?.default_node_shape || ""}
-        />
-      </div>
-      <div className="w-full">
-        <Search
-          label="Tags"
-          name="tags"
-          onChange={({ name, color, value, label }) => {
-            if ((graph?.tags || [])?.some((tag) => tag.id === value)) {
-              createNotification({
-                title: "Cannot add the same tag twice.",
-                variant: "warning",
-                icon: IconEnum.info_circle,
-                timer: 3,
-              });
-              return;
+          <div className="w-full">
+            <Select
+              label="Default node shape"
+              name="default_node_shape"
+              onChange={handleChange}
+              options={NodeShapesEnum}
+              value={graph?.default_node_shape || ""}
+            />
+          </div>
+
+          <div className="mt-2 flex w-full flex-col justify-between gap-y-2">
+            <div className="flex w-full items-center justify-between">
+              <span>Default node color:</span>
+              <ColorPicker
+                name="default_node_color"
+                onChange={handleChange}
+                value={graph?.default_node_color || DefaultBoardColor}
+              />
+            </div>
+            <div className="flex w-full items-center justify-between">
+              <span>Default edge color:</span>
+              <ColorPicker
+                name="default_edge_color"
+                onChange={handleChange}
+                value={graph?.default_edge_color || DefaultBoardColor}
+              />
+            </div>
+
+            <div className="flex w-full items-center justify-between">
+              <span>Is public:</span>
+              <Checkbox name="is_public" onChange={handleChange} value={graph?.is_public ?? false} />
+            </div>
+          </div>
+        </>
+      ) : null}
+
+      {selectedTab === 1 ? <TagInput handleChange={handleChange} isMultiple tags={graph?.tags || []} /> : null}
+
+      <div>
+        <Button
+          icon={graph?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(graph) || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={graph?.id ? "Save" : "Create"}
+          onClick={async () => {
+            if (graph) {
+              if (graph?.id) {
+                await update(
+                  {
+                    data: omit(graph, ["tags"]),
+                    relations: {
+                      tags: graph?.tags,
+                    },
+                  },
+                  {
+                    onSettled: (res) => {
+                      if (res?.ok) resetDrawerAtom();
+                    },
+                  },
+                );
+              } else
+                await create(
+                  {
+                    data: omit(graph, ["tags"]),
+                    relations: {
+                      tags: graph?.tags,
+                    },
+                  },
+                  {
+                    onSettled: (res) => {
+                      if (res?.ok) resetDrawerAtom();
+                    },
+                  },
+                );
             }
-            handleChange({
-              name,
-              value: (graph?.tags || []).concat({
-                title: label as string,
-                id: value,
-                project_id: project_id as string,
-                color: color as string,
-              }),
-            });
           }}
-          placeholder="Press enter to search tags"
-          searchEntity="tags"
+          variant="success"
         />
-        <div className="mt-2 flex max-h-64 flex-wrap gap-2 overflow-y-auto">
-          {graph?.tags?.length
-            ? graph.tags.map((tag) => (
-                <div key={tag.id} className="w-fit">
-                  <Badge
-                    clearAction={() => {
-                      handleChange({ name: "tags", value: (graph?.tags || []).filter((t) => t.id !== tag.id) });
-                    }}
-                    customColor={tag.color}
-                    label={tag.title}
-                    size="lg"
-                  />
-                </div>
-              ))
-            : null}
-        </div>
       </div>
-      <div className="mt-2 flex w-full flex-col justify-between gap-y-2">
-        <div className="flex w-full items-center justify-between">
-          <span>Default node color:</span>
-          <ColorPicker
-            name="default_node_color"
-            onChange={handleChange}
-            value={graph?.default_node_color || DefaultBoardColor}
-          />
-        </div>
-        <div className="flex w-full items-center justify-between">
-          <span>Default edge color:</span>
-          <ColorPicker
-            name="default_edge_color"
-            onChange={handleChange}
-            value={graph?.default_edge_color || DefaultBoardColor}
-          />
-        </div>
-
-        <div className="flex w-full items-center justify-between">
-          <span>Is public:</span>
-          <Checkbox name="is_public" onChange={handleChange} value={graph?.is_public ?? false} />
-        </div>
-      </div>
-      <Button
-        icon={graph?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(graph) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={graph?.id ? "Save" : "Create"}
-        onClick={async () => {
-          if (graph) {
-            if (graph?.id) {
-              await update(
-                {
-                  data: omit(graph, ["tags"]),
-                  relations: {
-                    tags: graph?.tags,
-                  },
-                },
-                {
-                  onSettled: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
-                },
-              );
-            } else
-              await create(
-                {
-                  data: omit(graph, ["tags"]),
-                  relations: {
-                    tags: graph?.tags,
-                  },
-                },
-                {
-                  onSettled: (res) => {
-                    if (res?.ok) resetDrawerAtom();
-                  },
-                },
-              );
-          }
-        }}
-        variant="success"
-      />
-    </div>
+    </DrawerLayout>
   );
 }
