@@ -162,5 +162,9 @@ export function applyFilter(
 export function getPinnedOffset(pinnedColumns: { id: string; minSize: number; maxSize: number }[], id: string) {
   const colIdx = pinnedColumns.findIndex((c) => c.id === id);
   if (colIdx === 0 || colIdx === -1) return 0;
-  return pinnedColumns[colIdx - 1].minSize;
+  let offset = 0;
+  for (let index = 0; index < colIdx; index += 1) {
+    offset += pinnedColumns[index].minSize;
+  }
+  return offset;
 }
