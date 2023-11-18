@@ -83,7 +83,7 @@ export function Dialog() {
     isOverlay: dialog?.type === "image_view" || dialog?.isOverlay,
     size: dialog?.size || "md",
     isImageView: dialog?.type === "image_view",
-    hasNoContent: !dialog?.type,
+    hasNoContent: !dialog?.type || dialog?.type === "delete_entity" || dialog?.type === "archive_entity",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
 

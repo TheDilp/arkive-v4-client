@@ -44,7 +44,7 @@ export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const { nodes, edges } = characterFamilyData?.data ?? { nodes: [], edges: [] };
 
   return (
-    <div className="flex h-full flex-col gap-y-2">
+    <div className="flex h-96 flex-col gap-y-2">
       <div className="flex flex-nowrap gap-x-2">
         <Select
           isLoading={isFetchingCharacterData}
