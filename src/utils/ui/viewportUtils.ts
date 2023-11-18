@@ -12,6 +12,6 @@ export function getElementPosition(el: HTMLElement): ElementPosition {
 
   // 40 is for the menubar
   if (rect.bottom < editorRect.top + 40) return "above";
-  if (rect.top > editorRect.bottom + 40) return "below";
+  if (rect.top > editorRect.bottom) return "below";
   return null;
 }
