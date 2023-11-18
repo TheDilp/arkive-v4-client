@@ -25,7 +25,7 @@ import {
   BlueprintType,
   RandomTableOptionType,
 } from "../../types";
-import { breadcrumbsAtom, drawerAtom, formatDateToString, getCharacterFullName, IconEnum } from "../../utils";
+import { breadcrumbsAtom, drawerAtom, formatDateToString, IconEnum } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -213,7 +213,7 @@ function AdditionalFieldDisplay({
             field_label={blueprint_field.title}
             items={(blueprint_field_data.characters || []).map((char) => ({
               id: char.related_id,
-              title: getCharacterFullName(char.character.first_name, undefined, char.character?.last_name),
+              title: char.character.full_name || "",
               image_id: char.character.portrait_id,
               type: "characters",
               link: `/projects/${project_id}/characters/${char.related_id}/resources`,
