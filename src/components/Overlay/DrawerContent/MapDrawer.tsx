@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { MapType } from "../../../types";
-import { drawerAtom, getImageURL, IconEnum, onDragEnd, useNotifications } from "../../../utils";
+import { drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
-import { Button, Checkbox, Input, Search } from "../../Form";
+import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge, Icon, Skeleton } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 
 function isDisabled(map: Partial<MapType> & { project_id: string }) {
   if (!map?.title) return true;
@@ -31,7 +31,6 @@ const tabs = [
 
 export function MapDrawer({ data }: { data: { id?: string } }) {
   const { project_id, item_id } = useParams();
-  const createNotification = useNotifications();
 
   const { data: existingMap, isFetching } = useGetEntity<MapType>(
     data?.id,
@@ -183,53 +182,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
           </DragDropContext>
         </div>
       ) : null}
-      {selectedTab === 2 ? (
-        <div className="flex flex-col gap-y-2">
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((map?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-
-              handleChange({
-                name,
-                value: (map?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags"
-            searchEntity="tags"
-          />
-
-          <div className="flex flex-wrap gap-2">
-            {map?.tags?.length
-              ? map.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (map?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        </div>
-      ) : null}
+      {selectedTab === 2 ? <TagInput handleChange={handleChange} isMultiple tags={map?.tags || []} /> : null}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isDisabled(map) || isCreating || isUpdating}

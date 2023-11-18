@@ -166,11 +166,7 @@ export function DocumentDrawer({ data }: Props) {
         </div>
       ) : null}
 
-      {selectedTab === 1 ? (
-        <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} />
-        </div>
-      ) : null}
+      {selectedTab === 1 ? <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} /> : null}
       <Button
         icon={document?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled({ title: document?.title }) || isCreating || isUpdating}
