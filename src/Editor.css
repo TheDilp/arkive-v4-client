@@ -204,6 +204,42 @@
     overflow: auto;
   }
 
+  .spoiler {
+    @apply cursor-pointer bg-zinc-700 px-2 text-zinc-700 transition-none;
+
+    &::selection {
+      @apply text-zinc-700;
+    }
+
+    &:hover {
+      @apply bg-transparent text-white;
+
+      .mention-atom-node-view-wrapper {
+        @apply text-white transition-none;
+      }
+      .characterMentionImage {
+        div {
+          @apply bg-zinc-600 transition-none;
+        }
+        img {
+          @apply opacity-100;
+        }
+      }
+    }
+
+    .mention-atom-node-view-wrapper {
+      @apply text-transparent transition-none;
+    }
+    .characterMentionImage {
+      div {
+        @apply bg-transparent transition-none;
+      }
+      img {
+        @apply opacity-0;
+      }
+    }
+  }
+
   .tableOfContentsList {
     @apply rounded bg-zinc-800 p-2 shadow;
   }

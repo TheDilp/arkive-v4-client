@@ -25,6 +25,7 @@ import {
   UnderlineExtension,
 } from "remirror/extensions";
 
+import { SpoilerExtension } from "../../components";
 import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
 import { CustomImageExtension } from "../../components/Complex/Editor/Extensions/CustomImageExtension";
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
@@ -133,6 +134,7 @@ export const DefaultEditorExtensions: (
     }),
     new BoldExtension({}),
     new ItalicExtension({}),
+    new SpoilerExtension({}),
     new HeadingExtension({
       extraAttributes: {
         id: () => crypto.randomUUID(),
