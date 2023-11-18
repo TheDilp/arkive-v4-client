@@ -19,7 +19,6 @@ import {
   ItalicExtension,
   LinkExtension,
   MarkdownExtension,
-  MentionAtomExtension,
   NodeFormattingExtension,
   OrderedListExtension,
   TaskListExtension,
@@ -30,7 +29,7 @@ import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensio
 import { CustomImageExtension } from "../../components/Complex/Editor/Extensions/CustomImageExtension";
 import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
 import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions/DiceFormulaExtension";
-import { MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
+import { CustomMentionExtension, MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useUpdateEntity } from "../../hooks";
@@ -43,39 +42,15 @@ export const DefaultEditorExtensions: (
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
   customPlaceholder?: string,
 ) => AnyExtension[] = (createNotification, customPlaceholder) => {
-  const CustomMentionExtension = new MentionAtomExtension({
-    nodeOverride: {
-      inline: true,
-    },
+  const CME = new CustomMentionExtension({
     priority: 10,
-    extraAttributes: {
-      alterId: {
-        default: null,
-        parseDOM: (dom) => dom.getAttribute("data-alterId"),
-        toDOM: () => ["data-alterId"],
-      },
-      projectId: {
-        default: null,
-        parseDOM: (dom) => dom.getAttribute("data-projectId"),
-        toDOM: () => ["data-projectId"],
-      },
-      icon: {
-        default: null,
-        parseDOM: (dom) => dom.getAttribute("data-icon"),
-        toDOM: () => ["data-icon"],
-      },
-      parentId: {
-        default: null,
-        parseDOM: (dom) => dom.getAttribute("data-parentId"),
-        toDOM: () => ["data-parentId"],
-      },
-    },
 
     matchers: [
       {
         char: "@",
         name: "characters",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+        matchOffset: 1,
       },
       {
         char: "@b:",
@@ -105,7 +80,7 @@ export const DefaultEditorExtensions: (
       },
     ],
   });
-  CustomMentionExtension.ReactComponent = MentionReactComponent;
+  CME.ReactComponent = MentionReactComponent;
 
   const DiceRollerExtension = new DiceFormulaExtension({
     extraAttributes: {
@@ -152,7 +127,7 @@ export const DefaultEditorExtensions: (
     new PlaceholderExtension({
       placeholder: customPlaceholder ?? "Write something awesome! 📜",
     }),
-    CustomMentionExtension,
+    CME,
     new CustomCalloutExtension({
       type: "info",
     }),

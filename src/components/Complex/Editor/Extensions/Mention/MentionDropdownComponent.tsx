@@ -1,9 +1,10 @@
-import { FloatingWrapper, useMentionAtom } from "@remirror/react";
+import { FloatingWrapper } from "@remirror/react";
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
+import { useMentionAtom } from "../../../../../hooks";
 import { baseURLS, FetchFunction, getImageURL, mentionDropdownAtom } from "../../../../../utils";
 import { Avatar, Spinner } from "../../../../Misc";
 

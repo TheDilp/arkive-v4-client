@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import { NodeViewComponentProps } from "@remirror/react";
 import { ComponentType } from "react";
-import { NodeExtensionSpec } from "remirror";
-import { MentionAtomExtension } from "remirror/extensions";
+import { ApplySchemaAttributes, ExtensionTag, NodeExtensionSpec, NodeSpecOverride } from "remirror";
+import { CreateEventHandlers, MentionAtomExtension } from "remirror/extensions";
 
 import { MentionReactComponent } from "./MentionReactComponent";
 
@@ -11,23 +11,31 @@ export class CustomMentionExtension extends MentionAtomExtension {
     return "mentionAtom" as const;
   }
 
-  createNodeSpec(): NodeExtensionSpec {
+  createTags() {
+    return [ExtensionTag.InlineNode, ExtensionTag.Behavior];
+  }
+
+  createNodeSpec(extra: ApplySchemaAttributes, override: NodeSpecOverride): NodeExtensionSpec {
     return {
       attrs: {
-        alterId: { default: null },
-        projectId: { default: null },
-        id: { default: null },
-        icon: { default: null },
-        parentId: { default: null },
-        name: { default: null },
-        label: { default: null },
+        alterId: { default: "" },
+        projectId: { default: "" },
+        id: { default: "" },
+        icon: { default: "" },
+        parentId: { default: "" },
+        name: { default: "" },
+        label: { default: "" },
       },
-      content: "inline",
       inline: true,
-
+      atom: true,
+      marks: "",
+      selectable: this.options.selectable,
+      draggable: this.options.draggable,
+      ...override,
       parseDOM: [
         {
           attrs: {
+            ...extra.defaults(),
             id: { default: null },
             alterId: { default: null },
             projectId: { default: null },
@@ -36,7 +44,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
             name: { default: null },
             label: { default: null },
           },
-          tag: "div",
+          tag: `${this.options.mentionTag}`,
           getAttrs: (dom) => {
             const node = dom as HTMLAnchorElement;
             const id = node.getAttribute("data-id");
@@ -59,8 +67,17 @@ export class CustomMentionExtension extends MentionAtomExtension {
           },
         },
       ],
+      toDOM: (node) => ["span", extra.dom(node)],
     };
   }
 
   ReactComponent?: ComponentType<NodeViewComponentProps> = MentionReactComponent;
+
+  createEventHandlers(): CreateEventHandlers {
+    return {
+      copy: () => {
+        return true;
+      },
+    };
+  }
 }
