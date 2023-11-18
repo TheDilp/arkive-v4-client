@@ -56,9 +56,9 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
           <Avatar
             key={char.related_id}
             image={getImageURL(project_id as string, "images", char?.character?.portrait_id || "")}
-            initials={getAvatarInitials(char.character.first_name, char.character?.last_name || "")}
+            initials={getAvatarInitials(char?.character?.full_name || "")}
             isBordered
-            label={getCharacterFullName(char.character.first_name, char?.character?.last_name || "")}
+            label={getCharacterFullName(char?.character?.full_name || "")}
             size="sm"
             tooltipAllowedPlacements={["left", "right"]}
           />
@@ -68,7 +68,7 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
         <Tooltip
           content={characters
             ?.slice(5)
-            .map((char) => getCharacterFullName(char?.character?.first_name, undefined, char?.character?.last_name))
+            .map((char) => char.character.full_name || "")
             .join(", ")}>
           <div className="w-min max-w-min">
             <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />

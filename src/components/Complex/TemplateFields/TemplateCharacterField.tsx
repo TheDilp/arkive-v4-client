@@ -1,5 +1,5 @@
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
+import { IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -22,7 +22,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           name={name}
-          onChange={({ value, first_name, last_name, image }) => {
+          onChange={({ value, label, image }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
               createNotification({
                 timer: 3,
@@ -40,8 +40,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
                   related_id: value,
                   character: {
                     id: value,
-                    first_name,
-                    last_name,
+                    full_name: label,
                     portrait_id: image,
                   },
                 },
@@ -64,7 +63,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
             }}
             id={val?.related_id}
             image_id={val?.character?.portrait_id}
-            title={getCharacterFullName(val?.character?.first_name, undefined, val.character?.last_name)}
+            title={val?.character?.full_name || ""}
             type="characters"
           />
         ))}

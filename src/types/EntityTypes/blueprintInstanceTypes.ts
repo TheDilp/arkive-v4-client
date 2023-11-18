@@ -16,7 +16,7 @@ export interface BlueprintInstanceBlueprintFieldType {
   field_type: BlueprintFieldTypes;
   characters: {
     related_id: string;
-    character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
+    character: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
   }[];
   blueprint_instances: {
     blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string };

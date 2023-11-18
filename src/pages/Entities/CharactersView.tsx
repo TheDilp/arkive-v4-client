@@ -60,6 +60,7 @@ function createColumns(
         </div>
       ),
       meta: {
+        pinned: true,
         noLink: true,
         centered: true,
       },
@@ -71,18 +72,22 @@ function createColumns(
       header: "First name",
       cell: (info) => info.getValue(),
       meta: {
+        pinned: true,
         sortable: true,
         filterOptions: NameFilters,
       },
+      minSize: 12,
     }),
     columnHelper.accessor("last_name", {
       id: "last_name",
       header: "Last name",
       cell: (info) => info.getValue(),
       meta: {
+        pinned: true,
         sortable: true,
         filterOptions: NameFilters,
       },
+      minSize: 12,
     }),
     columnHelper.accessor("nickname", {
       id: "nickname",

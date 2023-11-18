@@ -200,8 +200,7 @@ export function Search({
       value: string;
       color?: string;
       image?: string;
-      first_name?: string;
-      last_name?: string;
+      full_name?: string;
       icon?: string;
       parent_id?: string;
     }[]
@@ -316,8 +315,6 @@ export function Search({
                     color: item?.color,
                     image: item?.image,
                     parent_id: item?.parent_id,
-                    first_name: item?.first_name,
-                    last_name: item?.last_name,
                     icon: item?.icon,
                   });
                   if (hasShownOption) setDisplayValue(item.label);
@@ -405,8 +402,6 @@ export function Search({
                         color: item?.color,
                         image: item?.image,
                         parent_id: item?.parent_id,
-                        first_name: item?.first_name,
-                        last_name: item?.last_name,
                         icon: item?.icon,
                       });
 
