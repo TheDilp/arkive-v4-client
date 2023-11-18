@@ -34,6 +34,7 @@ import {
   contextMenuAtom,
   dialogAtom,
   drawerAtom,
+  EntitiesWithTags,
   getDefaultEntityIcon,
   getEntityFields,
   getImageURL,
@@ -167,6 +168,7 @@ function columns(
                     title: `Delete ${getSingularEntityType(entityType)}`,
                     size: "sm",
                     type: "delete_entity",
+                    isOverlay: true,
                   }));
                 },
               },
@@ -289,6 +291,9 @@ export function FolderView() {
             value: null,
           },
         ],
+      },
+      relations: {
+        tags: EntitiesWithTags.includes(type as string),
       },
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
@@ -437,7 +442,7 @@ export function FolderView() {
               <div className="w-52 max-w-[208px]">
                 <Button
                   icon={IconEnum.edit}
-                  label={`Edit current ${entityName}`}
+                  label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
                   onClick={() => {
                     setDrawer((prev) => ({
                       ...prev,
@@ -632,6 +637,7 @@ export function FolderView() {
                 },
               ],
               hasSelect: true,
+              hasTags: EntitiesWithTags.includes(type as string),
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
             }}

@@ -90,7 +90,6 @@ export const IconEnum = {
   sun: "ph:sun",
   table: "ph:table",
   table_add: "ph:grid-nine",
-  tag: "ph:tag",
   tags: "ph:tag",
   text_align_center: "ph:text-align-center",
   text_align_justify: "ph:text-align-justify",
