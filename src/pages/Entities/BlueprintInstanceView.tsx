@@ -359,6 +359,7 @@ export function BlueprintInstanceView() {
       },
       relations: {
         blueprint_fields: true,
+        tags: true,
       },
       orderBy,
       pagination,
@@ -402,6 +403,7 @@ export function BlueprintInstanceView() {
             )}
             config={{
               hasSelect: true,
+              hasTags: true,
               selection,
               getLink: (rowData: BlueprintInstanceType) =>
                 `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`,

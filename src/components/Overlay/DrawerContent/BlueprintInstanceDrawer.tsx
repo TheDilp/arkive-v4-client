@@ -36,8 +36,8 @@ import {
 import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
 import { TemplateLocationsField } from "../../Complex/TemplateFields/TemplateLocationsField";
 import { TemplateRandomTableField } from "../../Complex/TemplateFields/TemplateRandomTableField";
-import { Button, Input } from "../../Form";
-import { DrawerLayout } from "../../Layout";
+import { Button, Input, TagInput } from "../../Form";
+import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
@@ -299,11 +299,18 @@ function FieldTemplateRows({
     </li>
   );
 }
+
+const tabs = [
+  { id: "1", label: "Fields", icon: IconEnum.additional_fields },
+  { id: "2", label: "Tags", icon: IconEnum.tags },
+];
+
 export function BlueprintInstanceDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const [instance, setInstance] = useState<BlueprintInstanceType | null>(null);
+  const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
     data?.parent_id ?? item_id,
@@ -352,24 +359,32 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
-      <ul className="flex max-h-[90%] flex-col overflow-y-auto">
-        {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
+      <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
+      {selectedTab === 0 ? (
+        <ul className="flex max-h-[90%] flex-col overflow-y-auto">
+          {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
+          <div>
+            <Input
+              label={`${blueprint?.data?.title_name} (required)`}
+              name="title"
+              onChange={handleChange}
+              value={instance?.title}
+            />
+          </div>
+          {blueprint?.data?.blueprint_fields?.length ? (
+            <FieldTemplateRows
+              blueprint_fields={blueprint.data.blueprint_fields}
+              blueprint_fields_data={instance.blueprint_fields}
+              handleChange={handleChange}
+            />
+          ) : null}
+        </ul>
+      ) : null}
+      {selectedTab === 1 ? (
         <div>
-          <Input
-            label={`${blueprint?.data?.title_name} (required)`}
-            name="title"
-            onChange={handleChange}
-            value={instance?.title}
-          />
+          <TagInput handleChange={handleChange} isMultiple tags={instance?.tags || []} />
         </div>
-        {blueprint?.data?.blueprint_fields?.length ? (
-          <FieldTemplateRows
-            blueprint_fields={blueprint.data.blueprint_fields}
-            blueprint_fields_data={instance.blueprint_fields}
-            handleChange={handleChange}
-          />
-        ) : null}
-      </ul>
+      ) : null}
       <div className="mt-auto w-full">
         <Button
           icon={instance?.id ? IconEnum.save : IconEnum.add}
