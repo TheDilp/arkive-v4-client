@@ -18,7 +18,11 @@ export function WebhookDrawer({ data }: Props) {
   const { data: existingWebhook, isInitialLoading } = useGetEntity<WebhookType>(
     data?.id,
     "webhooks",
-    {},
+    {
+      data: {
+        id: data.id,
+      },
+    },
     { enabled: !!data?.id },
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateWebhook();
