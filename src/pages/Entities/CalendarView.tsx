@@ -55,10 +55,14 @@ export function CalendarView() {
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
   const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
 
-  const { data: existingCalendar, isFetching: isFetchingCalendar } = useGetEntity<CalendarType>(item_id, "calendars", {
-    data: { project_id },
-    relations: { months: true },
-  });
+  const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
+    item_id,
+    "calendars",
+    {
+      data: { project_id },
+      relations: { months: true },
+    },
+  );
   const { data: events } = useGetEntities<EventType>(
     {
       data: { project_id },
@@ -97,13 +101,13 @@ export function CalendarView() {
       queryKeyOverwrite: queryKey,
     },
   );
-  const { data: subitemEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
+  const { data: subitemEvent } = useGetSubEntity<EventType>(
     subitem_id,
     "events",
     { data: { parent_id: item_id } },
     { enabled: !!subitem_id },
   );
-  useChangeNavbarTitle(` Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
+  useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -126,7 +130,7 @@ export function CalendarView() {
   const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
   if (!existingCalendar?.data) return null;
 
-  if (isFetchingCalendar || isFetchingEvent) return <Skeleton type="calendar_view" />;
+  if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
 
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">

@@ -2,6 +2,7 @@ export * from "./BlueprintMention";
 export * from "./CharacterMention";
 export * from "./CustomMentionExtension";
 export * from "./DocumentMention";
+export * from "./EventMention";
 export * from "./GraphMention";
 export * from "./MapMention";
 export * from "./MentionDropdownComponent";

@@ -57,7 +57,7 @@ export function EventDrawer({ data }: Props) {
   );
 
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
-    { data: { project_id, parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
+    { data: { parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
     { staleTime: 5 * 60 * 1000 },
   );
@@ -168,7 +168,7 @@ export function EventDrawer({ data }: Props) {
           <div className="flex items-center justify-between gap-x-2">
             <Input
               label="Start day (required)"
-              max={existingMonths?.data[event?.start_month]?.days ?? 0}
+              max={existingMonths?.data?.[event?.start_month || 0]?.days ?? 0}
               min={1}
               name="start_day"
               onChange={handleChange}

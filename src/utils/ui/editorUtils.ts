@@ -81,6 +81,11 @@ export function DefaultEditorExtensions(
         name: "words",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
+      {
+        char: "@e:",
+        name: "events",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+      },
     ],
   });
 

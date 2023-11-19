@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { DocumentMention, GraphMention, MapMention, WordMention } from ".";
+import { DocumentMention, EventMention, GraphMention, MapMention, WordMention } from ".";
 import { BlueprintMention } from "./BlueprintMention";
 import { CharacterMention } from "./CharacterMention";
 
@@ -44,6 +44,8 @@ export function MentionReactComponent({ node }: Props) {
         />
       );
     if (name === "words") return <WordMention id={id} label={label} title={label} />;
+    if (name === "events")
+      return <EventMention nodeId={id} nodeLabel={label} parent_id={parent_id} project_id={project_id} title={label} />;
 
     return <span>{label}</span>;
   }
