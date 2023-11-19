@@ -34,113 +34,119 @@ function StaticRenderImage({ data }: { data: any }) {
   return null;
 }
 
-const typeMap = (project_id: string, isPublicView?: boolean): MarkMap => ({
-  bulletList: "ul",
-  doc: Doc,
-  hardBreak: "br",
-  heading: (args) => {
-    return <div style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>{Heading(args)}</div>;
-  },
-  link: "a",
-  listItem: "li",
-  paragraph: "p",
-  orderedList: "ol",
-  text: TextHandler,
-  blockquote: "blockquote",
-  callout: (data) => {
-    return (
-      <div
-        data-callout-type={data?.node?.attrs?.type ?? "custom"}
-        style={{
-          backgroundColor: `${data?.node?.attrs?.customcolor}50`,
-          borderColor: `${data?.node?.attrs?.customcolor}`,
-        }}>
-        {data?.children ?? null}
-      </div>
-    );
-  },
-  horizontalRule: "hr",
-  tableofcontents: "p",
-  secret: (data) => {
-    if (isPublicView) return null;
-    return (
-      <Collapsible icon={IconEnum.eye} initialOpen={false} label="Secret">
-        {data?.children}
-      </Collapsible>
-    );
-  },
-  image: (data) => StaticRenderImage({ data }),
-  table: (...props: any) => {
-    return (
-      <div className="h-min w-full">
-        <table className="w-full">
-          <tbody className="w-1/2">{props?.[0]?.children?.map((c: ReactElement) => c)}</tbody>
-        </table>
-      </div>
-    );
-  },
-  tableHeaderCell: (...props: any) => (
-    <th className="flex w-full items-center justify-center">{props?.[0]?.children?.map((c: ReactElement) => c)}</th>
-  ),
-  tableRow: (...props: any) => <tr className="flex w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</tr>,
-  tableCell: (...props: any) => {
-    return (
-      <td className="w-full overflow-y-auto border">
-        {props?.[0]?.children?.map((c: ReactElement) => {
-          const id = crypto.randomUUID();
+function typeMap(project_id: string, isPublicView?: boolean) {
+  return {
+    bulletList: "ul",
+    doc: Doc,
+    hardBreak: "br",
+    heading: (args: any) => {
+      return <div style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>{Heading(args)}</div>;
+    },
+    link: "a",
+    listItem: "li",
+    paragraph: "p",
+    orderedList: "ol",
+    text: TextHandler,
+    blockquote: "blockquote",
+    callout: (data: any) => {
+      return (
+        <div
+          data-callout-type={data?.node?.attrs?.type ?? "custom"}
+          style={{
+            backgroundColor: `${data?.node?.attrs?.customcolor}50`,
+            borderColor: `${data?.node?.attrs?.customcolor}`,
+          }}>
+          {data?.children ?? null}
+        </div>
+      );
+    },
+    horizontalRule: "hr",
+    tableofcontents: "p",
+    secret: (data: any) => {
+      if (isPublicView) return null;
+      return (
+        <Collapsible icon={IconEnum.eye} initialOpen={false} label="Secret">
+          {data?.children || null}
+        </Collapsible>
+      );
+    },
+
+    image: (data: any) => StaticRenderImage({ data }),
+    table: (...props: any) => {
+      return (
+        <div className="h-min w-full">
+          <table className="w-full">
+            <tbody className="w-1/2">{props?.[0]?.children?.map((c: ReactElement) => c)}</tbody>
+          </table>
+        </div>
+      );
+    },
+    tableHeaderCell: (...props: any) => (
+      <th className="flex w-full items-center justify-center">{props?.[0]?.children?.map((c: ReactElement) => c)}</th>
+    ),
+    tableRow: (...props: any) => <tr className="flex w-full">{props?.[0]?.children?.map((c: ReactElement) => c)}</tr>,
+    tableCell: (...props: any) => {
+      return (
+        <td className="w-full overflow-y-auto border">
+          {props?.[0]?.children?.map((c: ReactElement) => {
+            const id = crypto.randomUUID();
+            return (
+              <div key={id} className="max-w-sm break-all ">
+                {c}
+              </div>
+            );
+          })}
+        </td>
+      );
+    },
+
+    mentionAtom: (...props: any) => {
+      if (props?.[0]?.node) {
+        const { attrs } = props[0].node;
+        if (attrs) {
+          const { id, label, alterId, name: type } = attrs;
+          if (type === "characters")
+            return (
+              <CharacterMention isPublic={isPublicView} nodeId={id} nodeLabel={label} project_id={project_id} title={label} />
+            );
+          if (type === "documents")
+            return (
+              <DocumentMention
+                alterId={alterId}
+                id={id}
+                isDisabledTooltip
+                isPublic={isPublicView}
+                label={label}
+                project_id={project_id}
+                title={label}
+              />
+            );
+
+          if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
+
+          if (type === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
+          // if (type === "words") return <WordMention id={id} label={label} title={label} />;
+
           return (
-            <div key={id} className="max-w-sm break-all ">
-              {c}
-            </div>
+            <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
+              {label}
+            </Link>
           );
-        })}
-      </td>
-    );
-  },
-
-  mentionAtom: (...props: any) => {
-    if (props?.[0]?.node) {
-      const { attrs } = props[0].node;
-      if (attrs) {
-        const { id, label, alterId, name: type } = attrs;
-        if (type === "characters")
-          return (
-            <CharacterMention isPublic={isPublicView} nodeId={id} nodeLabel={label} project_id={project_id} title={label} />
-          );
-        if (type === "documents")
-          return (
-            <DocumentMention
-              alterId={alterId}
-              id={id}
-              isDisabledTooltip
-              isPublic={isPublicView}
-              label={label}
-              project_id={project_id}
-              title={label}
-            />
-          );
-
-        if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
-
-        if (type === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
-        // if (type === "words") return <WordMention id={id} label={label} title={label} />;
-
-        return (
-          <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
-            {label}
-          </Link>
-        );
+        }
       }
-    }
-    return null;
-  },
-});
+      return null;
+    },
+  };
+}
 
 const markMap: MarkMap = {
   italic: "em",
   bold: "strong",
   underline: "u",
   link: "a",
+  spoiler: (data: any) => {
+    return <span className="spoiler">{data?.children || null}</span>;
+  },
 };
 
 export function StaticRender({ content, isPublicView }: { content: RemirrorJSON; isPublicView?: boolean }) {

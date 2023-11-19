@@ -9,7 +9,7 @@ import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
 
-const menuBarItems = ({
+function menuBarItems({
   active,
   chain,
   setDrawer,
@@ -27,7 +27,7 @@ const menuBarItems = ({
   id?: string;
   icon?: string;
   isEditorMenubar?: boolean;
-}) => {
+}) {
   const options = [
     {
       id: "text_bold",
@@ -303,7 +303,7 @@ const menuBarItems = ({
   }
 
   return options;
-};
+}
 
 export function Menubar({
   size,
@@ -326,6 +326,7 @@ export function Menubar({
     () => menuBarItems({ active, chain, setDrawer, getContext, title, id, icon, isEditorMenubar }),
     [chain, isEditorMenubar, id, title],
   );
+
   return (
     <ul
       className={`sticky top-0 z-30 mb-1 flex ${

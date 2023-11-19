@@ -25,24 +25,26 @@ import {
   UnderlineExtension,
 } from "remirror/extensions";
 
-import { SpoilerExtension } from "../../components";
-import { CustomCalloutExtension } from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
-import { CustomImageExtension } from "../../components/Complex/Editor/Extensions/CustomImageExtension";
-import { CustomTableExtension } from "../../components/Complex/Editor/Extensions/CustomTableExtension";
-import { DiceFormulaExtension } from "../../components/Complex/Editor/Extensions/DiceFormulaExtension";
-import { CustomMentionExtension, MentionReactComponent } from "../../components/Complex/Editor/Extensions/Mention";
-import { SecretExtension } from "../../components/Complex/Editor/Extensions/SecretExtension";
-import { TableOfContentsExtension } from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
+import {
+  CustomCalloutExtension,
+  CustomImageExtension,
+  CustomMentionExtension,
+  CustomTableExtension,
+  DiceFormulaExtension,
+  SecretExtension,
+  SpoilerExtension,
+  TableOfContentsExtension,
+} from "../../components/Complex/Editor/Extensions";
 import { useUpdateEntity } from "../../hooks";
 import { ConversationType, DocumentType, MessageKindType, NotificationType, slashMenuItem } from "../../types";
 import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
-export const DefaultEditorExtensions: (
+export function DefaultEditorExtensions(
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
   customPlaceholder?: string,
-) => AnyExtension[] = (createNotification, customPlaceholder) => {
+): AnyExtension[] {
   const CME = new CustomMentionExtension({
     priority: 10,
 
@@ -81,7 +83,6 @@ export const DefaultEditorExtensions: (
       },
     ],
   });
-  CME.ReactComponent = MentionReactComponent;
 
   const DiceRollerExtension = new DiceFormulaExtension({
     extraAttributes: {
@@ -129,12 +130,12 @@ export const DefaultEditorExtensions: (
       placeholder: customPlaceholder ?? "Write something awesome! 📜",
     }),
     CME,
+    new SpoilerExtension({}),
     new CustomCalloutExtension({
       type: "info",
     }),
     new BoldExtension({}),
     new ItalicExtension({}),
-    new SpoilerExtension({}),
     new HeadingExtension({
       extraAttributes: {
         id: () => crypto.randomUUID(),
@@ -178,12 +179,12 @@ export const DefaultEditorExtensions: (
       },
     }),
   ];
-};
+}
 export function onError({ json, invalidContent, transformers }: InvalidContentHandlerProps) {
   // Automatically remove all invalid nodes and marks.
   return transformers.remove(json, invalidContent);
 }
-export const documentEditorHooks = (
+export function documentEditorHooks(
   changedData: any,
   resetChanges: () => void,
   refetch: (options?: (RefetchOptions & RefetchQueryFilters<unknown>) | undefined) => Promise<
@@ -195,56 +196,58 @@ export const documentEditorHooks = (
     >
   >,
   title: string,
-) => [
-  () => {
-    const { getJSON, getText, getHTML } = useHelpers();
-    const { project_id, item_id } = useParams();
-    const { mutate } = useUpdateEntity<{ data: Partial<DocumentType> }>("documents", project_id as string);
+) {
+  return [
+    () => {
+      const { getJSON, getText, getHTML } = useHelpers();
+      const { project_id, item_id } = useParams();
+      const { mutate } = useUpdateEntity<{ data: Partial<DocumentType> }>("documents", project_id as string);
 
-    const handleSaveShortcut = useCallback(
-      ({ state }: { state: EditorState }) => {
-        mutate(
-          {
-            data: {
-              id: item_id as string,
-              content: getJSON(state),
+      const handleSaveShortcut = useCallback(
+        ({ state }: { state: EditorState }) => {
+          mutate(
+            {
+              data: {
+                id: item_id as string,
+                content: getJSON(state),
+              },
             },
-          },
-          {
-            onSuccess: resetChanges,
-          },
+            {
+              onSuccess: resetChanges,
+            },
+          );
+          return true; // Prevents any further key handlers from being run.
+        },
+        [getJSON, item_id],
+      );
+      const handleCancelSaveShortcut = useCallback(() => {
+        if (changedData) {
+          resetChanges();
+          refetch();
+        }
+        return true;
+      }, [changedData]);
+      const handleExportShortcut = useCallback(() => {
+        const htmlString = getHTML();
+        saveAs(
+          new Blob([htmlString], {
+            type: "text/html;charset=utf-8",
+          }),
+          `${title || `Arkive Document - ${item_id}`}.html`,
         );
         return true; // Prevents any further key handlers from being run.
-      },
-      [getJSON, item_id],
-    );
-    const handleCancelSaveShortcut = useCallback(() => {
-      if (changedData) {
-        resetChanges();
-        refetch();
-      }
-      return true;
-    }, [changedData]);
-    const handleExportShortcut = useCallback(() => {
-      const htmlString = getHTML();
-      saveAs(
-        new Blob([htmlString], {
-          type: "text/html;charset=utf-8",
-        }),
-        `${title || `Arkive Document - ${item_id}`}.html`,
-      );
-      return true; // Prevents any further key handlers from being run.
-    }, [getText, item_id]);
+      }, [getText, item_id]);
 
-    // "Mod" means platform agnostic modifier key - i.e. Ctrl on Windows, or Cmd on MacOS
+      // "Mod" means platform agnostic modifier key - i.e. Ctrl on Windows, or Cmd on MacOS
 
-    useKeymap("Mod-s", handleSaveShortcut);
-    useKeymap("Mod-k", handleCancelSaveShortcut);
-    useKeymap("Mod-e", handleExportShortcut);
-  },
-];
+      useKeymap("Mod-s", handleSaveShortcut);
+      useKeymap("Mod-k", handleCancelSaveShortcut);
+      useKeymap("Mod-e", handleExportShortcut);
+    },
+  ];
+}
 
-export const messageEditorHooks = (
+export function messageEditorHooks(
   id: string,
   selectedCharacter: string | undefined,
   selectedType: MessageKindType,
@@ -252,52 +255,54 @@ export const messageEditorHooks = (
   conversation: Partial<ConversationType> | undefined,
   canSend: boolean,
   setMessageLength: Dispatch<SetStateAction<number>>,
-) => [
-  () => {
-    const queryClient = useQueryClient();
-    const { getJSON } = useHelpers();
-    const getContext = useRemirrorContext();
-    const { project_id } = useParams();
+) {
+  return [
+    () => {
+      const queryClient = useQueryClient();
+      const { getJSON } = useHelpers();
+      const getContext = useRemirrorContext();
+      const { project_id } = useParams();
 
-    const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
+      const isMentionDropdownOpen = useAtomValue(mentionDropdownAtom);
 
-    const handleSendMessage = useCallback(() => {
-      if (!isMentionDropdownOpen && canSend && (selectedType === "character" || selectedType === "narration")) {
-        const jsonContent = getJSON();
-        const messageData = {
-          id: crypto.randomUUID(),
-          parent_id: id,
-          content: jsonContent,
-          type: selectedType,
-          sender_id: selectedCharacter,
-        };
-        queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
-          if (old)
-            return {
-              ...old,
-              data: {
-                ...old?.data,
-                messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
-              },
-            };
-          return old;
-        });
-        sendJsonMessage({
-          data: messageData,
-          project_id,
-          conversation,
-        });
+      const handleSendMessage = useCallback(() => {
+        if (!isMentionDropdownOpen && canSend && (selectedType === "character" || selectedType === "narration")) {
+          const jsonContent = getJSON();
+          const messageData = {
+            id: crypto.randomUUID(),
+            parent_id: id,
+            content: jsonContent,
+            type: selectedType,
+            sender_id: selectedCharacter,
+          };
+          queryClient.setQueryData<{ data: ConversationType }>(["conversations", id], (old) => {
+            if (old)
+              return {
+                ...old,
+                data: {
+                  ...old?.data,
+                  messages: [...(old?.data?.messages || []), { ...messageData, content: jsonContent }],
+                },
+              };
+            return old;
+          });
+          sendJsonMessage({
+            data: messageData,
+            project_id,
+            conversation,
+          });
 
-        getContext.clearContent();
-        setMessageLength(0);
-        return true;
-      }
-      return false;
-    }, [selectedCharacter, selectedType, isMentionDropdownOpen, canSend]);
+          getContext.clearContent();
+          setMessageLength(0);
+          return true;
+        }
+        return false;
+      }, [selectedCharacter, selectedType, isMentionDropdownOpen, canSend]);
 
-    useKeymap("Enter", handleSendMessage);
-  },
-];
+      useKeymap("Enter", handleSendMessage);
+    },
+  ];
+}
 
 export const defaultSlashItems: slashMenuItem[] = [
   {

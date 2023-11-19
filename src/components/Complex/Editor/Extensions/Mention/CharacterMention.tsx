@@ -29,7 +29,7 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel, isPubli
     <Link
       className="inline-flex items-center font-lato font-bold underline transition-colors"
       to={isPublic ? `/public/characters/${nodeId}/resources` : `/projects/${project_id}/characters/${nodeId}/resources`}>
-      <div className={`relative ${isPublic ? "top-[0.175rem]" : "top-[0.0375rem]"} flex items-start`}>
+      <div className={`relative ${isPublic ? "top-[0.175rem]" : "top-[0.175rem]"} flex items-start`}>
         <span className=" relative">
           {data?.data?.portrait_id ? (
             <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>

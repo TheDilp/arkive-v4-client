@@ -204,6 +204,24 @@
     overflow: auto;
   }
 
+  .tableOfContentsList {
+    @apply rounded bg-zinc-800 p-2 shadow;
+  }
+
+  .ProseMirror-selectednode {
+    @apply outline-none;
+  }
+}
+.staticRendererContainer {
+  p {
+    @apply min-h-[1rem];
+  }
+  a {
+    @apply cursor-pointer  hover:text-sky-100  !important;
+  }
+  hr {
+    @apply border-zinc-600 !important;
+  }
   .spoiler {
     @apply cursor-pointer bg-zinc-700 px-2 text-zinc-700 transition-none;
 
@@ -228,35 +246,25 @@
     }
 
     .mention-atom-node-view-wrapper {
-      @apply text-transparent transition-none;
+      @apply text-transparent;
+
+      a {
+        @apply transition-none;
+      }
+      .characterMentionImage {
+        div {
+          @apply bg-transparent transition-none;
+        }
+      }
     }
     .characterMentionImage {
       div {
         @apply bg-transparent transition-none;
       }
       img {
-        @apply opacity-0;
+        @apply opacity-0 transition-none;
       }
     }
-  }
-
-  .tableOfContentsList {
-    @apply rounded bg-zinc-800 p-2 shadow;
-  }
-
-  .ProseMirror-selectednode {
-    @apply outline-none;
-  }
-}
-.staticRendererContainer {
-  p {
-    @apply min-h-[1rem];
-  }
-  a {
-    @apply cursor-pointer  hover:text-sky-100  !important;
-  }
-  hr {
-    @apply border-zinc-600 !important;
   }
 }
 .drawerEventDescription {
@@ -271,6 +279,50 @@
   &.ProseMirror {
     blockquote {
       @apply p-0 !important;
+    }
+  }
+  .spoiler {
+    @apply cursor-pointer bg-zinc-500 px-2 text-white transition-none;
+
+    &::selection {
+      @apply text-zinc-700;
+    }
+
+    &:hover {
+      @apply bg-transparent text-white;
+
+      .mention-atom-node-view-wrapper {
+        @apply text-white transition-none;
+      }
+      .characterMentionImage {
+        div {
+          @apply bg-zinc-600 transition-none;
+        }
+        img {
+          @apply opacity-100;
+        }
+      }
+    }
+
+    .mention-atom-node-view-wrapper {
+      @apply text-transparent;
+
+      a {
+        @apply transition-none;
+      }
+      .characterMentionImage {
+        div {
+          @apply bg-transparent transition-none;
+        }
+      }
+    }
+    .characterMentionImage {
+      div {
+        @apply bg-transparent transition-none;
+      }
+      img {
+        @apply opacity-0 transition-none;
+      }
     }
   }
 }

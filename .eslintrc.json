@@ -29,6 +29,7 @@
   "plugins": ["prettier", "react", "react-hooks", "simple-import-sort", "import", "@typescript-eslint", "eslint-plugin-import"],
   "rules": {
     "no-underscore-dangle": "off",
+    "func-style": ["error", "declaration"],
     "camelcase": "off",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
     "no-param-reassign": [

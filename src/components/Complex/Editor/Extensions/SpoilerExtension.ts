@@ -35,7 +35,6 @@ export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
       parseDOM: [
         {
           tag: "span",
-
           getAttrs: extra.parse,
         },
 
