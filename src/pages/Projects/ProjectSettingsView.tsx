@@ -19,7 +19,15 @@ import {
   Tabs,
   Title,
 } from "../../components";
-import { useBreakpoint, useGetEntities, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
+import {
+  useBreakpoint,
+  useDeleteWebhook,
+  useGetEntities,
+  useGetEntity,
+  useHandleChange,
+  useTable,
+  useUpdateEntity,
+} from "../../hooks";
 import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType, WebhookType } from "../../types";
 import {
   AllEntities,
@@ -191,6 +199,7 @@ export function ProjectSettingsView() {
   );
 
   const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", { enabled: !!user?.id });
+  const { mutateAsync: deleteWebhook } = useDeleteWebhook();
 
   useLayoutEffect(() => {
     if (projectData?.data) setProject(projectData.data);
@@ -401,8 +410,31 @@ export function ProjectSettingsView() {
                     (webhooks?.data || [])?.map((webhook) => (
                       <div key={webhook.id} className="flex items-center justify-between py-2">
                         <Title label={webhook.title} size="md" />
-                        <div className="h-8 w-8">
-                          <Button hasNoBackground icon={IconEnum.trash} onClick={undefined} variant="error" />
+                        <div className="flex items-center">
+                          <div className="h-8 w-8">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.edit}
+                              onClick={() =>
+                                setDrawer((prev) => ({
+                                  ...prev,
+                                  type: "webhooks",
+                                  data: { id: webhook.id },
+                                  title: "Create webhook",
+                                  size: "md",
+                                }))
+                              }
+                              variant="primary"
+                            />
+                          </div>
+                          <div className="h-8 w-8">
+                            <Button
+                              hasNoBackground
+                              icon={IconEnum.trash}
+                              onClick={async () => deleteWebhook({ data: { id: webhook.id } })}
+                              variant="error"
+                            />
+                          </div>
                         </div>
                       </div>
                     ))

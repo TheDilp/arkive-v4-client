@@ -169,3 +169,37 @@ export function useDeleteMany(type: AllAvailableEntities, project_id?: string | 
     },
   );
 }
+
+export function useDeleteWebhook() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (vars: { data: { id: string } }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/webhooks/${vars.data.id}`,
+        method: "DELETE",
+      });
+    },
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries(["allEntities", undefined, "webhooks"]);
+
+          createNotification({
+            title: getEntityCRUDNotification("webhooks", "delete"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 5,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error deleting this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
