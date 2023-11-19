@@ -14,14 +14,14 @@ export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-export function getNavbarEntityType(type: AvailableEntityType | "project-settings") {
+export function getNavbarEntityType(type: AvailableEntityType | "settings") {
   if (type === "random_tables") {
     return "random tables";
   }
   if (type === "character_fields_templates") {
     return "character fields templates";
   }
-  if (type === "project-settings") return "Project settings";
+  if (type === "settings") return "Project settings";
   return type;
 }
 

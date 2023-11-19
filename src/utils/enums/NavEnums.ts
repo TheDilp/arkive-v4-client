@@ -14,7 +14,7 @@ export const navItems: { icon: string; navigate: string; tooltip: string }[] = [
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
   { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
   { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
-  { icon: IconEnum.settings, navigate: "project-settings", tooltip: "Project settings" },
+  { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];
 
 export const projectCardNavItems = navItems.slice(0, -1);

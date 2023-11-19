@@ -57,7 +57,7 @@ const noFetchTypes = [
   "tags",
   "characters",
   "character_fields_templates",
-  "project-settings",
+  "settings",
   "assets",
 ];
 
@@ -357,7 +357,7 @@ export function FolderView() {
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
 
   useChangeNavbarTitle(
-    `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "project-settings") || "")} ${
+    `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
   );
@@ -375,7 +375,7 @@ export function FolderView() {
   if (type === "tags") return <TagView />;
   if (type === "character_fields_templates") return <TemplatesView />;
   if (type === "assets") return <AssetView />;
-  if (type === "project-settings") return <ProjectSettingsView />;
+  if (type === "settings") return <ProjectSettingsView />;
   return (
     <TablePageLayout>
       <div className="flex h-12 min-h-[3rem] items-center justify-between">

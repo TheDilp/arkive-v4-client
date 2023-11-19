@@ -36,8 +36,8 @@ import { UpdateProjectType } from "../../validation";
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "3", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
-  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "3", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "4", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();

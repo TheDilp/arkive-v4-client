@@ -55,10 +55,10 @@ export function Sidebar() {
                   item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
                 }
                 ${item.navigate === "blueprints" && pathname.includes("blueprints") ? selectedListItem() : ""}
-                ${item.navigate === type && type !== "project-settings" ? selectedListItem() : ""}
-                 ${item.navigate === "project-settings" && type === "project-settings" ? selectedSettingsListItem() : ""}
+                ${item.navigate === type && type !== "settings" ? selectedListItem() : ""}
+                 ${item.navigate === "settings" && type === "settings" ? selectedSettingsListItem() : ""}
                 
-                ${item.navigate === "project-settings" ? listSettingsItem() : ""}
+                ${item.navigate === "settings" ? listSettingsItem() : ""}
                 
                 `}
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
