@@ -1,5 +1,6 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -12,11 +13,11 @@ import {
   onChangeValue,
   TemplateStateType,
 } from "../../../types";
-import { CharacterFieldTypesEnum, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { CharacterFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Collapsible, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(template: TemplateStateType) {
@@ -51,14 +52,12 @@ function FieldRow({
   random_table,
   isLoading,
   changeField,
-  deleteField,
 }: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
   changeField: ({
     name,
     value,
   }: onChangeValue | InputOnChangeValue | { name: string; value: { id: string; value: string }[] }) => void;
-  deleteField: (i: number) => void;
   isLoading: boolean;
 }) {
   return (
@@ -103,15 +102,6 @@ function FieldRow({
             />
           </div>
         ) : null}
-        <div className="h-10 w-8 self-end">
-          <Button
-            hasNoBackground
-            icon={IconEnum.trash}
-            isDisabled={isLoading}
-            onClick={() => deleteField(index)}
-            variant="error"
-          />
-        </div>
       </div>
       {field_type === "select" || field_type === "select_multiple" ? (
         <DragDropContext
@@ -237,6 +227,7 @@ const tabs = [
 
 export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
+  const setDialog = useSetAtom(dialogAtom);
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -331,7 +322,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                     name: "character_fields",
                     value: (template.character_fields || []).concat({
                       id: crypto.randomUUID(),
-                      title: "",
+                      title: "New field",
                       field_type: "text",
                       sort: template?.character_fields?.length ?? 0,
                     }),
@@ -370,36 +361,81 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                   draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                                 }`}
                                 {...provided.draggableProps}
+                                key={field.id}
                                 style={{
                                   ...provided.draggableProps.style,
-                                  right: 0,
+                                  right: 16,
                                 }}>
-                                <div {...provided.dragHandleProps} className="mt-7 self-start">
+                                <div {...provided.dragHandleProps} className="mt-1 self-start">
                                   <Icon fontSize={24} icon={IconEnum.menu} />
                                 </div>
+                                <div className="w-full">
+                                  <Collapsible
+                                    actions={[
+                                      {
+                                        icon: IconEnum.trash,
+                                        isIconOnly: true,
+                                        variant: "error",
+                                        onClick: () =>
+                                          field?.title
+                                            ? setDialog((prev) => ({
+                                                ...prev,
+                                                title: `Delete field "${field.title}"?`,
+                                                cancel: {
+                                                  label: "Cancel",
+                                                  action: () => {},
+                                                },
+                                                isOverlay: true,
+                                                confirm: {
+                                                  icon: IconEnum.trash,
+                                                  variant: "error",
+                                                  label: "Delete",
+                                                  action: () =>
+                                                    handleChange({
+                                                      name: "character_fields",
+                                                      value: template?.character_fields?.filter((f) => f.id !== field.id),
+                                                    }),
+                                                },
+                                              }))
+                                            : handleChange({
+                                                name: "character_fields",
+                                                value: template?.character_fields?.filter((f) => f.id !== field.id),
+                                              }),
+                                      },
+                                    ]}
+                                    label={field?.title}>
+                                    <div
+                                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                                        draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                                      }`}
+                                      {...provided.draggableProps}
+                                      style={{
+                                        ...provided.draggableProps.style,
+                                        right: 0,
+                                      }}>
+                                      <div {...provided.dragHandleProps} className="mt-7 self-start">
+                                        <Icon fontSize={24} icon={IconEnum.menu} />
+                                      </div>
 
-                                <FieldRow
-                                  key={field.id}
-                                  calendar={field?.calendar}
-                                  calendar_id={field?.calendar_id}
-                                  changeField={handleChange}
-                                  deleteField={() =>
-                                    handleChange({
-                                      name: "character_fields",
-                                      value: template?.character_fields?.filter((f) => f.id !== field.id),
-                                    })
-                                  }
-                                  field_type={field.field_type}
-                                  formula={field?.formula}
-                                  id={field.id}
-                                  index={index}
-                                  isLoading={isLoading}
-                                  options={field?.options || []}
-                                  random_table={field?.random_table}
-                                  random_table_id={field?.random_table_id}
-                                  sort={field.sort}
-                                  title={field.title}
-                                />
+                                      <FieldRow
+                                        key={field.id}
+                                        calendar={field?.calendar}
+                                        calendar_id={field?.calendar_id}
+                                        changeField={handleChange}
+                                        field_type={field.field_type}
+                                        formula={field?.formula}
+                                        id={field.id}
+                                        index={index}
+                                        isLoading={isLoading}
+                                        options={field?.options || []}
+                                        random_table={field?.random_table}
+                                        random_table_id={field?.random_table_id}
+                                        sort={field.sort}
+                                        title={field.title}
+                                      />
+                                    </div>
+                                  </Collapsible>
+                                </div>
                               </div>
                             )}
                           </Draggable>

@@ -396,7 +396,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                     field?.title
                                       ? setDialogAtom((prev) => ({
                                           ...prev,
-                                          title: `Delete field "${field.title}"`,
+                                          title: `Delete field "${field.title}"?`,
                                           cancel: {
                                             label: "Cancel",
                                             action: () => {},
