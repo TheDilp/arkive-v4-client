@@ -107,6 +107,7 @@ export type DrawerAtomType = {
     }
   | { type: "entity_preview"; data: { id: string; parent_id?: string; entity_type: AvailableEntityType } }
   | { type: "invite_to_project" | null; data: null }
+  | { type: "webhooks"; data: { id?: string } }
 );
 
 export interface ContextMenuAtomType {

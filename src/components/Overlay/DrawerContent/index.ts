@@ -34,4 +34,5 @@ export * from "./RandomTableOptionsDrawer";
 export * from "./SearchDrawer";
 export * from "./TagsDrawer";
 export { default as TimelineDrawer } from "./TimelineDrawer";
+export * from "./WebhookDrawer";
 export * from "./WordDrawer";

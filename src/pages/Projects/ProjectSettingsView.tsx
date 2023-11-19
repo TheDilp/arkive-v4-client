@@ -4,6 +4,7 @@ import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
+  Alert,
   Avatar,
   Button,
   Checkbox,
@@ -16,9 +17,10 @@ import {
   Skeleton,
   Table,
   Tabs,
+  Title,
 } from "../../components";
-import { useBreakpoint, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
-import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType } from "../../types";
+import { useBreakpoint, useGetEntities, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
+import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType, WebhookType } from "../../types";
 import {
   AllEntities,
   capitalizeFirstLetter,
@@ -30,6 +32,7 @@ import {
   getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
+  userAtom,
 } from "../../utils";
 import { UpdateProjectType } from "../../validation";
 
@@ -159,7 +162,7 @@ export function ProjectSettingsView() {
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
-
+  const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
 
@@ -186,6 +189,8 @@ export function ProjectSettingsView() {
     "projects",
     project_id as string,
   );
+
+  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", { enabled: !!user?.id });
 
   useLayoutEffect(() => {
     if (projectData?.data) setProject(projectData.data);
@@ -348,7 +353,7 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
           {selectedTab === 3 ? (
-            <div className="flex max-h-[90%] flex-col gap-y-0 overflow-y-auto">
+            <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
                 {AllEntities.map((entity) => (
                   <div
@@ -380,6 +385,31 @@ export function ProjectSettingsView() {
                     </div>
                   </div>
                 ))}
+              </Collapsible>
+              <Collapsible
+                actions={[
+                  {
+                    icon: IconEnum.add,
+                    tooltip: "Add webhook",
+                    onClick: () =>
+                      setDrawer((prev) => ({ ...prev, type: "webhooks", data: {}, title: "Create webhook", size: "md" })),
+                  },
+                ]}
+                label="Webhooks">
+                <div className="flex flex-col gap-y-2">
+                  {webhooks?.data?.length ? (
+                    (webhooks?.data || [])?.map((webhook) => (
+                      <div key={webhook.id} className="flex items-center justify-between py-2">
+                        <Title label={webhook.title} size="md" />
+                        <div className="h-8 w-8">
+                          <Button hasNoBackground icon={IconEnum.trash} onClick={undefined} variant="error" />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <Alert label="There are no available webhooks for this user." variant="info" />
+                  )}
+                </div>
               </Collapsible>
             </div>
           ) : null}

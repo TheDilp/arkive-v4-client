@@ -110,5 +110,6 @@ export const IconEnum = {
   user_settings: "ph:user-gear",
   vertical: "ph:arrows-out-line-vertical",
   warning: "ph:warning",
+  webhooks: "ph:webhooks-logo",
   word: "codicon:whole-word",
 };

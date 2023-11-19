@@ -279,11 +279,11 @@ export function useGenerateDocument<
     },
   );
 }
-export function useInviteUserToProject<InsertType extends { data: { project_id: string; email: string } }>() {
+export function useInviteUserToProject() {
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newGraph: InsertType) =>
+    async (newGraph) =>
       FetchFunction({
         url: `${baseURLS.baseServer}/users/invite`,
         body: JSON.stringify(newGraph),
@@ -305,6 +305,43 @@ export function useInviteUserToProject<InsertType extends { data: { project_id: 
           variant: "error",
           timer: 3,
           icon: IconEnum.error,
+        });
+      },
+    },
+  );
+}
+export function useCreateWebhook() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (newItemValues: { data: { title: string; url: string; user_id: string } }) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/webhooks/create`,
+        body: JSON.stringify(newItemValues),
+        method: "POST",
+      }),
+
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries(["allEntities", "webhooks"]);
+          createNotification({
+            title: data?.message || getEntityCRUDNotification("webhooks", "create"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+            position: "top-right",
+          });
+        }
+      },
+      onError: (error: { message?: string }) => {
+        createNotification({
+          title: error?.message || "There was an error creating this entity.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+          position: "top-right",
         });
       },
     },
