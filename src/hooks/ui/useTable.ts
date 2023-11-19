@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { TableActionType, TableDispatch, TableParams } from "../../types";
 import { deleteObjectProps } from "../../utils";
 
-const tableReducerFn = (state: TableParams, action: TableActionType): TableParams => {
+function tableReducerFn(state: TableParams, action: TableActionType): TableParams {
   switch (action.type) {
     case "setFilter": {
       let tempFilters = { ...state.filters };
@@ -162,7 +162,7 @@ const tableReducerFn = (state: TableParams, action: TableActionType): TableParam
     default:
       return state;
   }
-};
+}
 
 export function useTable({
   orderBy,

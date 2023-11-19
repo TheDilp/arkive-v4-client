@@ -18,7 +18,7 @@ export const FamilyTreeGenerationsCountOptions = [
   { label: "50", value: "50" },
 ];
 
-export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
+export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
   return [
     // Nodes in general
     {
@@ -270,7 +270,7 @@ export const getCytoscapeStylesheet = (curve_style: CurveStyleType) => {
       },
     },
   ];
-};
+}
 export const cytoscapeGridOptions = {
   // On/Off Modules
   /* From the following four snap options, at most one should be true at a given time */

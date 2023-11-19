@@ -133,7 +133,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
     const startTime = Date.now();
     scrollingRef.current = startTime;
 
-    const run = () => {
+    function run() {
       if (scrollingRef.current !== startTime) return;
       const now = Date.now();
       const elapsed = now - startTime;
@@ -146,7 +146,7 @@ export function TimelineView({ events, month_count }: { events: EventType[]; mon
       } else {
         elementScroll(interpolated, canSmooth, instance);
       }
-    };
+    }
 
     requestAnimationFrame(run);
   }, []);

@@ -13,80 +13,82 @@ import { Dropdown } from "../Dropdown";
 
 const columnHelper = createColumnHelper<MapPinType>();
 
-const getColumns = (project_id: string, setDialog: Dispatch<SetStateAction<DialogAtomType>>) => [
-  columnHelper.display({
-    id: "icon",
-    header: "Icon",
-    cell: ({ row }) => (
-      <div className="flex w-full items-center justify-center">
-        {row?.original?.character ? (
-          <Avatar
-            image={getImageURL(project_id, "images", row?.original?.character?.portrait_id)}
-            label={getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)}
-            size="sm"
-          />
-        ) : (
-          <Icon fontSize={32} icon={row?.original?.icon as string} />
-        )}
-      </div>
-    ),
-    minSize: 5,
-    maxSize: 5,
-  }),
-  columnHelper.display({
-    id: "title",
-    header: "Icon title",
-    cell: ({ row }) => (
-      <div className="flex max-w-full items-center justify-start">
-        <span className="truncate">
-          {row.original?.title ||
-            (row?.original?.character?.first_name ? (
-              getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)
-            ) : (
-              <i>No name.</i>
-            ))}
-        </span>
-      </div>
-    ),
-    minSize: 5,
-  }),
+function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+  return [
+    columnHelper.display({
+      id: "icon",
+      header: "Icon",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          {row?.original?.character ? (
+            <Avatar
+              image={getImageURL(project_id, "images", row?.original?.character?.portrait_id)}
+              label={getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)}
+              size="sm"
+            />
+          ) : (
+            <Icon fontSize={32} icon={row?.original?.icon as string} />
+          )}
+        </div>
+      ),
+      minSize: 5,
+      maxSize: 5,
+    }),
+    columnHelper.display({
+      id: "title",
+      header: "Icon title",
+      cell: ({ row }) => (
+        <div className="flex max-w-full items-center justify-start">
+          <span className="truncate">
+            {row.original?.title ||
+              (row?.original?.character?.first_name ? (
+                getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)
+              ) : (
+                <i>No name.</i>
+              ))}
+          </span>
+        </div>
+      ),
+      minSize: 5,
+    }),
 
-  columnHelper.display({
-    id: "action",
-    header: "Actions",
-    meta: {
-      centered: true,
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Dropdown
-          allowedPlacements={["left", "left-start", "left-end"]}
-          items={[
-            {
-              id: "delete_map_pin",
-              label: "Delete map pin",
-              icon: IconEnum.trash,
-              onClick: () => {
-                setDialog((prev) => ({
-                  ...prev,
-                  data: {
-                    ...row.original,
-                    entity_title: "map_pins",
-                  },
-                  title: "Delete map pin",
-                  size: "sm",
-                  type: "delete_entity",
-                }));
+    columnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "delete_map_pin",
+                label: "Delete map pin",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "map_pins",
+                    },
+                    title: "Delete map pin",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
               },
-            },
-          ]}>
-          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-        </Dropdown>
-      </div>
-    ),
-    maxSize: 2,
-  }),
-];
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+      maxSize: 2,
+    }),
+  ];
+}
 
 export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
   const { project_id } = useParams();

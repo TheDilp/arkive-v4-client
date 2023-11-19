@@ -3,12 +3,12 @@ import { MutableRefObject, useRef } from "react";
 import { useUpdateManySubEntities } from "..";
 
 type NodePositionUpdateType = { id: string; x: number; y: number };
-const useBatchUpdateNodePositions = (parent_id: string) => {
+function useBatchUpdateNodePositions(parent_id: string) {
   const batchedData = useRef() as MutableRefObject<NodePositionUpdateType[]>;
   const timer = useRef([]) as MutableRefObject<any>;
   const updateManyNodePositions = useUpdateManySubEntities("nodes", parent_id);
 
-  const addOrUpdateNode = (newNode: NodePositionUpdateType) => {
+  function addOrUpdateNode(newNode: NodePositionUpdateType) {
     batchedData.current = [...(batchedData.current || [])];
     const idx = batchedData.current.findIndex((n: NodePositionUpdateType) => n.id === newNode.id);
 
@@ -24,9 +24,9 @@ const useBatchUpdateNodePositions = (parent_id: string) => {
       updateManyNodePositions.mutate({ data: batchedData.current.map((node) => ({ data: node, parent_id })) });
       batchedData.current = [];
     }, 350);
-  };
+  }
 
   return { addOrUpdateNode };
-};
+}
 
 export { useBatchUpdateNodePositions };

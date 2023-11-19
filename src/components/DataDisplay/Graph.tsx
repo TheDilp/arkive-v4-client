@@ -99,7 +99,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
     [boardState.curve_style],
   );
 
-  const makeEdgeCallback = (source: string, target: string, color?: string) => {
+  function makeEdgeCallback(source: string, target: string, color?: string) {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
     const newEdge = {
       id: crypto.randomUUID(),
@@ -119,7 +119,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
         },
       },
     );
-  };
+  }
 
   useEffect(() => {
     if (graph?.nodes && graph?.nodes.length > 0 && !nodes.length) {

@@ -8,7 +8,7 @@ import { HandleChangePropsType } from "../../types";
 export function useHandleChange({ data, setData }: { data: any; setData: any }) {
   const [changedFields, setChangedFields] = useState<any[]>([]);
   const [changedData, setChangedData] = useState<any>();
-  const handleChange = (newData: HandleChangePropsType) => {
+  function handleChange(newData: HandleChangePropsType) {
     const changedFieldsUpdated = [...changedFields];
     const updatedData = cloneDeep(data);
 
@@ -44,7 +44,7 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
         }),
       ),
     );
-  };
+  }
 
   function resetChanges() {
     setChangedFields([]);
