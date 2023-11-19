@@ -128,7 +128,12 @@ export function Input({
             ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, onChange })
             : onChange(e.target)
         }
-        onKeyDown={onKeyDown}
+        onKeyDown={(e) => {
+          if (e.key === "e" || e.key === "E" || e.key === "+") {
+            e.preventDefault();
+          }
+          if (onKeyDown) onKeyDown(e);
+        }}
         placeholder={placeholder}
         step={step}
         type={type}
