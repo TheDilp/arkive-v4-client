@@ -129,7 +129,7 @@ export function Input({
             : onChange(e.target)
         }
         onKeyDown={(e) => {
-          if (e.key === "e" || e.key === "E" || e.key === "+") {
+          if ((e.key === "e" || e.key === "E" || e.key === "+") && type === "number") {
             e.preventDefault();
           }
           if (onKeyDown) onKeyDown(e);
