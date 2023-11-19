@@ -1,9 +1,10 @@
 import { useAtomValue } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 
 import { useCreateWebhook, useGetEntity, useHandleChange } from "../../../hooks";
 import { WebhookType } from "../../../types";
-import { IconEnum, userAtom } from "../../../utils";
+import { drawerAtom, IconEnum, userAtom } from "../../../utils";
 import { InsertWebhookSchema } from "../../../validation/webhooks";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -28,7 +29,7 @@ export function WebhookDrawer({ data }: Props) {
   const { mutateAsync: create, isLoading: isCreating } = useCreateWebhook();
   const [webhook, setWebhook] = useState<WebhookType | null>();
   const { handleChange } = useHandleChange({ data: webhook, setData: setWebhook });
-
+  const resetDrawer = useResetAtom(drawerAtom);
   useLayoutEffect(() => {
     if (existingWebhook?.data) {
       setWebhook(existingWebhook?.data);
@@ -48,7 +49,7 @@ export function WebhookDrawer({ data }: Props) {
         placeholder="E.g. DnD group server"
         value={webhook?.title || ""}
       />
-      <Input label="Webhook url" name="url" onChange={handleChange} value={webhook?.url || ""} />
+      <Input isDisabled={!!data?.id} label="Webhook url" name="url" onChange={handleChange} value={webhook?.url || ""} />
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
@@ -60,6 +61,7 @@ export function WebhookDrawer({ data }: Props) {
               const parsedData = InsertWebhookSchema.parse({ data: webhook });
               await create(parsedData);
             }
+            resetDrawer();
           }}
           variant="success"
         />
