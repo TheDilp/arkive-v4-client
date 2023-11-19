@@ -7,6 +7,7 @@ import {
   Avatar,
   Button,
   Checkbox,
+  Collapsible,
   ColorPicker,
   createColumnHelper,
   Dropdown,
@@ -15,7 +16,6 @@ import {
   Skeleton,
   Table,
   Tabs,
-  Title,
 } from "../../components";
 import { useBreakpoint, useGetEntity, useHandleChange, useTable, useUpdateEntity } from "../../hooks";
 import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType } from "../../types";
@@ -336,39 +336,6 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
           {selectedTab === 2 ? (
-            <div className="flex max-h-[90%] flex-col gap-y-0 overflow-y-auto">
-              <Title label="Notifications from other project members" size="xl" />
-              {AllEntities.map((entity) => (
-                <div key={entity} className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0">
-                  <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
-                  <div className="flex w-52 items-center justify-between gap-x-2 text-center">
-                    <Checkbox
-                      isDisabled
-                      label="Create"
-                      name={`${entity}_create_notification`}
-                      onChange={() => {}}
-                      value={false}
-                    />
-                    <Checkbox
-                      isDisabled
-                      label="Update"
-                      name={`${entity}_update_notification`}
-                      onChange={() => {}}
-                      value={false}
-                    />
-                    <Checkbox
-                      isDisabled
-                      label="Delete"
-                      name={`${entity}_delete_notification`}
-                      onChange={() => {}}
-                      value={false}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-          {selectedTab === 3 ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -378,6 +345,42 @@ export function ProjectSettingsView() {
                   type="character_relationship_types"
                 />
               </div>
+            </div>
+          ) : null}
+          {selectedTab === 3 ? (
+            <div className="flex max-h-[90%] flex-col gap-y-0 overflow-y-auto">
+              <Collapsible label="Notifications from other project members">
+                {AllEntities.map((entity) => (
+                  <div
+                    key={entity}
+                    className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
+                    <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
+                    <div className="flex w-52 items-center justify-between gap-x-2 text-center">
+                      <Checkbox
+                        isDisabled
+                        label="Create"
+                        name={`${entity}_create_notification`}
+                        onChange={() => {}}
+                        value={false}
+                      />
+                      <Checkbox
+                        isDisabled
+                        label="Update"
+                        name={`${entity}_update_notification`}
+                        onChange={() => {}}
+                        value={false}
+                      />
+                      <Checkbox
+                        isDisabled
+                        label="Delete"
+                        name={`${entity}_delete_notification`}
+                        onChange={() => {}}
+                        value={false}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </Collapsible>
             </div>
           ) : null}
         </div>
