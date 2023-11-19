@@ -7,18 +7,18 @@ import { IconEnum } from "../../../../../utils";
 import { Card, Graph, Tooltip } from "../../../..";
 
 type Props = {
-  nodeId: string | undefined;
-  nodeLabel: string;
+  id: string | undefined;
+  label: string;
   title?: string;
   project_id: string | undefined;
 };
 
-function GraphMentionTooltip({ nodeId, project_id }: Pick<Props, "nodeId" | "project_id">) {
+function GraphMentionTooltip({ id, project_id }: Pick<Props, "id" | "project_id">) {
   const { data } = useGetEntity<GraphType>(
-    nodeId as string,
+    id as string,
     "graphs",
     { data: { project_id }, fields: ["title"], relations: { nodes: true, edges: true } },
-    { enabled: !!nodeId, queryKeyConcat: ["mention"] },
+    { enabled: !!id, queryKeyConcat: ["mention"] },
   );
   return (
     <Card title={data?.data?.title || ""}>
@@ -29,28 +29,25 @@ function GraphMentionTooltip({ nodeId, project_id }: Pick<Props, "nodeId" | "pro
   );
 }
 
-export function GraphMention({ title, nodeId, nodeLabel, project_id }: Props) {
-  return nodeId ? (
-    <Tooltip
-      arrowColor="#3f3f46"
-      content={<GraphMentionTooltip nodeId={nodeId} project_id={project_id} />}
-      delay={{ closeDelay: 500 }}>
+export function GraphMention({ title, id, label, project_id }: Props) {
+  return id ? (
+    <Tooltip arrowColor="#3f3f46" content={<GraphMentionTooltip id={id} project_id={project_id} />} delay={{ closeDelay: 500 }}>
       <Link
         className="inline-flex font-lato font-bold underline transition-colors hover:text-sky-400"
-        id={`link-${nodeId}`}
-        to={!project_id ? `/public/graphs/${nodeId}` : `/projects/${project_id}/graphs/${nodeId}`}>
+        id={`link-${id}`}
+        to={!project_id ? `/public/graphs/${id}` : `/projects/${project_id}/graphs/${id}`}>
         <div className="relative -top-[0.0625rem] flex items-start">
           <span className="relative">
             <Icon fontSize={14} icon={IconEnum.graph} />
           </span>
-          <span className="text-sm underline">{title || nodeLabel}</span>
+          <span className="text-sm underline">{title || label}</span>
         </div>
       </Link>
     </Tooltip>
   ) : (
     <div className="font-lato text-sm">
       <Icon icon={IconEnum.edit} />
-      {nodeLabel}
+      {label}
     </div>
   );
 }

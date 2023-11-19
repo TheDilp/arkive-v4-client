@@ -106,9 +106,7 @@ function typeMap(project_id: string, isPublicView?: boolean) {
         if (attrs) {
           const { id, label, alterId, name: type } = attrs;
           if (type === "characters")
-            return (
-              <CharacterMention isPublic={isPublicView} nodeId={id} nodeLabel={label} project_id={project_id} title={label} />
-            );
+            return <CharacterMention isPublic={isPublicView} id={id} label={label} project_id={project_id} title={label} />;
           if (type === "documents")
             return (
               <DocumentMention
@@ -122,9 +120,9 @@ function typeMap(project_id: string, isPublicView?: boolean) {
               />
             );
 
-          if (type === "maps") return <MapMention nodeId={id} nodeLabel={label} project_id={project_id} />;
+          if (type === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
 
-          if (type === "graphs") return <GraphMention nodeId={id} nodeLabel={label} project_id={project_id} />;
+          if (type === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
           // if (type === "words") return <WordMention id={id} label={label} title={label} />;
 
           return (

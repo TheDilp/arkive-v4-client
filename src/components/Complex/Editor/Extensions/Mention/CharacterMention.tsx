@@ -10,25 +10,25 @@ import { Avatar } from "../../../../Misc";
 
 type Props = {
   title?: string;
-  nodeId: string | undefined;
-  nodeLabel: string;
+  id: string | undefined;
+  label: string;
   project_id: string | undefined;
   isPublic?: boolean;
 };
-export function CharacterMention({ nodeId, project_id, title, nodeLabel, isPublic }: Props) {
+export function CharacterMention({ id, project_id, title, label, isPublic }: Props) {
   const { data } = useGetEntity<CharacterType>(
-    nodeId,
+    id,
     "characters",
     {
       fields: ["id", "full_name", "portrait_id"],
     },
-    { enabled: !!nodeId, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"] },
+    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"] },
   );
 
-  return nodeId ? (
+  return id ? (
     <Link
       className="inline-flex items-center font-lato font-bold underline transition-colors"
-      to={isPublic ? `/public/characters/${nodeId}/resources` : `/projects/${project_id}/characters/${nodeId}/resources`}>
+      to={isPublic ? `/public/characters/${id}/resources` : `/projects/${project_id}/characters/${id}/resources`}>
       <div className={`relative ${isPublic ? "top-[0.175rem]" : "top-[0.175rem]"} flex items-start`}>
         <span className=" relative">
           {data?.data?.portrait_id ? (
@@ -39,10 +39,10 @@ export function CharacterMention({ nodeId, project_id, title, nodeLabel, isPubli
             <Icon fontSize={14} icon={IconEnum.character} />
           )}
         </span>
-        <span className="text-sm underline hover:text-sky-400">{data?.data?.full_name || title || nodeLabel}</span>
+        <span className="text-sm underline hover:text-sky-400">{data?.data?.full_name || title || label}</span>
       </div>
     </Link>
   ) : (
-    <div className="font-lato text-sm">{nodeLabel}</div>
+    <div className="font-lato text-sm">{label}</div>
   );
 }
