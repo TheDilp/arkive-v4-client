@@ -106,7 +106,7 @@ function typeMap(project_id: string, isPublicView?: boolean) {
         if (attrs) {
           const { id, label, alterId, name: type } = attrs;
           if (type === "characters")
-            return <CharacterMention isPublic={isPublicView} id={id} label={label} project_id={project_id} title={label} />;
+            return <CharacterMention id={id} isPublic={isPublicView} label={label} project_id={project_id} title={label} />;
           if (type === "documents")
             return (
               <DocumentMention
