@@ -7,7 +7,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
-import { getTextContentFromSlice, RemirrorContentType } from "remirror";
+import { RemirrorContentType } from "remirror";
 
 import { SlashMenu } from "../../components";
 import { MentionDropdownComponent } from "../../components/Complex/Editor/Extensions/Mention";
@@ -24,10 +24,12 @@ import {
 } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
 import {
+  baseURLS,
   breadcrumbsAtom,
   contextMenuAtom,
   DefaultTagColor,
   drawerAtom,
+  FetchFunction,
   IconEnum,
   mentionPositionAtom,
   useNotifications,
@@ -46,7 +48,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
-  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", {
+  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
     enabled: !!user?.id,
     staleTime: Infinity,
   });
@@ -249,8 +251,19 @@ export function DocumentView({ editable }: { editable: boolean }) {
                       const slice = getContext()?.getState().selection.content();
                       if (slice) {
                         const id = crypto.randomUUID();
-                        const title = getTextContentFromSlice(slice).trim();
-                        if (title.length) {
+
+                        if (slice) {
+                          let title = "";
+                          slice.content.descendants((node) => {
+                            if (node.type.name === "mentionAtom") {
+                              title += node.attrs.label;
+                            } else if (node.type.name === "text") {
+                              title += node.textContent;
+                            }
+                          });
+                          if (title.length > 250) {
+                            return;
+                          }
                           await createDocument({ data: { id, project_id: project_id as string, title } });
                           getContext()?.commands?.replaceText({
                             attrs: {
@@ -275,7 +288,35 @@ export function DocumentView({ editable }: { editable: boolean }) {
                     subItems: (webhooks?.data || []).map((webhook) => ({
                       id: webhook.id,
                       title: webhook.title,
-                      onClick: () => {},
+                      onClick: () => {
+                        const slice = getContext()?.getState().selection.content();
+                        if (slice) {
+                          let text = "";
+                          slice.content.descendants((node) => {
+                            if (node.type.name === "mentionAtom") {
+                              text += node.attrs.label;
+                            } else if (node.type.name === "text") {
+                              text += node.textContent;
+                            }
+                          });
+                          if (text.length > 2500) {
+                            createNotification({
+                              title: "Text sent to Discord cannot have more than 2500 characters.",
+                              variant: "warning",
+                              icon: IconEnum.warning,
+                              timer: 5,
+                            });
+                          } else {
+                            FetchFunction({
+                              url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                              body: JSON.stringify({
+                                data: { title: currentDocument?.data?.title, description: text, type: "document_text" },
+                              }),
+                              method: "POST",
+                            });
+                          }
+                        }
+                      },
                     })),
                   },
                 ],

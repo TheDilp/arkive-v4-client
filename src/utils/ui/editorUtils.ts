@@ -64,7 +64,7 @@ export function DefaultEditorExtensions(
       {
         char: "@d:",
         name: "documents",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
       },
       {
         char: "@m:",

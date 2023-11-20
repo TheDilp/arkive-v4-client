@@ -146,9 +146,6 @@ export const UpdateCharacterSchema = z.object({
 });
 
 export const AddToCharacterSchema = z.object({
-  data: z.object({
-    id: z.string(),
-  }),
   relations: z.object({
     documents: z.object({ id: z.string() }).array().optional(),
     images: z.object({ id: z.string() }).array().optional(),
