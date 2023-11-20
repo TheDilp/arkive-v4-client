@@ -141,7 +141,7 @@ function columns(
                 ? [
                     {
                       id: "mentioned_in",
-                      label: "Mentioned in",
+                      title: "Mentioned in",
                       icon: IconEnum.graph,
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -155,8 +155,10 @@ function columns(
                     },
                     {
                       id: "view_public",
-                      label: "View public page",
+                      title: "View public page",
+                      icon: IconEnum.public,
                       onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
+                      isDisabled: !row.original.is_public,
                     },
                   ]
                 : []),
@@ -480,6 +482,7 @@ export function FolderView() {
                   event,
                   items: [
                     {
+                      id: "1",
                       title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
                       onClick: () => {
@@ -502,6 +505,8 @@ export function FolderView() {
                       },
                     },
                     {
+                      id: "2",
+
                       title: `Delete ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.trash,
                       onClick: () =>
@@ -538,6 +543,7 @@ export function FolderView() {
                     event,
                     items: [
                       {
+                        id: "1",
                         title: `Edit ${item.is_folder ? "folder" : entityName}`,
                         icon: IconEnum.edit,
                         onClick: () => {
@@ -560,6 +566,7 @@ export function FolderView() {
                         },
                       },
                       {
+                        id: "2",
                         title: `Delete ${entityName}`,
                         icon: IconEnum.trash,
                         onClick: () =>

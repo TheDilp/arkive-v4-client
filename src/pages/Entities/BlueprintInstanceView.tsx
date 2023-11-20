@@ -1,6 +1,6 @@
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 
 import { Avatar, Badge, Button, createColumnHelper, Dropdown, Table, TablePageLayout, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
@@ -91,17 +91,17 @@ function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFi
         allowedPlacements={["left-start"]}
         items={(locations || []).map(({ map_pin }) => ({
           id: map_pin?.id,
-          label: map_pin?.title || "",
+          title: map_pin?.title || "",
           icon: map_pin?.icon,
           subItems: [
             {
               id: `go_to_${map_pin?.id}`,
-              label: `Go to ${map_pin?.title}`,
+              title: `Go to ${map_pin?.title}`,
               onClick: () => navigate(`/projects/${project_id}/maps/${map_pin?.parent_id}/${map_pin?.id}`),
             },
             {
               id: `preview_${map_pin?.id}`,
-              label: `Preview ${map_pin?.title} map`,
+              title: `Preview ${map_pin?.title} map`,
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
@@ -128,6 +128,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
+  navigate: NavigateFunction,
 ) {
   const fieldColumns = [
     columnHelper.accessor("title", {
@@ -303,6 +304,13 @@ function createColumns(
                 },
               },
               {
+                id: "2",
+                title: "View public page",
+                icon: IconEnum.public,
+                onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
+                isDisabled: !row.original.is_public,
+              },
+              {
                 id: "delete_instance",
                 title: "Delete instance",
                 icon: IconEnum.trash,
@@ -334,6 +342,7 @@ export function BlueprintInstanceView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const createNotification = useNotifications();
+  const navigate = useNavigate();
   const [{ selection, pagination, orderBy }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
@@ -400,6 +409,7 @@ export function BlueprintInstanceView() {
               setDrawer,
               setDialog,
               createNotification,
+              navigate,
             )}
             config={{
               hasSelect: true,

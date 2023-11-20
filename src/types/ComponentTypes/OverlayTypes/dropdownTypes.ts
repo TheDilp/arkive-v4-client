@@ -5,7 +5,7 @@ import { IconThickness } from "../MiscTypes";
 
 export interface DropdownItemType {
   id: string;
-  label?: string;
+  title?: string;
   child?: ReactNode;
   icon?: string;
   image?: string;
@@ -17,7 +17,9 @@ export interface DropdownItemType {
 }
 export interface DropdownType {
   allowedPlacements?: PositionType;
-  children: JSX.Element;
+  children?: JSX.Element | null;
   items: DropdownItemType[];
   isReferenceMaxSize?: boolean;
+  // @ts-ignore
+  event?: MouseEvent<HTMLDivElement, MouseEvent> | null;
 }

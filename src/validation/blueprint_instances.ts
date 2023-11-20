@@ -4,6 +4,7 @@ export const InsertBlueprintInstanceSchema = z.object({
   data: z.object({
     parent_id: z.string(),
     title: z.string(),
+    is_public: z.boolean().nullable().optional(),
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional().nullable(),
@@ -57,6 +58,7 @@ export const UpdateBlueprintInstanceSchema = z.object({
   data: z.object({
     id: z.string(),
     title: z.string().optional(),
+    is_public: z.boolean().nullable().optional(),
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional().nullable(),

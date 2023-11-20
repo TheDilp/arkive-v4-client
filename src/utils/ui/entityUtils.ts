@@ -61,6 +61,15 @@ export function getEntityFields(type: AvailableEntityType): string[] {
   const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
   if (
+    type === "documents" ||
+    type === "maps" ||
+    type === "graphs" ||
+    type === "calendars" ||
+    type === "dictionaries" ||
+    type === "random_tables"
+  )
+    fields.push("is_public");
+  if (
     (type === "graphs" || type === "random_tables" || type === "calendars" || type === "dictionaries") &&
     fields.includes("image_id")
   )

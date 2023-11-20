@@ -58,6 +58,7 @@ export interface BlueprintInstanceType {
   id: string;
   title: string;
   parent_id: string;
+  is_public?: boolean;
   blueprint?: BlueprintType;
   tags: TagType[];
   blueprint_fields: BlueprintInstanceBlueprintFieldType[];

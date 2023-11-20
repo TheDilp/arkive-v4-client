@@ -36,7 +36,7 @@ import {
 import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
 import { TemplateLocationsField } from "../../Complex/TemplateFields/TemplateLocationsField";
 import { TemplateRandomTableField } from "../../Complex/TemplateFields/TemplateRandomTableField";
-import { Button, Input, TagInput } from "../../Form";
+import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
@@ -356,6 +356,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       });
     }
   }, [existingInstance?.data]);
+
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
@@ -370,6 +371,11 @@ export function BlueprintInstanceDrawer({ data }: Props) {
               onChange={handleChange}
               value={instance?.title}
             />
+          </div>
+
+          <div className="mt-2 flex w-full items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox name="is_public" onChange={handleChange} value={instance?.is_public ?? false} />
           </div>
           {blueprint?.data?.blueprint_fields?.length ? (
             <FieldTemplateRows
@@ -400,6 +406,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   data: {
                     id: instance.id,
                     title: instance.title,
+                    is_public: instance?.is_public,
                     parent_id: data?.parent_id ?? item_id,
                   },
                   relations: {
@@ -417,6 +424,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                 const dataToParse = {
                   data: {
                     title: instance.title,
+                    is_public: instance?.is_public,
                     parent_id: data?.parent_id ?? item_id,
                   },
                   relations: {
