@@ -47,7 +47,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit field template",
+                title: "Edit field template",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -61,13 +61,13 @@ function createColumns(
               },
               {
                 id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
                 icon: IconEnum.additional_fields,
                 onClick: row.getToggleExpandedHandler(),
               },
               {
                 id: "3",
-                label: "Delete field template",
+                title: "Delete field template",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

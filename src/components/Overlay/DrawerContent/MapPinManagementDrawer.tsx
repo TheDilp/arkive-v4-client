@@ -65,7 +65,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
             items={[
               {
                 id: "delete_map_pin",
-                label: "Delete map pin",
+                title: "Delete map pin",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

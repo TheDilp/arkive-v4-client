@@ -85,7 +85,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
             items={[
               {
                 id: "delete_relationship_type",
-                label: "Delete relationship type",
+                title: "Delete relationship type",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({
@@ -140,7 +140,7 @@ function membersColumns() {
             items={[
               {
                 id: "remove_member",
-                label: "Remove member from project",
+                title: "Remove member from project",
                 icon: IconEnum.user_remove,
                 onClick: () => {
                   // setDialog((prev) => ({

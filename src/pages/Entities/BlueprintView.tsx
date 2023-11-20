@@ -48,7 +48,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit blueprint",
+                title: "Edit blueprint",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -62,7 +62,7 @@ function createColumns(
               },
               {
                 id: "2",
-                label: "Create instance",
+                title: "Create instance",
                 icon: IconEnum.add,
                 onClick: () =>
                   setDrawer((prev) => ({
@@ -77,7 +77,7 @@ function createColumns(
               },
               {
                 id: "3",
-                label: "Delete blueprint",
+                title: "Delete blueprint",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

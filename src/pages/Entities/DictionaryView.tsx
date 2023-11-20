@@ -47,7 +47,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit Word",
+                title: "Edit Word",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -61,13 +61,13 @@ function createColumns(
               },
               {
                 id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} context`,
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} context`,
                 icon: IconEnum.text_align_justify,
                 onClick: row.getToggleExpandedHandler(),
               },
               {
                 id: "delete_word",
-                label: "Delete word",
+                title: "Delete word",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

@@ -53,7 +53,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit tag",
+                title: "Edit tag",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -68,12 +68,12 @@ function createColumns(
               {
                 id: "expand",
                 icon: IconEnum.tags,
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this tag`,
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this tag`,
                 onClick: row.getToggleExpandedHandler(),
               },
               {
                 id: "3",
-                label: "Delete tag",
+                title: "Delete tag",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

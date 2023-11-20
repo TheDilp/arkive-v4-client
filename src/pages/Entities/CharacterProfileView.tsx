@@ -179,7 +179,7 @@ function relationshipTableColumns(
             items={[
               {
                 id: "1",
-                label: `Preview profile of ${getCharacterFullName(
+                title: `Preview profile of ${getCharacterFullName(
                   row.original.first_name,
                   undefined,
                   row.original?.last_name,
@@ -196,7 +196,7 @@ function relationshipTableColumns(
               },
               {
                 id: "2",
-                label: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+                title: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
                 icon: IconEnum.character,
                 onClick: isPreview
                   ? () => {}
@@ -204,7 +204,7 @@ function relationshipTableColumns(
               },
               {
                 id: "3",
-                label: `View conversations of ${getCharacterFullName(
+                title: `View conversations of ${getCharacterFullName(
                   row.original.first_name,
                   undefined,
                   row.original?.last_name,
@@ -288,7 +288,7 @@ function documentsTableColumns(
             items={[
               {
                 id: "preview",
-                label: "Preview content",
+                title: "Preview content",
                 icon: IconEnum.document,
                 onClick: () =>
                   setDrawer((prev) => ({
@@ -304,7 +304,7 @@ function documentsTableColumns(
               },
               {
                 id: "2",
-                label: "Remove document",
+                title: "Remove document",
                 icon: IconEnum.trash,
                 onClick: async () => {
                   await removeItem({ data: { id: character_id, document: { data: { id: row.original.id } } } });
@@ -425,13 +425,13 @@ function assetTableColumns(
             items={[
               {
                 id: "2",
-                label: "Download",
+                title: "Download",
                 icon: IconEnum.download,
                 onClick: () => downloadImage({ data: row.original }),
               },
               {
                 id: "delete_image",
-                label: "Remove image",
+                title: "Remove image",
                 icon: IconEnum.trash,
                 onClick: async () => {
                   const parsedData = RemoveFromCharacterSchema.parse({
@@ -498,7 +498,7 @@ function conversationTableColumns(
             items={[
               {
                 id: "edit_conversation",
-                label: "Edit conversation",
+                title: "Edit conversation",
                 icon: IconEnum.edit,
                 onClick: () => {
                   const char = row.original.characters.find((c) => c.id === item_id);
@@ -514,7 +514,7 @@ function conversationTableColumns(
               },
               {
                 id: "generate_document",
-                label: "Create document from conversation",
+                title: "Create document from conversation",
                 icon: IconEnum.document,
                 onClick: async () => {
                   await generateDocument({
@@ -528,7 +528,7 @@ function conversationTableColumns(
               },
               {
                 id: "delete_conversation",
-                label: "Delete conversation",
+                title: "Delete conversation",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

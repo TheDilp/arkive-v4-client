@@ -14,8 +14,15 @@ import { MentionDropdownComponent } from "../../components/Complex/Editor/Extens
 import { Menubar } from "../../components/Complex/Editor/Menubar";
 import { Icon, Skeleton } from "../../components/Misc";
 import { Notification } from "../../components/Overlay";
-import { useChangeNavbarTitle, useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../hooks";
-import { DocumentType } from "../../types";
+import {
+  useChangeNavbarTitle,
+  useCreateEntity,
+  useGetEntities,
+  useGetEntity,
+  useHandleChange,
+  useUpdateEntity,
+} from "../../hooks";
+import { DocumentType, WebhookType } from "../../types";
 import {
   breadcrumbsAtom,
   contextMenuAtom,
@@ -24,6 +31,7 @@ import {
   IconEnum,
   mentionPositionAtom,
   useNotifications,
+  userAtom,
 } from "../../utils";
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
@@ -32,10 +40,16 @@ import { InsertDocumentType } from "../../validation";
 export function DocumentView({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
+  const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const drawer = useAtomValue(drawerAtom);
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
+
+  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", {
+    enabled: !!user?.id,
+    staleTime: Infinity,
+  });
 
   const {
     data: currentDocument,
@@ -228,6 +242,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                 event: e,
                 items: [
                   {
+                    id: "1",
                     title: "Create document with title",
                     icon: IconEnum.add,
                     onClick: async () => {
@@ -252,6 +267,16 @@ export function DocumentView({ editable }: { editable: boolean }) {
                         }
                       }
                     },
+                  },
+                  {
+                    id: "2",
+                    title: "Send text to Discord",
+                    icon: IconEnum.discord,
+                    subItems: (webhooks?.data || []).map((webhook) => ({
+                      id: webhook.id,
+                      title: webhook.title,
+                      onClick: () => {},
+                    })),
                   },
                 ],
               });

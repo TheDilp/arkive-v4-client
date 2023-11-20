@@ -72,7 +72,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit image",
+                title: "Edit image",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -86,13 +86,13 @@ function createColumns(
               },
               {
                 id: "2",
-                label: "Download",
+                title: "Download",
                 icon: IconEnum.download,
                 onClick: () => downloadImage({ data: row.original }),
               },
               {
                 id: "delete_image",
-                label: "Delete image",
+                title: "Delete image",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

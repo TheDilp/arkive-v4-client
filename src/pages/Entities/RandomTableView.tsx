@@ -35,7 +35,7 @@ function createColumns(
             items={[
               {
                 id: "edit_option",
-                label: "Edit option",
+                title: "Edit option",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -49,13 +49,13 @@ function createColumns(
               },
               {
                 id: "expand",
-                label: `${!row.getIsExpanded() ? "Show" : "Hide"} suboptions`,
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} suboptions`,
                 icon: IconEnum.random_table,
                 onClick: row.getToggleExpandedHandler(),
               },
               {
                 id: "delete_option",
-                label: "Delete option",
+                title: "Delete option",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

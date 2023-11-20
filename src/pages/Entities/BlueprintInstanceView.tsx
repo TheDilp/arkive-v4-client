@@ -290,7 +290,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit instance",
+                title: "Edit instance",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -304,7 +304,7 @@ function createColumns(
               },
               {
                 id: "delete_instance",
-                label: "Delete instance",
+                title: "Delete instance",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

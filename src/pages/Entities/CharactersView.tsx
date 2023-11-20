@@ -124,7 +124,7 @@ function createColumns(
             items={[
               {
                 id: "1",
-                label: "Edit character",
+                title: "Edit character",
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -139,7 +139,7 @@ function createColumns(
 
               {
                 id: "2",
-                label: "View relationship tree",
+                title: "View relationship tree",
                 icon: IconEnum.family_tree,
                 onClick: () => {
                   setDialog({
@@ -156,7 +156,7 @@ function createColumns(
               },
               {
                 id: "delete_character",
-                label: "Delete character",
+                title: "Delete character",
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({

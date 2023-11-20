@@ -125,7 +125,7 @@ function columns(
             items={[
               {
                 id: "1",
-                label: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
+                title: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
                 icon: IconEnum.edit,
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -162,7 +162,7 @@ function columns(
                 : []),
               {
                 id: "delete_entity",
-                label: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
+                title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
                 icon: IconEnum.trash,
                 onClick: () => {
                   setDialog((prev) => ({
@@ -406,7 +406,7 @@ export function FolderView() {
                 items={[
                   {
                     id: "1",
-                    label: `Create new ${entityName}`,
+                    title: `Create new ${entityName}`,
                     icon: getDefaultEntityIcon(type as AvailableEntityType),
                     onClick: () => {
                       setDrawer((prev) => ({
@@ -420,7 +420,7 @@ export function FolderView() {
                   },
                   {
                     id: "2",
-                    label: "Create new folder",
+                    title: "Create new folder",
                     icon: IconEnum.folder,
                     onClick: () => {
                       setDrawer((prev) => ({
