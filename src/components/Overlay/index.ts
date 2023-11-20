@@ -1,5 +1,4 @@
 export * from "./ColorPicker";
-export * from "./ContextMenu";
 export * from "./Dialog";
 export * from "./DialogContent";
 export * from "./Drawer";

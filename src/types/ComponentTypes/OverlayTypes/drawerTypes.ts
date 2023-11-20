@@ -3,7 +3,7 @@ import { Dispatch, MouseEvent, SetStateAction } from "react";
 
 import { Size } from "../../baseTypes";
 import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, MessageType, TagType } from "../../EntityTypes";
-import { ContextMenuItemType } from "./contextMenuTypes";
+import { DropdownItemType } from "./dropdownTypes";
 
 export type DrawerContentType =
   | null
@@ -112,5 +112,5 @@ export type DrawerAtomType = {
 
 export interface ContextMenuAtomType {
   event: MouseEvent<HTMLDivElement, MouseEvent> | null;
-  items: ContextMenuItemType[] | null;
+  items: DropdownItemType[] | null;
 }

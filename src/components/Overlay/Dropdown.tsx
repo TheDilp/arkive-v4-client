@@ -39,7 +39,7 @@ const DropdownClasses = tv({
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600  bg-zinc-800 cursor-pointer items-center border-0 text-left h-full px-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-800 cursor-pointer items-center border-0 text-left h-full w-full pl-2 m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -53,7 +53,7 @@ const DropdownItemClasses = tv({
   },
 });
 
-export function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize }: DropdownType) {
+export function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize, event }: DropdownType) {
   const { base, floatingBase } = DropdownClasses();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -117,8 +117,8 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
       setIsOpen(false);
     }
 
-    function onSubMenuOpen(event: { nodeId: string; parentId: string }) {
-      if (event.nodeId !== nodeId && event.parentId === parentId) {
+    function onSubMenuOpen(evt: { nodeId: string; parentId: string }) {
+      if (evt.nodeId !== nodeId && evt.parentId === parentId) {
         setIsOpen(false);
       }
     }
@@ -140,7 +140,27 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, click, role, dismiss, listNavigation]);
   const item = useListItem();
   const mergedRefs = useMergeRefs([refs.setReference, item.ref]);
-  if (items.length === 0) return null;
+  useEffect(() => {
+    if (event) {
+      refs.setPositionReference({
+        getBoundingClientRect() {
+          return {
+            width: 0,
+            height: 0,
+            x: event.clientX,
+            y: event.clientY,
+            top: event.clientY,
+            right: event.clientX,
+            bottom: event.clientY,
+            left: event.clientX,
+          };
+        },
+      });
+      //   @ts-ignore
+      setIsOpen(true);
+    }
+  }, [event]);
+  if (items?.length === 0) return null;
   const dropdownItemClasses = DropdownItemClasses({ isRoot: true, hasSubitems: !!items?.length });
 
   return (
@@ -151,7 +171,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
         role={isNested ? "menuitem" : undefined}
         tabIndex={!isNested ? 0 : -1}
         {...getReferenceProps()}>
-        {children}
+        {children || null}
       </div>
       <FloatingList elementsRef={elementsRef}>
         {isOpen ? (
@@ -165,9 +185,8 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                 {items && isOpen
                   ? items.map((dropdownItem) =>
                       dropdownItem.subItems?.length ? (
-                        <Dropdown allowedPlacements={allowedPlacements} items={dropdownItem.subItems}>
+                        <Dropdown key={dropdownItem.id} allowedPlacements={allowedPlacements} items={dropdownItem.subItems}>
                           <DropdownItem
-                            key={dropdownItem.id}
                             child={dropdownItem?.child}
                             icon={dropdownItem.icon}
                             iconColor={dropdownItem?.iconColor}
@@ -175,7 +194,6 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                             id={dropdownItem.id}
                             image={dropdownItem?.image}
                             isDisabled={dropdownItem?.isDisabled}
-                            label={dropdownItem.label}
                             onClick={() => {
                               if (dropdownItem?.isDisabled) return;
                               tree?.events.emit("click");
@@ -184,6 +202,8 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                               }
                               setIsOpen(false);
                             }}
+                            subItems={dropdownItem.subItems}
+                            title={dropdownItem.title}
                           />
                         </Dropdown>
                       ) : (
@@ -196,7 +216,6 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                           id={dropdownItem.id}
                           image={dropdownItem?.image}
                           isDisabled={dropdownItem?.isDisabled}
-                          label={dropdownItem.label}
                           onClick={() => {
                             if (dropdownItem?.isDisabled) return;
                             tree?.events.emit("click");
@@ -206,6 +225,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                             setIsOpen(false);
                           }}
                           subItems={dropdownItem.subItems}
+                          title={dropdownItem.title}
                         />
                       ),
                     )
@@ -220,7 +240,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
 }
 
 function DropdownItem({
-  label,
+  title: label,
   icon,
   onClick,
   subItems,
@@ -241,12 +261,19 @@ function DropdownItem({
       {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
       {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
       {child ?? null}
-      {icon && !subItems?.length ? (
-        <div className="ml-auto flex min-w-[22px] justify-end">
-          <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
-        </div>
-      ) : null}
-      {subItems?.length ? <Icon icon={IconEnum.chevron_right} /> : null}
+      <div className="ml-auto flex pr-2">
+        {icon ? (
+          <div>
+            <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
+          </div>
+        ) : null}
+
+        {subItems?.length ? (
+          <div>
+            <Icon fontSize={20} icon={IconEnum.chevron_right} />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 export * from "./colorPickerTypes";
-export * from "./contextMenuTypes";
 export * from "./dialogTypes";
 export * from "./drawerTypes";
 export * from "./dropdownTypes";
