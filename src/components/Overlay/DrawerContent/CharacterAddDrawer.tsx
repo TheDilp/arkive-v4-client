@@ -21,6 +21,7 @@ export function CharacterAddDrawer({ data }: Props) {
   const [items, setItems] = useState<{ label: string; value: string; image?: string; color?: string }[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
+    data.id,
     "characters",
     project_id as string,
   );
@@ -69,7 +70,7 @@ export function CharacterAddDrawer({ data }: Props) {
         isLoading={isMutating}
         label="Save"
         onClick={async () => {
-          const payload = { data, relations: { [data.type]: items.map((i) => ({ id: i.value })) } };
+          const payload = { relations: { [data.type]: items.map((i) => ({ id: i.value })) } };
           const parsedPayload = AddToCharacterSchema.parse(payload);
           await addToCharacter(parsedPayload, {
             onSuccess: resetDrawer,

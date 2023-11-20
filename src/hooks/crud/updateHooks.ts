@@ -390,7 +390,8 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
   );
 }
 
-export function useAddToEntity<InsertType extends { data: { id?: string }; relations: { [key: string]: { id: string }[] } }>(
+export function useAddToEntity<InsertType extends { relations: { [key: string]: { id: string }[] } }>(
+  id: string,
   type: AvailableEntityType,
   project_id: string,
 ) {
@@ -400,16 +401,16 @@ export function useAddToEntity<InsertType extends { data: { id?: string }; relat
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/add/${updateValues?.data?.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/add/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
     },
     {
-      onSettled: (data, _, vars) => {
+      onSettled: (data) => {
         if (data.ok) {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
-          queryClient.invalidateQueries([type, vars.data.id]);
+          queryClient.invalidateQueries([type, id]);
 
           createNotification({
             title: data?.message || "Items successfully added.",
