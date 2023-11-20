@@ -17,15 +17,15 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
     { enabled: !!id, queryKeyConcat: ["mention"], staleTime: 5 * 60 * 1000 },
   );
   return (
-    <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow">
+    <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow-lg">
       <div className="flex flex-col whitespace-pre-line font-lato font-light">
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Spinner />
           </div>
         ) : null}
-        <span className="italic">
-          {existingWord?.data?.title ? `(${existingWord?.data?.title}: ${existingWord?.data?.translation})` : null}
+        <span className="font-merriweather text-lg italic underline">
+          {existingWord?.data?.title ? `${existingWord?.data?.title}: ${existingWord?.data?.translation}` : null}
         </span>
         {existingWord?.data?.description && !isLoading ? existingWord?.data.description : null}
       </div>

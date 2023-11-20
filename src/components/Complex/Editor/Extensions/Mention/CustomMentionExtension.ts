@@ -67,7 +67,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
           },
         },
       ],
-      toDOM: (node) => ["span", extra.dom(node)],
+      toDOM: (node) => ["span", extra.dom(node), 0],
     };
   }
 

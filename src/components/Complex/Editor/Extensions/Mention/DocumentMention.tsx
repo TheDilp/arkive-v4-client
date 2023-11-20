@@ -22,7 +22,7 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
     id as string,
     "documents",
     { fields: ["id", "title", "content"] },
-    { enabled: !!id && !isPublic, queryKeyConcat: ["mention"] },
+    { enabled: !!id && !isPublic, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
   );
   return (
     <Card title={title || ""}>
@@ -57,10 +57,10 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
           : false,
       },
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false },
   );
   const alter_name = data?.data?.alter_names?.find((an) => an.id === alterId);
-  if (data?.data?.is_public || !isPublic)
+  if (data?.data && (data?.data?.is_public || !isPublic))
     return (
       <Tooltip
         arrowColor="#3f3f46"
