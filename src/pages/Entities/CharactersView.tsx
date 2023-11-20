@@ -41,6 +41,7 @@ const columnHelper = createColumnHelper<CharacterType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  isMd: boolean,
 ) {
   return [
     columnHelper.display({
@@ -83,7 +84,7 @@ function createColumns(
       header: "Last name",
       cell: (info) => info.getValue(),
       meta: {
-        pinned: true,
+        pinned: isMd,
         sortable: true,
         filterOptions: NameFilters,
       },
@@ -350,7 +351,7 @@ export function CharactersView() {
       ) : (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog)}
+            columns={createColumns(setDrawer, setDialog, isMd)}
             config={{
               hasSelect: true,
               hasFavorite: true,
