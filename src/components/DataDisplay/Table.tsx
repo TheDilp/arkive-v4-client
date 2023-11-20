@@ -729,6 +729,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                           minSize: cell.column.columnDef.minSize,
                           maxSize: cell.column.columnDef.maxSize,
                         }),
+                        width: cell.column.columnDef.size,
                         left: (cell.column.columnDef.meta as MetaType)?.pinned
                           ? `${getPinnedOffset(pinned, cell.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
                           : "",

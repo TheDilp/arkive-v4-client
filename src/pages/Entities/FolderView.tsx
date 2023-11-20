@@ -110,7 +110,8 @@ function columns(
     columnHelper.display({
       id: "title",
       header: "Title",
-      cell: ({ row }) => row.original.title,
+      cell: ({ row }) => <div className=" truncate">{row.original.title}</div>,
+      size: 15,
     }),
     columnHelper.display({
       id: "action",
@@ -270,7 +271,7 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
-  const { isMd } = useBreakpoint();
+  const breakpoints = useBreakpoint();
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
@@ -440,7 +441,7 @@ export function FolderView() {
                     icon={IconEnum.add}
                     label={`Create new ${entityName}`}
                     onClick={undefined}
-                    tooltip={isMd ? undefined : `Create new ${entityName}`}
+                    tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
                   />
                 </div>
               </Dropdown>
