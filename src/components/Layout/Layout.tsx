@@ -36,7 +36,7 @@ export function ProjectLayout() {
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
-      <Dropdown event={contextMenu.event} items={contextMenu?.items || []} />
+      <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
       {isLg ? <Sidebar /> : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
