@@ -16,12 +16,12 @@ export function Breadcrumbs() {
       {items?.length > 0 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}
       {items.map((item, index) => (
         <Fragment key={item.id}>
-          <div className="flex w-fit max-w-[10rem] items-center text-lg">
+          <div className="flex w-fit min-w-fit max-w-[10rem] items-center text-lg">
             <Link to={getLinkToItem(project_id as string, type as string, item.id, item.is_folder)}>
               <span className="truncate font-lato font-semibold">{item.title}</span>
             </Link>
           </div>
-          {index !== items.length - 1 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}
+          <span>{index !== items.length - 1 ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}</span>
         </Fragment>
       ))}
     </div>
