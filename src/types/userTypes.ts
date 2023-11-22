@@ -1,4 +1,4 @@
-import { ProjectType } from "./EntityTypes";
+import { ProjectType, WebhookType } from "./EntityTypes";
 
 export interface UserType {
   id: string;
@@ -7,4 +7,5 @@ export interface UserType {
   nickname: string;
   image: string;
   projects: ProjectType[];
+  webhooks: WebhookType[];
 }

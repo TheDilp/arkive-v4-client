@@ -27,14 +27,23 @@ import {
   useTable,
   useUpdateEntity,
 } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, DialogAtomType, DrawerAtomType, DrawerContentCreateNewType } from "../../types";
 import {
+  AvailableEntityType,
+  BaseEntityType,
+  DialogAtomType,
+  DrawerAtomType,
+  DrawerContentCreateNewType,
+  WebhookType,
+} from "../../types";
+import {
+  baseURLS,
   breadcrumbsAtom,
   capitalizeFirstLetter,
   contextMenuAtom,
   dialogAtom,
   drawerAtom,
   EntitiesWithTags,
+  FetchFunction,
   getDefaultEntityIcon,
   getEntityFields,
   getImageURL,
@@ -42,6 +51,7 @@ import {
   getPluralEntityType,
   getSingularEntityType,
   IconEnum,
+  userAtom,
   userSettingsAtom,
 } from "../../utils";
 import { ProjectSettingsView } from "../Projects";
@@ -77,6 +87,7 @@ function columns(
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
   project_id: string,
   navigate: NavigateFunction,
+  webhooks: WebhookType[],
   show_image?: boolean,
 ) {
   return [
@@ -154,6 +165,11 @@ function columns(
                         }));
                       },
                     },
+                  ]
+                : []),
+
+              ...(row.original.is_public
+                ? [
                     {
                       id: "view_public",
                       title: "View public page",
@@ -161,8 +177,28 @@ function columns(
                       onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
                       isDisabled: !row.original.is_public,
                     },
+
+                    {
+                      id: "send_to_discord",
+                      title: "Send to Discord",
+                      icon: IconEnum.discord,
+                      isDisabled: !row.original.is_public,
+                      subItems: webhooks.map((webhook) => ({
+                        id: webhook.id,
+                        title: webhook.title,
+                        onClick: () =>
+                          FetchFunction({
+                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                            body: JSON.stringify({
+                              data: { id: row.original.id, type: "document" },
+                            }),
+                            method: "POST",
+                          }),
+                      })),
+                    },
                   ]
                 : []),
+
               {
                 id: "delete_entity",
                 title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
@@ -272,6 +308,7 @@ function EntityItem({
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
   const breakpoints = useBreakpoint();
+  const user = useAtomValue(userAtom);
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
@@ -608,6 +645,7 @@ export function FolderView() {
               type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
               project_id as string,
               navigate,
+              user?.webhooks || [],
               show_image_table_view,
             )}
             config={{

@@ -16,7 +16,16 @@ export function ProjectLayout() {
   const { isLg } = useBreakpoint();
   const { user } = useUser();
   const { data } = useGetEntity<ProjectType>(project_id as string, "projects", {}, { staleTime: 60 * 60 * 1 });
-  const { data: userData } = useGetUser({ data: { auth_id: user?.id }, fields: ["id"] }, { enabled: !!user?.id });
+  const { data: userData } = useGetUser(
+    {
+      data: { auth_id: user?.id },
+      relations: {
+        webhooks: true,
+      },
+      fields: ["id"],
+    },
+    { enabled: !!user?.id },
+  );
   const setProjectAtom = useSetAtom(projectAtom);
   const setUserAtom = useSetAtom(userAtom);
   const contextMenu = useAtomValue(contextMenuAtom);

@@ -18,7 +18,6 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "maps") return IconEnum.map;
   if (type === "graphs") return IconEnum.graph;
   if (type === "calendars") return IconEnum.calendar;
-  if (type === "timelines") return IconEnum.timeline;
   if (type === "dictionaries") return IconEnum.dictionary;
   if (type === "nodes") return IconEnum.node;
   if (type === "edges") return IconEnum.edge;

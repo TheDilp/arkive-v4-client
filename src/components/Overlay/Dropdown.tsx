@@ -28,7 +28,6 @@ import { useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { DropdownItemType, DropdownType } from "../../types";
-import { IconEnum } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 
 const DropdownClasses = tv({
@@ -39,7 +38,7 @@ const DropdownClasses = tv({
   },
 });
 const DropdownItemClasses = tv({
-  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-800 cursor-pointer items-center border-0 text-left h-full w-full pl-2 m-0 outline-0 text-white hover:bg-zinc-700",
+  base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-800 cursor-pointer items-center border-0 text-left h-full w-full m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
       true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
@@ -185,7 +184,10 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                 {items && isOpen
                   ? items.map((dropdownItem) =>
                       dropdownItem.subItems?.length ? (
-                        <Dropdown key={dropdownItem.id} allowedPlacements={allowedPlacements} items={dropdownItem.subItems}>
+                        <Dropdown
+                          key={dropdownItem.id}
+                          allowedPlacements={allowedPlacements}
+                          items={dropdownItem?.isDisabled ? [] : dropdownItem.subItems}>
                           <DropdownItem
                             child={dropdownItem?.child}
                             icon={dropdownItem.icon}
@@ -259,18 +261,12 @@ function DropdownItem({
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
       {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
-      {label && !child ? <div className="select-none truncate pr-2 ">{label}</div> : null}
+      {label && !child ? <div className="select-none truncate px-2 ">{label}</div> : null}
       {child ?? null}
       <div className="ml-auto flex pr-2">
         {icon ? (
           <div>
             <Icon color={iconColor || "#ffffff"} fontSize={20} icon={icon} thickness={iconThickness || "regular"} />
-          </div>
-        ) : null}
-
-        {subItems?.length ? (
-          <div>
-            <Icon fontSize={20} icon={IconEnum.chevron_right} />
           </div>
         ) : null}
       </div>

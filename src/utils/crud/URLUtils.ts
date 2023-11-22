@@ -2,7 +2,7 @@ import { AssetType, SearchableEntities } from "../../types";
 import { baseURLS } from "../enums/ServerEnum";
 
 export function createURL(type: string): string {
-  if (type === "dictionaries") return `${baseURLS.baseServer}api/v4/${type}/create`;
+  if (type === "dictionaries") return `${baseURLS.baseServer}api/v1/${type}/create`;
   if (type === "entities") return `${baseURLS.baseServer}createentity`;
   if (type === "entityinstances") return `${baseURLS.baseServer}createentityinstance`;
 

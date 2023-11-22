@@ -21,7 +21,7 @@ export function PublicDocument() {
       queryKeyConcat: ["public"],
     },
   );
-  if (!document?.data) return <Skeleton type="drawer_form" />;
+  if (!document?.data) return <Skeleton type="editor" />;
   if (!document?.data?.is_public) return <Navigate to={`/public/${project_id}/documents`} />;
   return <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />;
 }
