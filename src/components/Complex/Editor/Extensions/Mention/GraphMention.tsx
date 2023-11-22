@@ -33,12 +33,12 @@ export function GraphMention({ title, id, label, project_id }: Props) {
   return id ? (
     <Tooltip arrowColor="#3f3f46" content={<GraphMentionTooltip id={id} project_id={project_id} />} delay={{ closeDelay: 500 }}>
       <Link
-        className="inline-flex font-lato font-bold underline transition-colors hover:text-sky-400"
+        className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         id={`link-${id}`}
         to={!project_id ? `/public/graphs/${id}` : `/projects/${project_id}/graphs/${id}`}>
-        <div className="relative -top-[0.0625rem] flex items-start">
-          <span className="relative">
-            <Icon fontSize={14} icon={IconEnum.graph} />
+        <div className="top-[0.025rem] flex items-start">
+          <span className="relative top-0.5">
+            <Icon fontSize={15} icon={IconEnum.graph} />
           </span>
           <span className="text-sm underline">{title || label}</span>
         </div>

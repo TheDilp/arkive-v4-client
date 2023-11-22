@@ -25,11 +25,11 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
 
   return id ? (
     <Link
-      className="inline-flex items-center font-lato font-bold underline transition-colors"
+      className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
       to={isPublic ? `/public/calendars/${parent_id}/${id}` : `/projects/${project_id}/calendars/${parent_id}/${id}`}>
-      <div className={`relative ${isPublic ? "top-[0.175rem]" : "top-[0.025rem]"} flex items-start`}>
+      <div className="top-[0.025rem] flex items-start">
         <span className="relative top-0.5">
-          <Icon fontSize={14} icon={IconEnum.event} />
+          <Icon fontSize={15} icon={IconEnum.event} />
         </span>
         <span className="text-sm underline hover:text-sky-400">{data?.data?.title || title || label}</span>
       </div>
