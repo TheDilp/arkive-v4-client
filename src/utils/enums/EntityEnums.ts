@@ -96,3 +96,13 @@ export const MessageTypeOptions = [
 ];
 
 export const MentionableEntites = ["characters", "blueprint_instances", "documents", "maps", "graphs", "words"];
+
+export const PublicEntities = [
+  "characters",
+  "blueprint_instances",
+  "documents",
+  "maps",
+  "graphs",
+  "dictionaries",
+  "random_tables",
+];
