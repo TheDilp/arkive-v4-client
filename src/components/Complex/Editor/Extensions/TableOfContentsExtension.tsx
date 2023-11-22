@@ -22,10 +22,8 @@ import { Alert } from "../../../Misc";
 
 interface TableOfContentsOptions {}
 
-@extension<TableOfContentsOptions>({
-  defaultOptions: {},
-})
-export class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
+@extension({})
+class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
   get name() {
     return "tableofcontents" as const;
   }
@@ -124,7 +122,7 @@ export class TableOfContentsExtension extends NodeExtension<TableOfContentsOptio
     ];
   }
 }
-
+export default TableOfContentsExtension;
 declare global {
   namespace Remirror {
     interface AllExtensions {

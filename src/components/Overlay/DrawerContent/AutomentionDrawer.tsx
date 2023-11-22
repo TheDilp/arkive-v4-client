@@ -65,7 +65,7 @@ function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: Sea
         tc = tc.concat(child.textContent);
       }
     });
-    const start = selectedEntity === "characters" ? pos : pos + 1;
+    const start = pos + 1;
     for (const match of tc.matchAll(re)) {
       const from = start + (match.index ?? 0);
       const to = from + match[0].length;

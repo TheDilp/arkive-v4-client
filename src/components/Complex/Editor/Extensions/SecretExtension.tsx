@@ -24,13 +24,8 @@ interface SecretOptions {
   classNames?: string;
 }
 
-@extension<SecretOptions>({
-  defaultOptions: {
-    secret: true,
-    classNames: "secretBlock",
-  },
-})
-export class SecretExtension extends NodeExtension<SecretOptions> {
+@extension({})
+class SecretExtension extends NodeExtension<SecretOptions> {
   get name() {
     return "secret" as const;
   }
@@ -132,7 +127,7 @@ export class SecretExtension extends NodeExtension<SecretOptions> {
     return this.toggleSecret()(props);
   }
 }
-
+export default SecretExtension;
 declare global {
   namespace Remirror {
     interface AllExtensions {

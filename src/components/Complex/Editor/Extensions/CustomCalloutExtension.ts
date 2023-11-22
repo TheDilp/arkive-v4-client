@@ -48,13 +48,8 @@ export interface CustomCalloutOptions {
   customColor?: string | null;
 }
 
-@extension<CustomCalloutOptions>({
-  defaultOptions: {
-    type: "info",
-    customColor: null,
-  },
-})
-export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
+@extension({})
+class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
   get name() {
     return "callout" as const;
   }
@@ -201,7 +196,9 @@ export class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> 
   }
 
   @command()
-  clearCallout(): CommandFunction {
+  clearCallout(): any {
     return toggleWrap("");
   }
 }
+
+export default CustomCalloutExtension;

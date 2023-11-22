@@ -21,8 +21,8 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
   const { data, isLoading } = useGetEntity<DocumentType>(
     id as string,
     "documents",
-    { fields: ["id", "title", "content"] },
-    { enabled: !!id && !isPublic, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"] },
+    { fields: ["content"] },
+    { enabled: !!id && !isPublic, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"] },
   );
   return (
     <Card title={title || ""}>
@@ -70,7 +70,7 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
         <Link
           className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           to={isPublic ? `/public/documents/${id}` : `/projects/${project_id}/documents/${id}`}>
-          <div className="relative top-[0.025rem] flex items-start">
+          <div className="top-[0.025rem] flex items-start">
             <span className="relative top-0.5">
               <Icon fontSize={15} icon={IconEnum.document} />
             </span>

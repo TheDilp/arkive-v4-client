@@ -15,10 +15,9 @@ import {
   toggleMark,
 } from "remirror";
 
-export interface SpoilerOptions {}
-
-@extension<SpoilerOptions>({ defaultOptions: {} })
-export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
+@extension({})
+// eslint-disable-next-line no-use-before-define
+class SpoilerExtension extends MarkExtension<SpoilerOptions> {
   get name() {
     return "spoiler" as const;
   }
@@ -81,3 +80,6 @@ export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
     return this.toggleSpoiler()(props);
   }
 }
+export interface SpoilerOptions {}
+
+export default SpoilerExtension;

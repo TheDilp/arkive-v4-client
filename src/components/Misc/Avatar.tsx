@@ -15,7 +15,10 @@ const AvatarClasses = tv({
   },
   variants: {
     size: {
-      xxs: {
+      "3xs": {
+        base: "w-3 h-3 min-w-[0.75rem] min-h-[0.75rem]",
+      },
+      "2xs": {
         base: "w-4 h-4 min-w-[1rem] min-h-[1rem]",
       },
       xs: {

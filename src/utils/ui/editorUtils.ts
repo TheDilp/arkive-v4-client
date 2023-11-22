@@ -26,15 +26,15 @@ import {
 } from "remirror/extensions";
 
 import {
-  CustomCalloutExtension,
   CustomImageExtension,
   CustomMentionExtension,
   CustomTableExtension,
   DiceFormulaExtension,
-  SecretExtension,
-  SpoilerExtension,
-  TableOfContentsExtension,
 } from "../../components/Complex/Editor/Extensions";
+import CustomCalloutExtension from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
+import SecretExtension from "../../components/Complex/Editor/Extensions/SecretExtension";
+import SpoilerExtension from "../../components/Complex/Editor/Extensions/SpoilerExtension";
+import TableOfContentsExtension from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useUpdateEntity } from "../../hooks";
 import { ConversationType, DocumentType, MessageKindType, NotificationType, slashMenuItem } from "../../types";
 import { mentionDropdownAtom } from "../atoms";

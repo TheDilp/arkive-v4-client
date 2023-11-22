@@ -308,7 +308,7 @@ export function ConversationView({ id }: { id: string }) {
                           image={getImageURL(project_id as string, "images", char?.portrait_id)}
                           initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
                           label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
-                          size="xxs"
+                          size="2xs"
                           tooltipAllowedPlacements={["left", "right"]}
                         />
                       </div>

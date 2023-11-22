@@ -114,7 +114,7 @@ function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFi
           ],
         }))}>
         <div className="pointer-events-none w-min max-w-min opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
-          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="xxs" />
+          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="2xs" />
         </div>
       </Dropdown>
     </div>

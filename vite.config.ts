@@ -1,14 +1,15 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import babel from "vite-plugin-babel";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react({
       babel: {
-        parserOpts: {
-          plugins: ["decorators-legacy", "classProperties"],
-        },
+        babelrc: false,
+        configFile: false,
+        plugins: [["@babel/plugin-proposal-decorators", { loose: true, version: "2022-03" }]],
       },
     }),
   ],
