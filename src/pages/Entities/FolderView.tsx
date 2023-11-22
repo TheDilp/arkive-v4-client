@@ -168,36 +168,32 @@ function columns(
                   ]
                 : []),
 
-              ...(row.original.is_public
-                ? [
-                    {
-                      id: "view_public",
-                      title: "View public page",
-                      icon: IconEnum.public,
-                      onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
-                      isDisabled: !row.original.is_public,
-                    },
+              {
+                id: "view_public",
+                title: "View public page",
+                icon: IconEnum.public,
+                onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
+                isDisabled: !row.original.is_public,
+              },
 
-                    {
-                      id: "send_to_discord",
-                      title: "Send to Discord",
-                      icon: IconEnum.discord,
-                      isDisabled: !row.original.is_public,
-                      subItems: webhooks.map((webhook) => ({
-                        id: webhook.id,
-                        title: webhook.title,
-                        onClick: () =>
-                          FetchFunction({
-                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                            body: JSON.stringify({
-                              data: { id: row.original.id, type: "document" },
-                            }),
-                            method: "POST",
-                          }),
-                      })),
-                    },
-                  ]
-                : []),
+              {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                isDisabled: !row.original.is_public,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: { id: row.original.id, type: "document" },
+                      }),
+                      method: "POST",
+                    }),
+                })),
+              },
 
               {
                 id: "delete_entity",

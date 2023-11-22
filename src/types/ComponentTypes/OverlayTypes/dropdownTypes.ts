@@ -20,6 +20,7 @@ export interface DropdownType {
   children?: JSX.Element | null;
   items: DropdownItemType[];
   isReferenceMaxSize?: boolean;
+  isDisabled?: boolean;
   // @ts-ignore
   event?: MouseEvent<HTMLDivElement, MouseEvent> | null;
 }

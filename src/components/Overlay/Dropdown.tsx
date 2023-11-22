@@ -41,7 +41,7 @@ const DropdownItemClasses = tv({
   base: "flex flex-nowrap group group-hover:bg-zinc-700 h-10 min-h-[2.5rem] border-zinc-600 bg-zinc-800 cursor-pointer items-center border-0 text-left h-full w-full m-0 outline-0 text-white hover:bg-zinc-700",
   variants: {
     isDisabled: {
-      true: "bg-zinc-500 text-zinc-300 cursor-not-allowed",
+      true: "bg-zinc-500 text-zinc-300 cursor-not-allowed hover:bg-zinc-500 group-hover:bg-zinc-500",
     },
     hasIcon: {
       true: "justify-between",
@@ -52,7 +52,14 @@ const DropdownItemClasses = tv({
   },
 });
 
-export function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize, event }: DropdownType) {
+export function DropdownComponent({
+  allowedPlacements = [],
+  children,
+  items,
+  isReferenceMaxSize,
+  event,
+  isDisabled,
+}: DropdownType) {
   const { base, floatingBase } = DropdownClasses();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -89,7 +96,7 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
   });
 
   const hover = useHover(context, {
-    enabled: isNested,
+    enabled: isNested && !isDisabled,
     delay: { open: 75 },
     handleClose: safePolygon({ blockPointerEvents: true }),
   });
@@ -187,7 +194,8 @@ export function DropdownComponent({ allowedPlacements = [], children, items, isR
                         <Dropdown
                           key={dropdownItem.id}
                           allowedPlacements={allowedPlacements}
-                          items={dropdownItem?.isDisabled ? [] : dropdownItem.subItems}>
+                          isDisabled={dropdownItem?.isDisabled}
+                          items={dropdownItem.subItems}>
                           <DropdownItem
                             child={dropdownItem?.child}
                             icon={dropdownItem.icon}
