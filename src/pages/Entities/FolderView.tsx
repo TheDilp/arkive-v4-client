@@ -418,89 +418,94 @@ export function FolderView() {
   if (type === "settings") return <ProjectSettingsView />;
   return (
     <TablePageLayout>
-      <div className="flex h-12 min-h-[3rem] items-center justify-between">
-        <Breadcrumbs />
-        {(isFetching || isFetchingFolder) && view === "folders" ? (
-          <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
-        ) : null}
-        {!item_id || data?.data?.is_folder ? (
-          <div className="flex min-w-fit gap-x-2">
-            <div className="w-32">
-              <Select
-                name="view"
-                onChange={({ value }) => {
-                  setView(value as "folders" | "table");
-                  ls.set(`${entityName}-table`, value);
-                }}
-                options={[
-                  { label: "Folders", value: "folders", icon: IconEnum.folder },
-                  { label: "Table", value: "table", icon: IconEnum.table },
-                ]}
-                placeholder="View"
-                value={view}
-              />
-            </div>
-            <div className="lg:w-52">
-              <Dropdown
-                allowedPlacements={["bottom-end"]}
-                items={[
-                  {
-                    id: "1",
-                    title: `Create new ${entityName}`,
-                    icon: getDefaultEntityIcon(type as AvailableEntityType),
-                    onClick: () => {
-                      setDrawer((prev) => ({
-                        ...prev,
-                        data: { project_id: project_id as string },
-                        title: `Create new ${entityName}`,
-                        type: type as DrawerContentCreateNewType,
-                        size: "lg",
-                      }));
-                    },
-                  },
-                  {
-                    id: "2",
-                    title: "Create new folder",
-                    icon: IconEnum.folder,
-                    onClick: () => {
-                      setDrawer((prev) => ({
-                        ...prev,
-                        title: `Create new ${entityName} folder`,
-                        data: { project_id, type: type as AvailableEntityType },
-                        type: "folder",
-                        size: "sm",
-                      }));
-                    },
-                  },
-                ]}>
-                <div className="lg:w-52">
-                  <Button
-                    icon={IconEnum.add}
-                    label={`Create new ${entityName}`}
-                    onClick={undefined}
-                    tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
-                  />
-                </div>
-              </Dropdown>
-            </div>
-
-            {(item_id || data?.data?.is_folder) && !isFetching ? (
-              <div className="w-52 max-w-[208px]">
-                <Button
-                  icon={IconEnum.edit}
-                  label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
-                  onClick={() => {
-                    setDrawer((prev) => ({
-                      ...prev,
-                      size: "lg",
-                      title: `Edit ${entityName}`,
-                      type: type as DrawerContentCreateNewType,
-                      data: { id: item_id as string, project_id: project_id as string },
-                    }));
+      <div className="flex h-12 max-h-[3rem] min-h-[3rem] flex-col items-center justify-between">
+        <div className="flex w-full items-start justify-between">
+          <Breadcrumbs />
+          {!item_id || data?.data?.is_folder ? (
+            <div className="flex min-w-fit gap-x-2">
+              <div className="w-32">
+                <Select
+                  name="view"
+                  onChange={({ value }) => {
+                    setView(value as "folders" | "table");
+                    ls.set(`${entityName}-table`, value);
                   }}
+                  options={[
+                    { label: "Folders", value: "folders", icon: IconEnum.folder },
+                    { label: "Table", value: "table", icon: IconEnum.table },
+                  ]}
+                  placeholder="View"
+                  value={view}
                 />
               </div>
-            ) : null}
+              <div className="lg:w-52">
+                <Dropdown
+                  allowedPlacements={["bottom-end"]}
+                  items={[
+                    {
+                      id: "1",
+                      title: `Create new ${entityName}`,
+                      icon: getDefaultEntityIcon(type as AvailableEntityType),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: { project_id: project_id as string },
+                          title: `Create new ${entityName}`,
+                          type: type as DrawerContentCreateNewType,
+                          size: "lg",
+                        }));
+                      },
+                    },
+                    {
+                      id: "2",
+                      title: "Create new folder",
+                      icon: IconEnum.folder,
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          title: `Create new ${entityName} folder`,
+                          data: { project_id, type: type as AvailableEntityType },
+                          type: "folder",
+                          size: "sm",
+                        }));
+                      },
+                    },
+                  ]}>
+                  <div className="lg:w-52">
+                    <Button
+                      icon={IconEnum.add}
+                      label={`Create new ${entityName}`}
+                      onClick={undefined}
+                      tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
+                    />
+                  </div>
+                </Dropdown>
+              </div>
+
+              {(item_id || data?.data?.is_folder) && !isFetching ? (
+                <div className="w-52 max-w-[208px]">
+                  <Button
+                    icon={IconEnum.edit}
+                    label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
+                    onClick={() => {
+                      setDrawer((prev) => ({
+                        ...prev,
+                        size: "lg",
+                        title: `Edit ${entityName}`,
+                        type: type as DrawerContentCreateNewType,
+                        data: { id: item_id as string, project_id: project_id as string },
+                      }));
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
+        {(isFetching || isFetchingFolder) && view === "folders" ? (
+          <div className="mt-6 w-full">
+            <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
           </div>
         ) : null}
       </div>

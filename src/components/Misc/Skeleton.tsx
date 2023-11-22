@@ -105,12 +105,12 @@ function DrawerFormSkeleton() {
 
 function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "entity_type" | "limit">) {
   return (
-    <div className="mt-24 grid h-full w-full animate-pulse grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
+    <div className="grid h-full w-full animate-pulse grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
       {[...Array(limit).keys()].map((key) => (
         <div key={key} className="col-span-1 flex flex-col items-center">
           {/* <div className="h-24 w-24"> */}
           <Icon color="darkgrey" fontSize={100} icon={getDefaultEntityIcon(entity_type as AvailableEntityType)} />
-          <div className="h-4 min-h-[0.25rem] w-full rounded bg-zinc-700" />
+          <div className="h-4 min-h-[0.125rem] w-full rounded bg-zinc-700" />
         </div>
         // </div>
       ))}
