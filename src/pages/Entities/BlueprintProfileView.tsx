@@ -5,9 +5,12 @@ import { isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
+  Alert,
+  Badge,
   Breadcrumbs,
   Button,
   CarouselEntityPreview,
+  Collapsible,
   EntityPreview,
   FormattedDate,
   Gallery,
@@ -307,6 +310,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   const { data: blueprint } = useGetEntity<BlueprintType>(
     parent_id || item_id,
@@ -330,11 +334,25 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
       data: { id: id || subitem_id },
       relations: {
         blueprint_fields: true,
+        tags: true,
       },
     },
     { enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 },
   );
-  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+
+  function openEditTagDrawer() {
+    if (blueprintInstance?.data?.id) {
+      setDrawer((prev) => ({
+        ...prev,
+        type: "edit_tags",
+        title: "Edit tags",
+        data: {
+          tags: blueprintInstance?.data?.tags || [],
+          entity: { type: "blueprint_instances", id: blueprintInstance?.data?.id },
+        },
+      }));
+    }
+  }
 
   useLayoutEffect(() => {
     if (blueprint?.data) {
@@ -429,22 +447,53 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
+          <div className="flex flex-col gap-y-2">
+            <Collapsible initialOpen label="Fields">
+              <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
+                {blueprintInstance?.data
+                  ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
+                      const blueprintField = blueprint?.data?.blueprint_fields?.find(
+                        (field) => field.id === blueprint_field.id,
+                      );
+                      if (!blueprintField) return null;
+                      return (
+                        <AdditionalFieldDisplay
+                          key={blueprint_field.id}
+                          blueprint_field={blueprintField}
+                          blueprint_field_data={blueprint_field}
+                          isPreview={!!id}
+                        />
+                      );
+                    })
+                  : null}
+              </div>
+            </Collapsible>
 
-          <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
-            {blueprintInstance?.data
-              ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
-                  const blueprintField = blueprint?.data?.blueprint_fields?.find((field) => field.id === blueprint_field.id);
-                  if (!blueprintField) return null;
-                  return (
-                    <AdditionalFieldDisplay
-                      key={blueprint_field.id}
-                      blueprint_field={blueprintField}
-                      blueprint_field_data={blueprint_field}
-                      isPreview={!!id}
-                    />
-                  );
-                })
-              : null}
+            <Collapsible
+              actions={[
+                {
+                  icon: IconEnum.edit,
+                  tooltip: "Edit tags",
+                  onClick: openEditTagDrawer,
+                },
+              ]}
+              icon={IconEnum.tags}
+              initialOpen={false}
+              label="Tags">
+              {blueprintInstance?.data?.tags?.length ? (
+                <div className="mt-2 flex w-full flex-wrap gap-2 animate-in fade-in fill-mode-both">
+                  {blueprintInstance.data.tags.map((tag) => (
+                    <div key={tag.id}>
+                      <Badge customColor={tag.color} label={tag.title} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-2 w-full">
+                  <Alert label="There is no content." variant="info" />
+                </div>
+              )}
+            </Collapsible>
           </div>
         </div>
       </div>

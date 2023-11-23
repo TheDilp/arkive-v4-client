@@ -2,7 +2,15 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Dispatch, MouseEvent, SetStateAction } from "react";
 
 import { Size } from "../../baseTypes";
-import { AllAvailableEntities, AvailableEntityType, ImageType, MapPinType, MessageType, TagType } from "../../EntityTypes";
+import {
+  AllAvailableEntities,
+  AvailableEntityType,
+  AvailableSubEntityType,
+  ImageType,
+  MapPinType,
+  MessageType,
+  TagType,
+} from "../../EntityTypes";
 import { DropdownItemType } from "./dropdownTypes";
 
 export type DrawerContentType =
@@ -88,7 +96,7 @@ export type DrawerAtomType = {
   | { type: "map_pin_management"; data: { map_id: string } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
-  | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } } }
+  | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } } }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number } }
   | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
   | {
