@@ -85,7 +85,7 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
           <FloatingFocusManager context={context} modal={false}>
             <div
               ref={refs.setFloating}
-              className=" z-10 flex max-h-56 w-full max-w-full flex-col gap-y-2 overflow-y-auto shadow"
+              className="z-10 flex max-h-56 w-full max-w-full flex-col gap-y-2 overflow-y-auto rounded bg-zinc-700 shadow "
               style={floatingStyles}>
               {items.slice(1).map((item) => (
                 <div key={item.id} className="w-full">
