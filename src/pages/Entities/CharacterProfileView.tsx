@@ -1,5 +1,5 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { isRemirrorJSON } from "remirror";
@@ -51,10 +51,13 @@ import {
   ImageType,
   MapType,
   RandomTableOptionType,
+  WebhookType,
 } from "../../types";
 import {
+  baseURLS,
   dialogAtom,
   drawerAtom,
+  FetchFunction,
   formatDateToString,
   getAvatarInitials,
   getCharacterFullName,
@@ -65,6 +68,7 @@ import {
   IconEnum,
   NameFilters,
   sortCharactersByName,
+  userAtom,
 } from "../../utils";
 import { RemoveFromCharacterSchema } from "../../validation";
 import { ConversationView } from ".";
@@ -378,6 +382,7 @@ function assetTableColumns(
     },
     unknown
   >,
+  webhooks: WebhookType[],
 ) {
   return [
     assetColumnHelper.display({
@@ -424,10 +429,27 @@ function assetTableColumns(
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
               {
-                id: "2",
+                id: "download_image",
                 title: "Download",
                 icon: IconEnum.download,
                 onClick: () => downloadImage({ data: row.original }),
+              },
+              {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: { id: row.original.id, type: "image" },
+                      }),
+                      method: "POST",
+                    }),
+                })),
               },
               {
                 id: "delete_image",
@@ -813,6 +835,8 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const user = useAtomValue(userAtom);
+
   const {
     data: existingCharacter,
     isLoading,
@@ -1137,7 +1161,13 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                   <div className="mt-2 h-[calc(100%-10rem)] animate-in fade-in fill-mode-both">
                     {assetView === "table" ? (
                       <Table
-                        columns={assetTableColumns(downloadImage, project_id, existingCharacter?.data?.id, removeItem)}
+                        columns={assetTableColumns(
+                          downloadImage,
+                          project_id,
+                          existingCharacter?.data?.id,
+                          removeItem,
+                          user?.webhooks || [],
+                        )}
                         config={{
                           hasNoHeaderGap: true,
                         }}
