@@ -76,7 +76,8 @@ export function Avatar({
   tooltipAllowedPlacements = [],
   shape = "circle",
   size = "md",
-}: AvatarType) {
+  isPreview,
+}: AvatarType & { isPreview?: boolean }) {
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage, shape });
 
@@ -96,7 +97,7 @@ export function Avatar({
             onClick={() => {
               if (hasShowImage) setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
             }}
-            src={getThumbnailUrl(image, getAvatarThumbnailDimensions(size))}
+            src={isPreview ? image : getThumbnailUrl(image, getAvatarThumbnailDimensions(size))}
           />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>
