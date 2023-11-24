@@ -448,7 +448,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
           <div className="flex flex-col gap-y-2">
-            <Collapsible initialOpen label="Fields">
+            <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
                 {blueprintInstance?.data
                   ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
