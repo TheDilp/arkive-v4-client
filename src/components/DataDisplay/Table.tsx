@@ -517,6 +517,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 Number(headerRef?.current?.clientHeight) +
                 (pagination ? 20 : 0) +
                 (!hasNoHeaderGap && !pagination ? 28 : 0) +
+                (hasNoHeaderGap && !pagination ? 28 : 0) +
                 (!hasNoHeaderGap && pagination ? 10 : 0) +
                 (isSubheaderEnabled && !pagination ? 40 : 0) +
                 (isSubheaderEnabled && pagination ? 40 : 0)
