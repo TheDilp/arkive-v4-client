@@ -37,11 +37,12 @@ export function getSearchURL(type: SearchableEntities) {
   return `/${type}`;
 }
 
-export function getThumbnailUrl(url: string, width?: number, height?: number) {
+export function getThumbnailUrl(url: string, dimensions?: { width: number; height: number }) {
+  const sizedUrl = `${dimensions?.width || 35}x${dimensions?.width || 35}/${url}`;
   const hash = createHmac("sha1", import.meta.env.VITE_THUMBNAIL_SECRET)
-    .update(`${width || 35}x${height || 35}/${url}`)
+    .update(sizedUrl)
     .digest("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_");
-  return `${baseURLS.baseThumbnailServer}/${hash}/${width || 35}x${height || 35}/${url}`;
+  return `${baseURLS.baseThumbnailServer}/${hash}/${sizedUrl}`;
 }

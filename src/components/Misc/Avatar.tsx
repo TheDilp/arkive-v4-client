@@ -5,6 +5,7 @@ import { tv } from "tailwind-variants";
 
 import { AvatarType } from "../../types";
 import { dialogAtom, getFirstLetters, getThumbnailUrl } from "../../utils";
+import { getAvatarThumbnailDimensions } from "../../utils/ui/avatarUtils";
 import { Tooltip } from "../Overlay/Tooltip";
 
 const AvatarClasses = tv({
@@ -95,7 +96,7 @@ export function Avatar({
             onClick={() => {
               if (hasShowImage) setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
             }}
-            src={getThumbnailUrl(image)}
+            src={getThumbnailUrl(image, getAvatarThumbnailDimensions(size))}
           />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>
