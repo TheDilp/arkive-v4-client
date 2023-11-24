@@ -1,5 +1,7 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import { useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { CollapsibleType } from "../../types";
@@ -27,8 +29,15 @@ const CollapsibleClasses = tv({
 
 export function Collapsible({ label, icon, initialOpen, children, actions, size = "xl" }: CollapsibleType) {
   const { label: labelClasses } = CollapsibleClasses({ size });
+  const [open, setOpen] = useState<boolean>(initialOpen ?? false);
   return (
-    <details className="cursor-default select-none" open={initialOpen ?? false}>
+    <details
+      className="cursor-default select-none"
+      onClick={(e) => {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }}
+      open={open}>
       <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1 font-lato">
         <span className={labelClasses()}>
           {icon ? (
@@ -61,15 +70,7 @@ export function Collapsible({ label, icon, initialOpen, children, actions, size 
           <Icon fontSize={24} icon={IconEnum.chevron_up} />
         </span>
       </summary>
-      <div
-        className="rounded-b bg-zinc-950"
-        // onClick={(e) => {
-        //   e.preventDefault();
-        //   e.stopPropagation();
-        // }}
-      >
-        {children}
-      </div>
+      {open ? <div className="rounded-b bg-zinc-950">{children}</div> : null}
     </details>
   );
 }
