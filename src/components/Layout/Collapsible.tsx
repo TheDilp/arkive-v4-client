@@ -70,7 +70,11 @@ export function Collapsible({ label, icon, initialOpen, children, actions, size 
           <Icon fontSize={24} icon={IconEnum.chevron_up} />
         </span>
       </summary>
-      {open ? <div className="rounded-b bg-zinc-950">{children}</div> : null}
+      {open ? (
+        <div className="rounded-b bg-zinc-950" onClick={(e) => e.stopPropagation()}>
+          {children}
+        </div>
+      ) : null}
     </details>
   );
 }
