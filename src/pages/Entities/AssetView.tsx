@@ -1,13 +1,23 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, ImageType } from "../../types";
-import { dialogAtom, drawerAtom, getAvatarInitials, getImageURL, IconEnum, NameFilters } from "../../utils";
+import { DialogAtomType, DrawerAtomType, ImageType, WebhookType } from "../../types";
+import {
+  baseURLS,
+  dialogAtom,
+  drawerAtom,
+  FetchFunction,
+  getAvatarInitials,
+  getImageURL,
+  IconEnum,
+  NameFilters,
+  userAtom,
+} from "../../utils";
 
 const columnHelper = createColumnHelper<ImageType>();
 type downloadImageMutationType = UseMutateAsyncFunction<
@@ -25,6 +35,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   downloadImage: downloadImageMutationType,
+  webhooks: WebhookType[],
 ) {
   return [
     columnHelper.display({
@@ -85,6 +96,23 @@ function createColumns(
                 },
               },
               {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: { id: row.original.id, type: "image" },
+                      }),
+                      method: "POST",
+                    }),
+                })),
+              },
+              {
                 id: "2",
                 title: "Download",
                 icon: IconEnum.download,
@@ -129,6 +157,7 @@ export function AssetView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
+  const user = useAtomValue(userAtom);
 
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
@@ -267,7 +296,7 @@ export function AssetView() {
       ) : (
         <div className="h-full max-h-[95%] w-full overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, downloadImage)}
+            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [])}
             config={{
               hasSelect: true,
               orderBy,
