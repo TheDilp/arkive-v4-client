@@ -1,3 +1,5 @@
+import { createHmac } from "crypto";
+
 import { AssetType, SearchableEntities } from "../../types";
 import { baseURLS } from "../enums/ServerEnum";
 
@@ -33,4 +35,13 @@ export function getSearchURL(type: SearchableEntities) {
   if (type === "all") return "";
   if (type === "by_tags") return "/all/tags";
   return `/${type}`;
+}
+
+export function getThumbnailUrl(url: string, width?: number, height?: number) {
+  const hash = createHmac("sha1", import.meta.env.VITE_THUMBNAIL_SECRET)
+    .update(`${width || 35}x${height || 35}/${url}`)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+  return `${baseURLS.baseThumbnailServer}/${hash}/${width || 35}x${height || 35}/${url}`;
 }

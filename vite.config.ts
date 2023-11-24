@@ -1,10 +1,10 @@
 import react from "@vitejs/plugin-react";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defineConfig } from "vitest/config";
-import babel from "vite-plugin-babel";
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    nodePolyfills(),
     react({
       babel: {
         babelrc: false,

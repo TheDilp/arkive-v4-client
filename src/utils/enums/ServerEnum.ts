@@ -5,6 +5,8 @@ export const baseURLS = {
   basePublicServer: `${import.meta.env.DEV ? "http://localhost" : "https://thearkive.app"}:${
     import.meta.env.VITE_SERVER_PORT
   }/public/api/v1`,
+
+  baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",
 };
 
 export const ResponseMessageEnum = {

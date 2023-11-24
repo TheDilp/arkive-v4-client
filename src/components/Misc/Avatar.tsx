@@ -4,7 +4,7 @@ import { useSetAtom } from "jotai";
 import { tv } from "tailwind-variants";
 
 import { AvatarType } from "../../types";
-import { dialogAtom, getFirstLetters } from "../../utils";
+import { dialogAtom, getFirstLetters, getThumbnailUrl } from "../../utils";
 import { Tooltip } from "../Overlay/Tooltip";
 
 const AvatarClasses = tv({
@@ -78,6 +78,7 @@ export function Avatar({
 }: AvatarType) {
   const setDialog = useSetAtom(dialogAtom);
   const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage, shape });
+
   return (
     <Tooltip
       allowedPlacements={tooltipAllowedPlacements}
@@ -94,7 +95,7 @@ export function Avatar({
             onClick={() => {
               if (hasShowImage) setDialog((prev) => ({ ...prev, data: { image }, type: "image_view", title: "Image view" }));
             }}
-            src={image}
+            src={getThumbnailUrl(image)}
           />
         ) : (
           <span className={text()}>{initials || getFirstLetters(label || "")}</span>
