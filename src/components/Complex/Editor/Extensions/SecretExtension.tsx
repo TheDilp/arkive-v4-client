@@ -24,7 +24,12 @@ interface SecretOptions {
   classNames?: string;
 }
 
-@extension({})
+@extension<SecretOptions>({
+  defaultOptions: {
+    secret: true,
+    classNames: "secretBlock",
+  },
+})
 class SecretExtension extends NodeExtension<SecretOptions> {
   get name() {
     return "secret" as const;

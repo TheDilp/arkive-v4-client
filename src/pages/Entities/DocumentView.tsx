@@ -203,7 +203,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <div
           className={`absolute fade-in-30 ${
             mentionPosition === "above" ? "top-48" : "bottom-10"
-          } duration-[800] left-1/2 animate-bounce text-green-400`}>
+          } left-1/2 animate-bounce text-green-400 duration-700`}>
           <Icon
             fontSize={48}
             icon={mentionPosition === "above" ? IconEnum.chevron_up : IconEnum.chevron_down}

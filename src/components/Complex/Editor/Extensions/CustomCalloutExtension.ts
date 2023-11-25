@@ -48,7 +48,12 @@ export interface CustomCalloutOptions {
   customColor?: string | null;
 }
 
-@extension({})
+@extension<CustomCalloutOptions>({
+  defaultOptions: {
+    type: "info",
+    customColor: null,
+  },
+})
 class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
   get name() {
     return "callout" as const;

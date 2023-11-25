@@ -22,7 +22,7 @@ import { Alert } from "../../../Misc";
 
 interface TableOfContentsOptions {}
 
-@extension({})
+@extension<TableOfContentsOptions>({ defaultOptions: {} })
 class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
   get name() {
     return "tableofcontents" as const;

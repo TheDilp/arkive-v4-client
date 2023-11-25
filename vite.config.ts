@@ -7,9 +7,9 @@ export default defineConfig({
     nodePolyfills(),
     react({
       babel: {
-        babelrc: false,
-        configFile: false,
-        plugins: [["@babel/plugin-proposal-decorators", { loose: true, version: "2022-03" }]],
+        parserOpts: {
+          plugins: ["decorators-legacy", "classProperties"],
+        },
       },
     }),
   ],
