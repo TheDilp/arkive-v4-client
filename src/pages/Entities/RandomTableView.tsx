@@ -1,4 +1,4 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
@@ -6,7 +6,7 @@ import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "..
 import { useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
-import { dialogAtom, drawerAtom, IconEnum, useNotifications } from "../../utils";
+import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, useNotifications, userAtom } from "../../utils";
 import { getRollValue } from "../../utils/ui/diceRollerUtils";
 
 const columnHelper = createColumnHelper<RandomTableOptionType>();
@@ -82,6 +82,7 @@ function createColumns(
 export function RandomTableView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const [{ selection }, dispatch] = useTable({
     selection: {},
@@ -99,9 +100,10 @@ export function RandomTableView() {
     },
   );
 
-  async function rollOnTable() {
+  async function rollOnTable(isValueOnly?: boolean) {
     const selectedItems = Object.values(selection || {}).flatMap((a) => a);
     const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
+
     const idx = value - 1;
     if (idx > -1) {
       const option = data?.data?.[idx];
@@ -111,9 +113,14 @@ export function RandomTableView() {
           const subOptionRoll = await getRollValue(`1d${option.random_table_suboptions.length}`, true);
           const subIdx = subOptionRoll - 1;
           const subOption = option.random_table_suboptions[subIdx];
+
           if (subOption) {
+            const resultTitle = `${option.title} - ${subOption.title}`;
+            if (isValueOnly) {
+              return resultTitle;
+            }
             createNotification({
-              title: `${option.title} - ${subOption.title}`,
+              title: resultTitle,
               timer: 15,
               description: `${option?.description || ""} ${subOption?.description || ""}`,
               variant: "info",
@@ -122,6 +129,9 @@ export function RandomTableView() {
               position: "top",
             });
           } else {
+            if (isValueOnly) {
+              return option;
+            }
             createNotification({
               title: option.title,
               timer: 15,
@@ -133,6 +143,9 @@ export function RandomTableView() {
             });
           }
         } else {
+          if (isValueOnly) {
+            return option;
+          }
           createNotification({
             title: option.title,
             timer: 15,
@@ -144,7 +157,9 @@ export function RandomTableView() {
           });
         }
       }
+      return "";
     }
+    return "";
   }
 
   function handleOpenNew() {
@@ -160,38 +175,47 @@ export function RandomTableView() {
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
-        {/* <div className="w-56">
-          <Input
-            name="quick_filter"
-            onChange={({ value }) => setFilter(value as string)}
-            placeholder="Quick search by first name"
-            value={filter}
-          />
-        </div> */}
-        {/* <div className="w-32">
-          <Select
-            name="view"
-            onChange={({ value }) => {
-              setView(value as "card" | "list");
-              ls.set("characters_view", value);
-            }}
-            options={[
-              { label: "Card", value: "card", icon: IconEnum.card },
-              { label: "List", value: "list", icon: IconEnum.table },
-            ]}
-            placeholder="View"
-            value={view}
-          />
-        </div> */}
         <div className="w-fit">
-          <Button
-            icon={IconEnum.d20}
-            isDisabled={!data?.data?.length}
-            label="Roll on table"
-            onClick={rollOnTable}
-            tooltip={Object.values(selection || {})?.length > 0 ? "Roll from selected." : ""}
-            variant="info"
-          />
+          <Dropdown
+            allowedPlacements={["left"]}
+            items={[
+              {
+                id: "local",
+                title: "Roll",
+                icon: IconEnum.d20,
+                onClick: rollOnTable,
+              },
+              {
+                id: "discord",
+                title: "Send roll to Discord",
+                icon: IconEnum.discord,
+                onClick: undefined,
+                subItems: (user?.webhooks || []).map((webhook) => ({
+                  title: webhook.title,
+                  id: webhook.id,
+                  onClick: async () => {
+                    const res = await rollOnTable(true);
+                    await FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      method: "POST",
+
+                      body: JSON.stringify({
+                        data: { optionTitle: typeof res === "string" ? res : res, type: "random_table_roll" },
+                      }),
+                    });
+                  },
+                })),
+              },
+            ]}>
+            <Button
+              icon={IconEnum.d20}
+              isDisabled={!data?.data?.length}
+              label="Roll on table"
+              onClick={undefined}
+              tooltip={Object.values(selection || {})?.length > 0 ? "Roll from selected." : ""}
+              variant="info"
+            />
+          </Dropdown>
         </div>
         <div className="w-52">
           <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />

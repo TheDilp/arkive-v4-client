@@ -29,9 +29,7 @@ export interface CharacterRelationshipDataType {
 
 export interface CharacterRelatedType {
   id: string;
-  first_name: string;
-  nickname?: string;
-  last_name?: string;
+  full_name: string;
   relation_type_id: string;
   relation_type?: CharacterRelationshipType;
   portrait_id?: string;

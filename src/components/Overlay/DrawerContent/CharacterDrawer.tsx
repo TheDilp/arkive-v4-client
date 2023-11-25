@@ -18,7 +18,6 @@ import {
 import {
   drawerAtom,
   getBlueprintFieldValueFromType,
-  getCharacterFullName,
   getDifferenceForCharacterFields,
   IconEnum,
   useNotifications,
@@ -92,129 +91,6 @@ function RelationshipRow({
     </li>
   );
 }
-
-// function FieldTemplateRow({
-//   template_id,
-//   title,
-//   character_fields = [],
-//   character_fields_data = {},
-//   createNotification,
-//   handleChange,
-// }: {
-//   template_id: string;
-//   title: string;
-//   project_id: string;
-//   character_fields?: CharacterFieldType[] | undefined;
-//   character_fields_data?: CharacterStateCharacterFieldsType;
-//   createNotification: (notification: Omit<NotificationType, "id">) => void;
-//   handleChange: (props: HandleChangePropsType) => void;
-// }) {
-//   const [isRolling, setIsRolling] = useState(false);
-//   const randomTableFields = character_fields
-//     .filter((field) => field.field_type === "random_table")
-//     .map((field) => ({ field_id: field.id, table_id: field.random_table_id }));
-
-//   const diceRollFields = character_fields
-//     .filter((field) => field.field_type === "dice_roll")
-//     .map((field) => ({ field_id: field.id, formula: field?.formula }));
-
-//   const { data, refetch } = useQuery<{ data: { random_table: { id: string; subitem_id?: string; title: string }[] }[] }>(
-//     ["randomTables", "many", template_id],
-//     async () =>
-//       FetchFunction({
-//         url: `${baseURLS.baseServer}/random_table_options/random/many`,
-//         body: JSON.stringify({ data: randomTableFields.map((t) => ({ table_id: t.table_id, count: 1 })) }),
-//         method: "POST",
-//       }),
-//     { enabled: false },
-//   );
-//   const hasRandomTableOrRoll = character_fields.some(
-//     (field) => field.field_type === "dice_roll" || field.field_type === "random_table",
-//   );
-
-//   const collapsibleActions = hasRandomTableOrRoll
-//     ? [
-//         {
-//           icon: IconEnum.d20,
-//           onClick: async (e: Event) => {
-//             e.preventDefault();
-//             const fieldsToChange: { name: string; value: { id: string; value: { value: number } } }[] = [];
-//             for (let i = 0; i < diceRollFields.length; i += 1) {
-//               const formula = diceRollFields[i]?.formula;
-
-//               if (formula) {
-//                 if (!isRolling) setIsRolling(true);
-//                 const idx = character_fields.findIndex((field) => field.id === diceRollFields[i].field_id);
-//                 if (idx > -1) {
-//                   // eslint-disable-next-line no-await-in-loop
-//                   const value = await getRollValue(formula, true);
-//                   fieldsToChange.push({
-//                     name: `character_fields[${template_id}][${idx}]`,
-//                     value: { id: diceRollFields[i].field_id, value: { value } },
-//                   });
-//                 }
-//               }
-//             }
-//             handleChange(fieldsToChange);
-//             setIsRolling(false);
-//             if (randomTableFields.length) await refetch();
-//           },
-//           tooltip: "Autoroll all random table and dice roll fields in this template.",
-//         },
-//       ]
-//     : [];
-
-//   useEffect(() => {
-//     if (data?.data?.length) {
-//       const fieldsToChange = [];
-//       for (let i = 0; i < data?.data?.length; i += 1) {
-//         const idx = character_fields.findIndex((field) => field.id === randomTableFields[i].field_id);
-//         if (idx > -1) {
-//           fieldsToChange.push({
-//             name: `character_fields[${template_id}][${idx}]`,
-//             value: {
-//               id: character_fields[idx].id,
-//               value: {
-//                 value: data?.data[i].random_table?.[0]?.id,
-//                 subOptionValue: data?.data[i].random_table?.[0]?.subitem_id,
-//               },
-//             },
-//           });
-//         }
-//       }
-//       handleChange(fieldsToChange);
-//     }
-//   }, [data?.data]);
-//   return (
-//     <li className="mt-4 flex flex-col gap-y-2 first:mt-0">
-//       <Collapsible actions={collapsibleActions} initialOpen={false} label={title}>
-//         <div className="flex select-none flex-col gap-y-2 p-2">
-//           {character_fields.sort(sortEntities).map((template_field) => {
-//             const fieldValueIndex = (character_fields_data[template_id] || [])?.findIndex(
-//               (field) => template_field?.id === field?.id,
-//             );
-//             if (fieldValueIndex !== undefined)
-//               return (
-//                 <CharacterFieldInputs
-//                   key={template_field.id}
-//                   {...template_field}
-//                   createNotification={createNotification}
-//                   formula={template_field?.formula}
-//                   handleChange={handleChange}
-//                   index={fieldValueIndex === -1 ? character_fields_data[template_id]?.length ?? 0 : fieldValueIndex}
-//                   isRolling={isRolling}
-//                   subOptionValue={character_fields_data[template_id]?.[fieldValueIndex]?.value?.subOptionValue}
-//                   template_id={template_id}
-//                   value={character_fields_data[template_id]?.[fieldValueIndex]?.value?.value || ""}
-//                 />
-//               );
-//             return null;
-//           })}
-//         </div>
-//       </Collapsible>
-//     </li>
-//   );
-// }
 
 function FieldTemplateRows({
   character_fields = [],
@@ -588,7 +464,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         </>
       ) : null}
       {selectedTab === 1 ? (
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-2 p-2">
           <div className="flex flex-nowrap items-center justify-between">
             <span>Insert new type:</span>
             <Dropdown
@@ -618,10 +494,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 return (
                   <Collapsible key={rg.id} initialOpen={false} label={rg.title}>
                     {isOther ? (
-                      <div className="flex flex-col gap-y-1">
+                      <div className="flex flex-col gap-y-2 p-2">
                         <Search
                           name="related_other"
-                          onChange={({ first_name, last_name, value, image }) => {
+                          onChange={({ label, value, image }) => {
                             if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -640,13 +516,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
-                            if (value && first_name) {
+                            if (value && label) {
                               handleChange({
                                 name: "related_other",
                                 value: (character?.related_other || []).concat({
                                   id: value,
-                                  first_name,
-                                  last_name,
+                                  full_name: label,
                                   portrait_id: image,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
@@ -662,7 +537,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                           {otherCharactersToShow?.map((char) => (
                             <RelationshipRow
                               key={char.id}
-                              character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                              character_name={char.full_name}
                               handleRemove={(character_b_id: string) =>
                                 handleChange({
                                   name: "related_other",
@@ -675,11 +550,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-y-2">
+                      <div className="flex flex-col gap-y-2 p-2">
                         <Search
                           label="Ascendants"
                           name="related_to"
-                          onChange={({ value, image, first_name, last_name }) => {
+                          onChange={({ value, image, label }) => {
                             if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -699,13 +574,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               return;
                             }
 
-                            if (value && first_name) {
+                            if (value && label) {
                               handleChange({
                                 name: "related_to",
                                 value: (character?.related_to || []).concat({
                                   id: value,
-                                  first_name,
-                                  last_name,
+                                  full_name: label,
                                   portrait_id: image,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
@@ -722,7 +596,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             .map((char) => (
                               <RelationshipRow
                                 key={char.id}
-                                character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                                character_name={char.full_name}
                                 handleRemove={(character_b_id: string) =>
                                   handleChange({
                                     name: "related_to",
@@ -736,7 +610,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         <Search
                           label="Descendants"
                           name="related_from"
-                          onChange={({ first_name, last_name, value, image }) => {
+                          onChange={({ label, value, image }) => {
                             if (character?.id && character.id === value) {
                               createNotification({
                                 title: "Cannot add a character to themselves.",
@@ -755,13 +629,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               });
                               return;
                             }
-                            if (value && first_name) {
+                            if (value && label) {
                               handleChange({
                                 name: "related_from",
                                 value: (character?.related_from || []).concat({
                                   id: value,
-                                  first_name,
-                                  last_name,
+                                  full_name: label,
                                   portrait_id: image,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
@@ -778,7 +651,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             .map((char) => (
                               <RelationshipRow
                                 key={char.id}
-                                character_name={getCharacterFullName(char.first_name, "", char?.last_name)}
+                                character_name={char.full_name}
                                 handleRemove={(character_b_id: string) =>
                                   handleChange({
                                     name: "related_from",
@@ -828,7 +701,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
                 },
               };
+              if (dataToParse?.data?.portrait?.id) {
+                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+              }
               const parsedData = UpdateCharacterSchema.parse(dataToParse);
+
               await update(parsedData, {
                 onSuccess: (res) => {
                   if (res?.ok) resetDrawerAtom();
@@ -842,6 +719,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   character_fields: character?.character_fields || [],
                 },
               };
+              if (dataToParse?.data?.portrait?.id) {
+                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+              }
               const parsedData = InsertCharacterSchema.parse(dataToParse);
               await create(parsedData, {
                 onSuccess: (res) => {
