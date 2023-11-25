@@ -52,8 +52,8 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
     <div className="relative flex w-full items-center">
       <div ref={refs.setReference} className="relative w-full">
         <EntityPreview
-          key={items?.[0]?.id}
           {...(items[0] || {})}
+          key={items?.[0]?.id}
           icon={items?.[0] ? items?.[0]?.icon : undefined}
           label={field_label}
           otherAction={

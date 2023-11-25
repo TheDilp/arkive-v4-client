@@ -100,14 +100,14 @@ export function MentionDropdownComponent() {
           (options || []).map((item, index) => {
             return (
               <li
-                key={item.key}
                 className={`remirror-mention-atom-popup-item box-border flex w-[12rem] items-center ${
                   indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
                 } ${indexIsHovered(index) ? "remirror-mention-atom-popup-highlight" : ""}`}
                 {...getItemProps({
                   item,
                   index,
-                })}>
+                })}
+                key={item.key}>
                 {item?.portrait_id ? (
                   <Avatar image={getImageURL(project_id as string, "images", item.portrait_id)} label={item.label} size="xs" />
                 ) : null}

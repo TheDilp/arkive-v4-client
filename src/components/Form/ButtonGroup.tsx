@@ -9,8 +9,8 @@ export function ButtonGroup({ buttons, value, size }: ButtonGroupType) {
       role="group">
       {buttons.map((button) => (
         <Button
-          key={button?.label || button?.icon}
           {...button}
+          key={button?.label || button?.icon}
           size={size || button.size}
           variant={getButtonGroupVariant(button.variant || "primary", button.label || "", value)}
         />

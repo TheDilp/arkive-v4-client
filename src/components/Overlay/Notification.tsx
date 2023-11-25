@@ -239,7 +239,7 @@ export function NotificationContainer() {
   return (
     <div className="scrollbar-hidden pointer-events-none absolute z-[999999] flex h-full w-full flex-col gap-y-4 overflow-y-auto">
       {notifications.map((n) => (
-        <Notification key={n.id} {...n} />
+        <Notification {...n} key={n.id} />
       ))}
     </div>
   );

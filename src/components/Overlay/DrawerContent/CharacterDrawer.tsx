@@ -536,7 +536,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                         <div className="flex flex-col gap-y-2">
                           {otherCharactersToShow?.map((char) => (
                             <RelationshipRow
-                              key={char.id}
                               character_name={char.full_name}
                               handleRemove={(character_b_id: string) =>
                                 handleChange({
@@ -545,6 +544,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                 })
                               }
                               {...char}
+                              key={char.id}
                             />
                           ))}
                         </div>
@@ -595,7 +595,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             ?.filter((char) => char.relation_type_id === rg.id)
                             .map((char) => (
                               <RelationshipRow
-                                key={char.id}
                                 character_name={char.full_name}
                                 handleRemove={(character_b_id: string) =>
                                   handleChange({
@@ -604,6 +603,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                   })
                                 }
                                 {...char}
+                                key={char.id}
                               />
                             ))}
                         </div>
@@ -650,7 +650,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             ?.filter((char) => char.relation_type_id === rg.id)
                             .map((char) => (
                               <RelationshipRow
-                                key={char.id}
                                 character_name={char.full_name}
                                 handleRemove={(character_b_id: string) =>
                                   handleChange({
@@ -659,6 +658,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                   })
                                 }
                                 {...char}
+                                key={char.id}
                               />
                             ))}
                         </div>

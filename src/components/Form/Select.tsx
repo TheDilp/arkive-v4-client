@@ -386,7 +386,6 @@ export function Select({
               {filteredItems.map((opt, i) => {
                 return (
                   <div
-                    key={`${opt}-${i.toFixed()}`}
                     ref={(node) => {
                       listRef.current[i] = node;
                     }}
@@ -424,7 +423,8 @@ export function Select({
                           });
                         }
                       },
-                    })}>
+                    })}
+                    key={`${opt}-${i.toFixed()}`}>
                     {opt?.image ? (
                       <Avatar
                         image={opt?.image?.link}

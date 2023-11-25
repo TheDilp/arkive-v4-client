@@ -90,11 +90,11 @@ export function SlashMenu() {
         {items.map((item, index) => {
           return (
             <li
-              key={item.name}
               className={`remirror-mention-atom-popup-item flex w-[12rem] items-center justify-between ${
                 indexIsSelected(index) ? "remirror-mention-atom-popup-highlight" : ""
               }`}
-              {...getItemProps({ item, index })}>
+              {...getItemProps({ item, index })}
+              key={item.name}>
               <Icon color={item.color} fontSize={32} icon={item.icon} />
               {item.name}
             </li>
