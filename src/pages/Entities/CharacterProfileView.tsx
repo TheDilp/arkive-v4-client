@@ -118,10 +118,10 @@ function relationshipTableColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
-            initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
+            initials={getAvatarInitials(row.original.full_name || "")}
             isBordered
             isTooltipDisabled
-            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
+            label={getCharacterFullName(row.original.full_name || "")}
             size="sm"
           />
         </div>
@@ -134,28 +134,14 @@ function relationshipTableColumns(
       maxSize: 5,
     }),
     relationshipColumnHelper.display({
-      id: "first_name",
-      header: "First name",
-      cell: ({ row }) => row.original.first_name,
+      id: "Name",
+      header: "Name",
+      cell: ({ row }) => row.original.full_name,
       meta: {
         pinned: true,
       },
       minSize: 15,
       maxSize: 15,
-    }),
-    relationshipColumnHelper.display({
-      id: "nickname",
-      header: "Nickname",
-      cell: ({ row }) => row.original?.nickname,
-      minSize: 15,
-      maxSize: 15,
-    }),
-    relationshipColumnHelper.display({
-      id: "last_name",
-      header: "Last name",
-      cell: ({ row }) => row.original.last_name,
-      // minSize: 15,
-      // maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "relation_type",
@@ -183,11 +169,7 @@ function relationshipTableColumns(
             items={[
               {
                 id: "1",
-                title: `Preview profile of ${getCharacterFullName(
-                  row.original.first_name,
-                  undefined,
-                  row.original?.last_name,
-                )}`,
+                title: `Preview profile of ${row.original.full_name}`,
                 icon: IconEnum.eye,
                 onClick: () =>
                   setDrawer((prev) => ({
@@ -200,7 +182,7 @@ function relationshipTableColumns(
               },
               {
                 id: "2",
-                title: `View profile of ${getCharacterFullName(row.original.first_name, undefined, row.original?.last_name)}`,
+                title: `View profile of ${row.original.full_name}`,
                 icon: IconEnum.character,
                 onClick: isPreview
                   ? () => {}
@@ -208,11 +190,7 @@ function relationshipTableColumns(
               },
               {
                 id: "3",
-                title: `View conversations of ${getCharacterFullName(
-                  row.original.first_name,
-                  undefined,
-                  row.original?.last_name,
-                )}`,
+                title: `View conversations of ${row.original.full_name}`,
                 icon: IconEnum.conversation,
                 onClick: () =>
                   isPreview ? () => {} : navigate(`/projects/${project_id}/characters/${row.original.id}/conversations`),
@@ -487,10 +465,10 @@ function conversationTableColumns(
             <div key={char.id} className="-ml-4 first:ml-0">
               <Avatar
                 image={getImageURL(project_id, "images", char?.portrait_id || "")}
-                initials={getAvatarInitials(char.first_name, char?.last_name || "")}
+                initials={getAvatarInitials(char?.full_name || "")}
                 isBordered
                 isTooltipDisabled
-                label={getCharacterFullName(char.first_name, char?.last_name || "")}
+                label={getCharacterFullName(char?.full_name || "")}
                 size="sm"
               />
             </div>
@@ -525,12 +503,20 @@ function conversationTableColumns(
                 onClick: () => {
                   const char = row.original.characters.find((c) => c.id === item_id);
                   if (char) {
-                    setDrawer((prev) => ({
-                      ...prev,
-                      data: { character: char, conversation_id: row.original.id },
-                      title: `Edit conversation - ${row.original.title}`,
-                      type: "conversations",
-                    }));
+                    setDrawer((prev) => {
+                      if (char.full_name) {
+                        return {
+                          ...prev,
+                          data: {
+                            character: { full_name: char.full_name, id: char.id, portrait_id: char.portrait_id },
+                            conversation_id: row.original.id,
+                          },
+                          title: `Edit conversation - ${row.original.title}`,
+                          type: "conversations",
+                        };
+                      }
+                      return prev;
+                    });
                   }
                 },
               },
@@ -948,15 +934,14 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
     }
   }
   function openConversationDrawer() {
-    if (existingCharacter?.data)
+    if (existingCharacter?.data?.full_name)
       setDrawer({
         type: "conversations",
         title: "Start new conversation",
         data: {
           character: {
             id: existingCharacter?.data.id,
-            first_name: existingCharacter?.data?.first_name,
-            last_name: existingCharacter?.data?.last_name,
+            full_name: existingCharacter?.data?.full_name,
             portrait_id: existingCharacter?.data?.portrait_id,
           },
         },

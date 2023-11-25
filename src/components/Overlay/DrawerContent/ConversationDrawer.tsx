@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterType, ConversationType } from "../../../types";
-import { drawerAtom, getCharacterFullName, IconEnum, useNotifications } from "../../../utils";
+import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import {
   InsertConversationSchema,
   InsertConversationType,
@@ -15,11 +15,11 @@ import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search } from "../../Form";
 import { Skeleton } from "../../Misc";
 
-type ConversationCharacterType = Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
+type ConversationCharacterType = Pick<CharacterType, "id" | "full_name" | "portrait_id">;
 type Props = {
   data: {
     conversation_id?: string;
-    character?: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
+    character?: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
   };
 };
 
@@ -89,7 +89,7 @@ export function ConversationDrawer({ data }: Props) {
     }
   }, [existingConversation?.data]);
 
-  if (!data?.character?.first_name) {
+  if (!data?.character?.full_name) {
     resetDrawer();
     return null;
   }
@@ -109,7 +109,7 @@ export function ConversationDrawer({ data }: Props) {
         isDisabled={isCreating || isUpdating}
         label="Members"
         name="characters"
-        onChange={({ first_name, last_name, image, value }) => {
+        onChange={({ label, image, value }) => {
           if (data?.character?.id === value) {
             createNotification({
               title: "Cannot add same character more than once.",
@@ -128,10 +128,10 @@ export function ConversationDrawer({ data }: Props) {
             });
             return;
           }
-          if (!first_name) return;
+          if (!label) return;
           setConversation((prev) => ({
             ...prev,
-            characters: (prev.characters || [])?.concat([{ id: value, first_name, last_name, portrait_id: image }]),
+            characters: (prev.characters || [])?.concat([{ id: value, full_name: label, portrait_id: image }]),
           }));
         }}
         placeholder="Press enter to search and add a character."
@@ -141,7 +141,7 @@ export function ConversationDrawer({ data }: Props) {
         <EntityPreview
           id={data.character.id}
           image_id={data.character.portrait_id}
-          title={getCharacterFullName(data.character.first_name, undefined, data.character.last_name)}
+          title={data.character.full_name}
           type="characters"
         />
       )}
@@ -152,7 +152,7 @@ export function ConversationDrawer({ data }: Props) {
           }
           id={char.id}
           image_id={char?.portrait_id}
-          title={getCharacterFullName(char.first_name, undefined, char.last_name)}
+          title={char?.full_name || ""}
           type="characters"
         />
       ))}

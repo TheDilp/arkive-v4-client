@@ -79,6 +79,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
           event: e.originalEvent,
           items: [
             {
+              id: "1",
               icon: IconEnum.add,
               title: "Add map pin",
               onClick: () => {
@@ -91,6 +92,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
               },
             },
             {
+              id: "2",
               icon: IconEnum.character,
               title: "Add character pin",
               onClick: () => {
@@ -106,6 +108,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
               },
             },
             {
+              id: "3",
               icon: IconEnum.map_pin,
               title: "Manage pins",
               onClick: () => {

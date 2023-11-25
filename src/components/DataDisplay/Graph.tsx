@@ -168,6 +168,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
             event: evt.originalEvent,
             items: [
               {
+                id: "1",
                 title: "New node",
                 icon: IconEnum.add,
                 onClick: () => {
@@ -182,11 +183,13 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 },
               },
               {
+                id: "2",
                 title: "Go to center of graph",
                 onClick: () => cyRef?.current?._cy?.center(),
                 icon: IconEnum.center,
               },
               {
+                id: "3",
                 title: "Fit view to nodes",
                 icon: IconEnum.fit,
                 onClick: () => {
@@ -204,8 +207,16 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                     );
                 },
               },
-              { title: "Quick create from document", icon: IconEnum.document_template },
-              { title: "Quick create from image", icon: IconEnum.image_template },
+              {
+                id: "4",
+                title: "Quick create from document",
+                icon: IconEnum.document_template,
+              },
+              {
+                id: "5",
+                title: "Quick create from image",
+                icon: IconEnum.image_template,
+              },
             ],
           });
         }
@@ -232,6 +243,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 selected.length <= 1
                   ? [
                       {
+                        id: "1",
                         title: "Edit node",
                         icon: IconEnum.edit,
                         onClick: () =>
@@ -246,6 +258,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                           })),
                       },
                       {
+                        id: "2",
                         title: "Highlight connected nodes",
                         icon: IconEnum.graph,
                         onClick: () => {
@@ -259,11 +272,13 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         },
                       },
                       {
+                        id: "3",
                         title: locked ? "Unlock node" : "Lock node",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
                       {
+                        id: "4",
                         title: "Center on node",
                         icon: IconEnum.center,
                         onClick: () => cyRef?.current?._cy.center(evt.target),
@@ -271,6 +286,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                       // { title: "Template from node" },
                       // !ADD OPTION TO DELETE MULTIPLE NODES
                       {
+                        id: "5",
                         title: "Delete node",
                         icon: IconEnum.trash,
                         onClick: () =>
@@ -288,6 +304,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                     ]
                   : [
                       {
+                        id: "6",
                         title: "Edit multiple nodes",
                         icon: IconEnum.edit,
                         onClick: () => {
@@ -303,16 +320,19 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         },
                       },
                       {
+                        id: "7",
                         title: locked ? "Unlock nodes" : "Lock nodes",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
                       {
+                        id: "8",
                         title: "Center on nodes",
                         icon: IconEnum.center,
                         onClick: () => cyRef?.current?._cy.center(evt.target),
                       },
                       {
+                        id: "9",
                         title: "Delete multiple nodes",
                         icon: IconEnum.trash,
                         onClick: () => {
@@ -344,6 +364,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                 selected.length <= 1
                   ? [
                       {
+                        id: "1",
                         title: "Edit edge",
                         icon: IconEnum.edit,
                         onClick: () => {
@@ -361,6 +382,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         },
                       },
                       {
+                        id: "2",
                         title: "Highlight connected nodes",
                         icon: IconEnum.graph,
                         onClick: () => {
@@ -372,6 +394,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                       },
                       // !DELETE MULTIPLE OR SINGLE EDGE
                       {
+                        id: "3",
                         title: "Delete selected edge",
                         icon: IconEnum.trash,
                         onClick: () => {
@@ -385,6 +408,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                     ]
                   : [
                       {
+                        id: "4",
                         title: "Edit many edges",
                         icon: IconEnum.edit,
                         onClick: () => {
@@ -402,6 +426,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
                         },
                       },
                       {
+                        id: "5",
                         title: "Delete selected edges",
                         icon: IconEnum.trash,
                         onClick: () => {

@@ -107,9 +107,7 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
             if (nodes.length)
               deleteManyNodes(
                 {
-                  data: nodes.map((node) => ({
-                    id: node.id(),
-                  })),
+                  data: { ids: node_ids },
                 },
                 {
                   onSuccess: () => {
@@ -121,9 +119,7 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
             if (edges.length)
               deleteManyEdges(
                 {
-                  data: edges.map((edge) => ({
-                    id: edge.id(),
-                  })),
+                  data: { ids: edge_ids },
                 },
                 {
                   onSuccess: () => {

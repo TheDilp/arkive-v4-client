@@ -467,3 +467,78 @@ export function useRemoveFromEntity<InsertType extends { data: { [key: string]: 
     },
   );
 }
+
+export function useUpdateTags<
+  InsertType extends { data: { id?: string; parent_id?: string | null }; relations?: { [key: string]: any } },
+>(type: AvailableEntityType | AvailableSubEntityType, project_id: string) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data, vars) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          // Invalidating a document causes the editor to refetch while open
+          // if (type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
+          if (type === "documents") {
+            queryClient.setQueryData<{ data: DocumentType }>(["documents", vars.data.id, "content"], (old) =>
+              //! Omit -> never allow document content to be changed through query client
+
+              {
+                return old
+                  ? {
+                      ...old,
+                      data: {
+                        ...old.data,
+                        ...vars.data,
+                        content:
+                          "content" in vars.data && vars.data?.content ? (vars.data.content as RemirrorJSON) : old.data.content,
+                      },
+                    }
+                  : old;
+              },
+            );
+          }
+
+          if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
+          if (vars.data.id && type !== "documents") queryClient.invalidateQueries([type, vars.data.id]);
+
+          // Invalidate mentions queries if this is a mentionable entity being updated
+          if (MentionableEntites.includes(type)) {
+            queryClient.invalidateQueries([type, vars.data.id, "mention"]);
+          }
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}

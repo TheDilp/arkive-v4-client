@@ -88,8 +88,10 @@
   blockquote {
     @apply my-2 border-0 px-0 italic;
   }
-  img:not(.characterMentionImage >) {
-    @apply p-1 !important;
+  :not(.characterMentionImage >) {
+    img {
+      @apply p-1 !important;
+    }
   }
   blockquote > * {
     @apply border-l-[3px] pl-2 font-merriweather text-2xl font-normal text-zinc-300 !important;

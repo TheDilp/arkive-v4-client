@@ -13,6 +13,7 @@ export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   ilike: "Search",
   in: "In list",
   is: "is",
+  "is not": "is not",
   "not in": "Not in list",
 };
 

@@ -2,13 +2,13 @@ import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useHandleChange, useUpdateEntity } from "../../../hooks";
-import { AvailableEntityType, TagType } from "../../../types";
+import { useHandleChange, useUpdateTags } from "../../../hooks";
+import { AvailableEntityType, AvailableSubEntityType, TagType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, TagInput } from "../../Form";
 
 type Props = {
-  data: { tags: TagType[]; entity: { type: AvailableEntityType; id: string } };
+  data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } };
 };
 
 export function EditTags({ data }: Props) {
@@ -18,7 +18,7 @@ export function EditTags({ data }: Props) {
 
   const { handleChange } = useHandleChange({ data: tagsData, setData: setTagsData });
 
-  const { mutateAsync: updateTags, isLoading: isMutating } = useUpdateEntity<{
+  const { mutateAsync: updateTags, isLoading: isMutating } = useUpdateTags<{
     data: { id?: string; parent_id?: string | null };
     relations: { tags: { id: string }[] };
   }>(data.entity.type, project_id as string);

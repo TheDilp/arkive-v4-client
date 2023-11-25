@@ -88,6 +88,7 @@ export function MapPin({
           event: e.originalEvent as any,
           items: [
             {
+              id: "1",
               title: "Edit pin",
               icon: IconEnum.edit,
               onClick: () =>
@@ -99,6 +100,7 @@ export function MapPin({
                 })),
             },
             {
+              id: "2",
               title: "Delete pin",
               icon: IconEnum.trash,
               onClick: () => {

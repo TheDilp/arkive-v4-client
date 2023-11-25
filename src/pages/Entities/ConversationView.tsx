@@ -8,15 +8,7 @@ import { isRemirrorJSON, RemirrorJSON } from "remirror";
 import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity, useGetInfiniteEntities } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
-import {
-  drawerAtom,
-  getAvatarInitials,
-  getCharacterFullName,
-  getImageURL,
-  IconEnum,
-  messageEditorHooks,
-  MessageTypeOptions,
-} from "../../utils";
+import { drawerAtom, getAvatarInitials, getImageURL, IconEnum, messageEditorHooks, MessageTypeOptions } from "../../utils";
 
 type DeleteMessageType = UseMutateAsyncFunction<
   any,
@@ -306,8 +298,8 @@ export function ConversationView({ id }: { id: string }) {
                       <div className=" flex flex-col items-end gap-x-1 self-end px-1">
                         <Avatar
                           image={getImageURL(project_id as string, "images", char?.portrait_id)}
-                          initials={getAvatarInitials(char?.first_name || "", char?.last_name || "") || ""}
-                          label={getCharacterFullName(char.first_name, undefined, char?.last_name)}
+                          initials={getAvatarInitials(char?.full_name || "") || ""}
+                          label={char?.full_name || ""}
                           size="2xs"
                           tooltipAllowedPlacements={["left", "right"]}
                         />
@@ -374,7 +366,7 @@ export function ConversationView({ id }: { id: string }) {
                   link: getImageURL(project_id as string, "images", char.portrait_id),
                   shape: "circle",
                 },
-                label: getCharacterFullName(char.first_name, undefined, char.last_name),
+                label: char?.full_name || "",
                 value: char.id,
               }))}
               value={selectedCharacter}

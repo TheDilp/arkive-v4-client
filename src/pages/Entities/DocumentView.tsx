@@ -221,7 +221,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
           if (params.firstRender) {
             return;
           }
-          if (params.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
+          if (params?.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
             handleChange({ name: "content", value: params.state.toJSON()?.doc });
         }}>
         <SlashMenu />

@@ -283,7 +283,7 @@ export function useInviteUserToProject() {
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newGraph) =>
+    async (newGraph: { data: { project_id: string; email: string } }) =>
       FetchFunction({
         url: `${baseURLS.baseServer}/users/invite`,
         body: JSON.stringify(newGraph),

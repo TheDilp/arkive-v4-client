@@ -5,6 +5,6 @@ export interface ConversationType {
   id: string;
   title: string;
   project_id: string;
-  characters: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[];
+  characters: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
   messages: MessageType[];
 }

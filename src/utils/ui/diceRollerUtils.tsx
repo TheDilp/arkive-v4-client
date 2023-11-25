@@ -1,13 +1,10 @@
 import DiceBox from "@3d-dice/dice-box";
 import DiceParser from "@3d-dice/dice-parser-interface";
-import DisplayResults from "@3d-dice/dice-ui/src/displayResults"; // fui index exports are messed up -> going to src
 
 import { NotificationType } from "../../types";
 import { DefaultTagColor, IconEnum } from "../enums";
 
 export const DiceRollParser = new DiceParser();
-
-export const DiceResults = new DisplayResults("#dice-box");
 
 export const Dice = new DiceBox(
   "#dice-box", // target DOM element to inject the canvas for rendering
@@ -33,7 +30,6 @@ DiceNoSim.init();
 Dice.init().then(() => {
   document.addEventListener("mousedown", () => {
     Dice.clear();
-    DiceResults.clear();
   });
 });
 
@@ -46,7 +42,7 @@ export function getCritColor(critical: "success" | "failure" | null | undefined)
   if (critical === "failure") return "text-red-400 font-bold";
   return "";
 }
-export const DiceRollRegex = /(((([(])?(\d{1,10})?([Dd]\d+))([)])?)(((kh)|(dl)|(kl)|(dh))(\d+))?([)])?([*+-/()])?(\d+)?)+/gi;
+export const DiceRollRegex = /(((([(])?(\d{1,10})?([Dd]\d+))([)])?)(((kh)|(dl)|(kl)|(dh))(\d+))?([)])?([*+-/()])?(\d+)?)+/giu;
 
 export async function getRollValue(notation: string, hasNoSimulation?: boolean) {
   const parsedNotation = DiceRollParser.parseNotation(notation);

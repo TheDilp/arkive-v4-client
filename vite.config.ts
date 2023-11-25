@@ -24,6 +24,8 @@ export default defineConfig({
           if (id.includes("lodash")) return "lodash";
           if (id.includes("remirror")) return "remirror";
           if (id.includes("leaflet")) return "leaflet";
+          if (id.includes("zod")) return "zod";
+          if (id.includes("react")) return "react";
           return "vendor";
         },
       },
