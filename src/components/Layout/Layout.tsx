@@ -1,11 +1,12 @@
+import { useUser } from "@clerk/clerk-react";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
-import { useBreakpoint, useGetEntity } from "../../hooks";
+import { useBreakpoint, useGetEntity, useGetUser } from "../../hooks";
 import { ProjectType } from "../../types";
-import { contextMenuAtom, projectAtom } from "../../utils";
+import { contextMenuAtom, projectAtom, userAtom } from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -14,6 +15,25 @@ export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
   const { data } = useGetEntity<ProjectType>(project_id as string, "projects", {}, { staleTime: 60 * 60 * 1 });
+  const { user } = useUser();
+
+  const { data: userData } = useGetUser(
+    {
+      data: { auth_id: user?.id },
+      relations: {
+        webhooks: true,
+      },
+      fields: ["id"],
+    },
+    { enabled: !!user?.id },
+  );
+  const setUserAtom = useSetAtom(userAtom);
+
+  useEffect(() => {
+    if (userData) {
+      setUserAtom(userData.data);
+    }
+  }, [userData?.data]);
 
   const setProjectAtom = useSetAtom(projectAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
