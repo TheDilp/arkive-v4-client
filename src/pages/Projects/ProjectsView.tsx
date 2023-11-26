@@ -1,18 +1,38 @@
 import { useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
+import { useEffect } from "react";
 
 import { Button, Drawer, Navbar, ProjectCard, Skeleton } from "../../components";
-import { useChangeNavbarTitle, useGetAllProjects } from "../../hooks";
+import { useChangeNavbarTitle, useGetAllProjects, useGetUser } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { drawerAtom, getImageURL, IconEnum } from "../../utils";
+import { drawerAtom, getImageURL, IconEnum, userAtom } from "../../utils";
 
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
-  const ownerId = localStorage.getItem("ownerId");
-  const { user } = useUser();
 
-  const { data, isLoading } = useGetAllProjects({ data: { auth_id: user?.id } });
   useChangeNavbarTitle("The Arkive");
+
+  const { user } = useUser();
+  const { data, isLoading } = useGetAllProjects({ data: { auth_id: user?.id } });
+
+  const { data: userData } = useGetUser(
+    {
+      data: { auth_id: user?.id },
+      relations: {
+        webhooks: true,
+      },
+      fields: ["id"],
+    },
+    { enabled: !!user?.id },
+  );
+  const setUserAtom = useSetAtom(userAtom);
+
+  useEffect(() => {
+    if (userData) {
+      setUserAtom(userData.data);
+    }
+  }, [userData?.data]);
+
   return (
     <div className="flex h-screen w-screen">
       <Drawer />
@@ -29,7 +49,7 @@ export function ProjectsView() {
                 ...prev,
                 type: "project",
                 title: "Create new project",
-                data: { owner_id: ownerId as string },
+                data: { owner_id: userData?.data?.id as string },
               }))
             }
             tooltip="Create new project"

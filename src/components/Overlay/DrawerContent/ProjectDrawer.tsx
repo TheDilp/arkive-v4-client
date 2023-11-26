@@ -1,15 +1,19 @@
+import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 
 import { useCreateProject, useHandleChange } from "../../../hooks";
 import { ProjectType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum, userAtom } from "../../../utils";
 import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
 
 export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: string } | null }) {
-  const ownerId = localStorage.getItem("ownerId");
-  const [project, setProject] = useState<Partial<ProjectType>>({ ...(data || { title: "" }), owner_id: ownerId as string });
+  const user = useAtomValue(userAtom);
+  const [project, setProject] = useState<Partial<ProjectType>>({
+    ...(data || { title: "" }),
+    owner_id: user?.id as string,
+  });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
   const { mutateAsync, isLoading: isMutating } = useCreateProject<InsertProjectType>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
