@@ -2,7 +2,7 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -125,7 +125,7 @@ function FieldRow({
                   <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
                     {(provided, draggableSnapshot) => (
                       <div
-                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
+                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
                           draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                         }`}
                         {...provided.draggableProps}
@@ -240,6 +240,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
+  const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertBlueprintType>("blueprints");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateBlueprintType>(
     "blueprints",
@@ -333,7 +334,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           <Button
             icon={IconEnum.add}
             isDisabled={isLoading}
-            onClick={() =>
+            onClick={() => {
               handleChange({
                 name: "blueprint_fields",
                 value: (blueprint.blueprint_fields || []).concat({
@@ -343,8 +344,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   // width: "half",
                   sort: blueprint?.blueprint_fields?.length ?? 0,
                 }),
-              })
-            }
+              });
+              setTimeout(() => {
+                fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
             variant="info"
           />
         </div>
@@ -419,6 +423,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                         }),
                                 },
                               ]}
+                              initialOpen={
+                                field.title === "New field" &&
+                                field.field_type === "text" &&
+                                index === (blueprint?.blueprint_fields?.length || 1) - 1
+                              }
                               label={field?.title}>
                               <FieldRow
                                 blueprint={field?.blueprint}
@@ -445,6 +454,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                   ))
                 : null}
               {providedDroppable.placeholder}
+              <div ref={fieldContainerRef} />
             </div>
           )}
         </Droppable>

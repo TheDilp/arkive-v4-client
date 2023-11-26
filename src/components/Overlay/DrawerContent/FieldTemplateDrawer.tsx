@@ -407,6 +407,11 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                               }),
                                       },
                                     ]}
+                                    initialOpen={
+                                      field.title === "New field" &&
+                                      field.field_type === "text" &&
+                                      index === (template?.character_fields?.length || 1) - 1
+                                    }
                                     label={field?.title}>
                                     <div
                                       className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-900 p-2 ${
