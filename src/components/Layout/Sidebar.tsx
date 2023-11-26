@@ -47,7 +47,7 @@ export function Sidebar() {
       <nav className={nav()}>
         <ul className={list()}>
           <li className={sidebarLogo()}>
-            <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={48} />
+            <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
           </li>
           {sidebarItems.map((item) => {
             return (
