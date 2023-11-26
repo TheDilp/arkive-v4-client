@@ -4,6 +4,7 @@ import {
   autoPlacement,
   autoUpdate,
   FloatingArrow,
+  FloatingPortal,
   hide,
   inline,
   offset,
@@ -103,32 +104,34 @@ export function Tooltip({
         }),
       )}
       {!isDisabled && open && (
-        <div
-          onClick={() => {
-            if (closeOnClick) {
-              setOpen((prev) => !prev);
-            }
-          }}
-          onKeyDown={() => {}}
-          role="tooltip"
-          tabIndex={-1}
-          {...getFloatingProps({
-            ref: refs.setFloating,
-            style: { ...floatingStyles, zIndex: 99999 },
-          })}>
-          {typeof content === "string" ? (
-            <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
-          ) : (
-            cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
-          )}
-          <FloatingArrow
-            ref={arrowRef}
-            className="z-[9999] [&>path:first-of-type]:stroke-none"
-            context={context}
-            fill={arrowColor || getArrowColor(variant) || "black"}
-            strokeWidth={0}
-          />
-        </div>
+        <FloatingPortal>
+          <div
+            onClick={() => {
+              if (closeOnClick) {
+                setOpen((prev) => !prev);
+              }
+            }}
+            onKeyDown={() => {}}
+            role="tooltip"
+            tabIndex={-1}
+            {...getFloatingProps({
+              ref: refs.setFloating,
+              style: { ...floatingStyles, zIndex: 9999 },
+            })}>
+            {typeof content === "string" ? (
+              <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
+            ) : (
+              cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
+            )}
+            <FloatingArrow
+              ref={arrowRef}
+              className="z-[9999] [&>path:first-of-type]:stroke-none"
+              context={context}
+              fill={arrowColor || getArrowColor(variant) || "black"}
+              strokeWidth={0}
+            />
+          </div>
+        </FloatingPortal>
       )}
     </>
   );

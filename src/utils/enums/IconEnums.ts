@@ -42,7 +42,7 @@ export const IconEnum = {
   eye: "ph:eye",
   eye_slash: "ph:eye-slash",
   family_tree: "ph:tree-structure",
-  filter: "ph:funnel",
+  filter: "iconoir:filter",
   fit: "icon-park-outline:off-screen-one",
   flow_arrow: "ph:flow-arrow",
   folder: "ph:folder-light",
