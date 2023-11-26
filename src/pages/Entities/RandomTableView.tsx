@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useGetEntities, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType } from "../../types";
+import { DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
 import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
 import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, useNotifications, userAtom } from "../../utils";
 import { getRollValue } from "../../utils/ui/diceRollerUtils";
@@ -14,6 +14,7 @@ const columnHelper = createColumnHelper<RandomTableOptionType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  webhooks: WebhookType[],
 ) {
   return [
     columnHelper.accessor("title", {
@@ -52,6 +53,29 @@ function createColumns(
                 title: `${!row.getIsExpanded() ? "Show" : "Hide"} suboptions`,
                 icon: IconEnum.random_table,
                 onClick: row.getToggleExpandedHandler(),
+              },
+              {
+                id: "discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                subItems: (webhooks || []).map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: async () => {
+                    await FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      method: "POST",
+
+                      body: JSON.stringify({
+                        data: {
+                          title: row.original.title,
+                          description: row.original.description,
+                          type: "random_table_roll",
+                        },
+                      }),
+                    });
+                  },
+                })),
               },
               {
                 id: "delete_option",
@@ -100,7 +124,10 @@ export function RandomTableView() {
     },
   );
 
-  async function rollOnTable(isValueOnly?: boolean) {
+  async function rollOnTable(isValueOnly?: boolean): Promise<{
+    option: { title: string; description: string | null } | null;
+    subOption: { title: string; description: string | null } | null;
+  }> {
     const selectedItems = Object.values(selection || {}).flatMap((a) => a);
     const value = await getRollValue(`1d${selectedItems?.length || data?.data?.length}`);
 
@@ -117,7 +144,10 @@ export function RandomTableView() {
           if (subOption) {
             const resultTitle = `${option.title} - ${subOption.title}`;
             if (isValueOnly) {
-              return resultTitle;
+              return {
+                option: { title: resultTitle, description: option?.description || "" },
+                subOption: { title: subOption?.title || "", description: subOption.description || "" },
+              };
             }
             createNotification({
               title: resultTitle,
@@ -130,7 +160,7 @@ export function RandomTableView() {
             });
           } else {
             if (isValueOnly) {
-              return option;
+              return { option: { title: option.title, description: option?.description || null }, subOption };
             }
             createNotification({
               title: option.title,
@@ -144,7 +174,7 @@ export function RandomTableView() {
           }
         } else {
           if (isValueOnly) {
-            return option;
+            return { option: { title: option.title, description: option.description || null }, subOption: null };
           }
           createNotification({
             title: option.title,
@@ -157,9 +187,9 @@ export function RandomTableView() {
           });
         }
       }
-      return "";
+      return { option: null, subOption: null };
     }
-    return "";
+    return { option: null, subOption: null };
   }
 
   function handleOpenNew() {
@@ -200,7 +230,11 @@ export function RandomTableView() {
                       method: "POST",
 
                       body: JSON.stringify({
-                        data: { optionTitle: typeof res === "string" ? res : res, type: "random_table_roll" },
+                        data: {
+                          title: `${res.option?.title || ""} ${res?.subOption?.title ? `- ${res.subOption.title}` : ""}`,
+                          description: `${res.option?.description || ""} ${res?.subOption?.description || ""}`,
+                          type: "random_table_roll",
+                        },
                       }),
                     });
                   },
@@ -223,7 +257,7 @@ export function RandomTableView() {
       </div>
       <div className="h-full w-full overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog)}
+          columns={createColumns(setDrawer, setDialog, user?.webhooks || [])}
           config={{
             hasSelect: true,
             expandable: true,

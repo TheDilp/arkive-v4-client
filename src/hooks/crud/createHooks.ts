@@ -326,6 +326,8 @@ export function useCreateWebhook() {
       onSuccess: (data) => {
         if (data?.ok) {
           queryClient.invalidateQueries(["allEntities", undefined, "webhooks"]);
+          queryClient.invalidateQueries(["user"]);
+
           createNotification({
             title: data?.message || getEntityCRUDNotification("webhooks", "create"),
             variant: "success",
