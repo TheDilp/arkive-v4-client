@@ -929,6 +929,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
         ...prev,
         type: "edit_tags",
         title: "Edit tags",
+        size: "md",
         data: { tags: existingCharacter?.data?.tags || [], entity: { type: "characters", id: existingCharacter?.data?.id } },
       }));
     }

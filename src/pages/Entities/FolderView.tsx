@@ -419,7 +419,7 @@ export function FolderView() {
   if (type === "settings") return <ProjectSettingsView />;
   return (
     <TablePageLayout>
-      <div className="flex h-12 max-h-[3rem] min-h-[3rem] flex-col items-center justify-between">
+      <div className="flex h-12 max-h-[3rem] min-h-[3rem] flex-col items-center justify-center">
         <div className="flex w-full items-start justify-between">
           <Breadcrumbs />
           {!item_id || data?.data?.is_folder ? (
