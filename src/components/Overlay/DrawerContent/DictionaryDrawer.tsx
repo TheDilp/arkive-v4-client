@@ -23,7 +23,7 @@ export function DictionaryDrawer({ data }: Props) {
   const { data: existingDictionary } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
-    { data, fields: ["title", "is_public", "is_folder", "parent_id"] },
+    { data, fields: ["title", "icon", "is_public", "is_folder", "parent_id"] },
     { enabled: !!data?.id },
   );
   const { mutateAsync: createDictionary, isLoading: isCreating } = useCreateEntity<{ data: InsertDictionaryType }>(
