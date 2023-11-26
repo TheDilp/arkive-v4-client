@@ -287,7 +287,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {selectedTab === 3 ? (
+            {selectedTab === 2 ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.user_invite}
