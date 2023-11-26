@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
+import { useBreakpoint } from "../../hooks";
 import { IconEnum, navItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
@@ -28,6 +29,7 @@ const SidebarClasses = tv({
 export function Sidebar() {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
+  const { isLg } = useBreakpoint();
   const {
     base,
     nav,
@@ -62,7 +64,10 @@ export function Sidebar() {
                 
                 `}
                 to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
-                <Tooltip allowedPlacements={["right"]} content={item.tooltip} isDisabled={item.navigate === type}>
+                <Tooltip
+                  allowedPlacements={[isLg ? "right" : "top"]}
+                  content={item.tooltip}
+                  isDisabled={item.navigate === type}>
                   <li className={listItem()}>
                     <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
                   </li>
