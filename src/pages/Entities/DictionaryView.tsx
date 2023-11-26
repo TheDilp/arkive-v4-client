@@ -1,11 +1,11 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useGetEntity, useTable } from "../../hooks";
-import { DialogAtomType, DictionaryType, DrawerAtomType, WordType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
+import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, NameFilters, userAtom } from "../../utils";
 
 type FilterType = "title" | "translation";
 const columnHelper = createColumnHelper<WordType>();
@@ -13,6 +13,8 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   parent_id: string,
+  webhooks: WebhookType[],
+  is_public: boolean,
 ) {
   return [
     columnHelper.accessor("title", {
@@ -66,6 +68,27 @@ function createColumns(
                 onClick: row.getToggleExpandedHandler(),
               },
               {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                isDisabled: !is_public,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: {
+                          id: row.original.id,
+                          type: "word",
+                        },
+                      }),
+                      method: "POST",
+                    }),
+                })),
+              },
+              {
                 id: "delete_word",
                 title: "Delete word",
                 icon: IconEnum.trash,
@@ -95,6 +118,7 @@ function createColumns(
 export function DictionaryView() {
   const { item_id } = useParams();
   const [filter, setFilter] = useState("");
+  const user = useAtomValue(userAtom);
   const [filterType, setFilterType] = useState<FilterType>("title");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -109,6 +133,7 @@ export function DictionaryView() {
     item_id,
     "dictionaries",
     {
+      fields: ["id", "title", "is_public"],
       relations: {
         words: true,
       },
@@ -164,7 +189,7 @@ export function DictionaryView() {
       </div>
       <div className="h-fit w-full">
         <Table
-          columns={createColumns(setDrawer, setDialog, item_id as string)}
+          columns={createColumns(setDrawer, setDialog, item_id as string, user?.webhooks || [], data?.data?.is_public || false)}
           config={{
             hasSelect: true,
             orderBy,
