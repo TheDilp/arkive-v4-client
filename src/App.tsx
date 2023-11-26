@@ -27,6 +27,7 @@ export default function App() {
         overflow: "hidden",
       }}>
       <ClerkProvider
+        afterSignInUrl="/projects"
         appearance={{
           baseTheme: dark,
         }}
