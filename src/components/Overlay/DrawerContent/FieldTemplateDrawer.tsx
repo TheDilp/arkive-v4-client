@@ -125,15 +125,15 @@ function FieldRow({
                   <Draggable key={opt.id} draggableId={opt.id || opt.value + index} index={optIndex}>
                     {(provided, draggableSnapshot) => (
                       <div
-                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                        className={`my-1 flex w-full flex-nowrap items-center gap-x-2 ${
                           draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                         }`}
                         {...provided.draggableProps}
                         ref={provided.innerRef}
                         style={{
                           ...provided.draggableProps.style,
-                          left: "calc(100%-32px)",
-                          right: 16,
+                          left: "calc(100%-3px)",
+                          right: 24,
                         }}>
                         <div {...provided.dragHandleProps} className="self-center">
                           <Icon fontSize={24} icon={IconEnum.menu} />
@@ -409,7 +409,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                     ]}
                                     label={field?.title}>
                                     <div
-                                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-900 p-2 ${
                                         draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                                       }`}
                                       {...provided.draggableProps}
