@@ -2,7 +2,7 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
@@ -230,6 +230,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const setDialog = useSetAtom(dialogAtom);
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
+  const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertTemplateType>("character_fields_templates");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateTemplateType>(
@@ -274,7 +275,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex h-screen max-h-screen flex-col gap-y-4 text-white">
+    <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-hidden text-white">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
@@ -309,7 +310,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         </>
       ) : null}
       {selectedTab === 1 ? (
-        <>
+        <div className="flex max-h-[90%] flex-col content-start gap-y-2 overflow-hidden">
           <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
           <div className="flex items-center justify-between">
             <span>Insert new field:</span>
@@ -317,7 +318,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               <Button
                 icon={IconEnum.add}
                 isDisabled={isLoading}
-                onClick={() =>
+                onClick={() => {
                   handleChange({
                     name: "character_fields",
                     value: (template.character_fields || []).concat({
@@ -326,13 +327,16 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                       field_type: "text",
                       sort: template?.character_fields?.length ?? 0,
                     }),
-                  })
-                }
+                  });
+                  setTimeout(() => {
+                    fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }}
                 variant="info"
               />
             </div>
           </div>
-          <div className="flex max-h-[65%] flex-col overflow-y-auto">
+          <div className="flex h-[calc(100%)] max-h-[calc(100%)] flex-col overflow-y-auto">
             <DragDropContext
               onDragEnd={(result) => {
                 if (!result.destination) {
@@ -348,7 +352,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               <Droppable droppableId="droppable">
                 {(providedDroppable) => (
                   <div
-                    className="relative flex flex-1 flex-col"
+                    className="relative flex flex-col"
                     {...providedDroppable.droppableProps}
                     ref={providedDroppable.innerRef}>
                     {template.character_fields?.length
@@ -442,12 +446,13 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                         ))
                       : null}
                     {providedDroppable.placeholder}
+                    <div ref={fieldContainerRef} />
                   </div>
                 )}
               </Droppable>
             </DragDropContext>
           </div>
-        </>
+        </div>
       ) : null}
       <div>
         <Button

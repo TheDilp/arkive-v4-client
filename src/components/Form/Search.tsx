@@ -204,10 +204,15 @@ export function Search({
       icon?: string;
       parent_id?: string;
     }[]
-  >({ data: { search_term: inputValue }, limit: limit ?? 0 }, searchEntity, project_id as string, {
-    enabled: false,
-    queryKeyConcat: [searchTerm, inputValue, name],
-  });
+  >(
+    { data: { search_term: inputValue, project_id: project_id as string }, limit: limit ?? 0 },
+    searchEntity,
+    project_id as string,
+    {
+      enabled: false,
+      queryKeyConcat: [searchTerm, inputValue, name],
+    },
+  );
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
     whileElementsMounted: autoUpdate,
     open,
