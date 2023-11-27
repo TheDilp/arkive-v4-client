@@ -1,5 +1,4 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
-import omit from "lodash.omit";
 import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -42,7 +41,7 @@ import {
   isProjectOwnerAtom,
   userAtom,
 } from "../../utils";
-import { UpdateProjectType } from "../../validation";
+import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
@@ -212,7 +211,10 @@ export function ProjectSettingsView() {
   }, [selectedTab, isProjectOwner]);
 
   async function handleSave() {
-    if (project) await updateProject({ data: omit(project, ["character_relationship_types"]) });
+    if (project) {
+      const parsedData = UpdateProjectSchema.parse({ data: project });
+      await updateProject(parsedData);
+    }
   }
   function handleOpenNewRelationshipTypeDrawer() {
     setDrawer((prev) => ({

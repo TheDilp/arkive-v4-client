@@ -13,7 +13,7 @@ export const UpdateProjectSchema = z.object({
     id: z.string(),
     title: z.string().optional(),
     image_id: z.string().optional().nullable(),
-    default_dice_color: z.string().optional(),
+    default_dice_color: z.string().optional().nullable(),
   }),
 });
 
