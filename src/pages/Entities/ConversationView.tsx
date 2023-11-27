@@ -231,7 +231,7 @@ export function ConversationView({ id }: { id: string }) {
   }, [id]);
 
   useLayoutEffect(() => {
-    if (messages?.pages?.length === 1) {
+    if (messages?.pages?.length) {
       const flattenedMessages = messages?.pages?.flatMap((page) => page?.data || []);
       if (flattenedMessages.length) setFlatMessages(flattenedMessages);
       messageContainerRef.current.scrollIntoView();
