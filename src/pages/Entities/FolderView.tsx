@@ -191,7 +191,7 @@ function columns(
                           FetchFunction({
                             url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
                             body: JSON.stringify({
-                              data: { id: row.original.id, type: "document" },
+                              data: { id: row.original.id, type: entityType },
                             }),
                             method: "POST",
                           }),

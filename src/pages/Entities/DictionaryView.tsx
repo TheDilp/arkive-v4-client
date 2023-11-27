@@ -81,7 +81,7 @@ function createColumns(
                       body: JSON.stringify({
                         data: {
                           id: row.original.id,
-                          type: "word",
+                          type: "words",
                         },
                       }),
                       method: "POST",

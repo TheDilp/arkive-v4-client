@@ -106,7 +106,7 @@ function createColumns(
                     FetchFunction({
                       url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
                       body: JSON.stringify({
-                        data: { id: row.original.id, type: "image" },
+                        data: { id: row.original.id, type: "images" },
                       }),
                       method: "POST",
                     }),
