@@ -2,6 +2,7 @@ import { useSetAtom } from "jotai";
 
 import { DialogAtomType, ImageSelectType } from "../../types";
 import { dialogAtom, IconEnum } from "../../utils";
+import { EntityPreview } from "../DataDisplay";
 import { Button, Search } from "../Form";
 
 export function ImageSelect({ name, onChange, label, value, type, isIconOnly, helperText }: ImageSelectType) {
@@ -12,17 +13,27 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
       <div className="truncate text-sm text-zinc-300">{label}</div>
       <div className="grid grid-cols-6 gap-x-2">
         <div className="col-span-4">
-          <Search
-            helperText={helperText}
-            imageType={type}
-            isAutocomplete
-            limit={100}
-            name={name}
-            onChange={onChange}
-            placeholder="Search images"
-            searchEntity={type === "map_images" ? "map_images" : "images"}
-            value={value}
-          />
+          {value ? (
+            <EntityPreview
+              clearAction={() => onChange({ name, value: "" })}
+              id={value as string}
+              image_id={value as string}
+              title={label || ""}
+              type="images"
+            />
+          ) : (
+            <Search
+              helperText={helperText}
+              imageType={type}
+              isAutocomplete
+              limit={100}
+              name={name}
+              onChange={onChange}
+              placeholder="Search images"
+              searchEntity={type === "map_images" ? "map_images" : "images"}
+              value={value}
+            />
+          )}
         </div>
 
         <div className="col-span-2">
