@@ -19,7 +19,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
               id={value as string}
               image_id={value as string}
               title={label || ""}
-              type="images"
+              type={type === "map_images" ? "maps" : "images"}
             />
           ) : (
             <Search
