@@ -1,4 +1,4 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
@@ -24,16 +24,19 @@ import {
   useTable,
   useUpdateEntity,
 } from "../../hooks";
-import { CharacterType, DialogAtomType, DrawerAtomType } from "../../types";
+import { CharacterType, DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
 import {
+  baseURLS,
   dialogAtom,
   drawerAtom,
+  FetchFunction,
   getAvatarInitials,
   getCharacterFullName,
   getImageURL,
   IconEnum,
   NameFilters,
   NumberFilters,
+  userAtom,
 } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterType>();
@@ -42,6 +45,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   isMd: boolean,
+  webhooks: WebhookType[],
 ) {
   return [
     columnHelper.display({
@@ -137,7 +141,6 @@ function createColumns(
                   }));
                 },
               },
-
               {
                 id: "2",
                 title: "View relationship tree",
@@ -154,6 +157,24 @@ function createColumns(
                     size: "lg",
                   });
                 },
+              },
+              {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                isDisabled: !row.original.is_public,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: { id: row.original.id, type: "characters" },
+                      }),
+                      method: "POST",
+                    }),
+                })),
               },
               {
                 id: "delete_character",
@@ -188,6 +209,7 @@ export function CharactersView() {
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") ?? "card");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
+  const user = useAtomValue(userAtom);
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -351,7 +373,7 @@ export function CharactersView() {
       ) : (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, isMd)}
+            columns={createColumns(setDrawer, setDialog, isMd, user?.webhooks || [])}
             config={{
               hasSelect: true,
               hasFavorite: true,

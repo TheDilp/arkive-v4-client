@@ -86,6 +86,7 @@ export interface CharacterType {
   id: string;
   project_id: string;
   is_favorite?: boolean | null;
+  is_public?: boolean | null;
   first_name: string;
   last_name?: string | null;
   nickname?: string | null;

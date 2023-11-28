@@ -460,6 +460,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               <span>Favorite:</span>
               <Checkbox name="is_favorite" onChange={handleChange} value={character?.is_favorite ?? false} />
             </li>
+            <div className="flex w-full items-center justify-between">
+              <span>Is public:</span>
+              <Checkbox name="is_public" onChange={handleChange} value={character?.is_public ?? false} />
+            </div>
           </ul>
         </>
       ) : null}
@@ -730,53 +734,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               });
             }
           }
-
-          // if (changedData) {
-          //   if (character?.id) {
-          //     const characterToUpdate = { ...(changedData || {}), id: character.id };
-          //     const { related_to, related_from, related_other, tags, character_fields, ...rest } = characterToUpdate;
-          //     const parsedData = UpdateCharacterSchema.parse({
-          //       data: { ...rest, portrait_id: rest?.portrait?.id },
-          //       relations: {
-          //         character_fields: character_fields
-          //           ? flattenArray(Object.values(character?.character_fields || {})) || []
-          //           : undefined,
-          //         related_from,
-          //         related_to,
-          //         related_other,
-          //         tags,
-          //       },
-          //     });
-
-          //     await update(parsedData, {
-          //       onSuccess: (res) => {
-          //         if (res?.ok) resetDrawerAtom();
-          //       },
-          //     });
-          //   } else {
-          //     const dataToParse = {
-          //       data: { ...character, portrait_id: character?.portrait?.id },
-          //       relations: {
-          //         character_fields: flattenArray(Object.values(character?.character_fields || {})) || [],
-          //         related_to: character?.related_to,
-          //         tags: character?.tags,
-          //       },
-          //     };
-          //     const parsedData = InsertCharacterSchema.parse(dataToParse);
-          //     await create(parsedData, {
-          //       onSuccess: (res) => {
-          //         if (res?.ok) resetDrawerAtom();
-          //       },
-          //     });
-          //   }
-          // } else {
-          //   createNotification({
-          //     variant: "info",
-          //     icon: IconEnum.info_circle,
-          //     title: "No data was changed.",
-          //     timer: 3,
-          //   });
-          // }
         }}
         variant="success"
       />
