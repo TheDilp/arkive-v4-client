@@ -351,7 +351,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     {
       relations: { character_fields: true, relationships: true, portrait: true, tags: true },
-      fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite"],
+      fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite", "is_public"],
     },
     {
       enabled: !!data?.id,

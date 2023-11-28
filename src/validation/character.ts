@@ -17,6 +17,7 @@ export const InsertCharacterSchema = z.object({
       }),
     map_pin_id: z.string().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),
@@ -76,6 +77,7 @@ export const UpdateCharacterSchema = z.object({
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
     portrait_id: z
       .string()
       .nullable()
