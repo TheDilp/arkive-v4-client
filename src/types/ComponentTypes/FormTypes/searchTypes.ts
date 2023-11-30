@@ -60,6 +60,8 @@ export interface SearchType extends BaseFormComponentType {
   hasShownOption?: boolean;
   isOptionsHidden?: boolean;
   isMultiple?: boolean;
+  isPublic?: boolean;
+  hasNoBackground?: boolean;
   initialDisplayValue?: string;
   imageType?: AssetType;
   limit?: number;

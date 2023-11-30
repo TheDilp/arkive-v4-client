@@ -98,6 +98,9 @@ const SearchClasses = tv({
         input: "pl-2",
       },
     },
+    hasNoBackground: {
+      true: { base: "bg-transparent border-t-0 border-x-0", input: "bg-transparent border-t-0" },
+    },
   },
 });
 
@@ -169,8 +172,10 @@ export function Search({
   isMultiple,
   limit,
   offset: offsetProp,
+  hasNoBackground,
   onChange,
   onSearch,
+  isPublic,
 }: SearchType) {
   const { project_id } = useParams();
   const {
@@ -185,6 +190,7 @@ export function Search({
     isAutocomplete,
     hasValueWithImage: !isMultiple && !!value && searchEntity === "images",
     isDisabled,
+    hasNoBackground,
   });
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -211,6 +217,7 @@ export function Search({
     {
       enabled: false,
       queryKeyConcat: [searchTerm, inputValue, name],
+      isPublic,
     },
   );
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
@@ -373,11 +380,12 @@ export function Search({
             </div>
           ) : (
             <Button
+              hasNoBackground={hasNoBackground}
               icon={isFetching ? IconEnum.loading : IconEnum.search}
               isDisabled={!inputValue}
               isLoading={isFetching}
               onClick={() => refetch()}
-              variant="info"
+              variant={hasNoBackground ? "primary" : "info"}
             />
           )}
         </div>

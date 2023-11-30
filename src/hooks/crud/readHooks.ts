@@ -227,15 +227,16 @@ export function useSearch<ReturnType>(
   request: { data: { search_term: string; project_id: string } | { tag_ids: string[]; match: "all" | "any" }; limit: number },
   type: SearchableEntities,
   project_id: string,
-  options?: UseQueryOptions<any> & { queryKeyConcat?: string[] },
+  options?: UseQueryOptions<any> & { queryKeyConcat?: string[]; isPublic?: boolean },
 ) {
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/search/${project_id}${getSearchURL(type)}`,
+        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${project_id}${getSearchURL(type)}`,
         method: "POST",
         body: JSON.stringify(request),
+        isPublic: options?.isPublic,
       }),
     options,
   );

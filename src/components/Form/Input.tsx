@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import { tv } from "tailwind-variants";
 
 import { InputType } from "../../types";
@@ -48,6 +49,9 @@ const InputClasses = tv({
       sm: {
         input: "h-8",
       },
+      xs: {
+        input: "h-6",
+      },
     },
     isDisabled: {
       true: {
@@ -93,6 +97,7 @@ export function Input({
   value,
   onChange,
   onKeyDown,
+  onBlur,
   isDisabled,
   isReadOnly,
   placeholder,
@@ -104,6 +109,7 @@ export function Input({
   min,
   max,
   isInline,
+  isAutofocused,
   step,
 }: InputType) {
   const {
@@ -118,11 +124,13 @@ export function Input({
 
       <input
         autoComplete="off"
+        autoFocus={isAutofocused}
         className={input()}
         disabled={isDisabled || isReadOnly}
         max={max}
         min={min}
         name={name}
+        onBlur={onBlur}
         onChange={(e) =>
           type === "number"
             ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, onChange })

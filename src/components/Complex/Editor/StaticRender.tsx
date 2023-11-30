@@ -21,7 +21,7 @@ function StaticRenderImage({ data }: { data: any }) {
       <img
         {...data.node.attrs}
         alt={data.node.attrs.title}
-        className="float-left cursor-pointer"
+        className="cursor-pointer"
         onClick={() =>
           setDialog({
             title: data.node.attrs.title,

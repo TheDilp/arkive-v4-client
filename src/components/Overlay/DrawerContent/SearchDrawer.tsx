@@ -93,7 +93,7 @@ export function SearchDrawer() {
               isDisabled={isSearchDisabled(selectedTab, searchCategory)}
               isOptionsHidden
               label="Search"
-              limit={500}
+              limit={selectedTab === 0 ? 5 : 500}
               name="searchTerm"
               onChange={() => {}}
               onSearch={(res) => setResults(res)}

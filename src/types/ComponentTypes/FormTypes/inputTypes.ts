@@ -1,4 +1,4 @@
-import { HTMLInputTypeAttribute, KeyboardEvent } from "react";
+import { FocusEventHandler, HTMLInputTypeAttribute, KeyboardEvent } from "react";
 
 import { BaseFormComponentType } from "../../baseTypes";
 
@@ -14,8 +14,10 @@ export interface InputType extends BaseFormComponentType {
   isInline?: boolean;
   onChange: ({ name, value }: InputOnChangeValue) => void;
   onKeyDown?: (e: KeyboardEvent) => void;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   value: string | number | undefined;
   isReadOnly?: boolean;
+  isAutofocused?: boolean;
   helperText?: string;
   min?: number;
   max?: number;
