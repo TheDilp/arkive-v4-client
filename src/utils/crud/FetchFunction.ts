@@ -31,7 +31,10 @@ export async function FetchFunction({
     if (data.message === "UNAUTHORIZED" && res.status === 403) {
       // @ts-ignore
       window?.Clerk?.signOut();
+    } else if (data.message === "NO_PUBLIC_ACCESS" && res.status === 403) {
+      throw new Response("NO_PUBLIC_ACCESS", { status: 403 });
     }
+
     throw new Error("There was an error with your request.");
   }
   return data;

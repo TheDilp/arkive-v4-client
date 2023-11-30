@@ -25,10 +25,13 @@ const router = createBrowserRouter([
       {
         path: "projects/*",
         element: <ProjectsView />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "projects/:project_id/*",
         element: <ProjectLayout />,
+        errorElement: <ErrorPage />,
+
         children: [
           {
             path: ":type",

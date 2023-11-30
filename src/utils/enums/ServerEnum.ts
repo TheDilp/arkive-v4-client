@@ -8,7 +8,7 @@ export const baseURLS = {
     import.meta.env.DEV
       ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}`
       : "https://arkive-v4-server-production.up.railway.app"
-  }:${import.meta.env.VITE_SERVER_PORT}/public/api/v1`,
+  }/api/v1/public`,
 
   baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",
 };

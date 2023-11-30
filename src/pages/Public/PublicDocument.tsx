@@ -15,10 +15,11 @@ export function PublicDocument() {
       data: {
         project_id,
       },
-      fields: ["content", "is_public"],
+      fields: ["title", "content", "is_public"],
     },
     {
       queryKeyConcat: ["public"],
+      isPublic: true,
     },
   );
   if (!document?.data) return <Skeleton type="editor" />;
