@@ -9,7 +9,7 @@ export function AccessDeniedPage() {
           Looks like this entity wasn&apos;t made public by its owner.{" "}
         </p>
         <Link
-          className="mt-6 inline-block rounded bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring"
+          className="mt-6 inline-block rounded bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring"
           to="/projects">
           Go to the project&apos;s home page
         </Link>
