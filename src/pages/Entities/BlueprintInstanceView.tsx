@@ -1,4 +1,4 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 
@@ -10,12 +10,15 @@ import {
   DialogAtomType,
   DrawerAtomType,
   NotificationType,
+  WebhookType,
 } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import {
+  baseURLS,
   dialogAtom,
   DiceRollRegex,
   drawerAtom,
+  FetchFunction,
   getAvatarInitials,
   getBlueprintInstanceColumnWidth,
   getCharacterFullName,
@@ -24,6 +27,7 @@ import {
   IconEnum,
   rollDiceWithNotification,
   useNotifications,
+  userAtom,
 } from "../../utils";
 
 function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
@@ -129,6 +133,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   navigate: NavigateFunction,
+  webhooks: WebhookType[],
 ) {
   const fieldColumns = [
     columnHelper.accessor("title", {
@@ -311,6 +316,24 @@ function createColumns(
                 isDisabled: !row.original.is_public,
               },
               {
+                id: "send_to_discord",
+                title: "Send to Discord",
+                icon: IconEnum.discord,
+                isDisabled: !row.original.is_public,
+                subItems: webhooks.map((webhook) => ({
+                  id: webhook.id,
+                  title: webhook.title,
+                  onClick: () =>
+                    FetchFunction({
+                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                      body: JSON.stringify({
+                        data: { id: row.original.id, type: "blueprint_instances" },
+                      }),
+                      method: "POST",
+                    }),
+                })),
+              },
+              {
                 id: "delete_instance",
                 title: "Delete instance",
                 icon: IconEnum.trash,
@@ -341,6 +364,7 @@ export function BlueprintInstanceView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const navigate = useNavigate();
   const [{ selection, pagination, orderBy }, dispatch] = useTable({
@@ -410,6 +434,7 @@ export function BlueprintInstanceView() {
               setDialog,
               createNotification,
               navigate,
+              user?.webhooks || [],
             )}
             config={{
               hasSelect: true,
