@@ -8,6 +8,7 @@ import useWebSocket from "react-use-websocket";
 
 import { AllAvailableEntities, WebsocketEventType } from "../../types";
 import {
+  baseURLS,
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
@@ -101,7 +102,7 @@ export function Navbar() {
     userId: string;
     nickname?: string;
     userImageUrl?: string;
-  }>(`ws://localhost:5174/ws/notifications/${project_id}`);
+  }>(`ws://${baseURLS.baseServer}:5174/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {
