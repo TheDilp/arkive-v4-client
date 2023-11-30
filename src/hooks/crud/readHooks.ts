@@ -63,8 +63,10 @@ export function useGetEntity<EntityType>(
         method: "POST",
         body: JSON.stringify(body),
         url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
+        isPublic: options?.isPublic,
       }),
     {
+      retry: options?.retry,
       enabled: options?.enabled,
       staleTime: options?.staleTime,
     },

@@ -4,7 +4,7 @@ export function AccessDeniedPage() {
   return (
     <div className="grid h-screen place-content-center bg-zinc-950 px-4">
       <div className="text-center">
-        <h1 className="text-9xl font-black text-red-600">No public access</h1>
+        <h1 className="text-9xl font-black text-zinc-300">No public access</h1>
         <p className="text-2xl font-bold tracking-tight text-zinc-400 sm:text-4xl">
           Looks like this entity wasn&apos;t made public by its owner.{" "}
         </p>

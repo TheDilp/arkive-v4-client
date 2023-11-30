@@ -26,14 +26,14 @@ export default function App() {
       style={{
         overflow: "hidden",
       }}>
-      <ClerkProvider
-        // afterSignInUrl="/projects"
-        appearance={{
-          baseTheme: dark,
-        }}
-        navigate={(to) => navigate(to)}
-        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <ClerkProvider
+          // afterSignInUrl="/projects"
+          appearance={{
+            baseTheme: dark,
+          }}
+          navigate={(to) => navigate(to)}
+          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
           <NotificationContainer />
           <ReactQueryDevtools position="top-left" />
           <SignedOut>
@@ -57,18 +57,18 @@ export default function App() {
               </Route>
             </Routes>
           </SignedIn>
-          <Routes>
-            <Route path="public/*">
-              {/* <Route path="*" /> */}
-              <Route element={<PublicLayout />} path=":project_id/*">
-                <Route path=":type" />
-                <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
-                <Route path=":type/:item_id/:subitem_id" />
-              </Route>
+        </ClerkProvider>
+        <Routes>
+          <Route path="public/*">
+            {/* <Route path="*" /> */}
+            <Route element={<PublicLayout />} path=":project_id/*">
+              <Route path=":type" />
+              <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
+              <Route path=":type/:item_id/:subitem_id" />
             </Route>
-          </Routes>
-        </QueryClientProvider>
-      </ClerkProvider>
+          </Route>
+        </Routes>
+      </QueryClientProvider>
     </main>
   );
 }

@@ -9,18 +9,20 @@ export async function FetchFunction({
   url,
   method,
   body,
+  isPublic,
 }: {
   url: string;
   method: "GET" | "POST" | "DELETE";
   body?: string | FormData;
+  isPublic?: boolean;
 }) {
   // @ts-ignore
-  const token = await window.Clerk.session.getToken();
+  const token = isPublic ? null : await window.Clerk.session.getToken();
   const res = await fetch(url, {
     method,
     body,
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: isPublic ? "" : `Bearer ${token}`,
       "Access-Control-Allow-Origin": "*",
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
@@ -32,7 +34,7 @@ export async function FetchFunction({
       // @ts-ignore
       window?.Clerk?.signOut();
     } else if (data.message === "NO_PUBLIC_ACCESS" && res.status === 403) {
-      throw new Response("NO_PUBLIC_ACCESS", { status: 403 });
+      throw new Error("No public access");
     }
 
     throw new Error("There was an error with your request.");
