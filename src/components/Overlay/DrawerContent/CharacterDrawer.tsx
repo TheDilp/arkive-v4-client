@@ -477,7 +477,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 .filter((rt) => !relationGroupIds.includes(rt.id))
                 .map((rt) => ({
                   id: rt.id,
-                  label: rt.title,
+                  title: rt.title,
                   isDisabled: relationGroupIds.includes(rt.id),
                   onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
                 }))}>
@@ -703,6 +703,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 relations: {
                   tags: character?.tags?.map((t) => ({ id: t.id })),
                   character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
+                  related_from: character?.related_from,
+                  related_to: character?.related_to,
+                  related_other: character?.related_other,
                 },
               };
               if (dataToParse?.data?.portrait?.id) {
@@ -721,6 +724,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 relations: {
                   tags: character?.tags?.map((t) => ({ id: t.id })),
                   character_fields: character?.character_fields || [],
+                  related_from: character?.related_from,
+                  related_to: character?.related_to,
+                  related_other: character?.related_other,
                 },
               };
               if (dataToParse?.data?.portrait?.id) {
