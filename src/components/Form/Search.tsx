@@ -264,7 +264,7 @@ export function Search({
       setSearchTerm(inputValue);
       const timeout = setTimeout(() => {
         refetch();
-      }, 1000);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);
@@ -430,7 +430,7 @@ export function Search({
                   isActive={activeIndex === index}
                   isSelected={(value || [])?.includes(item.value)}>
                   {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                  ((searchEntity === "places" || searchEntity === "characters") && item?.image) ? (
+                  ((searchEntity === "places" || searchEntity === "characters" || searchEntity === "all") && item?.image) ? (
                     <Avatar
                       image={getImageURL(
                         project_id as string,
@@ -443,7 +443,7 @@ export function Search({
                       size="xs"
                     />
                   ) : null}
-                  {item?.icon ? <Icon icon={item?.icon} /> : null}
+                  {item?.icon && !item?.image ? <Icon icon={item?.icon} /> : null}
                   <span className="truncate">{item.label}</span>
                 </Item>
               ))}

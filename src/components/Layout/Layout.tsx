@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react";
+import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
@@ -47,6 +47,10 @@ export function ProjectLayout() {
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+
       <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
       {isLg ? <Sidebar /> : null}
 

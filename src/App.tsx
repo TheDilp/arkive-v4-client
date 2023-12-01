@@ -1,4 +1,4 @@
-import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { ClerkProvider, SignedIn } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -36,9 +36,7 @@ export default function App() {
           publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
           <NotificationContainer />
           <ReactQueryDevtools position="top-left" />
-          <SignedOut>
-            <RedirectToSignIn />
-          </SignedOut>
+
           <SignedIn>
             <Routes>
               <Route element={<Navigate to="/projects" />} path="/" />
@@ -57,17 +55,17 @@ export default function App() {
               </Route>
             </Routes>
           </SignedIn>
-        </ClerkProvider>
-        <Routes>
-          <Route path="public/*">
-            {/* <Route path="*" /> */}
-            <Route element={<PublicLayout />} path=":project_id/*">
-              <Route path=":type" />
-              <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
-              <Route path=":type/:item_id/:subitem_id" />
+          <Routes>
+            <Route path="public/*">
+              {/* <Route path="*" /> */}
+              <Route element={<PublicLayout />} path=":project_id/*">
+                <Route path=":type" />
+                <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
+                <Route path=":type/:item_id/:subitem_id" />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </ClerkProvider>
       </QueryClientProvider>
     </main>
   );

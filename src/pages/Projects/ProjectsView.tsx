@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react";
+import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 
@@ -36,6 +36,9 @@ export function ProjectsView() {
   return (
     <div className="flex h-screen w-screen">
       <Drawer />
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
       <div className="h-full w-16 min-w-[4rem] max-w-[4rem] border-r border-zinc-800 bg-zinc-900">
         <div className="flex h-16 w-full items-center justify-center">
           <img alt="Arkive Logo" className="h-12" src="/Logo.webp" />
