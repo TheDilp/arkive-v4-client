@@ -119,7 +119,7 @@ export function ConversationDrawer({ data }: Props) {
             });
             return;
           }
-          if (conversation?.characters?.some((c) => c.id === value)) {
+          if ((conversation?.characters || [])?.some((c) => c.id === value)) {
             createNotification({
               title: "Cannot add same character more than once.",
               timer: 3,
@@ -145,8 +145,9 @@ export function ConversationDrawer({ data }: Props) {
           type="characters"
         />
       )}
-      {conversation?.characters?.map((char) => (
+      {(conversation?.characters || [])?.map((char) => (
         <EntityPreview
+          key={char.id}
           clearAction={(id) =>
             setConversation((prev) => ({ ...prev, characters: prev?.characters?.filter((c) => c.id !== id) }))
           }
