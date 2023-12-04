@@ -1,4 +1,4 @@
-export function getSearchLink(project_id: string, name: string, item_id: string, parent_id?: string) {
+export function getSearchLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
   if (name === "") return "#";
   if (name === "characters") {
     return `/projects/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;

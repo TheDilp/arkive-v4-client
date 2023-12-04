@@ -8,7 +8,7 @@ import {
   SearchableEntities,
   UserType,
 } from "../../types";
-import { ProjectType } from "../../types/EntityTypes/projectTypes";
+import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
 import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
@@ -19,6 +19,21 @@ export function useGetAllProjects(request: RequestBodyType<ProjectType>, options
         method: "POST",
         body: JSON.stringify(request),
         url: `${baseURLS.baseServer}/projects`,
+      }),
+    {
+      enabled: options?.enabled,
+      staleTime: options?.staleTime,
+    },
+  );
+}
+
+export function useGetProjectDashboard(project_id: string, options?: UseQueryOptions) {
+  return useQuery<{ data: ProjectDashboardType }>(
+    ["allEntities", "project", "dashboard"],
+    async () =>
+      FetchFunction({
+        method: "GET",
+        url: `${baseURLS.baseServer}/projects/${project_id}/dashboard`,
       }),
     {
       enabled: options?.enabled,

@@ -956,26 +956,28 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
   }, [type]);
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
-      <div className="flex h-12 min-h-[3rem] items-center justify-between">
-        <Breadcrumbs />
-        {item_id ? (
-          <div className="w-52">
-            <Button
-              icon={IconEnum.edit}
-              label="Edit current character"
-              onClick={() => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  size: "lg",
-                  title: "Edit character",
-                  type: "characters",
-                  data: { id: id || (item_id as string), project_id: project_id as string },
-                }));
-              }}
-            />
-          </div>
-        ) : null}
-      </div>
+      {isPreview ? null : (
+        <div className="flex h-12 min-h-[3rem] items-center justify-between">
+          <Breadcrumbs />
+          {item_id ? (
+            <div className="w-52">
+              <Button
+                icon={IconEnum.edit}
+                label="Edit current character"
+                onClick={() => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: "Edit character",
+                    type: "characters",
+                    data: { id: id || (item_id as string), project_id: project_id as string },
+                  }));
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+      )}
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (

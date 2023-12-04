@@ -8,6 +8,7 @@ import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
 import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
 import { ProjectsView } from "./pages/Projects";
+import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
 
@@ -51,6 +52,7 @@ export default function App() {
                   <Route element={<EntitiesView />} path=":type/:item_id/*" />
                   <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
                   <Route element={<FolderView />} path=":type/folder/:item_id/*" />
+                  <Route element={<Dashboard />} path="*" />
                 </Route>
               </Route>
             </Routes>
