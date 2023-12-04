@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../hooks";
 import { CharacterProfileView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Graph } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
@@ -19,7 +19,6 @@ export function BlueprintPreviewDrawer({ id, parent_id }: { id: string; parent_i
   return <BlueprintProfileView id={id} parent_id={parent_id} />;
 }
 export function DocumentPreviewDrawer({ id }: { id: string }) {
-  const navigate = useNavigate();
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
@@ -42,12 +41,6 @@ export function DocumentPreviewDrawer({ id }: { id: string }) {
           <div className="h-[calc(92%)] max-h-full overflow-auto">
             <StaticRender content={existingDocument?.data?.content as RemirrorJSON} />
           </div>
-          <Button
-            icon={IconEnum.edit}
-            label="Edit document (open editor)"
-            onClick={() => navigate(`/projects/${existingDocument?.data?.project_id}/documents/${id}`)}
-            variant="info"
-          />
         </div>
       ) : (
         <Alert label="This document has no content." />
@@ -70,7 +63,7 @@ export function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?:
 
   if (isLoading) return <Skeleton limit={1} type="project_view" />;
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       <MapView center_on={subitem_id} data={existingMap?.data} isViewOnly />
     </div>
   );
@@ -103,14 +96,29 @@ export function EntityPreviewDrawer({
 }: {
   data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType };
 }) {
+  const { project_id } = useParams();
+  const navigate = useNavigate();
+
   return (
     <DrawerLayout>
-      {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
-      {data.entity_type === "blueprint_instances" ? <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
-      {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
-      {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
-      {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
-      {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
+      <div className="flex-1 overflow-hidden">
+        {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "blueprint_instances" ? <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
+        {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
+        {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
+      </div>
+      <div className="">
+        <Button
+          icon={IconEnum.edit}
+          label={`Edit ${getSingularEntityType(data.entity_type).toLowerCase()}`}
+          onClick={() =>
+            navigate(`/projects/${project_id}/${data.entity_type}/${data?.parent_id ? `${data.parent_id}/` : ""}${data.id}`)
+          }
+          variant="info"
+        />
+      </div>
     </DrawerLayout>
   );
 }
