@@ -74,7 +74,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
 
   const map = useMapEvents({
     contextmenu(e: any) {
-      if (!isReadOnly) {
+      if (!isReadOnly && !isViewOnly) {
         setContextMenu({
           event: e.originalEvent,
           items: [
