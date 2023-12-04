@@ -40,8 +40,8 @@ export function ProjectsView() {
         <RedirectToSignIn />
       </SignedOut>
       <div className="h-full w-16 min-w-[4rem] max-w-[4rem] border-r border-zinc-800 bg-zinc-900">
-        <div className="flex h-16 w-full items-center justify-center">
-          <img alt="Arkive Logo" className="h-12" src="/Logo.webp" />
+        <div className="sticky left-0 top-0 flex h-16 min-h-[4rem] w-16 min-w-[4rem] select-none items-center justify-center border-r border-zinc-800 bg-zinc-900">
+          <img alt="Arkive Logo" className="h-12 min-w-[4rem]" height={48} src="/Logo.webp" width={64} />
         </div>
         <div className="h-16 w-full">
           <Button
