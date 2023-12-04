@@ -44,7 +44,11 @@ export function Dashboard() {
                       setDrawer((prev) => ({
                         ...prev,
                         title: "Preview",
-                        data: { id: r.id, entity_type: d.name as AvailableEntityType },
+                        data: {
+                          id: r.id,
+                          parent_id: "parent_id" in r ? r?.parent_id ?? undefined : undefined,
+                          entity_type: d.name as AvailableEntityType,
+                        },
                         type: "entity_preview",
                         size: "half",
                       }))
