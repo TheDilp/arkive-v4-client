@@ -7,7 +7,7 @@ import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
 
 const sidebarItems = [...navItems];
-sidebarItems.unshift({ icon: IconEnum.home, tooltip: "Projects", navigate: "/projects" });
+sidebarItems.unshift({ icon: IconEnum.dasboard, tooltip: "Dasboard", navigate: "/" });
 
 const SidebarClasses = tv({
   slots: {
@@ -47,7 +47,9 @@ export function Sidebar() {
       <nav className={nav()}>
         <ul className={list()}>
           <li className={sidebarLogo()}>
-            <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
+            <Link className="cursor-pointer" to="/projects">
+              <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
+            </Link>
           </li>
           {sidebarItems.map((item) => {
             return (
@@ -63,7 +65,7 @@ export function Sidebar() {
                 ${item.navigate === "settings" ? listSettingsItem() : ""}
                 
                 `}
-                to={item.navigate === "/projects" ? item.navigate : `/projects/${project_id}/${item.navigate}`}>
+                to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
                 <Tooltip
                   allowedPlacements={[isLg ? "right" : "top"]}
                   content={item.tooltip}

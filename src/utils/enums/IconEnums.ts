@@ -24,6 +24,7 @@ export const IconEnum = {
   check_circle: "ph:check-circle",
   check_double: "ph:checks",
   close: "mdi:close",
+  dasboard: "ph:presentation-chart",
   conversation: "ph:chats-circle",
   dictionary: "ph:book-bookmark-light",
   discord: "ph:discord-logo",
