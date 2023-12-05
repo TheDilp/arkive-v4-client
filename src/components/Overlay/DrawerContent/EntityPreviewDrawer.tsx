@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../hooks";
-import { CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
+import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { getSearchLink, getSingularEntityType, IconEnum } from "../../../utils";
@@ -93,6 +93,12 @@ export function GraphPreviewDrawer({ id }: { id?: string }) {
 export function DictionaryPreviewDrawer({ id }: { id?: string }) {
   return <DictionaryView id={id} />;
 }
+export function CalendarPreviewDrawer({ id }: { id?: string }) {
+  return <CalendarView id={id} />;
+}
+// export function EventPreviewDrawer({ parent_id, id }: { parent_id?: string; id?: string }) {
+//   return null;
+// }
 
 export function EntityPreviewDrawer({
   data,
@@ -112,6 +118,8 @@ export function EntityPreviewDrawer({
         {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
         {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
+        {/* {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null} */}
       </div>
       <div className="">
         <Button

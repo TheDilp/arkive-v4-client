@@ -59,7 +59,7 @@ const DrawerClasses = tv({
       lg: "w-full md:w-[32rem]",
       xl: "w-full md:w-[36rem]",
       "2xl": "w-full md:w-[40rem]",
-      half: "w-full md:w-1/2",
+      half: "w-full lg:w-1/2",
       full: "w-full",
     },
   },

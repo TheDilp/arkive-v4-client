@@ -48,7 +48,7 @@ export function DayNumber({
   );
 }
 
-export function CalendarView() {
+export function CalendarView({ id }: { id?: string }) {
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
@@ -56,7 +56,7 @@ export function CalendarView() {
   const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
-    item_id,
+    item_id || id,
     "calendars",
     {
       data: { project_id },
@@ -65,14 +65,14 @@ export function CalendarView() {
   );
   const { data: events } = useGetEntities<EventType>(
     {
-      data: { project_id },
+      data: { project_id, parent_id: item_id || id },
       filters: {
         and:
           view === "calendar"
             ? [
                 {
                   field: "parent_id",
-                  value: item_id as string,
+                  value: (item_id || id) as string,
                   operator: "eq",
                 },
                 {
@@ -89,7 +89,6 @@ export function CalendarView() {
                 },
               ],
       },
-      // fields: ["id", "title", "image_id", "start_day", "start_month", "start_year", "parent_id", "background_color", "s"],
       orderBy: [
         { field: "hours", sort: "asc" },
         { field: "minutes", sort: "asc" },
@@ -97,27 +96,28 @@ export function CalendarView() {
     },
     "events",
     {
-      enabled: !!existingCalendar?.data,
+      enabled: !!existingCalendar?.data && !!(item_id || id),
       queryKeyOverwrite: queryKey,
+      staleTime: 5 * 60 * 1000,
     },
   );
   const { data: subitemEvent } = useGetSubEntity<EventType>(
     subitem_id,
     "events",
-    { data: { parent_id: item_id } },
+    { data: { parent_id: item_id || id } },
     { enabled: !!subitem_id },
   );
   useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setQueryKey(["allEntities", project_id, "events", item_id, view, view === "calendar" ? date : null]);
+      setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
     }, 300);
     return () => clearTimeout(timeout);
   }, [date]);
 
   useEffect(() => {
-    setQueryKey(["allEntities", project_id, "events", item_id, view, view === "calendar" ? date : null]);
+    setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
   }, [view]);
 
   useLayoutEffect(() => {
@@ -204,7 +204,8 @@ export function CalendarView() {
 
       {view === "calendar" ? (
         <div
-          className="grid overflow-auto border border-zinc-700"
+          // check for id -> used as a preview in drawer
+          className={`grid overflow-auto border border-zinc-700 ${id ? "bg-zinc-900" : ""}`}
           style={{
             gridTemplateColumns: `repeat(${existingCalendar?.data?.days?.length || 0}, minmax(9rem, 1fr))`,
           }}>
