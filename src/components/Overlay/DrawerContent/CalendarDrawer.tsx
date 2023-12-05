@@ -29,7 +29,7 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
   const { handleChange } = useHandleChange({ data: months, setData: setMonths });
   return (
     <div className="mt-2 flex flex-col gap-y-2 p-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between ">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-950">
         <span>Insert new month:</span>
         <div className="h-8 w-8">
           <Button
@@ -105,7 +105,7 @@ function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<Se
   const { handleChange } = useHandleChange({ data: days, setData: setDays });
   return (
     <div className="mt-2 flex flex-col gap-y-2 p-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between">
+      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-950">
         <span>Insert new day:</span>
         <div className="h-8 w-8">
           <Button
