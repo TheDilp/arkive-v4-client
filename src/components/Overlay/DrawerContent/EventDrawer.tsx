@@ -1,22 +1,25 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
-import { EventStateType, EventType, MonthType, onChangeValue } from "../../../types";
+import { AvailableEntityType, EventStateType, EventType, MonthType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
   checkIfYearCorrect,
   drawerAtom,
+  getDefaultEntityIcon,
   getImageURL,
+  getSearchLink,
   IconEnum,
   useNotifications,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
-import { ImagePreview } from "../../DataDisplay";
+import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
@@ -45,13 +48,13 @@ export function EventDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
-
+  const setDrawer = useSetAtom(drawerAtom);
   const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
     data?.id,
     "events",
     {
       data: { project_id },
-      relations: { tags: true },
+      relations: { tags: true, document: true },
     },
     { enabled: !!data?.id },
   );
@@ -104,7 +107,7 @@ export function EventDrawer({ data }: Props) {
   async function handleSave() {
     if (!data?.id) {
       const parsedData = InsertEventSchema.parse({
-        data: { ...event, image_id: event?.image?.id },
+        data: { ...event, image_id: event?.image?.id, document_id: event?.document?.id },
         relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
       });
 
@@ -120,7 +123,7 @@ export function EventDrawer({ data }: Props) {
       });
     } else {
       const parsedData = UpdateEventSchema.parse({
-        data: event,
+        data: { ...event, image_id: event?.image?.id, document_id: event?.document?.id },
         relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
       });
       await updateEvent(parsedData, {
@@ -270,6 +273,36 @@ export function EventDrawer({ data }: Props) {
                 onChange={handleImageChange}
                 type="images"
                 value={event.image_id}
+              />
+            )}
+          </div>
+          <div>
+            {event?.document ? (
+              <EntityPreview
+                clearAction={() => handleChange({ name: "document", value: null })}
+                icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
+                id={event.document.id}
+                label="Document"
+                link={getSearchLink(project_id as string, "documents", event.document.id, null)}
+                previewAction={() =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: "Preview",
+                    data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
+                    type: "entity_preview",
+                    size: "half",
+                  }))
+                }
+                title={event.document.title}
+                type="documents"
+              />
+            ) : (
+              <Search
+                label="Event document (optional)"
+                name="document"
+                onChange={handleImageChange}
+                searchEntity="documents"
+                value={event.document_id}
               />
             )}
           </div>
