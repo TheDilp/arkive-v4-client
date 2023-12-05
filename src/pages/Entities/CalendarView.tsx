@@ -308,6 +308,41 @@ export function CalendarView({ id }: { id?: string }) {
               </div>
             </div>
           ))}
+          {[
+            ...Array(
+              existingCalendar?.data?.days?.length
+                ? existingCalendar.data.days.length -
+                    ((getStartingDayForMonth(
+                      existingCalendar?.data?.months,
+                      date?.year,
+                      date?.month,
+                      existingCalendar?.data?.days?.length,
+                    ) +
+                      Number(monthDays)) %
+                      existingCalendar.data.days.length)
+                : 0,
+            ).keys(),
+          ]
+            .reverse()
+            .map((day, _, arr) => (
+              <div
+                key={day}
+                className="group col-span-1 h-56 cursor-default border-b border-r border-zinc-700 hover:text-white"
+                onKeyDown={() => {}}
+                role="button"
+                tabIndex={-1}>
+                <DayNumber
+                  key={day}
+                  dayNumber={
+                    getFillerDayNumber(existingCalendar?.data?.months, date.month, day) - Number(monthDays) + arr.length
+                  }
+                  isFiller
+                  //   isReadOnly={isReadOnly}
+                  monthNumber={date.month}
+                  year={date.year}
+                />
+              </div>
+            ))}
         </div>
       ) : (
         <TimelineView events={events?.data || []} month_count={existingCalendar?.data?.months.length || 0} />
