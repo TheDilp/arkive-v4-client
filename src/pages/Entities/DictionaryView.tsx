@@ -1,9 +1,9 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
-import { Dispatch, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useGetEntity, useTable } from "../../hooks";
+import { useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
 import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, NameFilters, userAtom } from "../../utils";
 
@@ -115,7 +115,7 @@ function createColumns(
   ];
 }
 
-export function DictionaryView() {
+export function DictionaryView({ id }: { id?: string }) {
   const { item_id } = useParams();
   const [filter, setFilter] = useState("");
   const user = useAtomValue(userAtom);
@@ -129,23 +129,58 @@ export function DictionaryView() {
     selection: {},
   });
 
-  const { data, isLoading } = useGetEntity<DictionaryType>(
-    item_id,
+  const { data, isInitialLoading } = useGetEntity<DictionaryType>(
+    item_id || id,
     "dictionaries",
     {
       fields: ["id", "title", "is_public"],
-      relations: {
-        words: true,
-      },
-      orderBy,
-      filters,
-      pagination,
     },
     {
       staleTime: 5 * 60 * 1000,
     },
   );
 
+  const { data: words, isInitialLoading: isInitialLoadingWords } = useGetEntities<WordType>(
+    {
+      data: {
+        parent_id: item_id || id,
+      },
+      filters,
+      pagination,
+      orderBy,
+    },
+    "words",
+    { enabled: !!data?.data && !isInitialLoading },
+  );
+
+  useLayoutEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    if (filter.length >= 1) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", field: filterType, operator: "ilike", value: filter }],
+              field: filterType,
+            },
+          });
+        }
+      }, 750);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch, filterType]);
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
@@ -171,25 +206,33 @@ export function DictionaryView() {
             value={filterType}
           />
         </div>
-        <div className="w-52">
-          <Button
-            icon={IconEnum.add}
-            label="Create new word"
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: {},
-                title: "Create new word",
-                type: "words",
-                size: "lg",
-              }))
-            }
-          />
-        </div>
+        {id ? null : (
+          <div className="w-52">
+            <Button
+              icon={IconEnum.add}
+              label="Create new word"
+              onClick={() =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: {},
+                  title: "Create new word",
+                  type: "words",
+                  size: "lg",
+                }))
+              }
+            />
+          </div>
+        )}
       </div>
       <div className="h-fit w-full">
         <Table
-          columns={createColumns(setDrawer, setDialog, item_id as string, user?.webhooks || [], data?.data?.is_public || false)}
+          columns={createColumns(
+            setDrawer,
+            setDialog,
+            (item_id || id) as string,
+            user?.webhooks || [],
+            data?.data?.is_public || false,
+          )}
           config={{
             hasSelect: true,
             orderBy,
@@ -197,9 +240,9 @@ export function DictionaryView() {
             selection,
             expandable: true,
           }}
-          data={data?.data?.words || []}
+          data={words?.data || []}
           dispatch={dispatch}
-          isLoading={isLoading}
+          isLoading={isInitialLoading || isInitialLoadingWords}
           pagination={pagination}
           type="words"
         />
