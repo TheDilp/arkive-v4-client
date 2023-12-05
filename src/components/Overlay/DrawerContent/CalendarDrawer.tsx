@@ -174,7 +174,7 @@ export function CalendarDrawer({ data }: Props) {
     data?.id,
     "calendars",
     {
-      fields: ["id", "title", "icon", "hours", "days", "is_folder", "is_public"],
+      fields: ["id", "title", "icon", "hours", "minutes", "days", "is_folder", "is_public"],
       relations: { months: true, tags: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
