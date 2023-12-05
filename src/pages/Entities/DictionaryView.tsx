@@ -234,7 +234,7 @@ export function DictionaryView({ id }: { id?: string }) {
             data?.data?.is_public || false,
           )}
           config={{
-            hasSelect: true,
+            hasSelect: !id,
             orderBy,
             filters,
             selection,

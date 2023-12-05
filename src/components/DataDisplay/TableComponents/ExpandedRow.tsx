@@ -9,12 +9,12 @@ import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTable
 import { getCharacterFullName, getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
 import { Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Alert, Skeleton } from "../../Misc";
+import { Alert, Skeleton, Spinner } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
 import { EntityPreview } from "../EntityPreview";
 
 const ExpandedTableRowClasses = tv({
-  base: "p-4 border-b border-zinc-600 bg-zinc-800",
+  base: "p-4 border-b border-zinc-600 bg-zinc-700",
 });
 
 const expandedTagRowTabs = [
@@ -217,7 +217,7 @@ function ExpandedWord({ id }: { id: string }) {
       enabled: !!id,
     },
   );
-  if (isFetching) return <Skeleton type="editor" />;
+  if (isFetching) return <Spinner />;
   return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description} />;
 }
 
