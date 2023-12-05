@@ -185,21 +185,23 @@ export function CalendarView({ id }: { id?: string }) {
             value={view}
           />
         </div>
-        <div className="w-fit self-end">
-          <Button
-            icon={IconEnum.add}
-            label="Create new event"
-            onClick={() => {
-              setDrawer((prev) => ({
-                ...prev,
-                data: { month: date.month, year: date.year },
-                title: "Create new event",
-                type: "events",
-                size: "lg",
-              }));
-            }}
-          />
-        </div>
+        {id ? null : (
+          <div className="w-fit self-end">
+            <Button
+              icon={IconEnum.add}
+              label="Create new event"
+              onClick={() => {
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { month: date.month, year: date.year },
+                  title: "Create new event",
+                  type: "events",
+                  size: "lg",
+                }));
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {view === "calendar" ? (
@@ -269,13 +271,15 @@ export function CalendarView({ id }: { id?: string }) {
                       <div
                         className="cursor-pointer"
                         onClick={() =>
-                          setDrawer((prev) => ({
-                            ...prev,
-                            title: "Edit event",
-                            type: "events",
-                            data: { id: event.id, month: date.month, year: date.year },
-                            size: "lg",
-                          }))
+                          id
+                            ? {}
+                            : setDrawer((prev) => ({
+                                ...prev,
+                                title: "Edit event",
+                                type: "events",
+                                data: { id: event.id, month: date.month, year: date.year },
+                                size: "lg",
+                              }))
                         }
                         onKeyDown={() => {}}
                         role="button"
