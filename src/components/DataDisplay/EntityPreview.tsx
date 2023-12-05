@@ -11,9 +11,9 @@ const EntityPreviewClasses = tv({
     container: "flex flex-col",
     label: "block min-h-[20px] truncate text-sm text-zinc-300",
     base: "flex max-h-10 min-h-[2.5rem] items-center gap-x-1 rounded p-2",
-    link: "flex max-h-10 items-center gap-x-1 rounded p-2 ",
+    link: "flex max-h-10 mr-auto items-center gap-x-1 rounded p-2 ",
     linkTitle: "truncate",
-    action: "ml-auto w-min",
+    action: "w-min",
     otherAction: "w-min",
   },
   variants: {
