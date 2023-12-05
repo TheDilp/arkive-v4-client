@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity } from "../../../hooks";
-import { CharacterProfileView, MapView } from "../../../pages/Entities";
+import { CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { getSearchLink, getSingularEntityType, IconEnum } from "../../../utils";
@@ -81,7 +81,7 @@ export function GraphPreviewDrawer({ id }: { id?: string }) {
     },
   );
 
-  if (isLoading) return <Skeleton limit={2} type="project_view" />;
+  if (isLoading) return <Skeleton limit={1} type="project_view" />;
   if (graph?.data)
     return (
       <div className="h-full w-full overflow-hidden">
@@ -89,6 +89,9 @@ export function GraphPreviewDrawer({ id }: { id?: string }) {
       </div>
     );
   if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
+}
+export function DictionaryPreviewDrawer({ id }: { id?: string }) {
+  return <DictionaryView id={id} />;
 }
 
 export function EntityPreviewDrawer({
@@ -108,6 +111,7 @@ export function EntityPreviewDrawer({
         {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
         {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
       </div>
       <div className="">
         <Button
