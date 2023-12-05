@@ -78,12 +78,17 @@ function handleNumberChange({
   newValue,
   min,
   max,
+  step,
   onChange,
 }: {
   newValue: number;
-} & Pick<InputType, "onChange" | "min" | "max" | "name">) {
+} & Pick<InputType, "onChange" | "min" | "max" | "name" | "step">) {
   if (max && newValue > max) return;
   if (min && newValue < min) return;
+  if (step === 1 && (newValue === null || Number.isNaN(newValue))) {
+    onChange({ name, value: 1 });
+    return;
+  }
 
   if (Number.isNaN(newValue)) {
     onChange({ name, value: null });
@@ -133,12 +138,18 @@ export function Input({
         onBlur={onBlur}
         onChange={(e) =>
           type === "number"
-            ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, onChange })
+            ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, step, onChange })
             : onChange(e.target)
         }
         onKeyDown={(e) => {
           if ((e.key === "e" || e.key === "E" || e.key === "+") && type === "number") {
             e.preventDefault();
+          }
+          if (step === 1) {
+            if (e.key === "," || e.key === ".") {
+              e.preventDefault();
+              return;
+            }
           }
           if (onKeyDown) onKeyDown(e);
         }}

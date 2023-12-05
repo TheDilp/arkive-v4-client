@@ -162,6 +162,7 @@ export function CalendarView({ id }: { id?: string }) {
                   //   ls.set("characters_view", value);
                 }}
                 placeholder="Year"
+                step={1}
                 type="number"
                 value={date.year}
               />
@@ -221,16 +222,19 @@ export function CalendarView({ id }: { id?: string }) {
               {day}
             </div>
           ))}
+
           {[
             ...Array(
               existingCalendar?.data?.days?.length
-                ? getStartingDayForMonth(
-                    existingCalendar?.data?.months,
-                    date?.year,
-                    date?.month,
-                    existingCalendar?.data?.days?.length,
-                  ) % existingCalendar.data.days.length
-                : 0,
+                ? Math.abs(
+                    getStartingDayForMonth(
+                      existingCalendar?.data?.months,
+                      date?.year,
+                      date?.month,
+                      existingCalendar?.data?.days?.length,
+                    ) % existingCalendar.data.days.length,
+                  )
+                : 1,
             ).keys(),
           ]
             .reverse()
