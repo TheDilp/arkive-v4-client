@@ -54,7 +54,7 @@ export function EventDrawer({ data }: Props) {
     "events",
     {
       data: { project_id },
-      relations: { tags: true, document: true },
+      relations: { tags: true, image: true, document: true },
     },
     { enabled: !!data?.id },
   );
@@ -259,10 +259,11 @@ export function EventDrawer({ data }: Props) {
             />
           </div>
           <div>
-            {event?.image ? (
+            {event?.image?.id ? (
               <ImagePreview
                 clearAction={() => handleChange({ name: "image", value: null })}
                 id={event.image.id}
+                label="Event image (optional)"
                 title={event.image.title}
                 url={getImageURL(project_id as string, "images", event.image.id)}
               />
