@@ -185,36 +185,38 @@ function onClick({
   index,
   setIsOpen,
 }: Pick<SelectType, "isMultiple" | "value" | "options" | "onChange" | "name"> & {
-  index: number;
+  index: number | null;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  if (isMultiple) {
-    if (Array.isArray(value) && value.includes(options[index].value)) {
-      const newValue = value.filter((val) => val !== options[index].value);
-      onChange({ name, value: newValue });
-    } else if (
-      (Array.isArray(value) && !value.includes(options[index].value)) ||
-      value === undefined ||
-      value === null ||
-      value === ""
-    ) {
-      if (!value) {
-        onChange({
-          name,
-          value: [options[index].value],
-        });
-      } else {
-        onChange({
-          name,
-          value: value?.concat(options[index].value),
-        });
+  if (index) {
+    if (isMultiple) {
+      if (Array.isArray(value) && value.includes(options[index].value)) {
+        const newValue = value.filter((val) => val !== options[index].value);
+        onChange({ name, value: newValue });
+      } else if (
+        (Array.isArray(value) && !value.includes(options[index].value)) ||
+        value === undefined ||
+        value === null ||
+        value === ""
+      ) {
+        if (!value) {
+          onChange({
+            name,
+            value: [options[index].value],
+          });
+        } else {
+          onChange({
+            name,
+            value: value?.concat(options[index].value),
+          });
+        }
       }
-    }
-  } else {
-    const selectedItem = options.find((opt) => opt?.value === options[index].value);
-    if (selectedItem) {
-      onChange({ name, value: selectedItem?.value });
-      setIsOpen(false);
+    } else {
+      const selectedItem = options.find((opt) => opt?.value === options[index].value);
+      if (selectedItem) {
+        onChange({ name, value: selectedItem?.value });
+        setIsOpen(false);
+      }
     }
   }
 }
@@ -429,7 +431,7 @@ export function Select({
                           onClick({
                             isMultiple,
                             name,
-                            index: i,
+                            index: activeIndex,
                             onChange,
                             options: filteredItems,
                             value,
