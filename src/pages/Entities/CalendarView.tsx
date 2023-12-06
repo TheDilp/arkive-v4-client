@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
@@ -63,7 +63,7 @@ export function CalendarView({ id }: { id?: string }) {
       relations: { months: true },
     },
   );
-  const { data: events } = useGetEntities<EventType>(
+  const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
       filters: {
@@ -109,16 +109,13 @@ export function CalendarView({ id }: { id?: string }) {
   );
   useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
-    }, 300);
-    return () => clearTimeout(timeout);
+  useLayoutEffect(() => {
+    setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
   }, [date]);
 
-  useEffect(() => {
-    setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
-  }, [view]);
+  // useEffect(() => {
+  //   setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
+  // }, [view]);
 
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
@@ -232,6 +229,7 @@ export function CalendarView({ id }: { id?: string }) {
                       date?.year,
                       date?.month,
                       existingCalendar?.data?.days?.length,
+                      existingCalendar?.data?.starts_on_day || 0,
                     ) % existingCalendar.data.days.length,
                   )
                 : 1,
@@ -259,7 +257,7 @@ export function CalendarView({ id }: { id?: string }) {
             <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
               <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
               <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
-                {(events?.data || [])
+                {(isLoading ? [] : events?.data || [])
                   ?.filter(
                     (event) =>
                       (event.start_day === day + 1 || event.end_day === day + 1) &&
@@ -321,6 +319,7 @@ export function CalendarView({ id }: { id?: string }) {
                       date?.year,
                       date?.month,
                       existingCalendar?.data?.days?.length,
+                      existingCalendar?.data?.starts_on_day || 0,
                     ) +
                       Number(monthDays)) %
                       existingCalendar.data.days.length)

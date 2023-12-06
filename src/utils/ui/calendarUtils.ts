@@ -92,8 +92,10 @@ export function getStartingDayForMonth(
   year: number,
   monthIndex: number,
   weekdays: number | undefined,
+  starts_on_day: number | null | undefined,
 ) {
   if (year === undefined || !months || !weekdays) return 0;
+  if (year === 1 && typeof starts_on_day === "number") return starts_on_day;
   const dayInYear = months.reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
   const dayBeforeMonth = months
     .filter((_, index) => index < monthIndex)
