@@ -6,6 +6,7 @@ export interface SelectOptionType {
   value: string;
   image?: { link: string; shape?: AvatarShape };
   icon?: string;
+  isDisabled?: boolean;
 }
 export interface SelectType extends BaseFormComponentType {
   name: string;

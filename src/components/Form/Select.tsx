@@ -129,7 +129,7 @@ const SelectOption = tv({
     "outline-none",
     "focus-visible:outline-none",
     "focus-visible:ring-0",
-    "hover:cursor-pointer",
+    "cursor-pointer",
     "hover:bg-zinc-500",
     "flex",
     "items-center",
@@ -148,6 +148,9 @@ const SelectOption = tv({
     },
     isSelected: {
       true: "bg-blue-500",
+    },
+    isDisabled: {
+      true: "bg-zinc-500 text-zinc-400 cursor-not-allowed select-none border-zinc-700",
     },
   },
   compoundVariants: [
@@ -403,21 +406,24 @@ export function Select({
                       isSelected: Array.isArray(value)
                         ? value?.includes(filteredItems?.[i]?.value)
                         : value === filteredItems?.[i]?.value,
+                      isDisabled: opt.isDisabled,
                       size,
                     })}
                     role="option"
                     tabIndex={i === activeIndex ? 0 : -1}
                     {...getItemProps({
-                      onClick: () =>
-                        onClick({
-                          isMultiple,
-                          name,
-                          index: i,
-                          onChange,
-                          options: filteredItems,
-                          value,
-                          setIsOpen,
-                        }),
+                      onClick: () => {
+                        if (!opt.isDisabled)
+                          onClick({
+                            isMultiple,
+                            name,
+                            index: i,
+                            onChange,
+                            options: filteredItems,
+                            value,
+                            setIsOpen,
+                          });
+                      },
                       onKeyDown: (e) => {
                         if (e.key === "Enter") {
                           onClick({
