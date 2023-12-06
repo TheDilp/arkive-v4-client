@@ -188,7 +188,7 @@ function onClick({
   index: number | null;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  if (index) {
+  if (typeof index === "number") {
     if (isMultiple) {
       if (Array.isArray(value) && value.includes(options[index].value)) {
         const newValue = value.filter((val) => val !== options[index].value);
