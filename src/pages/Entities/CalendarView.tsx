@@ -177,7 +177,7 @@ export function CalendarView({ id }: { id?: string }) {
             }}
             options={[
               { label: "Calendar", value: "calendar", icon: IconEnum.calendar },
-              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt },
+              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt, isDisabled: true },
             ]}
             placeholder="View"
             value={view}
