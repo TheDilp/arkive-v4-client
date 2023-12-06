@@ -9,6 +9,7 @@ export interface CalendarType extends BaseEntityType {
   offset: number;
   hours?: number | null;
   minutes?: number | null;
+  starts_on_day?: number | null;
   months: MonthType[];
   days: string[];
   tags: TagType[];

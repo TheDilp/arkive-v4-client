@@ -9,6 +9,14 @@ export const InsertCalendarSchema = z.object({
     is_public: z.boolean().nullable().optional(),
     icon: z.string().nullable().optional(),
     project_id: z.string(),
+    starts_on_day: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((arg) => {
+        if (typeof arg === "string") return Number(arg);
+        return arg;
+      }),
     // offset: z.number(),
     hours: z.number().optional().nullable(),
     minutes: z.number().optional().nullable(),
@@ -30,6 +38,14 @@ export const UpdateCalendarSchema = z.object({
     icon: z.string().nullable().optional(),
     parent_id: z.string().nullable().optional(),
     days: z.string().array().min(1).optional(),
+    starts_on_day: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((arg) => {
+        if (typeof arg === "string") return Number(arg);
+        return arg;
+      }),
   }),
   relations: z.object({
     months: InsertMonthSchema.array().min(1).or(UpdateMonthSchema.array().min(1)),

@@ -5,9 +5,9 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, MonthStateType } from "../../../types";
-import { drawerAtom, IconEnum, onDragEnd } from "../../../utils";
+import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
-import { Button, Checkbox, Input, TagInput } from "../../Form";
+import { Button, Checkbox, Input, Select, TagInput } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
@@ -174,7 +174,7 @@ export function CalendarDrawer({ data }: Props) {
     data?.id,
     "calendars",
     {
-      fields: ["id", "title", "icon", "hours", "minutes", "days", "is_folder", "is_public"],
+      fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public"],
       relations: { months: true, tags: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
@@ -245,6 +245,17 @@ export function CalendarDrawer({ data }: Props) {
               placeholder="How many minutes per hour?"
               type="number"
               value={calendar?.minutes || ""}
+            />
+          </div>
+
+          <div>
+            <Select
+              helperText="Starts on the first day if not set"
+              label="Start year 1 on specific day (optional)"
+              name="starts_on_day"
+              onChange={handleChange}
+              options={(calendar?.days || []).map((day, idx) => ({ label: capitalizeFirstLetter(day), value: idx.toString() }))}
+              value={calendar?.starts_on_day ? calendar?.starts_on_day?.toString() : null}
             />
           </div>
 
