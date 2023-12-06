@@ -7,38 +7,47 @@ import { Avatar } from "..";
 import { Button } from "../Form/Button";
 
 const ImagePreviewClasses = tv({
-  base: "flex h-12 min-h-[3rem] items-center gap-x-2 rounded bg-zinc-700 p-2 w-full",
-  variants: {
-    size: {
-      md: "h-12 max-h-12 min-h-[3rem]",
-      lg: "h-16 max-h-16 min-h-[4rem]",
-    },
+  slots: {
+    container: "flex flex-col",
+    base: "flex max-h-10 min-h-[2.5rem] items-center gap-x-1 rounded p-2 bg-zinc-700 border-0",
+    label: "block min-h-[20px] truncate text-sm text-zinc-300",
+    title: "ml-2 truncate font-lato",
+    link: "flex max-h-10 mr-auto items-center gap-x-1 rounded p-2 ",
+    linkTitle: "truncate",
+    action: "ml-auto w-min",
+    otherAction: "w-min",
   },
 });
 
-export function ImagePreview({ id, title, url, size = "md", clearAction }: ImagePreviewType) {
+export function ImagePreview({ id, title, label, url, clearAction }: ImagePreviewType) {
   const { project_id } = useParams();
-  const classes = ImagePreviewClasses({ size });
+  const { container, action, title: titleClasses, label: labelClasses, base } = ImagePreviewClasses();
   return (
-    <div className={classes}>
-      <div className="col-span-1 flex items-center">
-        <Avatar image={url || getImageURL(project_id as string, "images", id) || ""} isPreview label={title} size={size} />
-      </div>
-      <div className="ml-2 truncate font-lato">{title}</div>
-      {clearAction ? (
-        <div className="ml-auto">
-          <Button
-            hasNoBackground
-            icon={IconEnum.close}
-            iconSize={24}
-            onClick={() => {
-              if (id) clearAction(id);
-              else if (url) clearAction(url);
-            }}
-            tooltip="Remove image"
-          />
-        </div>
-      ) : null}
+    <div className={container()}>
+      {label ? <div className={labelClasses()}>{label}</div> : null}
+      <span className={base()}>
+        <Avatar
+          hasShowImage
+          image={url || getImageURL(project_id as string, "images", id) || ""}
+          isPreview
+          label={title}
+          size="sm"
+        />
+        <div className={titleClasses()}>{title}</div>
+        {clearAction ? (
+          <div className={action()}>
+            <Button
+              hasNoBackground
+              icon={IconEnum.close}
+              onClick={() => {
+                if (id) clearAction(id);
+                else if (url) clearAction(url);
+              }}
+              tooltip="Remove image"
+            />
+          </div>
+        ) : null}
+      </span>
     </div>
   );
 }
