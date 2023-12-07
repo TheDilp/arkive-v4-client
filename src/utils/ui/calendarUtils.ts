@@ -110,12 +110,13 @@ export function getStartingDayForMonth(
   return (daysBeforeYear % weekdays) + dayBeforeMonth;
 }
 export function getFillerDayNumber(calendarMonths: MonthType[], currentMonthIndex: number, day: number) {
-  const days =
-    (calendarMonths[calendarMonths.length - 1]?.days || 0) + (calendarMonths[calendarMonths.length - 1]?.leap_days || 0);
+  let previousMonthIndex = currentMonthIndex - 1;
+
+  if (previousMonthIndex < 0) {
+    previousMonthIndex = calendarMonths.length - 1;
+  }
+  const days = (calendarMonths[previousMonthIndex]?.days || 0) + (calendarMonths[previousMonthIndex]?.leap_days || 0);
   if (days) {
-    if (currentMonthIndex === 0) {
-      return days - day - 1;
-    }
     return days - day - 1;
   }
   return 0;
