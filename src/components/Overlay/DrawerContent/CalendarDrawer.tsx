@@ -4,12 +4,13 @@ import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CalendarType, DayStateType, MonthStateType } from "../../../types";
+import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, MonthStateType } from "../../../types";
 import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
+import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
-import { Button, Checkbox, Input, Select, TagInput } from "../../Form";
+import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Icon, Skeleton } from "../../Misc";
+import { Badge, Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -42,9 +43,7 @@ function MonthsSection({
             icon={IconEnum.add}
             isIconOnly
             onClick={() =>
-              setMonths((prev) =>
-                prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0, leap_days: 0 }]),
-              )
+              setMonths((prev) => prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0 }]))
             }
             variant="info"
           />
@@ -88,7 +87,7 @@ function MonthsSection({
                           value={item.days ?? 0}
                         />
                       </div>
-                      <div className="w-1/4">
+                      {/* <div className="w-1/4">
                         <Input
                           label="Leap days (optional)"
                           name={`[${index}].leap_days`}
@@ -96,7 +95,7 @@ function MonthsSection({
                           type="number"
                           value={item.leap_days ?? 0}
                         />
-                      </div>
+                      </div> */}
                       <div className="h-10 self-end">
                         <Button
                           hasNoBackground
@@ -174,6 +173,196 @@ function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatc
     </div>
   );
 }
+function LeapDaysSection({
+  months,
+  leapDays,
+  setLeapDays,
+}: {
+  months: MonthStateType[];
+  leapDays: LeapDayStateType[];
+  setLeapDays: Dispatch<SetStateAction<LeapDayStateType[]>>;
+}) {
+  const { handleChange } = useHandleChange({ data: leapDays, setData: setLeapDays });
+  return (
+    <div className="mt-2 flex flex-col gap-y-2 p-2">
+      <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-950">
+        <span>Insert new leap day:</span>
+        <div className="h-8 w-8">
+          <Button
+            icon={IconEnum.add}
+            isIconOnly
+            onClick={() =>
+              setLeapDays((prev) =>
+                prev.concat([{ id: crypto.randomUUID(), month_id: months?.[0]?.id || "", conditions: { and: [], or: [] } }]),
+              )
+            }
+            variant="info"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col">
+        {leapDays.map((item, index) => (
+          <div key={item.id} className="my-1 flex w-full flex-col flex-nowrap items-center gap-x-2 rounded bg-zinc-800 p-1">
+            <Select
+              label="Month"
+              name={`[${index}].month_id`}
+              onChange={handleChange}
+              options={months.map((month) => ({ label: month.title, value: month.id }))}
+              value={item.month_id}
+            />
+            <div className="mt-2 flex w-full flex-col justify-start self-start">
+              <div className="flex items-center justify-between">
+                <div className="w-full">
+                  <Title isDrawerTitle label="Conditions - year must match all" />
+                </div>
+                <div>
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.add}
+                    iconSize={18}
+                    isIconOnly
+                    onClick={() => {
+                      const type: LeapDayConditionType = (item.conditions.and || [])?.some((c) => c.type === "every")
+                        ? "divisible_by"
+                        : "every";
+                      handleChange({
+                        name: `[${index}].conditions.and`,
+                        value: (item.conditions.and || []).concat({ type, value: 0 }),
+                      });
+                    }}
+                    size="xs"
+                    variant="info"
+                  />
+                </div>
+              </div>
+              {(item.conditions.and || []).map((cond, idx) => (
+                <div key={`${cond.type}_${idx.toString()}`} className="mt-1 flex flex-col gap-y-1">
+                  <div className="flex items-center gap-x-2">
+                    <Select
+                      label="Type"
+                      name={`[${index}].conditions.and[${idx}].type`}
+                      onChange={handleChange}
+                      options={LeapDayConditionsEnum.map((c) => {
+                        if (c.value === "every") {
+                          if ((item.conditions.and || [])?.some((condition) => condition.type === "every"))
+                            return { ...c, isDisabled: true };
+                          return c;
+                        }
+                        return c;
+                      })}
+                      value={cond.type}
+                    />
+                    <Input
+                      label="Value"
+                      min={1}
+                      name={`[${index}].conditions.and[${idx}].value`}
+                      onChange={handleChange}
+                      step={1}
+                      suffix="year(s)"
+                      type="number"
+                      value={cond.value}
+                    />
+                    <div className="h-8 w-8 self-end pb-2">
+                      <Button
+                        hasNoBackground
+                        icon={IconEnum.trash}
+                        isIconOnly
+                        onClick={() =>
+                          handleChange({
+                            name: `[${index}].conditions.and`,
+                            value: (item.conditions.and || []).toSpliced(idx, 1),
+                          })
+                        }
+                        variant="error"
+                      />
+                    </div>
+                  </div>
+                  {item.conditions.and?.length !== idx + 1 ? (
+                    <div className="mt-1 flex w-full justify-center">
+                      <div>
+                        <Badge label="AND" variant="info" />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 flex w-full flex-col justify-start self-start">
+              <div className="flex items-center justify-between">
+                <div className="w-full">
+                  <Title isDrawerTitle label="Conditions - year must match at least one" />
+                </div>
+                <div>
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.add}
+                    iconSize={18}
+                    isIconOnly
+                    onClick={() => {
+                      const type: LeapDayConditionType = (item.conditions.or || [])?.some((c) => c.type === "every")
+                        ? "divisible_by"
+                        : "every";
+                      handleChange({
+                        name: `[${index}].conditions.or`,
+                        value: (item.conditions.or || []).concat({ type, value: 0 }),
+                      });
+                    }}
+                    size="xs"
+                    variant="info"
+                  />
+                </div>
+              </div>
+              {(item.conditions.or || []).map((cond, idx) => (
+                <div key={`${cond.type}_${idx.toString()}`} className="mt-1 flex flex-col gap-y-1">
+                  <div className="flex items-center gap-x-2">
+                    <Select
+                      label="Type"
+                      name={`[${index}].conditions.or[${idx}].type`}
+                      onChange={handleChange}
+                      options={LeapDayConditionsEnum}
+                      value={cond.type}
+                    />
+                    <Input
+                      label="Value"
+                      min={1}
+                      name={`[${index}].conditions.or[${idx}].value`}
+                      onChange={handleChange}
+                      step={1}
+                      suffix="year(s)"
+                      type="number"
+                      value={cond.value}
+                    />
+                    <div className="h-8 w-8 self-end pb-2">
+                      <Button
+                        hasNoBackground
+                        icon={IconEnum.trash}
+                        isIconOnly
+                        onClick={() =>
+                          handleChange({
+                            name: `[${index}].conditions.or`,
+                            value: (item.conditions.or || []).toSpliced(idx, 1),
+                          })
+                        }
+                        variant="error"
+                      />
+                    </div>
+                  </div>
+                  {item.conditions.or?.length !== idx + 1 ? (
+                    <div className="mt-1 flex w-full justify-center">
+                      <div>
+                        <Badge label="OR" variant="info" />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -186,6 +375,7 @@ export function CalendarDrawer({ data }: Props) {
   const [calendar, setCalendar] = useState<Partial<CalendarType>>({ project_id });
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
+  const [leapDays, setLeapDays] = useState<LeapDayStateType[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
 
   const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
@@ -287,6 +477,9 @@ export function CalendarDrawer({ data }: Props) {
           </Collapsible>
           <Collapsible icon={IconEnum.sun} label="Days (required)">
             <DaysSection days={days} setDays={setDays} />
+          </Collapsible>
+          <Collapsible icon={IconEnum.leap_day} initialOpen label="Leap days (optional)">
+            <LeapDaysSection leapDays={leapDays} months={months} setLeapDays={setLeapDays} />
           </Collapsible>
         </div>
       ) : null}

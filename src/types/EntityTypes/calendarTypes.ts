@@ -15,15 +15,25 @@ export interface CalendarType extends BaseEntityType {
   tags: TagType[];
 }
 
-export type MonthType = {
+export interface MonthType {
   id: string;
   title: string;
   days: number;
   sort: number;
   events: EventType[];
   parent_id: string;
-  leap_days: number;
-};
+}
+
+export type LeapDayConditionType = "every" | "divisible_by" | "not_divisible_by";
+export interface LeapDayType {
+  id: string;
+  parent_id: string;
+  month_id: string;
+  conditions: {
+    and?: { type: LeapDayConditionType; value: string | number }[];
+    or?: { type: LeapDayConditionType; value: string | number }[];
+  };
+}
 
 export interface EventType {
   id: string;
@@ -51,6 +61,7 @@ export interface EventType {
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
 export type DayStateType = { id: string; title: string };
+export type LeapDayStateType = Omit<LeapDayType, "parent_id">;
 export type EventStateType = Partial<EventType> & { start_month: number | undefined };
 
 export interface CurrentDateType {

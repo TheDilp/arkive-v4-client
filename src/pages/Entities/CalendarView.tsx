@@ -125,10 +125,7 @@ export function CalendarView({ id }: { id?: string }) {
   }, [subitem_id, subitemEvent]);
 
   const monthDays =
-    typeof existingCalendar?.data?.months?.[date.month]?.days === "number" &&
-    typeof existingCalendar?.data?.months?.[date.month]?.leap_days === "number"
-      ? existingCalendar.data.months[date.month].days + existingCalendar.data.months[date.month].leap_days
-      : 0;
+    typeof existingCalendar?.data?.months?.[date.month]?.days === "number" ? existingCalendar.data.months[date.month].days : 0;
   if (!existingCalendar?.data) return null;
   const startingDayForMonth = getStartingDayForMonth(
     existingCalendar?.data?.months,
@@ -230,7 +227,6 @@ export function CalendarView({ id }: { id?: string }) {
               {day}
             </div>
           ))}
-
           {[
             ...Array(
               existingCalendar?.data?.days?.length ? Math.abs(startingDayForMonth % existingCalendar.data.days.length) : 1,
