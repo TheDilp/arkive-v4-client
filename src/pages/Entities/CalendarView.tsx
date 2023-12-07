@@ -124,8 +124,19 @@ export function CalendarView({ id }: { id?: string }) {
     }
   }, [subitem_id, subitemEvent]);
 
-  const monthDays = existingCalendar?.data?.months?.[date.month]?.days;
+  const monthDays =
+    existingCalendar?.data?.months?.[date.month]?.days && existingCalendar?.data?.months?.[date.month]?.leap_days
+      ? existingCalendar.data.months[date.month].days + existingCalendar.data.months[date.month].leap_days
+      : 0;
+
   if (!existingCalendar?.data) return null;
+  const startingDayForMonth = getStartingDayForMonth(
+    existingCalendar?.data?.months,
+    date?.year,
+    date?.month,
+    existingCalendar?.data?.days?.length,
+    existingCalendar?.data?.starts_on_day || 0,
+  );
 
   if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
 
@@ -222,17 +233,7 @@ export function CalendarView({ id }: { id?: string }) {
 
           {[
             ...Array(
-              existingCalendar?.data?.days?.length
-                ? Math.abs(
-                    getStartingDayForMonth(
-                      existingCalendar?.data?.months,
-                      date?.year,
-                      date?.month,
-                      existingCalendar?.data?.days?.length,
-                      existingCalendar?.data?.starts_on_day || 0,
-                    ) % existingCalendar.data.days.length,
-                  )
-                : 1,
+              existingCalendar?.data?.days?.length ? Math.abs(startingDayForMonth % existingCalendar.data.days.length) : 1,
             ).keys(),
           ]
             .reverse()
@@ -314,20 +315,12 @@ export function CalendarView({ id }: { id?: string }) {
             ...Array(
               existingCalendar?.data?.days?.length
                 ? existingCalendar.data.days.length -
-                    ((getStartingDayForMonth(
-                      existingCalendar?.data?.months,
-                      date?.year,
-                      date?.month,
-                      existingCalendar?.data?.days?.length,
-                      existingCalendar?.data?.starts_on_day || 0,
-                    ) +
-                      Number(monthDays)) %
-                      existingCalendar.data.days.length)
+                    ((startingDayForMonth + Number(monthDays)) % existingCalendar.data.days.length)
                 : 0,
             ).keys(),
           ]
             .reverse()
-            .map((day, _, arr) => (
+            .map((day, idx) => (
               <div
                 key={day}
                 className="group col-span-1 h-56 cursor-default border-b border-r border-zinc-700 hover:text-white"
@@ -336,9 +329,7 @@ export function CalendarView({ id }: { id?: string }) {
                 tabIndex={-1}>
                 <DayNumber
                   key={day}
-                  dayNumber={
-                    getFillerDayNumber(existingCalendar?.data?.months, date.month, day) - Number(monthDays) + arr.length
-                  }
+                  dayNumber={idx}
                   isFiller
                   //   isReadOnly={isReadOnly}
                   monthNumber={date.month}

@@ -96,10 +96,10 @@ export function getStartingDayForMonth(
 ) {
   if (year === undefined || !months || !weekdays) return 0;
   if (year === 1 && typeof starts_on_day === "number") return starts_on_day;
-  const dayInYear = months.reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
+  const dayInYear = months.reduce((accumulator, currentValue) => accumulator + currentValue.days + currentValue.leap_days, 0);
   const dayBeforeMonth = months
     .filter((_, index) => index < monthIndex)
-    .reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
+    .reduce((accumulator, currentValue) => accumulator + currentValue.days + currentValue.leap_days, 0);
   let daysBeforeYear;
   if (year < 0) {
     daysBeforeYear = 0;
@@ -110,7 +110,8 @@ export function getStartingDayForMonth(
   return (daysBeforeYear % weekdays) + dayBeforeMonth;
 }
 export function getFillerDayNumber(calendarMonths: MonthType[], currentMonthIndex: number, day: number) {
-  const days = calendarMonths[calendarMonths.length - 1]?.days;
+  const days =
+    (calendarMonths[calendarMonths.length - 1]?.days || 0) + (calendarMonths[calendarMonths.length - 1]?.leap_days || 0);
   if (days) {
     if (currentMonthIndex === 0) {
       return days - day - 1;
