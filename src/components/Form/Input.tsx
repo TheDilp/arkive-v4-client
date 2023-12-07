@@ -6,68 +6,69 @@ import { InputType } from "../../types";
 const InputClasses = tv({
   slots: {
     base: "relative flex flex-col font-lato w-full max-w-full",
-    input:
-      "flex h-10 w-full items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-md border p-2 text-base outline-none placeholder:italic",
+    inputContainer:
+      "flex items-center h-10 bg-zinc-900 text-white [&:has(:focus)]:bg-zinc-950 rounded-md border p-2 text-base outline-none",
+    input: "flex w-full items-center justify-center placeholder:italic bg-transparent outline-none",
     label: "text-sm truncate block min-h-[20px]",
     helperText: "text-xs",
   },
   variants: {
     variant: {
       primary: {
-        input: "border-zinc-700 focus:border-zinc-500",
+        inputContainer: "border-zinc-700 focus:border-zinc-500",
         label: "text-zinc-300",
         helperText: "text-zinc-400",
       },
       secondary: {
-        input: "border-zinc-400",
+        inputContainer: "border-zinc-400",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
       info: {
-        input: "border-blue-600",
+        inputContainer: "border-blue-600",
         label: "text-blue-400",
         helperText: "text-blue-400",
         icon: "text-blue-200",
       },
       success: {
-        input: "border-green-600",
+        inputContainer: "border-green-600",
         label: "text-green-400",
         helperText: "text-green-400",
       },
       warning: {
-        input: "border-orange-400",
+        inputContainer: "border-orange-400",
         label: "text-orange-400",
         helperText: "text-orange-400",
       },
       error: {
-        input: "border-red-600",
+        inputContainer: "border-red-600",
         label: "text-red-500",
         helperText: "text-red-500",
       },
     },
     size: {
       sm: {
-        input: "h-8",
+        inputContainer: "h-8",
       },
       xs: {
-        input: "h-6",
+        inputContainer: "h-6",
       },
     },
     isDisabled: {
       true: {
         base: "cursor-not-allowed select-none",
-        input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
+        inputContainer: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
     isReadOnly: {
       true: {
         base: "cursor-not-allowed",
-        input: "cursor-not-allowed pointer-events-none",
+        inputContainer: "cursor-not-allowed pointer-events-none",
       },
     },
     isInline: {
       true: {
-        input: "rounded-none border-none",
+        inputContainer: "rounded-none border-none",
       },
     },
   },
@@ -116,9 +117,12 @@ export function Input({
   isInline,
   isAutofocused,
   step,
+  prefix,
+  suffix,
 }: InputType) {
   const {
     base,
+    inputContainer,
     input,
     label: labelClasses,
     helperText: helperTextClasses,
@@ -126,38 +130,43 @@ export function Input({
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
+      <div className={inputContainer()}>
+        {prefix ? <span className="pr-1">{prefix}</span> : null}
 
-      <input
-        autoComplete="off"
-        autoFocus={isAutofocused}
-        className={input()}
-        disabled={isDisabled || isReadOnly}
-        max={max}
-        min={min}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) =>
-          type === "number"
-            ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, step, onChange })
-            : onChange(e.target)
-        }
-        onKeyDown={(e) => {
-          if ((e.key === "e" || e.key === "E" || e.key === "+") && type === "number") {
-            e.preventDefault();
+        <input
+          autoComplete="off"
+          autoFocus={isAutofocused}
+          className={input()}
+          disabled={isDisabled || isReadOnly}
+          max={max}
+          min={min}
+          name={name}
+          onBlur={onBlur}
+          onChange={(e) =>
+            type === "number"
+              ? handleNumberChange({ name, newValue: e.target.valueAsNumber, min, max, step, onChange })
+              : onChange(e.target)
           }
-          if (step === 1) {
-            if (e.key === "," || e.key === ".") {
+          onKeyDown={(e) => {
+            if ((e.key === "e" || e.key === "E" || e.key === "+") && type === "number") {
               e.preventDefault();
-              return;
             }
-          }
-          if (onKeyDown) onKeyDown(e);
-        }}
-        placeholder={placeholder}
-        step={step}
-        type={type}
-        value={value}
-      />
+            if (step === 1) {
+              if (e.key === "," || e.key === ".") {
+                e.preventDefault();
+                return;
+              }
+            }
+            if (onKeyDown) onKeyDown(e);
+          }}
+          placeholder={placeholder}
+          step={step}
+          type={type}
+          value={value}
+        />
+        {suffix ? <span className="pl-1">{suffix}</span> : null}
+      </div>
+
       {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}
     </div>
   );
