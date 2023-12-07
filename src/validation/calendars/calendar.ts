@@ -11,6 +11,7 @@ export const InsertCalendarSchema = z.object({
     project_id: z.string(),
     starts_on_day: z
       .string()
+      .or(z.number())
       .optional()
       .nullable()
       .transform((arg) => {
@@ -26,6 +27,15 @@ export const InsertCalendarSchema = z.object({
   relations: z.object({
     months: InsertMonthSchema.array().min(1),
     tags: z.object({ id: z.string() }).array().optional(),
+    leap_days: z
+      .object({ month: z.string() })
+      .array()
+      .optional()
+      .nullable()
+      .transform((arg) => {
+        if (arg) return arg.map((item) => ({ month: Number(item.month) }));
+        return arg;
+      }),
   }),
 });
 
@@ -40,6 +50,7 @@ export const UpdateCalendarSchema = z.object({
     days: z.string().array().min(1).optional(),
     starts_on_day: z
       .string()
+      .or(z.number())
       .optional()
       .nullable()
       .transform((arg) => {
@@ -50,6 +61,15 @@ export const UpdateCalendarSchema = z.object({
   relations: z.object({
     months: InsertMonthSchema.array().min(1).or(UpdateMonthSchema.array().min(1)),
     tags: z.object({ id: z.string() }).array().optional(),
+    leap_days: z
+      .object({ id: z.string().optional(), month: z.string() })
+      .array()
+      .optional()
+      .nullable()
+      .transform((arg) => {
+        if (arg) return arg.map((item) => ({ id: item.id, month: Number(item.month) }));
+        return arg;
+      }),
   }),
 });
 

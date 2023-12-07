@@ -17,7 +17,7 @@ import { CharacterFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum,
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
-import { Collapsible, Tabs } from "../../Layout";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 
 function isSaveDisabled(template: TemplateStateType) {
@@ -275,7 +275,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex h-screen max-h-screen flex-col gap-y-4 overflow-hidden text-white">
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
@@ -505,6 +505,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           variant="success"
         />
       </div>
-    </div>
+    </DrawerLayout>
   );
 }

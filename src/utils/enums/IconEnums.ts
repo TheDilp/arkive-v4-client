@@ -61,6 +61,7 @@ export const IconEnum = {
   image: "ph:images",
   image_template: "ph:file-image",
   info_circle: "ph:info",
+  leap_day: "ph:calendar-plus-thin",
   link: "ph:link",
   link_break: "ph:link-break",
   loading: "ph:circle-notch",

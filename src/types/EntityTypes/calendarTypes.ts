@@ -22,6 +22,7 @@ export type MonthType = {
   sort: number;
   events: EventType[];
   parent_id: string;
+  leap_days: number;
 };
 
 export interface EventType {
@@ -51,6 +52,7 @@ export interface EventType {
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
 export type DayStateType = { id: string; title: string };
 export type EventStateType = Partial<EventType> & { start_month: number | undefined };
+
 export interface CurrentDateType {
   month: number;
   year: number;

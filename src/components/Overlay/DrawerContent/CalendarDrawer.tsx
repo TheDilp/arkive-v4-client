@@ -8,7 +8,7 @@ import { CalendarType, DayStateType, MonthStateType } from "../../../types";
 import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { Button, Checkbox, Input, Select, TagInput } from "../../Form";
-import { Collapsible, Tabs } from "../../Layout";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
@@ -25,18 +25,26 @@ function isSaveDisabled(calendar: Partial<CalendarType>, months: MonthStateType[
   return false;
 }
 
-function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths: Dispatch<SetStateAction<MonthStateType[]>> }) {
+function MonthsSection({
+  months,
+  setMonths,
+}: {
+  months: MonthStateType[];
+  setMonths: Dispatch<SetStateAction<MonthStateType[]>>;
+}) {
   const { handleChange } = useHandleChange({ data: months, setData: setMonths });
   return (
     <div className="mt-2 flex flex-col gap-y-2 p-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-950">
+      <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-950">
         <span>Insert new month:</span>
         <div className="h-8 w-8">
           <Button
             icon={IconEnum.add}
             isIconOnly
             onClick={() =>
-              setMonths((prev) => prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0 }]))
+              setMonths((prev) =>
+                prev.concat([{ id: crypto.randomUUID(), title: "New month", sort: prev.length, days: 0, leap_days: 0 }]),
+              )
             }
             variant="info"
           />
@@ -65,19 +73,28 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
                       </div>
 
                       <Input
-                        label="Month name (required)"
+                        label="Name (required)"
                         name={`[${index}].title`}
                         onChange={handleChange}
                         placeholder="Eg November"
                         value={item.title}
                       />
-                      <div className="w-1/3">
+                      <div className="w-1/4">
                         <Input
                           label="Days in month (required)"
                           name={`[${index}].days`}
                           onChange={handleChange}
                           type="number"
                           value={item.days ?? 0}
+                        />
+                      </div>
+                      <div className="w-1/4">
+                        <Input
+                          label="Leap days (optional)"
+                          name={`[${index}].leap_days`}
+                          onChange={handleChange}
+                          type="number"
+                          value={item.leap_days ?? 0}
                         />
                       </div>
                       <div className="h-10 self-end">
@@ -101,11 +118,11 @@ function MonthsTab({ months, setMonths }: { months: MonthStateType[]; setMonths:
     </div>
   );
 }
-function DaysTab({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<SetStateAction<DayStateType[]>> }) {
+function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatch<SetStateAction<DayStateType[]>> }) {
   const { handleChange } = useHandleChange({ data: days, setData: setDays });
   return (
     <div className="mt-2 flex flex-col gap-y-2 p-2">
-      <div className="sticky top-0 z-20 flex flex-nowrap justify-between bg-zinc-950">
+      <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-950">
         <span>Insert new day:</span>
         <div className="h-8 w-8">
           <Button
@@ -170,6 +187,7 @@ export function CalendarDrawer({ data }: Props) {
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
   const resetDrawer = useResetAtom(drawerAtom);
+
   const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
     data?.id,
     "calendars",
@@ -217,10 +235,10 @@ export function CalendarDrawer({ data }: Props) {
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex flex-col gap-y-2 overflow-y-auto">
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
-        <>
+        <div className="max-h-[90%] overflow-y-auto">
           <div className="flex flex-nowrap gap-x-2">
             <Input label="Title (required)" name="title" onChange={handleChange} value={calendar?.title || ""} />
 
@@ -265,12 +283,12 @@ export function CalendarDrawer({ data }: Props) {
           </div>
 
           <Collapsible icon={IconEnum.moon} label="Months (required)">
-            <MonthsTab months={months} setMonths={setMonths} />
+            <MonthsSection months={months} setMonths={setMonths} />
           </Collapsible>
           <Collapsible icon={IconEnum.sun} label="Days (required)">
-            <DaysTab days={days} setDays={setDays} />
+            <DaysSection days={days} setDays={setDays} />
           </Collapsible>
-        </>
+        </div>
       ) : null}
 
       {selectedTab === 1 ? <TagInput handleChange={handleChange} tags={calendar?.tags || []} /> : null}
@@ -285,6 +303,6 @@ export function CalendarDrawer({ data }: Props) {
           variant="success"
         />
       </div>
-    </div>
+    </DrawerLayout>
   );
 }
