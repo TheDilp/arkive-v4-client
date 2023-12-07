@@ -159,6 +159,12 @@ const SelectOption = tv({
       isSelected: true,
       className: "bg-blue-400",
     },
+    {
+      isActive: true,
+      isSelected: true,
+      isDisabled: true,
+      className: "text-white",
+    },
   ],
 });
 
