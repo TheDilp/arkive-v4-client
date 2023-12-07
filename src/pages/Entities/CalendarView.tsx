@@ -125,10 +125,10 @@ export function CalendarView({ id }: { id?: string }) {
   }, [subitem_id, subitemEvent]);
 
   const monthDays =
-    existingCalendar?.data?.months?.[date.month]?.days && existingCalendar?.data?.months?.[date.month]?.leap_days
+    typeof existingCalendar?.data?.months?.[date.month]?.days === "number" &&
+    typeof existingCalendar?.data?.months?.[date.month]?.leap_days === "number"
       ? existingCalendar.data.months[date.month].days + existingCalendar.data.months[date.month].leap_days
       : 0;
-
   if (!existingCalendar?.data) return null;
   const startingDayForMonth = getStartingDayForMonth(
     existingCalendar?.data?.months,
