@@ -409,13 +409,13 @@ export function CalendarDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, tags: calendar.tags },
+        relations: { months, leapDays: JSON.stringify(leapDays), tags: calendar.tags },
       });
       await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
       const parsedData = UpdateCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, tags: calendar.tags },
+        relations: { months, leapDays: JSON.stringify(leapDays), tags: calendar.tags },
       });
 
       await updateCalendar(parsedData, { onSuccess: resetDrawer });

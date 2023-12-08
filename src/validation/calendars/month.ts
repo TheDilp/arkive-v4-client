@@ -4,7 +4,6 @@ export const InsertMonthSchema = z.object({
   title: z.string(),
   days: z.number(),
   sort: z.number(),
-  leap_days: z.number().optional(),
   parent_id: z.string().optional(),
 });
 export const UpdateMonthSchema = z.object({
@@ -12,5 +11,4 @@ export const UpdateMonthSchema = z.object({
   title: z.string().optional(),
   days: z.number().optional(),
   sort: z.number().optional(),
-  leap_days: z.number().optional(),
 });

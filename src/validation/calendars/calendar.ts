@@ -28,14 +28,10 @@ export const InsertCalendarSchema = z.object({
     months: InsertMonthSchema.array().min(1),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
-      .object({ month: z.string() })
+      .object({ parent_id: z.string(), month_id: z.string(), conditions: z.string().optional().nullable() })
       .array()
       .optional()
-      .nullable()
-      .transform((arg) => {
-        if (arg) return arg.map((item) => ({ month: Number(item.month) }));
-        return arg;
-      }),
+      .nullable(),
   }),
 });
 
@@ -62,14 +58,10 @@ export const UpdateCalendarSchema = z.object({
     months: InsertMonthSchema.array().min(1).or(UpdateMonthSchema.array().min(1)),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
-      .object({ id: z.string().optional(), month: z.string() })
+      .object({ parent_id: z.string(), month_id: z.string(), conditions: z.string().optional().nullable() })
       .array()
       .optional()
-      .nullable()
-      .transform((arg) => {
-        if (arg) return arg.map((item) => ({ id: item.id, month: Number(item.month) }));
-        return arg;
-      }),
+      .nullable(),
   }),
 });
 
