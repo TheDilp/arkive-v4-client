@@ -41,19 +41,17 @@ export default function App() {
           <Routes>
             <Route
               element={
-                <SignedOut>
-                  <RedirectToSignIn />
-                  <Outlet />
-                </SignedOut>
-              }
-              path="/">
-              <Route
-                element={
+                <>
+                  <SignedOut>
+                    <RedirectToSignIn />
+                  </SignedOut>
                   <SignedIn>
                     <Outlet />
                   </SignedIn>
-                }
-                path="projects/*">
+                </>
+              }
+              path="/">
+              <Route element={<Outlet />} path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
                 <Route element={<ProjectLayout />} path=":project_id/*">
                   <Route element={<FolderView />} path=":type" />
