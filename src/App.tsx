@@ -1,4 +1,4 @@
-import { ClerkProvider, SignedIn } from "@clerk/clerk-react";
+import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -40,7 +40,17 @@ export default function App() {
 
           <SignedIn>
             <Routes>
-              <Route element={<Navigate to="/projects" />} path="/" />
+              <Route
+                element={
+                  <div>
+                    <Navigate to="/projects" />
+                    <SignedOut>
+                      <RedirectToSignIn />
+                    </SignedOut>
+                  </div>
+                }
+                path="/"
+              />
               <Route path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
                 <Route element={<ProjectLayout />} path=":project_id/*">
