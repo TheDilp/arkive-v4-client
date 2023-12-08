@@ -29,7 +29,7 @@ export default function App() {
       }}>
       <QueryClientProvider client={queryClient}>
         <ClerkProvider
-          // afterSignInUrl="/projects"
+          afterSignInUrl="/projects"
           appearance={{
             baseTheme: dark,
           }}
