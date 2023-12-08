@@ -11,6 +11,7 @@ export interface CalendarType extends BaseEntityType {
   minutes?: number | null;
   starts_on_day?: number | null;
   months: MonthType[];
+  leap_days: LeapDayType[];
   days: string[];
   tags: TagType[];
 }
@@ -53,7 +54,6 @@ export interface EventType {
   end_year?: number | null;
   start_month: number;
   start_year: number;
-
   document?: DocumentType;
   image?: ImageType;
   tags: TagType[];
@@ -61,7 +61,7 @@ export interface EventType {
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
 export type DayStateType = { id: string; title: string };
-export type LeapDayStateType = Omit<LeapDayType, "parent_id">;
+export type LeapDayStateType = LeapDayType;
 export type EventStateType = Partial<EventType> & { start_month: number | undefined };
 
 export interface CurrentDateType {

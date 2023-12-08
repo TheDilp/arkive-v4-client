@@ -28,7 +28,14 @@ export const InsertCalendarSchema = z.object({
     months: InsertMonthSchema.array().min(1),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
-      .object({ parent_id: z.string(), month_id: z.string(), conditions: z.string().optional().nullable() })
+      .object({
+        parent_id: z.string(),
+        month_id: z.string(),
+        conditions: z.object({
+          and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+          or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+        }),
+      })
       .array()
       .optional()
       .nullable(),
@@ -55,10 +62,17 @@ export const UpdateCalendarSchema = z.object({
       }),
   }),
   relations: z.object({
-    months: InsertMonthSchema.array().min(1).or(UpdateMonthSchema.array().min(1)),
+    months: UpdateMonthSchema.array().min(1).or(InsertMonthSchema.array().min(1)),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
-      .object({ parent_id: z.string(), month_id: z.string(), conditions: z.string().optional().nullable() })
+      .object({
+        parent_id: z.string(),
+        month_id: z.string(),
+        conditions: z.object({
+          and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+          or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+        }),
+      })
       .array()
       .optional()
       .nullable(),

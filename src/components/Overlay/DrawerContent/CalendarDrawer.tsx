@@ -177,10 +177,12 @@ function LeapDaysSection({
   months,
   leapDays,
   setLeapDays,
+  parent_id,
 }: {
   months: MonthStateType[];
   leapDays: LeapDayStateType[];
   setLeapDays: Dispatch<SetStateAction<LeapDayStateType[]>>;
+  parent_id: string;
 }) {
   const { handleChange } = useHandleChange({ data: leapDays, setData: setLeapDays });
   return (
@@ -193,7 +195,9 @@ function LeapDaysSection({
             isIconOnly
             onClick={() =>
               setLeapDays((prev) =>
-                prev.concat([{ id: crypto.randomUUID(), month_id: months?.[0]?.id || "", conditions: { and: [], or: [] } }]),
+                prev.concat([
+                  { id: crypto.randomUUID(), parent_id, month_id: months?.[0]?.id || "", conditions: { and: [], or: [] } },
+                ]),
               )
             }
             variant="info"
@@ -383,7 +387,7 @@ export function CalendarDrawer({ data }: Props) {
     "calendars",
     {
       fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public"],
-      relations: { months: true, tags: true },
+      relations: { months: true, leap_days: true, tags: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
@@ -398,9 +402,10 @@ export function CalendarDrawer({ data }: Props) {
 
   useLayoutEffect(() => {
     if (existingCalendar?.data) {
-      const { months: mths, ...cal } = existingCalendar.data;
+      const { months: mths, leap_days, ...cal } = existingCalendar.data;
       setCalendar(cal);
       setMonths(mths);
+      setLeapDays(leap_days);
       setDays(cal.days.map((d) => ({ id: crypto.randomUUID(), title: d })));
     }
   }, [existingCalendar]);
@@ -409,13 +414,13 @@ export function CalendarDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, leapDays: JSON.stringify(leapDays), tags: calendar.tags },
+        relations: { months, leap_days: leapDays, tags: calendar.tags },
       });
       await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
       const parsedData = UpdateCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, leapDays: JSON.stringify(leapDays), tags: calendar.tags },
+        relations: { months, leap_days: leapDays, tags: calendar.tags },
       });
 
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
@@ -478,8 +483,8 @@ export function CalendarDrawer({ data }: Props) {
           <Collapsible icon={IconEnum.sun} label="Days (required)">
             <DaysSection days={days} setDays={setDays} />
           </Collapsible>
-          <Collapsible icon={IconEnum.leap_day} initialOpen label="Leap days (optional)">
-            <LeapDaysSection leapDays={leapDays} months={months} setLeapDays={setLeapDays} />
+          <Collapsible icon={IconEnum.leap_day} label="Leap days (optional)">
+            <LeapDaysSection leapDays={leapDays} months={months} parent_id={calendar?.id as string} setLeapDays={setLeapDays} />
           </Collapsible>
         </div>
       ) : null}
