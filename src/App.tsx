@@ -2,7 +2,7 @@ import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/cle
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Outlet, Route, Routes, useNavigate } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
@@ -38,20 +38,22 @@ export default function App() {
           <NotificationContainer />
           <ReactQueryDevtools position="top-left" />
 
-          <SignedIn>
-            <Routes>
+          <Routes>
+            <Route
+              element={
+                <SignedOut>
+                  <RedirectToSignIn />
+                  <Outlet />
+                </SignedOut>
+              }
+              path="/">
               <Route
                 element={
-                  <div>
-                    <Navigate to="/projects" />
-                    <SignedOut>
-                      <RedirectToSignIn />
-                    </SignedOut>
-                  </div>
+                  <SignedIn>
+                    <Outlet />
+                  </SignedIn>
                 }
-                path="/"
-              />
-              <Route path="projects/*">
+                path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
                 <Route element={<ProjectLayout />} path=":project_id/*">
                   <Route element={<FolderView />} path=":type" />
@@ -65,8 +67,8 @@ export default function App() {
                   <Route element={<Dashboard />} path="*" />
                 </Route>
               </Route>
-            </Routes>
-          </SignedIn>
+            </Route>
+          </Routes>
           <Routes>
             <Route path="public/*">
               {/* <Route path="*" /> */}
