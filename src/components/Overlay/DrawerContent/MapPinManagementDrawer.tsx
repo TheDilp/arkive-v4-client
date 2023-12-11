@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useTable } from "../../../hooks";
 import { DialogAtomType, MapPinType } from "../../../types";
-import { dialogAtom, getCharacterFullName, getImageURL, IconEnum } from "../../../utils";
+import { dialogAtom, getImageURL, IconEnum } from "../../../utils";
 import { Table } from "../../DataDisplay";
 import { Button } from "../../Form";
 import { Avatar, Icon } from "../../Misc";
@@ -23,7 +23,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
           {row?.original?.character ? (
             <Avatar
               image={getImageURL(project_id, "images", row?.original?.character?.portrait_id)}
-              label={getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)}
+              label={row?.original?.character?.full_name}
               size="sm"
             />
           ) : (
@@ -39,14 +39,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
       header: "Icon title",
       cell: ({ row }) => (
         <div className="flex max-w-full items-center justify-start">
-          <span className="truncate">
-            {row.original?.title ||
-              (row?.original?.character?.first_name ? (
-                getCharacterFullName(row?.original?.character?.first_name, undefined, row?.original?.character?.last_name)
-              ) : (
-                <i>No name.</i>
-              ))}
-          </span>
+          <span className="truncate">{row.original?.title || row?.original?.character?.full_name || <i>No name.</i>}</span>
         </div>
       ),
       minSize: 5,
@@ -116,7 +109,7 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
   }, [existingMapPins?.data]);
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
       <Table columns={columns} data={mapPins || []} dispatch={dispatch} isLoading={isFetching} type="icons" />
     </div>
   );
