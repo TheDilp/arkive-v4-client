@@ -80,7 +80,7 @@ export function EntityPreview({
             size="sm"
           />
         ) : null}
-        {!image_id && type !== "images" && icon ? (
+        {!image_id && type !== "images" ? (
           <span>
             <Icon fontSize={32} icon={icon || getDefaultEntityIcon(type)} />
           </span>
