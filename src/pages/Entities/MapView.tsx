@@ -41,6 +41,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     if (Array.isArray(value)) {
       if (value.includes("all") && !mapPinFilters.includes("all")) setMapPinFilters(["all"]);
       else if (mapPinFilters.includes("all")) setMapPinFilters(value.filter((v) => v !== "all") as MapPinFilterType[]);
+      else if (value.length === 0) setMapPinFilters(["all"]);
       else setMapPinFilters(value as MapPinFilterType[]);
     }
   }

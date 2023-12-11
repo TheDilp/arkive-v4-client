@@ -71,6 +71,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       setCharacter(char);
     } else {
       setMapPin({
+        id: crypto.randomUUID(),
         parent_id: item_id as string,
         lat: data.lat,
         lng: data.lng,

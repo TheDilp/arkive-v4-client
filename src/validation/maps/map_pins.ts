@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const InsertMapPinSchema = z.object({
   data: z.object({
+    id: z.string(),
     parent_id: z.string(),
     lat: z.number(),
     lng: z.number(),
