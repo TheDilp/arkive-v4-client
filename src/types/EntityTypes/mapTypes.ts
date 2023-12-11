@@ -15,13 +15,13 @@ export interface MapType {
   image_id: string | null;
 
   map_pins?: MapPinType[];
-  map_layers?: MapLayers[];
+  map_layers?: MapLayerType[];
   characters: CharacterType[];
 
   tags?: TagType[];
 }
 
-export interface MapLayers {
+export interface MapLayerType {
   id: string;
   title: string;
   parent_id: string;
@@ -49,7 +49,7 @@ export interface MapPinType {
   character_id?: string | null;
   image: ImageType;
 
-  character: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">;
+  character: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
 }
 
 export type CharacterLocationType = Pick<MapType, "id" | "title" | "image_id"> & { map_pin_id: string };

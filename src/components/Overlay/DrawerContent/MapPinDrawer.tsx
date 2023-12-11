@@ -1,11 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
-import { CharacterType, MapPinType } from "../../../types";
-import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
+import { MapPinType } from "../../../types";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search } from "../../Form";
@@ -64,10 +63,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     "map_pins",
     item_id as string,
   );
-  const queryClient = useQueryClient();
-  const [character, setCharacter] = useState<Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id"> | null>(
-    null,
-  );
+  const [character, setCharacter] = useState<MapPinType["character"] | null>(null);
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
   useLayoutEffect(() => {
     if (existingMapPin?.data) {
@@ -100,25 +96,26 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     <div className="flex flex-col gap-y-2">
       {exceptions?.characterPin ? (
         <div className="flex flex-col gap-y-2">
-          <Search
-            isDisabled={!!character}
-            name="character_id"
-            onChange={({ value: id, label, image: portrait_id }) => {
-              const [first_name, last_name] = (label || "").split(" ");
-              setCharacter({ id, first_name, last_name, portrait_id });
-            }}
-            placeholder="Press enter to search characters"
-            searchEntity="characters"
-          />
           {character ? (
             <EntityPreview
               clearAction={() => setCharacter(null)}
               id={character.id}
               image_id={character.portrait_id}
-              title={getCharacterFullName(character.first_name, undefined, character?.last_name)}
+              label="Character"
+              title={character?.full_name || ""}
               type="characters"
             />
-          ) : null}
+          ) : (
+            <Search
+              isDisabled={!!character}
+              name="character_id"
+              onChange={({ value: id, label, image: portrait_id }) => {
+                setCharacter({ id, full_name: label, portrait_id });
+              }}
+              placeholder="Press enter to search characters"
+              searchEntity="characters"
+            />
+          )}
           <div className="flex flex-nowrap justify-between">
             <span className="block min-h-[20px] truncate">Marker border:</span>
             <div className="flex items-center gap-x-2 pb-2">
@@ -227,7 +224,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             await createMapPin(parsed, {
               onSuccess: (res) => {
                 if (res?.ok) {
-                  queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
+                  // queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
                   resetDrawerAtom();
                 }
               },
@@ -237,7 +234,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             await updateMapPin(parsed, {
               onSuccess: (res) => {
                 if (res?.ok) {
-                  queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
+                  // queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
                   resetDrawerAtom();
                 }
               },
