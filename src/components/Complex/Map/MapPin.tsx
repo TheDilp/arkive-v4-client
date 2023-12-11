@@ -66,11 +66,11 @@ export function MapPin({
       if (e.originalEvent.shiftKey && map_link) {
         e.originalEvent.preventDefault();
         if (isReadOnly) navigate(`/public/maps/${map_link}`);
-        else navigate(`/project/${project_id}/maps/${map_link}`);
+        else navigate(`/projects/${project_id}/maps/${map_link}`);
       } else if (e.originalEvent.altKey && doc_id) {
         e.originalEvent.preventDefault();
         if (isReadOnly) navigate(`/public/documents/${doc_id}`);
-        else navigate(`/project/${project_id}/documents/${doc_id}}`);
+        else navigate(`/projects/${project_id}/documents/${doc_id}`);
       } else if (e.originalEvent.metaKey) {
         // setDrawer({
         //   ...DefaultDrawer,

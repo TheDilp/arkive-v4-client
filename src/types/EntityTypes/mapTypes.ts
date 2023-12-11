@@ -1,4 +1,5 @@
 import { CharacterType } from "./characterTypes";
+import { DocumentType } from "./documentTypes";
 import { ImageType } from "./imageTypes";
 import { TagType } from "./tagTypes";
 
@@ -47,8 +48,9 @@ export interface MapPinType {
   doc_id?: string | null;
   image_id?: string | null;
   character_id?: string | null;
-  image: ImageType;
 
+  document: DocumentType;
+  image: ImageType;
   character: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
 }
 

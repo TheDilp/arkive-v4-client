@@ -55,10 +55,9 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     { data: {} },
     { enabled: !!data?.id },
   );
-  const { mutateAsync: createMapPin, isLoading: isCreating } = useCreateSubEntity<InsertMapPinType>(
-    "map_pins",
-    item_id as string,
-  );
+  const { mutateAsync: createMapPin, isLoading: isCreating } = useCreateSubEntity<
+    InsertMapPinType & { character?: MapPinType["character"] | null }
+  >("map_pins", item_id as string);
   const { mutateAsync: updateMapPin, isLoading: isUpdating } = useUpdateMapSubEntity<UpdateMapPinType>(
     "map_pins",
     item_id as string,
@@ -192,22 +191,38 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           ) : null}
           {selectedTab === 1 ? (
             <div className="flex flex-wrap gap-2">
-              {/* {mapPin?.characters?.length
-            ? mapPin.characters.map((character) => (
-                <div key={character.id} className="w-full">
-                  <CharacterPreview
-                    character_name={character?.first_name}
-                    clearAction={() => {
-                      handleChange({
-                        name: "characters",
-                        value: (mapPin?.characters || []).filter((char) => char.id !== character.id),
-                      });
-                    }}
-                    id={character.id}
+              {mapPin?.document ? (
+                <div className="w-full">
+                  <EntityPreview
+                    clearAction={() =>
+                      handleChange([
+                        {
+                          name: "doc_id",
+                          value: null,
+                        },
+                        { name: "document", value: null },
+                      ])
+                    }
+                    id={mapPin.document.id}
+                    label="Document"
+                    title={mapPin.document.title}
+                    type="documents"
                   />
                 </div>
-              ))
-            : null} */}
+              ) : (
+                <Search
+                  label="Document"
+                  name="doc_id"
+                  onChange={({ name, label, value }) => {
+                    handleChange([
+                      { name, value },
+                      { name: "document", value: { title: label, id: value } },
+                    ]);
+                  }}
+                  searchEntity="documents"
+                  value={mapPin.doc_id || ""}
+                />
+              )}
             </div>
           ) : null}
         </>
@@ -221,20 +236,22 @@ export function MapPinDrawer({ data, exceptions }: Props) {
         onClick={async () => {
           if (!("id" in data) || !data?.id) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin });
-            await createMapPin(parsed, {
+            const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
+            if (character) final.character = character;
+            await createMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
-                  // queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
                   resetDrawerAtom();
                 }
               },
             });
           } else {
             const parsed = UpdateMapPinSchema.parse({ data: mapPin });
-            await updateMapPin(parsed, {
+            const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
+            if (character) final.character = character;
+            await updateMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
-                  // queryClient.invalidateQueries({ queryKey: ["maps", item_id] });
                   resetDrawerAtom();
                 }
               },
