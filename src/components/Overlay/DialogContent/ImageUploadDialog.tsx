@@ -1,12 +1,14 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useUploadAsset } from "../../../hooks";
-import { AssetType, Size } from "../../../types";
-import { getPreviewImageURLs, IconEnum } from "../../../utils";
+import { Size } from "../../../types";
+import { dialogAtom, getPreviewImageURLs, IconEnum } from "../../../utils";
 import { ImagePreview } from "../../DataDisplay/ImagePreview";
 import { Button, ImageUpload } from "../../Form";
+import { Tabs } from "../../Layout";
 
 const ImageUploadClasses = tv({
   slots: {
@@ -24,24 +26,53 @@ const ImageUploadClasses = tv({
   },
 });
 
-export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType }) {
+const tabs = [
+  { id: "1", label: "Images", icon: IconEnum.image },
+  { id: "2", label: "Map images", icon: IconEnum.map },
+];
+
+export function ImageUploadDialog({ size }: { size: Size }) {
   const { project_id } = useParams();
+  const [selectedTab, setSelectedTab] = useState(0);
+  const resetDialogAtom = useResetAtom(dialogAtom);
 
   const { imageUploadContainer, imagesList } = ImageUploadClasses({ size });
-  const { mutateAsync, isLoading: isMutating } = useUploadAsset(type, project_id as string);
-  const [files, setFiles] = useState<File[]>([]);
-  const imageUrls = getPreviewImageURLs(files);
+  const { mutateAsync: uploadImages, isLoading: isUploadingImages } = useUploadAsset("images", project_id as string);
+  const { mutateAsync: uploadMapImages, isLoading: isUploadingMapImages } = useUploadAsset("map_images", project_id as string);
+  const [images, setImages] = useState<File[]>([]);
+  const [mapImages, setMapImages] = useState<File[]>([]);
+
+  const imageUrls = getPreviewImageURLs(images);
+  const mapImageUrls = getPreviewImageURLs(mapImages);
   return (
     <div className="flex h-full flex-col justify-start gap-y-2 overflow-hidden p-2">
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       <div className={imageUploadContainer()}>
-        <ImageUpload images={files} onChange={setFiles} />
+        <ImageUpload images={selectedTab ? mapImages : images} onChange={selectedTab ? setMapImages : setImages} />
       </div>
       <div className={imagesList()}>
-        {imageUrls?.length && !isMutating
+        {imageUrls?.length && !isUploadingImages && selectedTab === 0
           ? imageUrls.map((img) => (
               <ImagePreview
                 key={`${img.name}${img.url}`}
-                clearAction={(name) => setFiles((prev) => prev.filter((f) => f.name !== name))}
+                clearAction={(name) => {
+                  if (selectedTab) setImages((prev) => prev.filter((f) => f.name !== name));
+                  else setMapImages((prev) => prev.filter((f) => f.name !== name));
+                }}
+                id={img.name}
+                title={img.name}
+                url={img.url}
+              />
+            ))
+          : null}
+        {mapImageUrls?.length && !isUploadingMapImages && selectedTab === 1
+          ? mapImageUrls.map((img) => (
+              <ImagePreview
+                key={`${img.name}${img.url}`}
+                clearAction={(name) => {
+                  if (selectedTab) setImages((prev) => prev.filter((f) => f.name !== name));
+                  else setMapImages((prev) => prev.filter((f) => f.name !== name));
+                }}
                 id={img.name}
                 title={img.name}
                 url={img.url}
@@ -52,11 +83,13 @@ export function ImageUploadDialog({ size, type }: { size: Size; type: AssetType 
       <div className="mt-auto">
         <Button
           icon={IconEnum.upload}
-          isDisabled={isMutating}
-          isLoading={isMutating}
-          label={isMutating ? "Uploading..." : "Upload"}
+          isDisabled={isUploadingImages || isUploadingMapImages}
+          isLoading={isUploadingImages || isUploadingMapImages}
+          label={isUploadingImages || isUploadingMapImages ? "Uploading..." : "Upload"}
           onClick={async () => {
-            if (files) await mutateAsync(files);
+            if (images.length) await uploadImages(images);
+            if (mapImages.length) await uploadMapImages(mapImages);
+            resetDialogAtom();
           }}
           variant="info"
         />
