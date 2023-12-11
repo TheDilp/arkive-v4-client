@@ -8,7 +8,7 @@ import {
   AvailableSubEntityType,
   ConversationType,
   DictionaryType,
-  MapLayers,
+  MapLayerType,
   MapPinType,
   MapType,
   MessageType,
@@ -74,7 +74,7 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
               set(
                 temp,
                 `data.${type}`,
-                ((temp?.data?.[type] as (MapLayers | MapPinType)[]) || [])?.filter((item) => item?.id !== vars.data.id),
+                ((temp?.data?.[type] as (MapLayerType | MapPinType)[]) || [])?.filter((item) => item?.id !== vars.data.id),
               );
               return temp;
             }

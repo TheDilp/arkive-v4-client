@@ -2,7 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 
-import { AvailableEntityType, AvailableSubEntityType, EdgeType, GraphType, NodeType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  EdgeType,
+  GraphType,
+  MapLayerType,
+  MapPinType,
+  MapType,
+  NodeType,
+} from "../../types";
 import {
   baseURLS,
   edgesAtom,
@@ -116,6 +125,25 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
       onMutate: (vars) => {
         const parentEntityType = getParentEntityType(type);
 
+        if (parentEntityType === "maps") {
+          const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
+          queryClient.setQueryData<{ data: MapType }>([parentEntityType, vars.data.parent_id], (oldData) =>
+            oldData
+              ? {
+                  ...oldData,
+                  data: {
+                    ...oldData?.data,
+                    [type]: (oldData.data?.[type as "map_pins" | "map_layers"] || []).concat(
+                      vars.data as MapPinType | MapLayerType,
+                    ),
+                  },
+                }
+              : oldData,
+          );
+
+          return { old };
+        }
+
         if (parentEntityType === "graphs") {
           const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
           queryClient.setQueryData<{ data: GraphType }>([parentEntityType, vars.data.parent_id], (oldData) =>
@@ -144,7 +172,12 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
       },
       onSuccess: (data, vars) => {
         const parentEntityType = getParentEntityType(type);
-        if (parentEntityType && parentEntityType !== "documents" && parentEntityType !== "graphs") {
+        if (
+          parentEntityType &&
+          parentEntityType !== "documents" &&
+          parentEntityType !== "maps" &&
+          parentEntityType !== "graphs"
+        ) {
           queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
           queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
         }
