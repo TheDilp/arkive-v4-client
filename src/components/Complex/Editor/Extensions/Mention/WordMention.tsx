@@ -14,7 +14,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
     id as string,
     "words",
     { fields: ["id", "title", "translation", "description"] },
-    { enabled: !!id, queryKeyConcat: ["mention"], staleTime: 5 * 60 * 1000 },
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000 },
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow-lg">
@@ -33,10 +33,18 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   );
 }
 export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
+  const { data } = useGetSubEntity<WordType>(
+    id as string,
+    "words",
+    {
+      fields: ["id", "title"],
+    },
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false },
+  );
   return (
     <Tooltip arrowColor="#3f3f46" content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
       <span className="cursor-pointer text-sm font-light italic">
-        {title || label}
+        {data?.data?.title || title || label}
         <sup>*</sup>
       </span>
     </Tooltip>
