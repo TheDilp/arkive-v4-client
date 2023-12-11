@@ -1,15 +1,13 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
-import { useResetAtom } from "jotai/utils";
 
 import { AssetType, RequestBodyType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
-import { baseURLS, dialogAtom, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
+import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
 export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
-  const resetDialogAtom = useResetAtom(dialogAtom);
   return useMutation(
     async (images: File[]) => {
       const formData = new FormData();
@@ -34,7 +32,6 @@ export function useUploadAsset(type: AssetType, project_id: string) {
             timer: 5,
           });
         queryClient.invalidateQueries(["allEntities", project_id, type]);
-        resetDialogAtom();
       },
     },
   );

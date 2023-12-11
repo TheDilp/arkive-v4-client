@@ -80,8 +80,8 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
             onChange={changeMapPinFilters}
             options={[
               { label: "All map pins", value: "all" },
-              { label: "Have documents", value: "documents" },
-              { label: "Have linked maps", value: "linked_maps" },
+              { label: "With documents", value: "documents" },
+              { label: "With linked maps", value: "linked_maps" },
             ]}
             placeholder="Filter"
             value={mapPinFilters}
