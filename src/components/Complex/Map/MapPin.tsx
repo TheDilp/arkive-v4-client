@@ -94,6 +94,7 @@ export function MapPin({
               onClick: () =>
                 setDrawer((prev) => ({
                   ...prev,
+                  title: "Edit map pin",
                   type: "map_pins",
                   data: markerData,
                   exceptions: { characterPin: !!character && !!character_id },

@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
-import { MapImage } from "../../components";
+import { MapImage, Select } from "../../components";
 import { useChangeNavbarTitle, useGetEntity } from "../../hooks";
-import { MapType } from "../../types";
+import { MapPinFilterType, MapType, onChangeValue } from "../../types";
 import { getImageURL } from "../../utils";
 
 type Props = {
@@ -19,6 +19,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapPinFilters, setMapPinFilters] = useState<MapPinFilterType[]>(["all"]);
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
 
@@ -35,6 +36,14 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   );
   const currentMap = data || existingMap?.data;
   useChangeNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
+
+  function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
+    if (Array.isArray(value)) {
+      if (value.includes("all") && !mapPinFilters.includes("all")) setMapPinFilters(["all"]);
+      else if (mapPinFilters.includes("all")) setMapPinFilters(value.filter((v) => v !== "all") as MapPinFilterType[]);
+      else setMapPinFilters(value as MapPinFilterType[]);
+    }
+  }
 
   useEffect(() => {
     if (currentMap && currentMap?.image_id && !bounds) {
@@ -62,6 +71,22 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+      <div className="w-full">
+        <div className="relative mb-3 ml-auto w-52">
+          <Select
+            isMultiple
+            name="mapPinFilter"
+            onChange={changeMapPinFilters}
+            options={[
+              { label: "All map pins", value: "all" },
+              { label: "Have documents", value: "documents" },
+              { label: "Have linked maps", value: "linked_maps" },
+            ]}
+            placeholder="Filter"
+            value={mapPinFilters}
+          />
+        </div>
+      </div>
       {loading || isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
       {currentMap && !isFetching && !loading && !!bounds ? (
         <div className="h-full w-full overflow-hidden">
@@ -85,6 +110,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
               isReadOnly={isReadOnly}
               isViewOnly={isViewOnly}
               mapData={currentMap}
+              mapPinFilters={mapPinFilters}
               src={getImageURL(project_id as string, "map_images", currentMap?.image_id)}
             />
           </MapContainer>

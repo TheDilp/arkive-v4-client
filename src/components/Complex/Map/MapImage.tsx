@@ -1,11 +1,11 @@
 import { useSetAtom } from "jotai";
 import { LatLngBoundsExpression } from "leaflet";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
-import { MapPinType, MapType } from "../../../types";
+import { MapPinFilterType, MapPinType, MapType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
@@ -18,58 +18,37 @@ type Props = {
   isViewOnly?: boolean;
   isClusteringPins: boolean;
   center_on?: string;
+  mapPinFilters: MapPinFilterType[];
 };
 
-export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly, isClusteringPins, center_on }: Props) {
+export function MapImage({
+  mapData,
+  src,
+  bounds,
+  imgRef,
+  isReadOnly,
+  isViewOnly,
+  isClusteringPins,
+  center_on,
+  mapPinFilters,
+}: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
-  const [markerFilter, setMarkerFilter] = useState<"map" | "doc" | "character" | false>(false);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   function PinFilter(mapPin: MapPinType) {
-    if (isReadOnly) {
-      if (mapPin.is_public) {
-        if (markerFilter === "map") {
-          return false;
-        }
-        if (markerFilter === "doc") {
-          return Boolean(mapPin.doc_id);
-        }
-        return true;
-      }
-      return false;
-    }
-    if (markerFilter === "character") {
-      return !!mapPin?.character_id && !!mapPin?.character;
-    }
-    if (markerFilter === "map") {
+    if (mapPin.character_id) return true;
+    if (mapPinFilters.includes("all")) return true;
+
+    if (mapPinFilters.includes("linked_maps")) {
       return Boolean(mapPin.map_link);
     }
-    if (markerFilter === "doc") {
+    if (mapPinFilters.includes("documents")) {
       return Boolean(mapPin.doc_id);
     }
     return true;
   }
-  function handleKeyUp(e: KeyboardEvent) {
-    if (!e.shiftKey && !e.altKey) {
-      setMarkerFilter(false);
-    }
-  }
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.shiftKey && e.altKey) {
-      setMarkerFilter(false);
-      return;
-    }
-    if (e.shiftKey) {
-      if (e.key === "C") {
-        setMarkerFilter("character");
-      } else {
-        setMarkerFilter("map");
-      }
-    } else if (e.altKey) {
-      setMarkerFilter("doc");
-    }
-  }
+
   const setDrawer = useSetAtom(drawerAtom);
 
   const map = useMapEvents({
@@ -127,14 +106,6 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
       }
     },
   });
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
 
   useEffect(() => {
     if ((subitem_id || center_on) && mapData && firstRender.current) {
@@ -147,6 +118,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
       firstRender.current = false;
     };
   }, [subitem_id, bounds]);
+
   if (!map) return null;
 
   const { nonCharacterPins, characterPins }: { nonCharacterPins: MapPinType[]; characterPins: MapPinType[] } = (
@@ -171,9 +143,8 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
       <LayersControl.BaseLayer checked name="Map">
         <ImageOverlay ref={imgRef} bounds={bounds} url={src} />
       </LayersControl.BaseLayer>
-
       {/* Markers layer */}
-      <LayersControl.Overlay checked name="Markers">
+      <LayersControl.Overlay checked name="Map pins">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
             {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
@@ -189,7 +160,7 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
         )}
       </LayersControl.Overlay>
       {/* Characters layer */}
-      <LayersControl.Overlay checked name="Characters">
+      <LayersControl.Overlay checked name="Character pins">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
             {characterPins?.filter(PinFilter)?.map((pin) => (
@@ -204,14 +175,10 @@ export function MapImage({ mapData, src, bounds, imgRef, isReadOnly, isViewOnly,
           </LayerGroup>
         )}
       </LayersControl.Overlay>
+
       <LayerGroup>
         {mapData?.map_layers?.length
           ? mapData.map_layers
-              .sort((a, b) => {
-                if (a.title > b.title) return 1;
-                if (a.title < b.title) return -1;
-                return 0;
-              })
               .filter((layer) => layer.image_id && (isReadOnly ? layer.is_public : true))
               .map((layer) => {
                 return (

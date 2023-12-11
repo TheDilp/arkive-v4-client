@@ -133,34 +133,46 @@ export function MapPinDrawer({ data, exceptions }: Props) {
 
                 <div className="flex flex-col justify-between">
                   <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Icon</span>
-                  <div className="flex items-center gap-x-2 pb-2">
-                    <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.color as string} />
-                    <IconPicker
-                      icon={mapPin.icon || ""}
-                      iconColor={mapPin.color || "#ffffff"}
-                      name="icon"
-                      onChange={handleChange}
-                    />
+                  <div className="flex w-16 items-center gap-x-2 pb-2">
+                    <div className="w-1/2">
+                      <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.color as string} />
+                    </div>
+                    <div className="w-1/2">
+                      <IconPicker
+                        icon={mapPin.icon || ""}
+                        iconColor={mapPin.color || "#ffffff"}
+                        name="icon"
+                        onChange={handleChange}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-nowrap justify-between">
                 <span className="block min-h-[20px] truncate">Marker border:</span>
-                <div className="flex items-center gap-x-2 pb-2">
-                  <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
-                  <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
+                <div className="flex w-16 items-center gap-x-2 pb-2">
+                  <div className="w-1/2">
+                    <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
+                  </div>
+                  <div className="w-1/2">
+                    <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
+                  </div>
                 </div>
               </div>
               <div className="flex flex-nowrap justify-between">
                 <span className="block min-h-[20px] truncate">Marker background:</span>
-                <div className="flex items-center gap-x-2 pb-2">
-                  <ColorPicker
-                    hasCustom
-                    name="background_color"
-                    onChange={handleChange}
-                    value={mapPin.background_color as string}
-                  />
-                  <Checkbox name="show_background" onChange={handleChange} value={mapPin?.show_background} />
+                <div className="flex w-16 items-center gap-x-2 pb-2">
+                  <div className="w-1/2">
+                    <ColorPicker
+                      hasCustom
+                      name="background_color"
+                      onChange={handleChange}
+                      value={mapPin.background_color as string}
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <Checkbox name="show_background" onChange={handleChange} value={mapPin?.show_background} />
+                  </div>
                 </div>
               </div>
               <div className="flex flex-nowrap justify-between">
