@@ -235,6 +235,39 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   value={mapPin.doc_id || ""}
                 />
               )}
+              {mapPin?.linked_map ? (
+                <div className="w-full">
+                  <EntityPreview
+                    clearAction={() =>
+                      handleChange([
+                        {
+                          name: "map_link",
+                          value: null,
+                        },
+                        { name: "linked_map", value: null },
+                      ])
+                    }
+                    id={mapPin.linked_map.id}
+                    image_id={mapPin?.linked_map?.image_id}
+                    label="Linked map"
+                    title={mapPin.linked_map?.title}
+                    type="maps"
+                  />
+                </div>
+              ) : (
+                <Search
+                  imageType="map_images"
+                  label="Linked map"
+                  name="map_link"
+                  onChange={({ name, label, value, image }) => {
+                    handleChange([
+                      { name, value },
+                      { name: "linked_map", value: { title: label, id: value, image } },
+                    ]);
+                  }}
+                  searchEntity="maps"
+                />
+              )}
             </div>
           ) : null}
         </>

@@ -430,7 +430,11 @@ export function Search({
                   isActive={activeIndex === index}
                   isSelected={(value || [])?.includes(item.value)}>
                   {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                  ((searchEntity === "places" || searchEntity === "characters" || searchEntity === "all") && item?.image) ? (
+                  ((searchEntity === "places" ||
+                    searchEntity === "maps" ||
+                    searchEntity === "characters" ||
+                    searchEntity === "all") &&
+                    item?.image) ? (
                     <Avatar
                       image={getImageURL(
                         project_id as string,
