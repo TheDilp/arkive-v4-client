@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
-import { contextMenuAtom, dialogAtom, drawerAtom, getCharacterFullName, getImageURL, IconEnum } from "../../../utils";
+import { contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 
 export function MapPin({
   map_id,
@@ -109,6 +109,7 @@ export function MapPin({
                   data: {
                     ...markerData,
                     entity_title: "map_pins",
+                    title: markerData?.character?.full_name || markerData?.title,
                   },
                   title: "Delete map pin",
                   size: "sm",
@@ -168,9 +169,7 @@ export function MapPin({
       position={position}>
       {title || isCharacterPin ? (
         <Tooltip direction="top">
-          <div className="Lato text-center">
-            {title || getCharacterFullName(character.first_name, undefined, character.last_name)}
-          </div>
+          <div className="Lato text-center">{title || character?.full_name}</div>
         </Tooltip>
       ) : null}
     </Marker>
