@@ -13,7 +13,12 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
   const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
     id as string,
     "words",
-    { fields: ["id", "title", "translation", "description"] },
+    {
+      data: {
+        id,
+      },
+      fields: ["id", "title", "translation", "description"],
+    },
     { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000 },
   );
   return (
@@ -37,6 +42,9 @@ export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
     id as string,
     "words",
     {
+      data: {
+        id,
+      },
       fields: ["id", "title"],
     },
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false },
