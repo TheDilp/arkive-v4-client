@@ -135,7 +135,19 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 <Select
                   label="Map pin type (optional)"
                   name="map_pin_type_id"
-                  onChange={handleChange}
+                  onChange={({ name, value }) => {
+                    const mapPinType = existingMapPinTypes?.data?.find((type) => type.id === value);
+                    const valuesToChange = [{ name, value }];
+                    if (mapPinType) {
+                      if (mapPinType.default_icon) {
+                        valuesToChange.push({ name: "icon", value: mapPinType.default_icon });
+                      }
+                      if (mapPinType.default_icon_color) {
+                        valuesToChange.push({ name: "color", value: mapPinType.default_icon_color });
+                      }
+                    }
+                    handleChange(valuesToChange);
+                  }}
                   options={(existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }))}
                   value={mapPin?.map_pin_type_id}
                 />
