@@ -63,4 +63,3 @@ export interface MapPinTypesType {
 }
 
 export type CharacterLocationType = Pick<MapType, "id" | "title" | "image_id"> & { map_pin_id: string };
-export type MapPinFilterType = "all" | "linked_maps" | "documents";

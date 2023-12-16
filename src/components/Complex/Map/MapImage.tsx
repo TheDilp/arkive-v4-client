@@ -5,7 +5,7 @@ import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-lea
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
-import { MapPinFilterType, MapPinType, MapType } from "../../../types";
+import { MapPinType, MapType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
@@ -18,7 +18,7 @@ type Props = {
   isViewOnly?: boolean;
   isClusteringPins: boolean;
   center_on?: string;
-  mapPinFilters: MapPinFilterType[];
+  mapPinFilters: string[];
 };
 
 export function MapImage({
@@ -40,17 +40,19 @@ export function MapImage({
     if (mapPin.character_id) return true;
     if (mapPinFilters.includes("all")) return true;
 
-    if (mapPinFilters.includes("linked_maps")) {
-      return Boolean(mapPin.map_link);
+    if (mapPinFilters.includes("linked_maps") && !!mapPin.map_link) {
+      return true;
     }
-    if (mapPinFilters.includes("documents")) {
-      return Boolean(mapPin.doc_id);
+    if (mapPinFilters.includes("documents") && !!mapPin.doc_id) {
+      return true;
     }
-    return true;
+    if (!mapPinFilters.includes("all") && mapPin.map_pin_type_id) {
+      return mapPinFilters.includes(mapPin.map_pin_type_id);
+    }
+    return false;
   }
 
   const setDrawer = useSetAtom(drawerAtom);
-
   const map = useMapEvents({
     contextmenu(e: any) {
       if (!isReadOnly && !isViewOnly) {

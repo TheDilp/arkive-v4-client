@@ -4,8 +4,8 @@ import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { MapImage, Select } from "../../components";
-import { useChangeNavbarTitle, useGetEntity } from "../../hooks";
-import { MapPinFilterType, MapType, onChangeValue } from "../../types";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
+import { MapPinTypesType, MapType, onChangeValue } from "../../types";
 import { getImageURL } from "../../utils";
 
 type Props = {
@@ -19,7 +19,13 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mapPinFilters, setMapPinFilters] = useState<MapPinFilterType[]>(["all"]);
+  const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
+    { data: { project_id } },
+    "map_pin_types",
+  );
+  const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
+  const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
+
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
 
@@ -40,9 +46,9 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
     if (Array.isArray(value)) {
       if (value.includes("all") && !mapPinFilters.includes("all")) setMapPinFilters(["all"]);
-      else if (mapPinFilters.includes("all")) setMapPinFilters(value.filter((v) => v !== "all") as MapPinFilterType[]);
+      else if (mapPinFilters.includes("all")) setMapPinFilters(value.filter((v) => v !== "all"));
       else if (value.length === 0) setMapPinFilters(["all"]);
-      else setMapPinFilters(value as MapPinFilterType[]);
+      else setMapPinFilters(value);
     }
   }
 
@@ -75,6 +81,9 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
       <div className="w-full">
         <div className="relative mb-3 ml-auto w-52">
           <Select
+            hasSearch
+            isDisabled={isInitialLoadingTypes}
+            isLoading={isInitialLoadingTypes}
             isMultiple
             name="mapPinFilter"
             onChange={changeMapPinFilters}
@@ -82,7 +91,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
               { label: "All map pins", value: "all" },
               { label: "With documents", value: "documents" },
               { label: "With linked maps", value: "linked_maps" },
-            ]}
+            ].concat(mapPinTypes)}
             placeholder="Filter"
             value={mapPinFilters}
           />
