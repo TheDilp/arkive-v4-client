@@ -14,6 +14,7 @@ export type AvailableEntityType =
   | "characters"
   | "documents"
   | "maps"
+  | "map_pin_types"
   | "graphs"
   | "screens"
   | "dictionaries"
@@ -43,7 +44,6 @@ export type AvailableSubEntityType =
   | "random_table_options"
   | "character_fields"
   | "blueprint_instances"
-  | "map_pin_types"
   | "messages";
 
 export type SearchableEntities =

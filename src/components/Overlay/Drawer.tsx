@@ -32,6 +32,7 @@ import {
   MapDrawer,
   MapPinDrawer,
   MapPinManagementDrawer,
+  MapPinTypeDrawer,
   MemberAddDrawer,
   MentionedInDocumentDrawer,
   MentionedInDrawer,
@@ -141,6 +142,7 @@ export function Drawer() {
           {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
           {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
           {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
+          {drawer.type === "map_pin_types" ? <MapPinTypeDrawer data={drawer?.data} /> : null}
           {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
           {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
           {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}

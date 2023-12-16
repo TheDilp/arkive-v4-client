@@ -23,6 +23,7 @@ export * from "./ManyNodesDrawer";
 export * from "./MapDrawer";
 export * from "./MapPinDrawer";
 export * from "./MapPinManagementDrawer";
+export * from "./MapPinTypeDrawer";
 export * from "./MemberAddDrawer";
 export * from "./MentionedInDocumentDrawer";
 export * from "./MentionedInDrawer";

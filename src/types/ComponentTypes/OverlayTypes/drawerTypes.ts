@@ -70,7 +70,8 @@ export type DrawerAtomType = {
         | "dictionaries"
         | "random_tables"
         | "random_table_option"
-        | "character_relationship_types";
+        | "character_relationship_types"
+        | "map_pin_types";
       data: { id?: string; project_id?: string };
     }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }

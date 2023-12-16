@@ -27,7 +27,7 @@ import {
   useTable,
   useUpdateEntity,
 } from "../../hooks";
-import { CharacterRelationshipType, DialogAtomType, ProjectType, UserType, WebhookType } from "../../types";
+import { CharacterRelationshipType, DialogAtomType, DrawerAtomType, ProjectType, UserType, WebhookType } from "../../types";
 import {
   AllEntities,
   capitalizeFirstLetter,
@@ -54,7 +54,10 @@ const tabs = [
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
 const membersColumnHelper = createColumnHelper<UserType>();
 
-function mapPinTypeTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+function mapPinTypeTableColumns(
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+) {
   return [
     relationshipTypesColumnHelper.display({
       id: "title",
@@ -73,6 +76,23 @@ function mapPinTypeTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomTyp
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
+              {
+                id: "update_map_pin_type",
+                title: "Edit map pin type",
+                icon: IconEnum.edit,
+                onClick: () => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: {
+                      id: row.original.id,
+                      title: row.original.title,
+                    },
+                    title: "Edit map pin type",
+                    size: "sm",
+                    type: "map_pin_types",
+                  }));
+                },
+              },
               {
                 id: "delete_map_pin_type",
                 title: "Delete map pin type",
@@ -224,7 +244,11 @@ export function ProjectSettingsView() {
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
 
   const [, dispatch] = useTable({});
-  const { data: projectData, isLoading } = useGetEntity<ProjectType>(
+  const {
+    data: projectData,
+    isLoading,
+    isFetching,
+  } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
     {
@@ -249,7 +273,7 @@ export function ProjectSettingsView() {
 
   useLayoutEffect(() => {
     if (projectData?.data) setProject(projectData.data);
-  }, [projectData]);
+  }, [projectData, isFetching]);
 
   useEffect(() => {
     if (selectedTab === 3 && !isProjectOwner) {
@@ -262,6 +286,14 @@ export function ProjectSettingsView() {
       const parsedData = UpdateProjectSchema.parse({ data: project });
       await updateProject(parsedData);
     }
+  }
+  function handleOpenNewMapPinTypeDrawer() {
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Create new map pin type",
+      type: "map_pin_types",
+      data: { project_id },
+    }));
   }
   function handleOpenNewRelationshipTypeDrawer() {
     setDrawer((prev) => ({
@@ -327,13 +359,7 @@ export function ProjectSettingsView() {
             ) : null}
             {selectedTab === 1 ? (
               <div className="ml-auto w-min">
-                <Button
-                  icon={IconEnum.add}
-                  label="Create"
-                  onClick={handleOpenNewRelationshipTypeDrawer}
-                  size="sm"
-                  variant="info"
-                />
+                <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewMapPinTypeDrawer} size="sm" variant="info" />
               </div>
             ) : null}
             {selectedTab === 2 ? (
@@ -401,7 +427,7 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
-                  columns={mapPinTypeTableColumns(setDialog)}
+                  columns={mapPinTypeTableColumns(setDialog, setDrawer)}
                   data={projectData?.data?.map_pin_types || []}
                   dispatch={dispatch}
                   type="map_pin_types"
