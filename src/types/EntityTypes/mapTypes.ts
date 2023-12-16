@@ -48,11 +48,18 @@ export interface MapPinType {
   doc_id?: string | null;
   image_id?: string | null;
   character_id?: string | null;
-
+  map_pin_type_id?: string | null;
   document?: DocumentType;
   linked_map?: MapType;
   image?: ImageType;
   character?: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
+  map_pin_type?: MapPinType | null;
+}
+
+export interface MapPinTypesType {
+  id: string;
+  title: string;
+  project_id: string;
 }
 
 export type CharacterLocationType = Pick<MapType, "id" | "title" | "image_id"> & { map_pin_id: string };

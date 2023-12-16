@@ -43,6 +43,7 @@ export type AvailableSubEntityType =
   | "random_table_options"
   | "character_fields"
   | "blueprint_instances"
+  | "map_pin_types"
   | "messages";
 
 export type SearchableEntities =

@@ -9,7 +9,7 @@ import { DictionaryType } from "./dictionaryTypes";
 import { DocumentType } from "./documentTypes";
 import { GraphType } from "./graphTypes";
 import { ImageType } from "./imageTypes";
-import { MapType } from "./mapTypes";
+import { MapPinTypesType, MapType } from "./mapTypes";
 import { RandomTableType } from "./randomTableTypes";
 
 export interface ProjectType {
@@ -22,6 +22,7 @@ export interface ProjectType {
   // show_image_folder_view?: boolean;
   // show_image_table_view?: boolean;
   character_relationship_types?: CharacterRelationshipType[];
+  map_pin_types?: MapPinTypesType[];
   members: UserType[];
 }
 

@@ -45,14 +45,59 @@ import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
-  { id: "2", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "3", label: "Members", icon: IconEnum.users, isOwner: true },
-  { id: "4", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
+  { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
+  { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
+  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "5", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
 const membersColumnHelper = createColumnHelper<UserType>();
 
+function mapPinTypeTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
+  return [
+    relationshipTypesColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <b>{row.original.title}</b>,
+    }),
+
+    relationshipTypesColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "delete_map_pin_type",
+                title: "Delete map pin type",
+                icon: IconEnum.trash,
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: "map_pin_types",
+                    },
+                    title: "Delete map pin type",
+                    size: "sm",
+                    type: "delete_entity",
+                  }));
+                },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
   return [
     relationshipTypesColumnHelper.display({
@@ -93,7 +138,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
                       ...row.original,
                       entity_title: "character_relationship_types",
                     },
-                    title: "Delete character",
+                    title: "Delete relationship type",
                     size: "sm",
                     type: "delete_entity",
                   }));
@@ -107,6 +152,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
     }),
   ];
 }
+
 function membersColumns() {
   return [
     membersColumnHelper.display({
@@ -184,6 +230,7 @@ export function ProjectSettingsView() {
     {
       fields: ["id", "title", "image_id", "default_dice_color", "owner_id"],
       relations: {
+        map_pin_types: true,
         character_relationship_types: true,
         members: true,
       },
@@ -292,6 +339,17 @@ export function ProjectSettingsView() {
             {selectedTab === 2 ? (
               <div className="ml-auto w-min">
                 <Button
+                  icon={IconEnum.add}
+                  label="Create"
+                  onClick={handleOpenNewRelationshipTypeDrawer}
+                  size="sm"
+                  variant="info"
+                />
+              </div>
+            ) : null}
+            {selectedTab === 3 ? (
+              <div className="ml-auto w-min">
+                <Button
                   icon={IconEnum.user_invite}
                   label="Invite"
                   onClick={handleOpenInviteToProjectDrawer}
@@ -304,10 +362,10 @@ export function ProjectSettingsView() {
           {selectedTab === 0 ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
               <div className=" grid grid-cols-12 gap-2">
-                <div className="col-span-12 lg:col-span-9">
+                <div className="col-span-12 lg:col-span-8">
                   <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
                 </div>
-                <div className="col-span-12 lg:col-span-3">
+                <div className="col-span-12 lg:col-span-4">
                   <ImageSelect
                     isIconOnly={isLg}
                     label="Project image"
@@ -343,6 +401,18 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
+                  columns={mapPinTypeTableColumns(setDialog)}
+                  data={projectData?.data?.map_pin_types || []}
+                  dispatch={dispatch}
+                  type="map_pin_types"
+                />
+              </div>
+            </div>
+          ) : null}
+          {selectedTab === 2 ? (
+            <div className="h-full">
+              <div className="h-fit w-full">
+                <Table
                   columns={relationshipTableColumns(setDialog)}
                   data={projectData?.data?.character_relationship_types || []}
                   dispatch={dispatch}
@@ -351,7 +421,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 2 ? (
+          {selectedTab === 3 ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -363,7 +433,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 3 ? (
+          {selectedTab === 4 ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
                 {AllEntities.map((entity) => (
