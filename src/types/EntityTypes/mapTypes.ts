@@ -60,6 +60,8 @@ export interface MapPinTypesType {
   id: string;
   title: string;
   project_id: string;
+  default_icon?: string | null;
+  default_icon_color?: string | null;
 }
 
 export type CharacterLocationType = Pick<MapType, "id" | "title" | "image_id"> & { map_pin_id: string };

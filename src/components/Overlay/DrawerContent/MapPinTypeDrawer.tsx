@@ -5,11 +5,12 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { MapPinTypesType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinTypeSchema, UpdateMapPinTypeSchema } from "../../../validation/maps/map_pin_types";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Skeleton } from "../../Misc";
+import { ColorPicker, IconPicker } from "..";
 
 type Props = {
   data: {
@@ -52,6 +53,29 @@ export function MapPinTypeDrawer({ data }: Props) {
   return (
     <DrawerLayout>
       <Input label="Title" name="title" onChange={handleChange} value={mapPinType.title || ""} />
+
+      <div className="flex items-center justify-between">
+        <span>Default icon color:</span>
+        <div className="flex w-8 justify-center">
+          <ColorPicker
+            hasCustom
+            name="default_icon_color"
+            onChange={handleChange}
+            value={mapPinType.default_icon_color || DefaultTagColor}
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Default icon:</span>
+        <div className="flex w-8 justify-center">
+          <IconPicker
+            icon={mapPinType.default_icon || ""}
+            iconColor={mapPinType.default_icon_color || DefaultTagColor}
+            name="default_icon"
+            onChange={handleChange}
+          />
+        </div>
+      </div>
 
       <Button
         icon={mapPinType?.id ? IconEnum.save : IconEnum.add}

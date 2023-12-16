@@ -11,6 +11,7 @@ import {
   ColorPicker,
   createColumnHelper,
   Dropdown,
+  Icon,
   ImageSelect,
   Input,
   Skeleton,
@@ -27,7 +28,15 @@ import {
   useTable,
   useUpdateEntity,
 } from "../../hooks";
-import { CharacterRelationshipType, DialogAtomType, DrawerAtomType, ProjectType, UserType, WebhookType } from "../../types";
+import {
+  CharacterRelationshipType,
+  DialogAtomType,
+  DrawerAtomType,
+  MapPinTypesType,
+  ProjectType,
+  UserType,
+  WebhookType,
+} from "../../types";
 import {
   AllEntities,
   capitalizeFirstLetter,
@@ -51,6 +60,7 @@ const tabs = [
   { id: "5", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
+const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
 const membersColumnHelper = createColumnHelper<UserType>();
 
@@ -59,13 +69,39 @@ function mapPinTypeTableColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
 ) {
   return [
-    relationshipTypesColumnHelper.display({
+    mapPinTypesColumnHelper.display({
       id: "title",
       header: "Title",
       cell: ({ row }) => <b>{row.original.title}</b>,
     }),
+    mapPinTypesColumnHelper.display({
+      id: "default_icon",
+      header: "Default icon",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (row.original.default_icon ? <Icon fontSize={24} icon={row.original.default_icon} /> : null),
+      maxSize: 1.75,
+    }),
+    mapPinTypesColumnHelper.display({
+      id: "default_icon_color",
+      header: "Default icon color",
+      cell: ({ row }) =>
+        row.original.default_icon_color ? (
+          <div className="flex w-full justify-center">
+            <div
+              className="h-6 w-6 select-none rounded-full shadow"
+              style={{ backgroundColor: row.original.default_icon_color }}
+            />
+          </div>
+        ) : null,
+      meta: {
+        centered: true,
+      },
+      maxSize: 2,
+    }),
 
-    relationshipTypesColumnHelper.display({
+    mapPinTypesColumnHelper.display({
       id: "action",
       header: "Actions",
       meta: {

@@ -19,7 +19,7 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
               e.stopPropagation();
             }}>
             <Input
-              helperText={!value.length || validateHexCode(value) ? "" : "This is not a valid hex code."}
+              helperText={!value?.length || validateHexCode(value) ? "" : "This is not a valid hex code."}
               label="Custom color"
               name="customColor"
               onChange={(e) => {
