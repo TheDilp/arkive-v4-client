@@ -18,6 +18,7 @@ export const InsertMapPinSchema = z.object({
     doc_id: z.string().nullable().optional(),
     image_id: z.string().nullable().optional(),
     character_id: z.string().nullable().optional(),
+    map_pin_type_id: z.string().nullable().optional(),
   }),
 });
 export const UpdateMapPinSchema = z.object({
@@ -37,6 +38,7 @@ export const UpdateMapPinSchema = z.object({
     doc_id: z.string().nullable().optional(),
     image_id: z.string().nullable().optional(),
     character_id: z.string().nullable().optional(),
+    map_pin_type_id: z.string().nullable().optional(),
   }),
 });
 

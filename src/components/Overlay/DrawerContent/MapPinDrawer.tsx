@@ -2,12 +2,12 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
-import { MapPinType } from "../../../types";
+import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
+import { MapPinType, MapPinTypesType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
-import { Button, Checkbox, Input, Search } from "../../Form";
+import { Button, Checkbox, Input, Search, Select } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker, IconPicker } from "..";
@@ -42,11 +42,13 @@ const tabs = [
 ];
 
 export function MapPinDrawer({ data, exceptions }: Props) {
-  const { item_id } = useParams();
+  const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const [mapPin, setMapPin] = useState<Partial<MapPinType>>({
     parent_id: item_id as string,
   });
+
+  const { data: existingMapPinTypes } = useGetEntities<MapPinTypesType>({ data: { project_id } }, "map_pin_types");
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { data: existingMapPin, isFetching } = useGetSubEntity<MapPinType>(
@@ -90,6 +92,8 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     }
   }, [character]);
 
+  console.log(mapPin);
+
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
@@ -130,11 +134,17 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           {selectedTab === 0 ? (
             <>
               <div className="flex flex-nowrap gap-x-2">
-                <Input label="Map pin title (optional)" name="title" onChange={handleChange} value={mapPin?.title || ""} />
+                <Select
+                  label="Map pin type (optional)"
+                  name="map_pin_type_id"
+                  onChange={handleChange}
+                  options={(existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }))}
+                  value={mapPin?.map_pin_type_id}
+                />
 
-                <div className="flex flex-col justify-between">
-                  <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Icon</span>
-                  <div className="flex w-16 items-center gap-x-2 pb-2">
+                <div className="flex w-16 flex-col justify-between">
+                  <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Icon (required)</span>
+                  <div className="flex items-center justify-end pb-2">
                     <div className="w-1/2">
                       <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.color as string} />
                     </div>
@@ -148,6 +158,9 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div>
+                <Input label="Map pin title (optional)" name="title" onChange={handleChange} value={mapPin?.title || ""} />
               </div>
               <div className="flex flex-nowrap justify-between">
                 <span className="block min-h-[20px] truncate">Marker border:</span>
