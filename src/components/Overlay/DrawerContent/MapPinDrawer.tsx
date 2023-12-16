@@ -92,8 +92,6 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     }
   }, [character]);
 
-  console.log(mapPin);
-
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
