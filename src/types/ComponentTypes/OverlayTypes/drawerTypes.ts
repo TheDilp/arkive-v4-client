@@ -90,7 +90,7 @@ export type DrawerAtomType = {
     }
   | {
       type: "mentioned_in";
-      data: { id: string; title: string; icon?: string };
+      data: { id: string; title: string; icon?: string; isAll?: boolean };
     }
   | { type: "autolinker"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string; title: string } }
   | { type: "map_pin_management"; data: { map_id: string } }

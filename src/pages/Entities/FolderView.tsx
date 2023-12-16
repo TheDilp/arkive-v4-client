@@ -424,6 +424,23 @@ export function FolderView() {
           <Breadcrumbs />
           {!item_id || data?.data?.is_folder ? (
             <div className="flex min-w-fit gap-x-2">
+              <div className="w-10">
+                <Button
+                  icon={IconEnum.graph}
+                  isIconOnly
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      size: "half",
+                      type: "mentioned_in",
+                      title: "All document mentions",
+                      data: { id: "", title: "", icon: "", isAll: true },
+                    }))
+                  }
+                  tooltip="View all document connections"
+                />
+              </div>
+
               <div className="w-32">
                 <Select
                   name="view"
