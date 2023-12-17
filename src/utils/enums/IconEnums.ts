@@ -80,6 +80,7 @@ export const IconEnum = {
   numbered_list: "ph:list-numbers",
   permissions: "ph:key",
   public: "ph:globe",
+  pdf: "ph:file-pdf",
   quote: "ph:quotes",
   random_table: "game-icons:perspective-dice-six-faces-random",
   save: "ph:floppy-disk",

@@ -52,6 +52,7 @@ import {
   getSingularEntityType,
   IconEnum,
   PublicEntities,
+  savePDF,
   userAtom,
   userSettingsAtom,
 } from "../../utils";
@@ -131,98 +132,117 @@ function columns(
       meta: {
         centered: true,
       },
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Dropdown
-            allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
-                icon: IconEnum.edit,
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: `Edit ${entityName} - ${row.original.title}`,
-                    size: "lg",
-                    type: entityType,
-                  }));
+      cell: ({ row }) => {
+        const actions: {
+          id: string;
+          title: string;
+          icon: string;
+          onClick?: () => void;
+          isDisabled?: boolean;
+          subItems?: {
+            id: string;
+            title: string;
+            onClick: () => Promise<any>;
+          }[];
+        }[] = [
+          {
+            id: "1",
+            title: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
+            icon: IconEnum.edit,
+            onClick: () => {
+              setDrawer((prev) => ({
+                ...prev,
+                data: row.original,
+                title: `Edit ${entityName} - ${row.original.title}`,
+                size: "lg",
+                type: entityType,
+              }));
+            },
+          },
+        ];
+
+        if (entityType === "documents") {
+          actions.push({
+            id: "mentioned_in",
+            title: "Mentioned in",
+            icon: IconEnum.graph,
+            onClick: () => {
+              setDrawer((prev) => ({
+                ...prev,
+                title: "Mentioned in",
+                data: { id: row.original.id, title: row.original.title, icon: row.original.icon ?? undefined },
+                type: "mentioned_in",
+                size: "half",
+              }));
+            },
+          });
+        }
+        if (PublicEntities.includes(entityType)) {
+          actions.push(
+            {
+              id: "view_public",
+              title: "View public page",
+              icon: IconEnum.public,
+              onClick: () => window.open(`/public/${project_id}/documents/${row.original.id}`, "_blank"),
+              isDisabled: !row.original.is_public,
+            },
+            {
+              id: "send_to_discord",
+              title: "Send to Discord",
+              icon: IconEnum.discord,
+              isDisabled: !row.original.is_public,
+              subItems: webhooks.map((webhook) => ({
+                id: webhook.id,
+                title: webhook.title,
+                onClick: () =>
+                  FetchFunction({
+                    url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                    body: JSON.stringify({
+                      data: { id: row.original.id, type: entityType },
+                    }),
+                    method: "POST",
+                  }),
+              })),
+            },
+          );
+        }
+        if (entityType === "dictionaries") {
+          actions.push({
+            id: "download_dictionary",
+            title: "Download PDF dictionary",
+            icon: IconEnum.pdf,
+            onClick: () => savePDF(row.original.title, row.original.id),
+          });
+
+          // ALWAYS GOES LAST
+          actions.push({
+            id: "delete_entity",
+            title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
+            icon: IconEnum.trash,
+            onClick: () => {
+              setDialog((prev) => ({
+                ...prev,
+                data: {
+                  ...row.original,
+                  entity_title: entityType,
                 },
-              },
-              ...(entityType === "documents"
-                ? [
-                    {
-                      id: "mentioned_in",
-                      title: "Mentioned in",
-                      icon: IconEnum.graph,
-                      onClick: () => {
-                        setDrawer((prev) => ({
-                          ...prev,
-                          title: "Mentioned in",
-                          data: { id: row.original.id, title: row.original.title, icon: row.original.icon ?? undefined },
-                          type: "mentioned_in",
-                          size: "half",
-                        }));
-                      },
-                    },
-                  ]
-                : []),
+                title: `Delete ${getSingularEntityType(entityType)}`,
+                size: "sm",
+                type: "delete_entity",
+                isOverlay: true,
+              }));
+            },
+          });
+        }
 
-              ...(PublicEntities.includes(entityType)
-                ? [
-                    {
-                      id: "view_public",
-                      title: "View public page",
-                      icon: IconEnum.public,
-                      onClick: () => window.open(`/public/${project_id}/documents/${row.original.id}`, "_blank"),
-                      isDisabled: !row.original.is_public,
-                    },
-
-                    {
-                      id: "send_to_discord",
-                      title: "Send to Discord",
-                      icon: IconEnum.discord,
-                      isDisabled: !row.original.is_public,
-                      subItems: webhooks.map((webhook) => ({
-                        id: webhook.id,
-                        title: webhook.title,
-                        onClick: () =>
-                          FetchFunction({
-                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                            body: JSON.stringify({
-                              data: { id: row.original.id, type: entityType },
-                            }),
-                            method: "POST",
-                          }),
-                      })),
-                    },
-                  ]
-                : []),
-
-              {
-                id: "delete_entity",
-                title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
-                icon: IconEnum.trash,
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: entityType,
-                    },
-                    title: `Delete ${getSingularEntityType(entityType)}`,
-                    size: "sm",
-                    type: "delete_entity",
-                    isOverlay: true,
-                  }));
-                },
-              },
-            ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-          </Dropdown>
-        </div>
-      ),
+        return (
+          <div className="flex items-center justify-center">
+            <Dropdown allowedPlacements={["left", "left-start", "left-end"]} items={actions}>
+              <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+            </Dropdown>
+          </div>
+        );
+      },
     }),
   ];
 }
