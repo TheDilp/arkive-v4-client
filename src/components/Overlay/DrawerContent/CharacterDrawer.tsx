@@ -689,60 +689,61 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />
       ) : null}
+      <div>
+        <Button
+          icon={character?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(character) || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={character?.id ? "Update" : "Create"}
+          onClick={async () => {
+            if (changedData) {
+              if (character?.id && existingCharacter?.data) {
+                const dataToParse = {
+                  data: character,
+                  relations: {
+                    tags: character?.tags?.map((t) => ({ id: t.id })),
+                    character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
+                    related_from: character?.related_from,
+                    related_to: character?.related_to,
+                    related_other: character?.related_other,
+                  },
+                };
+                if (dataToParse?.data?.portrait?.id) {
+                  dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+                }
+                const parsedData = UpdateCharacterSchema.parse(dataToParse);
 
-      <Button
-        icon={character?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(character) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={character?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (changedData) {
-            if (character?.id && existingCharacter?.data) {
-              const dataToParse = {
-                data: character,
-                relations: {
-                  tags: character?.tags?.map((t) => ({ id: t.id })),
-                  character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
-                  related_from: character?.related_from,
-                  related_to: character?.related_to,
-                  related_other: character?.related_other,
-                },
-              };
-              if (dataToParse?.data?.portrait?.id) {
-                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+                await update(parsedData, {
+                  onSuccess: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                });
+              } else {
+                const dataToParse = {
+                  data: character,
+                  relations: {
+                    tags: character?.tags?.map((t) => ({ id: t.id })),
+                    character_fields: character?.character_fields || [],
+                    related_from: character?.related_from,
+                    related_to: character?.related_to,
+                    related_other: character?.related_other,
+                  },
+                };
+                if (dataToParse?.data?.portrait?.id) {
+                  dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+                }
+                const parsedData = InsertCharacterSchema.parse(dataToParse);
+                await create(parsedData, {
+                  onSuccess: (res) => {
+                    if (res?.ok) resetDrawerAtom();
+                  },
+                });
               }
-              const parsedData = UpdateCharacterSchema.parse(dataToParse);
-
-              await update(parsedData, {
-                onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
-                },
-              });
-            } else {
-              const dataToParse = {
-                data: character,
-                relations: {
-                  tags: character?.tags?.map((t) => ({ id: t.id })),
-                  character_fields: character?.character_fields || [],
-                  related_from: character?.related_from,
-                  related_to: character?.related_to,
-                  related_other: character?.related_other,
-                },
-              };
-              if (dataToParse?.data?.portrait?.id) {
-                dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-              }
-              const parsedData = InsertCharacterSchema.parse(dataToParse);
-              await create(parsedData, {
-                onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
-                },
-              });
             }
-          }
-        }}
-        variant="success"
-      />
+          }}
+          variant="success"
+        />
+      </div>
     </DrawerLayout>
   );
 }
