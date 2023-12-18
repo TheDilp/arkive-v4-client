@@ -429,8 +429,9 @@ export function useAddToEntity<InsertType extends { relations: { [key: string]: 
     },
   );
 }
-export function useRemoveFromEntity<InsertType extends { data: { [key: string]: string | { data: { id: string } } } }>(
+export function useRemoveFromEntity<InsertType extends { relations: { [key: string]: { id: string }[] } }>(
   type: AvailableEntityType,
+  id: string,
   project_id: string,
 ) {
   const queryClient = useQueryClient();
@@ -439,16 +440,16 @@ export function useRemoveFromEntity<InsertType extends { data: { [key: string]: 
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/remove/${updateValues?.data?.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/remove/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
     },
     {
-      onSettled: (data, _, vars) => {
+      onSettled: (data) => {
         if (data.ok) {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
-          queryClient.invalidateQueries([type, vars.data.id]);
+          queryClient.invalidateQueries([type, id]);
 
           createNotification({
             title: data?.message || "Item successfully removed.",

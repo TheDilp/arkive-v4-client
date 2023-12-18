@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { DocumentType, UpdateDocumentType } from "../../../types";
+import { DocumentType, InsertDocumentType, UpdateDocumentType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { ImageSelect } from "../../Complex";
@@ -13,10 +13,6 @@ import { DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
-
-interface InsertDocumentType extends Omit<DocumentType, "alter_names"> {
-  alter_names: { title: string }[];
-}
 
 function isSaveDisabled(document: Partial<DocumentType>) {
   if (!document.title) return true;

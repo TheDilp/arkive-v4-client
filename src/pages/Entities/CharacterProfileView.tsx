@@ -211,24 +211,8 @@ function disableShowRelationshipTree(character: CharacterType | undefined) {
   return false;
 }
 function documentsTableColumns(
-  removeItem: UseMutateAsyncFunction<
-    any,
-    unknown,
-    {
-      data: {
-        [key: string]:
-          | string
-          | {
-              data: {
-                id: string;
-              };
-            };
-      };
-    },
-    unknown
-  >,
+  removeItem: UseMutateAsyncFunction<any, unknown, { relations: { [key: string]: { id: string }[] } }, unknown>,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
-  character_id: string,
   project_id: string,
 ) {
   return [
@@ -289,7 +273,7 @@ function documentsTableColumns(
                 title: "Remove document",
                 icon: IconEnum.trash,
                 onClick: async () => {
-                  await removeItem({ data: { id: character_id, document: { data: { id: row.original.id } } } });
+                  await removeItem({ relations: { documents: [{ id: row.original.id }] } });
                 },
               },
             ]}>
@@ -348,14 +332,10 @@ function assetTableColumns(
     any,
     unknown,
     {
-      data: {
-        [key: string]:
-          | string
-          | {
-              data: {
-                id: string;
-              };
-            };
+      relations: {
+        [key: string]: {
+          id: string;
+        }[];
       };
     },
     unknown
@@ -700,7 +680,6 @@ function AdditionalFieldDisplay({
   const value = character_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: character_field.field_type || "text", isPreview });
-
   return (
     <div className={fieldClasses}>
       {character_field.field_type === "text" ||
@@ -720,7 +699,7 @@ function AdditionalFieldDisplay({
           label={character_field.title}
           name={character_field.title}
           onChange={() => {}}
-          value={character_field?.options?.find((opt) => opt.id === character_field_data?.id)?.value || ""}
+          value={character_field?.options?.find((opt) => opt.id === character_field_data?.value)?.value || ""}
         />
       ) : null}
       {character_field.field_type === "textarea" && isRemirrorJSON(value) ? (
@@ -846,7 +825,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
     },
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
-  const { mutateAsync: removeItem } = useRemoveFromEntity("characters", project_id as string);
+  const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
 
   const relationships = [
@@ -1089,7 +1068,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                 {existingCharacter?.data?.documents?.length ? (
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     <Table
-                      columns={documentsTableColumns(removeItem, setDrawer, existingCharacter?.data?.id, project_id as string)}
+                      columns={documentsTableColumns(removeItem, setDrawer, project_id as string)}
                       config={{
                         expandable: true,
                         hasNoHeaderGap: true,
