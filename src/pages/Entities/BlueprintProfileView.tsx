@@ -290,6 +290,7 @@ function AdditionalFieldDisplay({
             type: "images",
           }))}
           isOpenable
+          type="images"
         />
       ) : null}
       {blueprint_field.field_type === "random_table" ? (

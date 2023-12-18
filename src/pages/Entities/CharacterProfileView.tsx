@@ -778,6 +778,7 @@ function AdditionalFieldDisplay({
             type: "images",
           }))}
           isOpenable
+          type="images"
         />
       ) : null}
       {character_field.field_type === "random_table" ? (
@@ -1143,7 +1144,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                         type="images"
                       />
                     ) : (
-                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable size="2xl" />
+                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable size="2xl" type="images" />
                     )}
                   </div>
                 ) : (

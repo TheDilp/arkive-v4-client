@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, ImageType, WebhookType } from "../../types";
+import { AssetType, DialogAtomType, DrawerAtomType, ImageType, WebhookType } from "../../types";
 import {
   baseURLS,
   dialogAtom,
@@ -153,6 +153,7 @@ export function AssetView() {
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
+  const [type, setType] = useState<AssetType>("images");
   const [{ orderBy, filters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -161,7 +162,7 @@ export function AssetView() {
 
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
-    "images",
+    type,
     { orderBy, filters, pagination },
     { enabled: view === "table", prefetch: true },
   );
@@ -183,7 +184,7 @@ export function AssetView() {
         },
       ],
     },
-    "images",
+    type,
     project_id,
     {
       enabled: view === "card",
@@ -233,6 +234,20 @@ export function AssetView() {
             onChange={({ value }) => setFilter(value as string)}
             placeholder="Quick search by title"
             value={filter}
+          />
+        </div>
+        <div className="w-32">
+          <Select
+            name="type"
+            onChange={({ value }) => {
+              setType(value as "images" | "map_images");
+            }}
+            options={[
+              { label: "Images", value: "images", icon: IconEnum.image },
+              { label: "Map images", value: "map_images", icon: IconEnum.map },
+            ]}
+            placeholder="Type"
+            value={type}
           />
         </div>
         <div className="w-32">
@@ -288,7 +303,7 @@ export function AssetView() {
               <div
                 key={img.id}
                 className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
-                <Image hasTitle image={img} isLazyLoading isOpenable />
+                <Image hasTitle image={img} isLazyLoading isOpenable type={type} />
               </div>
             )),
           )}
