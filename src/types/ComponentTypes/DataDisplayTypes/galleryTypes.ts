@@ -1,4 +1,4 @@
-import { Size } from "../../baseTypes";
+import { AssetType, Size } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
 export interface GalleryType {
@@ -6,4 +6,5 @@ export interface GalleryType {
   columns: number;
   isOpenable?: boolean;
   size?: Size;
+  type: AssetType;
 }

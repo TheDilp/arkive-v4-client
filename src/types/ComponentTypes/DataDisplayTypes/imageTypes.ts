@@ -1,4 +1,4 @@
-import { BaseComponentType } from "../../baseTypes";
+import { AssetType, BaseComponentType } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
 export interface ImageComponentType extends BaseComponentType {
@@ -7,4 +7,5 @@ export interface ImageComponentType extends BaseComponentType {
   hasTitle?: boolean;
   isLazyLoading?: boolean;
   url?: string;
+  type: AssetType;
 }

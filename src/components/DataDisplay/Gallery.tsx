@@ -56,7 +56,7 @@ function getRowSize(size: Size): number {
   return 12;
 }
 
-export function Gallery({ images, isOpenable, columns = 4, size = "md" }: GalleryType) {
+export function Gallery({ images, isOpenable, columns = 4, size = "md", type }: GalleryType) {
   const { container, base } = GalleryClasses({ columns });
   const rowSize = getRowSize(size);
   return (
@@ -68,7 +68,7 @@ export function Gallery({ images, isOpenable, columns = 4, size = "md" }: Galler
           gridAutoRows: `${rowSize}rem`,
         }}>
         {images.map((image) => (
-          <Image key={image.id} image={image} isOpenable={isOpenable} />
+          <Image key={image.id} image={image} isOpenable={isOpenable} type={type} />
         ))}
       </div>
     </div>
