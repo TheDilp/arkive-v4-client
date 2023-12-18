@@ -1,5 +1,6 @@
 import { Dispatch } from "react";
 
+import { AssetType } from "../../baseTypes";
 import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType } from "../../CRUD/CRUDTypes";
 import { AvailableEntityType } from "../../EntityTypes";
 import { ButtonType } from "../FormTypes";
@@ -84,7 +85,7 @@ export interface TableType {
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => Promise<void>;
   };
-  type: AvailableEntityType | "random_table_options" | "icons" | "words" | "context" | "images" | "map_pin_types";
+  type: AvailableEntityType | AssetType | "random_table_options" | "icons" | "words" | "context" | "map_pin_types";
   skeletonLimit?: number;
 }
 

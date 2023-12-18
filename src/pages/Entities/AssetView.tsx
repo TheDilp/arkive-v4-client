@@ -36,6 +36,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   downloadImage: downloadImageMutationType,
   webhooks: WebhookType[],
+  type: AssetType,
 ) {
   return [
     columnHelper.display({
@@ -45,7 +46,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(row.original.project_id, "images", row.original?.id || "")}
+            image={getImageURL(row.original.project_id, type, row.original?.id || "")}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}
@@ -311,7 +312,7 @@ export function AssetView() {
       ) : (
         <div className="h-full max-h-[95%] w-full overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [])}
+            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [], type)}
             config={{
               hasSelect: true,
               orderBy,
@@ -322,7 +323,7 @@ export function AssetView() {
             dispatch={dispatch}
             isLoading={isLoading}
             pagination={pagination}
-            type="images"
+            type={type}
           />
         </div>
       )}
