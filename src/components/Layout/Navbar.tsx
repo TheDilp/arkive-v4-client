@@ -16,6 +16,7 @@ import {
   IconEnum,
   navbarTitleAtom,
   useNotifications,
+  userAtom,
 } from "../../utils";
 import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
@@ -72,7 +73,8 @@ export function Navbar() {
   const isMutating = useIsMutating();
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
-  const { user } = useUser();
+  const { user: authUser } = useUser();
+  const user = useAtomValue(userAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -102,6 +104,7 @@ export function Navbar() {
     userId: string;
     nickname?: string;
     userImageUrl?: string;
+    notification_type: string;
   }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
@@ -109,16 +112,17 @@ export function Navbar() {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
         if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
-        if (user?.id && lastJsonMessage.userId && user?.id === lastJsonMessage?.userId) return;
-        createNotification({
-          icon: getDefaultEntityIcon(lastJsonMessage.entity),
-          title: lastJsonMessage.message,
-          image_id: lastJsonMessage.image_id,
-          variant: "info",
-          timer: 5,
-          image_url: lastJsonMessage.userImageUrl,
-          hasNoTruncate: true,
-        });
+        if (authUser?.id && lastJsonMessage.userId && authUser?.id === lastJsonMessage?.userId) return;
+        if (user?.feature_flags?.[lastJsonMessage?.notification_type])
+          createNotification({
+            icon: getDefaultEntityIcon(lastJsonMessage.entity),
+            title: lastJsonMessage.message,
+            image_id: lastJsonMessage.image_id,
+            variant: "info",
+            timer: 5,
+            image_url: lastJsonMessage.userImageUrl,
+            hasNoTruncate: true,
+          });
       }
     }
   }, [lastJsonMessage]);
