@@ -1,9 +1,10 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 
 import { Avatar, Badge, Button, createColumnHelper, Dropdown, Table, TablePageLayout, Tooltip } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
@@ -149,8 +150,8 @@ function createColumns(
 
   blueprint.blueprint_fields
     ?.filter((field) => field.field_type !== "textarea")
-    .slice(0, 6)
-    .forEach((field) => {
+    ?.slice(0, 6)
+    ?.forEach((field) => {
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
       fieldColumns.push(
         columnHelper.display({
@@ -364,6 +365,7 @@ export function BlueprintInstanceView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const resetDialog = useResetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const navigate = useNavigate();
@@ -383,7 +385,7 @@ export function BlueprintInstanceView() {
     fields: ["id", "title", "title_name"],
   });
   useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
-
+  const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", project_id);
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
@@ -440,6 +442,46 @@ export function BlueprintInstanceView() {
               hasSelect: true,
               hasTags: true,
               selection,
+              selectedActions: [
+                {
+                  icon: IconEnum.trash,
+                  variant: "error",
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Delete selected rows.",
+                  onClick: () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    if (ids.length) {
+                      setDialog((prev) => ({
+                        ...prev,
+                        title: "Delete many",
+                        description: `Are you sure you want to delete ${ids.length} ${
+                          ids.length > 1 ? "blueprint instances" : "blueprint instance"
+                        }?`,
+                        warning: "This action cannot be undone.",
+                        isOverlay: true,
+                        cancel: {
+                          label: "Cancel",
+                          variant: "primary",
+                          action: resetDialog,
+                        },
+                        confirm: {
+                          label: "Delete",
+                          icon: IconEnum.trash,
+                          action: async () =>
+                            deleteMany(
+                              { data: { ids } },
+                              {
+                                onSuccess: () => dispatch({ type: "clearSelection" }),
+                              },
+                            ),
+                          variant: "error",
+                        },
+                      }));
+                    }
+                  },
+                },
+              ],
               getLink: (rowData: BlueprintInstanceType) =>
                 `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`,
             }}
