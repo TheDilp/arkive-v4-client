@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 
 import { HandleChangePropsType, TagType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
 import { Badge } from "../Misc";
 import { Search } from "./Search";
 
@@ -14,7 +13,6 @@ type Props = {
 
 export function TagInput({ tags, label: componentLabel, handleChange, isMultiple }: Props) {
   const { project_id } = useParams();
-  const createNotification = useNotifications();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
@@ -23,11 +21,9 @@ export function TagInput({ tags, label: componentLabel, handleChange, isMultiple
         name="tags"
         onChange={({ name, label, value, color }) => {
           if ((tags || [])?.some((tag) => tag.id === value)) {
-            createNotification({
-              title: "Cannot add the same tag twice.",
-              variant: "warning",
-              icon: IconEnum.info_circle,
-              timer: 3,
+            handleChange({
+              name,
+              value: (tags || []).filter((t) => t.id !== value),
             });
             return;
           }
