@@ -11,7 +11,6 @@ export const AllEntities = [
   "events",
   "dictionaries",
   "words",
-  "screens",
   "character_fields_templates",
   "character_fields",
   "conversations",
@@ -105,4 +104,20 @@ export const PublicEntities = [
   "graphs",
   "dictionaries",
   "random_tables",
+];
+
+export const UserNotificationEntities = [
+  "characters",
+  "blueprints",
+  "blueprint_instances",
+  "documents",
+  "maps",
+  "map_pins",
+  "graphs",
+  "calendars",
+  "events",
+  "dictionaries",
+  "words",
+  "character_fields_templates",
+  "tags",
 ];

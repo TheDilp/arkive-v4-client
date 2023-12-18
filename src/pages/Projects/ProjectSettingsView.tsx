@@ -41,7 +41,6 @@ import {
   WebhookType,
 } from "../../types";
 import {
-  AllEntities,
   capitalizeFirstLetter,
   DefaultTagColor,
   dialogAtom,
@@ -52,6 +51,7 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   userAtom,
+  UserNotificationEntities,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
@@ -505,7 +505,7 @@ export function ProjectSettingsView() {
           {selectedTab === finalTabs.length - 1 ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
-                {AllEntities.map((entity) => (
+                {UserNotificationEntities.map((entity) => (
                   <div
                     key={entity}
                     className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">

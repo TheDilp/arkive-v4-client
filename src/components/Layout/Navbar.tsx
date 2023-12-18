@@ -1,5 +1,5 @@
 import { UserButton, useUser } from "@clerk/clerk-react";
-import { useIsMutating } from "@tanstack/react-query";
+import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useLayoutEffect, useState } from "react";
@@ -13,6 +13,7 @@ import {
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
+  getEntityTypeFromNotificationType,
   IconEnum,
   navbarTitleAtom,
   useNotifications,
@@ -70,6 +71,7 @@ function DiceRoller() {
 
 export function Navbar() {
   const { project_id, subitem_id } = useParams();
+  const queryClient = useQueryClient();
   const isMutating = useIsMutating();
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
@@ -113,7 +115,8 @@ export function Navbar() {
         // Don't create a notification if this is a conversation message
         if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
         if (authUser?.id && lastJsonMessage.userId && authUser?.id === lastJsonMessage?.userId) return;
-        if (user?.feature_flags?.[lastJsonMessage?.notification_type])
+        if (lastJsonMessage?.notification_type && user?.feature_flags?.[lastJsonMessage?.notification_type]) {
+          const entityType = getEntityTypeFromNotificationType(lastJsonMessage?.notification_type);
           createNotification({
             icon: getDefaultEntityIcon(lastJsonMessage.entity),
             title: lastJsonMessage.message,
@@ -123,6 +126,8 @@ export function Navbar() {
             image_url: lastJsonMessage.userImageUrl,
             hasNoTruncate: true,
           });
+          queryClient.invalidateQueries(["allEntities", project_id, entityType]);
+        }
       }
     }
   }, [lastJsonMessage]);

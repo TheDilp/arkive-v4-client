@@ -337,9 +337,14 @@ export function chooseRandomItems(
   return randomItems;
 }
 
-export function getIconUrlFromIconEnum(icon: string, color?: string) {
+export function getIconUrlFromIconEnum(icon: string, color?: string): string {
   const iconComponents = icon.split(":");
   return `https://api.iconify.design/${iconComponents[0]}/${iconComponents[1]}.svg${
     color ? `?color=${color.replace("#", "%23")}` : ""
   }`;
+}
+
+export function getEntityTypeFromNotificationType(notification_type: string): string {
+  const entityType = notification_type.replace("_notification", "").replace(/_(create|update|delete)/, "");
+  return entityType;
 }
