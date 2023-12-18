@@ -50,6 +50,7 @@ export function Dashboard() {
                           id: r.id,
                           parent_id: "parent_id" in r ? r?.parent_id ?? undefined : undefined,
                           entity_type: d.name as AvailableEntityType,
+                          isReadOnly: d.name === "events",
                         },
                         type: "entity_preview",
                         size: "half",

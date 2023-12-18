@@ -98,7 +98,7 @@ export type DrawerAtomType = {
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } } }
-  | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number } }
+  | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } }
   | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
   | {
       type: "edit_message";

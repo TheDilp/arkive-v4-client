@@ -15,14 +15,13 @@ import {
   getImageURL,
   getSearchLink,
   IconEnum,
-  useNotifications,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
-import { Button, Input, Search, Select, Textarea } from "../../Form";
+import { Button, Input, Search, Select, TagInput, Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
-import { Badge, Skeleton } from "../../Misc";
+import { Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
 
 function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrect: boolean }) {
@@ -35,7 +34,7 @@ function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrec
   return false;
 }
 
-type Props = { data: { id?: string; day?: number; month?: number; year?: number } };
+type Props = { data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } };
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Details", icon: IconEnum.edit },
@@ -46,7 +45,6 @@ export function EventDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const hasId = "id" in data && data?.id;
   const [selectedTab, setSelectedTab] = useState(0);
-  const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
@@ -58,11 +56,10 @@ export function EventDrawer({ data }: Props) {
     },
     { enabled: !!data?.id },
   );
-
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
-    { data: { parent_id: item_id }, orderBy: [{ field: "sort", sort: "asc" }] },
+    { data: { parent_id: item_id || existingEvent?.data?.parent_id }, orderBy: [{ field: "sort", sort: "asc" }] },
     "months",
-    { staleTime: 5 * 60 * 1000 },
+    { enabled: !!existingEvent?.data, staleTime: 5 * 60 * 1000 },
   );
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
@@ -155,6 +152,7 @@ export function EventDrawer({ data }: Props) {
         <>
           <div className="flex flex-nowrap gap-x-2">
             <Input
+              isDisabled={data?.isReadOnly}
               label="Event title (required)"
               name="title"
               onChange={handleChange}
@@ -164,12 +162,19 @@ export function EventDrawer({ data }: Props) {
             <div className="flex flex-col justify-between">
               <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Color</span>
               <div className="flex items-center justify-center gap-x-2 pb-2">
-                <ColorPicker hasCustom name="background_color" onChange={handleChange} value={event.background_color || ""} />
+                <ColorPicker
+                  hasCustom
+                  isDisabled={data?.isReadOnly}
+                  name="background_color"
+                  onChange={handleChange}
+                  value={event.background_color || ""}
+                />
               </div>
             </div>
           </div>
           <div className="flex items-center justify-between gap-x-2">
             <Input
+              isDisabled={data?.isReadOnly}
               label="Start day (required)"
               max={existingMonths?.data?.[event?.start_month || 0]?.days ?? 0}
               min={1}
@@ -179,7 +184,7 @@ export function EventDrawer({ data }: Props) {
               value={event?.start_day || ""}
             />
             <Select
-              isDisabled={isFetchingMonths}
+              isDisabled={isFetchingMonths || data?.isReadOnly}
               isLoading={isFetchingMonths}
               label="Start month (required)"
               name="start_month"
@@ -188,6 +193,7 @@ export function EventDrawer({ data }: Props) {
               value={typeof event?.start_month === "number" ? existingMonths?.data?.[event.start_month].id : undefined}
             />
             <Input
+              isDisabled={data?.isReadOnly}
               label="Start year (required)"
               name="start_year"
               onChange={handleChange}
@@ -198,7 +204,7 @@ export function EventDrawer({ data }: Props) {
           <div className="grid grid-cols-3 gap-x-2">
             <Input
               helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
-              isDisabled={typeof event?.end_month !== "number"}
+              isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
               label="End day (optional)"
               max={typeof event.end_month === "number" ? existingMonths?.data[event.end_month].days : 0}
               min={1}
@@ -212,7 +218,7 @@ export function EventDrawer({ data }: Props) {
             <Select
               helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
               isClearable
-              isDisabled={isFetchingMonths}
+              isDisabled={isFetchingMonths || data?.isReadOnly}
               isLoading={isFetchingMonths}
               label="End month (optional)"
               name="end_month"
@@ -223,7 +229,7 @@ export function EventDrawer({ data }: Props) {
             />
             <Input
               helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-              isDisabled={typeof event?.end_month !== "number"}
+              isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
               label="End year (optional)"
               name="end_year"
               onChange={handleChange}
@@ -235,8 +241,16 @@ export function EventDrawer({ data }: Props) {
           </div>
 
           <div className="flex items-center gap-x-2">
-            <Input label="Hour (optional)" name="hours" onChange={handleChange} type="number" value={event?.hours || ""} />
             <Input
+              isDisabled={data?.isReadOnly}
+              label="Hour (optional)"
+              name="hours"
+              onChange={handleChange}
+              type="number"
+              value={event?.hours || ""}
+            />
+            <Input
+              isDisabled={data?.isReadOnly}
               label="Minutes (optional)"
               name="minutes"
               onChange={handleChange}
@@ -251,6 +265,7 @@ export function EventDrawer({ data }: Props) {
         <>
           <div>
             <Textarea
+              isDisabled={data?.isReadOnly}
               label="Event description (optional)"
               name="description"
               onChange={handleChange}
@@ -261,7 +276,13 @@ export function EventDrawer({ data }: Props) {
           <div>
             {event?.image?.id ? (
               <ImagePreview
-                clearAction={() => handleChange({ name: "image", value: null })}
+                clearAction={
+                  data?.isReadOnly
+                    ? undefined
+                    : () => {
+                        handleChange({ name: "image", value: null });
+                      }
+                }
                 id={event.image.id}
                 label="Event image (optional)"
                 title={event.image.title}
@@ -269,6 +290,7 @@ export function EventDrawer({ data }: Props) {
               />
             ) : (
               <ImageSelect
+                isDisabled={data?.isReadOnly}
                 label="Event image (optional)"
                 name="image"
                 onChange={handleImageChange}
@@ -280,7 +302,7 @@ export function EventDrawer({ data }: Props) {
           <div>
             {event?.document ? (
               <EntityPreview
-                clearAction={() => handleChange({ name: "document", value: null })}
+                clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "document", value: null })}
                 icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
                 id={event.document.id}
                 label="Document"
@@ -299,6 +321,7 @@ export function EventDrawer({ data }: Props) {
               />
             ) : (
               <Search
+                isDisabled={data?.isReadOnly}
                 label="Event document (optional)"
                 name="document"
                 onChange={handleImageChange}
@@ -307,66 +330,22 @@ export function EventDrawer({ data }: Props) {
               />
             )}
           </div>
-          <div>{/* <Search label="Document (optional)" searchEntity="documents" /> */}</div>
         </>
       ) : null}
       {selectedTab === 2 ? (
-        <>
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((event?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-
-              handleChange({
-                name,
-                value: (event?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags."
-            searchEntity="tags"
-            value={undefined}
-          />
-
-          <div className="flex flex-wrap gap-2">
-            {event?.tags?.length
-              ? event.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (event?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        </>
+        <TagInput handleChange={handleChange} isDisabled={data?.isReadOnly} isMultiple tags={event?.tags || []} />
       ) : null}
 
-      <Button
-        icon={hasId ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={hasId ? "Save" : "Create"}
-        onClick={handleSave}
-        variant="success"
-      />
+      {data?.isReadOnly ? null : (
+        <Button
+          icon={hasId ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={hasId ? "Save" : "Create"}
+          onClick={handleSave}
+          variant="success"
+        />
+      )}
     </div>
   );
 }

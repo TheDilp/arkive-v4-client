@@ -71,6 +71,7 @@ export function ColorPicker({ name, value, hasCustom, onChange, isDisabled }: Co
       arrowColor="#18181B"
       content={<ColorPalette hasCustom={hasCustom} isDisabled={isDisabled} name={name} onChange={onChange} value={value} />}
       isClickable
+      isDisabled={isDisabled}
       passCloseTooltip>
       <div
         className="h-6 w-6 cursor-pointer rounded-full"

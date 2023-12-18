@@ -11,6 +11,7 @@ import { Graph } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
+import { EventDrawer } from "./EventDrawer";
 
 export function CharacterPreviewDrawer({ id }: { id: string }) {
   return <CharacterProfileView id={id} isPreview />;
@@ -96,9 +97,9 @@ export function DictionaryPreviewDrawer({ id }: { id?: string }) {
 export function CalendarPreviewDrawer({ id }: { id?: string }) {
   return <CalendarView id={id} />;
 }
-// export function EventPreviewDrawer({ parent_id, id }: { parent_id?: string; id?: string }) {
-//   return null;
-// }
+export function EventPreviewDrawer({ id }: { id?: string }) {
+  return <EventDrawer data={{ id, isReadOnly: true }} />;
+}
 
 export function EntityPreviewDrawer({
   data,
@@ -119,7 +120,7 @@ export function EntityPreviewDrawer({
         {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
-        {/* {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null} */}
+        {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} /> : null}
       </div>
       <div className="">
         <Button
