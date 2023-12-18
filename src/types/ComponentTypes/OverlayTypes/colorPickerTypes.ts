@@ -4,6 +4,7 @@ export interface ColorPickerType {
   hasCustom?: boolean;
   onChange: ({ name, value }: { name: string; value: string }) => void;
   closeTooltip?: () => void;
+  isDisabled?: boolean;
 }
 
 export interface ColorPaletteType {
@@ -12,4 +13,5 @@ export interface ColorPaletteType {
   hasCustom?: boolean;
   closeTooltip?: () => void;
   onChange: ({ name, value }: { name: string; value: string }) => void;
+  isDisabled?: boolean;
 }

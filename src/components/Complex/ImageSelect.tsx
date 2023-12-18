@@ -5,7 +5,7 @@ import { dialogAtom, IconEnum } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Search } from "../Form";
 
-export function ImageSelect({ name, onChange, label, value, type, isIconOnly, helperText }: ImageSelectType) {
+export function ImageSelect({ name, onChange, label, value, type, isIconOnly, helperText, isDisabled }: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
 
   return (
@@ -15,7 +15,13 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
         <div className="col-span-4">
           {value ? (
             <EntityPreview
-              clearAction={() => onChange({ name, value: "" })}
+              clearAction={
+                isDisabled
+                  ? undefined
+                  : () => {
+                      onChange({ name, value: "" });
+                    }
+              }
               id={value as string}
               image_id={value as string}
               title={label || ""}
@@ -26,6 +32,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
               helperText={helperText}
               imageType={type}
               isAutocomplete
+              isDisabled={isDisabled}
               limit={100}
               name={name}
               onChange={onChange}
@@ -39,6 +46,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
         <div className="col-span-2">
           <Button
             icon={IconEnum.upload}
+            isDisabled={isDisabled}
             isIconOnly={isIconOnly}
             label="Upload new"
             onClick={() =>

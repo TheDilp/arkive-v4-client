@@ -6,4 +6,5 @@ export interface ImageSelectType
     Pick<ButtonType, "isIconOnly"> {
   label?: string;
   type: AssetType;
+  isDisabled?: boolean;
 }

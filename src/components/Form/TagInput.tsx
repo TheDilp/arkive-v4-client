@@ -9,13 +9,15 @@ type Props = {
   tags: TagType[];
   handleChange: (newData: HandleChangePropsType) => void;
   isMultiple?: boolean;
+  isDisabled?: boolean;
 };
 
-export function TagInput({ tags, label: componentLabel, handleChange, isMultiple }: Props) {
+export function TagInput({ tags, label: componentLabel, handleChange, isMultiple, isDisabled }: Props) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
+        isDisabled={isDisabled}
         isMultiple={isMultiple}
         label={componentLabel || ""}
         name="tags"
