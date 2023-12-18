@@ -33,7 +33,6 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
   return (
     <span
       className={BadgeClasses({ variant, hasClearAction: !!clearAction, size, isColorWhite: customColor === "#ffffff" })}
-      onClick={clearAction}
       onKeyDown={() => {}}
       role="button"
       style={{
