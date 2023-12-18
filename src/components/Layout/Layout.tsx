@@ -23,7 +23,7 @@ export function ProjectLayout() {
       relations: {
         webhooks: true,
       },
-      fields: ["id"],
+      fields: ["id", "feature_flags"],
     },
     { enabled: !!user?.id },
   );

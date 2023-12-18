@@ -1,6 +1,8 @@
+import { useUser } from "@clerk/clerk-react";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { deepMerge } from "remirror";
 
 import {
   Alert,
@@ -27,6 +29,7 @@ import {
   useHandleChange,
   useTable,
   useUpdateEntity,
+  useUpdateUser,
 } from "../../hooks";
 import {
   CharacterRelationshipType,
@@ -271,10 +274,10 @@ export function ProjectSettingsView() {
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [project, setProject] = useState<ProjectType | null>();
+  const { user: authUser } = useUser();
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
@@ -303,6 +306,16 @@ export function ProjectSettingsView() {
     "projects",
     project_id as string,
   );
+  const { mutate: updateUser } = useUpdateUser(user?.id || "", authUser?.id || "");
+
+  function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
+    const newFeatureFlags = deepMerge(user?.feature_flags || {}, { [newValue.name]: newValue.value });
+    updateUser({
+      data: {
+        feature_flags: newFeatureFlags,
+      },
+    });
+  }
 
   const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", { enabled: !!user?.id });
   const { mutateAsync: deleteWebhook } = useDeleteWebhook();
@@ -505,25 +518,22 @@ export function ProjectSettingsView() {
                     <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
                     <div className="flex w-52 items-center justify-between gap-x-2 text-center">
                       <Checkbox
-                        isDisabled
                         label="Create"
                         name={`${entity}_create_notification`}
-                        onChange={() => {}}
-                        value={false}
+                        onChange={handleFeatureFlagChange}
+                        value={user?.feature_flags?.[`${entity}_create_notification`]}
                       />
                       <Checkbox
-                        isDisabled
                         label="Update"
                         name={`${entity}_update_notification`}
-                        onChange={() => {}}
-                        value={false}
+                        onChange={handleFeatureFlagChange}
+                        value={user?.feature_flags?.[`${entity}_update_notification`]}
                       />
                       <Checkbox
-                        isDisabled
                         label="Delete"
                         name={`${entity}_delete_notification`}
-                        onChange={() => {}}
-                        value={false}
+                        onChange={handleFeatureFlagChange}
+                        value={user?.feature_flags?.[`${entity}_delete_notification`]}
                       />
                     </div>
                   </div>

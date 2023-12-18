@@ -6,6 +6,7 @@ export interface UserType {
   email: string;
   nickname: string;
   image: string;
+  feature_flags: Record<string, boolean>;
   projects: ProjectType[];
   webhooks: WebhookType[];
 }

@@ -10,6 +10,7 @@ import {
   GraphType,
   MapType,
   MessagePlaceContentType,
+  UserType,
 } from "../../types";
 import {
   baseURLS,
@@ -535,6 +536,48 @@ export function useUpdateTags<
         } else
           createNotification({
             title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+
+export function useUpdateUser<InsertType extends { data: Pick<UserType, "feature_flags"> }>(id: string, auth_id: string) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/users/update/${id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(["user", auth_id]);
+        if (data.ok) {
+          createNotification({
+            title: data?.message || "User succesfully updated.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this user.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,
