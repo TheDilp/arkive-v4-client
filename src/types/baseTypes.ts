@@ -28,7 +28,14 @@ export type PositionType = (
   | "bottom-end"
 )[];
 
-export type ImagePreviewType = { id?: string; label?: string; title: string; url?: string; clearAction?: (id: string) => void };
+export type ImagePreviewType = {
+  id?: string;
+  label?: string;
+  title: string;
+  url?: string;
+  clearAction?: (id: string) => void;
+  hasShowImage?: boolean;
+};
 export type onChangeValue = {
   name: string;
   value: string | string[] | undefined;
