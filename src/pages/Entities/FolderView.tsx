@@ -213,27 +213,27 @@ function columns(
             icon: IconEnum.pdf,
             onClick: () => savePDF(row.original.title, row.original.id),
           });
-
-          // ALWAYS GOES LAST
-          actions.push({
-            id: "delete_entity",
-            title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
-            icon: IconEnum.trash,
-            onClick: () => {
-              setDialog((prev) => ({
-                ...prev,
-                data: {
-                  ...row.original,
-                  entity_title: entityType,
-                },
-                title: `Delete ${getSingularEntityType(entityType)}`,
-                size: "sm",
-                type: "delete_entity",
-                isOverlay: true,
-              }));
-            },
-          });
         }
+
+        // ALWAYS GOES LAST
+        actions.push({
+          id: "delete_entity",
+          title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
+          icon: IconEnum.trash,
+          onClick: () => {
+            setDialog((prev) => ({
+              ...prev,
+              data: {
+                ...row.original,
+                entity_title: entityType,
+              },
+              title: `Delete ${getSingularEntityType(entityType)}`,
+              size: "sm",
+              type: "delete_entity",
+              isOverlay: true,
+            }));
+          },
+        });
 
         return (
           <div className="flex items-center justify-center">
