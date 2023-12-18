@@ -102,7 +102,7 @@ export function Navbar() {
     userId: string;
     nickname?: string;
     userImageUrl?: string;
-  }>(`ws://${baseURLS.baseServer}:5174/ws/notifications/${project_id}`);
+  }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {

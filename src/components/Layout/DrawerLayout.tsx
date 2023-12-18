@@ -5,5 +5,5 @@ type Props = {
 };
 
 export function DrawerLayout({ children }: Props) {
-  return <div className="flex h-full w-full flex-col gap-y-2 overflow-hidden">{children}</div>;
+  return <div className="flex h-full w-full flex-col gap-y-2 overflow-y-auto">{children}</div>;
 }

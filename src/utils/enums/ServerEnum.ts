@@ -11,6 +11,11 @@ export const baseURLS = {
   }/public`,
 
   baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",
+  baseWebsocketServer: `${
+    import.meta.env.DEV
+      ? `ws://localhost:${import.meta.env.VITE_SERVER_PORT}`
+      : "wss://arkive-v4-server-production.up.railway.app"
+  }`,
 };
 
 export const ResponseMessageEnum = {
