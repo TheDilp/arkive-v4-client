@@ -113,10 +113,6 @@ export function CalendarView({ id }: { id?: string }) {
     setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
   }, [date]);
 
-  // useEffect(() => {
-  //   setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
-  // }, [view]);
-
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
       if (date.year !== subitemEvent?.data?.start_year || date.month !== subitemEvent?.data?.start_month)

@@ -328,7 +328,7 @@ export function useUpdateSubEntity(
           }
         }
         createNotification({
-          title: getEntityCRUDNotification("blueprint_instances", "update"),
+          title: getEntityCRUDNotification(type, "update"),
           variant: "success",
           icon: IconEnum.check,
           timer: 2,

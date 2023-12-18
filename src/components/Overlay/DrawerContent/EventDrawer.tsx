@@ -20,7 +20,7 @@ import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calend
 import { ImageSelect } from "../../Complex";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Input, Search, Select, TagInput, Textarea } from "../../Form";
-import { Tabs } from "../../Layout";
+import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
 
@@ -146,7 +146,7 @@ export function EventDrawer({ data }: Props) {
   if (isLoading) return <Skeleton type="drawer_form" />;
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
@@ -337,15 +337,17 @@ export function EventDrawer({ data }: Props) {
       ) : null}
 
       {data?.isReadOnly ? null : (
-        <Button
-          icon={hasId ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
-          isLoading={isCreating || isUpdating}
-          label={hasId ? "Save" : "Create"}
-          onClick={handleSave}
-          variant="success"
-        />
+        <div>
+          <Button
+            icon={hasId ? IconEnum.save : IconEnum.add}
+            isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
+            isLoading={isCreating || isUpdating}
+            label={hasId ? "Save" : "Create"}
+            onClick={handleSave}
+            variant="success"
+          />
+        </div>
       )}
-    </div>
+    </DrawerLayout>
   );
 }
