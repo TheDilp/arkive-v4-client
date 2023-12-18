@@ -288,7 +288,7 @@ export function AssetView() {
               <div
                 key={img.id}
                 className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
-                <Image hasTitle image={img} isOpenable />
+                <Image hasTitle image={img} isLazyLoading isOpenable />
               </div>
             )),
           )}

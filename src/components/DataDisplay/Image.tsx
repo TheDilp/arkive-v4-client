@@ -21,7 +21,7 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
   setDialog((prev) => ({ ...prev, data: { image, title }, type: "image_view", title: "Image view" }));
 }
 
-export function Image({ image, isOpenable, hasTitle, url }: ImageComponentType) {
+export function Image({ image, isOpenable, hasTitle, isLazyLoading, url }: ImageComponentType) {
   const { project_id } = useParams();
   const imageUrl = url || getImageURL(project_id as string, "images", image.id);
   const classes = ImageClasses({ isOpenable });
@@ -37,6 +37,7 @@ export function Image({ image, isOpenable, hasTitle, url }: ImageComponentType) 
       <img
         alt={image.title}
         className={classes}
+        loading={isLazyLoading ? "lazy" : "eager"}
         onClick={() => {
           if (isOpenable) openImageView(setDialog, imageUrl, image.title);
         }}
