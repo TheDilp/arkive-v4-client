@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/clerk-react";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
-import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { deepMerge } from "remirror";
 
@@ -324,12 +324,6 @@ export function ProjectSettingsView() {
     if (projectData?.data) setProject(projectData.data);
   }, [projectData, isFetching]);
 
-  useEffect(() => {
-    if (selectedTab === 3 && !isProjectOwner) {
-      setSelectedTab(0);
-    }
-  }, [selectedTab, isProjectOwner]);
-
   async function handleSave() {
     if (project) {
       const parsedData = UpdateProjectSchema.parse({ data: project });
@@ -496,7 +490,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 3 ? (
+          {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -508,7 +502,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 4 ? (
+          {selectedTab === finalTabs.length - 1 ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
                 {AllEntities.map((entity) => (
