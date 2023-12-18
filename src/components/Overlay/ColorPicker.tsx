@@ -7,7 +7,7 @@ import { ColorPresets, DefaultTagColor } from "../../utils/enums/ColorEnums";
 import { Input } from "..";
 import { Tooltip } from ".";
 
-function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorPaletteType) {
+function ColorPalette({ name, hasCustom, onChange, closeTooltip, value, isDisabled }: ColorPaletteType) {
   return (
     <div className="flex max-h-96 max-w-xs flex-col overflow-hidden rounded-md border border-zinc-700 bg-zinc-900">
       {hasCustom ? (
@@ -20,9 +20,11 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
             }}>
             <Input
               helperText={!value?.length || validateHexCode(value) ? "" : "This is not a valid hex code."}
+              isDisabled={isDisabled}
               label="Custom color"
               name="customColor"
               onChange={(e) => {
+                if (isDisabled) return;
                 const newHex = (e.value as string).replace("#", "");
                 if (newHex.length > 6) return;
                 onChange({ name, value: `#${newHex}` });
@@ -35,7 +37,9 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
           <input
             className="mt-7 self-start"
             color="hex"
+            disabled={isDisabled}
             onChange={(e) => {
+              if (isDisabled) return;
               onChange({ name, value: e.target.value });
             }}
             type="color"
@@ -49,6 +53,8 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
             key={color}
             className="h-6 w-6 cursor-pointer rounded-full"
             onClick={() => {
+              if (isDisabled) return;
+
               onChange({ name, value: color });
               if (closeTooltip) closeTooltip();
             }}
@@ -59,11 +65,11 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value }: ColorP
     </div>
   );
 }
-export function ColorPicker({ name, value, hasCustom, onChange }: ColorPickerType) {
+export function ColorPicker({ name, value, hasCustom, onChange, isDisabled }: ColorPickerType) {
   return (
     <Tooltip
       arrowColor="#18181B"
-      content={<ColorPalette hasCustom={hasCustom} name={name} onChange={onChange} value={value} />}
+      content={<ColorPalette hasCustom={hasCustom} isDisabled={isDisabled} name={name} onChange={onChange} value={value} />}
       isClickable
       passCloseTooltip>
       <div
