@@ -28,3 +28,15 @@ export function getSearchLink(
 export function getLinkToItem(project_id: string, type: string, id: string, is_folder?: boolean) {
   return `/projects/${project_id}/${type}/${is_folder ? "folder/" : ""}${id}`;
 }
+
+export function getMentionLink(
+  id: string,
+  type: string,
+  project_id: string,
+  is_public: boolean,
+  isPublic?: boolean,
+  parent_id?: string,
+) {
+  if (isPublic && !is_public) return "#";
+  return getSearchLink(project_id, type, id, parent_id, isPublic);
+}

@@ -91,11 +91,16 @@ export function useGetSubEntity<EntityType>(
   id: string | undefined,
   type: AvailableSubEntityType,
   body: RequestBodyType<EntityType>,
-  options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[] },
+  options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[]; isPublic?: boolean },
 ) {
   return useQuery<{ data: EntityType }>(
     options?.queryKeyOverwrite ?? [type, id, ...(options?.queryKeyConcat || [])],
-    async () => FetchFunction({ method: "POST", body: JSON.stringify(body), url: `${baseURLS.baseServer}/${type}/${id}` }),
+    async () =>
+      FetchFunction({
+        method: "POST",
+        body: JSON.stringify(body),
+        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type}/${id}`,
+      }),
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,

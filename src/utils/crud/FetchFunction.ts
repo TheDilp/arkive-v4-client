@@ -17,7 +17,7 @@ export async function FetchFunction({
   isPublic?: boolean;
 }) {
   // @ts-ignore
-  const token = isPublic ? null : await window.Clerk.session.getToken();
+  const token = isPublic ? null : await window?.Clerk?.session?.getToken();
   const res = await fetch(url, {
     method,
     body,
