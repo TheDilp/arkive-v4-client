@@ -8,7 +8,7 @@ import { RemirrorJSON } from "remirror";
 
 import { deleteObjectPropsRecursive, dialogAtom, IconEnum } from "../../../utils";
 import { Collapsible } from "../../Layout";
-import { DocumentMention, GraphMention, MapMention } from "./Extensions/Mention";
+import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
 // import WordMention from "../Mention/WordMention";
 
@@ -104,13 +104,25 @@ function typeMap(project_id: string, isPublicView?: boolean) {
       if (props?.[0]?.node) {
         const { attrs } = props[0].node;
         if (attrs) {
-          const { id, label, alterId, name: type } = attrs;
+          const { id, label, alterid, icon, name: type, parentid } = attrs;
           if (type === "characters")
             return <CharacterMention id={id} isPublic={isPublicView} label={label} project_id={project_id} title={label} />;
+          if (type === "blueprint_instances")
+            return (
+              <BlueprintMention
+                icon={icon}
+                id={id}
+                isPublic={isPublicView}
+                label={label}
+                parent_id={parentid}
+                project_id={project_id}
+                title={label}
+              />
+            );
           if (type === "documents")
             return (
               <DocumentMention
-                alterId={alterId}
+                alterId={alterid}
                 id={id}
                 isDisabledTooltip
                 isPublic={isPublicView}
@@ -120,12 +132,24 @@ function typeMap(project_id: string, isPublicView?: boolean) {
               />
             );
 
-          if (type === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
+          if (type === "maps") return <MapMention id={id} isPublic={isPublicView} label={label} project_id={project_id} />;
+          if (type === "graphs") return <GraphMention id={id} isPublic={isPublicView} label={label} project_id={project_id} />;
+          if (type === "words") return <WordMention id={id} isPublic={isPublicView} label={label} title={label} />;
+          if (type === "events")
+            return (
+              <EventMention
+                id={id}
+                isPublic={isPublicView}
+                label={label}
+                parent_id={parentid}
+                project_id={project_id}
+                title={label}
+              />
+            );
 
-          if (type === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
-          // if (type === "words") return <WordMention id={id} label={label} title={label} />;
-
-          return (
+          return isPublicView ? (
+            <span className="font-lato text-sm">{label}</span>
+          ) : (
             <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
               {label}
             </Link>

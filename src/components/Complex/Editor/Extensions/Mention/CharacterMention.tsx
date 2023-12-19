@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import { useGetEntity } from "../../../../../hooks";
 import { CharacterType } from "../../../../../types";
-import { getImageURL, IconEnum } from "../../../../../utils";
+import { getImageURL, getMentionLink, IconEnum } from "../../../../../utils";
 import { Avatar } from "../../../../Misc";
 
 type Props = {
@@ -22,13 +22,15 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     {
       fields: ["id", "full_name", "portrait_id"],
     },
-    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"] },
+    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
+
+  if (isPublic && !data?.data?.is_public) return <span className="font-lato text-sm">{label}</span>;
 
   return id ? (
     <Link
       className="inline-flex items-center font-lato font-bold transition-colors"
-      to={isPublic ? `/public/characters/${id}/resources` : `/projects/${project_id}/characters/${id}/resources`}>
+      to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
       <div className="flex items-start">
         {data?.data?.portrait_id ? (
           <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
@@ -41,6 +43,6 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
       </div>
     </Link>
   ) : (
-    <div className="font-lato text-sm">{label}</div>
+    <span className="font-lato text-sm">{label}</span>
   );
 }

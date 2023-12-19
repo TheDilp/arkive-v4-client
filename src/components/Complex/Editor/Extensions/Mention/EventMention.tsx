@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { useGetSubEntity } from "../../../../../hooks";
 import { EventType } from "../../../../../types";
-import { IconEnum } from "../../../../../utils";
+import { getMentionLink, IconEnum } from "../../../../../utils";
 
 type Props = {
   title?: string;
@@ -18,15 +18,22 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
     id,
     "events",
     {
-      fields: ["id", "title", "parent_id"],
+      fields: ["id", "title", "parent_id", "is_public"],
     },
-    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"] },
+    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
 
-  return id ? (
+  return data?.data && (data?.data?.is_public || !isPublic) ? (
     <Link
       className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
-      to={isPublic ? `/public/calendars/${parent_id}/${id}` : `/projects/${project_id}/calendars/${parent_id}/${id}`}>
+      to={getMentionLink(
+        project_id as string,
+        "calendars",
+        id as string,
+        !!data?.data?.is_public,
+        isPublic,
+        parent_id as string,
+      )}>
       <div className="top-[0.025rem] flex items-start">
         <span className="relative top-0.5">
           <Icon fontSize={15} icon={IconEnum.event} />
@@ -35,6 +42,6 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
       </div>
     </Link>
   ) : (
-    <div className="font-lato text-sm">{label}</div>
+    <span className="font-lato text-sm">{label}</span>
   );
 }

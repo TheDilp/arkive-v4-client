@@ -19,7 +19,7 @@ import {
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
-import { Button, Input, Search, Select, TagInput, Textarea } from "../../Form";
+import { Button, Checkbox, Input, Search, Select, TagInput, Textarea } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
@@ -260,6 +260,10 @@ export function EventDrawer({ data }: Props) {
               type="number"
               value={event?.minutes || ""}
             />
+          </div>
+          <div className="flex w-full items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox name="is_public" onChange={handleChange} value={event?.is_public ?? false} />
           </div>
         </>
       ) : null}
