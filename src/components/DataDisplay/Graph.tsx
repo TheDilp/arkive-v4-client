@@ -38,12 +38,13 @@ type Props = {
   data?: Partial<GraphType>;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
+  isPublic?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
   layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
-export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
+export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFamilyTreeView, layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -55,7 +56,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       fields: ["default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { enabled: !data, queryKeyOverwrite: ["graph_view"] },
+    { enabled: !data, queryKeyOverwrite: ["graph_view"], isPublic },
   );
 
   useLayoutEffect(() => {
