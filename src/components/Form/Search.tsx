@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useSearch } from "../../hooks";
+import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
 import { getImageURL, IconEnum } from "../../utils";
 import { Avatar, Icon } from "..";
@@ -174,6 +175,7 @@ export function Search({
   offset: offsetProp,
   hasNoBackground,
   onChange,
+  manualResults,
   onSearch,
   isPublic,
 }: SearchType) {
@@ -209,6 +211,7 @@ export function Search({
       full_name?: string;
       icon?: string;
       parent_id?: string;
+      type?: AllAvailableEntities;
     }[]
   >(
     { data: { search_term: inputValue, project_id: project_id as string }, limit: limit ?? 0 },
@@ -296,7 +299,7 @@ export function Search({
         ) : null}
         <input
           ref={inputRef}
-          autoComplete="one-time-code"
+          autoComplete="off"
           className={input()}
           disabled={isDisabled}
           name="search"
@@ -318,7 +321,7 @@ export function Search({
               if ((!value || isMultiple) && activeIndex === null) {
                 refetch();
               } else if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
-                const item = data?.data?.[activeIndex || 0];
+                const item = (manualResults || data?.data)?.[activeIndex || 0];
                 if (item) {
                   onChange({
                     name,
@@ -326,6 +329,7 @@ export function Search({
                     label: item.label,
                     color: item?.color,
                     image: item?.image,
+                    type: item?.type,
                     parent_id: item?.parent_id,
                     icon: item?.icon,
                   });
@@ -365,6 +369,7 @@ export function Search({
             }
           }}
           placeholder={placeholder}
+          type="search"
           value={hasShownOption && !inputValue ? displayValue : inputValue}
         />
 
@@ -392,7 +397,7 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && !isOptionsHidden && data?.data?.length && (
+        {(open || searchTerm || displayValue) && !isOptionsHidden && (data?.data?.length || manualResults?.length) && (
           <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
             <div
               {...getFloatingProps({
@@ -400,7 +405,7 @@ export function Search({
                 style: floatingStyles,
               })}
               className={optionsContainer()}>
-              {data?.data?.map((item, index) => (
+              {(manualResults || data?.data)?.map((item, index) => (
                 <Item
                   {...getItemProps({
                     key: item.value,
@@ -415,6 +420,7 @@ export function Search({
                         color: item?.color,
                         image: item?.image,
                         parent_id: item?.parent_id,
+                        type: item?.type,
                         icon: item?.icon,
                       });
 

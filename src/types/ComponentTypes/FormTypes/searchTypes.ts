@@ -1,6 +1,14 @@
 import { OffsetOptions } from "@floating-ui/react";
 
-import { AssetType, BaseFormComponentType, CharacterType, PositionType, SearchableEntities, SelectOptionType } from "../..";
+import {
+  AllAvailableEntities,
+  AssetType,
+  BaseFormComponentType,
+  CharacterType,
+  PositionType,
+  SearchableEntities,
+  SelectOptionType,
+} from "../..";
 
 export type SearchAllEntitiesType =
   | [
@@ -65,6 +73,16 @@ export interface SearchType extends BaseFormComponentType {
   initialDisplayValue?: string;
   imageType?: AssetType;
   limit?: number;
+  manualResults?: {
+    label: string;
+    value: string;
+    color?: string;
+    image?: string;
+    full_name?: string;
+    icon?: string;
+    parent_id?: string;
+    type?: AllAvailableEntities;
+  }[];
   onSearch?: (result: any) => void;
   onChange: ({
     name,
@@ -73,6 +91,7 @@ export interface SearchType extends BaseFormComponentType {
     image,
     parent_id,
     icon,
+    type,
   }: {
     name: string;
     value: string;
@@ -81,5 +100,6 @@ export interface SearchType extends BaseFormComponentType {
     image?: string;
     parent_id?: string;
     icon?: string;
+    type?: AllAvailableEntities;
   }) => void;
 }

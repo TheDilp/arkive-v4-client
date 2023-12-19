@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { Avatar, Button, Search } from "../../components";
+import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { ProjectType, SearchAllEntitiesType } from "../../types";
+import { AllAvailableEntities, ProjectType } from "../../types";
 import { getImageURL, getSearchLink, IconEnum } from "../../utils";
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
-  const [results, setResults] = useState<SearchAllEntitiesType | null>(null);
+  const [results, setResults] = useState<
+    { name: string; result: { id: string; label: string; image?: string; parent_id?: string }[] }[] | null
+  >(null);
 
   const { project_id } = useParams();
   const { data: project } = useGetEntity<ProjectType>(
@@ -52,34 +54,27 @@ export function PublicNavbar() {
 
       <div className="relative mb-2 mt-auto h-8 min-h-[2rem]">
         {typeof search === "string" ? (
-          <>
-            <Search
-              hasNoBackground
-              imageType="images"
-              isAutocomplete
-              isOptionsHidden
-              isPublic
-              name="search"
-              onChange={() => navigate(`/public/${project_id}/`)}
-              onSearch={(res) => setResults(res)}
-              searchEntity="all"
-            />
-            <ul className="rounded-b bg-zinc-800 text-base shadow">
-              {(results || []).flatMap((result) =>
-                result.result.map((r) => (
-                  <li key={r.id} className="flex items-center gap-x-2 px-2 py-1">
-                    <Link
-                      to={getSearchLink(project_id as string, result.name, r.id, "parent_id" in r ? r?.parent_id : null, true)}>
-                      {"image_id" in r && r?.image_id ? (
-                        <Avatar image={getImageURL(project_id as string, "images", r?.image_id as string)} size="xs" />
-                      ) : null}
-                      {"label" in r ? r?.label : null}
-                    </Link>
-                  </li>
-                )),
-              )}
-            </ul>
-          </>
+          <Search
+            hasNoBackground
+            imageType="images"
+            isAutocomplete
+            isPublic
+            manualResults={(results || []).flatMap((result) =>
+              result.result.map((r) => ({
+                value: r.id,
+                label: r.label,
+                image: r?.image,
+                parent_id: r?.parent_id,
+                type: result.name as AllAvailableEntities,
+              })),
+            )}
+            name="search"
+            onChange={({ type, value, parent_id }) =>
+              navigate(getSearchLink(project_id as string, type as string, value, parent_id, true))
+            }
+            onSearch={(res) => setResults(res)}
+            searchEntity="all"
+          />
         ) : (
           <Button hasNoBackground icon={IconEnum.search} isIconOnly onClick={() => setSearch("")} />
         )}
