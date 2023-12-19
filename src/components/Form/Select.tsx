@@ -105,12 +105,22 @@ const SelectClasses = tv({
     },
     {
       slots: ["select"],
+      isReadOnly: true,
+      class: "cursor-not-allowed select-none border-zinc-700 bg-zinc-900 text-white",
+    },
+    {
+      slots: ["select"],
       isOpen: true,
       class: "bg-zinc-800",
     },
     {
       slots: ["helperText"],
       isDisabled: true,
+      class: "hidden",
+    },
+    {
+      slots: ["helperText"],
+      isReadOnly: true,
       class: "hidden",
     },
   ],
@@ -239,6 +249,7 @@ export function Select({
   isExpandingToNewRow,
   isClearable,
   isDisabled,
+  isReadOnly,
   options = [],
   isMultiple,
   onChange,
@@ -260,13 +271,21 @@ export function Select({
     placeholder: placeholderClasses,
     displayItem: displayItemClasses,
     search,
-  } = SelectClasses({ variant, isDisabled: !options.length || isDisabled, size, isOpen, isExpandingToNewRow, hasSearch });
+  } = SelectClasses({
+    variant,
+    isDisabled: !options.length || isDisabled || isReadOnly,
+    isReadOnly,
+    size,
+    isOpen,
+    isExpandingToNewRow,
+    hasSearch,
+  });
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
     open: isOpen,
     onOpenChange: (o, e) => {
       // @ts-ignore
-      if (options.length !== 0 && !isDisabled && e?.target?.dataset?.option !== "clearable") {
+      if (options.length !== 0 && !isDisabled && !isReadOnly && e?.target?.dataset?.option !== "clearable") {
         setIsOpen(o);
       }
     },
@@ -364,7 +383,7 @@ export function Select({
           <div className={placeholderClasses()}>{options.length === 0 ? "No options available." : placeholder || "Select"}</div>
         )}
 
-        {isClearable && !!value && !isDisabled ? (
+        {isClearable && !!value && !isDisabled && !isReadOnly ? (
           <div
             className="ml-auto"
             data-option="clearable"
@@ -374,7 +393,13 @@ export function Select({
               onChange({ name, value: undefined });
             }}>
             <span className="pointer-events-none">
-              <Button hasNoBackground icon={IconEnum.close} isDisabled={isDisabled} isIconOnly onClick={undefined} />
+              <Button
+                hasNoBackground
+                icon={IconEnum.close}
+                isDisabled={isDisabled || isReadOnly}
+                isIconOnly
+                onClick={undefined}
+              />
             </span>
           </div>
         ) : null}
