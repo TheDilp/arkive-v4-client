@@ -27,9 +27,9 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
     <Link
       className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
       to={getMentionLink(
-        project_id as string,
-        "calendars",
         id as string,
+        "calendars",
+        project_id as string,
         !!data?.data?.is_public,
         isPublic,
         parent_id as string,
