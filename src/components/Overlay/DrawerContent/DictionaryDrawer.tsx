@@ -23,7 +23,7 @@ export function DictionaryDrawer({ data }: Props) {
   const { data: existingDictionary } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
-    { data, fields: ["title", "icon", "is_public", "is_folder", "parent_id"] },
+    { data, fields: ["id", "title", "icon", "is_public", "is_folder", "parent_id"] },
     { enabled: !!data?.id },
   );
   const { mutateAsync: createDictionary, isLoading: isCreating } = useCreateEntity<{ data: InsertDictionaryType }>(
@@ -33,7 +33,7 @@ export function DictionaryDrawer({ data }: Props) {
     "dictionaries",
     project_id as string,
   );
-  const [dictionary, setDictionary] = useState<DictionaryStateType>({ project_id });
+  const [dictionary, setDictionary] = useState<DictionaryStateType>({ id: data?.id, project_id });
 
   useLayoutEffect(() => {
     if (existingDictionary?.data) setDictionary(existingDictionary.data);
