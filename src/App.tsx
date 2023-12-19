@@ -75,7 +75,7 @@ export default function App() {
               <Route element={<PublicLayout />} path=":project_id/*">
                 <Route path=":type" />
                 <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
-                <Route path=":type/:item_id/:subitem_id" />
+                <Route element={<PublicEntitiesView />} path=":type/:item_id/:subitem_id" />
               </Route>
             </Route>
           </Routes>

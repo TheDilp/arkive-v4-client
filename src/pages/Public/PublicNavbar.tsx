@@ -69,9 +69,10 @@ export function PublicNavbar() {
               })),
             )}
             name="search"
-            onChange={({ type, value, parent_id }) =>
-              navigate(getSearchLink(project_id as string, type as string, value, parent_id, true))
-            }
+            onChange={({ type, value, parent_id }) => {
+              navigate(getSearchLink(project_id as string, type as string, value, parent_id, true));
+              setResults(null);
+            }}
             onSearch={(res) => setResults(res)}
             searchEntity="all"
           />

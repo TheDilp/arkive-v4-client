@@ -793,7 +793,7 @@ function AdditionalFieldDisplay({
   );
 }
 
-export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview?: boolean }) {
+export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string; isPreview?: boolean; isPublic?: boolean }) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
@@ -823,6 +823,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
     },
     {
       staleTime: 60 * 1000,
+      isPublic,
     },
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
@@ -991,7 +992,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
-                tabs={tabs}
+                tabs={isPublic ? tabs.slice(0, 3) : tabs}
               />
             </div>
           </div>
@@ -1006,7 +1007,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
-              tabs={tabs}
+              tabs={isPublic ? tabs.slice(0, 3) : tabs}
             />
           </div>
         ) : null}
@@ -1026,7 +1027,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                   />
                 </div>
               ) : null}
-              {tabs[selectedTab].label} {subitem_id ? "-" : ""}
+              {tabs[selectedTab].label} {subitem_id && tabs[selectedTab].label === "conversations" ? "-" : ""}
               {existingConversations?.data?.find((convo) => convo?.id === subitem_id)?.title}
             </span>
             {type === "relationships" ? (
@@ -1056,13 +1057,17 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
           {(isPreview ? selectedTab === 0 : type === "resources") ? (
             <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
-                actions={[
-                  {
-                    icon: IconEnum.add,
-                    tooltip: "Add document",
-                    onClick: openAddDocumentDrawer,
-                  },
-                ]}
+                actions={
+                  isPublic
+                    ? []
+                    : [
+                        {
+                          icon: IconEnum.add,
+                          tooltip: "Add document",
+                          onClick: openAddDocumentDrawer,
+                        },
+                      ]
+                }
                 icon={IconEnum.document}
                 initialOpen={false}
                 label="Documents">
@@ -1110,18 +1115,22 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
                 </div>
               </Collapsible>
               <Collapsible
-                actions={[
-                  {
-                    icon: assetView === "card" ? IconEnum.card : IconEnum.table,
-                    tooltip: "Change view",
-                    onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
-                  },
-                  {
-                    icon: IconEnum.add,
-                    tooltip: "Add assets",
-                    onClick: openAddImageDrawer,
-                  },
-                ]}
+                actions={
+                  isPublic
+                    ? []
+                    : [
+                        {
+                          icon: assetView === "card" ? IconEnum.card : IconEnum.table,
+                          tooltip: "Change view",
+                          onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
+                        },
+                        {
+                          icon: IconEnum.add,
+                          tooltip: "Add assets",
+                          onClick: openAddImageDrawer,
+                        },
+                      ]
+                }
                 icon={IconEnum.image}
                 initialOpen={false}
                 label="Assets">
@@ -1155,13 +1164,17 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
               </Collapsible>
 
               <Collapsible
-                actions={[
-                  {
-                    icon: IconEnum.edit,
-                    tooltip: "Edit tags",
-                    onClick: openEditTagDrawer,
-                  },
-                ]}
+                actions={
+                  isPublic
+                    ? []
+                    : [
+                        {
+                          icon: IconEnum.edit,
+                          tooltip: "Edit tags",
+                          onClick: openEditTagDrawer,
+                        },
+                      ]
+                }
                 icon={IconEnum.tags}
                 initialOpen={false}
                 label="Tags">
