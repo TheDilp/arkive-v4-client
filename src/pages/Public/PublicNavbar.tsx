@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Avatar, Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { ProjectType, SearchAllEntitiesType } from "../../types";
-import { getImageURL, IconEnum } from "../../utils";
+import { getImageURL, getSearchLink, IconEnum } from "../../utils";
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
@@ -24,6 +24,7 @@ export function PublicNavbar() {
     },
   );
   const navigate = useNavigate();
+
   return (
     <div className="mb-2 flex items-center justify-between gap-x-2 text-lg">
       <div className="flex flex-nowrap gap-x-2">
@@ -67,10 +68,13 @@ export function PublicNavbar() {
               {(results || []).flatMap((result) =>
                 result.result.map((r) => (
                   <li key={r.id} className="flex items-center gap-x-2 px-2 py-1">
-                    {"image" in r && r?.image ? (
-                      <Avatar image={getImageURL(project_id as string, "images", r?.image as string)} size="xs" />
-                    ) : null}
-                    {"label" in r ? r?.label : null}
+                    <Link
+                      to={getSearchLink(project_id as string, result.name, r.id, "parent_id" in r ? r?.parent_id : null, true)}>
+                      {"image_id" in r && r?.image_id ? (
+                        <Avatar image={getImageURL(project_id as string, "images", r?.image_id as string)} size="xs" />
+                      ) : null}
+                      {"label" in r ? r?.label : null}
+                    </Link>
                   </li>
                 )),
               )}

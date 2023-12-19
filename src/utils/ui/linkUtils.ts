@@ -1,10 +1,17 @@
-export function getSearchLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
+export function getSearchLink(
+  project_id: string,
+  name: string,
+  item_id: string,
+  parent_id?: string | null,
+  isPublic?: boolean,
+) {
   if (name === "") return "#";
+  const linkRoot = isPublic ? "public" : "projects";
   if (name === "characters") {
-    return `/projects/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
+    return `/${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "blueprint_instances") {
-    return `/projects/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
+    return `/${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   let link_type = "";
   if (name === "alter_names") link_type = "documents";
@@ -13,7 +20,7 @@ export function getSearchLink(project_id: string, name: string, item_id: string,
   if (name === "events") link_type = "calendars";
   if (name === "documents" || name === "maps" || name === "calendars" || name === "dictionaries" || name === "blueprints")
     link_type = name;
-  if (link_type) return `/projects/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
+  if (link_type) return `/${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
 
   return "#";
 }

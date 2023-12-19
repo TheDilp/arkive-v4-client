@@ -9,7 +9,7 @@ export function PublicLayout() {
       <Dialog />
       <div className="mx-auto flex max-h-full w-full flex-1 flex-col lg:max-w-5xl">
         <PublicNavbar />
-        <div className="flex-1 overflow-auto rounded bg-zinc-900 p-4">
+        <div className="flex-1 overflow-auto rounded border border-zinc-700 bg-zinc-900 p-4 shadow">
           <Outlet />
         </div>
       </div>
