@@ -113,7 +113,7 @@ export function Dialog() {
             <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => resetDialogAtom()} />
           </div>
         </div>
-        {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} type={dialog?.data?.type} /> : null}
+        {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} /> : null}
         {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
         ) : null}
