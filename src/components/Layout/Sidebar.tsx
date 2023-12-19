@@ -1,8 +1,9 @@
+import { useAtomValue } from "jotai";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useBreakpoint } from "../../hooks";
-import { IconEnum, navItems } from "../../utils";
+import { IconEnum, navItems, userAtom } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
 
@@ -25,11 +26,18 @@ const SidebarClasses = tv({
     navIcon: "cursor-pointer",
   },
 });
-
+const alwaysEnabledItems = ["/", "settings", "tags"];
 export function Sidebar() {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
+  const user = useAtomValue(userAtom);
+  const enabledEntities = Object.entries(user?.feature_flags || [])
+    .filter(([key, value]) => {
+      return key.includes("_enabled") && value;
+    })
+    .map(([key]) => key);
+
   const {
     base,
     nav,
@@ -51,13 +59,17 @@ export function Sidebar() {
               <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
             </Link>
           </li>
-          {sidebarItems.map((item) => {
-            return (
-              <Link
-                key={item.icon}
-                className={`${listItemLink()} ${
-                  item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
-                }
+          {sidebarItems
+            .filter(
+              (item) => enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate),
+            )
+            .map((item) => {
+              return (
+                <Link
+                  key={item.icon}
+                  className={`${listItemLink()} ${
+                    item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
+                  }
                 ${item.navigate === "blueprints" && pathname.includes("blueprints") ? selectedListItem() : ""}
                 ${item.navigate === type && type !== "settings" ? selectedListItem() : ""}
                  ${item.navigate === "settings" && type === "settings" ? selectedSettingsListItem() : ""}
@@ -65,18 +77,18 @@ export function Sidebar() {
                 ${item.navigate === "settings" ? listSettingsItem() : ""}
                 
                 `}
-                to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
-                <Tooltip
-                  allowedPlacements={[isLg ? "right" : "top"]}
-                  content={item.tooltip}
-                  isDisabled={item.navigate === type}>
-                  <li className={listItem()}>
-                    <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
-                  </li>
-                </Tooltip>
-              </Link>
-            );
-          })}
+                  to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
+                  <Tooltip
+                    allowedPlacements={[isLg ? "right" : "top"]}
+                    content={item.tooltip}
+                    isDisabled={item.navigate === type}>
+                    <li className={listItem()}>
+                      <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
+                    </li>
+                  </Tooltip>
+                </Link>
+              );
+            })}
         </ul>
       </nav>
     </div>

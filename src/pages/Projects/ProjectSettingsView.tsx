@@ -32,6 +32,7 @@ import {
   useUpdateUser,
 } from "../../hooks";
 import {
+  AllAvailableEntities,
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
@@ -47,11 +48,13 @@ import {
   drawerAtom,
   getFirstLetters,
   getImageURL,
+  getPluralEntityType,
   getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
   userAtom,
   UserNotificationEntities,
+  UserSidebarEntitiesEnabled,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
@@ -505,33 +508,54 @@ export function ProjectSettingsView() {
           {selectedTab === finalTabs.length - 1 ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
-                {UserNotificationEntities.map((entity) => (
-                  <div
-                    key={entity}
-                    className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
-                    <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
-                    <div className="flex w-52 items-center justify-between gap-x-2 text-center">
-                      <Checkbox
-                        label="Create"
-                        name={`${entity}_create_notification`}
-                        onChange={handleFeatureFlagChange}
-                        value={user?.feature_flags?.[`${entity}_create_notification`]}
-                      />
-                      <Checkbox
-                        label="Update"
-                        name={`${entity}_update_notification`}
-                        onChange={handleFeatureFlagChange}
-                        value={user?.feature_flags?.[`${entity}_update_notification`]}
-                      />
-                      <Checkbox
-                        label="Delete"
-                        name={`${entity}_delete_notification`}
-                        onChange={handleFeatureFlagChange}
-                        value={user?.feature_flags?.[`${entity}_delete_notification`]}
-                      />
+                <div className="bg-zinc-900 px-2 py-4">
+                  {UserNotificationEntities.map((entity) => (
+                    <div
+                      key={entity}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
+                      <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
+                      <div className="flex w-52 items-center justify-between gap-x-2 text-center">
+                        <Checkbox
+                          label="Create"
+                          name={`${entity}_create_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={user?.feature_flags?.[`${entity}_create_notification`]}
+                        />
+                        <Checkbox
+                          label="Update"
+                          name={`${entity}_update_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={user?.feature_flags?.[`${entity}_update_notification`]}
+                        />
+                        <Checkbox
+                          label="Delete"
+                          name={`${entity}_delete_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={user?.feature_flags?.[`${entity}_delete_notification`]}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </Collapsible>
+              <Collapsible label="Sidebar settings">
+                <div className="bg-zinc-900 px-2 py-4">
+                  {UserSidebarEntitiesEnabled.map((entity) => (
+                    <div
+                      key={entity}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
+                      <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
+                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
+                        <Checkbox
+                          label="Enabled"
+                          name={`${entity}_enabled`}
+                          onChange={handleFeatureFlagChange}
+                          value={user?.feature_flags?.[`${entity}_enabled`]}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </Collapsible>
               <Collapsible
                 actions={[

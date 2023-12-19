@@ -121,3 +121,15 @@ export const UserNotificationEntities = [
   "character_fields_templates",
   "tags",
 ];
+
+export const UserSidebarEntitiesEnabled = [
+  "characters",
+  "blueprints",
+  "documents",
+  "maps",
+  "graphs",
+  "calendars",
+  "dictionaries",
+  "random_tables",
+  "character_fields_templates",
+];

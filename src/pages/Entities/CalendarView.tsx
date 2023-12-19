@@ -48,7 +48,7 @@ export function DayNumber({
   );
 }
 
-export function CalendarView({ id }: { id?: string }) {
+export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
@@ -61,6 +61,9 @@ export function CalendarView({ id }: { id?: string }) {
     {
       data: { project_id },
       relations: { months: true },
+    },
+    {
+      isPublic,
     },
   );
   const { data: events, isLoading } = useGetEntities<EventType>(
@@ -105,7 +108,7 @@ export function CalendarView({ id }: { id?: string }) {
     subitem_id,
     "events",
     { data: { parent_id: item_id || id } },
-    { enabled: !!subitem_id },
+    { enabled: !!subitem_id, isPublic },
   );
   useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
 
