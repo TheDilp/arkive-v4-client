@@ -12,10 +12,11 @@ type Props = {
   data?: MapType;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
+  isPublic?: boolean;
   center_on?: string;
 };
 
-export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
+export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: Props) {
   const { project_id, item_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
     },
     {
       enabled: !data && !!item_id,
+      isPublic,
     },
   );
   const currentMap = data || existingMap?.data;

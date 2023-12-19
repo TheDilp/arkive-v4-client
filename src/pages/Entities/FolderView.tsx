@@ -183,7 +183,7 @@ function columns(
               id: "view_public",
               title: "View public page",
               icon: IconEnum.public,
-              onClick: () => window.open(`/public/${project_id}/documents/${row.original.id}`, "_blank"),
+              onClick: () => window.open(`/public/${project_id}/${entityType}/${row.original.id}`, "_blank"),
               isDisabled: !row.original.is_public,
             },
             {

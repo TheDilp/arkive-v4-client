@@ -147,12 +147,12 @@ export function MapPin({
         className: "relative",
         html: ReactDOM.renderToString(
           <div
-            className={`fixed rounded-full ${isCharacterPin ? "h-7 w-7" : "h-10 w-10"}`}
+            className={`fixed rounded-full ${isCharacterPin ? "h-6 w-6" : "h-8 w-8"}`}
             style={{
               background: image_id ? "" : background,
               backgroundImage:
                 image_id || (isCharacterPin && character?.portrait_id)
-                  ? `url(${getImageURL(project_id as string, "images", image_id || character.portrait_id)})`
+                  ? `url(${getImageURL(project_id as string, "images", image_id || character?.portrait_id)})`
                   : "",
               backgroundColor: show_background ? background_color || "" : "",
               backgroundPosition: "center",
@@ -163,9 +163,9 @@ export function MapPin({
             }}
           />,
         ),
-        iconAnchor: isCharacterPin ? [30, 46] : [25.5, 46],
-        iconSize: isCharacterPin ? [28, 28] : [40, 40],
-        tooltipAnchor: isCharacterPin ? [-16, -46] : [-4, -46],
+        // iconAnchor: isCharacterPin ? [30, 46] : [25.5, 46],
+        // iconSize: isCharacterPin ? [28, 28] : [40, 40],
+        tooltipAnchor: isCharacterPin ? [5, -8] : [10.5, -6],
       })}
       position={position}>
       {title || isCharacterPin ? (

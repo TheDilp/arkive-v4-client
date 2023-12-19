@@ -98,7 +98,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     <div className="flex flex-col gap-y-2">
       {exceptions?.characterPin ? (
         <div className="flex flex-col gap-y-2">
-          {character ? (
+          {character && mapPin.character_id ? (
             <EntityPreview
               clearAction={() => setCharacter(null)}
               id={character.id}
@@ -109,7 +109,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             />
           ) : (
             <Search
-              isDisabled={!!character}
+              isDisabled={!!character && !!mapPin.character_id}
               name="character_id"
               onChange={({ value: id, label, image: portrait_id }) => {
                 setCharacter({ id, full_name: label, portrait_id });
@@ -123,6 +123,12 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             <div className="flex items-center gap-x-2 pb-2">
               <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
               <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
+            </div>
+          </div>
+          <div className="flex flex-nowrap justify-between">
+            <span className="block min-h-[20px] truncate">Public:</span>
+            <div className="flex items-center gap-x-2 pb-2">
+              <Checkbox name="is_public" onChange={handleChange} value={!!mapPin?.is_public} />
             </div>
           </div>
         </div>
@@ -306,7 +312,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           if (!("id" in data) || !data?.id) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
-            if (character) final.character = character;
+            // if (character) final.character = character;
             await createMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
@@ -317,7 +323,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           } else {
             const parsed = UpdateMapPinSchema.parse({ data: mapPin });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
-            if (character) final.character = character;
+            // if (character) final.character = character;
             await updateMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
