@@ -152,7 +152,7 @@ export function EventDrawer({ data }: Props) {
         <>
           <div className="flex flex-nowrap gap-x-2">
             <Input
-              isDisabled={data?.isReadOnly}
+              isReadOnly={data?.isReadOnly}
               label="Event title (required)"
               name="title"
               onChange={handleChange}
@@ -174,7 +174,7 @@ export function EventDrawer({ data }: Props) {
           </div>
           <div className="flex items-center justify-between gap-x-2">
             <Input
-              isDisabled={data?.isReadOnly}
+              isReadOnly={data?.isReadOnly}
               label="Start day (required)"
               max={existingMonths?.data?.[event?.start_month || 0]?.days ?? 0}
               min={1}
@@ -184,8 +184,9 @@ export function EventDrawer({ data }: Props) {
               value={event?.start_day || ""}
             />
             <Select
-              isDisabled={isFetchingMonths || data?.isReadOnly}
+              isDisabled={isFetchingMonths}
               isLoading={isFetchingMonths}
+              isReadOnly={data?.isReadOnly}
               label="Start month (required)"
               name="start_month"
               onChange={handleMonthChange}
@@ -193,7 +194,7 @@ export function EventDrawer({ data }: Props) {
               value={typeof event?.start_month === "number" ? existingMonths?.data?.[event.start_month].id : undefined}
             />
             <Input
-              isDisabled={data?.isReadOnly}
+              isReadOnly={data?.isReadOnly}
               label="Start year (required)"
               name="start_year"
               onChange={handleChange}
@@ -218,8 +219,9 @@ export function EventDrawer({ data }: Props) {
             <Select
               helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
               isClearable
-              isDisabled={isFetchingMonths || data?.isReadOnly}
+              isDisabled={isFetchingMonths}
               isLoading={isFetchingMonths}
+              isReadOnly={data?.isReadOnly}
               label="End month (optional)"
               name="end_month"
               onChange={handleMonthChange}
@@ -229,7 +231,8 @@ export function EventDrawer({ data }: Props) {
             />
             <Input
               helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-              isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
+              isDisabled={typeof event?.end_month !== "number"}
+              isReadOnly={data?.isReadOnly}
               label="End year (optional)"
               name="end_year"
               onChange={handleChange}
@@ -242,7 +245,7 @@ export function EventDrawer({ data }: Props) {
 
           <div className="flex items-center gap-x-2">
             <Input
-              isDisabled={data?.isReadOnly}
+              isReadOnly={data?.isReadOnly}
               label="Hour (optional)"
               name="hours"
               onChange={handleChange}
@@ -250,7 +253,7 @@ export function EventDrawer({ data }: Props) {
               value={event?.hours || ""}
             />
             <Input
-              isDisabled={data?.isReadOnly}
+              isReadOnly={data?.isReadOnly}
               label="Minutes (optional)"
               name="minutes"
               onChange={handleChange}
