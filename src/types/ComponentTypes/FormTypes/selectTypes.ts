@@ -20,4 +20,5 @@ export interface SelectType extends BaseFormComponentType {
   value: string | string[] | number | null | undefined;
   options: SelectOptionType[];
   onChange: ({ name, value }: onChangeValue) => void;
+  isReadOnly?: boolean;
 }
