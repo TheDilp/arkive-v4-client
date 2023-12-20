@@ -19,8 +19,8 @@ import { IconPicker } from "../IconPicker";
 function isSaveDisabled(blueprint: BlueprintStateType) {
   if (!blueprint?.title) return true;
   if (!blueprint?.title_name) return true;
-  if (!blueprint?.blueprint_fields?.length) return true;
   if (
+    blueprint?.blueprint_fields?.length &&
     blueprint.blueprint_fields.some(
       (field) =>
         !field.title ||
