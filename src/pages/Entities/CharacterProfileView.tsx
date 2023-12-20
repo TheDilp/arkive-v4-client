@@ -152,8 +152,8 @@ function relationshipTableColumns(
             : getSentenceCase(row.original?.relation_type_title || "")}
         </div>
       ),
-      minSize: 10,
-      maxSize: 10,
+      minSize: 20,
+      maxSize: 20,
     }),
     relationshipColumnHelper.display({
       id: "action",
@@ -934,6 +934,23 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   useEffect(() => {
     setSelectedTab(getCharacterProfileTabFromType(type));
   }, [type]);
+
+  // const relationTypeArray = Object.values(
+  //   relationships.reduce((acc, obj) => {
+  //     const { relation_type_title } = obj;
+  //     if (!acc[relation_type_title]) {
+  //       acc[relation_type_title] = {
+  //         relation_type_title,
+  //         items: [],
+  //       };
+  //     }
+  //     acc[relation_type_title].items.push(obj);
+  //     return acc;
+  //   }, {}),
+  // );
+
+  // console.log(relationTypeArray);
+
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       {isPreview ? null : (
