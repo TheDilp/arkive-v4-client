@@ -8,9 +8,9 @@ import { RemirrorJSON } from "remirror";
 
 import { deleteObjectPropsRecursive, dialogAtom, IconEnum } from "../../../utils";
 import { Collapsible } from "../../Layout";
-import { Alert } from "../../Misc";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
+import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExtension";
 // import WordMention from "../Mention/WordMention";
 
 export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
@@ -63,41 +63,13 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     },
     horizontalRule: "hr",
     tableofcontents: () => {
-      const headings: { id: string; text: string; level: number }[] = [];
+      const headings: TOCHeadingType[] = [];
       content?.content?.forEach((n) => {
         if (n.type === "heading" && n?.content?.[0]?.text) {
           headings.push({ id: n.attrs?.id as string, text: n?.content?.[0]?.text, level: n.attrs?.level as number });
         }
       });
-      return (
-        <ul className="tableOfContentsList m-0 flex list-none flex-col border border-zinc-600">
-          <h2 className="font-merriweather underline">Table of contents</h2>
-          {headings?.length ? (
-            headings.map((heading, i) => (
-              <li
-                key={`${heading}+${i.toString()}`}
-                className="pointer-events-auto font-lato"
-                onClick={() => {
-                  const el = document.getElementById(heading.id);
-                  if (el) {
-                    const editor = document.getElementById("editor");
-                    if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
-                  }
-                }}>
-                <span
-                  className="pointer-events-auto cursor-pointer hover:text-blue-400"
-                  style={{
-                    paddingLeft: `${0.45 * (heading.level - 1)}rem`,
-                  }}>
-                  {heading.text}
-                </span>
-              </li>
-            ))
-          ) : (
-            <Alert label="There are no headings in this document." variant="info" />
-          )}
-        </ul>
-      );
+      return <TableOfContents headings={headings} />;
     },
     secret: (data: any) => {
       if (isPublicView) return null;
