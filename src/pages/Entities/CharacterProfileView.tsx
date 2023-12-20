@@ -141,7 +141,6 @@ function relationshipTableColumns(
         pinned: true,
       },
       minSize: 15,
-      maxSize: 15,
     }),
     relationshipColumnHelper.display({
       id: "relation_type",
@@ -1207,7 +1206,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                     config={{
                       getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
                     }}
-                    data={relationships.sort(sortCharactersByName)}
+                    data={relationships.toSorted(sortCharactersByName)}
                     dispatch={dispatch}
                     type="characters"
                   />
