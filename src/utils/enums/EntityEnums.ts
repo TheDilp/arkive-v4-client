@@ -102,8 +102,9 @@ export const PublicEntities = [
   "documents",
   "maps",
   "graphs",
+  "calendars",
   "dictionaries",
-  "random_tables",
+  // "random_tables",
 ];
 
 export const UserNotificationEntities = [

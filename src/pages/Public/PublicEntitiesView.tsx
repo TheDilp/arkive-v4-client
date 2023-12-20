@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 
 import { Graph } from "../../components";
-import { DictionaryView, MapView } from "../Entities";
+import { CalendarView, DictionaryView, MapView } from "../Entities";
 import { PublicDocument } from ".";
 
 export function PublicEntitiesView() {
@@ -10,6 +10,7 @@ export function PublicEntitiesView() {
   if (type === "documents") return <PublicDocument />;
   if (type === "maps") return <MapView isPublic isReadOnly isViewOnly />;
   if (type === "graphs") return <Graph isPublic isReadOnly isViewOnly />;
+  if (type === "calendars") return <CalendarView isPublic />;
   if (type === "dictionaries") return <DictionaryView isPublic />;
   return <div>PublicView</div>;
 }

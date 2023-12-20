@@ -116,6 +116,7 @@ export function useGetEntities<ReturnType>(
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
     queryKeyConcat?: (string | number | Record<any, any>)[];
+    isPublic?: boolean;
   },
 ) {
   const baseQueryKey = [
@@ -132,7 +133,7 @@ export function useGetEntities<ReturnType>(
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}`,
+      url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
     });
   }
   const configuredOptions = {

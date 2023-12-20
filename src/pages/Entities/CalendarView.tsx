@@ -152,9 +152,9 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                   }
                   //   ls.set("characters_view", value);
                 }}
-                options={existingCalendar?.data.months.map((month) => ({ value: month.id, label: month.title }))}
+                options={existingCalendar?.data?.months?.map((month) => ({ value: month.id, label: month.title }))}
                 placeholder="Month"
-                value={existingCalendar?.data?.months[date.month].id}
+                value={existingCalendar?.data?.months?.[date.month]?.id}
               />
             </div>
             <div className="w-32">
@@ -269,7 +269,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                       <div
                         className="cursor-pointer"
                         onClick={() =>
-                          id
+                          id || isPublic
                             ? {}
                             : setDrawer((prev) => ({
                                 ...prev,

@@ -241,7 +241,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
             value={filterType}
           />
         </div>
-        {id ? null : (
+        {id || isPublic ? null : (
           <div className="w-52">
             <Button
               icon={IconEnum.add}
