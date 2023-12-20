@@ -333,7 +333,7 @@ export function AdditionalFieldsTab({
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Realationships", icon: IconEnum.family_tree },
+  { id: "2", label: "Relationships", icon: IconEnum.family_tree },
   { id: "3", label: "Tags", icon: IconEnum.tags },
   { id: "4", label: "Additional fields", icon: IconEnum.additional_fields },
 ];
