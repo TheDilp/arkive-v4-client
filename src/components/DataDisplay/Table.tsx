@@ -380,7 +380,9 @@ function TableSubheaderFilterBadges({
       {fields.map((field) => (
         <Tooltip
           key={field}
-          content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}>
+          content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}
+          isClickable
+          isIgnoringHover>
           <div>
             <Badge
               clearAction={() =>

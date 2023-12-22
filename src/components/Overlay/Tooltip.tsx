@@ -78,7 +78,7 @@ export function Tooltip({
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context, {
-      enabled: !isClickable || true,
+      enabled: !isClickable ?? true,
       handleClose: isIgnoringHover ? null : safePolygon(),
       delay: {
         open: delay?.openDelay ?? 250,
