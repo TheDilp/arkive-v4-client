@@ -84,41 +84,60 @@ export function MapPin({
     },
     contextmenu: (e: any) => {
       if (!isReadOnly && !isViewOnly) {
+        const contextItems = [
+          {
+            id: "1",
+            title: "Edit pin",
+            icon: IconEnum.edit,
+            onClick: () =>
+              setDrawer((prev) => ({
+                ...prev,
+                title: "Edit map pin",
+                type: "map_pins",
+                data: markerData,
+                exceptions: { characterPin: !!character && !!character_id },
+              })),
+          },
+        ];
+        if (character_id) {
+          contextItems.push({
+            id: "character_drawer",
+            title: "Show character",
+            icon: IconEnum.character,
+            onClick: () => {
+              setDrawer((prev) => ({
+                ...prev,
+                data: {
+                  id: character_id,
+                },
+                title: "Edit character",
+                size: "lg",
+                type: "characters",
+              }));
+            },
+          });
+        }
+        contextItems.push({
+          id: "2",
+          title: "Delete pin",
+          icon: IconEnum.trash,
+          onClick: () => {
+            setDialog((prev) => ({
+              ...prev,
+              data: {
+                ...markerData,
+                entity_title: "map_pins",
+                title: markerData?.character?.full_name || markerData?.title,
+              },
+              title: "Delete map pin",
+              size: "sm",
+              type: "delete_entity",
+            }));
+          },
+        });
         setContextMenu({
           event: e.originalEvent as any,
-          items: [
-            {
-              id: "1",
-              title: "Edit pin",
-              icon: IconEnum.edit,
-              onClick: () =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  title: "Edit map pin",
-                  type: "map_pins",
-                  data: markerData,
-                  exceptions: { characterPin: !!character && !!character_id },
-                })),
-            },
-            {
-              id: "2",
-              title: "Delete pin",
-              icon: IconEnum.trash,
-              onClick: () => {
-                setDialog((prev) => ({
-                  ...prev,
-                  data: {
-                    ...markerData,
-                    entity_title: "map_pins",
-                    title: markerData?.character?.full_name || markerData?.title,
-                  },
-                  title: "Delete map pin",
-                  size: "sm",
-                  type: "delete_entity",
-                }));
-              },
-            },
-          ],
+          items: contextItems,
         });
       }
     },

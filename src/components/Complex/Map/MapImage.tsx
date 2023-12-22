@@ -104,7 +104,6 @@ export function MapImage({
             },
           ],
         });
-        // setDrawer((prev) => ({ ...prev, data: { ...e.latlng } }));
       }
     },
   });

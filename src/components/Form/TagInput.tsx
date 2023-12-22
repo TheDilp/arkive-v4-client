@@ -17,6 +17,7 @@ export function TagInput({ tags, label: componentLabel, handleChange, isMultiple
   return (
     <div className="flex flex-col gap-y-2">
       <Search
+        isAutocomplete
         isDisabled={isDisabled}
         isMultiple={isMultiple}
         label={componentLabel || ""}
