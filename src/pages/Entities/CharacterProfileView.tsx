@@ -1,5 +1,6 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { isRemirrorJSON } from "remirror";
@@ -66,7 +67,6 @@ import {
   getImageURL,
   getSentenceCase,
   IconEnum,
-  NameFilters,
   sortCharactersByName,
   userAtom,
 } from "../../utils";
@@ -368,10 +368,6 @@ function assetTableColumns(
       id: "title",
       header: "Title",
       cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-        filterOptions: NameFilters,
-      },
     }),
 
     assetColumnHelper.display({
@@ -975,10 +971,10 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
         </div>
       )}
-      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      <div className="max-h-[calc(100vh-40%)] w-full  flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-25%)] lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
-          <div className="flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
+          <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
             <Avatar
               hasShowImage
               image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
@@ -1008,13 +1004,13 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
-                tabs={isPublic ? tabs.slice(0, 3) : tabs}
+                tabs={isPublic ? tabs.slice(0, 3) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
               />
             </div>
           </div>
         ) : null}
         {!isLoading && !isLg ? (
-          <div className="w-full">
+          <div className="mb-2 w-full">
             <Tabs
               onChange={(tab, index) => {
                 if (!isPreview) {
@@ -1027,7 +1023,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             />
           </div>
         ) : null}
-        <div className="flex flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <div className="flex max-h-full flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">
               {type === "conversations" && subitem_id ? (
@@ -1151,7 +1147,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 initialOpen={false}
                 label="Assets">
                 {existingCharacter?.data?.images?.length ? (
-                  <div className="mt-2 h-[calc(100%-10rem)] animate-in fade-in fill-mode-both">
+                  <div className="mt-2 animate-in fade-in fill-mode-both">
                     {assetView === "table" ? (
                       <Table
                         columns={assetTableColumns(

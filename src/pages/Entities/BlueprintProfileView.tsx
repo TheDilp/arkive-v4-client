@@ -435,10 +435,11 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
           </div>
         </div>
       ) : null}
-      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      <div className="max-h-[calc(100vh-40%)] w-full flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-25%)] lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
-          <div className={`${id ? "" : "p-4"} flex flex-col items-center gap-y-2 rounded-lg bg-zinc-800 lg:col-span-1`}>
+          <div
+            className={`${id ? "" : "p-4"} flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 lg:col-span-1`}>
             <div className="mt-2 flex flex-col gap-y-1">
               <h2 className="text-center font-merriweather text-lg">{`${blueprintInstance?.data?.title || ""}`.trimEnd()}</h2>
             </div>
@@ -458,7 +459,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
           </div>
         ) : null}
         {!isLoading && !isLg ? (
-          <div className="w-full">
+          <div className="mb-2 w-full">
             <Tabs
               onChange={(tab, index) => {
                 navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
@@ -469,7 +470,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
             />
           </div>
         ) : null}
-        <div className="flex flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <div className="flex max-h-full flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
