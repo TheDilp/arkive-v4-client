@@ -1,9 +1,10 @@
 import { useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
 import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
 
@@ -103,6 +104,8 @@ export function TagView() {
   useChangeNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const { mutateAsync: deleteMany } = useDeleteMany("tags", project_id);
+  const resetDialogAtom = useResetAtom(dialogAtom);
   const [filter, setFilter] = useState("");
   const columns = createColumns(setDrawer, setDialog);
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
@@ -178,6 +181,44 @@ export function TagView() {
             orderBy,
             filters,
             selection,
+            selectedActions: [
+              {
+                icon: IconEnum.trash,
+                variant: "error",
+                hasNoBackground: true,
+                isIconOnly: true,
+                tooltip: "Delete selected rows.",
+                onClick: () => {
+                  const ids = Object.values(selection || {}).flatMap((id) => id);
+                  if (ids.length) {
+                    setDialog((prev) => ({
+                      ...prev,
+                      title: "Delete many",
+                      description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "tag" : "tags"}?`,
+                      warning: "This action cannot be undone.",
+                      isOverlay: true,
+                      cancel: {
+                        label: "Cancel",
+                        variant: "primary",
+                        action: resetDialogAtom,
+                      },
+                      confirm: {
+                        label: "Delete",
+                        icon: IconEnum.trash,
+                        action: async () =>
+                          deleteMany(
+                            { data: { ids } },
+                            {
+                              onSuccess: () => dispatch({ type: "clearSelection" }),
+                            },
+                          ),
+                        variant: "error",
+                      },
+                    }));
+                  }
+                },
+              },
+            ],
           }}
           data={data?.data || []}
           dispatch={dispatch}

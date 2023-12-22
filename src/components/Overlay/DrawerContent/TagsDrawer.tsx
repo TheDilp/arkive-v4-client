@@ -113,10 +113,20 @@ export function TagsDrawer({ data }: { data: TagType | { project_id: string } })
             if (Array.isArray(tags)) {
               await createMany({ data: tags.map((tag) => ({ ...omit(tag, ["id"]), color: tag?.color || DefaultTagColor })) });
             } else {
-              await create({ data: tags });
+              await create(
+                { data: tags },
+                {
+                  onSuccess: resetDrawerAtom,
+                },
+              );
             }
           } else if (!Array.isArray(tags)) {
-            await update({ data: omit(tags, ["project_id"]) });
+            await update(
+              { data: omit(tags, ["project_id"]) },
+              {
+                onSuccess: resetDrawerAtom,
+              },
+            );
             queryClient.invalidateQueries({
               predicate: (query) =>
                 EntitiesWithTags.includes(query.queryKey[2] as string) ||
