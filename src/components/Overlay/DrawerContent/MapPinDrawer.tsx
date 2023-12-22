@@ -1,9 +1,10 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
-import { MapPinType, MapPinTypesType } from "../../../types";
+import { MapPinType, MapPinTypesType, MapType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
@@ -47,7 +48,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
   const [mapPin, setMapPin] = useState<Partial<MapPinType>>({
     parent_id: item_id as string,
   });
-
+  const queryClient = useQueryClient();
   const { data: existingMapPinTypes } = useGetEntities<MapPinTypesType>({ data: { project_id } }, "map_pin_types");
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -312,7 +313,18 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           if (!("id" in data) || !data?.id) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
-            // if (character) final.character = character;
+
+            if (character) {
+              queryClient.setQueryData<{ data: MapType }>(["maps", mapPin.parent_id], (old) => {
+                if (old)
+                  return {
+                    ...old,
+                    data: { ...old.data, map_pins: [...(old?.data?.map_pins || []), { ...mapPin, character } as MapPinType] },
+                  };
+                return old;
+              });
+            }
+
             await createMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {

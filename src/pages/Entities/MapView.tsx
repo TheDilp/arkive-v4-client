@@ -47,7 +47,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
 
   function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
     if (Array.isArray(value)) {
-      // if (value.includes("all") && value.length === 1 && mapPinFilters.includes("all")) setMapPinFilters(["all"]);
       if (value.length === 0) setMapPinFilters(["all"]);
       else if (value.includes("all") && !mapPinFilters.includes("all")) setMapPinFilters(["all"]);
       else if (mapPinFilters.includes("all")) setMapPinFilters(value.filter((v) => v !== "all"));
