@@ -145,22 +145,6 @@ export function MapImage({
       <LayersControl.BaseLayer checked name="Map">
         <ImageOverlay ref={imgRef} bounds={bounds} url={src} />
       </LayersControl.BaseLayer>
-      {/* Markers layer */}
-      <LayersControl.Overlay checked name="Map pins">
-        {isClusteringPins ? (
-          <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
-          </MarkerClusterGroup>
-        ) : (
-          <LayerGroup>
-            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
-          </LayerGroup>
-        )}
-      </LayersControl.Overlay>
       {/* Characters layer */}
       <LayersControl.Overlay checked name="Character pins">
         {isClusteringPins ? (
@@ -172,6 +156,22 @@ export function MapImage({
         ) : (
           <LayerGroup>
             {characterPins?.filter(PinFilter)?.map((pin) => (
+              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
+            ))}
+          </LayerGroup>
+        )}
+      </LayersControl.Overlay>
+      {/* Markers layer */}
+      <LayersControl.Overlay checked name="Map pins">
+        {isClusteringPins ? (
+          <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
+            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
+              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
+            ))}
+          </MarkerClusterGroup>
+        ) : (
+          <LayerGroup>
+            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
               <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
             ))}
           </LayerGroup>
