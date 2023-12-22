@@ -128,7 +128,7 @@ const fieldSizeClass = tv({
       select: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       characters_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
-      characters_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      characters_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
       locations_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
       locations_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       blueprints_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
@@ -178,7 +178,7 @@ function AdditionalFieldDisplay({
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text", isPreview });
-
+  const setDrawer = useSetAtom(drawerAtom);
   return (
     <div className={fieldClasses}>
       {blueprint_field.field_type === "text" ||
@@ -210,8 +210,33 @@ function AdditionalFieldDisplay({
         </>
       ) : null}
       {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
-      {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
+      {blueprint_field.field_type === "characters_single" ? (
         <div className="w-full">
+          <EntityPreview
+            id={blueprint_field_data.characters?.[0]?.character.id}
+            image_id={blueprint_field_data.characters?.[0]?.character?.portrait_id}
+            label={blueprint_field.title}
+            previewAction={
+              blueprint_field_data.characters?.[0]?.character
+                ? (id, parent_id) => {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Preview",
+                      data: { id, parent_id, entity_type: "characters" },
+                      type: "entity_preview",
+                      size: "half",
+                    }));
+                  }
+                : undefined
+            }
+            title={blueprint_field_data.characters?.[0]?.character?.full_name || ""}
+            type="characters"
+            variant="primary"
+          />
+        </div>
+      ) : null}
+      {blueprint_field.field_type === "characters_multiple" ? (
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={blueprint_field.title}
             items={(blueprint_field_data.characters || []).map((char) => ({
@@ -452,20 +477,22 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
                 {blueprintInstance?.data
-                  ? blueprintInstance?.data?.blueprint_fields.map((blueprint_field) => {
-                      const blueprintField = blueprint?.data?.blueprint_fields?.find(
-                        (field) => field.id === blueprint_field.id,
-                      );
-                      if (!blueprintField) return null;
-                      return (
-                        <AdditionalFieldDisplay
-                          key={blueprint_field.id}
-                          blueprint_field={blueprintField}
-                          blueprint_field_data={blueprint_field}
-                          isPreview={!!id}
-                        />
-                      );
-                    })
+                  ? blueprintInstance?.data?.blueprint_fields
+                      ?.toSorted((a, b) => a.sort - b.sort)
+                      .map((blueprint_field) => {
+                        const blueprintField = blueprint?.data?.blueprint_fields?.find(
+                          (field) => field.id === blueprint_field.id,
+                        );
+                        if (!blueprintField) return null;
+                        return (
+                          <AdditionalFieldDisplay
+                            key={blueprint_field.id}
+                            blueprint_field={blueprintField}
+                            blueprint_field_data={blueprint_field}
+                            isPreview={!!id}
+                          />
+                        );
+                      })
                   : null}
               </div>
             </Collapsible>

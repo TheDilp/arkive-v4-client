@@ -1,19 +1,7 @@
-import {
-  autoUpdate,
-  flip,
-  FloatingFocusManager,
-  FloatingPortal,
-  offset,
-  size,
-  useDismiss,
-  useFloating,
-  useInteractions,
-} from "@floating-ui/react";
 import { useSetAtom } from "jotai";
-import { useState } from "react";
 
 import { AvailableEntityType, ItemPreviewType } from "../../types";
-import { drawerAtom, IconEnum } from "../../utils";
+import { drawerAtom } from "../../utils";
 import { EntityPreview } from "./EntityPreview";
 
 type Props = {
@@ -24,90 +12,34 @@ type Props = {
 export function CarouselEntityPreview({ items, field_label }: Props) {
   const setDrawer = useSetAtom(drawerAtom);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const { refs, floatingStyles, context } = useFloating({
-    placement: "bottom-start",
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      flip(),
-      offset(8),
-      size({
-        apply({ rects, elements }) {
-          Object.assign(elements.floating.style, {
-            maxWidth: `${rects.reference.width}px`,
-            minWidth: `${rects.reference.width}px`,
-          });
-        },
-      }),
-    ],
-  });
-
-  const dismiss = useDismiss(context);
-
-  useInteractions([dismiss]);
-
   return (
-    <div className="relative flex w-full items-center">
-      <div ref={refs.setReference} className="relative w-full">
-        <EntityPreview
-          {...(items[0] || {})}
-          key={items?.[0]?.id}
-          icon={items?.[0] ? items?.[0]?.icon : undefined}
-          label={field_label}
-          otherAction={
-            items.length > 1
-              ? () => {
-                  setIsOpen((prev) => !prev);
-                }
-              : undefined
-          }
-          otherActionIcon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down}
-          previewAction={
-            items.length
-              ? (id, parent_id) => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    title: "Preview",
-                    data: { id, parent_id, entity_type: items[0].type as AvailableEntityType },
-                    type: "entity_preview",
-                    size: "half",
-                  }));
-                }
-              : undefined
-          }
-          variant="primary"
-        />
-      </div>
-      {isOpen && items.length > 1 ? (
-        <FloatingPortal>
-          <FloatingFocusManager context={context} modal={false}>
-            <div
-              ref={refs.setFloating}
-              className="z-[60] flex max-h-56 w-full max-w-full flex-col gap-y-2 overflow-y-auto rounded bg-zinc-700 shadow "
-              style={floatingStyles}>
-              {items.slice(1).map((item) => (
-                <div key={item.id} className="w-full">
-                  <EntityPreview
-                    {...item}
-                    label=""
-                    previewAction={(id) => {
-                      setDrawer((prev) => ({
-                        ...prev,
-                        title: "Preview",
-                        data: { id, entity_type: items[0].type as AvailableEntityType },
-                        type: "entity_preview",
-                        size: "half",
-                      }));
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </FloatingFocusManager>
-        </FloatingPortal>
-      ) : null}
-    </div>
+    <>
+      <span className="col-span-6 text-sm text-zinc-200">{field_label}</span>
+      {items.map((item) => (
+        <div key={item?.id} className="col-span-2 xs:col-span-6 sm:col-span-2">
+          <EntityPreview
+            icon={item ? item?.icon : undefined}
+            id={item?.id}
+            image_id={item?.image_id}
+            previewAction={
+              items.length
+                ? (id, parent_id) => {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Preview",
+                      data: { id, parent_id, entity_type: item.type as AvailableEntityType },
+                      type: "entity_preview",
+                      size: "half",
+                    }));
+                  }
+                : undefined
+            }
+            title={item.title}
+            type={item.type}
+            variant="primary"
+          />
+        </div>
+      ))}
+    </>
   );
 }

@@ -380,7 +380,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           {blueprint?.data?.blueprint_fields?.length ? (
             <FieldTemplateRows
               blueprint_fields={blueprint.data.blueprint_fields}
-              blueprint_fields_data={instance.blueprint_fields}
+              blueprint_fields_data={instance.blueprint_fields.toSorted((a, b) => a.sort - b.sort)}
               handleChange={handleChange}
             />
           ) : null}
