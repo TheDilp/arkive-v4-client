@@ -22,7 +22,7 @@ export interface MetaType {
   filterOptions?: FilterEnumType[];
 }
 
-export type TableColumnFilterType = RequestFilterType & { id: string };
+export type TableColumnFilterType = RequestFilterType & { id: string; relationalData?: { [key: string]: any } };
 
 export interface TableParams {
   orderBy?: RequestOrderByType[];

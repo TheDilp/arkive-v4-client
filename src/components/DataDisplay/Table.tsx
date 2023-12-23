@@ -8,6 +8,7 @@ import { tv } from "tailwind-variants";
 
 import { useHandleChange } from "../../hooks";
 import {
+  AvailableEntityType,
   FilterEnumType,
   HandleChangePropsType,
   MetaType,
@@ -36,6 +37,7 @@ import {
 import { Button, ButtonGroup, Checkbox, Input, Search, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
+import { EntityPreview } from "./EntityPreview";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
 
 export { createColumnHelper } from "@tanstack/react-table";
@@ -168,15 +170,31 @@ function TableColumnFilterList({
                     value={filt.value as string}
                   />
                 ) : null}
+                {/* TODO: REFACTOR */}
+                {/*  eslint-disable-next-line no-nested-ternary */}
                 {filt.operator && !Array.isArray(filt.value) && filterType?.type === "search" && filterType?.searchType ? (
-                  <Search
-                    isAutocomplete
-                    name={`${type}[${index}].value`}
-                    onChange={({ name, value }) => handleChange({ name, value })}
-                    searchEntity={filterType?.searchType}
-                    size="sm"
-                    value={filt.value as string | undefined}
-                  />
+                  filt?.relationalData ? (
+                    <EntityPreview
+                      id={filt.relationalData.value}
+                      image_id={filt.relationalData.image}
+                      title={filt.relationalData.label}
+                      type={filterType?.searchType as AvailableEntityType}
+                    />
+                  ) : (
+                    <Search
+                      isAutocomplete
+                      name={`${type}[${index}].value`}
+                      onChange={({ name, value, label, image }) =>
+                        handleChange([
+                          { name, value },
+                          { name: `${type}[${index}].relationalData`, value: { value, label, image } },
+                        ])
+                      }
+                      searchEntity={filterType?.searchType}
+                      size="sm"
+                      value={filt.value as string | undefined}
+                    />
+                  )
                 ) : null}
               </div>
               <div className="[&>button]:w-8">
