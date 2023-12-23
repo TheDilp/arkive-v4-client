@@ -176,6 +176,12 @@ function TableColumnFilterList({
                 filterType?.searchType &&
                 filt?.relationalData ? (
                   <EntityPreview
+                    clearAction={() =>
+                      handleChange([
+                        { name: `${type}[${index}].value`, value: "" },
+                        { name: `${type}[${index}].relationalData`, value: undefined },
+                      ])
+                    }
                     id={filt.relationalData.value}
                     image_id={filt.relationalData.image}
                     size="sm"
@@ -401,18 +407,25 @@ function TableSubheaderFilterBadges({
         </Tooltip>
       ))}
       {relationFields.map((field) => (
-        <div key={field}>
-          <Badge
-            clearAction={() =>
-              dispatch({
-                type: "removeRelationFilterByField",
-                payload: field,
-              })
-            }
-            label={getSentenceCase(field)}
-            variant="info"
-          />
-        </div>
+        <Tooltip
+          key={field}
+          content={getFilterTooltip({
+            and: andRelationFiltersByField[field] || [],
+            or: orRelationFiltersByField[field] || [],
+          })}>
+          <div>
+            <Badge
+              clearAction={() =>
+                dispatch({
+                  type: "removeRelationFilterByField",
+                  payload: field,
+                })
+              }
+              label={getSentenceCase(field)}
+              variant="info"
+            />
+          </div>
+        </Tooltip>
       ))}
     </div>
   );

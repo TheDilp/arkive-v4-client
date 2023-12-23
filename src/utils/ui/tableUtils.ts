@@ -82,8 +82,16 @@ export function removeColumnFilter(
   }));
 }
 
-export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "value">) {
-  return `${FilterNamesEnum[filter.operator]}: "${filter.value}"`;
+export function getFilterBadgeLabelOperator(operator: TableColumnFilterType["operator"], isRelationFilter: boolean): string {
+  if (isRelationFilter) return "";
+  if (isRelationFilter) return "Doesn't have";
+  return `${FilterNamesEnum[operator]}:`;
+}
+
+export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "value" | "relationalData">) {
+  return `${getFilterBadgeLabelOperator(filter.operator, !!filter?.relationalData)} "${
+    filter?.relationalData?.label || filter.value
+  }"`;
 }
 
 export function groupFiltersByField(
@@ -125,8 +133,8 @@ export function getFilterTooltip({
   and,
   or,
 }: {
-  and?: Pick<TableColumnFilterType, "id" | "value" | "operator">[];
-  or?: Pick<TableColumnFilterType, "id" | "value" | "operator">[];
+  and?: Pick<TableColumnFilterType, "id" | "value" | "operator" | "relationalData">[];
+  or?: Pick<TableColumnFilterType, "id" | "value" | "operator" | "relationalData">[];
 }) {
   let base = "";
   if (and?.length) {

@@ -63,6 +63,7 @@
         "endOfLine": "auto"
       }
     ],
+    "jsx-a11y/control-has-associated-label": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".ts", ".tsx"] }],
     "react/jsx-sort-props": "error",
     "react/jsx-no-bind": "off",
