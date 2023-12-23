@@ -46,6 +46,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   isMd: boolean,
   webhooks: WebhookType[],
+  project_id: string,
 ) {
   return [
     columnHelper.display({
@@ -55,7 +56,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(row.original.project_id, "images", row.original?.portrait?.id || "")}
+            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
             isBordered
             isTooltipDisabled
@@ -226,6 +227,7 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
+      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "age"],
     },
     "characters",
     {
@@ -247,6 +249,7 @@ export function CharactersView() {
       relations: {
         portrait: true,
       },
+      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "age"],
       filters,
       pagination: {
         limit: 12,
@@ -373,7 +376,7 @@ export function CharactersView() {
       ) : (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, isMd, user?.webhooks || [])}
+            columns={createColumns(setDrawer, setDialog, isMd, user?.webhooks || [], project_id as string)}
             config={{
               hasSelect: true,
               hasFavorite: true,

@@ -6,7 +6,7 @@ import { FavoriteColumn, SelectColumn, TagColumn } from "../../components/DataDi
 import { RequestPaginationType, SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
-export const relationFiltersList = ["tags"];
+export const relationFiltersList = ["tags", "characters", "blueprint_instaces", "maps", "documents"];
 
 export function getTableColumns(
   columns: ColumnDef<any>[],
@@ -155,8 +155,9 @@ export function applyFilter(
     or?: TableColumnFilterType[] | undefined;
   },
   dispatch: TableDispatch,
+  isRelationFilter: boolean,
 ) {
-  dispatch({ type: "setFilter", payload: { ...columnFilters, field: columnId } });
+  dispatch({ type: isRelationFilter ? "setRelationFilters" : "setFilter", payload: { ...columnFilters, field: columnId } });
 }
 
 export function getPinnedOffset(pinnedColumns: { id: string; minSize: number; maxSize: number }[], id: string) {

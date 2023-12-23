@@ -4,7 +4,7 @@ import {
   FloatingFocusManager,
   FloatingPortal,
   offset,
-  size,
+  size as floatingSize,
   useDismiss,
   useFloating,
   useId,
@@ -17,10 +17,10 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useSearch } from "../../hooks";
-import { AllAvailableEntities } from "../../types";
+import { AllAvailableEntities, AvailableEntityType } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
 import { getImageURL, IconEnum } from "../../utils";
-import { Avatar, Icon } from "..";
+import { Avatar, EntityPreview, Icon } from "..";
 import { Button } from ".";
 
 interface ItemProps {
@@ -80,7 +80,8 @@ const SearchClasses = tv({
     },
     size: {
       sm: {
-        input: "h-8",
+        base: "max-h-8",
+        input: "max-h-8",
       },
     },
     isDisabled: {
@@ -177,6 +178,7 @@ export function Search({
   onChange,
   manualResults,
   onSearch,
+  size,
   isPublic,
 }: SearchType) {
   const { project_id } = useParams();
@@ -192,6 +194,7 @@ export function Search({
     isAutocomplete,
     hasValueWithImage: !isMultiple && !!value && searchEntity === "images",
     isDisabled,
+    size,
     hasNoBackground,
   });
   const [open, setOpen] = useState(false);
@@ -219,10 +222,11 @@ export function Search({
     project_id as string,
     {
       enabled: false,
-      queryKeyConcat: [searchTerm, inputValue, name],
+      queryKeyConcat: [searchTerm, name],
       isPublic,
     },
   );
+
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
     whileElementsMounted: autoUpdate,
     open,
@@ -230,7 +234,7 @@ export function Search({
     middleware: [
       autoPlacement({ allowedPlacements }),
       offset(offsetProp || { mainAxis: 2 }),
-      size({
+      floatingSize({
         apply({ rects, availableHeight, elements }) {
           Object.assign(elements.floating.style, {
             width: `${rects.reference.width}px`,
@@ -279,15 +283,27 @@ export function Search({
   useEffect(() => {
     if (document.activeElement !== inputRef.current) setOpen(false);
   }, [document.activeElement, inputRef.current]);
+  if (!isMultiple && !!data?.data.length && !!value && !Array.isArray(value)) {
+    const item = data.data.find((i) => i.value === value);
+    if (item)
+      return (
+        <EntityPreview
+          clearAction={() => {
+            remove();
+            onChange({ name, value: "" });
+          }}
+          id={item.value}
+          title={item?.label || item?.full_name || ""}
+          type={searchEntity as AvailableEntityType}
+        />
+      );
+  }
 
   return (
     <div className="w-full">
       {label ? <div className={labelClasses()}>{label}</div> : null}
       <div
         className={base()}
-        onBlur={() => {
-          setOpen(false);
-        }}
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
@@ -306,9 +322,6 @@ export function Search({
           className={input()}
           disabled={isDisabled}
           name="search"
-          onBlur={() => {
-            setOpen(false);
-          }}
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
@@ -319,7 +332,6 @@ export function Search({
             if (e.key === "Escape" && document.activeElement === inputRef.current) {
               setInputValue("");
               setOpen(false);
-              remove();
             }
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
@@ -342,9 +354,8 @@ export function Search({
                   if (hasShownOption) setDisplayValue(item.label);
                   if (!isMultiple) {
                     setInputValue("");
-                    setOpen(false);
-                    remove();
                   }
+                  setOpen(false);
                   inputRef.current?.focus();
                 }
               }
@@ -356,7 +367,6 @@ export function Search({
                 // setInputValue("");
                 // setDisplayValue("");
               }
-              remove();
               if (displayValue) {
                 setDisplayValue("");
               }
@@ -420,7 +430,9 @@ export function Search({
                       ref(node) {
                         listRef.current[index] = node;
                       },
-                      onClick() {
+                      onClick(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         onChange({
                           name,
                           value: item.value,
@@ -433,11 +445,7 @@ export function Search({
                         });
 
                         if (hasShownOption) setDisplayValue(item.label);
-                        if (!isMultiple) {
-                          setInputValue("");
-                          setOpen(false);
-                          remove();
-                        }
+                        setOpen(false);
                         inputRef.current?.focus();
                       },
                     })}

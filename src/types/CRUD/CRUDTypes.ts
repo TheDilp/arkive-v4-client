@@ -46,8 +46,9 @@ export interface RequestBodyType<InsertType> {
     or?: RequestFilterType[];
   } | null;
   relationFilters?: {
-    [key: string]: string[];
-  };
+    and?: RequestFilterType[];
+    or?: RequestFilterType[];
+  } | null;
   pagination?: RequestPaginationType;
   relations?: RequestRelationsType;
   columns?: RequestColumnsType;

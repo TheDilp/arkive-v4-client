@@ -26,6 +26,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "events") return IconEnum.event;
   if (type === "blueprints" || type === "blueprint_instances") return IconEnum.blueprint;
   if (type === "conversations") return IconEnum.conversation;
+  if (type === "tags") return IconEnum.tags;
 
   return IconEnum.error;
 }

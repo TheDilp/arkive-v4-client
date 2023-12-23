@@ -16,6 +16,7 @@ import {
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import {
   baseURLS,
+  CharacterFilters,
   dialogAtom,
   DiceRollRegex,
   drawerAtom,
@@ -160,6 +161,7 @@ function createColumns(
         columnHelper.display({
           id: field.title,
           header: field.title,
+
           cell: ({ row }) => {
             const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
 
@@ -279,6 +281,7 @@ function createColumns(
             noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
               field.field_type,
             ),
+            filterOptions: CharacterFilters,
           },
           minSize,
           maxSize,
@@ -372,11 +375,12 @@ export function BlueprintInstanceView() {
   const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const navigate = useNavigate();
-  const [{ selection, pagination, orderBy, filters }, dispatch] = useTable({
+  const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
     filters: {},
+    relationFilters: {},
   });
 
   const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -401,6 +405,7 @@ export function BlueprintInstanceView() {
         tags: true,
       },
       filters,
+      relationFilters,
       orderBy,
       pagination,
     },
@@ -448,6 +453,7 @@ export function BlueprintInstanceView() {
               hasTags: true,
               selection,
               filters,
+              relationFilters,
               selectedActions: [
                 {
                   icon: IconEnum.trash,

@@ -2,15 +2,16 @@ import { Dispatch } from "react";
 
 import { AssetType } from "../../baseTypes";
 import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType } from "../../CRUD/CRUDTypes";
-import { AvailableEntityType } from "../../EntityTypes";
+import { AvailableEntityType, SearchableEntities } from "../../EntityTypes";
 import { ButtonType } from "../FormTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
 export type TableSelectionType = { [key: number]: string[] };
 
 export interface FilterEnumType extends SelectOptionType {
-  type: "boolean" | "text" | "number";
-  options?: SelectOptionType[];
+  type: "boolean" | "text" | "number" | "search";
+  options?: (SelectOptionType | { label: string; value: boolean })[];
+  searchType?: SearchableEntities;
 }
 export interface MetaType {
   sortable?: boolean;
@@ -26,7 +27,7 @@ export type TableColumnFilterType = RequestFilterType & { id: string };
 export interface TableParams {
   orderBy?: RequestOrderByType[];
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-  relationFilters?: Record<string, string[]>;
+  relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   pagination?: RequestPaginationType;
   selection?: TableSelectionType;
 }
@@ -44,14 +45,16 @@ export type TableActionType =
       type: "setPagination";
       payload: { limit?: number; page?: number };
     }
-  | { type: "setFilter"; payload: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[]; field?: string } }
+  | {
+      type: "setFilter" | "setRelationFilters";
+      payload: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[]; field?: string };
+    }
   | { type: "clearAllFilters" }
   | { type: "removeFilter"; payload: { and?: TableColumnFilterType; or?: TableColumnFilterType } }
   | {
-      type: "removeFilterByField";
+      type: "removeFilterByField" | "removeRelationFilterByField";
       payload: string;
     }
-  | { type: "setRelationFilters"; payload: Record<string, string[]> }
   | {
       type: "setSort";
       payload: { field: string; sort: SortType };
@@ -79,7 +82,7 @@ export interface TableType {
     selection?: TableSelectionType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-    relationFilters?: Record<string, string[]>;
+    relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     selectedActions?: TableSelectedAction[];
     getLink?: (rowData: any) => string;
     onRowClick?: (rowData: any) => void;
@@ -96,6 +99,7 @@ export interface TableColumnFilterComponentType {
   dispatch: TableDispatch;
   isAndDisabled?: boolean;
   isOrDisabled?: boolean;
+  isRelationFilter?: boolean;
 }
 
 export type SetFavoriteType = (data: { is_favorite: boolean; id: string }) => Promise<void>;

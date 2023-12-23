@@ -14,7 +14,14 @@ import { Sidebar } from "./Sidebar";
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
-  const { data } = useGetEntity<ProjectType>(project_id as string, "projects", {}, { staleTime: 60 * 60 * 1 });
+  const { data } = useGetEntity<ProjectType>(
+    project_id as string,
+    "projects",
+    {
+      fields: ["id", "title"],
+    },
+    { staleTime: 60 * 60 * 1 },
+  );
   const { user } = useUser();
 
   const { data: userData } = useGetUser(

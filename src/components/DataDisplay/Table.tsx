@@ -2,23 +2,21 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import omit from "lodash.omit";
 import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useGetEntities, useHandleChange } from "../../hooks";
+import { useHandleChange } from "../../hooks";
 import {
   FilterEnumType,
+  HandleChangePropsType,
   MetaType,
   RequestFilterTypes,
   RequestOrderByType,
   TableColumnFilterComponentType,
   TableColumnFilterType,
-  TableDispatch,
   TableParams,
   TableType,
-  TagType,
 } from "../../types";
 import {
   applyFilter,
@@ -35,7 +33,7 @@ import {
   relationFiltersList,
   removeColumnFilter,
 } from "../../utils";
-import { Button, ButtonGroup, Checkbox, Input, Select } from "../Form";
+import { Button, ButtonGroup, Checkbox, Input, Search, Select } from "../Form";
 import { Badge, Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { ExpandedTableRow } from "./TableComponents/ExpandedRow";
@@ -47,9 +45,9 @@ const TableClasses = tv({
     head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] max-h-[3rem] h-12 sticky top-0 border-b select-none",
     select: "select-none z-20",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
-    subheaderContainer: "px-2 max-h-[2.5rem]",
-    subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-10",
-    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden",
+    subheaderContainer: "px-2 max-h-[2.5rem] sticky top-0 left-0",
+    subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-8",
+    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden sticky left-0 top-0",
     subheaderRowTitle: "font-medium",
     rowContainer:
       "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.04rem] border-zinc-600",
@@ -111,7 +109,7 @@ function TableColumnFilterList({
   applyFilter: () => void;
   filters: TableColumnFilterType[];
   type: "and" | "or";
-  handleChange: ({ name, value }: { name: string; value: any }) => void;
+  handleChange: (newValue: HandleChangePropsType) => void;
   filterOptions: FilterEnumType[];
   setColumnFilters: Dispatch<
     SetStateAction<{
@@ -124,6 +122,7 @@ function TableColumnFilterList({
     <>
       {filters.map((filt, index) => {
         const filterType = filterOptions?.find((opt) => opt.value === filt.operator);
+
         return (
           <div key={filt.id} className="flex flex-col gap-y-2">
             <div className="flex w-full flex-nowrap items-center gap-x-2">
@@ -169,6 +168,16 @@ function TableColumnFilterList({
                     value={filt.value as string}
                   />
                 ) : null}
+                {filt.operator && !Array.isArray(filt.value) && filterType?.type === "search" && filterType?.searchType ? (
+                  <Search
+                    isAutocomplete
+                    name={`${type}[${index}].value`}
+                    onChange={({ name, value }) => handleChange({ name, value })}
+                    searchEntity={filterType?.searchType}
+                    size="sm"
+                    value={filt.value as string | undefined}
+                  />
+                ) : null}
               </div>
               <div className="[&>button]:w-8">
                 <Button
@@ -202,6 +211,7 @@ function TableColumnFilter({
   filterOptions,
   isAndDisabled,
   isOrDisabled,
+  isRelationFilter,
   dispatch,
 }: TableColumnFilterComponentType) {
   const {
@@ -249,7 +259,7 @@ function TableColumnFilter({
             </div>
           </div>
           <TableColumnFilterList
-            applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch)}
+            applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter)}
             filterOptions={filterOptions}
             filters={columnFilters?.and || []}
             handleChange={handleChange}
@@ -284,7 +294,7 @@ function TableColumnFilter({
         </div>
       )}
       <TableColumnFilterList
-        applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch)}
+        applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter)}
         filterOptions={filterOptions}
         filters={columnFilters?.or || []}
         handleChange={handleChange}
@@ -310,6 +320,7 @@ function TableColumnFilter({
                   ],
                 },
                 dispatch,
+                !!isRelationFilter,
               );
             } else if (orFilter && orFilter?.value === true) {
               applyFilter(
@@ -318,46 +329,13 @@ function TableColumnFilter({
                   or: [{ ...orFilter, value: true }],
                 },
                 dispatch,
+                !!isRelationFilter,
               );
             }
           } else {
-            applyFilter(columnId as string, columnFilters, dispatch);
+            applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter);
           }
         }}
-        variant="success"
-      />
-    </div>
-  );
-}
-
-function TableTagFilter({ activeTags, dispatch }: { activeTags: string[]; dispatch: TableDispatch }) {
-  const { project_id } = useParams();
-  const { data: tags, isFetching } = useGetEntities<TagType>(
-    { data: { project_id }, orderBy: [{ field: "title", sort: "asc" }], pagination: { limit: 5000 } },
-    "tags",
-  );
-  const [selectedTags, setSelectedTags] = useState<string[]>(activeTags);
-  useEffect(() => {
-    if (Array.isArray(activeTags)) setSelectedTags(activeTags);
-  }, [activeTags]);
-  return (
-    <div className="flex min-w-[15rem] max-w-[15rem] flex-col gap-y-2">
-      <Select
-        hasSearch
-        isDisabled={isFetching}
-        isLoading={isFetching}
-        isMultiple
-        label="Match all"
-        name="tags"
-        onChange={({ value }) => setSelectedTags(value as string[])}
-        options={tags?.data?.map((tag) => ({ label: tag.title, value: tag.id })) || []}
-        value={selectedTags}
-      />
-      <Button
-        icon={IconEnum.filter}
-        isDisabled={isFetching || tags?.data?.length === 0 || selectedTags.length === 0}
-        label="Apply filter"
-        onClick={() => dispatch({ type: "setRelationFilters", payload: { tags: selectedTags } })}
         variant="success"
       />
     </div>
@@ -372,9 +350,11 @@ function TableSubheaderFilterBadges({
   const { subheaderFilterBadges } = TableClasses();
   const andFiltersByField = groupFiltersByField(filters?.and || []);
   const orFiltersByField = groupFiltersByField(filters?.or || []);
+  const andRelationFiltersByField = groupFiltersByField(relationFilters?.and || []);
+  const orRelationFiltersByField = groupFiltersByField(relationFilters?.or || []);
 
   const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
-  const relationFields = [...new Set(Object.keys(relationFilters || {}))];
+  const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
   return (
     <div className={subheaderFilterBadges()}>
       {fields.map((field) => (
@@ -400,8 +380,8 @@ function TableSubheaderFilterBadges({
           <Badge
             clearAction={() =>
               dispatch({
-                type: "setRelationFilters",
-                payload: omit(relationFilters, [field]),
+                type: "removeRelationFilterByField",
+                payload: field,
               })
             }
             label={getSentenceCase(field)}
@@ -527,8 +507,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
             const activeColumnFilters = {
-              and: (filters?.and || []).filter((filt) => filt.field === id),
-              or: (filters?.or || []).filter((filt) => filt.field === id),
+              and: (filters?.and || relationFilters?.and || []).filter((filt) => filt.field === id),
+              or: (filters?.or || relationFilters?.or || []).filter((filt) => filt.field === id),
             };
             const isRelationFilter = relationFiltersList.includes(id || "");
             return (
@@ -561,18 +541,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             e.preventDefault();
                             e.stopPropagation();
                           }}>
-                          {isRelationFilter ? null : (
-                            <TableColumnFilter
-                              columnId={id}
-                              dispatch={dispatch}
-                              filterOptions={(meta as MetaType)?.filterOptions || []}
-                              filters={activeColumnFilters}
-                              isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                            />
-                          )}
-                          {id === "tags" ? (
-                            <TableTagFilter activeTags={relationFilters?.tags || []} dispatch={dispatch} />
-                          ) : null}
+                          <TableColumnFilter
+                            columnId={id}
+                            dispatch={dispatch}
+                            filterOptions={(meta as MetaType)?.filterOptions || []}
+                            filters={activeColumnFilters}
+                            isAndDisabled={["is_favorite"].includes(hdr.column.id)}
+                            isRelationFilter={isRelationFilter}
+                          />
                         </div>
                       }
                       customOffset={{ mainAxis: 8 }}

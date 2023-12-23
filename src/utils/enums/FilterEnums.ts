@@ -1,4 +1,4 @@
-import { RequestFilterTypes } from "../../types";
+import { FilterEnumType, RequestFilterTypes } from "../../types";
 
 export const inputFilters = ["eq", "gt", "gte", "lt", "lte"];
 export const rangeFilters = ["between", "notBetween"];
@@ -17,12 +17,12 @@ export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   "not in": "Not in list",
 };
 
-export const NameFilters = [
+export const NameFilters: FilterEnumType[] = [
   { label: FilterNamesEnum.eq, value: "eq", type: "text" },
   { label: FilterNamesEnum.ilike, value: "ilike", type: "text" },
 ];
 
-export const NumberFilters = [
+export const NumberFilters: FilterEnumType[] = [
   {
     label: FilterNamesEnum.eq,
     value: "eq",
@@ -50,12 +50,12 @@ export const NumberFilters = [
   },
 ];
 
-export const TagFilters = [
-  { label: FilterNamesEnum.in, value: "in", type: "relation" },
-  { label: FilterNamesEnum["not in"], value: "not in", type: "relation" },
+export const TagFilters: FilterEnumType[] = [
+  { label: FilterNamesEnum.in, value: "in", type: "search", searchType: "tags" },
+  { label: FilterNamesEnum["not in"], value: "not in", type: "search", searchType: "tags" },
 ];
 
-export const FavoritesFilters = [
+export const FavoritesFilters: FilterEnumType[] = [
   {
     label: "Is favorite",
     value: "eq",
@@ -70,5 +70,20 @@ export const FavoritesFilters = [
         value: false,
       },
     ],
+  },
+];
+
+export const CharacterFilters: FilterEnumType[] = [
+  {
+    label: "Includes",
+    value: FilterNamesEnum.in,
+    type: "search",
+    searchType: "characters",
+  },
+  {
+    label: "Does not include",
+    value: FilterNamesEnum["not in"],
+    type: "search",
+    searchType: "characters",
   },
 ];

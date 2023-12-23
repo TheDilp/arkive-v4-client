@@ -55,6 +55,19 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       }
       return state;
     }
+    case "removeRelationFilterByField": {
+      if (action.payload) {
+        return {
+          ...state,
+          relationFilters: {
+            ...state.relationFilters,
+            and: (state.relationFilters?.and || []).filter((filt) => filt.field !== action.payload),
+            or: (state.relationFilters?.or || []).filter((filt) => filt.field !== action.payload),
+          },
+        };
+      }
+      return state;
+    }
     case "removeFilter": {
       if (action.payload?.and) {
         return {
