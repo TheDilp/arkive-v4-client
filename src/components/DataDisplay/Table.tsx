@@ -177,6 +177,7 @@ function TableColumnFilterList({
                     <EntityPreview
                       id={filt.relationalData.value}
                       image_id={filt.relationalData.image}
+                      size="sm"
                       title={filt.relationalData.label}
                       type={filterType?.searchType as AvailableEntityType}
                     />

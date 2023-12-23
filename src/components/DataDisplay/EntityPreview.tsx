@@ -10,7 +10,7 @@ const EntityPreviewClasses = tv({
   slots: {
     container: "flex flex-col",
     label: "block min-h-[20px] truncate text-sm text-zinc-300",
-    base: "flex max-h-10 min-h-[2.5rem] items-center gap-x-1 rounded p-2",
+    base: "flex items-center gap-x-1 rounded p-2",
     link: "flex max-h-10 mr-auto items-center gap-x-1 rounded p-2 ",
     linkTitle: "truncate",
     action: "w-min",
@@ -24,6 +24,10 @@ const EntityPreviewClasses = tv({
       secondary: {
         base: "bg-zinc-700 border-0",
       },
+    },
+    size: {
+      sm: "h-8 min-h-[2rem] max-h-8",
+      md: "h-10 min-h-[2.5rem] max-h-10",
     },
     hasNoBackground: {
       true: {
@@ -53,6 +57,7 @@ export function EntityPreview({
   hasNoBackground,
   otherActionIcon,
   variant = "secondary",
+  size = "md",
   previewAction,
   clearAction,
   otherAction,
@@ -66,7 +71,7 @@ export function EntityPreview({
     linkTitle,
     action: actionClasses,
     otherAction: otherActionClasses,
-  } = EntityPreviewClasses({ hasNoBackground, variant, hasLink: !!link });
+  } = EntityPreviewClasses({ hasNoBackground, variant, size, hasLink: !!link });
   return (
     <div className={container()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -82,7 +87,7 @@ export function EntityPreview({
         ) : null}
         {!image_id && type !== "images" ? (
           <span>
-            <Icon fontSize={32} icon={icon || getDefaultEntityIcon(type)} />
+            <Icon fontSize={size === "md" ? 32 : 24} icon={icon || getDefaultEntityIcon(type)} />
           </span>
         ) : null}
         <Link className={linkClasses()} to={link || "#"}>

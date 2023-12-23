@@ -1,4 +1,4 @@
-import { Variant } from "../../baseTypes";
+import { Size, Variant } from "../../baseTypes";
 import { AvailableEntityType, AvailableSubEntityType } from "../../EntityTypes";
 
 export interface ItemPreviewType {
@@ -16,4 +16,5 @@ export interface ItemPreviewType {
   otherActionIcon?: string;
   type: AvailableEntityType | AvailableSubEntityType | "images";
   variant?: Variant;
+  size?: Size;
 }

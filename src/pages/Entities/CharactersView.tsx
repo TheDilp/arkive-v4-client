@@ -114,8 +114,8 @@ function createColumns(
         centered: true,
         filterOptions: NumberFilters,
       },
-      minSize: 6,
-      maxSize: 6,
+      minSize: 8,
+      maxSize: 8,
     }),
     columnHelper.display({
       id: "action",
