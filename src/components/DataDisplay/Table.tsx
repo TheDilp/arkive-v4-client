@@ -170,32 +170,38 @@ function TableColumnFilterList({
                     value={filt.value as string}
                   />
                 ) : null}
-                {/* TODO: REFACTOR */}
-                {/*  eslint-disable-next-line no-nested-ternary */}
-                {filt.operator && !Array.isArray(filt.value) && filterType?.type === "search" && filterType?.searchType ? (
-                  filt?.relationalData ? (
-                    <EntityPreview
-                      id={filt.relationalData.value}
-                      image_id={filt.relationalData.image}
-                      size="sm"
-                      title={filt.relationalData.label}
-                      type={filterType?.searchType as AvailableEntityType}
-                    />
-                  ) : (
-                    <Search
-                      isAutocomplete
-                      name={`${type}[${index}].value`}
-                      onChange={({ name, value, label, image }) =>
-                        handleChange([
-                          { name, value },
-                          { name: `${type}[${index}].relationalData`, value: { value, label, image } },
-                        ])
-                      }
-                      searchEntity={filterType?.searchType}
-                      size="sm"
-                      value={filt.value as string | undefined}
-                    />
-                  )
+                {filt.operator &&
+                !Array.isArray(filt.value) &&
+                filterType?.type === "search" &&
+                filterType?.searchType &&
+                filt?.relationalData ? (
+                  <EntityPreview
+                    id={filt.relationalData.value}
+                    image_id={filt.relationalData.image}
+                    size="sm"
+                    title={filt.relationalData.label}
+                    type={filterType?.searchType as AvailableEntityType}
+                  />
+                ) : null}
+
+                {filt.operator &&
+                !Array.isArray(filt.value) &&
+                filterType?.type === "search" &&
+                filterType?.searchType &&
+                !filt?.relationalData ? (
+                  <Search
+                    isAutocomplete
+                    name={`${type}[${index}].value`}
+                    onChange={({ name, value, label, image }) =>
+                      handleChange([
+                        { name, value },
+                        { name: `${type}[${index}].relationalData`, value: { value, label, image } },
+                      ])
+                    }
+                    searchEntity={filterType?.searchType}
+                    size="sm"
+                    value={filt.value as string | undefined}
+                  />
                 ) : null}
               </div>
               <div className="[&>button]:w-8">
