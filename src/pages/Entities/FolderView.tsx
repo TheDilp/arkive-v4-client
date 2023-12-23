@@ -397,6 +397,7 @@ export function FolderView() {
       relations: {
         children: true,
         parents: true,
+        tags: EntitiesWithTags.includes(type as string),
       },
     },
     {
