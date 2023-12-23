@@ -17,10 +17,10 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useSearch } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType } from "../../types";
+import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
 import { getImageURL, IconEnum } from "../../utils";
-import { Avatar, EntityPreview, Icon } from "..";
+import { Avatar, Icon } from "..";
 import { Button } from ".";
 
 interface ItemProps {
@@ -205,7 +205,7 @@ export function Search({
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
 
-  const { data, isFetching, remove, refetch } = useSearch<
+  const { data, isFetching, refetch } = useSearch<
     {
       label: string;
       value: string;
@@ -283,21 +283,6 @@ export function Search({
   useEffect(() => {
     if (document.activeElement !== inputRef.current) setOpen(false);
   }, [document.activeElement, inputRef.current]);
-  if (!isMultiple && !!data?.data.length && !!value && !Array.isArray(value)) {
-    const item = data.data.find((i) => i.value === value);
-    if (item)
-      return (
-        <EntityPreview
-          clearAction={() => {
-            remove();
-            onChange({ name, value: "" });
-          }}
-          id={item.value}
-          title={item?.label || item?.full_name || ""}
-          type={searchEntity as AvailableEntityType}
-        />
-      );
-  }
 
   return (
     <div className="w-full">
