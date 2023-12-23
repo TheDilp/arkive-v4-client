@@ -395,7 +395,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
   );
 
   return (
-    <div className="flex h-full min-h-full flex-col gap-y-2">
+    <div className="flex h-full min-h-full flex-col gap-y-2 ">
       {item_id ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -470,7 +470,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
             />
           </div>
         ) : null}
-        <div className="flex max-h-full flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4">
+        <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex">{tabs[selectedTab].label}</span>
           </h2>
