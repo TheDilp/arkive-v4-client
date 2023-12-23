@@ -319,6 +319,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       data: {
         id: data?.parent_id ?? item_id,
       },
+      fields: ["id", "title", "title_name", "icon"],
       relations: {
         random_table_options: true,
         blueprint_fields: true,
@@ -336,6 +337,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     "blueprint_instances",
     {
       data: { id: data?.id },
+      fields: ["id", "title", "parent_id", "is_public"],
       relations: {
         blueprint_fields: true,
         tags: true,

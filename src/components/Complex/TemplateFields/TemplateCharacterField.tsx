@@ -21,6 +21,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
+          isAutocomplete
           name={name}
           onChange={({ value, label, image }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
