@@ -26,6 +26,7 @@ import {
   getDayOrdinal,
   getImageURL,
   IconEnum,
+  NameFilters,
   rollDiceWithNotification,
   useNotifications,
   userAtom,
@@ -142,6 +143,8 @@ function createColumns(
       header: title_name,
       meta: {
         pinned: true,
+        sortable: true,
+        filterOptions: NameFilters,
       },
       cell: ({ row }) => row.original?.title || "",
       minSize: 15,
@@ -369,10 +372,11 @@ export function BlueprintInstanceView() {
   const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const navigate = useNavigate();
-  const [{ selection, pagination, orderBy }, dispatch] = useTable({
+  const [{ selection, pagination, orderBy, filters }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
+    filters: {},
   });
 
   const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -396,6 +400,7 @@ export function BlueprintInstanceView() {
         blueprint_fields: true,
         tags: true,
       },
+      filters,
       orderBy,
       pagination,
     },
@@ -442,6 +447,7 @@ export function BlueprintInstanceView() {
               hasSelect: true,
               hasTags: true,
               selection,
+              filters,
               selectedActions: [
                 {
                   icon: IconEnum.trash,

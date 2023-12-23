@@ -709,14 +709,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       key={cell.id}
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                      } ${cell.column.id === "select" ? "sticky left-0 z-0" : ""}
+                      } ${cell.column.id === "select" ? "sticky left-0 z-10" : ""}
                       ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
                        ${
                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                            ? "bg-blue-300"
                            : "bg-zinc-950"
                        }
-                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-0" : ""}
+                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""}
                       ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""}
                     
                       `}
