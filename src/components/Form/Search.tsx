@@ -285,6 +285,9 @@ export function Search({
       {label ? <div className={labelClasses()}>{label}</div> : null}
       <div
         className={base()}
+        onBlur={() => {
+          setOpen(false);
+        }}
         {...getReferenceProps({
           ref: refs.setReference,
         })}>
@@ -303,6 +306,9 @@ export function Search({
           className={input()}
           disabled={isDisabled}
           name="search"
+          onBlur={() => {
+            setOpen(false);
+          }}
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
@@ -397,69 +403,71 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && !isOptionsHidden && (data?.data?.length || manualResults?.length) && (
-          <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
-            <div
-              {...getFloatingProps({
-                ref: refs.setFloating,
-                style: floatingStyles,
-              })}
-              className={optionsContainer()}>
-              {(manualResults || data?.data)?.map((item, index) => (
-                <Item
-                  {...getItemProps({
-                    key: item.value,
-                    ref(node) {
-                      listRef.current[index] = node;
-                    },
-                    onClick() {
-                      onChange({
-                        name,
-                        value: item.value,
-                        label: item.label,
-                        color: item?.color,
-                        image: item?.image,
-                        parent_id: item?.parent_id,
-                        type: item?.type,
-                        icon: item?.icon,
-                      });
+        {(open || (!isAutocomplete && (searchTerm || displayValue))) &&
+          !isOptionsHidden &&
+          (data?.data?.length || manualResults?.length) && (
+            <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
+              <div
+                {...getFloatingProps({
+                  ref: refs.setFloating,
+                  style: floatingStyles,
+                })}
+                className={optionsContainer()}>
+                {(manualResults || data?.data)?.map((item, index) => (
+                  <Item
+                    {...getItemProps({
+                      key: item.value,
+                      ref(node) {
+                        listRef.current[index] = node;
+                      },
+                      onClick() {
+                        onChange({
+                          name,
+                          value: item.value,
+                          label: item.label,
+                          color: item?.color,
+                          image: item?.image,
+                          parent_id: item?.parent_id,
+                          type: item?.type,
+                          icon: item?.icon,
+                        });
 
-                      if (hasShownOption) setDisplayValue(item.label);
-                      if (!isMultiple) {
-                        setInputValue("");
-                        setOpen(false);
-                        remove();
-                      }
-                      inputRef.current?.focus();
-                    },
-                  })}
-                  isActive={activeIndex === index}
-                  isSelected={(value || [])?.includes(item.value)}>
-                  {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                  ((searchEntity === "places" ||
-                    searchEntity === "maps" ||
-                    searchEntity === "characters" ||
-                    searchEntity === "all") &&
-                    item?.image) ? (
-                    <Avatar
-                      image={getImageURL(
-                        project_id as string,
-                        imageType || "images",
-                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
-                      )}
-                      imageLoading="lazy"
-                      isTooltipDisabled
-                      label={label || ""}
-                      size="xs"
-                    />
-                  ) : null}
-                  {item?.icon && !item?.image ? <Icon icon={item?.icon} /> : null}
-                  <span className="truncate">{item.label}</span>
-                </Item>
-              ))}
-            </div>
-          </FloatingFocusManager>
-        )}
+                        if (hasShownOption) setDisplayValue(item.label);
+                        if (!isMultiple) {
+                          setInputValue("");
+                          setOpen(false);
+                          remove();
+                        }
+                        inputRef.current?.focus();
+                      },
+                    })}
+                    isActive={activeIndex === index}
+                    isSelected={(value || [])?.includes(item.value)}>
+                    {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
+                    ((searchEntity === "places" ||
+                      searchEntity === "maps" ||
+                      searchEntity === "characters" ||
+                      searchEntity === "all") &&
+                      item?.image) ? (
+                      <Avatar
+                        image={getImageURL(
+                          project_id as string,
+                          imageType || "images",
+                          searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
+                        )}
+                        imageLoading="lazy"
+                        isTooltipDisabled
+                        label={label || ""}
+                        size="xs"
+                      />
+                    ) : null}
+                    {item?.icon && !item?.image ? <Icon icon={item?.icon} /> : null}
+                    <span className="truncate">{item.label}</span>
+                  </Item>
+                ))}
+              </div>
+            </FloatingFocusManager>
+          )}
       </FloatingPortal>
     </div>
   );
