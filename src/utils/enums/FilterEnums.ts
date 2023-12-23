@@ -26,7 +26,7 @@ export const NumberFilters: FilterEnumType[] = [
   {
     label: FilterNamesEnum.eq,
     value: "eq",
-    type: "text",
+    type: "number",
   },
   {
     label: FilterNamesEnum.gt,

@@ -122,6 +122,7 @@ export function BlueprintView() {
       filters,
       orderBy,
       pagination,
+      fields: ["id", "title", "title_name", "icon"],
       data: {
         project_id,
       },

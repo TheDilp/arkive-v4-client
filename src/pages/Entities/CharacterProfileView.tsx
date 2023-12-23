@@ -815,6 +815,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         documents: true,
         images: true,
       },
+      fields: ["id", "full_name", "portrait_id", "age"],
     },
     {
       staleTime: 60 * 1000,
@@ -847,7 +848,9 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       data: { project_id },
       fields: ["id", "title"],
       relations: { character_fields: true },
-      relationFilters: { tags: (existingCharacter?.data?.tags || [])?.map((t) => t.id) },
+      relationFilters: {
+        and: (existingCharacter?.data?.tags || [])?.map((t) => ({ operator: "in", value: [t.id], field: "id" })),
+      },
     },
     "character_fields_templates",
     { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
@@ -971,7 +974,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
         </div>
       )}
-      <div className="max-h-[calc(100vh-40%)] w-full  flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-25%)] lg:grid-cols-5 lg:content-stretch">
+      <div className="max-h-[calc(100vh-40%)] w-full  flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-20%)] lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
           <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">

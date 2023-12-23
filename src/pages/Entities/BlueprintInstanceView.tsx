@@ -405,6 +405,7 @@ export function BlueprintInstanceView() {
         tags: true,
       },
       filters,
+      fields: ["id", "is_public", "title"],
       relationFilters,
       orderBy,
       pagination,
