@@ -16,7 +16,7 @@ import {
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import {
   baseURLS,
-  CharacterFilters,
+  CharacterBlueprintRelationFilter,
   dialogAtom,
   DiceRollRegex,
   drawerAtom,
@@ -281,7 +281,8 @@ function createColumns(
             noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
               field.field_type,
             ),
-            filterOptions: CharacterFilters,
+            filterOptions: CharacterBlueprintRelationFilter(field.field_type),
+            relationType: field.field_type,
           },
           minSize,
           maxSize,
@@ -452,6 +453,7 @@ export function BlueprintInstanceView() {
             config={{
               hasSelect: true,
               hasTags: true,
+              orderBy,
               selection,
               filters,
               relationFilters,
