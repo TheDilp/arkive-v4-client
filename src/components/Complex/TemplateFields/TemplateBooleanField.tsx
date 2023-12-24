@@ -20,7 +20,7 @@ export function TemplateBooleanField({ title, name, currentValue, handleChange, 
           onChange={({ value }) =>
             handleChange([
               { name: `${name}.id`, value: id },
-              { name: `${name}.value`, value: { value } },
+              { name: `${name}.value`, value },
             ])
           }
           value={currentValue as boolean}
