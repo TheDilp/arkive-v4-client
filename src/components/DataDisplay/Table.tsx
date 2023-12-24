@@ -9,6 +9,7 @@ import { tv } from "tailwind-variants";
 import { useHandleChange } from "../../hooks";
 import {
   AvailableEntityType,
+  BlueprintFieldTypes,
   FilterEnumType,
   HandleChangePropsType,
   MetaType,
@@ -23,6 +24,7 @@ import {
   applyFilter,
   capitalizeSentence,
   getAreColumnFiltersActive,
+  getBlueprintFieldValueFromType,
   getFilterTooltip,
   getIsApplyColumnFiltersDisabled,
   getPinnedOffset,
@@ -182,6 +184,7 @@ function TableColumnFilterList({
                         { name: `${type}[${index}].relationalData`, value: undefined },
                       ])
                     }
+                    icon={filt.relationalData.icon}
                     id={filt.relationalData.value}
                     image_id={filt.relationalData.image}
                     size="sm"
@@ -198,10 +201,10 @@ function TableColumnFilterList({
                   <Search
                     isAutocomplete
                     name={`${type}[${index}].value`}
-                    onChange={({ name, value, label, image }) =>
+                    onChange={({ name, value, label, image, icon }) =>
                       handleChange([
                         { name, value },
-                        { name: `${type}[${index}].relationalData`, value: { value, label, image } },
+                        { name: `${type}[${index}].relationalData`, value: { value, label, image, icon } },
                       ])
                     }
                     searchEntity={filterType?.searchType}
@@ -244,6 +247,7 @@ function TableColumnFilter({
   isOrDisabled,
   isRelationFilter,
   dispatch,
+  meta,
 }: TableColumnFilterComponentType) {
   const {
     columnFilterContainer,
@@ -279,7 +283,9 @@ function TableColumnFilter({
                         ...(prev[columnId === "is_favorite" ? "or" : "and"] || []),
                       ].concat({
                         id: crypto.randomUUID(),
-                        field: columnId,
+                        field: (meta as MetaType)?.relationType
+                          ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                          : columnId,
                         value: "",
                         operator: filterOptions[0].value as RequestFilterTypes,
                       }),
@@ -548,7 +554,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
               and: (filters?.and || relationFilters?.and || []).filter((filt) => filt.field === id),
               or: (filters?.or || relationFilters?.or || []).filter((filt) => filt.field === id),
             };
-            const isRelationFilter = relationFiltersList.includes(id || "");
+            const isRelationFilter =
+              relationFiltersList.includes(id || "") || relationFiltersList.includes((meta as MetaType)?.relationType || "");
             return (
               <Fragment key={hdr.id}>
                 <div
@@ -586,6 +593,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             filters={activeColumnFilters}
                             isAndDisabled={["is_favorite"].includes(hdr.column.id)}
                             isRelationFilter={isRelationFilter}
+                            meta={meta as MetaType}
                           />
                         </div>
                       }
