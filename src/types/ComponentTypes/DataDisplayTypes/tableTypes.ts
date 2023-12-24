@@ -23,7 +23,11 @@ export interface MetaType {
   relationType?: string;
 }
 
-export type TableColumnFilterType = RequestFilterType & { id: string; relationalData?: { [key: string]: any } };
+export type TableColumnFilterType = RequestFilterType & {
+  id: string;
+  header_name: string;
+  relationalData?: { [key: string]: any };
+};
 
 export interface TableParams {
   orderBy?: RequestOrderByType[];

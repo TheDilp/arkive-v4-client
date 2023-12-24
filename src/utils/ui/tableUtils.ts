@@ -104,26 +104,30 @@ export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operato
   }"`;
 }
 
-export function groupFiltersByField(
+export function groupFiltersByHeader(
   items: TableColumnFilterType[],
 ): Record<string, Pick<TableColumnFilterType, "id" | "operator" | "value">[]> {
   return items.reduce((accumulator: Record<any, any>, item) => {
-    const { field, ...rest } = item;
-    if (!accumulator[field]) {
-      accumulator[field] = [];
+    const { header_name, ...rest } = item;
+    if (!accumulator[header_name]) {
+      accumulator[header_name] = [];
     }
-    accumulator[field].push(rest);
+    accumulator[header_name].push(rest);
     return accumulator;
   }, {});
 }
 
 export function getAreColumnFiltersActive(
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
+  relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
   id?: string,
 ): boolean {
   if (id) {
+    console.log(relationFilters, id);
     if (filters?.and?.some((filt) => filt.field === id)) return true;
     if (filters?.or?.some((filt) => filt.field === id)) return true;
+    if (relationFilters?.and?.some((filt) => filt.field === id || filt?.relationalData?.blueprint_field_id === id)) return true;
+    if (relationFilters?.or?.some((filt) => filt.field === id || filt?.relationalData?.blueprint_field_id === id)) return true;
     return false;
   }
   return false;

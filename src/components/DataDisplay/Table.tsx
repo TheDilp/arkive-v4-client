@@ -31,7 +31,7 @@ import {
   getSentenceCase,
   getTableColumns,
   getTableColumnWidths,
-  groupFiltersByField,
+  groupFiltersByHeader,
   IconEnum,
   relationFiltersList,
   removeColumnFilter,
@@ -294,6 +294,7 @@ function TableColumnFilter({
                           : columnId,
                         value: "",
                         operator: filterOptions[0].value as RequestFilterTypes,
+                        header_name: columnHeader,
                       }),
                     }));
                 }}
@@ -331,6 +332,7 @@ function TableColumnFilter({
                         : columnId,
                       value: "",
                       operator: filterOptions[0].value as RequestFilterTypes,
+                      header_name: columnHeader,
                     }),
                   }));
               }}
@@ -396,10 +398,10 @@ function TableSubheaderFilterBadges({
   dispatch,
 }: Pick<TableParams, "filters" | "relationFilters"> & Pick<TableType, "dispatch">) {
   const { subheaderFilterBadges } = TableClasses();
-  const andFiltersByField = groupFiltersByField(filters?.and || []);
-  const orFiltersByField = groupFiltersByField(filters?.or || []);
-  const andRelationFiltersByField = groupFiltersByField(relationFilters?.and || []);
-  const orRelationFiltersByField = groupFiltersByField(relationFilters?.or || []);
+  const andFiltersByField = groupFiltersByHeader(filters?.and || []);
+  const orFiltersByField = groupFiltersByHeader(filters?.or || []);
+  const andRelationFiltersByField = groupFiltersByHeader(relationFilters?.and || []);
+  const orRelationFiltersByField = groupFiltersByHeader(relationFilters?.or || []);
 
   const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
   const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
@@ -619,7 +621,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         }}>
                         <span>
                           <Icon
-                            className={getAreColumnFiltersActive(filters, id) ? "text-blue-400" : "text-zinc-700"}
+                            className={
+                              getAreColumnFiltersActive(filters, relationFilters, id) ? "text-blue-400" : "text-zinc-700"
+                            }
                             fontSize={20}
                             icon={IconEnum.filter}
                           />
