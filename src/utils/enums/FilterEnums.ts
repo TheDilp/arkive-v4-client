@@ -50,6 +50,24 @@ export const NumberFilters: FilterEnumType[] = [
   },
 ];
 
+export const BooleanFilters: FilterEnumType[] = [
+  {
+    label: "Is",
+    value: "eq",
+    type: "boolean",
+    options: [
+      {
+        label: "True",
+        value: true,
+      },
+      {
+        label: "False",
+        value: false,
+      },
+    ],
+  },
+];
+
 export const TagFilters: FilterEnumType[] = [{ label: "Includes", value: "in", type: "search", searchType: "tags" }];
 
 export const FavoritesFilters: FilterEnumType[] = [
@@ -70,20 +88,22 @@ export const FavoritesFilters: FilterEnumType[] = [
   },
 ];
 
-const FilterableBlueprintEntitiesEnum = ["characters", "blueprint_instances", "documents", "map_pins"];
 export function CharacterBlueprintRelationFilter(type: BlueprintFieldTypes): FilterEnumType[] {
+  if (type === "text") return NameFilters;
+  if (type === "number") return NumberFilters;
+  if (type === "boolean") return BooleanFilters;
+  // if (type === "select") return SelectFilters
+
   let entity = type.replace(/_(single|multiple)/, "");
   if (entity === "locations") entity = "map_pins";
   if (entity === "blueprints") entity = "blueprint_instances";
 
-  if (entity && entity !== "value" && FilterableBlueprintEntitiesEnum.includes(entity))
-    return [
-      {
-        label: "Includes",
-        value: "in",
-        type: "search",
-        searchType: entity as SearchableEntities,
-      },
-    ];
-  return [];
+  return [
+    {
+      label: "Includes",
+      value: "in",
+      type: "search",
+      searchType: entity as SearchableEntities,
+    },
+  ];
 }

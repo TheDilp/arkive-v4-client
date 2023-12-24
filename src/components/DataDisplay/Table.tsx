@@ -15,6 +15,7 @@ import {
   MetaType,
   RequestFilterTypes,
   RequestOrderByType,
+  SearchableEntities,
   TableColumnFilterComponentType,
   TableColumnFilterType,
   TableParams,
@@ -33,7 +34,6 @@ import {
   getTableColumnWidths,
   groupFiltersByHeader,
   IconEnum,
-  relationFiltersList,
   removeColumnFilter,
 } from "../../utils";
 import { Button, ButtonGroup, Checkbox, Input, Search, Select } from "../Form";
@@ -142,11 +142,11 @@ function TableColumnFilterList({
                   value={filt.operator}
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex flex-1 justify-end">
                 {filt.operator && !Array.isArray(filt.value) && filterType?.type === "boolean" ? (
                   <Checkbox
                     name={`${type}[${index}].value`}
-                    onChange={({ name, value }) => handleChange({ name, value: value as boolean })}
+                    onChange={({ name, value }) => handleChange({ name, value: typeof value === "boolean" ? value : !!value })}
                     size="lg"
                     value={filt.value as boolean}
                   />
@@ -212,7 +212,7 @@ function TableColumnFilterList({
                         },
                       ])
                     }
-                    searchEntity={filterType?.searchType}
+                    searchEntity={filterType?.searchType as SearchableEntities}
                     size="sm"
                     value={filt.value as string | undefined}
                   />
@@ -248,10 +248,8 @@ function TableColumnFilter({
   columnId,
   columnHeader,
   filters,
-  filterOptions,
   isAndDisabled,
   isOrDisabled,
-  isRelationFilter,
   dispatch,
   meta,
 }: TableColumnFilterComponentType) {
@@ -268,12 +266,15 @@ function TableColumnFilter({
     and: (filters?.and || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
     or: (filters?.or || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
   });
-
+  const { filterOptions, isRelationFilter } = meta as MetaType;
   const { handleChange } = useHandleChange({ data: columnFilters, setData: setColumnFilters });
-
+  if (!filterOptions) return null;
   return (
     <div className={columnFilterContainer()}>
-      <h4 className={columnFilterTitle()}>{getSentenceCase(columnHeader || "")} filters</h4>
+      <h4 className={columnFilterTitle()}>
+        {getSentenceCase(typeof columnHeader === "string" ? columnHeader : "" || "")}{" "}
+        {columnHeader && typeof columnHeader === "string" ? "filters" : ""}
+      </h4>
       {isAndDisabled ? null : (
         <>
           <div className={columnFilterCategory()}>
@@ -292,7 +293,7 @@ function TableColumnFilter({
                         field: (meta as MetaType)?.relationType
                           ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
                           : columnId,
-                        value: "",
+                        value: (meta as MetaType)?.relationType === "boolean" ? false : "",
                         operator: filterOptions[0].value as RequestFilterTypes,
                         header_name: columnHeader,
                       }),
@@ -567,8 +568,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
               and: (filters?.and || relationFilters?.and || []).filter((filt) => filt.field === id),
               or: (filters?.or || relationFilters?.or || []).filter((filt) => filt.field === id),
             };
-            const isRelationFilter =
-              relationFiltersList.includes(id || "") || relationFiltersList.includes((meta as MetaType)?.relationType || "");
+
             return (
               <Fragment key={hdr.id}>
                 <div
@@ -603,10 +603,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             columnHeader={(hdr.column.columnDef.header as string) || ""}
                             columnId={id}
                             dispatch={dispatch}
-                            filterOptions={(meta as MetaType)?.filterOptions || []}
                             filters={activeColumnFilters}
                             isAndDisabled={["is_favorite"].includes(hdr.column.id)}
-                            isRelationFilter={isRelationFilter}
                             meta={meta as MetaType}
                           />
                         </div>
@@ -622,7 +620,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         <span>
                           <Icon
                             className={
-                              getAreColumnFiltersActive(filters, relationFilters, id) ? "text-blue-400" : "text-zinc-700"
+                              getAreColumnFiltersActive(hdr.column.columnDef.header as string, filters, relationFilters, id)
+                                ? "text-blue-400"
+                                : "text-zinc-700"
                             }
                             fontSize={20}
                             icon={IconEnum.filter}

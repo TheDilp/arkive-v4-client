@@ -16,6 +16,7 @@ export const relationFiltersList = [
   "locations_multiple",
   "documents_single",
   "documents_multiple",
+  "value",
 ];
 
 export function getTableColumns(
@@ -118,6 +119,7 @@ export function groupFiltersByHeader(
 }
 
 export function getAreColumnFiltersActive(
+  header: string,
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
   relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
   id?: string,
@@ -125,8 +127,18 @@ export function getAreColumnFiltersActive(
   if (id) {
     if (filters?.and?.some((filt) => filt.field === id)) return true;
     if (filters?.or?.some((filt) => filt.field === id)) return true;
-    if (relationFilters?.and?.some((filt) => filt.field === id || filt?.relationalData?.blueprint_field_id === id)) return true;
-    if (relationFilters?.or?.some((filt) => filt.field === id || filt?.relationalData?.blueprint_field_id === id)) return true;
+    if (
+      relationFilters?.and?.some(
+        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id,
+      )
+    )
+      return true;
+    if (
+      relationFilters?.or?.some(
+        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id,
+      )
+    )
+      return true;
     return false;
   }
   return false;

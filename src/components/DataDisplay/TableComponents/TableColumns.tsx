@@ -42,6 +42,7 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
 export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => Promise<void>): ColumnDef<any> {
   return {
     id: "is_favorite",
+    header: "",
     cell: ({ row }) => (
       <Button
         hasNoBackground
@@ -64,6 +65,7 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
     meta: {
       noLink: true,
       filterOptions: TagFilters,
+      isRelationFilter: true,
     },
     minSize: 12,
     maxSize: 12,

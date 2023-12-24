@@ -417,6 +417,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     blueprint_fields: getDifferenceForBlueprintInstance(existingInstance?.data, instance),
                   },
                 };
+
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
                 await update(parsedData, {
                   onSuccess: (res) => {

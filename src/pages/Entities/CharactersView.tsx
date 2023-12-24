@@ -291,7 +291,7 @@ export function CharactersView() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
               field: "first_name",
             },
           });

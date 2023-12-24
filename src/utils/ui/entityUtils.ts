@@ -114,10 +114,10 @@ export function getSearchFieldTypeLinkType(type: string) {
 
 export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize?: number } {
   if (type === "text" || type === "date") return { minSize: 15, maxSize: 15 };
-  if (type === "images_single" || type === "characters_single" || type === "number") return { minSize: 7.5, maxSize: 7.5 };
+  if (type === "images_single" || type === "characters_single" || type === "number" || type === "boolean")
+    return { minSize: 7.5, maxSize: 7.5 };
   if (type === "characters_multiple" || type === "select" || type === "dice_roll" || type === "random_table")
     return { minSize: 12, maxSize: 12 };
-  if (type === "boolean") return { minSize: 2.75, maxSize: 2.75 };
   if (type === "select_multiple") return { minSize: 18, maxSize: 18 };
   if (type === "locations_multiple" || type === "blueprints_multiple") return { minSize: 15, maxSize: 15 };
   return { minSize: 10, maxSize: 10 };
@@ -160,6 +160,8 @@ export function getDifferenceForBlueprintInstance(
     if (typeof originalField.value === "string" || typeof field.value === "string")
       return !isEqual(field.value, originalField.value);
     if (typeof originalField.value === "number" || typeof field.value === "number")
+      return !isEqual(field.value, originalField.value);
+    if (typeof originalField.value === "boolean" || typeof field.value === "boolean")
       return !isEqual(field.value, originalField.value);
     if (isRemirrorJSON(originalField.value) || isRemirrorJSON(field.value)) {
       return !isEqual(field.value, originalField.value);

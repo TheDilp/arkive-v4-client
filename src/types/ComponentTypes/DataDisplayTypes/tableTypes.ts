@@ -9,9 +9,9 @@ import { SelectOptionType } from "../FormTypes/selectTypes";
 export type TableSelectionType = { [key: number]: string[] };
 
 export interface FilterEnumType extends SelectOptionType {
-  type: "boolean" | "text" | "number" | "search";
+  type: "boolean" | "text" | "number" | "select" | "search";
   options?: (SelectOptionType | { label: string; value: boolean })[];
-  searchType?: SearchableEntities;
+  searchType?: SearchableEntities | "value";
 }
 export interface MetaType {
   sortable?: boolean;
@@ -21,6 +21,7 @@ export interface MetaType {
   selection: TableSelectionType;
   filterOptions?: FilterEnumType[];
   relationType?: string;
+  isRelationFilter?: boolean;
 }
 
 export type TableColumnFilterType = RequestFilterType & {
@@ -101,11 +102,9 @@ export interface TableColumnFilterComponentType {
   columnId: string | undefined;
   columnHeader: string;
   filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-  filterOptions: FilterEnumType[];
   dispatch: TableDispatch;
   isAndDisabled?: boolean;
   isOrDisabled?: boolean;
-  isRelationFilter?: boolean;
   meta: MetaType | undefined;
 }
 

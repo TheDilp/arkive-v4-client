@@ -34,7 +34,7 @@ export function getCharacterFullName(first_name: string, nickname?: string | nul
 }
 
 export function getSentenceCase(field: string) {
-  const result = field.replaceAll("_", " ").replace(/([A-Z])/g, " $1");
+  const result = field?.replaceAll("_", " ")?.replace(/([A-Z])/g, " $1") || "";
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 

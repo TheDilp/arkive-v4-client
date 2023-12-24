@@ -3,7 +3,17 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 
-import { Avatar, Badge, Button, createColumnHelper, Dropdown, Table, TablePageLayout, Tooltip } from "../../components";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Checkbox,
+  createColumnHelper,
+  Dropdown,
+  Table,
+  TablePageLayout,
+  Tooltip,
+} from "../../components";
 import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import {
   BlueprintInstanceBlueprintFieldType,
@@ -166,6 +176,8 @@ function createColumns(
             const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
 
             if (field.field_type === "text" || field.field_type === "number") return fieldData?.value || "";
+            if (field.field_type === "boolean")
+              return <Checkbox name="bool" onChange={() => {}} value={(fieldData?.value as boolean | undefined) ?? false} />;
             if (field.field_type === "select" || field.field_type === "select_multiple") {
               return (
                 (Array.isArray(fieldData?.value) ? fieldData?.value : [fieldData?.value])
@@ -277,12 +289,13 @@ function createColumns(
             return "";
           },
           meta: {
-            centered: field.field_type === "images_single",
+            centered: field.field_type === "images_single" || field.field_type === "boolean",
             noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
               field.field_type,
             ),
             filterOptions: CharacterBlueprintRelationFilter(field.field_type),
             relationType: field.field_type,
+            isRelationFilter: true,
           },
           minSize,
           maxSize,
@@ -296,6 +309,7 @@ function createColumns(
       header: "Actions",
       meta: {
         centered: true,
+        isRelationFilter: true,
       },
       cell: ({ row }) => (
         <div className="flex items-center justify-center">
