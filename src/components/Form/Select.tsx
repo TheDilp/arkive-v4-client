@@ -423,6 +423,19 @@ export function Select({
                       setFilteredItems(options);
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onClick({
+                        isMultiple,
+                        name,
+                        index: activeIndex,
+                        onChange,
+                        options: filteredItems,
+                        value,
+                        setIsOpen,
+                      });
+                    }
+                  }}
                   placeholder="Search"
                 />
               ) : null}
@@ -456,19 +469,6 @@ export function Select({
                             value,
                             setIsOpen,
                           });
-                      },
-                      onKeyDown: (e) => {
-                        if (e.key === "Enter") {
-                          onClick({
-                            isMultiple,
-                            name,
-                            index: activeIndex,
-                            onChange,
-                            options: filteredItems,
-                            value,
-                            setIsOpen,
-                          });
-                        }
                       },
                     })}
                     key={`${opt}-${i.toFixed()}`}>
