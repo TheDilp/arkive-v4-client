@@ -6,8 +6,8 @@ import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CharacterFieldTemplateType, InputOnChangeValue, onChangeValue } from "../../../types";
-import { BlueprintFieldType, BlueprintStateType } from "../../../types/EntityTypes/blueprintTypes";
+import { InputOnChangeValue, onChangeValue } from "../../../types";
+import { BlueprintFieldType, BlueprintStateType, BlueprintType } from "../../../types/EntityTypes/blueprintTypes";
 import { BlueprintFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
@@ -247,13 +247,14 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     project_id as string,
   );
 
-  const { data: existingBlueprint, isFetching } = useGetEntity<CharacterFieldTemplateType>(
+  const { data: existingBlueprint, isFetching } = useGetEntity<BlueprintType>(
     data?.id,
     "blueprints",
     {
       data: {
         id: data?.id,
       },
+      fields: ["id", "title", "project_id", "icon", "title_name"],
       relations: {
         blueprint_fields: true,
       },
