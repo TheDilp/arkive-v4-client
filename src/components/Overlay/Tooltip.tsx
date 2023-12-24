@@ -24,7 +24,7 @@ import { tv } from "tailwind-variants";
 import { DefaultTooltipType, TooltipType, Variant } from "../../types";
 
 const defaultTooltipClasses = tv({
-  base: "z-50 select-none rounded border-none min-w-max border-transparent p-1 text-sm text-white shadow",
+  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow max-w-[200px]",
   variants: {
     variant: {
       primary: "bg-black",
@@ -100,7 +100,6 @@ export function Tooltip({
         getReferenceProps({
           ref: refs.setReference,
           ...children.props,
-          // ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
         }),
       )}
       {!isDisabled && open && (
