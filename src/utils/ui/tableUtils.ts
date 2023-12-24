@@ -123,7 +123,6 @@ export function getAreColumnFiltersActive(
   id?: string,
 ): boolean {
   if (id) {
-    console.log(relationFilters, id);
     if (filters?.and?.some((filt) => filt.field === id)) return true;
     if (filters?.or?.some((filt) => filt.field === id)) return true;
     if (relationFilters?.and?.some((filt) => filt.field === id || filt?.relationalData?.blueprint_field_id === id)) return true;
