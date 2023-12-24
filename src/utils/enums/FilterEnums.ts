@@ -1,4 +1,4 @@
-import { FilterEnumType, RequestFilterTypes } from "../../types";
+import { BlueprintFieldTypes, FilterEnumType, RequestFilterTypes, SearchableEntities } from "../../types";
 
 export const inputFilters = ["eq", "gt", "gte", "lt", "lte"];
 export const rangeFilters = ["between", "notBetween"];
@@ -50,10 +50,7 @@ export const NumberFilters: FilterEnumType[] = [
   },
 ];
 
-export const TagFilters: FilterEnumType[] = [
-  { label: FilterNamesEnum.in, value: "in", type: "search", searchType: "tags" },
-  { label: FilterNamesEnum["not in"], value: "not in", type: "search", searchType: "tags" },
-];
+export const TagFilters: FilterEnumType[] = [{ label: "Includes", value: "in", type: "search", searchType: "tags" }];
 
 export const FavoritesFilters: FilterEnumType[] = [
   {
@@ -73,17 +70,20 @@ export const FavoritesFilters: FilterEnumType[] = [
   },
 ];
 
-export const CharacterFilters: FilterEnumType[] = [
-  {
-    label: "Includes",
-    value: FilterNamesEnum.in,
-    type: "search",
-    searchType: "characters",
-  },
-  {
-    label: "Does not include",
-    value: FilterNamesEnum["not in"],
-    type: "search",
-    searchType: "characters",
-  },
-];
+const FilterableBlueprintEntitiesEnum = ["characters", "blueprint_instances", "documents", "map_pins"];
+export function CharacterBlueprintRelationFilter(type: BlueprintFieldTypes): FilterEnumType[] {
+  let entity = type.replace(/_(single|multiple)/, "");
+  if (entity === "locations") entity = "map_pins";
+  if (entity === "blueprints") entity = "blueprint_instances";
+
+  if (entity && entity !== "value" && FilterableBlueprintEntitiesEnum.includes(entity))
+    return [
+      {
+        label: "Includes",
+        value: "in",
+        type: "search",
+        searchType: entity as SearchableEntities,
+      },
+    ];
+  return [];
+}
