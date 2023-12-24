@@ -25,6 +25,7 @@ export function Editor({
   });
 
   return (
+    // @ts-ignore
     <Remirror
       editable={!isReadOnly && !isDisabled}
       hooks={hooks ?? []}

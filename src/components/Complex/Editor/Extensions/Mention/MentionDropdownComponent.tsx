@@ -89,6 +89,7 @@ export function MentionDropdownComponent() {
   }, [state?.query?.full]);
 
   return (
+    // @ts-ignore
     <FloatingWrapper
       containerClass="commandMenu"
       enabled={Boolean(state)}

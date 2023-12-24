@@ -212,7 +212,7 @@ export function AssetView() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              and: [{ id: "quick_filter", header_name: "title", field: "title", operator: "ilike", value: filter }],
               field: "title",
             },
           });

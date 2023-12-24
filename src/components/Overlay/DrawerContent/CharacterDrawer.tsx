@@ -369,7 +369,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     {
       data: { project_id: project_id as string },
       relations: { character_fields: true },
-      relationFilters: { tags: character?.tags?.map((t) => t.id) || [] },
+      relationFilters: {
+        and: (existingCharacter?.data?.tags || [])?.map((t) => ({ operator: "in", value: [t.id], field: "id" })),
+      },
     },
     "character_fields_templates",
     {

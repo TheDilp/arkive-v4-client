@@ -180,6 +180,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       data: {
         parent_id: item_id || id,
       },
+      fields: ["id", "title", "translation"],
       filters,
       pagination,
       orderBy,
@@ -203,7 +204,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", field: filterType, operator: "ilike", value: filter }],
+              and: [{ id: "quick_filter", header_name: "title", field: filterType, operator: "ilike", value: filter }],
               field: filterType,
             },
           });

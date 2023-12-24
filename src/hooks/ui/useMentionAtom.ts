@@ -160,6 +160,7 @@ export function useMentionAtom<Data extends MentionAtomNodeAttributes = MentionA
   );
 
   // Add the handlers to the `MentionExtension`
+  // @ts-ignore
   useExtensionEvent(CustomMentionExtension, "onChange", onChange);
 
   return useMemo(() => ({ ...menu, state }), [menu, state]);

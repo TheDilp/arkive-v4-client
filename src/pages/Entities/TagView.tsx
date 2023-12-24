@@ -113,7 +113,10 @@ export function TagView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
-  const { data, isLoading } = useGetEntities({ data: { project_id }, filters, pagination, orderBy }, "tags");
+  const { data, isLoading } = useGetEntities<TagType>(
+    { data: { project_id }, fields: ["id", "color", "title", "project_id"], filters, pagination, orderBy },
+    "tags",
+  );
 
   useLayoutEffect(() => {
     if (!filter) {
@@ -130,7 +133,7 @@ export function TagView() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              and: [{ id: "quick_filter", header_name: "title", field: "title", operator: "ilike", value: filter }],
               field: "title",
             },
           });

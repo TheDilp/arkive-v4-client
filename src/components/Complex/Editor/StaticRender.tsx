@@ -41,6 +41,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     doc: Doc,
     hardBreak: "br",
     heading: (args: any) => {
+      // @ts-ignore
       return <div style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>{Heading(args)}</div>;
     },
     link: "a",
@@ -186,8 +187,10 @@ export function StaticRender({ content, isPublicView }: { content: RemirrorJSON;
   if (!parsedContent) return null;
   return (
     <div className="staticRendererContainer">
+      {/* @ts-ignore */}
       <RemirrorRenderer
         json={parsedContent as RemirrorJSON}
+        // @ts-ignore
         markMap={markMap}
         typeMap={typeMap(project_id as string, content, isPublicView)}
       />

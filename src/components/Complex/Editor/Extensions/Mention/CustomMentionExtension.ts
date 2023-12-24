@@ -71,6 +71,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
     };
   }
 
+  // @ts-ignore
   ReactComponent?: ComponentType<NodeViewComponentProps> = MentionReactComponent;
 
   createEventHandlers(): CreateEventHandlers {

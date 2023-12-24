@@ -85,6 +85,7 @@ export function SlashMenu() {
   }, [change?.query?.full]);
 
   return (
+    // @ts-ignore
     <FloatingWrapper containerClass="commandMenu" enabled={enabled} placement="auto" positioner="always" renderOutsideEditor>
       <ul className="remirror-mention-atom-popup-wrapper z-50 h-[15rem] overflow-y-auto p-0" {...getMenuProps()}>
         {items.map((item, index) => {

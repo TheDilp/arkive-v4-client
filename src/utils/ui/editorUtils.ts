@@ -134,6 +134,7 @@ export function DefaultEditorExtensions(
     new PlaceholderExtension({
       placeholder: customPlaceholder ?? "Write something awesome! 📜",
     }),
+    // @ts-ignore
     CME,
     new SpoilerExtension({}),
     new CustomCalloutExtension({
