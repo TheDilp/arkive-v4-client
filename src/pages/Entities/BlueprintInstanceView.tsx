@@ -159,7 +159,7 @@ function createColumns(
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
       fieldColumns.push(
         columnHelper.display({
-          id: field.title,
+          id: field.id,
           header: field.title,
 
           cell: ({ row }) => {

@@ -103,6 +103,7 @@ const TableFilterClasses = tv({
 });
 
 function TableColumnFilterList({
+  colId,
   applyFilter: applyFilterFn,
   filters,
   handleChange,
@@ -110,6 +111,7 @@ function TableColumnFilterList({
   setColumnFilters,
   type,
 }: {
+  colId: string;
   applyFilter: () => void;
   filters: TableColumnFilterType[];
   type: "and" | "or";
@@ -204,7 +206,10 @@ function TableColumnFilterList({
                     onChange={({ name, value, label, image, icon }) =>
                       handleChange([
                         { name, value },
-                        { name: `${type}[${index}].relationalData`, value: { value, label, image, icon } },
+                        {
+                          name: `${type}[${index}].relationalData`,
+                          value: { value, label, image, icon, blueprint_field_id: colId },
+                        },
                       ])
                     }
                     searchEntity={filterType?.searchType}
@@ -241,6 +246,7 @@ function TableColumnFilterList({
 
 function TableColumnFilter({
   columnId,
+  columnHeader,
   filters,
   filterOptions,
   isAndDisabled,
@@ -267,7 +273,7 @@ function TableColumnFilter({
 
   return (
     <div className={columnFilterContainer()}>
-      <h4 className={columnFilterTitle()}>{getSentenceCase(columnId || "")} filters</h4>
+      <h4 className={columnFilterTitle()}>{getSentenceCase(columnHeader || "")} filters</h4>
       {isAndDisabled ? null : (
         <>
           <div className={columnFilterCategory()}>
@@ -297,6 +303,7 @@ function TableColumnFilter({
           </div>
           <TableColumnFilterList
             applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter)}
+            colId={columnId as string}
             filterOptions={filterOptions}
             filters={columnFilters?.and || []}
             handleChange={handleChange}
@@ -319,7 +326,9 @@ function TableColumnFilter({
                     ...prev,
                     or: [...(prev.or || [])].concat({
                       id: crypto.randomUUID(),
-                      field: columnId,
+                      field: (meta as MetaType)?.relationType
+                        ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                        : columnId,
                       value: "",
                       operator: filterOptions[0].value as RequestFilterTypes,
                     }),
@@ -332,12 +341,14 @@ function TableColumnFilter({
       )}
       <TableColumnFilterList
         applyFilter={() => applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter)}
+        colId={columnId as string}
         filterOptions={filterOptions}
         filters={columnFilters?.or || []}
         handleChange={handleChange}
         setColumnFilters={setColumnFilters}
         type="or"
       />
+
       <Button
         icon={IconEnum.filter}
         isDisabled={getIsApplyColumnFiltersDisabled(columnFilters)}
@@ -587,6 +598,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             e.stopPropagation();
                           }}>
                           <TableColumnFilter
+                            columnHeader={(hdr.column.columnDef.header as string) || ""}
                             columnId={id}
                             dispatch={dispatch}
                             filterOptions={(meta as MetaType)?.filterOptions || []}

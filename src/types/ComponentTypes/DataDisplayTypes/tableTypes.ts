@@ -95,6 +95,7 @@ export interface TableType {
 
 export interface TableColumnFilterComponentType {
   columnId: string | undefined;
+  columnHeader: string;
   filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   filterOptions: FilterEnumType[];
   dispatch: TableDispatch;

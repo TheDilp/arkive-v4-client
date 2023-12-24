@@ -360,6 +360,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   }, [existingInstance?.data]);
 
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
+
   return (
     <DrawerLayout>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
@@ -382,7 +383,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           {blueprint?.data?.blueprint_fields?.length ? (
             <FieldTemplateRows
               blueprint_fields={blueprint.data.blueprint_fields}
-              blueprint_fields_data={instance.blueprint_fields.toSorted((a, b) => a.sort - b.sort)}
+              blueprint_fields_data={instance.blueprint_fields}
               handleChange={handleChange}
             />
           ) : null}

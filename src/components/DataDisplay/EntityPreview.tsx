@@ -82,7 +82,7 @@ export function EntityPreview({
             image={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             isTooltipDisabled
             label={title}
-            size={size}
+            size={size === "md" ? "sm" : "xs"}
           />
         ) : null}
         {!image_id && type !== "images" ? (
