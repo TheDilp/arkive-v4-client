@@ -42,6 +42,43 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
 
       return { ...state, pagination: { limit: state.pagination?.limit || 10, page: 0 }, filters: tempFilters };
     }
+    case "setRelationFilter": {
+      let tempFilters = { ...state.relationFilters };
+      const { field } = action.payload;
+      if (action?.payload?.and?.length) {
+        if (tempFilters?.and) {
+          const newFilters = tempFilters.and.filter((filt) => filt.field !== field);
+
+          tempFilters = {
+            ...tempFilters,
+            and: newFilters.concat(action.payload.and),
+          };
+        } else {
+          tempFilters = {
+            ...tempFilters,
+            and: action.payload.and,
+          };
+        }
+      } else {
+        tempFilters = tempFilters?.and
+          ? { ...tempFilters, and: tempFilters.and.filter((filt) => filt.field !== field) }
+          : tempFilters;
+      }
+      if (action?.payload?.or?.length) {
+        if (tempFilters?.or) {
+          const newFilters = tempFilters.or.filter((filt) => filt.field !== field);
+          tempFilters = { ...tempFilters, or: newFilters.concat(action.payload.or) };
+        } else {
+          tempFilters = { ...tempFilters, or: action.payload.or };
+        }
+      } else {
+        tempFilters = tempFilters?.or
+          ? { ...tempFilters, or: tempFilters.or.filter((filt) => filt.field !== field) }
+          : tempFilters;
+      }
+
+      return { ...state, pagination: { limit: state.pagination?.limit || 10, page: 0 }, relationFilters: tempFilters };
+    }
     case "removeFilterByField": {
       if (action.payload) {
         return {
@@ -90,12 +127,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
 
       return newState;
     }
-    case "setRelationFilters": {
-      if (action.payload) {
-        return { ...state, relationFilters: action.payload, pagination: { limit: state.pagination?.limit || 10, page: 0 } };
-      }
-      return state;
-    }
+
     case "setPagination":
       return { ...state, pagination: { ...state.pagination, ...action.payload } };
     case "setSort": {
