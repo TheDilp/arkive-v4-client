@@ -161,7 +161,7 @@ export function Search({
   initialDisplayValue,
   placeholder,
   label,
-  isAutocomplete,
+  isAutocomplete = true,
   variant = "primary",
   searchEntity,
   isDisabled,
