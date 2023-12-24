@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Navigate, unstable_useBlocker as useBlocker, useParams } from "react-router-dom";
+import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorContentType } from "remirror";
 
 import { SlashMenu } from "../../components";
@@ -212,6 +212,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
         </div>
       ) : null}
 
+      {/* @ts-ignore */}
       <Remirror
         editable
         hooks={documentEditorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
