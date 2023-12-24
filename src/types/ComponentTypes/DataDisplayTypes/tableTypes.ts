@@ -20,6 +20,7 @@ export interface MetaType {
   pinned?: boolean;
   selection: TableSelectionType;
   filterOptions?: FilterEnumType[];
+  relationType?: string;
 }
 
 export type TableColumnFilterType = RequestFilterType & { id: string; relationalData?: { [key: string]: any } };
@@ -46,7 +47,7 @@ export type TableActionType =
       payload: { limit?: number; page?: number };
     }
   | {
-      type: "setFilter" | "setRelationFilters";
+      type: "setFilter" | "setRelationFilter";
       payload: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[]; field?: string };
     }
   | { type: "clearAllFilters" }
@@ -100,6 +101,7 @@ export interface TableColumnFilterComponentType {
   isAndDisabled?: boolean;
   isOrDisabled?: boolean;
   isRelationFilter?: boolean;
+  meta: MetaType | undefined;
 }
 
 export type SetFavoriteType = (data: { is_favorite: boolean; id: string }) => Promise<void>;
