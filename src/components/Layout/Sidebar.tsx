@@ -26,7 +26,7 @@ const SidebarClasses = tv({
     navIcon: "cursor-pointer",
   },
 });
-const alwaysEnabledItems = ["/", "settings", "tags"];
+const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 export function Sidebar() {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
