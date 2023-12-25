@@ -266,7 +266,7 @@ function TableColumnFilter({
     and: (filters?.and || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
     or: (filters?.or || []).map((filt) => ({ ...filt, id: crypto.randomUUID() })),
   });
-  const { filterOptions, isRelationFilter } = meta as MetaType;
+  const { filterOptions, isRelationFilter, relationType } = meta as MetaType;
   const { handleChange } = useHandleChange({ data: columnFilters, setData: setColumnFilters });
   if (!filterOptions) return null;
   return (
@@ -286,14 +286,14 @@ function TableColumnFilter({
                   if (columnId)
                     setColumnFilters((prev) => ({
                       ...prev,
-                      [columnId === "is_favorite" ? "or" : "and"]: [
+                      [columnId === "is_favorite" || relationType === "boolean" ? "or" : "and"]: [
                         ...(prev[columnId === "is_favorite" ? "or" : "and"] || []),
                       ].concat({
                         id: crypto.randomUUID(),
-                        field: (meta as MetaType)?.relationType
+                        field: relationType
                           ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
                           : columnId,
-                        value: (meta as MetaType)?.relationType === "boolean" ? false : "",
+                        value: relationType === "boolean" ? false : "",
                         operator: filterOptions[0].value as RequestFilterTypes,
                         header_name: columnHeader,
                       }),
@@ -361,6 +361,31 @@ function TableColumnFilter({
             const orFilter = columnFilters?.or?.find((filt) => filt?.field === "is_favorite");
             // Favorites filter has an empty string by default
             // Needs to be converted to false
+            if (orFilter && (orFilter?.value === "" || orFilter?.value === false)) {
+              applyFilter(
+                columnId as string,
+                {
+                  or: [
+                    { ...orFilter, value: false },
+                    { ...orFilter, operator: "is", value: null },
+                  ],
+                },
+                dispatch,
+                !!isRelationFilter,
+              );
+            } else if (orFilter && orFilter?.value === true) {
+              applyFilter(
+                columnId as string,
+                {
+                  or: [{ ...orFilter, value: true }],
+                },
+                dispatch,
+                !!isRelationFilter,
+              );
+            }
+          } else if (relationType === "boolean") {
+            const orFilter = columnFilters?.or?.find((filt) => filt?.field === "value");
+
             if (orFilter && (orFilter?.value === "" || orFilter?.value === false)) {
               applyFilter(
                 columnId as string,
@@ -604,7 +629,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             columnId={id}
                             dispatch={dispatch}
                             filters={activeColumnFilters}
-                            isAndDisabled={["is_favorite"].includes(hdr.column.id)}
+                            isAndDisabled={
+                              ["is_favorite"].includes(hdr.column.id) || (meta as MetaType)?.relationType === "boolean"
+                            }
                             meta={meta as MetaType}
                           />
                         </div>
