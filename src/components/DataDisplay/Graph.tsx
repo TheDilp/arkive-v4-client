@@ -1,6 +1,9 @@
 /* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
-import { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
+import cytoscape, { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
+import dagre from "cytoscape-dagre";
+import edgehandles from "cytoscape-edgehandles";
+import gridguide from "cytoscape-grid-guide";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
@@ -33,6 +36,10 @@ import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStyl
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
 import { Button, Quickbar, Spinner } from "..";
+
+cytoscape.use(edgehandles);
+cytoscape.use(dagre);
+gridguide(cytoscape);
 
 type Props = {
   data?: Partial<GraphType>;

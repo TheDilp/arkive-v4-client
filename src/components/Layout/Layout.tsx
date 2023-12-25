@@ -6,7 +6,7 @@ import { Outlet, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntity, useGetUser } from "../../hooks";
 import { ProjectType } from "../../types";
-import { contextMenuAtom, projectAtom, userAtom } from "../../utils";
+import { contextMenuAtom, DefaultTagColor, projectAtom, userAtom } from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -47,7 +47,7 @@ export function ProjectLayout() {
   useEffect(() => {
     if (data?.data) {
       setProjectAtom(data.data);
-      ls.set("default_dice_color", data.data?.default_dice_color);
+      ls.set("default_dice_color", data.data?.default_dice_color || DefaultTagColor);
     }
   }, [data?.data]);
 

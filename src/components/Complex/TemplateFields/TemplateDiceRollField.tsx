@@ -1,7 +1,8 @@
+import ls from "localstorage-slim";
 import { useState } from "react";
 
 import { HandleChangePropsType } from "../../../types";
-import { DiceNoSim, DiceRollParser, IconEnum, useNotifications } from "../../../utils";
+import { DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../../utils";
 import { Button, Input } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
@@ -14,7 +15,7 @@ type Props = {
   currentValue: string | number | null;
   isCollapsible?: boolean;
 };
-
+const defaultDiceColor = ls.get("default_dice_color");
 export function TemplateDiceRollField({ title, name, formula, handleChange, id, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
   const [isRolling, setIsRolling] = useState(false);
@@ -42,7 +43,9 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
               setIsRolling(true);
               try {
                 const parsedNotation = DiceRollParser.parseNotation(formula);
-                DiceNoSim.roll(parsedNotation)
+                Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: true });
+
+                Dice.roll(parsedNotation)
                   .then((r: any) => {
                     const rollData = DiceRollParser.parseFinalResults(r);
                     if (rollData?.valid) {
@@ -61,6 +64,7 @@ export function TemplateDiceRollField({ title, name, formula, handleChange, id, 
                       position: "top",
                     });
                   });
+                Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: false });
               } catch (error) {
                 createNotification({
                   timer: 2,

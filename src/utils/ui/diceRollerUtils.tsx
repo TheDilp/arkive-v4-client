@@ -1,11 +1,12 @@
 import DiceBox from "@3d-dice/dice-box";
 import DiceParser from "@3d-dice/dice-parser-interface";
+import ls from "localstorage-slim";
 
 import { NotificationType } from "../../types";
 import { DefaultTagColor, IconEnum } from "../enums";
 
+const defaultDiceColor = ls.get("default_dice_color");
 export const DiceRollParser = new DiceParser();
-
 export const Dice = new DiceBox(
   "#dice-box", // target DOM element to inject the canvas for rendering
   {
@@ -15,17 +16,6 @@ export const Dice = new DiceBox(
     throwForce: 10,
   },
 );
-
-export const DiceNoSim = new DiceBox(
-  "#dice-box-no-sim", // target DOM element to inject the canvas for rendering
-  {
-    id: "no-sim-canvas",
-    assetPath: "/assets/dice-box/",
-    suspendSimulation: true,
-  },
-);
-
-DiceNoSim.init();
 
 Dice.init().then(() => {
   document.addEventListener("mousedown", () => {
@@ -47,8 +37,11 @@ export const DiceRollRegex = /(((([(])?(\d{1,10})?([Dd]\d+))([)])?)(((kh)|(dl)|(
 export async function getRollValue(notation: string, hasNoSimulation?: boolean) {
   const parsedNotation = DiceRollParser.parseNotation(notation);
   if (hasNoSimulation) {
-    const rollData = await DiceNoSim.roll(parsedNotation);
+    Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: true });
+
+    const rollData = await Dice.roll(parsedNotation);
     const { value } = DiceRollParser.parseFinalResults(rollData);
+    Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: false });
     return value;
   }
 
@@ -72,8 +65,8 @@ export async function rollDiceWithNotification(
   if (diceRoll) {
     try {
       const parsedNotation = DiceRollParser.parseNotation(diceRoll);
-      (hasNoSimulation ? DiceNoSim : Dice)
-        .roll(parsedNotation)
+      if (hasNoSimulation) Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: true });
+      Dice.roll(parsedNotation)
         .then((r: any) => {
           const rollData = DiceRollParser.parseFinalResults(r);
           if (rollData?.valid) {
@@ -96,6 +89,7 @@ export async function rollDiceWithNotification(
             position: "top",
           });
         });
+      if (hasNoSimulation) Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: false });
     } catch (error) {
       createNotification({
         timer: 2,
