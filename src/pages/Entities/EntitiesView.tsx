@@ -1,14 +1,16 @@
 import { useSetAtom } from "jotai";
+import { lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph } from "../../components";
+import { Breadcrumbs, Button, Graph, Spinner } from "../../components";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
 import { drawerAtom, getSingularEntityType, IconEnum } from "../../utils";
-import { DocumentView, MapView, RandomTableView } from ".";
+import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
 import { DictionaryView } from "./DictionaryView";
 
+const DocumentView = lazy(() => import("./DocumentView"));
 export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
   const entityName = getSingularEntityType(type as AvailableEntityType);
@@ -36,7 +38,11 @@ export function EntitiesView() {
           </div>
         ) : null}
       </div>
-      {!!item_id && type === "documents" ? <DocumentView editable /> : null}
+      {!!item_id && type === "documents" ? (
+        <Suspense fallback={<Spinner />}>
+          <DocumentView editable />
+        </Suspense>
+      ) : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}
       {!!item_id && type === "blueprints" ? <BlueprintInstanceView /> : null}

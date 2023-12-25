@@ -52,7 +52,6 @@ import {
   getSingularEntityType,
   IconEnum,
   PublicEntities,
-  savePDF,
   userAtom,
   userSettingsAtom,
 } from "../../utils";
@@ -211,7 +210,7 @@ function columns(
             id: "download_dictionary",
             title: "Download PDF dictionary",
             icon: IconEnum.pdf,
-            onClick: () => savePDF(row.original.title, row.original.id),
+            // onClick: () => savePDF(row.original.title, row.original.id),
           });
         }
 

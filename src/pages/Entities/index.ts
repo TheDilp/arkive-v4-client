@@ -6,7 +6,6 @@ export * from "./CharacterProfileView";
 export * from "./CharactersView";
 export * from "./ConversationView";
 export * from "./DictionaryView";
-export * from "./DocumentView";
 export * from "./EntitiesView";
 export * from "./FolderView";
 export * from "./MapView";
