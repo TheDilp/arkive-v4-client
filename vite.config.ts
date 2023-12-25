@@ -18,7 +18,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
+          if (id.includes("cytoscape")) return "cytoscape";
           if (id.includes("3d-dice")) return "dice";
+          if (id.includes("@tanstack")) return "tanstack";
+          if (id.includes("remirror")) return "remirror";
           return "vendor";
         },
       },
