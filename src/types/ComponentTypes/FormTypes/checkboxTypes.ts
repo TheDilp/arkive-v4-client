@@ -9,5 +9,6 @@ export interface CheckboxType extends BaseFormComponentType {
   value?: boolean;
   label?: string;
   tooltip?: TooltipContentType;
+  isReadOnly?: boolean;
   onChange: ({ name, value }: { name: string; value: boolean }, event: MouseEvent<HTMLDivElement, any>) => void;
 }

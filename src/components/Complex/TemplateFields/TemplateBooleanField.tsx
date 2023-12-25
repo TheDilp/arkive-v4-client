@@ -16,6 +16,7 @@ export function TemplateBooleanField({ title, name, currentValue, handleChange, 
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex flex-nowrap justify-end">
         <Checkbox
+          isReadOnly
           name={name}
           onChange={({ value }) =>
             handleChange([

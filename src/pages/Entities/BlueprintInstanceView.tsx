@@ -177,7 +177,14 @@ function createColumns(
 
             if (field.field_type === "text" || field.field_type === "number") return fieldData?.value || "";
             if (field.field_type === "boolean")
-              return <Checkbox name="bool" onChange={() => {}} value={(fieldData?.value as boolean | undefined) ?? false} />;
+              return (
+                <Checkbox
+                  isReadOnly
+                  name="bool"
+                  onChange={() => {}}
+                  value={(fieldData?.value as boolean | undefined) ?? false}
+                />
+              );
             if (field.field_type === "select" || field.field_type === "select_multiple") {
               return (
                 (Array.isArray(fieldData?.value) ? fieldData?.value : [fieldData?.value])

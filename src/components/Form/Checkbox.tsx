@@ -50,6 +50,11 @@ const CheckboxClasses = tv({
         checkbox: "bg-zinc-300 text-zinc-100 cursor-not-allowed",
       },
     },
+    isReadOnly: {
+      true: {
+        checkbox: " cursor-not-allowed",
+      },
+    },
   },
   defaultVariants: {
     // size: "md",
@@ -57,13 +62,13 @@ const CheckboxClasses = tv({
   },
 });
 
-export function Checkbox({ label, value = false, name, helperText, onChange, variant, isDisabled }: CheckboxType) {
+export function Checkbox({ label, value = false, name, helperText, onChange, variant, isDisabled, isReadOnly }: CheckboxType) {
   const {
     base,
     label: labelClasses,
     checkbox,
     helperText: helperTextClasses,
-  } = CheckboxClasses({ variant, isDisabled, checked: value });
+  } = CheckboxClasses({ variant, isDisabled, isReadOnly, checked: value });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -72,7 +77,7 @@ export function Checkbox({ label, value = false, name, helperText, onChange, var
         aria-checked={value}
         className={checkbox()}
         onClick={(e) => {
-          if (isDisabled) return;
+          if (isDisabled || isReadOnly) return;
           onChange({ name, value: !value }, e);
         }}
         onKeyDown={() => {}}
