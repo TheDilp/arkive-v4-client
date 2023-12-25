@@ -37,6 +37,7 @@ function createColumns(
   downloadImage: downloadImageMutationType,
   webhooks: WebhookType[],
   type: AssetType,
+  project_id: string,
 ) {
   return [
     columnHelper.display({
@@ -46,7 +47,7 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(row.original.project_id, type, row.original?.id || "")}
+            image={getImageURL(project_id, type, row.original?.id || "")}
             isBordered
             isTooltipDisabled
             label={getAvatarInitials(row.original.title)}
@@ -164,7 +165,7 @@ export function AssetView() {
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
     type,
-    { orderBy, filters, pagination },
+    { orderBy, fields: ["id", "title", "type"], filters, pagination },
     { enabled: view === "table", prefetch: true },
   );
 
@@ -175,6 +176,7 @@ export function AssetView() {
   } = useGetInfiniteAssets<ImageType>(
     {
       filters,
+      fields: ["id", "title", "type"],
       pagination: {
         limit: isLg ? 24 : 12,
       },
@@ -312,7 +314,7 @@ export function AssetView() {
       ) : (
         <div className="h-full max-h-[95%] w-full overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [], type)}
+            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [], type, project_id as string)}
             config={{
               hasSelect: true,
               orderBy,
