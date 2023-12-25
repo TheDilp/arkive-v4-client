@@ -32,7 +32,8 @@ export function getCritColor(critical: "success" | "failure" | null | undefined)
   if (critical === "failure") return "text-red-400 font-bold";
   return "";
 }
-export const DiceRollRegex = /(((([(])?(\d{1,10})?([Dd]\d+))([)])?)(((kh)|(dl)|(kl)|(dh))(\d+))?([)])?([*+-/()])?(\d+)?)+/giu;
+export const DiceRollRegex =
+  /(((([(])?(\d{1,10})?([Dd]\d+))([)])?)(((kh)|(dl)|(kl)|(dh))(\d+))?([)])?([*+-/()])?(\d+)?([*+-/()])?)+/giu;
 
 export async function getRollValue(notation: string, hasNoSimulation?: boolean) {
   const parsedNotation = DiceRollParser.parseNotation(notation);
