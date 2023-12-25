@@ -318,7 +318,7 @@ function TableColumnFilter({
 
       {isOrDisabled ? null : (
         <div className={columnFilterCategory()}>
-          <div className={columnFilterCategoryTitle()}>OR FILTERS</div>
+          <div className={columnFilterCategoryTitle()}>{isAndDisabled ? "" : "OR"} FILTERS</div>
           <div className={columnFilterButtonContainer()}>
             <Button
               icon={IconEnum.add}
