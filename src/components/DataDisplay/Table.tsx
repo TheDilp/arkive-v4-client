@@ -286,7 +286,7 @@ function TableColumnFilter({
                   if (columnId)
                     setColumnFilters((prev) => ({
                       ...prev,
-                      [columnId === "is_favorite" || relationType === "boolean" ? "or" : "and"]: [
+                      [columnId === "is_favorite" ? "or" : "and"]: [
                         ...(prev[columnId === "is_favorite" ? "or" : "and"] || []),
                       ].concat({
                         id: crypto.randomUUID(),
@@ -328,12 +328,13 @@ function TableColumnFilter({
                     ...prev,
                     or: [...(prev.or || [])].concat({
                       id: crypto.randomUUID(),
-                      field: (meta as MetaType)?.relationType
-                        ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                      field: meta?.relationType
+                        ? getBlueprintFieldValueFromType(meta?.relationType as BlueprintFieldTypes) || ""
                         : columnId,
                       value: "",
                       operator: filterOptions[0].value as RequestFilterTypes,
                       header_name: columnHeader,
+                      relationalData: { blueprint_field_id: columnId },
                     }),
                   }));
               }}
@@ -383,31 +384,16 @@ function TableColumnFilter({
                 !!isRelationFilter,
               );
             }
-          } else if (relationType === "boolean") {
-            const orFilter = columnFilters?.or?.find((filt) => filt?.field === "value");
-
-            if (orFilter && (orFilter?.value === "" || orFilter?.value === false)) {
-              applyFilter(
-                columnId as string,
-                {
-                  or: [
-                    { ...orFilter, value: false },
-                    { ...orFilter, operator: "is", value: null },
-                  ],
-                },
-                dispatch,
-                !!isRelationFilter,
-              );
-            } else if (orFilter && orFilter?.value === true) {
-              applyFilter(
-                columnId as string,
-                {
-                  or: [{ ...orFilter, value: true }],
-                },
-                dispatch,
-                !!isRelationFilter,
-              );
-            }
+          } else if (isRelationFilter) {
+            applyFilter(
+              columnId as string,
+              {
+                and: (columnFilters?.and || [])?.map((filt) => ({ ...filt, relationalData: { blueprint_field_id: columnId } })),
+                or: (columnFilters?.or || [])?.map((filt) => ({ ...filt, relationalData: { blueprint_field_id: columnId } })),
+              },
+              dispatch,
+              !!isRelationFilter,
+            );
           } else {
             applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter);
           }
@@ -629,9 +615,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             columnId={id}
                             dispatch={dispatch}
                             filters={activeColumnFilters}
-                            isAndDisabled={
-                              ["is_favorite"].includes(hdr.column.id) || (meta as MetaType)?.relationType === "boolean"
-                            }
+                            isAndDisabled={hdr.column.id === "is_favorite"}
                             meta={meta as MetaType}
                           />
                         </div>
