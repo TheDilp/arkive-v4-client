@@ -178,6 +178,7 @@ export function DefaultEditorExtensions(
     new DropCursorExtension({}),
     new TableOfContentsExtension({}),
     new CustomTableExtension({
+      tabKeyboardShortcuts: true,
       priority: 0,
       resizable: false,
       resizeableOptions: {
