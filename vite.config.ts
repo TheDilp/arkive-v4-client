@@ -18,12 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes("react")) return "react";
           if (id.includes("3d-dice")) return "dice";
-          if (id.includes("cytoscape")) return "cytoscape";
-          if (id.includes("clerk")) return "clerk";
-          if (id.includes("@tanstack")) return "tanstack";
-          if (id.includes("remirror")) return "remirror";
           return "vendor";
         },
       },
