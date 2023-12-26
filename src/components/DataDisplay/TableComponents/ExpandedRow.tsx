@@ -14,19 +14,21 @@ import { Badge } from "../../Misc/Badge";
 import { EntityPreview } from "../EntityPreview";
 
 const ExpandedTableRowClasses = tv({
-  base: "p-4 border-b border-zinc-600 bg-zinc-700",
+  base: "p-4 border-b border-zinc-600 bg-zinc-700 max-w-full w-full",
 });
 
-const expandedTagRowTabs = [
-  { id: "1", label: "Characters", icon: IconEnum.character },
-  { id: "2", label: "Documents", icon: IconEnum.document },
-  { id: "3", label: "Maps", icon: IconEnum.map },
-  { id: "4", label: "Graphs", icon: IconEnum.graph },
-  { id: "5", label: "Nodes", icon: IconEnum.node },
-  { id: "6", label: "Edges", icon: IconEnum.edge },
-  { id: "8", label: "Calendars", icon: IconEnum.calendar },
-  { id: "9", label: "Dictionaries", icon: IconEnum.dictionary },
-];
+function expandedTagRowTabs(counts: number[]) {
+  return [
+    { id: "1", label: `Characters (${counts[0]})`, icon: IconEnum.character },
+    { id: "2", label: `Documents (${counts[1]})`, icon: IconEnum.document },
+    { id: "3", label: `Maps (${counts[2]})`, icon: IconEnum.map },
+    { id: "4", label: `Graphs (${counts[3]})`, icon: IconEnum.graph },
+    { id: "5", label: `Nodes (${counts[4]})`, icon: IconEnum.node },
+    { id: "6", label: `Edges (${counts[5]})`, icon: IconEnum.edge },
+    { id: "8", label: `Calendars (${counts[6]})`, icon: IconEnum.calendar },
+    { id: "9", label: `Dictionaries (${counts[7]})`, icon: IconEnum.dictionary },
+  ];
+}
 
 type FormattedTagEntitiesSearch = Record<"characters", Pick<CharacterType, "id" | "full_name" | "portrait_id">[]> &
   Record<"documents" | "maps" | "graphs" | "calendars" | "dictionaries", { id: string; title: string; icon?: string }[]> &
@@ -177,8 +179,12 @@ function ExpandedTag({ id }: { id: string }) {
   if (isFetching) return <Skeleton type="expanded_tag" />;
 
   return (
-    <div className="w-full min-w-fit">
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={expandedTagRowTabs} />
+    <div className="w-full max-w-full">
+      <Tabs
+        onChange={(_, index) => setSelectedTab(index)}
+        selectedTab={selectedTab}
+        tabs={expandedTagRowTabs(Object.values(formatted).map((items) => items.length))}
+      />
       {selectedTab === 0 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="characters" />
       ) : null}

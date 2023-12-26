@@ -796,7 +796,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 </div>
               </Link>
               {row.getIsExpanded() ? (
-                <div className="">
+                <div className="max-w-[calc(100vw-2rem)] overflow-x-hidden">
                   <ExpandedTableRow data={row.original} type={type} />
                 </div>
               ) : null}
