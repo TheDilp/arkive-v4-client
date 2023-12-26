@@ -28,7 +28,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
     data?.id,
     "random_table_options",
     {
-      data: {},
+      fields: ["id", "title", "description", "icon", "icon_color"],
       relations: { random_table_suboptions: true },
     },
     {

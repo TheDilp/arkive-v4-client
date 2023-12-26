@@ -90,6 +90,7 @@ export function RandomTableDrawer({ data }: Props) {
       relations: {
         random_table_options: true,
       },
+      fields: ["id", "title", "description", "icon", "is_public"],
     },
     { enabled: !!data?.id },
   );
