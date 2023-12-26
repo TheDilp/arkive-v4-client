@@ -27,7 +27,7 @@ export function WordDrawer({ data }: Props) {
   const { data: existingWord } = useGetSubEntity(
     data?.id,
     "words",
-    { fields: ["id", "title", "description", "translation", "parent_id"] },
+    { data: { id: data?.id }, fields: ["id", "title", "description", "translation", "parent_id"] },
     { enabled: !!data?.id },
   );
   const { mutateAsync: createWord, isLoading: isCreating } = useCreateSubEntity<InsertWordType>("words", project_id);
