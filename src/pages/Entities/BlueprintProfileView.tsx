@@ -395,7 +395,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
   );
 
   return (
-    <div className="flex h-full min-h-full flex-col gap-y-2 ">
+    <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2 ">
       {item_id ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -435,7 +435,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
           </div>
         </div>
       ) : null}
-      <div className="max-h-[calc(100vh-40%)] w-full flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-25%)] lg:grid-cols-5 lg:content-stretch">
+      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
           <div

@@ -974,7 +974,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
         </div>
       )}
-      <div className="w-full flex-1 flex-1 content-start gap-4 overflow-auto pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      <div className="w-full flex-1 content-start gap-4 overflow-auto pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
           <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
