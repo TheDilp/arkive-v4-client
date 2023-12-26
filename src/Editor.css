@@ -130,7 +130,7 @@
   }
 
   p {
-    @apply text-sm;
+    @apply text-base;
     .remirror-resizable-view {
       @apply inline-block;
       > * {
