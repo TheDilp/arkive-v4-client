@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 import { useGetEntities, useGetSubEntity, useSearch } from "../../../hooks";
 import { CharacterFieldType, CharacterType, SearchAllEntitiesByTagType, TableType, WordType } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { getCharacterFullName, getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
+import { getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
 import { Textarea } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Skeleton, Spinner } from "../../Misc";
@@ -28,10 +28,7 @@ const expandedTagRowTabs = [
   { id: "9", label: "Dictionaries", icon: IconEnum.dictionary },
 ];
 
-type FormattedTagEntitiesSearch = Record<
-  "characters",
-  Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id">[]
-> &
+type FormattedTagEntitiesSearch = Record<"characters", Pick<CharacterType, "id" | "full_name" | "portrait_id">[]> &
   Record<"documents" | "maps" | "graphs" | "calendars" | "dictionaries", { id: string; title: string; icon?: string }[]> &
   Record<"nodes" | "edges", { id: string; label: string; parent_id: string }[]>;
 
@@ -61,7 +58,7 @@ function ExpandedRowTagListWrapper({
                 id={item.id}
                 image_id={item.portrait_id}
                 link={`/projects/${project_id}/characters/${item.id}/resources`}
-                title={getCharacterFullName(item.first_name, undefined, item?.last_name)}
+                title={item?.full_name || ""}
                 type="characters"
               />
             ))
