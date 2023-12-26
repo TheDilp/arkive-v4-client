@@ -21,7 +21,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
-    { data: { project_id } },
+    { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
     "map_pin_types",
   );
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
@@ -35,6 +35,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     "maps",
     {
       data: {},
+      fields: ["id", "image_id", "icon", "cluster_pins"],
       relations: { map_pins: true, map_layers: true },
     },
     {

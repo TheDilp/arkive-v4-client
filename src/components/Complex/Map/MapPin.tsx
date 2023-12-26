@@ -184,7 +184,7 @@ export function MapPin({
         ),
         // iconAnchor: isCharacterPin ? [30, 46] : [25.5, 46],
         // iconSize: isCharacterPin ? [28, 28] : [40, 40],
-        tooltipAnchor: isCharacterPin ? [5, -8] : [10.5, -6],
+        tooltipAnchor: isCharacterPin ? [6, -8] : [10.5, -6],
       })}
       position={position}>
       {title || isCharacterPin ? (
