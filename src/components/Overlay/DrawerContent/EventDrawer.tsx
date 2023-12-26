@@ -53,11 +53,30 @@ export function EventDrawer({ data }: Props) {
     {
       data: { project_id },
       relations: { tags: true, image: true, document: true },
+      fields: [
+        "id",
+        "title",
+        "background_color",
+        "start_day",
+        "start_month",
+        "start_year",
+        "end_day",
+        "end_month",
+        "end_year",
+        "hours",
+        "minutes",
+        "is_public",
+        "description",
+      ],
     },
     { enabled: !!data?.id },
   );
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
-    { data: { parent_id: item_id || existingEvent?.data?.parent_id }, orderBy: [{ field: "sort", sort: "asc" }] },
+    {
+      data: { parent_id: item_id || existingEvent?.data?.parent_id },
+      orderBy: [{ field: "sort", sort: "asc" }],
+      fields: ["id", "title", "days", "sort"],
+    },
     "months",
     { enabled: !!existingEvent?.data, staleTime: 5 * 60 * 1000 },
   );

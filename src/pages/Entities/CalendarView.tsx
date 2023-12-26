@@ -60,6 +60,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
     "calendars",
     {
       data: { project_id },
+      fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
       relations: { months: true },
     },
     {
@@ -69,6 +70,19 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
   const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
+      fields: [
+        "id",
+        "title",
+        "background_color",
+        "start_day",
+        "start_month",
+        "start_year",
+        "end_day",
+        "end_month",
+        "end_year",
+        "hours",
+        "minutes",
+      ],
       filters: {
         and:
           view === "calendar"
