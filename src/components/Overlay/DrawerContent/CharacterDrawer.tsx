@@ -108,8 +108,9 @@ function FieldTemplateRows({
           const templateValueKey = getBlueprintFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
           const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
+
           const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
-          if (template_field.field_type === "text" || template_field.field_type === "number")
+          if (template_field.field_type === "text" || template_field.field_type === "number") {
             return (
               <TemplateInputField
                 key={template_field.id}
@@ -124,6 +125,8 @@ function FieldTemplateRows({
                 title={template_field.title}
               />
             );
+          }
+
           if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
             return (
               <TemplateSelectField
@@ -312,14 +315,12 @@ export function AdditionalFieldsTab({
       {!templates?.data?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
 
       {(templates?.data || []).map((t) => {
-        const templateFieldIds = t.character_fields.map((f) => f.id);
-        const character_fields_data = (character_fields || [])?.filter((field) => templateFieldIds.includes(field.id));
         return (
           <Collapsible key={t.id} label={t.title}>
             <div className="p-2">
               <FieldTemplateRows
                 character_fields={t.character_fields}
-                character_fields_data={character_fields_data}
+                character_fields_data={character_fields || []}
                 handleChange={handleChange}
               />
             </div>
