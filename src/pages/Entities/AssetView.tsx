@@ -290,7 +290,7 @@ export function AssetView() {
       </div>
       {view === "card" ? (
         <div
-          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6"
+          className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6 xl:grid-cols-8"
           onScroll={(e) => {
             const { target } = e;
             if (target) {
