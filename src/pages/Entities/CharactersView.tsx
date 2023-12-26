@@ -249,7 +249,7 @@ export function CharactersView() {
       relations: {
         portrait: true,
       },
-      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "age"],
+      fields: ["id", "full_name", "portrait_id", "is_favorite", "age"],
       filters,
       pagination: {
         limit: 12,
@@ -306,7 +306,7 @@ export function CharactersView() {
   }, [filter, dispatch, view]);
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
+      <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
         <div className="w-52">
           <Input
             name="quick_filter"
@@ -364,10 +364,9 @@ export function CharactersView() {
             page.data.map((char: CharacterType) => (
               <CharacterCard
                 key={char.id}
-                first_name={char?.first_name}
+                full_name={char.full_name}
                 id={char?.id}
                 is_favorite={char?.is_favorite}
-                last_name={char?.last_name}
                 portrait_id={char?.portrait_id}
               />
             )),

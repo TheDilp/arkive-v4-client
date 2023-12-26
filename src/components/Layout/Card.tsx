@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { BaseCardType, CharacterType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
-import { getCharacterFullName, getImageURL, IconEnum, projectCardNavItems } from "../../utils";
+import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
@@ -82,23 +82,22 @@ export function ProjectDashboardInfoCard({ title, count, icon, latestItems }: Pr
 
 export function CharacterCard({
   id,
-  first_name,
-  last_name,
+  full_name,
   portrait_id,
   is_favorite,
-}: Pick<CharacterType, "id" | "first_name" | "last_name" | "portrait_id" | "is_favorite">) {
+}: Pick<CharacterType, "id" | "full_name" | "portrait_id" | "is_favorite">) {
   const { project_id } = useParams();
   return (
     <Link
       className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
-      to={id}>
+      to={`${id}/resources`}>
       {is_favorite ? (
         <div className="absolute right-0 top-0 z-10 m-4">
           <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />
         </div>
       ) : null}
       <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
-        {getCharacterFullName(first_name, "", last_name)}
+        {full_name}
       </h2>
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-zinc-950 bg-cover bg-top transition-all duration-300 group-hover:scale-125 group-hover:brightness-75 lg:bg-center"
