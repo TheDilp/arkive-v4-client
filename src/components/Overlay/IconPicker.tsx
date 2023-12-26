@@ -108,6 +108,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                 value={category}
               />
               <Input
+                isAutofocused
                 isDisabled={!category}
                 name="filter"
                 onChange={({ value }) => setFilter(value as string)}
