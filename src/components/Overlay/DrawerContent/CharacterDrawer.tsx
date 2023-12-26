@@ -372,7 +372,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       fields: ["id", "title", "sort"],
       relations: { character_fields: true },
       relationFilters: {
-        or: (existingCharacter?.data?.tags || [])?.map((t) => ({
+        or: (character?.tags || [])?.map((t) => ({
           operator: "in",
           value: t.id,
           relationalData: { blueprint_field_id: "tags" },
