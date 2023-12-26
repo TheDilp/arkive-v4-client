@@ -368,9 +368,15 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: { project_id: project_id as string },
+      fields: ["id", "title", "sort"],
       relations: { character_fields: true },
       relationFilters: {
-        and: (existingCharacter?.data?.tags || [])?.map((t) => ({ operator: "in", value: [t.id], field: "id" })),
+        or: (existingCharacter?.data?.tags || [])?.map((t) => ({
+          operator: "in",
+          value: t.id,
+          relationalData: { blueprint_field_id: "tags" },
+          field: "tags",
+        })),
       },
     },
     "character_fields_templates",
@@ -382,6 +388,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { data: relationshipTypes, isFetching: isFetchingRelationshipTypes } = useGetEntities<CharacterRelationshipType>(
     {
       data: { project_id: project_id as string },
+      fields: ["id", "title", "ascendant_title", "descendant_title"],
     },
     "character_relationship_types",
     {

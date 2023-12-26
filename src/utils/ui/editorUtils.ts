@@ -253,7 +253,6 @@ export function documentEditorHooks(
     },
   ];
 }
-
 export function messageEditorHooks(
   id: string,
   selectedCharacter: string | undefined,
@@ -310,7 +309,6 @@ export function messageEditorHooks(
     },
   ];
 }
-
 export const defaultSlashItems: slashMenuItem[] = [
   {
     name: "Heading 1",

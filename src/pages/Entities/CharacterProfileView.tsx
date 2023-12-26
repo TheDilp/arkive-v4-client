@@ -3,7 +3,6 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
-import { isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
@@ -697,11 +696,11 @@ function AdditionalFieldDisplay({
           value={character_field?.options?.find((opt) => opt.id === character_field_data?.value)?.value || ""}
         />
       ) : null}
-      {character_field.field_type === "textarea" && isRemirrorJSON(value) ? (
+      {character_field.field_type === "textarea" ? (
         <>
           <span className="text-sm text-zinc-300">{character_field.title}</span>
           <div className="rounded-md border border-zinc-700 bg-zinc-900">
-            <StaticRender content={(value || {}) as any} />
+            <StaticRender content={(value || undefined) as any} />
           </div>
         </>
       ) : null}
@@ -849,7 +848,12 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       fields: ["id", "title"],
       relations: { character_fields: true },
       relationFilters: {
-        and: (existingCharacter?.data?.tags || [])?.map((t) => ({ operator: "in", value: [t.id], field: "id" })),
+        or: (existingCharacter?.data?.tags || [])?.map((t) => ({
+          operator: "in",
+          value: t.id,
+          relationalData: { blueprint_field_id: "tags" },
+          field: "tags",
+        })),
       },
     },
     "character_fields_templates",
@@ -873,11 +877,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     if (existingCharacter?.data)
       setDialog({
         type: "family_tree",
-        title: `Family tree of ${getCharacterFullName(
-          existingCharacter?.data.first_name,
-          existingCharacter?.data?.nickname || "",
-          existingCharacter?.data?.last_name || "",
-        )}`,
+        title: `Family tree of ${existingCharacter?.data.full_name || ""}`,
         data: { id: existingCharacter?.data.id },
         size: "lg",
       });

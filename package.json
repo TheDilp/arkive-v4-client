@@ -14,7 +14,7 @@
     "@tanstack/react-query-devtools": "^4.29.19",
     "@tanstack/react-table": "^8.9.3",
     "@tanstack/react-virtual": "3.0.0-beta.59",
-    "cytoscape": "^3.26.0",
+    "cytoscape": "3.26.0",
     "cytoscape-dagre": "^2.5.0",
     "cytoscape-edgehandles": "^4.0.1",
     "cytoscape-grid-guide": "^2.3.3",
