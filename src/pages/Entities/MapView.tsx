@@ -19,14 +19,13 @@ type Props = {
 export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: Props) {
   const { project_id, item_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
-  const [loading, setLoading] = useState(true);
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
     "map_pin_types",
   );
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
   const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
-
+  const fr = useRef(true) as any;
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
 
@@ -57,7 +56,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
 
   useEffect(() => {
     if (currentMap && currentMap?.image_id && !bounds) {
-      setLoading(true);
+      // setLoading(true);
 
       const img = new Image();
       img.src = getImageURL(project_id as string, "map_images", currentMap?.image_id);
@@ -71,11 +70,18 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
             [0, 0],
             [img.height, img.width],
           ]);
+          imgRef.current.panTo([0, 0]);
+          imgRef.current.leafletElement.fitBounds(bounds);
         }
-        setLoading(false);
       };
     }
   }, [currentMap, project_id]);
+
+  useEffect(() => {
+    return () => {
+      fr.current = false;
+    };
+  }, []);
 
   if (!currentMap) return null;
   return (
@@ -100,11 +106,14 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           />
         </div>
       </div>
-      {loading || isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && !isFetching && !loading && !!bounds ? (
+      {isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
+      {currentMap && !isFetching && !!bounds ? (
         <div className="h-full w-full overflow-hidden">
           <MapContainer
-            ref={mapRef}
+            ref={(node) => {
+              mapRef.current = node;
+              if (bounds) node?.fitBounds(bounds as LatLngBoundsExpression);
+            }}
             attributionControl={false}
             bounds={bounds as LatLngBoundsExpression}
             center={[bounds[1][0] / 2, bounds[1][1] / 2]}

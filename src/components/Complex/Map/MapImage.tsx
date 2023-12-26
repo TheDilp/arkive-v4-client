@@ -113,7 +113,7 @@ export function MapImage({
       const pin = mapData?.map_pins?.find((map_pin) => (center_on ? map_pin.id === center_on : map_pin.id === subitem_id));
       if (pin) map.panTo([pin.lat, pin.lng], {});
     } else if (bounds && firstRender.current) {
-      map.fitBounds(bounds);
+      // map.fitBounds(bounds);
     }
     return () => {
       firstRender.current = false;
@@ -138,7 +138,6 @@ export function MapImage({
       characterPins: [],
     },
   );
-
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">
