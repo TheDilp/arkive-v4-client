@@ -758,7 +758,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       key={cell.id}
                       className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                         (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                      } ${cell.column.id === "select" ? "sticky left-0 z-10" : ""}
+                      } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"}
                       ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
                        ${
                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
