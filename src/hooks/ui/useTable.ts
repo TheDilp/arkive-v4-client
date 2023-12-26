@@ -133,15 +133,9 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
     case "setSort": {
       if (action.payload?.field && action.payload?.sort) {
         if (state.orderBy?.length) {
-          const fieldIdx = state.orderBy.findIndex((ob) => ob.field === action.payload.field);
+          // const fieldIdx = state.orderBy.findIndex((ob) => ob.field === action.payload.field);
 
-          if (fieldIdx > -1) {
-            const newOrderBy = state.orderBy.splice(fieldIdx);
-            newOrderBy.push(action.payload);
-            return { ...state, orderBy: newOrderBy };
-          }
-
-          return { ...state, orderBy: state?.orderBy?.length ? [...state.orderBy, action.payload] : [action.payload] };
+          return { ...state, orderBy: state?.orderBy?.length ? [action.payload] : [action.payload] };
         }
         return { ...state, orderBy: [action.payload] };
       }
