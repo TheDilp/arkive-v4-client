@@ -245,6 +245,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       data: {
         id: data?.id,
       },
+      fields: ["id", "title", "sort"],
       relations: {
         character_fields: true,
         tags: true,

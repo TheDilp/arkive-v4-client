@@ -114,6 +114,7 @@ export function TemplatesView() {
       data: {
         project_id,
       },
+      fields: ["id", "title", "sort"],
       relations: {
         tags: true,
       },
