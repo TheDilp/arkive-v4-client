@@ -951,7 +951,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   // console.log(relationTypeArray);
 
   return (
-    <div className="flex h-full min-h-full flex-col gap-y-2">
+    <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2 overflow-hidden">
       {isPreview ? null : (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -974,7 +974,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
         </div>
       )}
-      <div className="max-h-[calc(100vh-40%)] w-full  flex-1 content-start gap-4 pt-0 lg:grid lg:max-h-[calc(100vh-20%)] lg:grid-cols-5 lg:content-stretch">
+      <div className="w-full flex-1 flex-1 content-start gap-4 overflow-auto pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
           <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">

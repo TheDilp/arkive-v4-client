@@ -1,6 +1,6 @@
 import { UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { MutableRefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { isRemirrorJSON, RemirrorJSON } from "remirror";
@@ -133,8 +133,6 @@ export function PlaceMessage({
 export function ConversationView({ id }: { id: string }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
-  const messageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const messageBottomRef = useRef() as MutableRefObject<HTMLDivElement>;
   const setDrawer = useSetAtom(drawerAtom);
   const [selectedType, setSelectedType] = useState<MessageKindType>("character");
   const [selectedCharacter, setSelectedCharacter] = useState<string | undefined>(item_id ?? undefined);
@@ -146,6 +144,7 @@ export function ConversationView({ id }: { id: string }) {
     data: {
       id,
     },
+    fields: ["id", "title"],
     relations: {
       characters: true,
       messages: true,
@@ -161,6 +160,7 @@ export function ConversationView({ id }: { id: string }) {
         conversation_id: id,
         project_id,
       },
+      fields: ["id", "content", "parent_id", "sender_id", "type"],
       pagination: {
         limit: 20,
       },
@@ -201,8 +201,6 @@ export function ConversationView({ id }: { id: string }) {
                 const hasMessage = (flatMessages || []).at(-1)?.id === parsedMessage.id;
                 if (hasMessage) return;
                 setFlatMessages((prev) => [parsedMessage, ...prev]);
-
-                messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
               } catch (error) {
                 // console.error("ERROR PARSING MESSAGE CONTENT.");
               }
@@ -234,7 +232,6 @@ export function ConversationView({ id }: { id: string }) {
     if (messages?.pages?.length) {
       const flattenedMessages = messages?.pages?.flatMap((page) => page?.data || []);
       if (flattenedMessages.length) setFlatMessages(flattenedMessages);
-      messageContainerRef.current.scrollIntoView();
     }
   }, [messages?.pages?.length]);
 
@@ -246,7 +243,7 @@ export function ConversationView({ id }: { id: string }) {
 
   if (isLoading) return <Skeleton type="conversations" />;
   return (
-    <div className="flex h-[calc(100vh-20rem)] max-h-[calc(100vh-20rem)] flex-col justify-between lg:h-[calc(100vh-15rem)] lg:max-h-[calc(100vh-15rem)]">
+    <div className="relative flex h-full max-h-full flex-col justify-between">
       <div className="flex flex-1 flex-col gap-y-2 overflow-auto">
         <div className="h-10">
           <Button
@@ -257,10 +254,7 @@ export function ConversationView({ id }: { id: string }) {
             variant="info-bordered"
           />
         </div>
-        <div
-          ref={messageContainerRef}
-          className="sticky flex flex-col-reverse gap-y-2 overflow-y-auto"
-          style={{ overflowAnchor: "none" }}>
+        <div className="flex flex-col-reverse gap-y-2">
           {flatMessages?.length ? (
             flatMessages.map((m) => {
               if (m.type === "narration")
@@ -342,7 +336,6 @@ export function ConversationView({ id }: { id: string }) {
           ) : (
             <Alert label="This is the start of this conversation." />
           )}
-          <div ref={messageBottomRef} className="h-0 w-0" />
         </div>
       </div>
       <div className="flex min-h-fit flex-col gap-y-2 pt-2">
