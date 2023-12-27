@@ -72,6 +72,11 @@ export function DefaultEditorExtensions(
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
       },
       {
+        char: "@mp:",
+        name: "map_pins",
+        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+      },
+      {
         char: "@g:",
         name: "graphs",
         supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,

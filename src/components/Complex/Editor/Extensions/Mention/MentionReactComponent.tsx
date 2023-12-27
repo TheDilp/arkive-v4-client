@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { DocumentMention, EventMention, GraphMention, MapMention, WordMention } from ".";
 import { BlueprintMention } from "./BlueprintMention";
 import { CharacterMention } from "./CharacterMention";
+import { MapPinMention } from "./MapPinMention";
 
 type Props = {
   node: any;
@@ -31,6 +32,7 @@ export function MentionReactComponent({ node }: Props) {
     if (name === "documents")
       return <DocumentMention alterId={alterId} id={id} label={label} project_id={project_id} title={label} />;
     if (name === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
+    if (name === "map_pins") return <MapPinMention id={id} label={label} parent_id={parent_id} project_id={project_id} />;
     if (name === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
     if (name === "blueprint_instances")
       return <BlueprintMention icon={icon} id={id} label={label} parent_id={parent_id} project_id={project_id} title={label} />;

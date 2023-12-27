@@ -29,7 +29,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
 
   return id ? (
     <Link
-      className="inline-flex items-center font-lato font-bold transition-colors"
+      className="inline-flex items-center font-lato text-sm font-bold transition-colors"
       to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
       <div className="flex items-start">
         {data?.data?.portrait_id ? (
