@@ -51,6 +51,7 @@ export function Tooltip({
   content,
   isDisabled,
   isClickable,
+  isPortal,
   closeOnClick,
   customOffset,
   isIgnoringHover,
@@ -102,7 +103,7 @@ export function Tooltip({
           ...children.props,
         }),
       )}
-      {!isDisabled && open && (
+      {!isDisabled && open && isPortal ? (
         <FloatingPortal>
           <div
             onClick={() => {
@@ -124,14 +125,42 @@ export function Tooltip({
             )}
             <FloatingArrow
               ref={arrowRef}
-              className="z-[9999] [&>path:first-of-type]:stroke-none"
+              className="z-[9998] [&>path:first-of-type]:stroke-none"
               context={context}
               fill={arrowColor || getArrowColor(variant) || "black"}
               strokeWidth={0}
             />
           </div>
         </FloatingPortal>
-      )}
+      ) : null}
+      {!isDisabled && open ? (
+        <div
+          onClick={() => {
+            if (closeOnClick) {
+              setOpen((prev) => !prev);
+            }
+          }}
+          onKeyDown={() => {}}
+          role="tooltip"
+          tabIndex={-1}
+          {...getFloatingProps({
+            ref: refs.setFloating,
+            style: { ...floatingStyles, zIndex: 9999 },
+          })}>
+          {typeof content === "string" ? (
+            <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
+          ) : (
+            cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
+          )}
+          <FloatingArrow
+            ref={arrowRef}
+            className="z-[9998] [&>path:first-of-type]:stroke-none"
+            context={context}
+            fill={arrowColor || getArrowColor(variant) || "black"}
+            strokeWidth={0}
+          />
+        </div>
+      ) : null}
     </>
   );
 }
