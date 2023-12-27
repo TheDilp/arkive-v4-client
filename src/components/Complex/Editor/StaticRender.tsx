@@ -134,7 +134,6 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
               <DocumentMention
                 alterId={alterid}
                 id={id}
-                isDisabledTooltip
                 isPublic={isPublicView}
                 label={label}
                 project_id={project_id}
