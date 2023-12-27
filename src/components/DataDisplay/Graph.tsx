@@ -60,7 +60,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     item_id,
     "graphs",
     {
-      fields: ["default_node_shape", "default_node_color", "default_edge_color"],
+      fields: ["title", "is_public", "default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
     { enabled: !data, queryKeyOverwrite: ["graph_view"], isPublic },

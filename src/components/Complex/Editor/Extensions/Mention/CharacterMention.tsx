@@ -20,7 +20,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     id,
     "characters",
     {
-      fields: ["id", "full_name", "portrait_id"],
+      fields: ["id", "full_name", "is_public", "portrait_id"],
     },
     { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );

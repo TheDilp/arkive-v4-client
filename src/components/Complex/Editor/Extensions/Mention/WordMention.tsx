@@ -10,7 +10,7 @@ type Props = {
   isPublic?: boolean;
 };
 
-export function WordMentionTooltip({ id }: Pick<Props, "id">) {
+export function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
   const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
     id as string,
     "words",
@@ -20,7 +20,7 @@ export function WordMentionTooltip({ id }: Pick<Props, "id">) {
       },
       fields: ["id", "title", "translation", "description"],
     },
-    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000 },
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], retry: false, staleTime: 5 * 60 * 1000, isPublic },
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-700 bg-zinc-800 p-2 shadow-lg">
@@ -51,7 +51,10 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
   return (
-    <Tooltip arrowColor="#3f3f46" content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
+    <Tooltip
+      arrowColor="#3f3f46"
+      content={<WordMentionTooltip id={id} isPublic={isPublic} />}
+      isDisabled={isDisabledTooltip ?? false}>
       <span className="cursor-pointer text-sm font-light italic">
         {data?.data?.title || title || label}
         <sup>*</sup>

@@ -22,6 +22,9 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
     "map_pin_types",
+    {
+      enabled: !isPublic,
+    },
   );
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
   const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
@@ -86,25 +89,27 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-      <div className="w-full">
-        <div className="relative mb-3 ml-auto w-52">
-          <Select
-            hasSearch
-            isDisabled={isInitialLoadingTypes}
-            isLoading={isInitialLoadingTypes}
-            isMultiple
-            name="mapPinFilter"
-            onChange={changeMapPinFilters}
-            options={[
-              { label: "All map pins", value: "all" },
-              { label: "With documents", value: "documents" },
-              { label: "With linked maps", value: "linked_maps" },
-            ].concat(mapPinTypes)}
-            placeholder="Filter"
-            value={mapPinFilters}
-          />
+      {isPublic ? null : (
+        <div className="w-full">
+          <div className="relative mb-3 ml-auto w-52">
+            <Select
+              hasSearch
+              isDisabled={isInitialLoadingTypes}
+              isLoading={isInitialLoadingTypes}
+              isMultiple
+              name="mapPinFilter"
+              onChange={changeMapPinFilters}
+              options={[
+                { label: "All map pins", value: "all" },
+                { label: "With documents", value: "documents" },
+                { label: "With linked maps", value: "linked_maps" },
+              ].concat(mapPinTypes)}
+              placeholder="Filter"
+              value={mapPinFilters}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
       {currentMap && !isFetching && !!bounds ? (
         <div className="h-full w-full overflow-hidden">

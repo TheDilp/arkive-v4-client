@@ -104,6 +104,7 @@ export function useGetSubEntity<EntityType>(
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
+      retry: options?.retry ?? 3,
     },
   );
 }
