@@ -133,7 +133,7 @@ export function Tooltip({
           </div>
         </FloatingPortal>
       ) : null}
-      {!isDisabled && open ? (
+      {!isDisabled && open && !isPortal ? (
         <div
           onClick={() => {
             if (closeOnClick) {
