@@ -63,6 +63,7 @@ import {
   getCharacterFullName,
   getCharacterProfileTabFromType,
   getDefaultEntityIcon,
+  getFirstLetters,
   getImageURL,
   getSentenceCase,
   IconEnum,
@@ -980,10 +981,12 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
             <Avatar
               hasShowImage
-              image={getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)}
-              initials={
-                getAvatarInitials(existingCharacter?.data?.first_name || "", existingCharacter?.data?.last_name || "") || ""
+              image={
+                existingCharacter?.data?.portrait_id
+                  ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)
+                  : undefined
               }
+              initials={getFirstLetters(existingCharacter?.data?.full_name || "")}
               isTooltipDisabled
               size="4xl"
             />
