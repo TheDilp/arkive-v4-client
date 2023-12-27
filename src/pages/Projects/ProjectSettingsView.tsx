@@ -274,14 +274,17 @@ function membersColumns() {
 export function ProjectSettingsView() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const [selectedTab, setSelectedTab] = useState(0);
+
+  const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
+
   const [project, setProject] = useState<ProjectType | null>();
   const { user: authUser } = useUser();
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const { handleChange } = useHandleChange({ data: project, setData: setProject });
 
@@ -320,7 +323,11 @@ export function ProjectSettingsView() {
     });
   }
 
-  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id } }, "webhooks", { enabled: !!user?.id });
+  const { data: webhooks } = useGetEntities<WebhookType>(
+    { data: { user_id: user?.id }, fields: ["id", "title", "user_id"] },
+    "webhooks",
+    { enabled: !!user?.id && finalTabs[selectedTab].label === "User settings" },
+  );
   const { mutateAsync: deleteWebhook } = useDeleteWebhook();
 
   useLayoutEffect(() => {
@@ -357,7 +364,6 @@ export function ProjectSettingsView() {
       data: null,
     }));
   }
-  const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
@@ -389,7 +395,7 @@ export function ProjectSettingsView() {
 
         <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
-            {tabs[selectedTab].label}
+            {finalTabs[selectedTab].label}
             {selectedTab === 0 ? (
               <div className="ml-auto w-min">
                 <Button

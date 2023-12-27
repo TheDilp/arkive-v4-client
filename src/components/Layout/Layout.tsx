@@ -18,7 +18,7 @@ export function ProjectLayout() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title"],
+      fields: ["id", "title", "owner_id"],
     },
     { staleTime: 60 * 60 * 1 },
   );
