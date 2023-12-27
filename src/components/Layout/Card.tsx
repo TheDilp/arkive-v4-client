@@ -111,12 +111,12 @@ export function CharacterCard({
 
 export function Card({ title, subtitle, children, image }: BaseCardType & { children: JSX.Element | JSX.Element[] | null }) {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-md bg-zinc-700 p-4 shadow">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-md border border-zinc-800 bg-zinc-700 p-4 shadow">
       {image ? (
         <div className="mb-4 h-64 w-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${image})` }} />
       ) : null}
-      <h2 className="w-full text-center text-3xl text-white">{title}</h2>
-      <h2 className="w-full text-center text-lg text-zinc-400">{subtitle}</h2>
+      <h2 className="pointer-events-none w-full text-center text-3xl text-white">{title}</h2>
+      {subtitle ? <h2 className="w-full text-center text-lg text-zinc-400">{subtitle}</h2> : null}
       {children}
     </div>
   );

@@ -15,6 +15,7 @@ export interface TooltipType {
   arrowColor?: string;
   isDisabled?: boolean;
   isClickable?: boolean;
+  isPortal?: boolean;
   closeOnClick?: boolean;
   passCloseTooltip?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };

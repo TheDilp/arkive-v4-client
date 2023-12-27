@@ -28,7 +28,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   const fr = useRef(true) as any;
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
-
   const { data: existingMap, isFetching } = useGetEntity<MapType>(
     item_id as string,
     "maps",
@@ -112,7 +111,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           <MapContainer
             ref={(node) => {
               mapRef.current = node;
-
               if (bounds && !center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
               if (center_on) {
                 const pin = currentMap?.map_pins?.find((map_pin) =>

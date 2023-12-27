@@ -71,7 +71,6 @@ export function useGetEntity<EntityType>(
   if (options?.queryKeyOverwrite) {
     queryKey = options.queryKeyOverwrite;
   }
-
   return useQuery<{ data: EntityType }>(
     queryKey,
     async () =>

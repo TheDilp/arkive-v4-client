@@ -104,7 +104,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* Maps */
 .leaflet-container {
-  @apply flex h-[calc(100%-4rem)] flex-1 select-none overflow-visible bg-black !important;
+  @apply flex h-[calc(100%-4rem)] flex-1 select-none overflow-visible bg-transparent !important;
   .leafletImageOverlayLayer {
     @apply z-10;
   }

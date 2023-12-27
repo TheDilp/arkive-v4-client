@@ -11,7 +11,6 @@ type Props = {
   alterId: string | undefined;
   id: string | undefined;
   label: string;
-  isDisabledTooltip?: boolean;
   project_id: string | undefined;
   isPublic?: boolean;
   title?: string;
@@ -21,13 +20,15 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
   const { data, isLoading } = useGetEntity<DocumentType>(
     id as string,
     "documents",
-    { data: { id }, fields: ["content"] },
-    { enabled: !!id && !isPublic, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"] },
+    { data: { id }, fields: ["content", "is_public"] },
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"], isPublic },
   );
   return (
     <Card title={title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto overflow-x-hidden whitespace-pre-line">
-        {data?.data?.content && !isLoading ? <StaticRender content={data.data.content as RemirrorJSON} /> : null}
+        {data?.data?.content && !isLoading ? (
+          <StaticRender content={data.data.content as RemirrorJSON} isPublicView={isPublic} />
+        ) : null}
         {isLoading ? (
           <div className="flex max-h-[24rem] max-w-[24rem] items-center justify-center">
             <Spinner />
@@ -37,7 +38,7 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
     </Card>
   );
 }
-export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, project_id, isPublic }: Props) {
+export function DocumentMention({ alterId, title, id, label, project_id, isPublic }: Props) {
   const { data } = useGetEntity<DocumentType>(
     id as string,
     "documents",
@@ -65,8 +66,8 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
       <Tooltip
         arrowColor="#3f3f46"
         content={<DocumentMentionTooltip id={id} isPublic={isPublic} title={data?.data?.title || title || label} />}
-        delay={{ openDelay: 500 }}
-        isDisabled={(isDisabledTooltip || isPublic) ?? false}>
+        delay={{ openDelay: 500, closeDelay: 200 }}
+        isDisabled={(isPublic && !data?.data?.is_public) ?? false}>
         <Link
           className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           to={getMentionLink(id as string, "documents", project_id as string, data?.data?.is_public ?? false, isPublic)}>
