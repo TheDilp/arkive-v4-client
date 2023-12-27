@@ -85,8 +85,12 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
           ...state,
           filters: {
             ...state.filters,
-            and: (state.filters?.and || []).filter((filt) => filt.field !== action.payload),
-            or: (state.filters?.or || []).filter((filt) => filt.field !== action.payload),
+            and: (state.filters?.and || []).filter(
+              (filt) => filt.field !== action.payload && filt.header_name !== action.payload,
+            ),
+            or: (state.filters?.or || []).filter(
+              (filt) => filt.field !== action.payload && filt.header_name !== action.payload,
+            ),
           },
         };
       }
