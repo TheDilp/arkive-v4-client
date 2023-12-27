@@ -334,7 +334,6 @@ function TableColumnFilter({
                       value: "",
                       operator: filterOptions[0].value as RequestFilterTypes,
                       header_name: columnHeader,
-                      relationalData: { blueprint_field_id: columnId },
                     }),
                   }));
               }}
@@ -388,8 +387,14 @@ function TableColumnFilter({
             applyFilter(
               columnId as string,
               {
-                and: (columnFilters?.and || [])?.map((filt) => ({ ...filt, relationalData: { blueprint_field_id: columnId } })),
-                or: (columnFilters?.or || [])?.map((filt) => ({ ...filt, relationalData: { blueprint_field_id: columnId } })),
+                and: (columnFilters?.and || [])?.map((filt) => ({
+                  ...filt,
+                  relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
+                })),
+                or: (columnFilters?.or || [])?.map((filt) => ({
+                  ...filt,
+                  relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
+                })),
               },
               dispatch,
               !!isRelationFilter,
@@ -478,8 +483,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, selection, selectedActions, getLink, onRowClick } =
     config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
-  const areFiltersActive = !!filters?.and?.length || !!filters?.or?.length || !!Object.keys(relationFilters || {}).length;
-  const isSubheaderEnabled = areFiltersActive;
+  const isSubheaderEnabled =
+    !!filters?.and?.length || !!filters?.or?.length || relationFilters?.and?.length || relationFilters?.or?.length;
 
   const {
     head,
@@ -601,7 +606,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   <div className="truncate">{flexRender(header, hdr.getContext())}</div>
                   {(meta as MetaType)?.filterOptions?.length && dispatch ? (
                     <Tooltip
-                      allowedPlacements={["bottom", "left", "left-end", "left-start", "right", "right-start", "right-end"]}
+                      allowedPlacements={["bottom", "left"]}
                       arrowColor="#27272a"
                       content={
                         <div
