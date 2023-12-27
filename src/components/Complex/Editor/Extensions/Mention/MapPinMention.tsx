@@ -70,6 +70,6 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
       </Link>
     </Tooltip>
   ) : (
-    <span className="font-lato text-sm">{label || ""}</span>
+    <span className="font-lato">{label || ""}</span>
   );
 }

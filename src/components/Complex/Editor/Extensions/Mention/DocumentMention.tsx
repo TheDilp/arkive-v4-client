@@ -80,5 +80,5 @@ export function DocumentMention({ alterId, title, id, label, isDisabledTooltip, 
       </Tooltip>
     );
 
-  return <span className="font-lato text-sm">{label}</span>;
+  return <span className="font-lato">{label}</span>;
 }

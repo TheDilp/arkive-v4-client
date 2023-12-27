@@ -25,7 +25,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
 
-  if (isPublic && !data?.data?.is_public) return <span className="font-lato text-sm">{label}</span>;
+  if (isPublic && !data?.data?.is_public) return <span className="font-lato">{label}</span>;
 
   return id ? (
     <Link
@@ -43,6 +43,6 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
       </div>
     </Link>
   ) : (
-    <span className="font-lato text-sm">{label}</span>
+    <span className="font-lato">{label}</span>
   );
 }

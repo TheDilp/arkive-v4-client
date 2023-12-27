@@ -46,5 +46,5 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
         </div>
       </Link>
     );
-  return <span className="font-lato text-sm">{label}</span>;
+  return <span className="font-lato">{label}</span>;
 }

@@ -42,6 +42,6 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
       </div>
     </Link>
   ) : (
-    <span className="font-lato text-sm">{label}</span>
+    <span className="font-lato">{label}</span>
   );
 }

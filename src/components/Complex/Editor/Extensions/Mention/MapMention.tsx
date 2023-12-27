@@ -34,6 +34,6 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
       </div>
     </Link>
   ) : (
-    <span className="font-lato text-sm">{label}</span>
+    <span className="font-lato">{label}</span>
   );
 }

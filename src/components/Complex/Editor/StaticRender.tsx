@@ -158,7 +158,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
             );
 
           return isPublicView ? (
-            <span className="font-lato text-sm">{label}</span>
+            <span className="font-lato">{label}</span>
           ) : (
             <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
               {label}
