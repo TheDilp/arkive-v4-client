@@ -120,9 +120,9 @@ function createMentions(
 
 const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: string }[] = [
   {
-    label: "Documents",
-    value: "documents",
-    icon: IconEnum.document,
+    label: "Characters",
+    value: "characters",
+    icon: IconEnum.character,
   },
   {
     label: "Blueprints",
@@ -130,9 +130,9 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
     icon: IconEnum.blueprint,
   },
   {
-    label: "Characters",
-    value: "characters",
-    icon: IconEnum.character,
+    label: "Documents",
+    value: "documents",
+    icon: IconEnum.document,
   },
   {
     label: "Maps",
