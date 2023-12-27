@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: Props) {
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, subitem_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
@@ -112,7 +112,14 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           <MapContainer
             ref={(node) => {
               mapRef.current = node;
-              if (bounds) node?.fitBounds(bounds as LatLngBoundsExpression);
+
+              if (bounds && !center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
+              if (center_on) {
+                const pin = currentMap?.map_pins?.find((map_pin) =>
+                  center_on ? map_pin.id === center_on : map_pin.id === subitem_id,
+                );
+                if (pin) node?.panTo([pin.lat, pin.lng], {});
+              }
             }}
             attributionControl={false}
             bounds={bounds as LatLngBoundsExpression}
