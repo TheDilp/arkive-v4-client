@@ -19,8 +19,8 @@ function createColumns(
     columnHelper.display({
       id: "icon",
       cell: ({ row }) => <Icon fontSize={24} icon={row.original?.icon || getDefaultEntityIcon("blueprints")} />,
-      maxSize: 2.75,
-      minSize: 2.75,
+      maxSize: 3.25,
+      minSize: 3.25,
       meta: {
         centered: true,
       },
