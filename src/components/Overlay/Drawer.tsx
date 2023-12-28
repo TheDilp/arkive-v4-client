@@ -15,6 +15,7 @@ import {
   CalendarDrawer,
   CharacterAddDrawer,
   CharacterDrawer,
+  CharacterFilterDrawer,
   CharacterRelationshipTypeDrawer,
   ConversationDrawer,
   DictionaryDrawer,
@@ -151,6 +152,7 @@ export function Drawer() {
           {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
           {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
           {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
+          {drawer.type === "character_filter" ? <CharacterFilterDrawer /> : null}
         </div>
       </div>
     );

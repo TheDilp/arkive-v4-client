@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum, TextFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
 
@@ -20,7 +20,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
     columnHelper.accessor("sort", {
@@ -29,7 +29,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
       maxSize: 10,
       minSize: 5,

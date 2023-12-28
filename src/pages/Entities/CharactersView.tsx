@@ -34,8 +34,8 @@ import {
   getCharacterFullName,
   getImageURL,
   IconEnum,
-  NameFilters,
   NumberFilters,
+  TextFilters,
   userAtom,
 } from "../../utils";
 
@@ -80,7 +80,7 @@ function createColumns(
       meta: {
         pinned: true,
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
       minSize: 12,
     }),
@@ -91,7 +91,7 @@ function createColumns(
       meta: {
         pinned: isMd,
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
       minSize: 12,
     }),
@@ -101,7 +101,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
       maxSize: 15,
     }),
@@ -309,7 +309,14 @@ export function CharactersView() {
       <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
         <div className="mr-auto">
           <div className="h-11 w-11">
-            <Button icon={IconEnum.filter} isIconOnly onClick={undefined} tooltip="Filter characters" />
+            <Button
+              icon={IconEnum.filter}
+              isIconOnly
+              onClick={() =>
+                setDrawer((prev) => ({ ...prev, type: "character_filter", data: {}, size: "lg", title: "Character filter" }))
+              }
+              tooltip="Filter characters"
+            />
           </div>
         </div>
         <div className="w-52">

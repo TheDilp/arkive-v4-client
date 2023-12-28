@@ -37,7 +37,7 @@ import {
   getDayOrdinal,
   getImageURL,
   IconEnum,
-  NameFilters,
+  TextFilters,
   rollDiceWithNotification,
   useNotifications,
   userAtom,
@@ -155,7 +155,7 @@ function createColumns(
       meta: {
         pinned: true,
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
       cell: ({ row }) => row.original?.title || "",
       minSize: 15,
@@ -164,7 +164,6 @@ function createColumns(
 
   blueprint.blueprint_fields
     ?.filter((field) => field.field_type !== "textarea")
-    ?.slice(0, 6)
     ?.forEach((field) => {
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
       fieldColumns.push(

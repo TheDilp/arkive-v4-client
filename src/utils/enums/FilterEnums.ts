@@ -17,7 +17,7 @@ export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   "not in": "Not in list",
 };
 
-export const NameFilters: FilterEnumType[] = [
+export const TextFilters: FilterEnumType[] = [
   { label: FilterNamesEnum.eq, value: "eq", type: "text" },
   { label: FilterNamesEnum.ilike, value: "ilike", type: "text" },
 ];
@@ -92,7 +92,7 @@ export function CharacterBlueprintRelationFilter(
   type: BlueprintFieldTypes,
   selectOptions?: { label: string; value: string }[],
 ): FilterEnumType[] {
-  if (type === "text") return NameFilters;
+  if (type === "text") return TextFilters;
   if (type === "number") return NumberFilters;
   if (type === "boolean") return BooleanFilters;
   if ((type === "select" || type === "select_multiple") && selectOptions?.length)

@@ -7,7 +7,7 @@ import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } fr
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, NameFilters } from "../../utils";
+import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, TextFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<BlueprintType>();
 
@@ -31,7 +31,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
 

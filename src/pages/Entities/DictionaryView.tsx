@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
-import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, NameFilters, userAtom } from "../../utils";
+import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, TextFilters, userAtom } from "../../utils";
 
 type FilterType = "title" | "translation";
 const columnHelper = createColumnHelper<WordType>();
@@ -23,7 +23,7 @@ function createColumns(
       cell: (info) => <div className="pr-1 italic">{info.getValue()}</div>,
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
     columnHelper.accessor("translation", {
@@ -32,7 +32,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
   ];

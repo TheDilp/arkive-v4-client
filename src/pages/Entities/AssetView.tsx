@@ -15,7 +15,7 @@ import {
   getAvatarInitials,
   getImageURL,
   IconEnum,
-  NameFilters,
+  TextFilters,
   userAtom,
 } from "../../utils";
 
@@ -68,7 +68,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
 

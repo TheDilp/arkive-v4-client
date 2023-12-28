@@ -4,6 +4,7 @@ export * from "./BlueprintInstanceDrawer";
 export * from "./CalendarDrawer";
 export * from "./CharacterAddDrawer";
 export * from "./CharacterDrawer";
+export * from "./CharacterFilterDrawer";
 export * from "./CharacterRelationshipTypeDrawer";
 export * from "./ConversationDrawer";
 export * from "./DictionaryDrawer";

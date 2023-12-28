@@ -4,6 +4,9 @@ export interface RequestFilterType {
   field: string;
   value: string | number | string[] | number[] | boolean | null;
   operator: RequestFilterTypes;
+  id: string;
+  header_name: string;
+  relationalData?: { [key: string]: any };
 }
 export type SortType = "asc" | "desc" | null;
 export interface RequestOrderByType {
@@ -39,7 +42,7 @@ export interface RequestBodyType<InsertType> {
   data?: {
     [key: string]: any;
   };
-  fields?: (keyof InsertType)[];
+  fields: (keyof InsertType)[];
   orderBy?: RequestOrderByType[];
   filters?: {
     and?: RequestFilterType[];

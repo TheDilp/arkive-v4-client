@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, NameFilters } from "../../utils";
+import { dialogAtom, drawerAtom, IconEnum, TextFilters } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
 
@@ -21,7 +21,7 @@ function createColumns(
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
-        filterOptions: NameFilters,
+        filterOptions: TextFilters,
       },
     }),
     columnHelper.accessor("color", {
