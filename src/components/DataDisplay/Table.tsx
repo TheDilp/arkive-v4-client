@@ -51,7 +51,7 @@ const TableClasses = tv({
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "px-2 max-h-[2.5rem] sticky top-0 left-0",
     subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-8",
-    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden sticky left-0 top-0",
+    subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden flex-1 sticky left-0 top-0",
     subheaderRowTitle: "font-medium",
     rowContainer:
       "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.04rem] border-zinc-600",
@@ -477,6 +477,9 @@ function TableSubheaderFilterBadges({
           </div>
         </Tooltip>
       ))}
+      <div className="ml-auto">
+        <Badge clearAction={() => dispatch({ type: "clearAllFilters" })} label="Clear all" variant="secondary" />
+      </div>
     </div>
   );
 }
