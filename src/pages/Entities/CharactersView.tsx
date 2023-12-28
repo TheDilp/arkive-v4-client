@@ -307,6 +307,11 @@ export function CharactersView() {
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
+        <div className="mr-auto">
+          <div className="h-11 w-11">
+            <Button icon={IconEnum.filter} isIconOnly onClick={undefined} tooltip="Filter characters" />
+          </div>
+        </div>
         <div className="w-52">
           <Input
             name="quick_filter"
