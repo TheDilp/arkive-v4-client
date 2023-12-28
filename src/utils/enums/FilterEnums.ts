@@ -99,7 +99,7 @@ export function CharacterBlueprintRelationFilter(
     return [
       {
         label: "Includes",
-        value: "in",
+        value: "eq",
         type,
         options: selectOptions,
       },

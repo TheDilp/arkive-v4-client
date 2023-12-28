@@ -439,7 +439,8 @@ function TableSubheaderFilterBadges({
       {fields.map((field) => (
         <Tooltip
           key={field}
-          content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}>
+          content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}
+          isPortal>
           <div>
             <Badge
               clearAction={() =>
@@ -460,7 +461,8 @@ function TableSubheaderFilterBadges({
           content={getFilterTooltip({
             and: andRelationFiltersByField[field] || [],
             or: orRelationFiltersByField[field] || [],
-          })}>
+          })}
+          isPortal>
           <div>
             <Badge
               clearAction={() =>
