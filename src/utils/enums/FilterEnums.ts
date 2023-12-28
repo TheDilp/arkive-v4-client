@@ -88,11 +88,22 @@ export const FavoritesFilters: FilterEnumType[] = [
   },
 ];
 
-export function CharacterBlueprintRelationFilter(type: BlueprintFieldTypes): FilterEnumType[] {
+export function CharacterBlueprintRelationFilter(
+  type: BlueprintFieldTypes,
+  selectOptions?: { label: string; value: string }[],
+): FilterEnumType[] {
   if (type === "text") return NameFilters;
   if (type === "number") return NumberFilters;
   if (type === "boolean") return BooleanFilters;
-  // if (type === "select") return SelectFilters
+  if ((type === "select" || type === "select_multiple") && selectOptions?.length)
+    return [
+      {
+        label: "Includes",
+        value: "in",
+        type,
+        options: selectOptions,
+      },
+    ];
 
   let entity = type.replace(/_(single|multiple)/, "");
   if (entity === "locations") entity = "map_pins";

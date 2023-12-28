@@ -9,8 +9,8 @@ import { SelectOptionType } from "../FormTypes/selectTypes";
 export type TableSelectionType = { [key: number]: string[] };
 
 export interface FilterEnumType extends SelectOptionType {
-  type: "boolean" | "text" | "number" | "select" | "search";
-  options?: (SelectOptionType | { label: string; value: boolean })[];
+  type: "boolean" | "text" | "number" | "select" | "select_multiple" | "search";
+  options?: (SelectOptionType | { label: string; value: boolean | string })[];
   searchType?: SearchableEntities | "value";
 }
 export interface MetaType {

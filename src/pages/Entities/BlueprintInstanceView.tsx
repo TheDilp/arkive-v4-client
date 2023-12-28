@@ -300,7 +300,12 @@ function createColumns(
             noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
               field.field_type,
             ),
-            filterOptions: CharacterBlueprintRelationFilter(field.field_type),
+            filterOptions: CharacterBlueprintRelationFilter(
+              field.field_type,
+              field.field_type === "select" || field.field_type === "select_multiple"
+                ? (field?.options || []).map((opt) => ({ label: opt.value, value: opt.id }))
+                : undefined,
+            ),
             relationType: field.field_type,
             isRelationFilter: true,
           },

@@ -176,6 +176,18 @@ function TableColumnFilterList({
                 ) : null}
                 {filt.operator &&
                 !Array.isArray(filt.value) &&
+                (filterType?.type === "select" || filterType?.type === "select_multiple") ? (
+                  <Select
+                    label=""
+                    name={`${type}[${index}].value`}
+                    onChange={handleChange}
+                    options={(filterOptions?.[0]?.options as { label: string; value: string }[]) || []}
+                    size="sm"
+                    value={filt?.value as string | undefined}
+                  />
+                ) : null}
+                {filt.operator &&
+                !Array.isArray(filt.value) &&
                 filterType?.type === "search" &&
                 filterType?.searchType &&
                 filt?.relationalData ? (
@@ -626,7 +638,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         </div>
                       }
                       customOffset={{ mainAxis: 8 }}
-                      isClickable>
+                      isClickable
+                      isPortal>
                       <div
                         className="flex w-min justify-center pl-0.5"
                         onClick={(e) => {
