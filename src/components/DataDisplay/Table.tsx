@@ -25,7 +25,7 @@ import {
   applyFilter,
   capitalizeSentence,
   getAreColumnFiltersActive,
-  getBlueprintFieldValueFromType,
+  getFieldValueFromType,
   getFilterTooltip,
   getIsApplyColumnFiltersDisabled,
   getPinnedOffset,
@@ -49,8 +49,8 @@ const TableClasses = tv({
     head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] max-h-[3rem] h-12 sticky top-0 border-b select-none",
     select: "select-none z-20",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
-    subheaderContainer: "px-2 max-h-[2.5rem] sticky top-0 left-0",
-    subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-8",
+    subheaderContainer: "py-0.5 max-h-[2.5rem] sticky top-0 left-0",
+    subheaderFiltersRow: "flex flex-nowrap items-center py-1 gap-x-2 h-8 w-full",
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden flex-1 sticky left-0 top-0",
     subheaderRowTitle: "font-medium",
     rowContainer:
@@ -303,7 +303,7 @@ function TableColumnFilter({
                       ].concat({
                         id: crypto.randomUUID(),
                         field: relationType
-                          ? getBlueprintFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                          ? getFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
                           : columnId,
                         value: relationType === "boolean" ? false : "",
                         operator: filterOptions[0].value as RequestFilterTypes,
@@ -341,7 +341,7 @@ function TableColumnFilter({
                     or: [...(prev.or || [])].concat({
                       id: crypto.randomUUID(),
                       field: meta?.relationType
-                        ? getBlueprintFieldValueFromType(meta?.relationType as BlueprintFieldTypes) || ""
+                        ? getFieldValueFromType(meta?.relationType as BlueprintFieldTypes) || ""
                         : columnId,
                       value: "",
                       operator: filterOptions[0].value as RequestFilterTypes,
@@ -478,7 +478,13 @@ function TableSubheaderFilterBadges({
         </Tooltip>
       ))}
       <div className="ml-auto">
-        <Badge clearAction={() => dispatch({ type: "clearAllFilters" })} label="Clear all" variant="secondary" />
+        <Button
+          icon={IconEnum.close}
+          label="Clear all"
+          onClick={() => dispatch({ type: "clearAllFilters" })}
+          size="sm"
+          variant="secondary"
+        />
       </div>
     </div>
   );
@@ -785,7 +791,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
                        ${
                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
-                           ? "bg-blue-300"
+                           ? "bg-blue-400"
                            : "bg-zinc-950"
                        }
                       ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""}
