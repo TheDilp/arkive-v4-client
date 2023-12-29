@@ -313,7 +313,13 @@ export function CharactersView() {
               icon={IconEnum.filter}
               isIconOnly
               onClick={() =>
-                setDrawer((prev) => ({ ...prev, type: "character_filter", data: {}, size: "lg", title: "Character filter" }))
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "character_filter",
+                  data: { dispatch },
+                  size: "lg",
+                  title: "Character filter",
+                }))
               }
               tooltip="Filter characters"
             />

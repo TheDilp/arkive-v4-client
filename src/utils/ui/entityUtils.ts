@@ -8,6 +8,7 @@ import {
   BlueprintInstanceType,
   CharacterCharacterFieldType,
   CharacterType,
+  FieldTypes,
   RandomTableOptionType,
 } from "../../types";
 import { IconEnum } from "..";
@@ -122,8 +123,8 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
   if (type === "locations_multiple" || type === "blueprints_multiple") return { minSize: 15, maxSize: 15 };
   return { minSize: 10, maxSize: 10 };
 }
-export function getBlueprintFieldValueFromType(
-  type: BlueprintFieldTypes,
+export function getFieldValueFromType(
+  type: BlueprintFieldTypes | FieldTypes,
 ): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "blueprint_instances" | "value" | null {
   if (
     type === "text" ||

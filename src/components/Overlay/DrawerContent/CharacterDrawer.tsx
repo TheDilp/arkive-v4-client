@@ -15,13 +15,7 @@ import {
   HandleChangePropsType,
   TagType,
 } from "../../../types";
-import {
-  drawerAtom,
-  getBlueprintFieldValueFromType,
-  getDifferenceForCharacterFields,
-  IconEnum,
-  useNotifications,
-} from "../../../utils";
+import { drawerAtom, getDifferenceForCharacterFields, getFieldValueFromType, IconEnum, useNotifications } from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
 import {
   DrawerLayout,
@@ -105,7 +99,7 @@ function FieldTemplateRows({
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
         {character_fields.map((template_field) => {
-          const templateValueKey = getBlueprintFieldValueFromType(template_field.field_type);
+          const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
           const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
 

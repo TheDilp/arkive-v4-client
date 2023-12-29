@@ -16,8 +16,8 @@ import {
   checkIfMonthCorrect,
   checkIfYearCorrect,
   drawerAtom,
-  getBlueprintFieldValueFromType,
   getDifferenceForBlueprintInstance,
+  getFieldValueFromType,
   IconEnum,
   useNotifications,
 } from "../../../utils";
@@ -90,7 +90,7 @@ function FieldTemplateRows({
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
         {blueprint_fields.map((template_field) => {
-          const blueprintValueKey = getBlueprintFieldValueFromType(template_field.field_type);
+          const blueprintValueKey = getFieldValueFromType(template_field.field_type);
           if (!blueprintValueKey) return null;
           const blueprintValueIndex = blueprint_fields_data.findIndex((f) => f.id === template_field.id);
           const baseName = `blueprint_fields[${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}]`;

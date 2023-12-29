@@ -11,6 +11,7 @@ import {
   MessageType,
   TagType,
 } from "../../EntityTypes";
+import { TableDispatch } from "../DataDisplayTypes";
 import { DropdownItemType } from "./dropdownTypes";
 
 export type DrawerContentType =
@@ -117,7 +118,7 @@ export type DrawerAtomType = {
   | { type: "entity_preview"; data: { id: string; parent_id?: string; entity_type: AvailableEntityType } }
   | { type: "invite_to_project" | null; data: null }
   | { type: "webhooks"; data: { id?: string } }
-  | { type: "character_filter"; data: { id?: string } }
+  | { type: "character_filter"; data: { dispatch: TableDispatch } }
 );
 
 export interface ContextMenuAtomType {

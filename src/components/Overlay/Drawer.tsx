@@ -152,7 +152,7 @@ export function Drawer() {
           {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
           {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
           {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
-          {drawer.type === "character_filter" ? <CharacterFilterDrawer /> : null}
+          {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
         </div>
       </div>
     );
