@@ -99,9 +99,12 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
         project_id,
         parent_id: templateId,
       },
+      fields: ["id", "title", "field_type"],
       filters: {
         and: [
           {
+            id: "expanded_row_fields",
+            header_name: "Expanded row fields",
             field: "parent_id",
             value: templateId,
             operator: "eq",
