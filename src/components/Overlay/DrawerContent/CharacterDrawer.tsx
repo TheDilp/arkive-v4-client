@@ -369,6 +369,8 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         or: (character?.tags || [])?.map((t) => ({
           operator: "in",
           value: t.id,
+          id: crypto.randomUUID(),
+          header_name: "tags",
           relationalData: { blueprint_field_id: "tags" },
           field: "tags",
         })),
