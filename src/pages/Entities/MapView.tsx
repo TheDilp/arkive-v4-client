@@ -128,7 +128,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
             center={[bounds[1][0] / 2, bounds[1][1] / 2]}
             className="h-full w-full flex-1 outline-none"
             crs={CRS.Simple}
-            maxZoom={2}
+            maxZoom={5}
             minZoom={-3}
             scrollWheelZoom
             zoom={1}
