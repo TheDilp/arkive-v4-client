@@ -87,7 +87,8 @@ export function Avatar({
       content={label || ""}
       delay={{ openDelay: 0 }}
       isDisabled={!label || isTooltipDisabled}
-      isIgnoringHover>
+      isIgnoringHover
+      isPortal>
       <div className={base()}>
         {image ? (
           <img
