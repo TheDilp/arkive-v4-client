@@ -346,7 +346,7 @@ export function Select({
 
   useEffect(() => {
     if (!filteredItems.length && options.length) setFilteredItems(options);
-    if (!isOpen && filteredItems.length !== options.length) setFilteredItems(options);
+    if (!isOpen) setFilteredItems(options);
   }, [options, isOpen]);
 
   return (
