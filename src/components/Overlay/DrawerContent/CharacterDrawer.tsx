@@ -430,7 +430,13 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
             <div className="w-full lg:w-1/2">
-              <Input label="First name" name="first_name" onChange={handleChange} value={character?.first_name || ""} />
+              <Input
+                isAutofocused
+                label="First name"
+                name="first_name"
+                onChange={handleChange}
+                value={character?.first_name || ""}
+              />
             </div>
             <div className="w-full lg:w-1/2">
               <Input label="Nickname (optional)" name="nickname" onChange={handleChange} value={character?.nickname || ""} />
