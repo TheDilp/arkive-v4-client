@@ -162,6 +162,7 @@ export function Search({
   placeholder,
   label,
   isAutocomplete = true,
+  isAutofocused,
   variant = "primary",
   searchEntity,
   isDisabled,
@@ -283,6 +284,15 @@ export function Search({
   useEffect(() => {
     if (document.activeElement !== inputRef.current) setOpen(false);
   }, [document.activeElement, inputRef.current]);
+
+  useEffect(() => {
+    if (isAutofocused) {
+      // timer depends on the drawer anim duration
+      setTimeout(() => {
+        inputRef?.current?.focus();
+      }, 500);
+    }
+  }, []);
 
   return (
     <div className="w-full">
