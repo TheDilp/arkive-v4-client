@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import {
   autoPlacement,
   autoUpdate,
@@ -285,15 +286,6 @@ export function Search({
     if (document.activeElement !== inputRef.current) setOpen(false);
   }, [document.activeElement, inputRef.current]);
 
-  useEffect(() => {
-    if (isAutofocused) {
-      // timer depends on the drawer anim duration
-      setTimeout(() => {
-        inputRef?.current?.focus();
-      }, 500);
-    }
-  }, []);
-
   return (
     <div className="w-full">
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -314,6 +306,7 @@ export function Search({
         <input
           ref={inputRef}
           autoComplete="off"
+          autoFocus={isAutofocused}
           className={input()}
           disabled={isDisabled}
           name="search"

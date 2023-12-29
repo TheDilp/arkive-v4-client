@@ -74,6 +74,7 @@ export function Drawer() {
   const { base, title } = DrawerClasses({ size: drawer.size });
 
   const [isOpen, setIsOpen] = useState(!!drawer.type);
+  const [renderContent, setRenderContent] = useState(false);
   const { refs, context } = useFloating({
     placement: "right",
     open: isOpen,
@@ -102,6 +103,9 @@ export function Drawer() {
 
   useEffect(() => {
     setIsOpen(!!drawer.type);
+    setTimeout(() => {
+      setRenderContent(!!drawer.type);
+    }, 200);
   }, [drawer.type]);
 
   if (isMounted)
@@ -113,47 +117,49 @@ export function Drawer() {
             <Button hasNoBackground icon={IconEnum.close} iconSize={22} onClick={resetDrawerAtom} />
           </div>
         </h3>
-        <div className="flex h-[calc(100%-6rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
-          {drawer.type === "project" ? <ProjectDrawer data={drawer.data} /> : null}
-          {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
-          {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
-          {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
-          {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
-          {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
-          {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
-          {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
-          {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
-          {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
-          {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
-          {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
-          {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
-          {drawer.type === "blueprints" ? <BlueprintDrawer data={drawer?.data} /> : null}
-          {drawer.type === "blueprint_instances" ? <BlueprintInstanceDrawer data={drawer?.data} /> : null}
-          {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
-          {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
-          {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
-          {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
-          {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
-          {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
-          {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
-          {drawer.type === "insert_image" ? <InsertEditorImageDrawer data={drawer?.data} /> : null}
-          {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
-          {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
-          {drawer.type === "search" ? <SearchDrawer /> : null}
-          {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
-          {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
-          {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
-          {drawer.type === "map_pin_types" ? <MapPinTypeDrawer data={drawer?.data} /> : null}
-          {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
-          {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
-          {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
-          {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
-          {drawer.type === "autolinker" ? <AutomentionDrawer data={drawer?.data} /> : null}
-          {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
-          {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
-          {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
-          {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
-        </div>
+        {renderContent ? (
+          <div className="flex h-[calc(100%-6rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
+            {drawer.type === "project" ? <ProjectDrawer data={drawer.data} /> : null}
+            {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
+            {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
+            {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
+            {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
+            {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
+            {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
+            {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
+            {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
+            {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
+            {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
+            {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
+            {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
+            {drawer.type === "blueprints" ? <BlueprintDrawer data={drawer?.data} /> : null}
+            {drawer.type === "blueprint_instances" ? <BlueprintInstanceDrawer data={drawer?.data} /> : null}
+            {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
+            {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
+            {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
+            {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
+            {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
+            {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
+            {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
+            {drawer.type === "insert_image" ? <InsertEditorImageDrawer data={drawer?.data} /> : null}
+            {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
+            {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
+            {drawer.type === "search" ? <SearchDrawer /> : null}
+            {drawer.type === "edit_tags" ? <EditTags data={drawer?.data || []} /> : null}
+            {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
+            {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
+            {drawer.type === "map_pin_types" ? <MapPinTypeDrawer data={drawer?.data} /> : null}
+            {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
+            {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
+            {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}
+            {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
+            {drawer.type === "autolinker" ? <AutomentionDrawer data={drawer?.data} /> : null}
+            {drawer.type === "mentioned_in_document" ? <MentionedInDocumentDrawer data={drawer?.data} /> : null}
+            {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
+            {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
+            {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
+          </div>
+        ) : null}
       </div>
     );
   return null;

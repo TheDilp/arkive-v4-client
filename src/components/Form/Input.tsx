@@ -127,6 +127,7 @@ export function Input({
     label: labelClasses,
     helperText: helperTextClasses,
   } = InputClasses({ variant, size, isDisabled, isReadOnly, isInline });
+
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
