@@ -36,7 +36,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
     data?.id,
     "maps",
     {
-      fields: ["id", "icon", "title", "image_id", "is_public"],
+      fields: ["id", "icon", "title", "cluster_pins", "image_id", "is_public"],
       relations: { map_pins: true, map_layers: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
