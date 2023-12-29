@@ -1,5 +1,5 @@
 import { CRS, LatLngBoundsExpression } from "leaflet";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
@@ -28,7 +28,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   );
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
   const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
-  const fr = useRef(true) as any;
+  const firstRender = useRef(true) as MutableRefObject<boolean>;
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
   const { data: existingMap, isFetching } = useGetEntity<MapType>(
@@ -76,14 +76,11 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           imgRef.current.leafletElement.fitBounds(bounds);
         }
       };
+      setTimeout(() => {
+        firstRender.current = false;
+      }, 200);
     }
   }, [currentMap, project_id]);
-
-  useEffect(() => {
-    return () => {
-      fr.current = false;
-    };
-  }, []);
 
   if (!currentMap) return null;
   return (
@@ -116,12 +113,14 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           <MapContainer
             ref={(node) => {
               mapRef.current = node;
-              if (bounds && !center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
-              if (center_on) {
-                const pin = currentMap?.map_pins?.find((map_pin) =>
-                  center_on ? map_pin.id === center_on : map_pin.id === subitem_id,
-                );
-                if (pin) node?.panTo([pin.lat, pin.lng], {});
+              if (bounds && firstRender.current) {
+                if (!center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
+                if (center_on) {
+                  const pin = currentMap?.map_pins?.find((map_pin) =>
+                    center_on ? map_pin.id === center_on : map_pin.id === subitem_id,
+                  );
+                  if (pin) node?.panTo([pin.lat, pin.lng], {});
+                }
               }
             }}
             attributionControl={false}
