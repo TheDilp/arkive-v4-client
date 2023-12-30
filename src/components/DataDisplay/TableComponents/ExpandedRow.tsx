@@ -111,6 +111,12 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
           },
         ],
       },
+      orderBy: [
+        {
+          field: "sort",
+          sort: "asc",
+        },
+      ],
     },
     "character_fields",
   );
