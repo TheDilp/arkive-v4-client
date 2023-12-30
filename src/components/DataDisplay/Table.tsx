@@ -178,9 +178,11 @@ function TableColumnFilterList({
                 !Array.isArray(filt.value) &&
                 (filterType?.type === "select" || filterType?.type === "select_multiple") ? (
                   <Select
-                    label=""
                     name={`${type}[${index}].value`}
-                    onChange={handleChange}
+                    onChange={(newValue) => {
+                      const opt = filterOptions?.[0]?.options?.find((o) => o.value === newValue.value);
+                      handleChange([newValue, { name: `${type}[${index}].relationalData.label`, value: opt?.label || "" }]);
+                    }}
                     options={(filterOptions?.[0]?.options as { label: string; value: string }[]) || []}
                     size="sm"
                     value={filt?.value as string | undefined}
