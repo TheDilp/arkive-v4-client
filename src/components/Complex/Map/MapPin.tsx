@@ -6,7 +6,7 @@ import { Marker, Tooltip } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
-import { MapPinType } from "../../../types";
+import { DropdownItemType, MapPinType } from "../../../types";
 import { contextMenuAtom, dialogAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 
 export function MapPin({
@@ -32,6 +32,8 @@ export function MapPin({
     title,
     lat,
     lng,
+    doc_id,
+    map_link,
     character,
     character_id,
     is_public,
@@ -54,7 +56,7 @@ export function MapPin({
       })),
     contextmenu: (e: any) => {
       if (!isReadOnly && !isViewOnly) {
-        const contextItems = [
+        const contextItems: DropdownItemType[] = [
           {
             id: "1",
             title: "Edit pin",
@@ -68,43 +70,83 @@ export function MapPin({
                 exceptions: { characterPin: !!character && !!character_id },
               })),
           },
-        ];
-        if (character_id) {
-          contextItems.push({
+          {
             id: "character_drawer",
-            title: "Show character",
+            title: "Preview character",
             icon: IconEnum.character,
+            isDisabled: !character_id,
             onClick: () => {
-              setDrawer((prev) => ({
+              if (character_id)
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: {
+                    id: character_id,
+                    entity_type: "characters",
+                  },
+                  title: "Preview character",
+                  size: "half",
+                  type: "entity_preview",
+                }));
+            },
+          },
+          {
+            id: "document_drawer",
+            title: "Preview document",
+            icon: IconEnum.document,
+            isDisabled: !doc_id,
+            onClick: () => {
+              if (doc_id)
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: {
+                    id: doc_id,
+                    entity_type: "documents",
+                  },
+                  title: "Preview document",
+                  size: "half",
+                  type: "entity_preview",
+                }));
+            },
+          },
+          {
+            id: "map_drawer",
+            title: "Preview map",
+            icon: IconEnum.map,
+            isDisabled: !map_link,
+            onClick: () => {
+              if (map_link)
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: {
+                    id: map_link,
+                    entity_type: "maps",
+                  },
+                  title: "Preview map",
+                  size: "half",
+                  type: "entity_preview",
+                }));
+            },
+          },
+          {
+            id: "2",
+            title: "Delete pin",
+            icon: IconEnum.trash,
+            onClick: () => {
+              setDialog((prev) => ({
                 ...prev,
                 data: {
-                  id: character_id,
+                  ...markerData,
+                  entity_title: "map_pins",
+                  title: markerData?.character?.full_name || markerData?.title,
                 },
-                title: "Edit character",
-                size: "lg",
-                type: "characters",
+                title: "Delete map pin",
+                size: "sm",
+                type: "delete_entity",
               }));
             },
-          });
-        }
-        contextItems.push({
-          id: "2",
-          title: "Delete pin",
-          icon: IconEnum.trash,
-          onClick: () => {
-            setDialog((prev) => ({
-              ...prev,
-              data: {
-                ...markerData,
-                entity_title: "map_pins",
-                title: markerData?.character?.full_name || markerData?.title,
-              },
-              title: "Delete map pin",
-              size: "sm",
-              type: "delete_entity",
-            }));
           },
-        });
+        ];
+
         setContextMenu({
           event: e.originalEvent as any,
           items: contextItems,
