@@ -46,14 +46,16 @@ export function MapPin({
   const setDialog = useSetAtom(dialogAtom);
   const isCharacterPin = !!character_id && !!character;
   const eventHandlers = {
-    dblclick: () =>
-      setDrawer((prev) => ({
-        ...prev,
-        title: "Edit map pin",
-        type: "map_pins",
-        data: markerData,
-        exceptions: { characterPin: !!character && !!character_id },
-      })),
+    dblclick: () => {
+      if (!isReadOnly && !isViewOnly)
+        setDrawer((prev) => ({
+          ...prev,
+          title: "Edit map pin",
+          type: "map_pins",
+          data: markerData,
+          exceptions: { characterPin: !!character && !!character_id },
+        }));
+    },
     contextmenu: (e: any) => {
       if (!isReadOnly && !isViewOnly) {
         const contextItems: DropdownItemType[] = [

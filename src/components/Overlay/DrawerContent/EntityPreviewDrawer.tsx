@@ -66,7 +66,7 @@ export function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?:
   if (isLoading) return <Skeleton limit={1} type="project_view" />;
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
-      <MapView center_on={subitem_id} data={existingMap?.data} isViewOnly />
+      <MapView center_on={subitem_id} data={existingMap?.data} isReadOnly isViewOnly />
     </div>
   );
 }
