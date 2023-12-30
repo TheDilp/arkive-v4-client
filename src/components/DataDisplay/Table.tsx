@@ -215,7 +215,6 @@ function TableColumnFilterList({
                 filterType?.searchType &&
                 !filt?.relationalData ? (
                   <Search
-                    isAutocomplete
                     name={`${type}[${index}].value`}
                     onChange={({ name, value, label, image, icon }) =>
                       handleChange([
@@ -492,7 +491,7 @@ function TableSubheaderFilterBadges({
   );
 }
 
-function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orderBy?: RequestOrderByType; id?: string }) {
+function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orderBy?: RequestOrderByType<any>; id?: string }) {
   return (
     <div className="w-min">
       <Button

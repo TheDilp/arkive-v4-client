@@ -40,7 +40,6 @@ export type BlueprintFieldTypes =
   | "blueprints_single"
   | "blueprints_multiple";
 
-export type FieldWidthType = "half" | "full";
 export interface CharacterFieldType {
   id: string;
   sort: number;

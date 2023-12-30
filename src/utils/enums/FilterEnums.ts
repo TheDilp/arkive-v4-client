@@ -88,6 +88,13 @@ export const FavoritesFilters: FilterEnumType[] = [
   },
 ];
 
+export function getSearchType(type: string) {
+  let entity = type.replace(/_(single|multiple)/, "");
+  if (entity === "locations") entity = "map_pins";
+  if (entity === "blueprints") entity = "blueprint_instances";
+  return entity;
+}
+
 export function CharacterBlueprintRelationFilter(
   type: BlueprintFieldTypes,
   selectOptions?: { label: string; value: string }[],
@@ -105,16 +112,12 @@ export function CharacterBlueprintRelationFilter(
       },
     ];
 
-  let entity = type.replace(/_(single|multiple)/, "");
-  if (entity === "locations") entity = "map_pins";
-  if (entity === "blueprints") entity = "blueprint_instances";
-
   return [
     {
       label: "Includes",
       value: "in",
       type: "search",
-      searchType: entity as SearchableEntities,
+      searchType: getSearchType(type) as SearchableEntities,
     },
   ];
 }

@@ -3,14 +3,24 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useHandleChange } from "../../../hooks";
 import {
+  AvailableEntityType,
   CharacterFieldTemplateType,
   FieldTypes,
   HandleChangePropsType,
   RequestFilterType,
+  SearchableEntities,
   TableDispatch,
 } from "../../../types";
-import { getFieldValueFromType, IconEnum, NumberFilters, TextFilters } from "../../../utils";
-import { Button, Input, Select } from "../../Form";
+import {
+  getFieldValueFromType,
+  getSearchType,
+  IconEnum,
+  NumberFilters,
+  relationFiltersList,
+  TextFilters,
+} from "../../../utils";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Input, Search, Select } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Badge } from "../../Misc";
 
@@ -107,8 +117,8 @@ function CharacterFiltersList({
             value={f?.field?.id}
           />
         </div>
-        <div className="col-span-1">
-          {f?.field?.field_type === "number" || f?.field?.field_type === "text" ? (
+        {f?.field?.field_type === "number" || f?.field?.field_type === "text" ? (
+          <div className="col-span-1">
             <Select
               label="Filter value"
               name={`${type}[${i}].filter.operator`}
@@ -116,8 +126,8 @@ function CharacterFiltersList({
               options={f?.field?.field_type === "number" ? NumberFilters : TextFilters}
               value={(f?.filter?.operator || "") as string | number}
             />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         {f?.field?.field_type === "number" || f?.field?.field_type === "text" ? (
           <div className="col-span-1">
@@ -143,6 +153,45 @@ function CharacterFiltersList({
               value={(f?.filter?.value || "") as string | number}
             />
           </div>
+        ) : null}
+        {relationFiltersList.includes(f?.field?.field_type) ? (
+          <>
+            <div className="col-span-1 flex items-center">Includes:</div>
+            <div className="col-span-1">
+              {f.filter.value ? (
+                <EntityPreview
+                  clearAction={() =>
+                    handleChange([
+                      { name: `${type}[${i}].filter.value`, value: "" },
+                      { name: `${type}[${i}].filter.relationalData`, value: undefined },
+                    ])
+                  }
+                  icon={f.filter.relationalData?.icon}
+                  id={f.filter.relationalData?.value}
+                  image_id={f.filter.relationalData?.image}
+                  size="sm"
+                  title={f.filter.relationalData?.label}
+                  type={getSearchType(f.field.field_type) as AvailableEntityType}
+                />
+              ) : (
+                <Search
+                  name={`${type}[${i}].filter.value`}
+                  onChange={({ name, value, label, image, icon }) =>
+                    handleChange([
+                      { name, value },
+                      {
+                        name: `${type}[${i}].filter.relationalData`,
+                        value: { value, label, image, icon, character_field_id: f.field.id },
+                      },
+                    ])
+                  }
+                  searchEntity={getSearchType(f.field.field_type) as SearchableEntities}
+                  size="sm"
+                  value={f.filter.value as string | undefined}
+                />
+              )}
+            </div>
+          </>
         ) : null}
       </div>
       <div className="mt-5 h-10 w-10 self-center">
@@ -262,6 +311,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           type="or"
         />
       </ul>
+
       <div>
         <Button
           icon={IconEnum.filter}
