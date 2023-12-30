@@ -118,47 +118,48 @@ export function MapPinDrawer({ data, exceptions }: Props) {
 
   return (
     <div className="flex flex-col gap-y-2">
-      {exceptions?.characterPin ? (
-        <div className="flex flex-col gap-y-2">
-          {character && mapPin.character_id ? (
-            <EntityPreview
-              clearAction={() => setCharacter(null)}
-              id={character.id}
-              image_id={character.portrait_id}
-              label="Character"
-              title={character?.full_name || ""}
-              type="characters"
-            />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+
+      {selectedTab === 0 ? (
+        <div>
+          {exceptions?.characterPin ? (
+            <div className="flex flex-col gap-y-2">
+              {character && mapPin.character_id ? (
+                <EntityPreview
+                  clearAction={() => setCharacter(null)}
+                  id={character.id}
+                  image_id={character.portrait_id}
+                  label="Character"
+                  title={character?.full_name || ""}
+                  type="characters"
+                />
+              ) : (
+                <Search
+                  isAutofocused
+                  isDisabled={!!character && !!mapPin.character_id}
+                  name="character_id"
+                  onChange={({ value: id, label, image: portrait_id }) => {
+                    setCharacter({ id, full_name: label, portrait_id });
+                  }}
+                  placeholder="Type at least 2 characters"
+                  searchEntity="characters"
+                />
+              )}
+              <div className="flex flex-nowrap justify-between">
+                <span className="block min-h-[20px] truncate">Marker border:</span>
+                <div className="flex items-center gap-x-2 pb-2">
+                  <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
+                  <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
+                </div>
+              </div>
+              <div className="flex flex-nowrap justify-between">
+                <span className="block min-h-[20px] truncate">Public:</span>
+                <div className="flex items-center gap-x-2 pb-2">
+                  <Checkbox name="is_public" onChange={handleChange} value={!!mapPin?.is_public} />
+                </div>
+              </div>
+            </div>
           ) : (
-            <Search
-              isAutofocused
-              isDisabled={!!character && !!mapPin.character_id}
-              name="character_id"
-              onChange={({ value: id, label, image: portrait_id }) => {
-                setCharacter({ id, full_name: label, portrait_id });
-              }}
-              placeholder="Press enter to search characters"
-              searchEntity="characters"
-            />
-          )}
-          <div className="flex flex-nowrap justify-between">
-            <span className="block min-h-[20px] truncate">Marker border:</span>
-            <div className="flex items-center gap-x-2 pb-2">
-              <ColorPicker hasCustom name="border_color" onChange={handleChange} value={mapPin.border_color as string} />
-              <Checkbox name="show_border" onChange={handleChange} value={mapPin?.show_border} />
-            </div>
-          </div>
-          <div className="flex flex-nowrap justify-between">
-            <span className="block min-h-[20px] truncate">Public:</span>
-            <div className="flex items-center gap-x-2 pb-2">
-              <Checkbox name="is_public" onChange={handleChange} value={!!mapPin?.is_public} />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-          {selectedTab === 0 ? (
             <>
               <div className="flex flex-nowrap gap-x-2">
                 <Select
@@ -253,78 +254,79 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 )}
               </div>
             </>
-          ) : null}
-          {selectedTab === 1 ? (
-            <div className="flex flex-wrap gap-2">
-              {mapPin?.document ? (
-                <div className="w-full">
-                  <EntityPreview
-                    clearAction={() =>
-                      handleChange([
-                        {
-                          name: "doc_id",
-                          value: null,
-                        },
-                        { name: "document", value: null },
-                      ])
-                    }
-                    id={mapPin.document.id}
-                    label="Document"
-                    title={mapPin.document.title}
-                    type="documents"
-                  />
-                </div>
-              ) : (
-                <Search
-                  label="Document"
-                  name="doc_id"
-                  onChange={({ name, label, value }) => {
-                    handleChange([
-                      { name, value },
-                      { name: "document", value: { title: label, id: value } },
-                    ]);
-                  }}
-                  searchEntity="documents"
-                  value={mapPin.doc_id || ""}
-                />
-              )}
-              {mapPin?.linked_map ? (
-                <div className="w-full">
-                  <EntityPreview
-                    clearAction={() =>
-                      handleChange([
-                        {
-                          name: "map_link",
-                          value: null,
-                        },
-                        { name: "linked_map", value: null },
-                      ])
-                    }
-                    id={mapPin.linked_map.id}
-                    image_id={mapPin?.linked_map?.image_id}
-                    label="Linked map"
-                    title={mapPin.linked_map?.title}
-                    type="maps"
-                  />
-                </div>
-              ) : (
-                <Search
-                  imageType="map_images"
-                  label="Linked map"
-                  name="map_link"
-                  onChange={({ name, label, value, image }) => {
-                    handleChange([
-                      { name, value },
-                      { name: "linked_map", value: { title: label, id: value, image } },
-                    ]);
-                  }}
-                  searchEntity="maps"
-                />
-              )}
+          )}
+        </div>
+      ) : null}
+      {selectedTab === 1 ? (
+        <div className="flex flex-wrap gap-2">
+          {mapPin?.document ? (
+            <div className="w-full">
+              <EntityPreview
+                clearAction={() =>
+                  handleChange([
+                    {
+                      name: "doc_id",
+                      value: null,
+                    },
+                    { name: "document", value: null },
+                  ])
+                }
+                id={mapPin.document.id}
+                label="Document"
+                title={mapPin.document.title}
+                type="documents"
+              />
+            </div>
+          ) : (
+            <Search
+              label="Document"
+              name="doc_id"
+              onChange={({ name, label, value }) => {
+                handleChange([
+                  { name, value },
+                  { name: "document", value: { title: label, id: value } },
+                ]);
+              }}
+              searchEntity="documents"
+              value={mapPin.doc_id || ""}
+            />
+          )}
+          {!exceptions?.characterPin && mapPin?.linked_map ? (
+            <div className="w-full">
+              <EntityPreview
+                clearAction={() =>
+                  handleChange([
+                    {
+                      name: "map_link",
+                      value: null,
+                    },
+                    { name: "linked_map", value: null },
+                  ])
+                }
+                id={mapPin.linked_map.id}
+                image_id={mapPin?.linked_map?.image_id}
+                label="Linked map"
+                title={mapPin.linked_map?.title}
+                type="maps"
+              />
             </div>
           ) : null}
-        </>
-      )}
+          {!exceptions?.characterPin && !mapPin?.linked_map ? (
+            <Search
+              imageType="map_images"
+              label="Linked map"
+              name="map_link"
+              onChange={({ name, label, value, image }) => {
+                handleChange([
+                  { name, value },
+                  { name: "linked_map", value: { title: label, id: value, image } },
+                ]);
+              }}
+              searchEntity="maps"
+            />
+          ) : null}
+        </div>
+      ) : null}
 
       <Button
         icon={IconEnum.save}
