@@ -269,7 +269,7 @@ export function Search({
   }, [data?.data]);
 
   useEffect(() => {
-    if (isAutocomplete && inputValue && document.activeElement === inputRef.current) {
+    if (isAutocomplete && inputValue.length >= 2 && document.activeElement === inputRef.current) {
       setSearchTerm(inputValue);
       const timeout = setTimeout(() => {
         refetch();
