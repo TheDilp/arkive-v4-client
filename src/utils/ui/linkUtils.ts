@@ -15,6 +15,7 @@ export function getSearchLink(
   }
   let link_type = "";
   if (name === "alter_names") link_type = "documents";
+  if (name === "words") link_type = "dictionaries";
   if (name === "map_pins" || name === "character_map_pins") link_type = "maps";
   if (name === "nodes" || name === "edges" || name === "graphs") link_type = "graphs";
   if (name === "events") link_type = "calendars";

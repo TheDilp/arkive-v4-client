@@ -15,7 +15,7 @@ export function ProjectsView() {
   const { user } = useUser();
   const { data, isLoading } = useGetAllProjects({
     data: { auth_id: user?.id },
-    fields: ["id", "title", "default_dice_color", "owner_id"],
+    fields: ["id", "title", "image_id"],
   });
 
   const { data: userData } = useGetUser(

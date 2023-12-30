@@ -89,7 +89,7 @@ export function SearchDrawer() {
           <>
             <Search
               helperText={selectedTab === 0 ? "Shows the top 5 results per category." : ""}
-              isAutocomplete
+              isAutofocused
               isDisabled={isSearchDisabled(selectedTab, searchCategory)}
               isOptionsHidden
               label="Search"
@@ -117,6 +117,7 @@ export function SearchDrawer() {
           <div className="flex w-full flex-nowrap gap-x-2">
             <div className="flex-1">
               <Search
+                isAutofocused
                 label="Search"
                 name="searchTerm"
                 onChange={({ label, value, color }) => {
@@ -208,6 +209,7 @@ export function SearchDrawer() {
                                     : getDefaultEntityIcon(name)
                                 }
                                 id={result_item.id}
+                                image_id={"portrait_id" in result_item ? result_item?.portrait_id : undefined}
                                 link={getSearchLink(
                                   project_id as string,
                                   name,

@@ -21,6 +21,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "graphs") return IconEnum.graph;
   if (type === "calendars") return IconEnum.calendar;
   if (type === "dictionaries") return IconEnum.dictionary;
+  if (type === "words") return IconEnum.word;
   if (type === "nodes") return IconEnum.node;
   if (type === "edges") return IconEnum.edge;
   if (type === "random_tables") return IconEnum.random_table;
