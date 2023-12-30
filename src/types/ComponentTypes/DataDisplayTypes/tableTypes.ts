@@ -37,22 +37,14 @@ export interface TableParams {
   pagination?: RequestPaginationType;
   selection?: TableSelectionType;
 }
-export type TableActionTypes =
-  | "setSort"
-  | "removeFilter"
-  | "setSelected"
-  | "setAllSelected"
-  | "clearSelected"
-  | "clearFilters"
-  | "setRelationFilters"
-  | "clearrelationFilters";
+
 export type TableActionType =
   | {
       type: "setPagination";
       payload: { limit?: number; page?: number };
     }
   | {
-      type: "setFilter" | "setRelationFilter";
+      type: "setFilter" | "setRelationFilter" | "setRelationFilters";
       payload: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[]; field?: string };
     }
   | { type: "clearAllFilters" }

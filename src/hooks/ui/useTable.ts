@@ -1,4 +1,5 @@
 import { useReducer } from "react";
+import { deepMerge } from "remirror";
 
 import { TableActionType, TableDispatch, TableParams } from "../../types";
 import { deleteObjectProps } from "../../utils";
@@ -78,6 +79,18 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       }
 
       return { ...state, pagination: { limit: state.pagination?.limit || 10, page: 0 }, relationFilters: tempFilters };
+    }
+    case "setRelationFilters": {
+      const andTagFilters = (state.relationFilters?.and || [])?.filter((f) => f.field === "tags");
+      const orTagFilters = (state.relationFilters?.or || [])?.filter((f) => f.field === "tags");
+      return {
+        ...state,
+        pagination: { limit: state.pagination?.limit || 10, page: 0 },
+        relationFilters: {
+          and: deepMerge(action.payload.and || [], andTagFilters),
+          or: deepMerge(action.payload.or || [], orTagFilters),
+        },
+      };
     }
     case "removeFilterByField": {
       if (action.payload) {
