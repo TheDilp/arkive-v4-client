@@ -3,7 +3,7 @@ import L, { LatLngExpression } from "leaflet";
 import { useState } from "react";
 import ReactDOM from "react-dom/server";
 import { Marker, Tooltip } from "react-leaflet";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { useUpdateMapSubEntity } from "../../../hooks";
 import { MapPinType } from "../../../types";
@@ -32,13 +32,10 @@ export function MapPin({
     title,
     lat,
     lng,
-    doc_id,
-    map_link,
     character,
     character_id,
     is_public,
   } = markerData;
-  const navigate = useNavigate();
   const { project_id } = useParams();
   const { mutate: updateMapPin } = useUpdateMapSubEntity<{ data: Partial<MapPinType> }>("map_pins", map_id);
   const [position, setPosition] = useState<LatLngExpression>([lat, lng]);
@@ -47,41 +44,14 @@ export function MapPin({
   const setDialog = useSetAtom(dialogAtom);
   const isCharacterPin = !!character_id && !!character;
   const eventHandlers = {
-    click: (e: any) => {
-      if (e.originalEvent.shiftKey && e.originalEvent.altKey) return;
-      if (!e.originalEvent.shiftKey && !e.originalEvent.altKey && !e.originalEvent.metaKey) {
-        if (doc_id) {
-          // setDrawer((prev) => ({
-          //   type: "content_preview",
-          //   data: { id: doc_id, type: "documents" },
-          //   show: true,
-          //   drawerSize: "md",
-          //   exceptions: {
-          //     isReadOnly: isReadOnly,
-          //   },
-          //   modal: true,
-          // }));
-        }
-      }
-      if (e.originalEvent.shiftKey && map_link) {
-        e.originalEvent.preventDefault();
-        if (isReadOnly) navigate(`/public/maps/${map_link}`);
-        else navigate(`/projects/${project_id}/maps/${map_link}`);
-      } else if (e.originalEvent.altKey && doc_id) {
-        e.originalEvent.preventDefault();
-        if (isReadOnly) navigate(`/public/documents/${doc_id}`);
-        else navigate(`/projects/${project_id}/documents/${doc_id}`);
-      } else if (e.originalEvent.metaKey) {
-        // setDrawer({
-        //   ...DefaultDrawer,
-        //   type: "content_preview",
-        //   data: { id: "", type: "screens" },
-        //   show: true,
-        //   drawerSize: "lg",
-        //   modal: true,
-        // });
-      }
-    },
+    dblclick: () =>
+      setDrawer((prev) => ({
+        ...prev,
+        title: "Edit map pin",
+        type: "map_pins",
+        data: markerData,
+        exceptions: { characterPin: !!character && !!character_id },
+      })),
     contextmenu: (e: any) => {
       if (!isReadOnly && !isViewOnly) {
         const contextItems = [
