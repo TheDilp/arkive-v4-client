@@ -9,8 +9,8 @@ export interface RequestFilterType {
   relationalData?: { [key: string]: any };
 }
 export type SortType = "asc" | "desc" | null;
-export interface RequestOrderByType {
-  field: string;
+export interface RequestOrderByType<InsertType> {
+  field: keyof InsertType;
   sort: SortType;
 }
 
@@ -43,7 +43,7 @@ export interface RequestBodyType<InsertType> {
     [key: string]: any;
   };
   fields: (keyof InsertType)[];
-  orderBy?: RequestOrderByType[];
+  orderBy?: RequestOrderByType<InsertType>[];
   filters?: {
     and?: RequestFilterType[];
     or?: RequestFilterType[];
