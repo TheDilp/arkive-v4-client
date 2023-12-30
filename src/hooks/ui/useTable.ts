@@ -140,7 +140,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       return state;
     }
     case "clearAllFilters": {
-      const newState = deleteObjectProps({ ...state }, ["filters"]);
+      const newState = deleteObjectProps({ ...state }, ["filters", "relationalFilters"]);
 
       return newState;
     }
