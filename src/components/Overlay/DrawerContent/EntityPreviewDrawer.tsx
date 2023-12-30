@@ -110,7 +110,6 @@ export function EntityPreviewDrawer({
 }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
-
   return (
     <DrawerLayout>
       <div className="flex-1 overflow-hidden">
