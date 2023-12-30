@@ -49,13 +49,34 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     parent_id: item_id as string,
   });
   const queryClient = useQueryClient();
-  const { data: existingMapPinTypes } = useGetEntities<MapPinTypesType>({ data: { project_id } }, "map_pin_types");
+  const { data: existingMapPinTypes } = useGetEntities<MapPinTypesType>(
+    { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
+    "map_pin_types",
+  );
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { data: existingMapPin, isFetching } = useGetSubEntity<MapPinType>(
     data?.id,
     "map_pins",
-    { data: {} },
+    {
+      data: {},
+      fields: [
+        "id",
+        "title",
+        "map_pin_type_id",
+        "background_color",
+        "border_color",
+        "character_id",
+        "color",
+        "doc_id",
+        "icon",
+        "image_id",
+        "is_public",
+        "map_link",
+        "show_background",
+        "show_border",
+      ],
+    },
     { enabled: !!data?.id },
   );
   const { mutateAsync: createMapPin, isLoading: isCreating } = useCreateSubEntity<
@@ -110,6 +131,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             />
           ) : (
             <Search
+              isAutofocused
               isDisabled={!!character && !!mapPin.character_id}
               name="character_id"
               onChange={({ value: id, label, image: portrait_id }) => {
@@ -314,6 +336,8 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
 
+            // Must insert character into query data here as the character prop/data itself
+            // is not sent via request
             if (character) {
               queryClient.setQueryData<{ data: MapType }>(["maps", mapPin.parent_id], (old) => {
                 if (old)

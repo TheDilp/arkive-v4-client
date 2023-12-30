@@ -126,7 +126,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
         const parentEntityType = getParentEntityType(type);
 
         if (parentEntityType === "maps") {
-          if ("character_id" in vars.data && !vars.data.character_id) {
+          if (("character_id" in vars.data && !vars.data.character_id) || !("character_id" in vars.data)) {
             const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
             queryClient.setQueryData<{ data: MapType }>([parentEntityType, vars.data.parent_id], (oldData) =>
               oldData
