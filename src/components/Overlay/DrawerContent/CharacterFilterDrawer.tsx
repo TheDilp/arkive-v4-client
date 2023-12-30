@@ -273,7 +273,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           type="and"
         />
       </ul>
-      <hr className="border-zinc-600" />
+      {/* <hr className="border-zinc-600" />
       <ul className="flex flex-col gap-y-2">
         <li className="flex items-center justify-between">
           <div>Add new OR filter:</div>
@@ -310,7 +310,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           handleChange={handleChange}
           type="or"
         />
-      </ul>
+      </ul> */}
 
       <div>
         <Button
