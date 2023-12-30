@@ -42,7 +42,7 @@ export function TagInput({ tags, label: componentLabel, handleChange, isMultiple
             }),
           });
         }}
-        placeholder="Press enter to search tags"
+        placeholder="Type at least 2 characters"
         searchEntity="tags"
         value={isMultiple ? tags.map((t) => t.id) : undefined}
       />

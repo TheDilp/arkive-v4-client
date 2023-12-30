@@ -81,7 +81,8 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
             content={row.original.tags
               .slice(1)
               .map((tag: TagType) => tag.title)
-              .join(", ")}>
+              .join(", ")}
+            isPortal>
             <div className="w-min max-w-min">
               <Badge label={`+${row.original.tags.length - 1}`} size="sm" variant="secondary" />
             </div>
