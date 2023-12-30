@@ -51,7 +51,7 @@ export function Tooltip({
   content,
   isDisabled,
   isClickable,
-  isPortal,
+  isPortal = true,
   closeOnClick,
   customOffset,
   isIgnoringHover,

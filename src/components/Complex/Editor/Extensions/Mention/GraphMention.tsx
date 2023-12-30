@@ -42,7 +42,8 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
     <Tooltip
       arrowColor="#3f3f46"
       content={<GraphMentionTooltip id={id} isPublic={!!isPublic} project_id={project_id} />}
-      delay={{ closeDelay: 500 }}>
+      delay={{ closeDelay: 500 }}
+      isPortal={false}>
       <Link
         className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         id={`link-${id}`}

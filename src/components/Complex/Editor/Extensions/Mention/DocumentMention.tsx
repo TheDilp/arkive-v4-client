@@ -57,7 +57,8 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
         arrowColor="#3f3f46"
         content={<DocumentMentionTooltip id={id} isPublic={isPublic} title={data?.data?.title || title || label} />}
         delay={{ openDelay: 500, closeDelay: 200 }}
-        isDisabled={(isPublic && !data?.data?.is_public) ?? false}>
+        isDisabled={(isPublic && !data?.data?.is_public) ?? false}
+        isPortal={false}>
         <Link
           className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           to={getMentionLink(id as string, "documents", project_id as string, data?.data?.is_public ?? false, isPublic)}>

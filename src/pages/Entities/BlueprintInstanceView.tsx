@@ -52,7 +52,8 @@ function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
           content={titles
             ?.slice(1)
             ?.map((title) => title)
-            .join(", ")}>
+            .join(", ")}
+          isPortal>
           <div className="w-min max-w-min">
             <Badge label={`+${titles.length - 1}`} size="sm" variant="secondary" />
           </div>

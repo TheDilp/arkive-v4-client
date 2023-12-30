@@ -47,7 +47,8 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
       arrowColor="#3f3f46"
       content={<MapMentionTooltip id={id} isPublic={!!isPublic} project_id={project_id} />}
       delay={{ openDelay: 500, closeDelay: 200 }}
-      isDisabled={(isPublic && !data?.data?.is_public) ?? false}>
+      isDisabled={(isPublic && !data?.data?.is_public) ?? false}
+      isPortal={false}>
       <Link
         className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
         to={getMentionLink(id as string, "maps", project_id as string, !!data?.data?.is_public, isPublic)}>
