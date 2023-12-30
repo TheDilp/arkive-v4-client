@@ -410,7 +410,7 @@ function assetTableColumns(
                 icon: IconEnum.trash,
                 onClick: async () => {
                   const parsedData = RemoveFromCharacterSchema.parse({
-                    data: { id: character_id, image: { data: { id: row.original.id } } },
+                    relations: { images: [{ id: row.original.id }] },
                   });
                   await removeItem(parsedData);
                 },
