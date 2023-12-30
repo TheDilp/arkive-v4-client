@@ -80,7 +80,11 @@ export function Dialog() {
 
   const { base, container, title, titleContainer } = DialogClasses({
     position: dialog?.position || "center",
-    isOverlay: dialog?.type === "image_view" || dialog?.isOverlay,
+    isOverlay:
+      dialog?.type === "image_view" ||
+      dialog?.type === "archive_entity" ||
+      dialog?.type === "delete_entity" ||
+      dialog?.isOverlay,
     size: dialog?.size || "md",
     isImageView: dialog?.type === "image_view",
     hasNoContent: !dialog?.type || dialog?.type === "delete_entity" || dialog?.type === "archive_entity",
