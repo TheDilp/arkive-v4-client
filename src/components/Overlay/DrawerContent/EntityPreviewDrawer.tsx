@@ -55,6 +55,7 @@ export function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?:
     "maps",
     {
       data: {},
+      fields: ["id", "title", "image_id", "is_public"],
       relations: { map_pins: true, map_layers: true },
     },
     {
@@ -75,6 +76,7 @@ export function GraphPreviewDrawer({ id }: { id?: string }) {
     "graphs",
     {
       data: {},
+      fields: ["id", "title", "is_public"],
       relations: { nodes: true, edges: true },
     },
     {

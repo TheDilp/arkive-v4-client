@@ -23,6 +23,7 @@ export function WebhookDrawer({ data }: Props) {
       data: {
         id: data.id,
       },
+      fields: ["id", "title", "url", "user_id"],
     },
     { enabled: !!data?.id },
   );

@@ -13,6 +13,7 @@ export type MessagePlaceContentType = {
 
 export type MessageType = {
   id: string;
+  created_at?: string;
   parent_id: string;
   sender_id?: string;
   character?: CharacterType;

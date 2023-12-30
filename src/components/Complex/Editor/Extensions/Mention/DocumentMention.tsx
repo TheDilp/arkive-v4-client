@@ -45,17 +45,7 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
     {
       fields: ["id", "title", "is_public"],
       relations: {
-        alter_names: alterId
-          ? {
-              and: [
-                {
-                  field: "id",
-                  value: alterId,
-                  operator: "eq",
-                },
-              ],
-            }
-          : false,
+        alter_names: !!alterId,
       },
     },
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },

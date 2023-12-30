@@ -31,7 +31,7 @@ export type TableColumnFilterType = RequestFilterType & {
 };
 
 export interface TableParams {
-  orderBy?: RequestOrderByType[];
+  orderBy?: RequestOrderByType<any>[];
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   pagination?: RequestPaginationType;
@@ -76,7 +76,7 @@ export interface TableType {
     hasTags?: boolean;
     hasTagsWarning?: boolean;
     hasNoHeaderGap?: boolean;
-    orderBy?: RequestOrderByType[];
+    orderBy?: RequestOrderByType<any>[];
     selection?: TableSelectionType;
     expandable?: boolean;
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };

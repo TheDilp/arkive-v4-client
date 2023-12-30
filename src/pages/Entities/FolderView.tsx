@@ -352,6 +352,8 @@ export function FolderView() {
       filters: {
         and: [
           {
+            id: "parent",
+            header_name: "Parent",
             field: "parent_id",
             operator: "is",
             value: null,

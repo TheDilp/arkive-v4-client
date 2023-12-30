@@ -104,9 +104,31 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
       data: {
         parent_id: item_id,
       },
+      fields: [
+        "id",
+        "label",
+        "icon",
+        "background_color",
+        "background_opacity",
+        "font_color",
+        "font_family",
+        "font_size",
+        "type",
+        "image_id",
+        "text_h_align",
+        "text_v_align",
+        "x",
+        "y",
+        "z_index",
+        "width",
+        "height",
+        "is_locked",
+      ],
       filters: {
         and: [
           {
+            id: "parent",
+            header_name: "Parent",
             field: "id",
             operator: "in",
             value: data.ids,

@@ -19,11 +19,11 @@ export default function TimelineDrawer({ data }: Props) {
   const { data: existingTimeline, isFetching: isFetchingTimeline } = useGetEntity<TimelineStateType>(
     data?.id,
     "timelines",
-    { data: {} },
+    { data: {}, fields: ["id"] },
     { enabled: !!data?.id },
   );
   const { data: existingCalenders, isFetching: isFetchingCalendars } = useGetEntities<CalendarType>(
-    { data: { project_id } },
+    { data: { project_id }, fields: ["id"] },
     "calendars",
   );
 

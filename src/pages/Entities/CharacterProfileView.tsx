@@ -850,6 +850,8 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       relations: { character_fields: true },
       relationFilters: {
         or: (existingCharacter?.data?.tags || [])?.map((t) => ({
+          id: "tags",
+          header_name: "Tags",
           operator: "in",
           value: t.id,
           relationalData: { blueprint_field_id: "tags" },

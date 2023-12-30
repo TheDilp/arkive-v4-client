@@ -48,6 +48,7 @@ export function ConversationDrawer({ data }: Props) {
       data: {
         id: data?.conversation_id,
       },
+      fields: ["id", "title", "project_id"],
       relations: {
         characters: true,
       },

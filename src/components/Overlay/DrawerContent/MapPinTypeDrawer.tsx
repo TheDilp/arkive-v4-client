@@ -31,7 +31,9 @@ export function MapPinTypeDrawer({ data }: Props) {
   const { data: existingMapPinType, isInitialLoading } = useGetEntity<MapPinTypesType>(
     data?.id,
     "map_pin_types",
-    {},
+    {
+      fields: ["id", "title", "default_icon", "default_icon_color"],
+    },
     { enabled: !!data?.id },
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{ data: { title: string; project_id: string } }>(

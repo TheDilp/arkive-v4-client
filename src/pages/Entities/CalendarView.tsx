@@ -88,11 +88,15 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
           view === "calendar"
             ? [
                 {
+                  id: "parent",
+                  header_name: "Parent",
                   field: "parent_id",
                   value: (item_id || id) as string,
                   operator: "eq",
                 },
                 {
+                  id: "start_year",
+                  header_name: "Start year",
                   field: "start_year",
                   operator: "eq",
                   value: date.year,
@@ -100,6 +104,8 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
               ]
             : [
                 {
+                  id: "parent",
+                  header_name: "Parent",
                   field: "parent_id",
                   value: item_id as string,
                   operator: "eq",
@@ -121,7 +127,28 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
   const { data: subitemEvent } = useGetSubEntity<EventType>(
     subitem_id,
     "events",
-    { data: { parent_id: item_id || id } },
+    {
+      data: { parent_id: item_id || id },
+      fields: [
+        "id",
+        "title",
+        "description",
+        "background_color",
+        "document_id",
+        "end_day",
+        "end_month",
+        "end_year",
+        "start_day",
+        "start_month",
+        "start_year",
+        "image_id",
+        "is_public",
+        "parent_id",
+        "minutes",
+        "hours",
+        "text_color",
+      ],
+    },
     { enabled: !!subitem_id, isPublic },
   );
   useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);

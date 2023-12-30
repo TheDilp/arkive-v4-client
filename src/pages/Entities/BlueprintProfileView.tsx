@@ -345,6 +345,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
       data: {
         id: parent_id || item_id,
       },
+      fields: ["id", "title", "title_name", "icon"],
       relations: {
         random_table_options: true,
         blueprint_fields: true,
@@ -358,6 +359,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
     "blueprint_instances",
     {
       data: { id: id || subitem_id },
+      fields: ["id", "title", "is_public", "parent_id"],
       relations: {
         blueprint_fields: true,
         tags: true,
