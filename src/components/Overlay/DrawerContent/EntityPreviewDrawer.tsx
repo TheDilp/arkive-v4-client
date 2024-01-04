@@ -112,7 +112,7 @@ export function EntityPreviewDrawer({
   const navigate = useNavigate();
   return (
     <DrawerLayout>
-      <div className="flex-1 overflow-hidden">
+      <div className="overflow-y-auto">
         {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "blueprint_instances" ? <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
         {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}

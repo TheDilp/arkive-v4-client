@@ -130,10 +130,10 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }
 
   useEffect(() => {
-    if (graph?.nodes && graph?.nodes.length > 0 && !nodes.length) {
+    if (graph?.nodes) {
       setNodes(graph?.nodes);
     }
-    if (graph?.edges && graph?.edges.length > 0 && !edges.length) {
+    if (graph?.edges) {
       setEdges(graph?.edges);
     }
   }, [graph?.nodes, graph?.edges]);
