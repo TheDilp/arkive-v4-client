@@ -1,9 +1,6 @@
 /* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
-import cytoscape, { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
-import dagre from "cytoscape-dagre";
-import edgehandles from "cytoscape-edgehandles";
-import gridguide from "cytoscape-grid-guide";
+import { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import set from "lodash.set";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
@@ -36,10 +33,6 @@ import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStyl
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
 import { InsertEdgeType, InsertNodeType } from "../../validation";
 import { Button, Quickbar, Spinner } from "..";
-
-cytoscape.use(edgehandles);
-cytoscape.use(dagre);
-gridguide(cytoscape);
 
 type Props = {
   data?: Partial<GraphType>;
@@ -450,7 +443,6 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
           }
         }
       });
-
       // Moving nodes
       cyRef?.current?._cy.on("free", "node", function (evt: EventObject) {
         evt.preventDefault();
@@ -532,7 +524,6 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         });
       });
     }
-
     return () => {
       cyRef?.current?._cy.removeListener("mousedown cxttap dbltap free");
     };
