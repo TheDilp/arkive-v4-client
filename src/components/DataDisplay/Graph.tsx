@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import set from "lodash.set";
+import uniqBy from "lodash.uniqby";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
@@ -56,7 +57,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       fields: ["title", "is_public", "default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { enabled: !data, queryKeyOverwrite: ["graph_view"], isPublic },
+    { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view"], isPublic },
   );
 
   useLayoutEffect(() => {
@@ -69,7 +70,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
   const graph = existingGraphData?.data || data;
 
-  useChangeNavbarTitle(` Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
+  useChangeNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{
@@ -806,9 +807,11 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                 return { data: { source_id: d.source, target_id: d.target, curve_style: "taxi", taxi_direction: "vertical" } };
               });
 
+              const uniqueEdges = uniqBy(edgesToGenerate, (edge) => [edge.data.source_id, edge.data.target_id]);
+
               await generateGraph({
                 data: { project_id: project_id as string, title: dialogValue?.title || "Family tree" },
-                relations: { nodes: nodesToGenerate, edges: edgesToGenerate },
+                relations: { nodes: nodesToGenerate, edges: uniqueEdges },
               });
             }}
             variant="info"
