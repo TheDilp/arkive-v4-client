@@ -261,6 +261,7 @@ export function getDifferenceForCharacterFields(
     }
 
     if (originalField?.blueprint_instances?.length !== field?.blueprint_instances?.length) return true;
+    if (originalField?.events?.length !== field?.events?.length) return true;
     if (originalField?.documents?.length !== field?.documents?.length) return true;
     if (originalField?.map_pins?.length !== field?.map_pins?.length) return true;
     if (originalField?.images?.length !== field?.images?.length) return true;
@@ -308,6 +309,11 @@ export function getDifferenceForCharacterFields(
     if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
       return !field?.images?.every((char) =>
         originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id),
+      );
+    }
+    if (!!originalField?.events?.length && !!field?.events?.length && originalField?.events?.length === field?.events?.length) {
+      return !field?.events?.every((char) =>
+        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id),
       );
     }
 
