@@ -8,12 +8,12 @@ import { Avatar, Icon } from "../Misc";
 
 const EntityPreviewClasses = tv({
   slots: {
-    container: "flex flex-col",
+    container: "flex flex-col overflow-hidden",
     label: "block min-h-[20px] truncate text-sm text-zinc-300",
     base: "flex items-center gap-x-1 rounded p-2",
     link: "flex max-h-10 mr-auto items-center gap-x-1 rounded p-2 ",
     linkTitle: "truncate",
-    action: "w-min",
+    action: "w-min min-w-[2rem]",
     otherAction: "w-min",
   },
   variants: {

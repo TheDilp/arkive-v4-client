@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetEntities, useHandleChange } from "../../../hooks";
@@ -20,32 +20,47 @@ import {
   TextFilters,
 } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
-import { Button, Input, Search, Select } from "../../Form";
-import { DrawerLayout } from "../../Layout";
+import { Button, Input, Search, Select, Title } from "../../Form";
+import { Collapsible, DrawerLayout } from "../../Layout";
 import { Badge } from "../../Misc";
+import { Dropdown } from "../Dropdown";
 
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
 
-type CharacterFilter = {
+type CharacterFilterField = {
   id: string;
-  template: { id: string; title: string };
-  field: { id: string; field_type: string; title: string; options?: { id: string; value: string }[] };
+  field_id: string;
+  field_type: string;
+  title: string;
+  options?: { id: string; value: string }[];
   filter: RequestFilterType;
 };
 
-function formatCharacterFilter(filt: CharacterFilter) {
+type CharacterFilter = {
+  id: string;
+  template: {
+    id: string;
+    title: string;
+  };
+  fields: {
+    and: CharacterFilterField[];
+    or: CharacterFilterField[];
+  };
+};
+
+function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
   return {
-    ...filt.filter,
-    field: getFieldValueFromType(filt.field.field_type as FieldTypes) || "",
-    header_name: `${filt.template.title} - ${filt.field.title}`,
-    relationalData: { character_field_id: filt.field.id, label: filt?.filter?.relationalData?.label || "" },
+    id: field.field_id,
+    field: getFieldValueFromType(field.field_type as FieldTypes) || "",
+    operator: field.filter.operator,
+    header_name: field?.filter?.header_name || field.title,
+    value: field.filter.value,
+    relationalData: { character_field_id: field.field_id },
   };
 }
 
-function isApplyDisabled(filters: { and: CharacterFilter[]; or: CharacterFilter[] }) {
-  if (!filters.and.length && !filters.or.length) return true;
-  if (filters.and.some((f) => !f.filter.value)) return true;
-  if (filters.or.some((f) => !f.filter.value)) return true;
+function isApplyDisabled(filters: CharacterFilter[]) {
+  if (!filters.length) return true;
   return false;
 }
 
@@ -53,7 +68,7 @@ function CharacterFiltersList({
   filters,
   existingTemplates,
   handleChange,
-  type,
+  removeTemplate,
 }: {
   filters: CharacterFilter[];
   existingTemplates:
@@ -62,152 +77,354 @@ function CharacterFiltersList({
       }
     | undefined;
   handleChange: (newData: HandleChangePropsType) => void;
-  type: "and" | "or";
+  removeTemplate: (id: string) => void;
 }) {
   return filters.map((f, i) => (
-    <li key={f.id} className="flex gap-x-1">
-      <div className="grid flex-1 grid-cols-2 gap-1">
-        {i !== 0 ? (
-          <div className="col-span-2 flex justify-center">
-            <div className="max-w-fit">
-              <Badge label={type.toUpperCase()} variant="info" />
+    <li key={f.id} className="flex flex-col gap-x-1">
+      <Collapsible
+        actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
+        label={f.template.title}>
+        <div className="grid flex-1 grid-cols-12 gap-1 p-2">
+          <div className="col-span-12 flex items-center justify-between">
+            <div className="flex-1">
+              <Title isDrawerTitle label="AND filters" />
             </div>
-          </div>
-        ) : null}
-        <div className="col-span-1">
-          <Select
-            label="Template"
-            name={`${type}[${i}].template`}
-            onChange={({ name, value }) => {
-              const template = (existingTemplates?.data || [])?.find((t) => t.id === value);
-              if (template) {
-                handleChange([
-                  { name, value: { id: template.id, title: template.title } },
-                  { name: `${type}[${i}].field`, value: null },
-                ]);
-              }
-            }}
-            options={(existingTemplates?.data || [])?.map((opt) => ({ value: opt.id, label: opt.title }))}
-            value={f.template.id}
-          />
-        </div>
-        <div className="col-span-1">
-          <Select
-            label="Field"
-            name={`${type}[${i}].field`}
-            onChange={({ name, value }) => {
-              const field = existingTemplates?.data
-                ?.find((t) => t.id === f.template.id)
-                ?.character_fields?.find((char_field) => char_field.id === value);
-
-              if (field) {
-                handleChange({
-                  name,
-                  value: { id: field.id, field_type: field.field_type, title: field.title, options: field.options },
-                });
-              }
-            }}
-            options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
-              (opt) => ({
-                value: opt.id,
-                label: opt.title,
-                isDisabled: nonFilterableEntities.includes(opt.field_type),
-              }),
-            )}
-            value={f?.field?.id}
-          />
-        </div>
-        {f?.field?.field_type === "number" || f?.field?.field_type === "text" ? (
-          <div className="col-span-1">
-            <Select
-              label="Filter value"
-              name={`${type}[${i}].filter.operator`}
-              onChange={handleChange}
-              options={f?.field?.field_type === "number" ? NumberFilters : TextFilters}
-              value={(f?.filter?.operator || "") as string | number}
-            />
-          </div>
-        ) : null}
-
-        {f?.field?.field_type === "number" || f?.field?.field_type === "text" ? (
-          <div className="col-span-1">
-            <Input
-              label="Filter value"
-              name={`${type}[${i}].filter.value`}
-              onChange={handleChange}
-              type={f?.field?.field_type}
-              value={(f?.filter?.value || "") as string | number}
-            />
-          </div>
-        ) : null}
-        {f?.field?.field_type === "select" || f?.field?.field_type === "select_multiple" ? (
-          <div className="col-span-2">
-            <Select
-              label="Filter value"
-              name={`${type}[${i}].filter.value`}
-              onChange={(newValue) => {
-                const opt = f.field.options?.find((o) => o.id === newValue.value);
-                handleChange([newValue, { name: `${type}[${i}].filter.relationalData.label`, value: opt?.value }]);
-              }}
-              options={(f.field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
-              value={(f?.filter?.value || "") as string | number}
-            />
-          </div>
-        ) : null}
-        {relationFiltersList.includes(f?.field?.field_type) ? (
-          <>
-            <div className="col-span-1 flex items-center">Includes:</div>
-            <div className="col-span-1">
-              {f.filter.value ? (
-                <EntityPreview
-                  clearAction={() =>
-                    handleChange([
-                      { name: `${type}[${i}].filter.value`, value: "" },
-                      { name: `${type}[${i}].filter.relationalData`, value: undefined },
-                    ])
-                  }
-                  icon={f.filter.relationalData?.icon}
-                  id={f.filter.relationalData?.value}
-                  image_id={f.filter.relationalData?.image}
-                  size="sm"
-                  title={f.filter.relationalData?.label}
-                  type={getSearchType(f.field.field_type) as AvailableEntityType}
-                />
-              ) : (
-                <Search
-                  name={`${type}[${i}].filter.value`}
-                  onChange={({ name, value, label, image, icon }) =>
-                    handleChange([
-                      { name, value },
+            <div className="h-6 w-6">
+              <Button
+                hasNoBackground
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: `[${i}].fields.and`,
+                    value: (f?.fields.and || []).concat([
                       {
-                        name: `${type}[${i}].filter.relationalData`,
-                        value: { value, label, image, icon, character_field_id: f.field.id },
+                        id: crypto.randomUUID(),
+                        field_type: "",
+                        field_id: "",
+                        title: "",
+                        filter: {
+                          id: crypto.randomUUID(),
+                          header_name: "",
+                          field: "",
+                          value: "",
+                          operator: "eq",
+                          relationalData: { character_field_id: "" },
+                        },
                       },
-                    ])
-                  }
-                  searchEntity={getSearchType(f.field.field_type) as SearchableEntities}
-                  size="sm"
-                  value={f.filter.value as string | undefined}
-                />
-              )}
+                    ]),
+                  })
+                }
+              />
             </div>
-          </>
-        ) : null}
-      </div>
-      <div className="mt-5 h-10 w-10 self-center">
-        <Button
-          hasNoBackground
-          icon={IconEnum.trash}
-          isIconOnly
-          onClick={() => {
-            handleChange({
-              name: type,
-              value: filters.filter((filt) => filt.id !== f.id),
-            });
-          }}
-          variant="error"
-        />
-      </div>
+          </div>
+          {f.fields.and.map((field, fIdx) => (
+            <Fragment key={field.id}>
+              <div className="col-span-12">
+                {fIdx !== 0 ? (
+                  <div className="mt-1.5 flex w-full justify-center">
+                    <div className="w-16">
+                      <Badge label="AND" variant="info" />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <div className="col-span-4">
+                <Select
+                  label="Field"
+                  name={`[${i}].fields.and[${fIdx}]`}
+                  onChange={({ name, value }) => {
+                    const templateField = existingTemplates?.data
+                      ?.find((t) => t.id === f.template.id)
+                      ?.character_fields?.find((char_field) => char_field.id === value);
+                    if (templateField) {
+                      handleChange({
+                        name,
+                        value: {
+                          id: field.id,
+                          field_id: templateField.id,
+                          field_type: templateField.field_type,
+                          title: templateField.title,
+                          options: templateField.options,
+                        },
+                      });
+                    }
+                  }}
+                  options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
+                    (opt) => ({
+                      value: opt.id,
+                      label: opt.title,
+                      isDisabled: nonFilterableEntities.includes(opt.field_type),
+                    }),
+                  )}
+                  value={field?.field_id}
+                />
+              </div>
+              {field?.field_type === "number" || field?.field_type === "text" ? (
+                <div className="col-span-3">
+                  <Select
+                    label="Filter type"
+                    name={`[${i}].fields.and[${fIdx}].filter.operator`}
+                    onChange={handleChange}
+                    options={field?.field_type === "number" ? NumberFilters : TextFilters}
+                    value={(field?.filter?.operator || "") as string | number}
+                  />
+                </div>
+              ) : null}
+
+              {field?.field_type === "number" || field?.field_type === "text" ? (
+                <div className="col-span-4">
+                  <Input
+                    label="Filter value"
+                    name={`[${i}].fields.and[${fIdx}].filter.value`}
+                    onChange={handleChange}
+                    type={field?.field_type}
+                    value={(field?.filter?.value || "") as string | number}
+                  />
+                </div>
+              ) : null}
+              {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
+                <div className="col-span-7">
+                  <Select
+                    label="Filter value"
+                    name={`[${i}].fields.and[${fIdx}].filter.value`}
+                    onChange={(newValue) => {
+                      const opt = field.options?.find((o) => o.id === newValue.value);
+                      handleChange([newValue, { name: `[${i}].filter.relationalData.label`, value: opt?.value }]);
+                    }}
+                    options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
+                    value={(field?.filter?.value || "") as string | number}
+                  />
+                </div>
+              ) : null}
+              {relationFiltersList.includes(field?.field_type) ? (
+                <div className="col-span-7 grid grid-cols-3">
+                  <div className="col-span-1 mt-5 flex items-center justify-center">Includes</div>
+                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[8rem] ">
+                    {field?.filter?.value ? (
+                      <div className="w-full">
+                        <EntityPreview
+                          clearAction={() =>
+                            handleChange([
+                              { name: `[${i}].fields.and[${fIdx}].filter.value`, value: "" },
+                              { name: `[${i}].fields.and[${fIdx}].filter.relationalData`, value: undefined },
+                            ])
+                          }
+                          icon={field.filter.relationalData?.icon}
+                          id={field.filter.relationalData?.value}
+                          image_id={field.filter.relationalData?.image}
+                          size="sm"
+                          title={field.filter.relationalData?.label}
+                          type={getSearchType(field.field_type) as AvailableEntityType}
+                        />
+                      </div>
+                    ) : (
+                      <Search
+                        name={`[${i}].fields.and[${fIdx}].filter.value`}
+                        onChange={({ name, value, label, image, icon }) =>
+                          handleChange([
+                            { name, value },
+                            {
+                              name: `[${i}].fields.and[${fIdx}].filter.relationalData`,
+                              value: { value, label, image, icon, character_field_id: field.id },
+                            },
+                          ])
+                        }
+                        searchEntity={getSearchType(field.field_type) as SearchableEntities}
+                        value={field?.filter?.value as string | undefined}
+                      />
+                    )}
+                  </div>
+                </div>
+              ) : null}
+              <div className="col-span-1">
+                <div className="mt-5 h-10 w-10 self-center">
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.trash}
+                    isIconOnly
+                    onClick={() => {
+                      handleChange({
+                        name: `[${i}].fields.and`,
+                        value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
+                      });
+                    }}
+                    variant="error"
+                  />
+                </div>
+              </div>
+            </Fragment>
+          ))}
+          <div className="col-span-12 flex items-center justify-between">
+            <div className="flex-1">
+              <Title isDrawerTitle label="OR filters" />
+            </div>
+            <div className="h-6 w-6">
+              <Button
+                hasNoBackground
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: `[${i}].fields.or`,
+                    value: (f?.fields.or || []).concat([
+                      {
+                        id: crypto.randomUUID(),
+                        field_id: "",
+                        field_type: "",
+                        title: "",
+                        filter: {
+                          id: crypto.randomUUID(),
+                          header_name: "",
+                          field: "",
+                          value: "",
+                          operator: "eq",
+                          relationalData: { character_field_id: "" },
+                        },
+                      },
+                    ]),
+                  })
+                }
+              />
+            </div>
+          </div>
+          {f.fields.or.map((field, fIdx) => (
+            <Fragment key={field.id}>
+              <div className="col-span-12">
+                {fIdx !== 0 ? (
+                  <div className="mt-1.5 flex w-full justify-center">
+                    <div className="w-16">
+                      <Badge label="OR" variant="info" />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <div className="col-span-4">
+                <Select
+                  label="Field"
+                  name={`[${i}].fields.or[${fIdx}]`}
+                  onChange={({ name, value }) => {
+                    const templateField = existingTemplates?.data
+                      ?.find((t) => t.id === f.template.id)
+                      ?.character_fields?.find((char_field) => char_field.id === value);
+                    if (templateField) {
+                      handleChange({
+                        name,
+                        value: {
+                          id: field.id,
+                          field_id: templateField.id,
+                          field_type: templateField.field_type,
+                          title: templateField.title,
+                          options: templateField.options,
+                        },
+                      });
+                    }
+                  }}
+                  options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
+                    (opt) => ({
+                      value: opt.id,
+                      label: opt.title,
+                      isDisabled: nonFilterableEntities.includes(opt.field_type),
+                    }),
+                  )}
+                  value={field?.field_id}
+                />
+              </div>
+              {field?.field_type === "number" || field?.field_type === "text" ? (
+                <div className="col-span-3">
+                  <Select
+                    label="Filter type"
+                    name={`[${i}].fields.or[${fIdx}].filter.operator`}
+                    onChange={handleChange}
+                    options={field?.field_type === "number" ? NumberFilters : TextFilters}
+                    value={(field?.filter?.operator || "") as string | number}
+                  />
+                </div>
+              ) : null}
+
+              {field?.field_type === "number" || field?.field_type === "text" ? (
+                <div className="col-span-4">
+                  <Input
+                    label="Filter value"
+                    name={`[${i}].fields.or[${fIdx}].filter.value`}
+                    onChange={handleChange}
+                    type={field?.field_type}
+                    value={(field?.filter?.value || "") as string | number}
+                  />
+                </div>
+              ) : null}
+              {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
+                <div className="col-span-7">
+                  <Select
+                    label="Filter value"
+                    name={`[${i}].fields.or[${fIdx}].filter.value`}
+                    onChange={(newValue) => {
+                      const opt = field.options?.find((o) => o.id === newValue.value);
+                      handleChange([newValue, { name: `[${i}].filter.relationalData.label`, value: opt?.value }]);
+                    }}
+                    options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
+                    value={(field?.filter?.value || "") as string | number}
+                  />
+                </div>
+              ) : null}
+              {relationFiltersList.includes(field?.field_type) ? (
+                <div className="col-span-7 grid grid-cols-3">
+                  <div className="col-span-1 mt-5 flex items-center justify-center">Includes</div>
+                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[8rem] ">
+                    {field?.filter?.value ? (
+                      <div className="w-full">
+                        <EntityPreview
+                          clearAction={() =>
+                            handleChange([
+                              { name: `[${i}].fields.or[${fIdx}].filter.value`, value: "" },
+                              { name: `[${i}].fields.or[${fIdx}].filter.relationalData`, value: undefined },
+                            ])
+                          }
+                          icon={field.filter.relationalData?.icon}
+                          id={field.filter.relationalData?.value}
+                          image_id={field.filter.relationalData?.image}
+                          size="sm"
+                          title={field.filter.relationalData?.label}
+                          type={getSearchType(field.field_type) as AvailableEntityType}
+                        />
+                      </div>
+                    ) : (
+                      <Search
+                        name={`[${i}].fields.or[${fIdx}].filter.value`}
+                        onChange={({ name, value, label, image, icon }) =>
+                          handleChange([
+                            { name, value },
+                            {
+                              name: `[${i}].fields.or[${fIdx}].filter.relationalData`,
+                              value: { value, label, image, icon, character_field_id: field.id },
+                            },
+                          ])
+                        }
+                        searchEntity={getSearchType(field.field_type) as SearchableEntities}
+                        value={field?.filter?.value as string | undefined}
+                      />
+                    )}
+                  </div>
+                </div>
+              ) : null}
+              <div className="col-span-1">
+                <div className="mt-5 h-10 w-10 self-center">
+                  <Button
+                    hasNoBackground
+                    icon={IconEnum.trash}
+                    isIconOnly
+                    onClick={() => {
+                      handleChange({
+                        name: `[${i}].fields.or`,
+                        value: f.fields.or.filter((filtering_field) => field.id !== filtering_field.id),
+                      });
+                    }}
+                    variant="error"
+                  />
+                </div>
+              </div>
+            </Fragment>
+          ))}
+        </div>
+      </Collapsible>
     </li>
   ));
 }
@@ -215,10 +432,7 @@ function CharacterFiltersList({
 export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatch } }) {
   const { project_id } = useParams();
   const { dispatch } = data;
-  const [filters, setFilters] = useState<{
-    and: CharacterFilter[];
-    or: CharacterFilter[];
-  }>({ and: [], or: [] });
+  const [filters, setFilters] = useState<CharacterFilter[]>([]);
   const { data: existingTemplates, isInitialLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: {
@@ -238,79 +452,54 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
     <DrawerLayout>
       <ul className="flex flex-col gap-y-2">
         <li className="flex items-center justify-between">
-          <div>Add new AND filter:</div>
-          <div className="h-8 w-8">
-            <Button
-              icon={IconEnum.add}
-              isDisabled={!existingTemplates?.data?.length || isInitialLoading}
-              isLoading={isInitialLoading}
-              onClick={() => {
-                setFilters((prev) => ({
-                  and: prev.and.concat({
-                    id: crypto.randomUUID(),
-                    template: { id: "", title: "" },
-                    field: { id: "", field_type: "", title: "" },
-                    filter: {
-                      id: crypto.randomUUID(),
-                      header_name: "",
-                      field: "",
-                      value: "",
-                      operator: "eq",
-                      relationalData: { character_field_id: "" },
-                    },
-                  }),
-                  or: prev.or,
-                }));
-              }}
-              variant="info"
-            />
-          </div>
+          <div>Add filters for template:</div>
+          <Dropdown
+            allowedPlacements={["left"]}
+            items={(existingTemplates?.data || [])
+              ?.filter((temp) => !filters.some((f) => f.template.id === temp.id))
+              ?.map((temp) => ({
+                id: temp.id,
+                title: temp.title,
+                value: temp.id,
+
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: temp.id,
+                      template: { id: temp.id, title: temp.title },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+              }))}>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                isDisabled={!existingTemplates?.data?.length || isInitialLoading}
+                isLoading={isInitialLoading}
+                onClick={undefined}
+                variant="info"
+              />
+            </div>
+          </Dropdown>
         </li>
         <CharacterFiltersList
           existingTemplates={existingTemplates}
-          filters={filters.and}
+          filters={filters}
           handleChange={handleChange}
-          type="and"
+          removeTemplate={(id: string) =>
+            setFilters((prev) =>
+              prev.toSpliced(
+                prev.findIndex((p) => p.id === id),
+                1,
+              ),
+            )
+          }
         />
       </ul>
-      {/* <hr className="border-zinc-600" />
-      <ul className="flex flex-col gap-y-2">
-        <li className="flex items-center justify-between">
-          <div>Add new OR filter:</div>
-          <div className="h-8 w-8">
-            <Button
-              icon={IconEnum.add}
-              isDisabled={!existingTemplates?.data?.length || isInitialLoading}
-              isLoading={isInitialLoading}
-              onClick={() => {
-                setFilters((prev) => ({
-                  or: prev.or.concat({
-                    id: crypto.randomUUID(),
-                    template: { id: "", title: "" },
-                    field: { id: "", field_type: "", title: "" },
-                    filter: {
-                      id: crypto.randomUUID(),
-                      header_name: "",
-                      field: "",
-                      value: "",
-                      operator: "eq",
-                      relationalData: { character_field_id: "" },
-                    },
-                  }),
-                  and: prev.and,
-                }));
-              }}
-              variant="info"
-            />
-          </div>
-        </li>
-        <CharacterFiltersList
-          existingTemplates={existingTemplates}
-          filters={filters.or}
-          handleChange={handleChange}
-          type="or"
-        />
-      </ul> */}
 
       <div>
         <Button
@@ -318,9 +507,12 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           isDisabled={isApplyDisabled(filters)}
           label="Apply filter"
           onClick={() => {
-            const andFilters = filters.and.map(formatCharacterFilter);
-            const orFilters = filters.or.map(formatCharacterFilter);
-            dispatch({ type: "setRelationFilters", payload: { and: andFilters, or: orFilters } });
+            const andFields = filters.flatMap((f) => f.fields.and);
+            const orFields = filters.flatMap((f) => f.fields.or);
+
+            const and = andFields.map(formatCharacterFilter);
+            const or = orFields.map(formatCharacterFilter);
+            dispatch({ type: "setRelationFilters", payload: { and, or } });
           }}
           variant="success"
         />

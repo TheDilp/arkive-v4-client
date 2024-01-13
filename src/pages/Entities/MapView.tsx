@@ -109,7 +109,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
       )}
       {isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
       {currentMap && !isFetching && !!bounds ? (
-        <div className="h-full w-full overflow-hidden">
+        <div className="min-h-full min-w-full">
           <MapContainer
             ref={(node) => {
               mapRef.current = node;

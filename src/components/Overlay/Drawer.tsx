@@ -50,7 +50,7 @@ import {
 
 const DrawerClasses = tv({
   slots: {
-    base: "bg-zinc-800 absolute right-0 top-0 h-full transition-transform px-4 pb-4 z-[60] duration-500 ease-in-out max-h-full w-0",
+    base: "bg-zinc-800 absolute right-0 top-0 h-full transition-transform px-4 pb-4 z-[60] duration-500 ease-in-out max-h-full w-0 w-24",
     title:
       "font-merriweather text-white h-16 max-h-[4rem] text-2xl text-center border-b items-center border-zinc-700 mb-4 flex justify-between flex-nowrap",
   },

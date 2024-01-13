@@ -435,6 +435,7 @@ function TableSubheaderFilterBadges({
 
   const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
   const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
+
   return (
     <div className={subheaderFilterBadges()}>
       {fields.map((field) => (

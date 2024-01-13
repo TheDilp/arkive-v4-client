@@ -32,6 +32,7 @@ const ButtonClasses = tv({
       },
     },
     size: {
+      xs: "h-6 text-sm",
       sm: "h-8 text-sm",
       md: "text-base",
       lg: "text-lg",
