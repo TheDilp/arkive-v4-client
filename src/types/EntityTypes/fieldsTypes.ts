@@ -18,7 +18,9 @@ export type FieldTypes =
   | "number"
   | "textarea"
   | "blueprints_single"
-  | "blueprints_multiple";
+  | "blueprints_multiple"
+  | "events_single"
+  | "events_multiple";
 export type BlueprintFieldTypes =
   | "text"
   | "textarea"
@@ -38,7 +40,9 @@ export type BlueprintFieldTypes =
   | "locations_single"
   | "locations_multiple"
   | "blueprints_single"
-  | "blueprints_multiple";
+  | "blueprints_multiple"
+  | "events_single"
+  | "events_multiple";
 
 export interface CharacterFieldType {
   id: string;

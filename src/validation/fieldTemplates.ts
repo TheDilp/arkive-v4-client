@@ -18,6 +18,8 @@ const FieldTypeSchema = z.union([
   z.literal("locations_multiple"),
   z.literal("blueprints_single"),
   z.literal("blueprints_multiple"),
+  z.literal("events_single"),
+  z.literal("events_multiple"),
 ]);
 
 export const InsertTemplateSchema = z.object({

@@ -4,6 +4,7 @@ export * from "./TemplateCharacterField";
 export * from "./TemplateDateField";
 export * from "./TemplateDiceRollField";
 export * from "./TemplateDocumentField";
+export * from "./TemplateEventField";
 export * from "./TemplateFieldContainer";
 export * from "./TemplateImageField";
 export * from "./TemplateInputField";

@@ -3,6 +3,7 @@ import {
   CharacterLocationType,
   CharacterRelationshipType,
   DocumentType,
+  EventType,
   FieldTypes,
   MapPinType,
   MapType,
@@ -59,6 +60,10 @@ export interface CharacterCharacterFieldType {
   }[];
   images: {
     image: Pick<ImageType, "id" | "title">;
+    related_id: string;
+  }[];
+  events: {
+    event: Pick<EventType, "id" | "title" | "parent_id">;
     related_id: string;
   }[];
 

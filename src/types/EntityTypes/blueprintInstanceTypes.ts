@@ -1,5 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { BlueprintType } from "./blueprintTypes";
+import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
 import { BlueprintFieldTypes } from "./fieldsTypes";
@@ -34,7 +35,10 @@ export interface BlueprintInstanceBlueprintFieldType {
     image: Pick<ImageType, "id" | "title">;
     related_id: string;
   }[];
-
+  events: {
+    event: Pick<EventType, "id" | "title" | "parent_id">;
+    related_id: string;
+  }[];
   random_table: {
     option_id?: string;
     suboption_id?: string;

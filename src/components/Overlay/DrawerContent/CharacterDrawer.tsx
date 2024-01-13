@@ -27,6 +27,7 @@ import {
   TemplateBooleanField,
   TemplateDiceRollField,
   TemplateDocumentField,
+  TemplateEventField,
   TemplateImageField,
   TemplateInputField,
   TemplateLocationsField,
@@ -267,6 +268,21 @@ function FieldTemplateRows({
                 key={template_field.id}
                 currentValue={
                   character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.images
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") {
+            return (
+              <TemplateEventField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.events
                 }
                 fieldType={template_field.field_type}
                 handleChange={handleChange}

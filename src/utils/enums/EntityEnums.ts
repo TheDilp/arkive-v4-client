@@ -33,8 +33,10 @@ export const CharacterFieldTypesEnum = [
   { value: "images_multiple", label: "Images (multiple)" },
   { value: "locations_single", label: "Location (single)" },
   { value: "locations_multiple", label: "Locations (multiple)" },
-  { value: "blueprints_single", label: "Blueprint instances (single )" },
+  { value: "blueprints_single", label: "Blueprint instances (single)" },
   { value: "blueprints_multiple", label: "Blueprint instances (multiple)" },
+  { value: "events_single", label: "Events (single)" },
+  { value: "events_multiple", label: "Events (multiple)" },
 ];
 
 export const BlueprintFieldTypesEnum = [
