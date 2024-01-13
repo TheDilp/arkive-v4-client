@@ -55,7 +55,7 @@ function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
     operator: field.filter.operator,
     header_name: field?.filter?.header_name || field.title,
     value: field.filter.value,
-    relationalData: { character_field_id: field.field_id },
+    relationalData: { character_field_id: field.field_id, label: field?.filter?.relationalData?.label },
   };
 }
 
@@ -192,7 +192,10 @@ function CharacterFiltersList({
                     name={`[${i}].fields.and[${fIdx}].filter.value`}
                     onChange={(newValue) => {
                       const opt = field.options?.find((o) => o.id === newValue.value);
-                      handleChange([newValue, { name: `[${i}].filter.relationalData.label`, value: opt?.value }]);
+                      handleChange([
+                        newValue,
+                        { name: `[${i}].fields.and[${fIdx}].filter.relationalData.label`, value: opt?.value },
+                      ]);
                     }}
                     options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
                     value={(field?.filter?.value || "") as string | number}
@@ -364,7 +367,10 @@ function CharacterFiltersList({
                     name={`[${i}].fields.or[${fIdx}].filter.value`}
                     onChange={(newValue) => {
                       const opt = field.options?.find((o) => o.id === newValue.value);
-                      handleChange([newValue, { name: `[${i}].filter.relationalData.label`, value: opt?.value }]);
+                      handleChange([
+                        newValue,
+                        { name: `[${i}].fields.or[${fIdx}].filter.relationalData.label`, value: opt?.value },
+                      ]);
                     }}
                     options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
                     value={(field?.filter?.value || "") as string | number}
