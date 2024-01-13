@@ -145,6 +145,9 @@ function CharacterFiltersList({
                           field_type: templateField.field_type,
                           title: templateField.title,
                           options: templateField.options,
+                          filter: {
+                            operator: "eq",
+                          },
                         },
                       });
                     }
@@ -314,6 +317,9 @@ function CharacterFiltersList({
                           field_type: templateField.field_type,
                           title: templateField.title,
                           options: templateField.options,
+                          filter: {
+                            operator: "eq",
+                          },
                         },
                       });
                     }
