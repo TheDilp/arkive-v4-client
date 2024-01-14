@@ -25,7 +25,7 @@ export function TemplateLocationsField({ title, name, handleChange, id, fieldTyp
         <Search
           label={isCollapsible ? "" : title}
           name={name}
-          onChange={({ value, label, icon }) => {
+          onChange={({ value, label, icon, parent_id }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
               createNotification({
                 timer: 3,
@@ -43,6 +43,7 @@ export function TemplateLocationsField({ title, name, handleChange, id, fieldTyp
                   related_id: value,
                   map_pin: {
                     id: value,
+                    parent_id,
                     title: label,
                     icon,
                   },
