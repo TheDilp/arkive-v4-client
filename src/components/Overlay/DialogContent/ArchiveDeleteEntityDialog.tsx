@@ -35,7 +35,11 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
         {data?.entity_title === "characters"
           ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
           : data?.title}
-        ?<p className="text-center text-sm text-red-400">This action cannot be undone.</p>
+        ?
+        {data?.entity_title === "blueprints" ? (
+          <p className="text-center text-red-600">Deleting a blueprint will also delete all of its fields and instances.</p>
+        ) : null}
+        <p className="text-center text-sm text-red-400">This action cannot be undone.</p>
       </div>
       <div className="mx-auto my-2 flex items-center gap-x-4">
         {data?.image && data?.project_id ? (
