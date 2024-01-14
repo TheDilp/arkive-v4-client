@@ -57,6 +57,7 @@ export function EventDrawer({ data }: Props) {
         "id",
         "title",
         "background_color",
+        "parent_id",
         "start_day",
         "start_month",
         "start_year",
