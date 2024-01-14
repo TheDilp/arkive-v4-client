@@ -205,7 +205,7 @@ function CharacterFiltersList({
               {relationFiltersList.includes(field?.field_type) ? (
                 <div className="col-span-7 grid grid-cols-3">
                   <div className="col-span-1 mt-5 flex items-center justify-center">Includes</div>
-                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[8rem] ">
+                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[5.5rem]">
                     {field?.filter?.value ? (
                       <div className="w-full">
                         <EntityPreview
@@ -218,7 +218,6 @@ function CharacterFiltersList({
                           icon={field.filter.relationalData?.icon}
                           id={field.filter.relationalData?.value}
                           image_id={field.filter.relationalData?.image}
-                          size="sm"
                           title={field.filter.relationalData?.label}
                           type={getSearchType(field.field_type) as AvailableEntityType}
                         />

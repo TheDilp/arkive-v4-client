@@ -16,6 +16,8 @@ export const relationFiltersList = [
   "locations_multiple",
   "documents_single",
   "documents_multiple",
+  "events_single",
+  "events_multiple",
   "value",
 ];
 
