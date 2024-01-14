@@ -5,7 +5,7 @@ import { useGetEntity } from "../../../hooks";
 import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
 import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
-import { getSearchLink, getSingularEntityType, IconEnum } from "../../../utils";
+import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Graph } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
@@ -127,7 +127,7 @@ export function EntityPreviewDrawer({
         <Button
           icon={IconEnum.edit}
           label={`Edit ${getSingularEntityType(data.entity_type).toLowerCase()}`}
-          onClick={() => navigate(getSearchLink(project_id as string, data.entity_type, data.id, data.parent_id))}
+          onClick={() => navigate(getEntityLink(project_id as string, data.entity_type, data.id, data.parent_id))}
           variant="info"
         />
       </div>

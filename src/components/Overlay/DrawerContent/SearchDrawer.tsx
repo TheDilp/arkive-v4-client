@@ -14,7 +14,7 @@ import {
 } from "../../../types";
 import { drawerAtom, getDefaultEntityIcon, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
-import { getSearchLink } from "../../../utils/ui/linkUtils";
+import { getEntityLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select, Title } from "../../Form";
 import { Tabs } from "../../Layout";
@@ -192,7 +192,7 @@ export function SearchDrawer() {
                                 icon={IconEnum.character}
                                 id={result_item.id}
                                 image_id={result_item?.portrait_id}
-                                link={getSearchLink(project_id as string, name, result_item.id, undefined)}
+                                link={getEntityLink(project_id as string, name, result_item.id, undefined)}
                                 title={`${result_item.full_name}
                                 ${
                                   "parent_title" in result_item && result_item?.parent_title
@@ -210,7 +210,7 @@ export function SearchDrawer() {
                                 }
                                 id={result_item.id}
                                 image_id={"portrait_id" in result_item ? result_item?.portrait_id : undefined}
-                                link={getSearchLink(
+                                link={getEntityLink(
                                   project_id as string,
                                   name,
                                   result_item.id,
@@ -241,7 +241,7 @@ export function SearchDrawer() {
                     <EntityPreview
                       id={item.value}
                       image_id={item?.image}
-                      link={getSearchLink(
+                      link={getEntityLink(
                         project_id as string,
                         searchCategory || "",
                         item.value,
@@ -254,7 +254,7 @@ export function SearchDrawer() {
                     <EntityPreview
                       id={item.value}
                       image_id={item.image}
-                      link={getSearchLink(
+                      link={getEntityLink(
                         project_id as string,
                         searchCategory || "",
                         item.value,

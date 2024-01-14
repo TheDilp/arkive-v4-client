@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { AllAvailableEntities, ProjectType } from "../../types";
-import { getImageURL, getSearchLink, IconEnum } from "../../utils";
+import { getEntityLink, getImageURL, IconEnum } from "../../utils";
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
@@ -70,7 +70,7 @@ export function PublicNavbar() {
             )}
             name="search"
             onChange={({ type, value, parent_id }) => {
-              navigate(getSearchLink(project_id as string, type as string, value, parent_id, true));
+              navigate(getEntityLink(project_id as string, type as string, value, parent_id, true));
               setResults(null);
             }}
             onSearch={(res) => setResults(res)}

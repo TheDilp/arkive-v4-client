@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { EntityPreview, Icon } from "../../components";
 import { useGetProjectDashboard } from "../../hooks";
 import { AvailableEntityType } from "../../types";
-import { capitalizeFirstLetter, drawerAtom, getDefaultEntityIcon, getPluralEntityType, getSearchLink } from "../../utils";
+import { capitalizeFirstLetter, drawerAtom, getDefaultEntityIcon, getEntityLink, getPluralEntityType } from "../../utils";
 
 export function Dashboard() {
   const { project_id } = useParams();
@@ -36,7 +36,7 @@ export function Dashboard() {
                     hasNoBackground
                     id={r.id}
                     image_id={"portrait_id" in r ? r.portrait_id : null}
-                    link={getSearchLink(
+                    link={getEntityLink(
                       project_id as string,
                       d.name as AvailableEntityType,
                       r.id,

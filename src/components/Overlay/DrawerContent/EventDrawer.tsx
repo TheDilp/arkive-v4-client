@@ -12,8 +12,8 @@ import {
   checkIfYearCorrect,
   drawerAtom,
   getDefaultEntityIcon,
+  getEntityLink,
   getImageURL,
-  getSearchLink,
   IconEnum,
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
@@ -332,7 +332,7 @@ export function EventDrawer({ data }: Props) {
                 icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
                 id={event.document.id}
                 label="Document"
-                link={getSearchLink(project_id as string, "documents", event.document.id, null)}
+                link={getEntityLink(project_id as string, "documents", event.document.id, null)}
                 previewAction={() =>
                   setDrawer((prev) => ({
                     ...prev,

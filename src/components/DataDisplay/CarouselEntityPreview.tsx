@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { AvailableEntityType, ItemPreviewType } from "../../types";
-import { drawerAtom, getSearchLink } from "../../utils";
+import { drawerAtom, getEntityLink } from "../../utils";
 import { EntityPreview } from "./EntityPreview";
 
 type Props = {
@@ -22,7 +22,7 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
             icon={item ? item?.icon : undefined}
             id={item?.id}
             image_id={item?.image_id}
-            link={getSearchLink(project_id as string, item.type, item.id, item.parent_id)}
+            link={getEntityLink(project_id as string, item.type, item.id, item.parent_id)}
             previewAction={
               items.length
                 ? () => {

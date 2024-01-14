@@ -1,4 +1,4 @@
-export function getSearchLink(
+export function getEntityLink(
   project_id: string,
   name: string,
   item_id: string,
@@ -39,5 +39,5 @@ export function getMentionLink(
   parent_id?: string,
 ) {
   if (isPublic && !is_public) return "#";
-  return getSearchLink(project_id, type, id, parent_id, isPublic);
+  return getEntityLink(project_id, type, id, parent_id, isPublic);
 }
