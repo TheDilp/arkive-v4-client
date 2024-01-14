@@ -51,7 +51,7 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value, isDisabl
         {ColorPresets.map((color) => (
           <div
             key={color}
-            className="h-6 w-6 cursor-pointer rounded-full"
+            className={`h-6 w-6 cursor-pointer rounded-full ${isDisabled ? "cursor-not-allowed" : ""}`}
             onClick={() => {
               if (isDisabled) return;
 
@@ -74,7 +74,7 @@ export function ColorPicker({ name, value, hasCustom, onChange, isDisabled }: Co
       isDisabled={isDisabled}
       passCloseTooltip>
       <div
-        className="h-6 w-6 cursor-pointer rounded-full"
+        className={`h-6 w-6 rounded-full ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}
         style={{
           backgroundColor: value || DefaultTagColor,
         }}
