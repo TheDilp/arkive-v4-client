@@ -20,6 +20,8 @@ const BlueprintFieldTypeSchema = z.union([
   z.literal("characters_multiple"),
   z.literal("blueprints_single"),
   z.literal("blueprints_multiple"),
+  z.literal("events_single"),
+  z.literal("events_multiple"),
 ]);
 
 export const InsertBlueprintSchema = z.object({

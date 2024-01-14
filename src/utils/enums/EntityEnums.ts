@@ -23,10 +23,10 @@ export const CharacterFieldTypesEnum = [
   { value: "number", label: "Number" },
   { value: "select", label: "Select" },
   { value: "select_multiple", label: "Select (multiple)" },
-  { value: "dice_roll", label: "Dice Roll" },
+  { value: "boolean", label: "Boolean" },
   { value: "date", label: "Date" },
   { value: "random_table", label: "Random Table" },
-  { value: "boolean", label: "Boolean" },
+  { value: "dice_roll", label: "Dice Roll" },
   { value: "documents_single", label: "Document (single)" },
   { value: "documents_multiple", label: "Documents (multiple)" },
   { value: "images_single", label: "Image (single)" },
@@ -57,8 +57,10 @@ export const BlueprintFieldTypesEnum = [
   { value: "locations_multiple", label: "Locations (multiple)" },
   { value: "characters_single", label: "Character (single)" },
   { value: "characters_multiple", label: "Characters (multiple)" },
-  { value: "blueprints_single", label: "Blueprint instances (single )" },
+  { value: "blueprints_single", label: "Blueprint instances (single)" },
   { value: "blueprints_multiple", label: "Blueprint instances (multiple)" },
+  { value: "events_single", label: "Events (single)" },
+  { value: "events_multiple", label: "Events (multiple)" },
 ];
 
 export const SearchFieldTypes = [

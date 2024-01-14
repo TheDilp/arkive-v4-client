@@ -14,6 +14,7 @@ export const InsertBlueprintInstanceSchema = z.object({
         characters: z.object({ related_id: z.string() }).array().optional().nullable(),
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
+        events: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
         blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
         random_table: z
@@ -68,6 +69,7 @@ export const UpdateBlueprintInstanceSchema = z.object({
         characters: z.object({ related_id: z.string() }).array().optional().nullable(),
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
+        events: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
         blueprint_instances: z.object({ related_id: z.string() }).array().optional().nullable(),
         random_table: z

@@ -28,6 +28,7 @@ import {
   TemplateCharacterField,
   TemplateDiceRollField,
   TemplateDocumentField,
+  TemplateEventField,
   TemplateImageField,
   TemplateInputField,
   TemplateSelectField,
@@ -265,6 +266,23 @@ function FieldTemplateRows({
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.map_pins
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                isCollapsible
+                name={baseName}
+                title={template_field.title}
+              />
+            );
+          }
+          if (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") {
+            return (
+              <TemplateEventField
+                key={template_field.id}
+                currentValue={
+                  blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
+                    ?.events
                 }
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
