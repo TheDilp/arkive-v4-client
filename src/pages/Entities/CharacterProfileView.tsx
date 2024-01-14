@@ -751,6 +751,21 @@ function AdditionalFieldDisplay({
           />
         </div>
       ) : null}
+      {character_field.field_type === "events_single" || character_field.field_type === "events_multiple" ? (
+        <div className="w-full">
+          <CarouselEntityPreview
+            field_label={character_field.title}
+            items={(character_field_data?.events || []).map((event) => ({
+              id: event.event.id,
+              parent_id: event.event.parent_id,
+              title: event.event.title || "",
+              icon: IconEnum.event,
+              type: "events",
+              link: `/projects/${project_id}/calendars/${event.event.parent_id}/${event.related_id}`,
+            }))}
+          />
+        </div>
+      ) : null}
       {character_field.field_type === "images_single" && character_field_data?.images?.[0] ? (
         <div className="w-full">
           <EntityPreview
@@ -832,14 +847,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     ...(existingCharacter?.data?.related_other || []),
   ].filter((r) => !!r);
 
-  useChangeNavbarTitle(
-    `Characters | ${getCharacterFullName(
-      existingCharacter?.data?.first_name || "",
-      undefined,
-      existingCharacter?.data?.last_name,
-    )}`,
-    !!existingCharacter?.data,
-  );
+  useChangeNavbarTitle(`Characters | ${existingCharacter?.data?.full_name}`, !!existingCharacter?.data);
 
   const [, dispatch] = useTable({});
 
@@ -954,7 +962,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   // console.log(relationTypeArray);
 
   return (
-    <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2 overflow-hidden">
+    <div className="flex max-h-[calc(100vh-10rem)] min-h-[calc(100vh-10rem)] flex-col gap-y-2 overflow-y-auto lg:max-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]">
       {isPreview ? null : (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -977,7 +985,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
         </div>
       )}
-      <div className="w-full flex-1 content-start gap-4 overflow-auto pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      <div className="w-full content-start gap-4 overflow-auto pt-0 lg:grid lg:flex-1 lg:grid-cols-5 lg:content-stretch">
         {isLoading ? <Skeleton type="character_profile" /> : null}
         {!isLoading && isLg ? (
           <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">

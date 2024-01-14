@@ -74,7 +74,7 @@ export function EventDrawer({ data }: Props) {
   );
   const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
     {
-      data: { parent_id: item_id || existingEvent?.data?.parent_id },
+      data: { parent_id: existingEvent?.data?.parent_id },
       orderBy: [{ field: "sort", sort: "asc" }],
       fields: ["id", "title", "days", "sort"],
     },
@@ -211,7 +211,7 @@ export function EventDrawer({ data }: Props) {
               name="start_month"
               onChange={handleMonthChange}
               options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.start_month === "number" ? existingMonths?.data?.[event.start_month].id : undefined}
+              value={typeof event?.start_month === "number" ? existingMonths?.data?.[event?.start_month]?.id : undefined}
             />
             <Input
               isReadOnly={data?.isReadOnly}

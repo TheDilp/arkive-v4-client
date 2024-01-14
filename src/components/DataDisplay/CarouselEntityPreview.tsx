@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { AvailableEntityType, ItemPreviewType } from "../../types";
 import { drawerAtom, getEntityLink } from "../../utils";
+import { Alert } from "../Misc";
 import { EntityPreview } from "./EntityPreview";
 
 type Props = {
@@ -16,6 +17,11 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
   return (
     <>
       <span className="col-span-6 text-sm text-zinc-200">{field_label}</span>
+      {items.length === 0 ? (
+        <div className="overflow-hidden [&>div>div:nth-child(2)]:truncate">
+          <Alert label="There is no content." />
+        </div>
+      ) : null}
       {items.map((item) => (
         <div key={item?.id} className="col-span-2 xs:col-span-6 sm:col-span-2">
           <EntityPreview
