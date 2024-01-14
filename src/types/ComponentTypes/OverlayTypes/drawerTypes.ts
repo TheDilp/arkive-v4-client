@@ -115,7 +115,10 @@ export type DrawerAtomType = {
         conversation_id?: string;
       };
     }
-  | { type: "entity_preview"; data: { id: string; parent_id?: string; entity_type: AvailableEntityType } }
+  | {
+      type: "entity_preview";
+      data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType };
+    }
   | { type: "invite_to_project" | null; data: null }
   | { type: "webhooks"; data: { id?: string } }
   | { type: "character_filter"; data: { dispatch: TableDispatch } }

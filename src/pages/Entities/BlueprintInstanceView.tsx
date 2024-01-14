@@ -139,6 +139,47 @@ function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFi
   );
 }
 
+function EventColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["events"] }) {
+  const { project_id } = useParams();
+  const navigate = useNavigate();
+  const setDrawer = useSetAtom(drawerAtom);
+
+  return (
+    <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
+      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.event?.title || "").filter((l) => !!l)} />
+      <Dropdown
+        allowedPlacements={["left-start"]}
+        items={(locations || []).map(({ event }) => ({
+          id: event?.id,
+          title: event?.title || "",
+          subItems: [
+            {
+              id: `go_to_${event?.id}`,
+              title: `Go to ${event?.title}`,
+              onClick: () => navigate(`/projects/${project_id}/calendars/${event?.parent_id}/${event?.id}`),
+            },
+            {
+              id: `preview_${event?.id}`,
+              title: `Preview event ${event?.title}`,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "entity_preview",
+                  size: "half",
+                  title: `Preview event - ${event?.title}`,
+                  data: { id: event?.id, parent_id: event?.parent_id, entity_type: "events" },
+                })),
+            },
+          ],
+        }))}>
+        <div className="pointer-events-none w-min max-w-min opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
+          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="2xs" />
+        </div>
+      </Dropdown>
+    </div>
+  );
+}
+
 function createColumns(
   blueprint: BlueprintType,
   title_name: string,
@@ -211,6 +252,9 @@ function createColumns(
             }
             if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
               return <LocationColumn locations={fieldData?.map_pins || []} />;
+            }
+            if (field.field_type === "events_single" || field.field_type === "events_multiple") {
+              return <EventColumn locations={fieldData?.events || []} />;
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
@@ -297,9 +341,15 @@ function createColumns(
           },
           meta: {
             centered: field.field_type === "images_single" || field.field_type === "boolean",
-            noLink: ["images_single", "images_multiple", "locations_single", "locations_multiple", "dice_roll"].includes(
-              field.field_type,
-            ),
+            noLink: [
+              "images_single",
+              "images_multiple",
+              "locations_single",
+              "locations_multiple",
+              "events_single",
+              "events_multiple",
+              "dice_roll",
+            ].includes(field.field_type),
             filterOptions: CharacterBlueprintRelationFilter(
               field.field_type,
               field.field_type === "select" || field.field_type === "select_multiple"
