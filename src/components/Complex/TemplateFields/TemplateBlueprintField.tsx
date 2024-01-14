@@ -1,5 +1,7 @@
+import { useParams } from "react-router-dom";
+
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { IconEnum, useNotifications } from "../../../utils";
+import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -16,7 +18,7 @@ type Props = {
 
 export function TemplateBlueprintField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
-
+  const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
@@ -64,6 +66,7 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
             }}
             icon={val?.blueprint_instance?.icon}
             id={val?.related_id}
+            link={getEntityLink(project_id as string, "blueprint_instances", id, val?.blueprint_instance?.parent_id, false)}
             title={val?.blueprint_instance?.title}
             type="blueprint_instances"
           />

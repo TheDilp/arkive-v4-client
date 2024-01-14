@@ -1,5 +1,7 @@
+import { useParams } from "react-router-dom";
+
 import { DocumentType, HandleChangePropsType } from "../../../types";
-import { IconEnum, useNotifications } from "../../../utils";
+import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -16,7 +18,7 @@ type Props = {
 
 export function TemplateDocumentField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
   const createNotification = useNotifications();
-
+  const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
@@ -64,6 +66,7 @@ export function TemplateDocumentField({ title, name, handleChange, id, fieldType
             }}
             icon={val?.document?.icon || ""}
             id={val?.related_id}
+            link={getEntityLink(project_id as string, "map_pins", id, undefined, false)}
             title={val?.document?.title}
             type="documents"
           />
