@@ -25,7 +25,7 @@ export function TemplateEventField({ title, name, handleChange, id, fieldType, c
         <Search
           label={isCollapsible ? "" : title}
           name={name}
-          onChange={({ value, label, icon }) => {
+          onChange={({ value, label, icon, parent_id }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
               createNotification({
                 timer: 3,
@@ -44,6 +44,7 @@ export function TemplateEventField({ title, name, handleChange, id, fieldType, c
                   event: {
                     id: value,
                     title: label,
+                    parent_id,
                     icon,
                   },
                 },
