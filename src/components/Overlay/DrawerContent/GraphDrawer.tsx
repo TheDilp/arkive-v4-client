@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { GraphType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
-import { Button, Checkbox, DrawerLayout, IconPicker, Input, Select, Skeleton, Tabs, TagInput } from "../..";
+import { Button, Checkbox, DrawerLayout, FolderSelect, IconPicker, Input, Select, Skeleton, Tabs, TagInput } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type insertGraphType = Partial<GraphType> & { parent_id?: string | null; project_id: string };
@@ -120,6 +120,8 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
                 value={graph?.default_edge_color || DefaultBoardColor}
               />
             </div>
+
+            <FolderSelect handleChange={handleChange} parent_id={graph?.parent_id ?? null} type="graphs" />
 
             <div className="flex w-full items-center justify-between">
               <span>Is public:</span>
