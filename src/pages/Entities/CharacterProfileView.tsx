@@ -873,7 +873,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
       data: {
-        character_id: item_id,
+        character_id: existingCharacter?.data?.id,
         project_id,
       },
       fields: ["id", "title"],
@@ -1280,7 +1280,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           ) : null}
           {(isPreview ? selectedTab === 3 : type === "conversations") ? (
             <div className="flex-1">
-              {subitem_id ? null : (
+              {subitem_id && !isPreview ? null : (
                 <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
                   <Table
                     columns={conversationTableColumns(
@@ -1291,9 +1291,11 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                       generateDocument,
                     )}
                     config={{
-                      onRowClick: (rowData: ConversationType) => {
-                        navigate(`/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`);
-                      },
+                      onRowClick: isPreview
+                        ? undefined
+                        : (rowData: ConversationType) => {
+                            navigate(`/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`);
+                          },
                     }}
                     data={existingConversations?.data || []}
                     dispatch={dispatch}
@@ -1303,7 +1305,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 </div>
               )}
               <div className="h-full max-h-[100%] overflow-hidden">
-                {subitem_id ? <ConversationView id={subitem_id} /> : null}
+                {subitem_id && !isPreview ? <ConversationView id={subitem_id} /> : null}
               </div>
             </div>
           ) : null}
