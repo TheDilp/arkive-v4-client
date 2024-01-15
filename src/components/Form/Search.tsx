@@ -466,6 +466,22 @@ export function Search({
                     <span className="truncate">{item.label}</span>
                   </Item>
                 ))}
+
+                {/* If no results for public search display NO RESULTS */}
+                {isPublic && data?.data?.length && !manualResults?.length ? (
+                  <Item
+                    {...getItemProps({
+                      key: "no_results",
+                      onClick(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      },
+                    })}
+                    isActive={false}
+                    isSelected={false}>
+                    <span className="truncate">No results</span>
+                  </Item>
+                ) : null}
               </div>
             </FloatingFocusManager>
           )}

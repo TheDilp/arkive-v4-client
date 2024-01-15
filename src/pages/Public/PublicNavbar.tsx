@@ -51,7 +51,6 @@ export function PublicNavbar() {
           </nav>
         </div>
       </div>
-
       <div className="relative mb-2 mt-auto h-8 min-h-[2rem]">
         {typeof search === "string" ? (
           <Search
