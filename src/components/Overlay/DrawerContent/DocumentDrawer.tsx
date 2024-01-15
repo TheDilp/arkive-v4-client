@@ -145,7 +145,7 @@ export function DocumentDrawer({ data }: Props) {
             value={alterNameInput}
           />
           <div className="flex flex-nowrap items-center gap-x-2">
-            {!!parentData?.data?.parents?.length && parentData?.data?.parents?.length > 1 && document?.parent_id ? (
+            {!!parentData?.data?.parents?.length && document?.parent_id ? (
               <div className="flex-1">
                 <EntityPreview
                   clearAction={() => handleChange({ name: "parent_id", value: null })}
@@ -157,27 +157,12 @@ export function DocumentDrawer({ data }: Props) {
                 />
               </div>
             ) : (
-              <Search
-                isFolders
-                label="Folder"
-                name="parent_id"
-                onChange={({ label, value }) => {
-                  handleChange([
-                    {
-                      name: "parent_id",
-                      value,
-                    },
-                    { name: "parents", value: [{ title: label, id: value }, {}] },
-                  ]);
-                }}
-                searchEntity="documents"
-              />
+              <Search isFolders label="Folder" name="parent_id" onChange={handleChange} searchEntity="documents" />
             )}
 
             <Tooltip
               allowedPlacements={["left"]}
               content={`root/${parentData?.data?.parents?.map((p) => p.title).join("/") || ""}`}
-              isDisabled={!parentData?.data?.parents?.length || parentData?.data?.parents?.length <= 1}
               isInline>
               <div className="mb-1.5 h-6 w-6 self-end">
                 <Icon fontSize={24} icon={IconEnum.info_circle} />
