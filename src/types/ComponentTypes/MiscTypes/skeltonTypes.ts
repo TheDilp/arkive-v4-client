@@ -14,7 +14,8 @@ export type SkeletonType = {
     | "expanded_tag"
     | "conversations"
     | "avatar"
-    | "project_view";
+    | "project_view"
+    | "sidebar";
   limit?: number;
   entity_type?: AvailableEntityType;
 };

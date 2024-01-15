@@ -302,6 +302,49 @@ function ProjectViewSkeleton({ limit = 4 }: { limit?: number }) {
   );
 }
 
+function SidebarSkeleton() {
+  return (
+    <ul className="flex flex-col">
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+      <li className="flex h-16 w-16 items-center justify-center">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
+      </li>
+    </ul>
+  );
+}
+
 export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
@@ -316,5 +359,6 @@ export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
   if (type === "conversations") return <ConversationSkeleton />;
   if (type === "avatar") return <AvatarSkeleton limit={limit} />;
   if (type === "project_view") return <ProjectViewSkeleton limit={limit} />;
+  if (type === "sidebar") return <SidebarSkeleton />;
   return null;
 }
