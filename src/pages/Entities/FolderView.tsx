@@ -408,7 +408,6 @@ export function FolderView() {
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
-        children: true,
         parents: true,
         tags: EntitiesWithTags.includes(type as string),
       },
@@ -754,7 +753,7 @@ export function FolderView() {
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
             }}
-            data={(item_id ? data?.data?.children : base?.data) || []}
+            data={base?.data || []}
             dispatch={dispatch}
             isLoading={isInitialLoading || isInitialLoadingFolder}
             type={type as AvailableEntityType}
