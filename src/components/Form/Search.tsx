@@ -102,7 +102,10 @@ const SearchClasses = tv({
       },
     },
     hasNoBackground: {
-      true: { base: "bg-transparent border-t-0 border-x-0 rounded-none", input: "bg-transparent border-t-0 border-b-0" },
+      true: {
+        base: "bg-transparent border-t-0 border-x-0 rounded-none [&:has(input:focus)]:bg-transparent [&>input:focus]:bg-transparent",
+        input: "bg-transparent border-t-0 border-b-0",
+      },
     },
   },
 });
