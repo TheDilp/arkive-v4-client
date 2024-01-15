@@ -12,8 +12,10 @@ import {
   UpdateRandomTableSchema,
   UpdateRandomTableType,
 } from "../../../validation/random_tables";
+import { FolderSelect } from "../../Complex";
 import { Button, Checkbox, Input, Textarea } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data?: {
@@ -82,7 +84,7 @@ export function RandomTableDrawer({ data }: Props) {
   const [selectTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
-  const { data: existingRandomTable } = useGetEntity<RandomTableType>(
+  const { data: existingRandomTable, isInitialLoading } = useGetEntity<RandomTableType>(
     data?.id,
     "random_tables",
     {
@@ -112,6 +114,8 @@ export function RandomTableDrawer({ data }: Props) {
     }
   }, [existingRandomTable]);
 
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectTab} tabs={tabs} />
@@ -134,6 +138,7 @@ export function RandomTableDrawer({ data }: Props) {
               value={randomTable?.description || ""}
             />
           </div>
+          <FolderSelect handleChange={handleChange} parent_id={randomTable?.parent_id ?? null} type="random_tables" />
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox name="is_public" onChange={handleChange} value={randomTable?.is_public ?? false} />

@@ -80,6 +80,6 @@ export type SearchableMentionEntities =
   | "nodes"
   | "words";
 
-export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars";
+export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars" | "random_tables";
 
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;
