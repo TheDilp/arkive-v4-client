@@ -27,20 +27,28 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
   const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType, project_id as string);
   const { mutate: deleteAsset } = useDeleteAsset(project_id as string, data.asset_type);
   const createNotification = useNotifications();
+
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
         Are you sure you want to {action === "delete" ? <span className="text-red-600">PERMANENTLY</span> : ""} {action} this{" "}
-        {getSingularEntityType(data?.entity_title) || "entity"} -{" "}
+        {getSingularEntityType(data?.entity_title) || "entity"} {data?.is_folder ? "folder" : ""} - &quot;
         {data?.entity_title === "characters"
           ? getCharacterFullName(data?.first_name || "", data?.last_name || "")
           : data?.title}
-        ?
+        &quot; ?
         {data?.entity_title === "blueprints" ? (
           <p className="text-center text-red-600">Deleting a blueprint will also delete all of its fields and instances.</p>
         ) : null}
+        {data?.is_folder ? (
+          <p className="text-center text-red-500">
+            <span className="text-red-600">WARNING: </span>
+            Deleting a folder will also delete all of its children!
+          </p>
+        ) : null}
         <p className="text-center text-sm text-red-400">This action cannot be undone.</p>
       </div>
+
       <div className="mx-auto my-2 flex items-center gap-x-4">
         {data?.image && data?.project_id ? (
           <>
@@ -56,7 +64,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
         ) : null}
       </div>
 
-      <div className="mt-auto flex gap-x-8">
+      <div className="mt-auto flex gap-x-2">
         <Button icon={IconEnum.close} label="Cancel" onClick={resetDialogAtom} />
         <Button
           icon={action === "archive" ? IconEnum.archive : IconEnum.trash}
