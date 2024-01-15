@@ -149,13 +149,23 @@ function columns(
             title: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
             icon: IconEnum.edit,
             onClick: () => {
-              setDrawer((prev) => ({
-                ...prev,
-                data: row.original,
-                title: `Edit ${entityName} - ${row.original.title}`,
-                size: "lg",
-                type: entityType,
-              }));
+              setDrawer((prev) =>
+                row.original.is_folder
+                  ? {
+                      ...prev,
+                      data: { id: row.original.id, type: entityType as AvailableEntityType },
+                      title: "test",
+                      size: "sm",
+                      type: "folder",
+                    }
+                  : {
+                      ...prev,
+                      data: row.original,
+                      title: `Edit ${entityName} - ${row.original.title}`,
+                      size: "lg",
+                      type: entityType,
+                    },
+              );
             },
           },
         ];
