@@ -962,7 +962,12 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   // console.log(relationTypeArray);
 
   return (
-    <div className="flex max-h-[calc(100vh-10rem)] min-h-[calc(100vh-10rem)] flex-col gap-y-2 overflow-y-auto lg:max-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]">
+    <div
+      className={`flex flex-col gap-y-2 overflow-y-auto ${
+        isPreview
+          ? "max-h-[calc(100vh-20rem)] min-h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-10rem)] lg:min-h-[calc(100vh-10rem)]"
+          : "max-h-[calc(100vh-10rem)] min-h-[calc(100vh-10rem)] lg:max-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]"
+      }`}>
       {isPreview ? null : (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
