@@ -11,6 +11,7 @@ import {
   UpdateDictionarySchema,
   UpdateDictionaryType,
 } from "../../../validation";
+import { FolderSelect } from "../../Complex";
 import { Button, Checkbox, Input } from "../../Form";
 import { IconPicker } from "../IconPicker";
 
@@ -65,6 +66,8 @@ export function DictionaryDrawer({ data }: Props) {
           <IconPicker icon={dictionary?.icon || ""} name="icon" onChange={handleChange} />
         </span>
       </div>
+
+      <FolderSelect handleChange={handleChange} parent_id={dictionary?.parent_id ?? null} type="dictionaries" />
 
       <div className="flex w-full items-center justify-between">
         <span>Is public:</span>
