@@ -174,6 +174,7 @@ export function Search({
   imageType,
   isOptionsHidden,
   isMultiple,
+  isFolders,
   limit,
   offset: offsetProp,
   hasNoBackground,
@@ -226,6 +227,7 @@ export function Search({
       enabled: false,
       queryKeyConcat: [searchTerm, name],
       isPublic,
+      isFolders,
     },
   );
 

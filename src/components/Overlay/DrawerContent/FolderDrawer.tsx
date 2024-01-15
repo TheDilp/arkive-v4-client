@@ -13,14 +13,22 @@ type Props = {
     type: AvailableEntityType;
   };
 };
-type ExistingFolderType = { id?: string; project_id: string; is_folder: boolean; title: string; tags?: TagType[] };
+type ExistingFolderType = {
+  id?: string;
+  project_id: string;
+  parent_id: string | undefined;
+  is_folder: boolean;
+  title: string;
+  tags?: TagType[];
+};
 
 export function FolderDrawer({ data }: Props) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const [folder, setFolder] = useState<ExistingFolderType>({
     title: "",
     project_id: project_id as string,
     is_folder: true,
+    parent_id: item_id,
     tags: [],
   });
 
@@ -50,36 +58,47 @@ export function FolderDrawer({ data }: Props) {
 
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { changedData, handleChange } = useHandleChange({ data: folder, setData: setFolder });
+
+  async function handleSave() {
+    if (changedData) {
+      if (data?.id) {
+        await updateFolder(
+          data.type === "random_tables"
+            ? { data: { id: data.id, title: folder.title } }
+            : {
+                data: { id: data.id, title: folder.title },
+                relations: { tags: folder.tags || [] },
+              },
+          {
+            onSuccess: resetDrawerAtom,
+          },
+        );
+      } else {
+        const { tags, ...rest } = folder;
+        await createFolder(data.type === "random_tables" ? { data: rest } : { data: rest, relations: { tags } }, {
+          onSuccess: resetDrawerAtom,
+        });
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-y-2">
-      <Input label="Title (required)" name="title" onChange={handleChange} value={folder.title} />
+      <Input
+        label="Title (required)"
+        name="title"
+        onChange={handleChange}
+        onKeyDown={async (e) => {
+          if (e.key === "Enter") await handleSave();
+        }}
+        value={folder.title}
+      />
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
         isDisabled={!folder.title || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={data?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (changedData) {
-            if (data?.id) {
-              await updateFolder(
-                data.type === "random_tables"
-                  ? { data: { id: data.id, title: folder.title } }
-                  : {
-                      data: { id: data.id, title: folder.title },
-                      relations: { tags: folder.tags || [] },
-                    },
-                {
-                  onSuccess: resetDrawerAtom,
-                },
-              );
-            } else {
-              const { tags, ...rest } = folder;
-              await createFolder(data.type === "random_tables" ? { data: rest } : { data: rest, relations: { tags } }, {
-                onSuccess: resetDrawerAtom,
-              });
-            }
-          }
-        }}
+        onClick={handleSave}
         variant="success"
       />
     </div>

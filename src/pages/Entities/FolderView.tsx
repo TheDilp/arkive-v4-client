@@ -3,7 +3,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
-import { Link, NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { Link, NavigateFunction, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
   Alert,
@@ -327,9 +327,11 @@ function EntityItem({
 
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
+  const { pathname } = useLocation();
   const breakpoints = useBreakpoint();
   const user = useAtomValue(userAtom);
   const entityName = getSingularEntityType(type as AvailableEntityType);
+  const isFolder = pathname.includes("/folder/");
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
   const navigate = useNavigate();
@@ -355,8 +357,8 @@ export function FolderView() {
             id: "parent",
             header_name: "Parent",
             field: "parent_id",
-            operator: "is",
-            value: null,
+            operator: isFolder ? "eq" : "is",
+            value: isFolder ? (item_id as string) : null,
           },
         ],
       },
@@ -378,7 +380,7 @@ export function FolderView() {
     },
     type as AvailableEntityType,
     {
-      enabled: !item_id && !!type && !noFetchTypes.includes(type),
+      enabled: (!item_id || isFolder) && !!type && !noFetchTypes.includes(type),
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -402,7 +404,7 @@ export function FolderView() {
       },
     },
     {
-      enabled: !!item_id && !!type && !noFetchTypes.includes(type),
+      enabled: !!item_id && !!type && !noFetchTypes.includes(type) && !isFolder,
       staleTime: 5 * 60 * 1000,
       queryKeyConcat: [item_id as string],
     },
@@ -444,7 +446,7 @@ export function FolderView() {
       <div className="flex h-12 max-h-[3rem] min-h-[3rem] flex-col items-center justify-center">
         <div className="flex w-full items-start justify-between">
           <Breadcrumbs />
-          {!item_id || data?.data?.is_folder ? (
+          {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
               {type === "documents" ? (
                 <div className="w-10">
@@ -480,7 +482,7 @@ export function FolderView() {
                   value={view}
                 />
               </div>
-              <div className="lg:w-52">
+              <div className="w-fit lg:w-52">
                 <Dropdown
                   allowedPlacements={["bottom-end"]}
                   items={[
@@ -513,7 +515,7 @@ export function FolderView() {
                       },
                     },
                   ]}>
-                  <div className="lg:w-52">
+                  <div className="w-fit lg:w-52">
                     <Button
                       icon={IconEnum.add}
                       label={`Create new ${entityName}`}
@@ -524,8 +526,8 @@ export function FolderView() {
                 </Dropdown>
               </div>
 
-              {(item_id || data?.data?.is_folder) && !isFetching ? (
-                <div className="w-52 max-w-[208px]">
+              {isFolder ? (
+                <div className="w-fit max-w-[208px] lg:w-52">
                   <Button
                     icon={IconEnum.edit}
                     label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}

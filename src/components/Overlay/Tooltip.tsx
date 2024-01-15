@@ -24,17 +24,21 @@ import { tv } from "tailwind-variants";
 import { DefaultTooltipType, TooltipType, Variant } from "../../types";
 
 const defaultTooltipClasses = tv({
-  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow max-w-[200px]",
+  base: "z-50 select-none rounded border-none border-transparent p-1 text-sm text-white shadow ",
   variants: {
     variant: {
       primary: "bg-black",
       secondary: "bg-zinc-700",
     },
+    inline: {
+      true: "max-w-fit min-w-fit",
+      false: "max-w-[200px]",
+    },
   },
 });
 
-function DefaultTooltip({ children, variant }: DefaultTooltipType) {
-  const classes = defaultTooltipClasses({ variant });
+function DefaultTooltip({ children, variant, isInline }: DefaultTooltipType) {
+  const classes = defaultTooltipClasses({ variant, isInline });
   return <div className={classes}>{children}</div>;
 }
 
@@ -57,6 +61,7 @@ export function Tooltip({
   isIgnoringHover,
   arrowColor,
   passCloseTooltip,
+  isInline,
   variant = "primary",
 }: TooltipType) {
   const [open, setOpen] = useState(false);
@@ -119,7 +124,9 @@ export function Tooltip({
               style: { ...floatingStyles, zIndex: 9999 },
             })}>
             {typeof content === "string" ? (
-              <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
+              <DefaultTooltip isInline={isInline} variant={variant}>
+                {content}
+              </DefaultTooltip>
             ) : (
               cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
             )}

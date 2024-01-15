@@ -18,6 +18,7 @@ export interface TooltipType {
   isPortal?: boolean;
   closeOnClick?: boolean;
   passCloseTooltip?: boolean;
+  isInline?: boolean;
   customOffset?: { mainAxis?: number; crossAxis?: number };
   variant?: Variant;
 }
@@ -25,4 +26,5 @@ export interface TooltipType {
 export type DefaultTooltipType = {
   children: ReactElement | string | null;
   variant?: Variant;
+  isInline?: boolean;
 };
