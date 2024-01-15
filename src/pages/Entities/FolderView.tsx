@@ -414,11 +414,12 @@ export function FolderView() {
       },
     },
     {
-      enabled: !!item_id && !!type && !noFetchTypes.includes(type) && !isFolder,
+      enabled: !!item_id && !!type && !noFetchTypes.includes(type) && isFolder,
       staleTime: 5 * 60 * 1000,
       queryKeyConcat: [item_id as string],
     },
   );
+
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -565,7 +566,7 @@ export function FolderView() {
       </div>
       {!isFetching && view === "folders" ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
-          {(base?.data?.length && !item_id ? base.data : []).map((item) => (
+          {(base?.data?.length && (!item_id || isFolder) ? base.data : []).map((item) => (
             <EntityItem
               key={item.id}
               changeParent={changeParent}
@@ -625,7 +626,7 @@ export function FolderView() {
               type={type as AvailableEntityType}
             />
           ))}
-          {(data?.data?.children?.length && data?.data?.is_folder ? data.data.children : []).map((item) => {
+          {(data?.data?.children?.length && isFolder ? data.data.children : []).map((item) => {
             return (
               <EntityItem
                 key={item.id}
@@ -753,7 +754,7 @@ export function FolderView() {
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
             }}
-            data={base?.data || data?.data?.children || []}
+            data={(item_id ? data?.data?.children : base?.data) || []}
             dispatch={dispatch}
             isLoading={isInitialLoading || isInitialLoadingFolder}
             type={type as AvailableEntityType}
