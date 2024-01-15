@@ -8,6 +8,7 @@ import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, Mon
 import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
+import { FolderSelect } from "../../Complex";
 import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Icon, Skeleton } from "../../Misc";
@@ -386,7 +387,7 @@ export function CalendarDrawer({ data }: Props) {
     data?.id,
     "calendars",
     {
-      fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public"],
+      fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public", "parent_id"],
       relations: { months: true, leap_days: true, tags: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
@@ -472,7 +473,8 @@ export function CalendarDrawer({ data }: Props) {
             />
           </div>
 
-          <div className="flex w-full items-center justify-between">
+          <FolderSelect handleChange={handleChange} parent_id={calendar?.parent_id ?? null} type="calendars" />
+          <div className="my-2 flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox name="is_public" onChange={handleChange} value={calendar?.is_public ?? false} />
           </div>
