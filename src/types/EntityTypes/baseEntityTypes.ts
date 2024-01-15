@@ -65,6 +65,7 @@ export type SearchableEntities =
   | "images"
   | "calendars"
   | "map_images"
+  | "dictionaries"
   | "words"
   | "tags"
   | "places";
@@ -78,5 +79,7 @@ export type SearchableMentionEntities =
   | "graphs"
   | "nodes"
   | "words";
+
+export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars";
 
 export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;

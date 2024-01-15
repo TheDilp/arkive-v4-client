@@ -7,14 +7,12 @@ import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from 
 import { DocumentType, InsertDocumentType, UpdateDocumentType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
-import { ImageSelect } from "../../Complex";
-import { EntityPreview } from "../../DataDisplay";
-import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
+import { FolderSelect, ImageSelect } from "../../Complex";
+import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
-import { Badge, Icon, Skeleton } from "../../Misc";
+import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
-import { Tooltip } from "../Tooltip";
 
 function isSaveDisabled(document: Partial<DocumentType>) {
   if (!document.title) return true;
@@ -56,19 +54,6 @@ export function DocumentDrawer({ data }: Props) {
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
     existingDocument?.data || { project_id: project_id as string },
-  );
-  const { data: parentData } = useGetEntity<DocumentType>(
-    document?.parent_id as string,
-    "documents",
-    {
-      data: {},
-      relations: { parents: true },
-      fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public"],
-    },
-    {
-      enabled: !!document?.parent_id,
-      queryKeyConcat: [document?.parent_id as string],
-    },
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
@@ -144,31 +129,7 @@ export function DocumentDrawer({ data }: Props) {
             placeholder="Press enter to add an alternative name"
             value={alterNameInput}
           />
-          <div className="flex flex-nowrap items-center gap-x-2">
-            {!!parentData?.data?.parents?.length && document?.parent_id ? (
-              <div className="flex-1">
-                <EntityPreview
-                  clearAction={() => handleChange({ name: "parent_id", value: null })}
-                  icon={IconEnum.folder}
-                  id="parent"
-                  label="Folder"
-                  title={parentData?.data?.parents?.at(-1)?.title || ""}
-                  type="documents"
-                />
-              </div>
-            ) : (
-              <Search isFolders label="Folder" name="parent_id" onChange={handleChange} searchEntity="documents" />
-            )}
-
-            <Tooltip
-              allowedPlacements={["left"]}
-              content={`root/${parentData?.data?.parents?.map((p) => p.title).join("/") || ""}`}
-              isInline>
-              <div className="mb-1.5 h-6 w-6 self-end">
-                <Icon fontSize={24} icon={IconEnum.info_circle} />
-              </div>
-            </Tooltip>
-          </div>
+          <FolderSelect handleChange={handleChange} parent_id={document?.parent_id ?? null} type="documents" />
 
           <div className="flex flex-wrap gap-2">
             {document?.alter_names?.length

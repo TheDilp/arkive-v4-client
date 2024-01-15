@@ -7,7 +7,7 @@ import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from 
 import { MapType } from "../../../types";
 import { drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
-import { ImageSelect } from "../../Complex";
+import { FolderSelect, ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Tabs } from "../../Layout";
@@ -57,7 +57,6 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
   }, [existingMap]);
 
   if (isFetching) return <Skeleton type="drawer_form" />;
-
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, indx) => setSelectedTab(indx)} selectedTab={selectedTab} tabs={tabs} />
@@ -72,6 +71,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             type="map_images"
             value={map?.image_id}
           />
+          <FolderSelect handleChange={handleChange} parent_id={map?.parent_id ?? null} type="maps" />
           <div className="flex flex-nowrap justify-between">
             <span>Cluster pins:</span>
             <Checkbox name="cluster_pins" onChange={handleChange} value={map?.cluster_pins ?? false} />
