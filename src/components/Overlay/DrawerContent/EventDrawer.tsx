@@ -283,7 +283,7 @@ export function EventDrawer({ data }: Props) {
           </div>
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
-            <Checkbox name="is_public" onChange={handleChange} value={event?.is_public ?? false} />
+            <Checkbox isDisabled={!!data} name="is_public" onChange={handleChange} value={event?.is_public ?? false} />
           </div>
         </>
       ) : null}

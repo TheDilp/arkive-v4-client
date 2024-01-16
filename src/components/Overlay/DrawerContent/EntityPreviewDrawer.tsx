@@ -104,8 +104,10 @@ export function EventPreviewDrawer({ id }: { id?: string }) {
 }
 
 export function EntityPreviewDrawer({
+  isPublic,
   data,
 }: {
+  isPublic?: boolean;
   data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType };
 }) {
   const { project_id } = useParams();
@@ -123,14 +125,16 @@ export function EntityPreviewDrawer({
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} /> : null}
       </div>
-      <div className="">
-        <Button
-          icon={IconEnum.edit}
-          label={`Edit ${getSingularEntityType(data.entity_type).toLowerCase()}`}
-          onClick={() => navigate(getEntityLink(project_id as string, data.entity_type, data.id, data.parent_id))}
-          variant="info"
-        />
-      </div>
+      {isPublic ? null : (
+        <div className="">
+          <Button
+            icon={IconEnum.edit}
+            label={`Edit ${getSingularEntityType(data.entity_type).toLowerCase()}`}
+            onClick={() => navigate(getEntityLink(project_id as string, data.entity_type, data.id, data.parent_id))}
+            variant="info"
+          />
+        </div>
+      )}
     </DrawerLayout>
   );
 }

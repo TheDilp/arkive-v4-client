@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
+import { Alert, Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
@@ -48,7 +48,7 @@ export function DayNumber({
   );
 }
 
-export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean }) {
+export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
@@ -64,9 +64,11 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
       relations: { months: true },
     },
     {
+      enabled: !data,
       isPublic,
     },
   );
+  const calendar = data ?? existingCalendar?.data;
   const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
@@ -119,9 +121,10 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
     },
     "events",
     {
-      enabled: !!existingCalendar?.data && !!(item_id || id),
+      enabled: !!calendar && !!(item_id || id),
       queryKeyOverwrite: queryKey,
       staleTime: 5 * 60 * 1000,
+      isPublic,
     },
   );
   const { data: subitemEvent } = useGetSubEntity<EventType>(
@@ -151,7 +154,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
     },
     { enabled: !!subitem_id, isPublic },
   );
-  useChangeNavbarTitle(`Calendars | ${existingCalendar?.data?.title}`, !!existingCalendar?.data);
+  useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
     setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
@@ -164,19 +167,18 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
     }
   }, [subitem_id, subitemEvent]);
 
-  const monthDays =
-    typeof existingCalendar?.data?.months?.[date.month]?.days === "number" ? existingCalendar.data.months[date.month].days : 0;
-  if (!existingCalendar?.data) return null;
+  const monthDays = typeof calendar?.months?.[date.month]?.days === "number" ? calendar.months[date.month].days : 0;
+  if (!calendar) return null;
   const startingDayForMonth = getStartingDayForMonth(
-    existingCalendar?.data?.months,
+    calendar?.months,
     date?.year,
     date?.month,
-    existingCalendar?.data?.days?.length,
-    existingCalendar?.data?.starts_on_day || 0,
+    calendar?.days?.length,
+    calendar?.starts_on_day || 0,
   );
 
   if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
-
+  if (!calendar) return <Alert label="Calendar not found." variant="error" />;
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
@@ -187,15 +189,15 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                 label="Month"
                 name="number"
                 onChange={({ value }) => {
-                  const idx = existingCalendar.data.months.findIndex((m) => m.id === value);
+                  const idx = calendar.months.findIndex((m) => m.id === value);
                   if (idx > -1) {
                     setDate((prev) => ({ ...prev, month: idx }));
                   }
                   //   ls.set("characters_view", value);
                 }}
-                options={existingCalendar?.data?.months?.map((month) => ({ value: month.id, label: month.title }))}
+                options={calendar?.months?.map((month) => ({ value: month.id, label: month.title }))}
                 placeholder="Month"
-                value={existingCalendar?.data?.months?.[date.month]?.id}
+                value={calendar?.months?.[date.month]?.id}
               />
             </div>
             <div className="w-32">
@@ -231,7 +233,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
             value={view}
           />
         </div>
-        {id ? null : (
+        {id || isPublic ? null : (
           <div className="w-fit self-end">
             <Button
               icon={IconEnum.add}
@@ -255,9 +257,9 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
           // check for id -> used as a preview in drawer
           className={`grid overflow-auto border border-zinc-700 ${id ? "bg-zinc-900" : ""}`}
           style={{
-            gridTemplateColumns: `repeat(${existingCalendar?.data?.days?.length || 0}, minmax(9rem, 1fr))`,
+            gridTemplateColumns: `repeat(${calendar?.days?.length || 0}, minmax(9rem, 1fr))`,
           }}>
-          {existingCalendar?.data?.days?.map((day) => (
+          {calendar?.days?.map((day) => (
             <div
               key={day}
               className="group sticky top-0 col-span-1 h-min border-b border-r border-zinc-700 bg-black px-2 text-white"
@@ -267,11 +269,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
               {day}
             </div>
           ))}
-          {[
-            ...Array(
-              existingCalendar?.data?.days?.length ? Math.abs(startingDayForMonth % existingCalendar.data.days.length) : 1,
-            ).keys(),
-          ]
+          {[...Array(calendar?.days?.length ? Math.abs(startingDayForMonth % calendar.days.length) : 1).keys()]
             .reverse()
             .map((day) => (
               <div
@@ -282,9 +280,9 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                 tabIndex={-1}>
                 <DayNumber
                   key={day}
-                  dayNumber={getFillerDayNumber(existingCalendar?.data?.months, date.month, day)}
+                  dayNumber={getFillerDayNumber(calendar?.months, date.month, day)}
                   isFiller
-                  //   isReadOnly={isReadOnly}
+                  isReadOnly={isPublic}
                   monthNumber={date.month}
                   year={date.year}
                 />
@@ -292,7 +290,7 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
             ))}
           {[...Array(monthDays).keys()].map((day) => (
             <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
-              <DayNumber key={day} dayNumber={day} monthNumber={date.month} year={date.year} />
+              <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
               <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
                 {(isLoading ? [] : events?.data || [])
                   ?.filter(
@@ -311,7 +309,13 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                         className="cursor-pointer"
                         onClick={() =>
                           id || isPublic
-                            ? {}
+                            ? setDrawer((prev) => ({
+                                ...prev,
+                                title: "Preview event",
+                                type: "entity_preview",
+                                data: { id: event.id, entity_type: "events" },
+                                size: "lg",
+                              }))
                             : setDrawer((prev) => ({
                                 ...prev,
                                 title: "Edit event",
@@ -349,9 +353,8 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
           ))}
           {[
             ...Array(
-              existingCalendar?.data?.days?.length
-                ? existingCalendar.data.days.length -
-                    ((startingDayForMonth + Number(monthDays)) % existingCalendar.data.days.length)
+              calendar?.days?.length
+                ? calendar.days.length - ((startingDayForMonth + Number(monthDays)) % calendar.days.length)
                 : 0,
             ).keys(),
           ]
@@ -363,19 +366,12 @@ export function CalendarView({ id, isPublic }: { id?: string; isPublic?: boolean
                 onKeyDown={() => {}}
                 role="button"
                 tabIndex={-1}>
-                <DayNumber
-                  key={day}
-                  dayNumber={idx}
-                  isFiller
-                  //   isReadOnly={isReadOnly}
-                  monthNumber={date.month}
-                  year={date.year}
-                />
+                <DayNumber key={day} dayNumber={idx} isFiller isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
               </div>
             ))}
         </div>
       ) : (
-        <TimelineView events={events?.data || []} month_count={existingCalendar?.data?.months.length || 0} />
+        <TimelineView events={events?.data || []} month_count={calendar?.months.length || 0} />
       )}
     </div>
   );

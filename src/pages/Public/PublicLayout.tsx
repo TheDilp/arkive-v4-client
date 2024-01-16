@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 
-import { Dialog } from "../../components";
+import { Dialog, Drawer } from "../../components";
 import { PublicNavbar } from "./PublicNavbar";
 
 export function PublicLayout() {
@@ -10,6 +10,7 @@ export function PublicLayout() {
       <Dialog />
       <div className="mx-auto flex max-h-full w-full flex-1 flex-col lg:max-w-5xl">
         <PublicNavbar />
+        <Drawer isPublic />
         <div className="flex-1 overflow-auto rounded border border-zinc-700 p-4">
           <Outlet />
         </div>
