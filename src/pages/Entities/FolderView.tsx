@@ -72,6 +72,11 @@ const noFetchTypes = [
   "assets",
 ];
 
+const documentTypes = [
+  { label: "Documents", value: "documents" },
+  { label: "Templates", value: "templates" },
+];
+
 type EntityItemType = {
   id: string;
   is_folder: boolean | null;
@@ -346,7 +351,7 @@ export function FolderView() {
   const [{ selection }, dispatch] = useTable({ selection: [] });
   const navigate = useNavigate();
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
-
+  const [documentType, setDocumentType] = useState<"documents" | "templates">("documents");
   const {
     data: base,
     isFetching,
@@ -370,7 +375,37 @@ export function FolderView() {
             operator: isFolder ? "eq" : "is",
             value: isFolder ? (item_id as string) : null,
           },
+          ...(documentType === "templates" && type === "documents"
+            ? [
+                {
+                  id: "template",
+                  header_name: "Template",
+                  field: "is_template",
+                  operator: "eq" as const,
+                  value: true,
+                },
+              ]
+            : []),
         ],
+        or:
+          documentType !== "templates" && type === "documents"
+            ? [
+                {
+                  id: "template",
+                  header_name: "Template",
+                  field: "is_template",
+                  operator: "is",
+                  value: null,
+                },
+                {
+                  id: "template",
+                  header_name: "Template",
+                  field: "is_template",
+                  operator: "eq" as const,
+                  value: false,
+                },
+              ]
+            : [],
       },
       relations: {
         tags: EntitiesWithTags.includes(type as string),
@@ -459,22 +494,32 @@ export function FolderView() {
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
               {type === "documents" ? (
-                <div className="w-10">
-                  <Button
-                    icon={IconEnum.graph}
-                    isIconOnly
-                    onClick={() =>
-                      setDrawer((prev) => ({
-                        ...prev,
-                        size: "half",
-                        type: "mentioned_in",
-                        title: "All document mentions",
-                        data: { id: "", title: "", icon: "", isAll: true },
-                      }))
-                    }
-                    tooltip="View all document connections"
-                  />
-                </div>
+                <>
+                  <div className="w-10">
+                    <Button
+                      icon={IconEnum.graph}
+                      isIconOnly
+                      onClick={() =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          size: "half",
+                          type: "mentioned_in",
+                          title: "All document mentions",
+                          data: { id: "", title: "", icon: "", isAll: true },
+                        }))
+                      }
+                      tooltip="View all document connections"
+                    />
+                  </div>
+                  <div className="w-32">
+                    <Select
+                      name="documentType"
+                      onChange={({ value }) => setDocumentType(value as "documents" | "templates")}
+                      options={documentTypes}
+                      value={documentType}
+                    />
+                  </div>
+                </>
               ) : null}
 
               <div className="w-32">
