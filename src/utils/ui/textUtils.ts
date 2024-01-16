@@ -7,8 +7,9 @@ export function getFirstLetters(sentence: string): string {
     .map((word) => word.charAt(0))
     .join("");
 }
-export function getAvatarInitials(first_name: string, last_name?: string): string {
-  return `${first_name.charAt(0)}${last_name ? last_name.charAt(0) : ""}`;
+export function getAvatarInitials(full_name: string): string {
+  const names = full_name.split(" ");
+  return `${names.at(0)?.charAt(0)}${names.at(1) ? names.at(1)?.charAt(0) : ""}`;
 }
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
