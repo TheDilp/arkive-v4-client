@@ -320,9 +320,9 @@ function AdditionalFieldDisplay({
       ) : null}
       {blueprint_field.field_type === "random_table" ? (
         <RandomTableField
-          random_table_id={blueprint_field_data.random_table.related_id}
-          random_table_option_id={blueprint_field_data.random_table.option_id as string | undefined}
-          suboptionValue={blueprint_field_data.random_table.suboption_id}
+          random_table_id={blueprint_field_data?.random_table?.related_id}
+          random_table_option_id={blueprint_field_data?.random_table?.option_id as string | undefined}
+          suboptionValue={blueprint_field_data?.random_table?.suboption_id}
           title={blueprint_field.title}
         />
       ) : null}

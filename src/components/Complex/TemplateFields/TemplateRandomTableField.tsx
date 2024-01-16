@@ -25,6 +25,7 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
           <Select
             hasSearch
             isClearable
+            isReadOnly
             name={`${name}`}
             onChange={({ value }) => {
               handleChange([
