@@ -43,6 +43,26 @@ import {
   userAtom,
 } from "../../utils";
 
+const columnHelper = createColumnHelper<BlueprintInstanceType>();
+const centeredColumns = [
+  "images_single",
+  "characters_single",
+  "locations_single",
+  "documents_single",
+  "blueprints_single",
+  "events_single",
+  "boolean",
+];
+const noLinkColumns = [
+  "images_single",
+  "images_multiple",
+  "locations_single",
+  "locations_multiple",
+  "events_single",
+  "events_multiple",
+  "dice_roll",
+];
+
 function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
   return (
     <div className="flex max-w-full items-center gap-x-2">
@@ -62,13 +82,12 @@ function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
     </div>
   );
 }
-const columnHelper = createColumnHelper<BlueprintInstanceType>();
 
 function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
   const { project_id } = useParams();
 
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="flex w-full items-center gap-x-2">
       <div className="z-0 flex w-full items-center justify-center -space-x-4">
         {characters?.slice(0, 5)?.map((char) => (
           <Avatar
@@ -340,16 +359,8 @@ function createColumns(
             return "";
           },
           meta: {
-            centered: field.field_type === "images_single" || field.field_type === "boolean",
-            noLink: [
-              "images_single",
-              "images_multiple",
-              "locations_single",
-              "locations_multiple",
-              "events_single",
-              "events_multiple",
-              "dice_roll",
-            ].includes(field.field_type),
+            centered: centeredColumns.includes(field.field_type),
+            noLink: noLinkColumns.includes(field.field_type),
             filterOptions: CharacterBlueprintRelationFilter(
               field.field_type,
               field.field_type === "select" || field.field_type === "select_multiple"
