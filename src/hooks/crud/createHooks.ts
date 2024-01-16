@@ -67,7 +67,7 @@ export function useCreateEntity<
   return useMutation(
     async (newItemValues: InsertType) =>
       FetchFunction({
-        url: isTemplate ? `${baseURLS.baseServer}/createfromtemplate` : `${baseURLS.baseServer}/${type}/create`,
+        url: `${baseURLS.baseServer}/${type}/create${isTemplate ? "/template" : ""}`,
         body: JSON.stringify(newItemValues),
         method: "POST",
       }),
@@ -363,6 +363,42 @@ export function useCreateWebhook() {
 
           createNotification({
             title: data?.message || getEntityCRUDNotification("webhooks", "create"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+            position: "top-right",
+          });
+        }
+      },
+      onError: (error: { message?: string }) => {
+        createNotification({
+          title: error?.message || "There was an error creating this entity.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+          position: "top-right",
+        });
+      },
+    },
+  );
+}
+export function useCreateFromTemplate(project_id: string) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (vars: { id: string; titles?: string[]; count: number }) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/documents/create/from_template/${vars.id}`,
+        body: JSON.stringify({ data: { titles: vars.titles, count: vars.count } }),
+        method: "POST",
+      }),
+
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, "documents"]);
+          createNotification({
+            title: data?.message || getEntityCRUDNotification("documents", "create"),
             variant: "success",
             icon: IconEnum.check,
             timer: 2,

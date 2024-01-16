@@ -30,7 +30,7 @@ export const IconEnum = {
   discord: "ph:discord-logo",
   divider: "radix-icons:divider-horizontal",
   document: "ph:files-fill",
-  document_template: "fluent-mdl2:save-template",
+  document_template: "ph:file-dashed",
   download: "ph:download",
   drag: "ph:dots-six-vertical",
   d20: "game-icons:dice-twenty-faces-twenty",

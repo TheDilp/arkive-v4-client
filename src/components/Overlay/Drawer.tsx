@@ -20,6 +20,7 @@ import {
   ConversationDrawer,
   DictionaryDrawer,
   DocumentDrawer,
+  DocumentFromTemplate,
   EdgeDrawer,
   EditMessageDrawer,
   EditTags,
@@ -123,7 +124,8 @@ export function Drawer() {
             {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
             {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
             {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
-            {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} /> : null}
+            {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
+            {drawer.type === "from_template" ? <DocumentFromTemplate data={drawer?.data} /> : null}
             {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
             {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
             {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}

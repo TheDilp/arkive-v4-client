@@ -75,6 +75,7 @@ export type DrawerAtomType = {
         | "map_pin_types";
       data: { id?: string; project_id?: string };
     }
+  | { type: "from_template"; data: { id: string; title: string } }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
   | { type: "many_nodes" | "many_edges"; data: { ids: string[]; parent_id: string } }
   | { type: "random_table_options"; data: { parent_id: string } }

@@ -3,7 +3,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
-import { Link, NavigateFunction, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 import {
   Alert,
@@ -62,6 +62,11 @@ import { CharactersView } from "./CharactersView";
 import { TagView } from "./TagView";
 import { TemplatesView } from "./TemplatesView";
 
+function getEditActionTitle(is_document_template: boolean, is_folder: boolean, entityName: string) {
+  if (is_document_template) return "Edit document template";
+  return is_folder ? "Edit folder" : `Edit ${entityName}`;
+}
+
 const noFetchTypes = [
   "random_table_options",
   "blueprints",
@@ -92,7 +97,7 @@ function columns(
   entityName: string,
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
   project_id: string,
-  navigate: NavigateFunction,
+  is_document_template: boolean,
   webhooks: WebhookType[],
   show_image?: boolean,
 ) {
@@ -151,7 +156,7 @@ function columns(
         }[] = [
           {
             id: "1",
-            title: row.original.is_folder ? "Edit folder" : `Edit ${entityName}`,
+            title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
             icon: IconEnum.edit,
             onClick: () => {
               setDrawer((prev) =>
@@ -174,8 +179,7 @@ function columns(
             },
           },
         ];
-
-        if (entityType === "documents") {
+        if (entityType === "documents" && !is_document_template) {
           actions.push({
             id: "mentioned_in",
             title: "Mentioned in",
@@ -191,7 +195,7 @@ function columns(
             },
           });
         }
-        if (PublicEntities.includes(entityType)) {
+        if (PublicEntities.includes(entityType) && !is_document_template) {
           actions.push(
             {
               id: "view_public",
@@ -220,11 +224,27 @@ function columns(
             },
           );
         }
+        if (is_document_template) {
+          actions.push({
+            id: "create_from_template",
+            title: "Create document from template",
+            icon: IconEnum.document_template,
+            onClick: () =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: { id: row.original.id, title: row.original.title },
+                type: "from_template",
+                size: "lg",
+                title: "Create from template",
+              })),
+          });
+        }
         if (entityType === "dictionaries") {
           actions.push({
             id: "download_dictionary",
             title: "Download PDF dictionary",
             icon: IconEnum.pdf,
+            isDisabled: true,
             // onClick: () => savePDF(row.original.title, row.original.id),
           });
         }
@@ -349,9 +369,8 @@ export function FolderView() {
   const isFolder = pathname.includes("/folder/");
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection }, dispatch] = useTable({ selection: [] });
-  const navigate = useNavigate();
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
-  const [documentType, setDocumentType] = useState<"documents" | "templates">("documents");
+  const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
   const {
     data: base,
     isFetching,
@@ -455,7 +474,6 @@ export function FolderView() {
   );
 
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
-
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -514,7 +532,10 @@ export function FolderView() {
                   <div className="w-32">
                     <Select
                       name="documentType"
-                      onChange={({ value }) => setDocumentType(value as "documents" | "templates")}
+                      onChange={({ value }) => {
+                        setDocumentType(value as "documents" | "templates");
+                        ls.set("documentType", value);
+                      }}
                       options={documentTypes}
                       value={documentType}
                     />
@@ -569,6 +590,27 @@ export function FolderView() {
                         }));
                       },
                     },
+                    ...(type === "documents"
+                      ? [
+                          {
+                            id: "3",
+                            title: "Create new template",
+                            icon: IconEnum.document_template,
+                            onClick: () => {
+                              setDrawer((prev) => ({
+                                ...prev,
+                                data: { project_id: project_id as string },
+                                title: "Create new template",
+                                type: "documents",
+                                exceptions: {
+                                  createTemplate: true,
+                                },
+                                size: "lg",
+                              }));
+                            },
+                          },
+                        ]
+                      : []),
                   ]}>
                   <div className="w-fit lg:w-52">
                     <Button
@@ -748,7 +790,7 @@ export function FolderView() {
               entityName,
               type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
               project_id as string,
-              navigate,
+              documentType === "templates" && type === "documents",
               user?.webhooks || [],
               show_image_table_view,
             )}

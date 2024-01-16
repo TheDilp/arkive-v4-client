@@ -9,6 +9,7 @@ export * from "./CharacterRelationshipTypeDrawer";
 export * from "./ConversationDrawer";
 export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
+export * from "./DocumentFromTemplate";
 export * from "./EdgeDrawer";
 export * from "./EditMessageDrawer";
 export * from "./EditTags";
