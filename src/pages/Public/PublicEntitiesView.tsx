@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 
-import { CalendarView, DictionaryView } from "../Entities";
+import { DictionaryView } from "../Entities";
 import { PublicDocument, PublicGraph, PublicMap } from ".";
+import { PublicCalendar } from "./PublicCalendar";
 
 export function PublicEntitiesView() {
   const { type } = useParams();
@@ -9,7 +10,7 @@ export function PublicEntitiesView() {
   if (type === "documents") return <PublicDocument />;
   if (type === "maps") return <PublicMap />;
   if (type === "graphs") return <PublicGraph />;
-  if (type === "calendars") return <CalendarView isPublic />;
+  if (type === "calendars") return <PublicCalendar />;
   if (type === "dictionaries") return <DictionaryView isPublic />;
-  return <div>PublicView</div>;
+  return null;
 }

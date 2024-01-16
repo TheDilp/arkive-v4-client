@@ -15,7 +15,7 @@ export function PublicCalendar() {
       data: {
         project_id,
       },
-      fields: ["title", "is_public"],
+      fields: ["title", "days", "is_public"],
       relations: {
         months: true,
       },
