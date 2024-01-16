@@ -96,8 +96,7 @@ export function removeColumnFilter(
 }
 
 export function getFilterBadgeLabelOperator(operator: TableColumnFilterType["operator"], isRelationFilter: boolean): string {
-  if (isRelationFilter) return "";
-  if (isRelationFilter) return "Doesn't have";
+  if (isRelationFilter && !Object.keys(FilterNamesEnum).includes(operator)) return "";
   return `${FilterNamesEnum[operator]}:`;
 }
 
