@@ -47,7 +47,7 @@ const CheckboxClasses = tv({
     },
     isDisabled: {
       true: {
-        checkbox: "bg-zinc-300 text-zinc-100 cursor-not-allowed",
+        checkbox: "bg-zinc-400 text-zinc-100 cursor-not-allowed",
       },
     },
     isReadOnly: {
