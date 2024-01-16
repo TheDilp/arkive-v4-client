@@ -586,3 +586,49 @@ export function useUpdateUser<InsertType extends { data: Pick<UserType, "feature
     },
   );
 }
+
+export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; is_public: boolean } }>(
+  type: AvailableEntityType,
+  project_id: string,
+) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/bulk/update/${type.toLowerCase()}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating these items.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}

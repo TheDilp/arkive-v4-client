@@ -26,6 +26,7 @@ import {
   useGetEntity,
   useTable,
   useUpdateEntity,
+  useUpdateManyPublic,
 } from "../../hooks";
 import {
   AvailableEntityType,
@@ -472,6 +473,7 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     },
   );
+  const { mutateAsync } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
 
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
   const setDrawer = useSetAtom(drawerAtom);
@@ -796,6 +798,38 @@ export function FolderView() {
             )}
             config={{
               selectedActions: [
+                ...(PublicEntities.includes(type as AvailableEntityType)
+                  ? [
+                      {
+                        icon: IconEnum.eye,
+                        hasNoBackground: true,
+                        isIconOnly: true,
+                        tooltip: "Set public",
+                        onClick: async () => {
+                          const ids = Object.values(selection || {}).flatMap((id) => id);
+                          const entitesNotFolders = (base?.data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
+                          if (entitesNotFolders.length) {
+                            await mutateAsync({ data: { ids, is_public: true } });
+                            dispatch({ type: "clearSelection" });
+                          }
+                        },
+                      },
+                      {
+                        icon: IconEnum.eye_slash,
+                        hasNoBackground: true,
+                        isIconOnly: true,
+                        tooltip: "Set private",
+                        onClick: async () => {
+                          const ids = Object.values(selection || {}).flatMap((id) => id);
+                          const entitesNotFolders = (base?.data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
+                          if (entitesNotFolders.length) {
+                            await mutateAsync({ data: { ids, is_public: false } });
+                            dispatch({ type: "clearSelection" });
+                          }
+                        },
+                      },
+                    ]
+                  : []),
                 {
                   icon: IconEnum.trash,
                   variant: "error",
