@@ -3,9 +3,17 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Alert, Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
-import { DefaultTagColor, drawerAtom, getFillerDayNumber, getImageURL, getStartingDayForMonth, IconEnum } from "../../utils";
+import {
+  contextMenuAtom,
+  DefaultTagColor,
+  drawerAtom,
+  getFillerDayNumber,
+  getImageURL,
+  getStartingDayForMonth,
+  IconEnum,
+} from "../../utils";
 import { TimelineView } from "./TimelineView";
 
 export function DayNumber({
@@ -51,6 +59,7 @@ export function DayNumber({
 export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
+  const setContextMenu = useSetAtom(contextMenuAtom);
   const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
   const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
@@ -154,6 +163,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     },
     { enabled: !!subitem_id, isPublic },
   );
+  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string);
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
@@ -324,6 +334,52 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                 size: "lg",
                               }))
                         }
+                        onContextMenu={(e: any) => {
+                          e.preventDefault();
+                          setContextMenu({
+                            event: e,
+                            items:
+                              id || isPublic
+                                ? [
+                                    {
+                                      id: "1",
+                                      title: "Preview event",
+                                      icon: IconEnum.eye,
+                                      onClick: () =>
+                                        setDrawer((prev) => ({
+                                          ...prev,
+                                          title: "Preview event",
+                                          type: "entity_preview",
+                                          data: { id: event.id, entity_type: "events" },
+                                          size: "lg",
+                                        })),
+                                    },
+                                  ]
+                                : [
+                                    {
+                                      id: "1",
+                                      title: "Edit event",
+                                      icon: IconEnum.add,
+                                      onClick: () =>
+                                        setDrawer((prev) => ({
+                                          ...prev,
+                                          title: "Edit event",
+                                          type: "events",
+                                          data: { id: event.id, month: date.month, year: date.year },
+                                          size: "lg",
+                                        })),
+                                    },
+                                    {
+                                      id: "2",
+                                      title: "Delete event",
+                                      icon: IconEnum.trash,
+                                      onClick: () => {
+                                        deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
+                                      },
+                                    },
+                                  ],
+                          });
+                        }}
                         onKeyDown={() => {}}
                         role="button"
                         tabIndex={-1}>
