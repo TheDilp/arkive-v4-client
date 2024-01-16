@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { DocumentType, InsertDocumentType, UpdateDocumentType } from "../../../types";
+import { DocumentType, DrawerAtomType, InsertDocumentType, UpdateDocumentType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
@@ -23,6 +23,7 @@ type Props = {
   data: {
     id?: string;
   };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 type documentRelationsType = {
@@ -34,7 +35,7 @@ const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Tags", icon: IconEnum.tags },
 ];
-export function DocumentDrawer({ data }: Props) {
+export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -59,7 +60,7 @@ export function DocumentDrawer({ data }: Props) {
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
     data: Partial<InsertDocumentType> & { project_id: string };
     relations?: documentRelationsType;
-  }>("documents");
+  }>("documents", exceptions?.createTemplate);
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: UpdateDocumentType;
@@ -103,6 +104,8 @@ export function DocumentDrawer({ data }: Props) {
             value={document?.image_id}
           />
           <Input
+            helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
+            isDisabled={exceptions?.createTemplate}
             label="Alternative names"
             name="alter_names"
             onChange={({ value }) => setAlterNameInput(value as string)}
@@ -126,7 +129,7 @@ export function DocumentDrawer({ data }: Props) {
                 }
               }
             }}
-            placeholder="Press enter to add an alternative name"
+            placeholder={exceptions?.createTemplate ? "" : "Press enter to add an alternative name"}
             value={alterNameInput}
           />
           <FolderSelect handleChange={handleChange} parent_id={document?.parent_id ?? null} type="documents" />
