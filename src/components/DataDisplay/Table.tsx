@@ -729,23 +729,25 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 }, 0)}
               </b>
               <span className="border-r border-zinc-500 pr-2">rows </span>
-              {selectedActions?.length
-                ? selectedActions.map((action) => (
-                    <div key={action?.label || action?.icon} className="">
-                      <Button
-                        hasNoBackground
-                        icon={action.icon}
-                        onClick={() => {
-                          if (action.onClick) {
-                            action.onClick();
-                          }
-                        }}
-                        tooltip="Delete selected rows"
-                        variant={action.variant}
-                      />
-                    </div>
-                  ))
-                : null}
+              <span className="mx-2 flex items-center gap-x-4">
+                {selectedActions?.length
+                  ? selectedActions.map((action) => (
+                      <div key={action?.label || action?.icon}>
+                        <Button
+                          hasNoBackground
+                          icon={action.icon}
+                          onClick={() => {
+                            if (action.onClick) {
+                              action.onClick();
+                            }
+                          }}
+                          tooltip={action.tooltip}
+                          variant={action.variant}
+                        />
+                      </div>
+                    ))
+                  : null}
+              </span>
             </div>
           ) : null}
         </div>
