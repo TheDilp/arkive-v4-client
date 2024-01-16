@@ -372,11 +372,7 @@ export function FolderView() {
   const [{ selection }, dispatch] = useTable({ selection: [] });
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
   const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
-  const {
-    data: base,
-    isFetching,
-    isInitialLoading,
-  } = useGetEntities<BaseEntityType & { image_id?: string }>(
+  const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
       pagination: {
         limit: 10,
@@ -449,11 +445,7 @@ export function FolderView() {
       staleTime: 5 * 60 * 1000,
     },
   );
-  const {
-    data,
-    isFetching: isFetchingFolder,
-    isInitialLoading: isInitialLoadingFolder,
-  } = useGetEntity<BaseEntityType & { image_id?: string }>(
+  const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
     {
@@ -646,13 +638,13 @@ export function FolderView() {
           ) : null}
         </div>
 
-        {(isFetching || isFetchingFolder) && view === "folders" ? (
-          <div className="mt-6 w-full">
+        {(isInitialLoading || isInitialLoadingFolder) && view === "folders" ? (
+          <div className="mt-72 w-full">
             <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
           </div>
         ) : null}
       </div>
-      {!isFetching && view === "folders" ? (
+      {!isInitialLoading && !isInitialLoadingFolder && view === "folders" ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && (!item_id || isFolder) ? base.data : []).map((item) => (
             <EntityItem
@@ -776,7 +768,7 @@ export function FolderView() {
               />
             );
           })}
-          {!base?.data?.length && !data?.data?.children?.length && !isFetchingFolder ? (
+          {!base?.data?.length && !data?.data?.children?.length && !isInitialLoadingFolder ? (
             <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
             </div>
