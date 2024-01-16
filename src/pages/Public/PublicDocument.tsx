@@ -30,7 +30,7 @@ export function PublicDocument() {
   if (!document?.data?.is_public) return <Navigate to={`/public/${project_id}/documents`} />;
   return (
     <PublicEntityLayout title={document?.data?.title}>
-      <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />;
+      <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />
     </PublicEntityLayout>
   );
 }
