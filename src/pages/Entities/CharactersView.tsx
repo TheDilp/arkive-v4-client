@@ -57,7 +57,7 @@ function createColumns(
           <Avatar
             hasShowImage
             image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
-            initials={getAvatarInitials(row.original.first_name, row.original?.last_name || "")}
+            initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
             isBordered
             isTooltipDisabled
             label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
