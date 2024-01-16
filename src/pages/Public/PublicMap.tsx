@@ -4,6 +4,7 @@ import { Skeleton } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { MapType } from "../../types";
 import { MapView } from "../Entities";
+import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicMap() {
   const { project_id, item_id } = useParams();
@@ -31,5 +32,9 @@ export function PublicMap() {
 
   if (!map?.data) return <Skeleton type="editor" />;
   if (!map?.data?.is_public) return <Navigate to={`/public/${project_id}/maps`} />;
-  return <MapView data={map?.data} />;
+  return (
+    <PublicEntityLayout title={map?.data?.title}>
+      <MapView data={map?.data} />
+    </PublicEntityLayout>
+  );
 }

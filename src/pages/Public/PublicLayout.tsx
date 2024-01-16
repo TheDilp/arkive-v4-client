@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 
 import { Dialog } from "../../components";
@@ -13,6 +14,15 @@ export function PublicLayout() {
           <Outlet />
         </div>
       </div>
+    </div>
+  );
+}
+
+export function PublicEntityLayout({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex h-full w-full flex-col gap-y-2">
+      {title ? <h2 className="font-lato text-3xl">{title}</h2> : null}
+      {children}
     </div>
   );
 }

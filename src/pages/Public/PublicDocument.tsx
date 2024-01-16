@@ -4,6 +4,7 @@ import { RemirrorJSON } from "remirror";
 import { Skeleton, StaticRender } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { DocumentType } from "../../types";
+import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicDocument() {
   const { project_id, item_id } = useParams();
@@ -27,5 +28,9 @@ export function PublicDocument() {
 
   if (!document?.data) return <Skeleton type="editor" />;
   if (!document?.data?.is_public) return <Navigate to={`/public/${project_id}/documents`} />;
-  return <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />;
+  return (
+    <PublicEntityLayout title={document?.data?.title}>
+      <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />;
+    </PublicEntityLayout>
+  );
 }

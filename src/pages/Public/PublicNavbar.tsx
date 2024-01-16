@@ -38,7 +38,7 @@ export function PublicNavbar() {
           />
         </div>
         <div className="flex flex-col items-start">
-          <h2 className="flex-1 font-merriweather text-2xl font-bold">{project?.data?.title}</h2>
+          <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
               <li>Characters</li>
