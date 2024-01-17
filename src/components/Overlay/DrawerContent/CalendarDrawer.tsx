@@ -446,6 +446,7 @@ export function CalendarDrawer({ data }: Props) {
           <div className="flex flex-nowrap items-center gap-x-2">
             <Input
               label="Hours (optional)"
+              min={0}
               name="hours"
               onChange={handleChange}
               placeholder="How many hours in a day?"
@@ -454,6 +455,7 @@ export function CalendarDrawer({ data }: Props) {
             />
             <Input
               label="Minutes (optional)"
+              min={0}
               name="minutes"
               onChange={handleChange}
               placeholder="How many minutes per hour?"
