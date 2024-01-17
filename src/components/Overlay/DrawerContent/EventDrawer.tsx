@@ -4,8 +4,8 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
-import { AvailableEntityType, EventStateType, EventType, MonthType, onChangeValue } from "../../../types";
+import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
+import { AvailableEntityType, CalendarType, EventStateType, EventType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
@@ -47,6 +47,12 @@ export function EventDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawer = useResetAtom(drawerAtom);
   const setDrawer = useSetAtom(drawerAtom);
+
+  const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(item_id as string, "calendars", {
+    fields: ["hours", "minutes"],
+    relations: { months: true },
+  });
+
   const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
     data?.id,
     "events",
@@ -72,15 +78,17 @@ export function EventDrawer({ data }: Props) {
     },
     { enabled: !!data?.id },
   );
-  const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
-    {
-      data: { parent_id: existingEvent?.data?.parent_id },
-      orderBy: [{ field: "sort", sort: "asc" }],
-      fields: ["id", "title", "days", "sort"],
-    },
-    "months",
-    { enabled: !!existingEvent?.data, staleTime: 5 * 60 * 1000 },
-  );
+
+  const existingMonths = calendar?.data?.months || [];
+  // const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
+  //   {
+  //     data: { parent_id: existingEvent?.data?.parent_id },
+  //     orderBy: [{ field: "sort", sort: "asc" }],
+  //     fields: ["id", "title", "days", "sort"],
+  //   },
+  //   "months",
+  //   { enabled: !!existingEvent?.data, staleTime: 5 * 60 * 1000 },
+  // );
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events", project_id as string);
@@ -113,7 +121,7 @@ export function EventDrawer({ data }: Props) {
       handleChange({ name, value });
       return;
     }
-    const idx = existingMonths?.data?.findIndex((month) => month.id === value) ?? -1;
+    const idx = existingMonths?.findIndex((month) => month.id === value) ?? -1;
     if (idx > -1) handleChange({ name, value: idx });
   }
 
@@ -196,7 +204,7 @@ export function EventDrawer({ data }: Props) {
             <Input
               isReadOnly={data?.isReadOnly}
               label="Start day (required)"
-              max={existingMonths?.data?.[event?.start_month || 0]?.days ?? 0}
+              max={existingMonths?.[event?.start_month || 0]?.days ?? 0}
               min={1}
               name="start_day"
               onChange={handleChange}
@@ -210,8 +218,8 @@ export function EventDrawer({ data }: Props) {
               label="Start month (required)"
               name="start_month"
               onChange={handleMonthChange}
-              options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.start_month === "number" ? existingMonths?.data?.[event?.start_month]?.id : undefined}
+              options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+              value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
             />
             <Input
               isReadOnly={data?.isReadOnly}
@@ -227,7 +235,7 @@ export function EventDrawer({ data }: Props) {
               helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
               isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
               label="End day (optional)"
-              max={typeof event.end_month === "number" ? existingMonths?.data[event.end_month].days : 0}
+              max={typeof event.end_month === "number" ? existingMonths[event.end_month].days : 0}
               min={1}
               name="end_day"
               onChange={handleChange}
@@ -245,8 +253,8 @@ export function EventDrawer({ data }: Props) {
               label="End month (optional)"
               name="end_month"
               onChange={handleMonthChange}
-              options={existingMonths?.data?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.end_month === "number" ? existingMonths?.data?.[event.end_month].id : undefined}
+              options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+              value={typeof event?.end_month === "number" ? existingMonths?.[event.end_month].id : undefined}
               variant={isMonthCorrect ? "primary" : "error"}
             />
             <Input
@@ -267,18 +275,22 @@ export function EventDrawer({ data }: Props) {
             <Input
               isReadOnly={data?.isReadOnly}
               label="Hour (optional)"
+              max={calendar?.data?.hours ?? undefined}
+              min={0}
               name="hours"
               onChange={handleChange}
               type="number"
-              value={event?.hours || ""}
+              value={event?.hours || 0}
             />
             <Input
               isReadOnly={data?.isReadOnly}
               label="Minutes (optional)"
+              max={calendar?.data?.minutes ?? undefined}
+              min={0}
               name="minutes"
               onChange={handleChange}
               type="number"
-              value={event?.minutes || ""}
+              value={event?.minutes || 0}
             />
           </div>
           <div className="flex w-full items-center justify-between">
