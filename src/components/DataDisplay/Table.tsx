@@ -578,7 +578,6 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   });
   const { rows } = table.getRowModel();
 
-  if (isLoading) return <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />;
   const pinned = columns.filter((col) => col?.meta?.pinned);
   return (
     <>
@@ -586,20 +585,21 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
         ref={bodyRef}
         className="scrollbar-hidden max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-700"
         style={{
-          height: expandable
-            ? ""
-            : `${
-                // 20px added to account for the pagination
-                // 40px added to account for the subheader when it is enabled
-                rowVirtualizer.getTotalSize() +
-                Number(headerRef?.current?.clientHeight) +
-                (pagination ? 20 : 0) +
-                (!hasNoHeaderGap && !pagination ? 28 : 0) +
-                (hasNoHeaderGap && !pagination ? 28 : 0) +
-                (!hasNoHeaderGap && pagination ? 10 : 0) +
-                (isSubheaderEnabled && !pagination ? 40 : 0) +
-                (isSubheaderEnabled && pagination ? 40 : 0)
-              }px`,
+          height:
+            expandable || isLoading
+              ? ""
+              : `${
+                  // 20px added to account for the pagination
+                  // 40px added to account for the subheader when it is enabled
+                  rowVirtualizer.getTotalSize() +
+                  Number(headerRef?.current?.clientHeight) +
+                  (pagination ? 20 : 0) +
+                  (!hasNoHeaderGap && !pagination ? 28 : 0) +
+                  (hasNoHeaderGap && !pagination ? 28 : 0) +
+                  (!hasNoHeaderGap && pagination ? 10 : 0) +
+                  (isSubheaderEnabled && !pagination ? 40 : 0) +
+                  (isSubheaderEnabled && pagination ? 40 : 0)
+                }px`,
         }}>
         <div ref={headerRef} className={head()}>
           {table.getFlatHeaders().map((hdr) => {
@@ -775,36 +775,39 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           </div>
         ) : null}
 
-        {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
-          const row = rows[virtualRow.index];
-          return (
-            <div
-              key={row.id}
-              className={`${rowContainer()} ${
-                config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
-                  ? "group hover:text-white"
-                  : "hover:bg-zinc-800"
-              }`}
-              style={{
-                height: expandable ? "" : `${virtualRow.size}px`,
-                transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
-              }}>
-              <Link
-                onClick={(e) => {
-                  if (onRowClick) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onRowClick(row.original);
-                  }
-                }}
-                to={getLink ? getLink(row.original) : "#"}>
-                <div className={`${rowClasses()} ${onRowClick ? hasRowAction() : ""} group`}>
-                  {row.getVisibleCells().map((cell) => (
-                    <div
-                      key={cell.id}
-                      className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
-                        (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                      } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"}
+        {isLoading ? (
+          <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />
+        ) : (
+          rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
+            const row = rows[virtualRow.index];
+            return (
+              <div
+                key={row.id}
+                className={`${rowContainer()} ${
+                  config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
+                    ? "group hover:text-white"
+                    : "hover:bg-zinc-800"
+                }`}
+                style={{
+                  height: expandable ? "" : `${virtualRow.size}px`,
+                  transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+                }}>
+                <Link
+                  onClick={(e) => {
+                    if (onRowClick) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onRowClick(row.original);
+                    }
+                  }}
+                  to={getLink ? getLink(row.original) : "#"}>
+                  <div className={`${rowClasses()} ${onRowClick ? hasRowAction() : ""} group`}>
+                    {row.getVisibleCells().map((cell) => (
+                      <div
+                        key={cell.id}
+                        className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
+                          (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
+                        } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"}
                       ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
                        ${
                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
@@ -815,40 +818,41 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""}
                     
                       `}
-                      onClick={(e) => {
-                        if (
-                          cell.column.id === "select" ||
-                          cell.column.id === "action" ||
-                          cell.column.id === "is_favorite" ||
-                          (cell.column.columnDef.meta as MetaType)?.noLink
-                        ) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }
-                      }}
-                      style={{
-                        ...getTableColumnWidths(cell.column.id, {
-                          minSize: cell.column.columnDef.minSize,
-                          maxSize: cell.column.columnDef.maxSize,
-                        }),
-                        width: cell.column.columnDef.size,
-                        left: (cell.column.columnDef.meta as MetaType)?.pinned
-                          ? `${getPinnedOffset(pinned, cell.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
-                          : "",
-                      }}>
-                      <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
-                    </div>
-                  ))}
-                </div>
-              </Link>
-              {row.getIsExpanded() ? (
-                <div className="max-w-[calc(100vw-2rem)] overflow-x-hidden">
-                  <ExpandedTableRow data={row.original} type={type} />
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+                        onClick={(e) => {
+                          if (
+                            cell.column.id === "select" ||
+                            cell.column.id === "action" ||
+                            cell.column.id === "is_favorite" ||
+                            (cell.column.columnDef.meta as MetaType)?.noLink
+                          ) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }
+                        }}
+                        style={{
+                          ...getTableColumnWidths(cell.column.id, {
+                            minSize: cell.column.columnDef.minSize,
+                            maxSize: cell.column.columnDef.maxSize,
+                          }),
+                          width: cell.column.columnDef.size,
+                          left: (cell.column.columnDef.meta as MetaType)?.pinned
+                            ? `${getPinnedOffset(pinned, cell.column.id) + (config?.hasSelect ? 2.75 : 0)}rem`
+                            : "",
+                        }}>
+                        <div className={contentWrapper()}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Link>
+                {row.getIsExpanded() ? (
+                  <div className="max-w-[calc(100vw-2rem)] overflow-x-hidden">
+                    <ExpandedTableRow data={row.original} type={type} />
+                  </div>
+                ) : null}
+              </div>
+            );
+          })
+        )}
       </div>
       {pagination ? (
         <div className={paginationContainer()}>
