@@ -48,10 +48,17 @@ export function EventDrawer({ data }: Props) {
   const resetDrawer = useResetAtom(drawerAtom);
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(item_id as string, "calendars", {
-    fields: ["hours", "minutes"],
-    relations: { months: true },
-  });
+  const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(
+    item_id as string,
+    "calendars",
+    {
+      fields: ["hours", "minutes"],
+      relations: { months: true },
+    },
+    {
+      queryKeyConcat: ["event_drawer"],
+    },
+  );
 
   const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
     data?.id,
