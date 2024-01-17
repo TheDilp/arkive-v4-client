@@ -605,8 +605,22 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
             const activeColumnFilters = {
-              and: (filters?.and || relationFilters?.and || []).filter((filt) => filt.field === id),
-              or: (filters?.or || relationFilters?.or || []).filter((filt) => filt.field === id),
+              and: (filters?.and || [])
+                .concat(relationFilters?.and || [])
+                .filter(
+                  (filt) =>
+                    filt.field === id ||
+                    filt.relationalData?.blueprint_field_id === id ||
+                    filt?.relationalData?.character_field_id === id,
+                ),
+              or: (filters?.or || [])
+                .concat(relationFilters?.or || [])
+                .filter(
+                  (filt) =>
+                    filt.field === id ||
+                    filt.relationalData?.blueprint_field_id === id ||
+                    filt?.relationalData?.character_field_id === id,
+                ),
             };
 
             return (
