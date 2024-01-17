@@ -2,6 +2,8 @@
 import { tv } from "tailwind-variants";
 
 import { InputType } from "../../types";
+import { IconEnum } from "../../utils";
+import { Button } from "./Button";
 
 const InputClasses = tv({
   slots: {
@@ -166,6 +168,12 @@ export function Input({
           value={value}
         />
         {suffix ? <span className="pl-1">{suffix}</span> : null}
+
+        {type === "search" && value ? (
+          <span>
+            <Button hasNoBackground icon={IconEnum.close} onClick={() => onChange({ name, value: "" })} />
+          </span>
+        ) : null}
       </div>
 
       {helperText ? <div className={helperTextClasses()}>{helperText}</div> : null}

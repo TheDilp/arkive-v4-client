@@ -330,6 +330,7 @@ export function CharactersView() {
             name="quick_filter"
             onChange={({ value }) => setFilter(value as string)}
             placeholder="Quick search by first name"
+            type="search"
             value={filter}
           />
         </div>
