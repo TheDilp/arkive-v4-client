@@ -469,7 +469,7 @@ export function CalendarDrawer({ data }: Props) {
               name="starts_on_day"
               onChange={handleChange}
               options={(calendar?.days || []).map((day, idx) => ({ label: capitalizeFirstLetter(day), value: idx.toString() }))}
-              value={calendar?.starts_on_day ? calendar?.starts_on_day?.toString() : null}
+              value={typeof calendar?.starts_on_day === "number" ? calendar?.starts_on_day?.toString() : null}
             />
           </div>
 
