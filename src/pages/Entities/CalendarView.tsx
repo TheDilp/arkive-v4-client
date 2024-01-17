@@ -89,6 +89,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
       fields: [
         "id",
         "title",
+        "image_id",
         "background_color",
         "start_day",
         "start_month",
