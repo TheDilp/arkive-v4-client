@@ -145,7 +145,7 @@ function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFi
                   type: "entity_preview",
                   size: "half",
                   title: "Preview map",
-                  data: { id: map_pin?.parent_id, subitem_id: map_pin?.id, entity_type: "maps" },
+                  data: { parent_id: map_pin?.parent_id, id: map_pin?.id, entity_type: "map_pins" },
                 })),
             },
           ],
