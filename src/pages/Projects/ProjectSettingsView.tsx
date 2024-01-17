@@ -514,11 +514,11 @@ export function ProjectSettingsView() {
           {selectedTab === finalTabs.length - 1 ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
-                <div className="bg-zinc-900 px-2 py-4">
+                <div className="bg-zinc-900">
                   {UserNotificationEntities.map((entity) => (
                     <div
                       key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
                       <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
                       <div className="flex w-52 items-center justify-between gap-x-2 text-center">
                         <Checkbox
@@ -545,11 +545,11 @@ export function ProjectSettingsView() {
                 </div>
               </Collapsible>
               <Collapsible label="Sidebar settings">
-                <div className="bg-zinc-900 px-2 py-4">
+                <div className="bg-zinc-900">
                   {UserSidebarEntitiesEnabled.map((entity) => (
                     <div
                       key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 py-1 pt-0 first:border-t-0">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
                       <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
