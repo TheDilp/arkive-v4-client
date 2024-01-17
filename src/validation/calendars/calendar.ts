@@ -51,6 +51,8 @@ export const UpdateCalendarSchema = z.object({
     icon: z.string().nullable().optional(),
     parent_id: z.string().nullable().optional(),
     days: z.string().array().min(1).optional(),
+    hours: z.number().optional().nullable(),
+    minutes: z.number().optional().nullable(),
     starts_on_day: z
       .string()
       .or(z.number())
