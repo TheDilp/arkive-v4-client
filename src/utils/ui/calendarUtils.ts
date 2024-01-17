@@ -1,5 +1,11 @@
 import { EventType } from "../../types";
-import { CalendarType, EventStateType, MonthType } from "../../types/EntityTypes/calendarTypes";
+import {
+  CalendarType,
+  EventStateType,
+  LeapDayConditionType,
+  LeapDayType,
+  MonthType,
+} from "../../types/EntityTypes/calendarTypes";
 
 export function sortEvents(a: EventType, b: EventType) {
   if (a?.hours && b?.hours) {
@@ -87,35 +93,77 @@ export function getNextDate(date: { month: number; year: number }, calendar: Cal
   }
   return date;
 }
+
+export function checkLeapDayCondition(
+  cond: { type: LeapDayConditionType; value: number | string },
+  date: { year: number; month: number },
+) {
+  if (cond.type === "every") return date.year % Number(cond.value) === 0;
+  if (cond.type === "divisible_by") return date.year % Number(cond.value) === 0;
+  if (cond.type === "not_divisible_by") return date.year % Number(cond.value) !== 0;
+  return false;
+}
+
+export function getLeapDays(leap_days: LeapDayType[], months: MonthType[], date: { month: number; year: number }): number {
+  let leapDayCount = 0;
+  for (let index = 0; index < leap_days.length; index += 1) {
+    const day = leap_days[index];
+    const monthIdx = months.findIndex((m) => m.id === day.month_id);
+    if (monthIdx === -1 || monthIdx === undefined || monthIdx !== date.month) break;
+
+    const andConditionsMatch =
+      !day.conditions.and?.length || (day.conditions.and || [])?.every((cond) => checkLeapDayCondition(cond, date));
+    const orConditionsMatch =
+      !day.conditions.or?.length || (day.conditions.or || [])?.some((cond) => checkLeapDayCondition(cond, date));
+    if (andConditionsMatch && orConditionsMatch) leapDayCount += 1;
+  }
+
+  return leapDayCount;
+}
+
 export function getStartingDayForMonth(
   months: MonthType[] | undefined,
   year: number,
   monthIndex: number,
   weekdays: number | undefined,
   starts_on_day: number | null | undefined,
+  previousMonthLeapDays: number,
 ) {
+  // ! There is no need to use leap days in the starting day calculation as
+  // ! they are already used when calculating filler days
   if (year === undefined || !months || !weekdays) return 0;
   if (year === 1 && monthIndex === 0 && typeof starts_on_day === "number") return starts_on_day;
-  const dayInYear = months.reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
+  let daysTotal = 0;
+
+  for (let index = 0; index < year - 1; index += 1) {
+    const dayInYear = months.reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
+    daysTotal += dayInYear;
+  }
+
   const dayBeforeMonth = months
     .filter((_, index) => index < monthIndex)
     .reduce((accumulator, currentValue) => accumulator + currentValue.days, 0);
-  let daysBeforeYear;
+  // let daysBeforeYear;
   if (year < 0) {
-    daysBeforeYear = 0;
+    // daysBeforeYear = 0;
   } else {
-    daysBeforeYear = year * dayInYear;
+    // daysBeforeYear = year * daysTotal;
   }
 
-  return (daysBeforeYear % weekdays) + dayBeforeMonth;
+  return (daysTotal % weekdays) + dayBeforeMonth + previousMonthLeapDays;
 }
-export function getFillerDayNumber(calendarMonths: MonthType[], currentMonthIndex: number, day: number) {
+export function getFillerDayNumber(
+  calendarMonths: MonthType[],
+  currentMonthIndex: number,
+  day: number,
+  previousMonthLeapDays: number,
+) {
   let previousMonthIndex = currentMonthIndex - 1;
 
   if (previousMonthIndex < 0) {
     previousMonthIndex = calendarMonths.length - 1;
   }
-  const days = calendarMonths[previousMonthIndex]?.days || 0;
+  const days = (calendarMonths[previousMonthIndex]?.days || 0) + previousMonthLeapDays;
   if (days) {
     return days - day - 1;
   }

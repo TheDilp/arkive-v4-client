@@ -1,5 +1,6 @@
 import { useSetAtom } from "jotai";
-import { useLayoutEffect, useState } from "react";
+import ls from "localstorage-slim";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Alert, Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
@@ -11,6 +12,7 @@ import {
   drawerAtom,
   getFillerDayNumber,
   getImageURL,
+  getLeapDays,
   getStartingDayForMonth,
   IconEnum,
 } from "../../utils";
@@ -60,7 +62,10 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
-  const [date, setDate] = useState<CurrentDateType>({ month: 0, year: 1 });
+  const [date, setDate] = useState<CurrentDateType>({
+    month: ls.get(`calendar_${id ?? item_id}_month`) ?? 0,
+    year: ls.get(`calendar_${id ?? item_id}_year`) ?? 1,
+  });
   const [view, setView] = useState<"calendar" | "timeline">("calendar");
   const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
 
@@ -70,7 +75,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     {
       data: { project_id },
       fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
-      relations: { months: true },
+      relations: { months: true, leap_days: true },
     },
     {
       enabled: !data,
@@ -178,6 +183,15 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   }, [subitem_id, subitemEvent]);
 
   const monthDays = typeof calendar?.months?.[date.month]?.days === "number" ? calendar.months[date.month].days : 0;
+  const leapDayCount = useMemo(() => getLeapDays(calendar?.leap_days || [], calendar?.months || [], date), [date, calendar]);
+  const previousMonthLeapDayCount = useMemo(
+    () =>
+      getLeapDays(calendar?.leap_days || [], calendar?.months || [], {
+        year: date.month - 1 === -1 ? date.year - 1 : date.year,
+        month: date.month - 1 === -1 ? (calendar?.months?.length ?? 1) - 1 : date.month - 1,
+      }),
+    [date, calendar],
+  );
   if (!calendar) return null;
   const startingDayForMonth = getStartingDayForMonth(
     calendar?.months,
@@ -185,6 +199,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     date?.month,
     calendar?.days?.length,
     calendar?.starts_on_day || 0,
+    previousMonthLeapDayCount,
   );
 
   if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
@@ -202,8 +217,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                   const idx = calendar.months.findIndex((m) => m.id === value);
                   if (idx > -1) {
                     setDate((prev) => ({ ...prev, month: idx }));
+                    ls.set(`calendar_${calendar.id}_month`, idx);
                   }
-                  //   ls.set("characters_view", value);
                 }}
                 options={calendar?.months?.map((month) => ({ value: month.id, label: month.title }))}
                 placeholder="Month"
@@ -216,7 +231,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 name="year"
                 onChange={({ value }) => {
                   setDate((prev) => ({ ...prev, year: value as number }));
-                  //   ls.set("characters_view", value);
+                  ls.set(`calendar_${calendar.id}_year`, value);
                 }}
                 placeholder="Year"
                 step={1}
@@ -290,7 +305,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 tabIndex={-1}>
                 <DayNumber
                   key={day}
-                  dayNumber={getFillerDayNumber(calendar?.months, date.month, day)}
+                  dayNumber={getFillerDayNumber(calendar?.months, date.month, day, previousMonthLeapDayCount)}
                   isFiller
                   isReadOnly={isPublic}
                   monthNumber={date.month}
@@ -298,7 +313,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 />
               </div>
             ))}
-          {[...Array(monthDays).keys()].map((day) => (
+          {[...Array(monthDays + leapDayCount).keys()].map((day) => (
             <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
               <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
               <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
