@@ -268,7 +268,19 @@ function documentsTableColumns(
           isIconOnly
           onClick={async () => {
             await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
-            queryClient.refetchQueries(["characters", character_id]);
+            queryClient.setQueryData<{ data: CharacterType }>(["characters", character_id], (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  documents: (old.data.documents || [])?.map((doc) => {
+                    if (doc.id === row.original.id) return { ...doc, is_public: !row.original.is_public };
+                    return doc;
+                  }),
+                },
+              };
+            });
           }}
         />
       ),
