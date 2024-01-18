@@ -1,4 +1,4 @@
-import { UseMutateFunction } from "@tanstack/react-query";
+import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
@@ -100,6 +100,17 @@ function columns(
   project_id: string,
   is_document_template: boolean,
   webhooks: WebhookType[],
+  updatePublic: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
   show_image?: boolean,
 ) {
   return [
@@ -135,6 +146,26 @@ function columns(
       header: "Title",
       cell: ({ row }) => <div className=" truncate">{row.original.title}</div>,
       size: 15,
+    }),
+    columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
     }),
     columnHelper.display({
       id: "action",
@@ -786,6 +817,7 @@ export function FolderView() {
               project_id as string,
               documentType === "templates" && type === "documents",
               user?.webhooks || [],
+              mutateAsync,
               show_image_table_view,
             )}
             config={{

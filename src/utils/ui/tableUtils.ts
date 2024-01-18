@@ -52,7 +52,11 @@ export function getTableColumns(
     finalColumns.unshift(SelectColumn(dispatch, pagination));
   }
   if (hasTags) {
-    finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
+    if (finalColumns.some((c) => c.id === "is_public")) {
+      finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning));
+    } else {
+      finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
+    }
   }
 
   return finalColumns;
