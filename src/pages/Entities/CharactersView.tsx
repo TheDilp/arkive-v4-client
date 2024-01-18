@@ -1,3 +1,4 @@
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
@@ -23,6 +24,7 @@ import {
   useGetInfiniteEntities,
   useTable,
   useUpdateEntity,
+  useUpdateManyPublic,
 } from "../../hooks";
 import { CharacterType, DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
 import {
@@ -44,6 +46,17 @@ const columnHelper = createColumnHelper<CharacterType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  updatePublicMany: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
   isMd: boolean,
   webhooks: WebhookType[],
   project_id: string,
@@ -116,6 +129,26 @@ function createColumns(
       },
       minSize: 8,
       maxSize: 8,
+    }),
+    columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
     }),
     columnHelper.display({
       id: "action",
@@ -243,6 +276,8 @@ export function CharactersView() {
       enabled: view === "table",
     },
   );
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
+
   const { mutateAsync: deleteMany } = useDeleteMany("characters", project_id);
   const {
     data: cardData,
@@ -401,7 +436,7 @@ export function CharactersView() {
       ) : (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, isMd, user?.webhooks || [], project_id as string)}
+            columns={createColumns(setDrawer, setDialog, updatePublicMany, isMd, user?.webhooks || [], project_id as string)}
             config={{
               hasSelect: true,
               hasFavorite: true,
@@ -415,6 +450,34 @@ export function CharactersView() {
                 await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
               },
               selectedActions: [
+                {
+                  icon: IconEnum.eye,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Set public",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const entitesNotFolders = (data?.data || [])?.filter((e) => ids.includes(e.id));
+                    if (entitesNotFolders.length) {
+                      await updatePublicMany({ data: { ids, is_public: true } });
+                      dispatch({ type: "clearSelection" });
+                    }
+                  },
+                },
+                {
+                  icon: IconEnum.eye_slash,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Set private",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const entitesNotFolders = (data?.data || [])?.filter((e) => ids.includes(e.id));
+                    if (entitesNotFolders.length) {
+                      await updatePublicMany({ data: { ids, is_public: false } });
+                      dispatch({ type: "clearSelection" });
+                    }
+                  },
+                },
                 {
                   icon: IconEnum.trash,
                   variant: "error",
