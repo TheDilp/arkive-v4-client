@@ -178,6 +178,13 @@ function createColumns(
                 })),
               },
               {
+                id: "view_public",
+                title: "View public page",
+                icon: IconEnum.public,
+                onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
+                isDisabled: !row.original.is_public,
+              },
+              {
                 id: "delete_character",
                 title: "Delete character",
                 icon: IconEnum.trash,
@@ -227,7 +234,7 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
-      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "age"],
+      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "is_public", "age"],
     },
     "characters",
     {
