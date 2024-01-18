@@ -138,3 +138,5 @@ export const UserSidebarEntitiesEnabled = [
   "random_tables",
   "character_fields_templates",
 ];
+
+export const MiscellaneousSettings = ["sort_tags_alphabetically"];

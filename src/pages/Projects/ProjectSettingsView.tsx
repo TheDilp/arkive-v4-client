@@ -52,6 +52,7 @@ import {
   getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
+  MiscellaneousSettings,
   userAtom,
   UserNotificationEntities,
   UserSidebarEntitiesEnabled,
@@ -557,6 +558,25 @@ export function ProjectSettingsView() {
                           name={`${entity}_enabled`}
                           onChange={handleFeatureFlagChange}
                           value={user?.feature_flags?.[`${entity}_enabled`]}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Collapsible>
+              <Collapsible label="Miscellaneous settings">
+                <div className="bg-zinc-900">
+                  {MiscellaneousSettings.map((setting) => (
+                    <div
+                      key={setting}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
+                      <span>{getSentenceCase(setting)}:</span>
+                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
+                        <Checkbox
+                          label="Enabled"
+                          name={setting}
+                          onChange={handleFeatureFlagChange}
+                          value={user?.feature_flags?.[setting]}
                         />
                       </div>
                     </div>

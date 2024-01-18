@@ -1,7 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { useAtomValue } from "jotai";
 
 import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
-import { FavoritesFilters, IconEnum, TagFilters } from "../../../utils";
+import { FavoritesFilters, IconEnum, sortTags, TagFilters, userAtom } from "../../../utils";
 import { Alert, Badge, Button, Checkbox, Tooltip } from "../..";
 
 export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType): ColumnDef<any> {
@@ -59,6 +60,8 @@ export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => Promise<v
 }
 
 export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: TagType[] }> {
+  const user = useAtomValue(userAtom);
+
   return {
     id: "tags",
     header: "Tags",
@@ -69,29 +72,33 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
     },
     minSize: 12,
     maxSize: 12,
-    cell: ({ row }) => (
-      <div className="flex w-full max-w-full items-center justify-center gap-x-2">
-        {row.original?.tags?.length ? (
-          <div className="w-fit">
-            <Badge customColor={row.original.tags[0].color} label={row.original.tags[0].title} />
-          </div>
-        ) : null}
-        {row.original?.tags?.length > 1 ? (
-          <Tooltip
-            content={row.original.tags
-              .slice(1)
-              .map((tag: TagType) => tag.title)
-              .join(", ")}
-            isPortal>
-            <div className="w-min max-w-min">
-              <Badge label={`+${row.original.tags.length - 1}`} size="sm" variant="secondary" />
+    cell: ({ row }) => {
+      const sortedTags = user?.feature_flags?.sort_tags_alphabetically
+        ? row.original?.tags?.sort(sortTags)
+        : row.original?.tags;
+
+      return (
+        <div className="flex w-full max-w-full items-center justify-center gap-x-2">
+          {sortedTags?.length ? (
+            <div className="w-fit">
+              <Badge customColor={row.original.tags[0].color} label={row.original.tags[0].title} />
             </div>
-          </Tooltip>
-        ) : null}
-        {row.original?.tags?.length === 0 && hasTagsWarning ? (
-          <Alert label="There are no tags." variant="error-bordered" />
-        ) : null}
-      </div>
-    ),
+          ) : null}
+          {sortedTags?.length > 1 ? (
+            <Tooltip
+              content={row.original.tags
+                .slice(1)
+                .map((tag: TagType) => tag.title)
+                .join(", ")}
+              isPortal>
+              <div className="w-min max-w-min">
+                <Badge label={`+${row.original.tags.length - 1}`} size="sm" variant="secondary" />
+              </div>
+            </Tooltip>
+          ) : null}
+          {sortedTags?.length === 0 && hasTagsWarning ? <Alert label="There are no tags." variant="error-bordered" /> : null}
+        </div>
+      );
+    },
   };
 }
