@@ -18,24 +18,26 @@ export function EntitiesView() {
   return (
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
-        <Breadcrumbs />
-        {item_id ? (
-          <div className="w-52">
-            <Button
-              icon={IconEnum.edit}
-              label={`Edit current ${entityName}`}
-              onClick={() => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  size: "lg",
-                  title: `Edit ${entityName}`,
-                  type: type as DrawerContentCreateNewType,
-                  data: { id: item_id as string, project_id: project_id as string },
-                }));
-              }}
-            />
-          </div>
-        ) : null}
+        <div className="flex w-full items-start justify-between">
+          <Breadcrumbs />
+          {item_id ? (
+            <div className="w-52">
+              <Button
+                icon={IconEnum.edit}
+                label={`Edit current ${entityName}`}
+                onClick={() => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: `Edit ${entityName}`,
+                    type: type as DrawerContentCreateNewType,
+                    data: { id: item_id as string, project_id: project_id as string },
+                  }));
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
       {!!item_id && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
