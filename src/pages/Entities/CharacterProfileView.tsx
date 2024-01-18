@@ -326,7 +326,6 @@ function assetTableColumns(
     unknown
   >,
   project_id: string | undefined,
-  character_id: string,
   removeItem: UseMutateAsyncFunction<
     any,
     unknown,
@@ -1007,9 +1006,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             />
 
             <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="text-center font-merriweather text-lg">
-                {`${existingCharacter?.data?.first_name || ""} ${existingCharacter?.data?.last_name || ""}`.trimEnd()}
-              </h2>
+              <h2 className="text-center font-merriweather text-lg">{`${existingCharacter?.data?.full_name}`.trimEnd()}</h2>
               {existingCharacter?.data?.nickname ? (
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
@@ -1171,13 +1168,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     {assetView === "table" ? (
                       <Table
-                        columns={assetTableColumns(
-                          downloadImage,
-                          project_id,
-                          existingCharacter?.data?.id,
-                          removeItem,
-                          user?.webhooks || [],
-                        )}
+                        columns={assetTableColumns(downloadImage, project_id, removeItem, user?.webhooks || [])}
                         config={{
                           hasNoHeaderGap: true,
                         }}
