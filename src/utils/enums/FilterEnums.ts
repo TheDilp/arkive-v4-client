@@ -52,19 +52,19 @@ export const NumberFilters: FilterEnumType[] = [
 
 export const BooleanFilters: FilterEnumType[] = [
   {
-    label: "Is",
+    label: FilterNamesEnum.eq,
     value: "eq",
     type: "boolean",
-    options: [
-      {
-        label: "True",
-        value: true,
-      },
-      {
-        label: "False",
-        value: false,
-      },
-    ],
+    // options: [
+    //   {
+    //     label: "True",
+    //     value: true,
+    //   },
+    //   {
+    //     label: "False",
+    //     value: false,
+    //   },
+    // ],
   },
 ];
 

@@ -150,12 +150,17 @@ export function getAreColumnFiltersActive(
 }
 
 export function getIsApplyColumnFiltersDisabled(filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] }) {
-  if (!filters?.and?.length && !filters?.or?.length) return true;
   if (filters?.and) {
     if (filters.and.some((filt) => filt.value === undefined || filt.value === null || filt.value === "")) return true;
   }
   if (filters?.or) {
-    if (filters.or.some((filt) => filt.value === undefined || filt.value === null || filt.value === "")) return true;
+    if (
+      filters.or.some((filt) => {
+        if (filt.field === "is_favorite" || filt.field === "is_public") return false;
+        return filt.value === undefined || filt.value === null || filt.value === "";
+      })
+    )
+      return true;
   }
   return false;
 }

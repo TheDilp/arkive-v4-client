@@ -29,6 +29,7 @@ import {
 import { CharacterType, DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
 import {
   baseURLS,
+  BooleanFilters,
   dialogAtom,
   drawerAtom,
   FetchFunction,
@@ -136,6 +137,7 @@ function createColumns(
       meta: {
         centered: true,
         noLink: true,
+        filterOptions: BooleanFilters,
       },
       cell: ({ row }) => (
         <Button

@@ -126,7 +126,7 @@ function TableColumnFilterList({
 }) {
   return (
     <>
-      {filters.map((filt, index) => {
+      {(colId === "is_public" || colId === "is_favorite" ? filters.slice(0, 1) : filters).map((filt, index) => {
         const filterType = filterOptions?.find((opt) => opt.value === filt.operator);
 
         return (
@@ -237,13 +237,17 @@ function TableColumnFilterList({
                   icon={IconEnum.close}
                   iconSize={20}
                   onClick={() => {
-                    removeColumnFilter(filt.id, type, setColumnFilters);
+                    if (colId === "is_public" || colId === "is_favorite") {
+                      filters.forEach((flt) => removeColumnFilter(flt.id, type, setColumnFilters));
+                    } else {
+                      removeColumnFilter(filt.id, type, setColumnFilters);
+                    }
                   }}
                   size="sm"
                 />
               </div>
             </div>
-            {index !== filters.length - 1 ? (
+            {index !== filters.length - 1 && colId !== "is_public" && colId !== "is_favorite" ? (
               <div className="flex h-full items-center justify-center">
                 <div className="w-16">
                   <Badge label={capitalizeSentence(type)} variant="info" />
@@ -299,9 +303,7 @@ function TableColumnFilter({
                   if (columnId)
                     setColumnFilters((prev) => ({
                       ...prev,
-                      [columnId === "is_favorite" ? "or" : "and"]: [
-                        ...(prev[columnId === "is_favorite" ? "or" : "and"] || []),
-                      ].concat({
+                      and: [...(prev.and || [])].concat({
                         id: crypto.randomUUID(),
                         field: relationType
                           ? getFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
@@ -335,19 +337,34 @@ function TableColumnFilter({
           <div className={columnFilterButtonContainer()}>
             <Button
               icon={IconEnum.add}
+              isDisabled={
+                columnId === "is_favorite" || columnId === "is_public"
+                  ? columnFilters?.or?.some((filt) => filt.field === columnId)
+                  : false
+              }
               onClick={() => {
                 if (columnId)
                   setColumnFilters((prev) => ({
                     ...prev,
-                    or: [...(prev.or || [])].concat({
-                      id: crypto.randomUUID(),
-                      field: meta?.relationType
-                        ? getFieldValueFromType(meta?.relationType as BlueprintFieldTypes) || ""
-                        : columnId,
-                      value: "",
-                      operator: filterOptions[0].value as RequestFilterTypes,
-                      header_name: columnHeader,
-                    }),
+                    or: [...(prev.or || [])].concat(
+                      columnId === "is_favorite" || columnId === "is_public"
+                        ? {
+                            id: crypto.randomUUID(),
+                            field: columnId,
+                            value: false,
+                            operator: filterOptions[0].value as RequestFilterTypes,
+                            header_name: columnId,
+                          }
+                        : {
+                            id: crypto.randomUUID(),
+                            field: relationType
+                              ? getFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                              : columnId,
+                            value: relationType === "boolean" ? false : "",
+                            operator: filterOptions[0].value as RequestFilterTypes,
+                            header_name: columnHeader,
+                          },
+                    ),
                   }));
               }}
               variant="info"
@@ -370,17 +387,19 @@ function TableColumnFilter({
         isDisabled={getIsApplyColumnFiltersDisabled(columnFilters)}
         label="Apply filters"
         onClick={() => {
-          if (columnId === "is_favorite") {
-            const orFilter = columnFilters?.or?.find((filt) => filt?.field === "is_favorite");
+          if (columnId === "is_favorite" || columnId === "is_public") {
+            const orFilter = columnFilters?.or?.find((filt) => filt?.field === columnId);
             // Favorites filter has an empty string by default
             // Needs to be converted to false
             if (orFilter && (orFilter?.value === "" || orFilter?.value === false)) {
               applyFilter(
                 columnId as string,
                 {
+                  // header_name gets sentence_case'd for the badge when filter is applied
+                  // left as snake case for backed
                   or: [
-                    { ...orFilter, value: false },
-                    { ...orFilter, operator: "is", value: null },
+                    { ...orFilter, header_name: columnId, value: false },
+                    { ...orFilter, header_name: columnId, operator: "is", value: null },
                   ],
                 },
                 dispatch,
@@ -390,31 +409,33 @@ function TableColumnFilter({
               applyFilter(
                 columnId as string,
                 {
-                  or: [{ ...orFilter, value: true }],
+                  // header_name gets sentence_case'd for the badge when filter is applied
+                  // left as snake case for backed
+                  or: [{ ...orFilter, header_name: columnId, value: true }],
                 },
                 dispatch,
                 !!isRelationFilter,
               );
             }
           } else if (isRelationFilter) {
-            applyFilter(
-              columnId as string,
-              {
-                and: (columnFilters?.and || [])?.map((filt) => ({
-                  ...filt,
-                  relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
-                })),
-                or: (columnFilters?.or || [])?.map((filt) => ({
-                  ...filt,
-                  relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
-                })),
-              },
-              dispatch,
-              !!isRelationFilter,
-            );
-          } else {
+            if (columnFilters.and?.length || columnFilters.or?.length)
+              applyFilter(
+                columnId as string,
+                {
+                  and: (columnFilters?.and || [])?.map((filt) => ({
+                    ...filt,
+                    relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
+                  })),
+                  or: (columnFilters?.or || [])?.map((filt) => ({
+                    ...filt,
+                    relationalData: { ...(filt?.relationalData || {}), blueprint_field_id: columnId },
+                  })),
+                },
+                dispatch,
+                !!isRelationFilter,
+              );
+          } else if (columnFilters.and?.length || columnFilters.or?.length)
             applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter);
-          }
         }}
         variant="success"
       />
@@ -432,7 +453,6 @@ function TableSubheaderFilterBadges({
   const orFiltersByField = groupFiltersByHeader(filters?.or || []);
   const andRelationFiltersByField = groupFiltersByHeader(relationFilters?.and || []);
   const orRelationFiltersByField = groupFiltersByHeader(relationFilters?.or || []);
-
   const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
   const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
   return (
@@ -658,7 +678,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             columnId={id}
                             dispatch={dispatch}
                             filters={activeColumnFilters}
-                            isAndDisabled={hdr.column.id === "is_favorite"}
+                            isAndDisabled={hdr.column.id === "is_favorite" || hdr.column.id === "is_public"}
                             meta={meta as MetaType}
                           />
                         </div>
