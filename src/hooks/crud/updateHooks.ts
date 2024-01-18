@@ -1,10 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
+import cloneDeep from "lodash.clonedeep";
 import { RemirrorJSON } from "remirror";
 
 import {
   AvailableEntityType,
   AvailableSubEntityType,
+  CharacterType,
   ConversationType,
   DocumentType,
   GraphType,
@@ -402,7 +404,7 @@ export function useAddToEntity<InsertType extends { relations: { [key: string]: 
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/add/${id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/resource/add/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
@@ -415,6 +417,84 @@ export function useAddToEntity<InsertType extends { relations: { [key: string]: 
 
           createNotification({
             title: data?.message || "Items successfully added.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this item.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+export function useUpdateEntityResource<
+  InsertType extends { relations: { [key: string]: { [key: string]: string | boolean | number | null }[] } },
+>(id: string, type: AvailableEntityType) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/resource/update/${id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onSettled: (data, _, vars) => {
+        if (data.ok) {
+          queryClient.setQueryData<{ data: CharacterType }>([type, id], (old) => {
+            if (!old) return old;
+
+            //! REFACTOR IF NEEDED TO USE SOMETHING OTHER THAN DOCUMENTS
+            const newData = cloneDeep(old);
+
+            const relationKeys = Object.keys(vars.relations);
+
+            for (let index = 0; index < relationKeys.length; index += 1) {
+              // @ts-ignore
+              const oldResources: Record<string, any>[] = newData.data[relationKeys[index]] as Record<string, any>[];
+              const updatedResources = vars.relations[relationKeys[index]];
+
+              // If updating the documents resource for the character model
+              // and the payload contains an is_main_page set all others
+              // to false for is_main_page
+              if (
+                type === "characters" &&
+                relationKeys[index] === "documents" &&
+                updatedResources.length === 1 &&
+                updatedResources[0].is_main_page
+              ) {
+                for (let j = 0; j < oldResources.length; j += 1) {
+                  if (oldResources[j].id === updatedResources[0].id) {
+                    oldResources[j] = { ...oldResources[j], ...updatedResources[0] };
+                  } else {
+                    oldResources[j].is_main_page = false;
+                  }
+                }
+              } else {
+                updatedResources.forEach((resource) => {
+                  const oldIdx = oldResources.findIndex((i) => i.id === resource.id);
+                  if (oldIdx > -1 && !!oldIdx) {
+                    oldResources[oldIdx] = { ...oldResources[oldIdx], ...resource };
+                  }
+                });
+              }
+
+              // @ts-ignore
+              newData.data[relationKeys[index]] = oldResources;
+            }
+            return newData;
+          });
+
+          createNotification({
+            title: data?.message || "Resource successfully updated.",
             variant: "success",
             icon: IconEnum.check,
             timer: 2,

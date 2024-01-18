@@ -51,7 +51,7 @@ export interface CharacterCharacterFieldType {
     related_id: string;
   }[];
   documents: {
-    document: Pick<DocumentType, "id" | "title" | "icon">;
+    document: Pick<DocumentType, "id" | "title" | "icon"> & { is_main_page: boolean | null };
     related_id: string;
   }[];
   map_pins: {
