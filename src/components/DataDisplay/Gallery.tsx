@@ -5,8 +5,8 @@ import { Image } from "./Image";
 
 const GalleryClasses = tv({
   slots: {
-    container: "overflow-y-auto",
-    base: "grid gap-1 grid-cols-1  md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
+    container: "overflow-y-auto h-full",
+    base: "grid gap-1 grid-cols-1 md:grid-cols-2 min-h-fit lg:pb-0 pb-48",
   },
   variants: {
     columns: {
