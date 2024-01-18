@@ -1,4 +1,4 @@
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { QueryClient, UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
@@ -36,6 +36,7 @@ import {
   useGetSubEntity,
   useRemoveFromEntity,
   useTable,
+  useUpdateManyPublic,
 } from "../../hooks";
 import {
   CharacterCharacterFieldType,
@@ -211,9 +212,21 @@ function disableShowRelationshipTree(character: CharacterType | undefined) {
 }
 function documentsTableColumns(
   removeItem: UseMutateAsyncFunction<any, unknown, { relations: { [key: string]: { id: string }[] } }, unknown>,
-
+  updatePublic: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  queryClient: QueryClient,
   project_id: string,
+  character_id: string,
 ) {
   return [
     documentsColumnHelper.display({
@@ -240,6 +253,27 @@ function documentsTableColumns(
       id: "title",
       header: "Title",
       cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+    }),
+    documentsColumnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            queryClient.refetchQueries(["characters", character_id]);
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
     }),
 
     documentsColumnHelper.display({
@@ -813,7 +847,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
-
+  const queryClient = useQueryClient();
   const {
     data: existingCharacter,
     isLoading,
@@ -839,6 +873,8 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     },
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
+  const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
+
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
 
@@ -1106,7 +1142,14 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 {existingCharacter?.data?.documents?.length ? (
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     <Table
-                      columns={documentsTableColumns(removeItem, setDrawer, project_id as string)}
+                      columns={documentsTableColumns(
+                        removeItem,
+                        updateDocumentsPublic,
+                        setDrawer,
+                        queryClient,
+                        project_id as string,
+                        item_id as string,
+                      )}
                       config={{
                         expandable: true,
                         hasNoHeaderGap: true,
