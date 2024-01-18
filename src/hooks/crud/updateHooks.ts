@@ -668,7 +668,7 @@ export function useUpdateUser<InsertType extends { data: Pick<UserType, "feature
 }
 
 export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; is_public: boolean } }>(
-  type: AvailableEntityType,
+  type: AvailableEntityType | AvailableSubEntityType,
   project_id: string,
 ) {
   const queryClient = useQueryClient();

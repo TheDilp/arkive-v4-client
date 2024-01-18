@@ -1,3 +1,4 @@
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
@@ -14,7 +15,7 @@ import {
   TablePageLayout,
   Tooltip,
 } from "../../components";
-import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable, useUpdateManyPublic } from "../../hooks";
 import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
@@ -26,6 +27,7 @@ import {
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import {
   baseURLS,
+  BooleanFilters,
   CharacterBlueprintRelationFilter,
   dialogAtom,
   DiceRollRegex,
@@ -207,6 +209,17 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   navigate: NavigateFunction,
+  updatePublicMany: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
   webhooks: WebhookType[],
 ) {
   const fieldColumns = [
@@ -378,6 +391,30 @@ function createColumns(
 
   fieldColumns.push(
     columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+        filterOptions: BooleanFilters,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
+  );
+
+  fieldColumns.push(
+    columnHelper.display({
       id: "action",
       header: "Actions",
       meta: {
@@ -452,6 +489,7 @@ function createColumns(
       ),
     }),
   );
+
   return fieldColumns;
 }
 
@@ -481,7 +519,10 @@ export function BlueprintInstanceView() {
     fields: ["id", "title", "title_name"],
   });
   useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
+
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("blueprint_instances", project_id as string);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", project_id);
+
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
       data: {
@@ -535,6 +576,7 @@ export function BlueprintInstanceView() {
               setDialog,
               createNotification,
               navigate,
+              updatePublicMany,
               user?.webhooks || [],
             )}
             config={{
@@ -545,6 +587,34 @@ export function BlueprintInstanceView() {
               filters,
               relationFilters,
               selectedActions: [
+                {
+                  icon: IconEnum.eye,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Set public",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const entitesNotFolders = (instances?.data || [])?.filter((e) => ids.includes(e.id));
+                    if (entitesNotFolders.length) {
+                      await updatePublicMany({ data: { ids, is_public: true } });
+                      dispatch({ type: "clearSelection" });
+                    }
+                  },
+                },
+                {
+                  icon: IconEnum.eye_slash,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Set private",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const entitesNotFolders = (instances?.data || [])?.filter((e) => ids.includes(e.id));
+                    if (entitesNotFolders.length) {
+                      await updatePublicMany({ data: { ids, is_public: false } });
+                      dispatch({ type: "clearSelection" });
+                    }
+                  },
+                },
                 {
                   icon: IconEnum.trash,
                   variant: "error",
