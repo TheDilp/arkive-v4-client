@@ -12,7 +12,6 @@ import {
   Breadcrumbs,
   Button,
   CarouselEntityPreview,
-  Checkbox,
   Collapsible,
   createColumnHelper,
   Dropdown,
@@ -37,7 +36,6 @@ import {
   useGetSubEntity,
   useRemoveFromEntity,
   useTable,
-  useUpdateEntityResource,
 } from "../../hooks";
 import {
   CharacterCharacterFieldType,
@@ -213,18 +211,7 @@ function disableShowRelationshipTree(character: CharacterType | undefined) {
 }
 function documentsTableColumns(
   removeItem: UseMutateAsyncFunction<any, unknown, { relations: { [key: string]: { id: string }[] } }, unknown>,
-  updateResource: UseMutateAsyncFunction<
-    any,
-    unknown,
-    {
-      relations: {
-        [key: string]: {
-          [key: string]: string | boolean | number | null;
-        }[];
-      };
-    },
-    unknown
-  >,
+
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   project_id: string,
 ) {
@@ -254,35 +241,7 @@ function documentsTableColumns(
       header: "Title",
       cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
     }),
-    documentsColumnHelper.display({
-      id: "is_main_page",
-      header: "Is main page",
-      cell: ({ row }) => (
-        <Checkbox
-          name="is_main_page"
-          onChange={async () =>
-            updateResource({
-              relations: {
-                documents: [
-                  {
-                    id: row.original.id,
-                    is_main_page: !row.original.is_main_page,
-                  },
-                ],
-              },
-            })
-          }
-          value={!!row.original.is_main_page}
-        />
-      ),
-      maxSize: 5,
-      size: 5,
-      minSize: 5,
-      meta: {
-        centered: true,
-        noLink: true,
-      },
-    }),
+
     documentsColumnHelper.display({
       id: "action",
       header: "Actions",
@@ -882,7 +841,6 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
-  const { mutateAsync: updateResource } = useUpdateEntityResource(item_id as string, "characters");
 
   const relationships = [
     ...(existingCharacter?.data?.related_to || []),
@@ -1148,7 +1106,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 {existingCharacter?.data?.documents?.length ? (
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     <Table
-                      columns={documentsTableColumns(removeItem, updateResource, setDrawer, project_id as string)}
+                      columns={documentsTableColumns(removeItem, setDrawer, project_id as string)}
                       config={{
                         expandable: true,
                         hasNoHeaderGap: true,
