@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { AllAvailableEntities, ProjectType } from "../../types";
-import { getEntityLink, getImageURL, IconEnum } from "../../utils";
+import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
+import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
@@ -59,13 +59,18 @@ export function PublicNavbar() {
             isAutocomplete
             isPublic
             manualResults={(results || []).flatMap((result) =>
-              result.result.map((r) => ({
-                value: r.id,
-                label: r.label,
-                image: r?.image,
-                parent_id: r?.parent_id,
-                type: result.name as AllAvailableEntities,
-              })),
+              result.result.map((r) => {
+                return {
+                  icon: getDefaultEntityIcon(
+                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableEntityType),
+                  ),
+                  value: r.id,
+                  label: r.label,
+                  image: r?.image,
+                  parent_id: r?.parent_id,
+                  type: result.name as AllAvailableEntities,
+                };
+              }),
             )}
             name="search"
             onChange={({ type, value, parent_id }) => {

@@ -11,7 +11,7 @@ export function PublicLayout() {
       <div className="mx-auto flex max-h-full w-full flex-1 flex-col lg:max-w-5xl">
         <PublicNavbar />
         <Drawer isPublic />
-        <div className="flex-1 overflow-auto rounded border border-zinc-700 p-4">
+        <div className="flex-1 overflow-auto rounded border border-zinc-700">
           <Outlet />
         </div>
       </div>
@@ -22,7 +22,7 @@ export function PublicLayout() {
 export function PublicEntityLayout({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="flex h-full w-full flex-col gap-y-2">
-      {title ? <h2 className="font-lato text-3xl">{title}</h2> : null}
+      {title ? <h2 className="px-4 py-2 font-lato text-3xl">{title}</h2> : null}
       {children}
     </div>
   );
