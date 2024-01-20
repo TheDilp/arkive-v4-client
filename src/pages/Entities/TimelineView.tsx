@@ -29,9 +29,8 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const x = d3
         .scaleLinear()
-        .domain([0, (yearCount + 2) * monthCount])
-        .range([XAXISOFFSET, width / 1.5 - padding]);
-
+        .domain([0, yearCount * monthCount * 2])
+        .range([XAXISOFFSET, width / 2 - XAXISOFFSET]);
       const y = d3
         .scaleLinear()
         .domain([0, yearCount * 2])
@@ -39,21 +38,22 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(monthCount * (yearCount + 1))
+        .ticks(yearCount * monthCount * 2)
         .tickSize(10)
-        .tickFormat((d) => `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`);
+        .tickFormat((d) => {
+          return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
+        });
 
       // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
       const points = events.map((e) => {
         // const eventMonth = months?.[e.start_month];
         // console.log(e);
         return {
-          x: (e.start_year - 1) * monthCount + e.start_day * 0.01,
+          x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
           y: e.start_year + 0.5,
           background_color: e.background_color || DefaultTagColor,
         };
       });
-
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -61,7 +61,6 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .call(axisBottom);
 
       const groupForCircles = svg.append("g").attr("id", "groupForCircles");
-
       points.forEach((e) => {
         groupForCircles
           .append("g")
