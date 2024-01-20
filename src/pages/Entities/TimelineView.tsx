@@ -1,13 +1,16 @@
 import * as d3 from "d3";
 import groupBy from "lodash.groupby";
-import { MutableRefObject, useLayoutEffect, useRef } from "react";
+import { MouseEvent, MutableRefObject, useLayoutEffect, useRef } from "react";
 
 import { EventType, MonthType } from "../../types";
+import { DefaultTagColor } from "../../utils";
 
 const circleRadius = 5;
+const XAXISOFFSET = 20;
 
 export function TimelineView({ events, months }: { events: EventType[]; months: MonthType[] }) {
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
+  const container = useRef() as MutableRefObject<HTMLDivElement>;
   // const firstRender = useRef(true);
   useLayoutEffect(() => {
     if (
@@ -19,19 +22,16 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
       const monthCount = months.length;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
-
-      // Converts the month number to the timeline which has ticks that go from 1 - 10
-      // which is needed if the number of months is not exactly 10
-      const monthConversionFactor = monthCount / 10;
-
+      const padding = 100;
       const width = (timelineContainer?.current?.clientWidth || 1) * 2 || 1;
       const height = timelineContainer?.current?.clientHeight || 1;
       const svg = d3.select(timelineContainer.current);
 
       const x = d3
         .scaleLinear()
-        .domain([0, yearCount])
-        .range([0, width / 1.5]);
+        .domain([0, (yearCount + 2) * monthCount])
+        .range([XAXISOFFSET, width / 1.5 - padding]);
+
       const y = d3
         .scaleLinear()
         .domain([0, yearCount])
@@ -39,14 +39,14 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(monthCount * yearCount)
-        .tickFormat((d) => {
-          return `${months[(Number(d) * 10) % monthCount].title} ${Math.floor((Number(d) * 10) / monthCount + 1)}`;
-        });
+        .ticks(monthCount * (yearCount + 1))
+        .tickSize(10)
+        .tickFormat((d) => `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`);
 
       const points = events.map((e) => ({
-        x: e.start_year * monthConversionFactor + e.start_day * 0.01,
+        x: (e.start_year - 1) * monthCount,
         y: e.start_year,
+        background_color: e.background_color || DefaultTagColor,
       }));
 
       svg
@@ -64,20 +64,36 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
           .attr("cx", x(e.x))
           .attr("cy", y(e.y))
           .attr("r", circleRadius)
-          .style("fill", "purple");
+          .style("fill", e.background_color);
+      });
+
+      const highlighter = svg
+        .append("rect")
+        .attr("class", "highlighter")
+        .attr("height", height)
+        .attr("width", width)
+        .style("pointer-events", "all")
+        .style("fill", "none")
+        .on("mouseover", (e: MouseEvent) => {
+          e.currentTarget.classList.add("stroke-blue-400", "w-[1px]", "absolute");
+        })
+        .on("mouseout", () => {});
+      svg.on("mousemove", (e: MouseEvent) => {
+        highlighter.attr("transform", `translate(${e.clientX + container.current.scrollLeft - padding + 20}, 0)`);
       });
     }
 
     return () => {
       d3.select(timelineContainer.current).select("#groupForCircles").remove();
       d3.select(timelineContainer.current).select(".axis--x").remove();
+      d3.select(timelineContainer.current).select(".highlighter").remove();
     };
   }, [events]);
 
   return (
-    <div className="h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
-      <div className="h-full w-[200%] ">
-        {events.length ? <svg ref={timelineContainer} className="block h-full min-w-full bg-zinc-900 p-2" /> : null}
+    <div ref={container} className="h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
+      <div className="h-full w-[200%]">
+        {events.length ? <svg ref={timelineContainer} className="block h-full min-w-full bg-zinc-900" /> : null}
       </div>
     </div>
   );
