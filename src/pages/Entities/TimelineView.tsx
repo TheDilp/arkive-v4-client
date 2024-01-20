@@ -17,7 +17,13 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       timelineContainer?.current?.clientHeight
     ) {
       const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
+      const monthCount = months.length;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
+
+      // Converts the month number to the timeline which has ticks that go from 1 - 10
+      // which is needed if the number of months is not exactly 10
+      const monthConversionFactor = monthCount / 10;
+
       const width = (timelineContainer?.current?.clientWidth || 1) * 2 || 1;
       const height = timelineContainer?.current?.clientHeight || 1;
       const svg = d3.select(timelineContainer.current);
@@ -26,14 +32,23 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .scaleLinear()
         .domain([0, yearCount])
         .range([0, width / 1.5]);
+      const y = d3
+        .scaleLinear()
+        .domain([0, yearCount])
+        .range([height / 1.5, 0]);
 
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(months.length * yearCount, "$.1f")
+        .ticks(monthCount * yearCount)
         .tickFormat((d) => {
-          return `${months[(Number(d) * 10) % months.length].title} ${Math.floor((Number(d) * 10) / months.length + 1)}`;
+          return `${months[(Number(d) * 10) % monthCount].title} ${Math.floor((Number(d) * 10) / monthCount + 1)}`;
         });
-      const points = events.map((e) => ({ x: (e.start_month + 1) * (e.start_year * months.length), y: e.start_year }));
+
+      const points = events.map((e) => ({
+        x: e.start_year * monthConversionFactor + e.start_day * 0.01,
+        y: e.start_year,
+      }));
+
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -46,8 +61,8 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         groupForCircles
           .append("g")
           .append("circle")
-          .attr("cx", e.x)
-          .attr("cy", e.y)
+          .attr("cx", x(e.x))
+          .attr("cy", y(e.y))
           .attr("r", circleRadius)
           .style("fill", "purple");
       });
