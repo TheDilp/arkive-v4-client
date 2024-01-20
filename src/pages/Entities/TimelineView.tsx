@@ -9,6 +9,33 @@ import { DefaultTagColor } from "../../utils";
 const circleRadius = 5;
 const XAXISOFFSET = 20;
 
+function truncateLongEventText(texts: any) {
+  // eslint-disable-next-line func-names
+  texts.each(function () {
+    // @ts-ignore
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/);
+
+    const ellipsis = text.text("").append("tspan").attr("class", "elip").text("...");
+    const width = parseFloat(text.attr("width")) - (ellipsis?.node()?.getComputedTextLength() ?? 0);
+    const numWords = words.length;
+
+    const tspan = text.insert("tspan", ":first-child").text(words.join(" "));
+
+    // Try the whole line
+    // While it's too long, and we have words left, keep removing words
+
+    while ((tspan?.node()?.getComputedTextLength() ?? 10) > width && words.length) {
+      words.pop();
+      tspan.text(words.join(" "));
+    }
+
+    if (words.length === numWords) {
+      ellipsis.remove();
+    }
+  });
+}
+
 export function TimelineView({ events, months }: { events: EventType[]; months: MonthType[] }) {
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
@@ -26,7 +53,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       // Calendar constants
       const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
       const monthCount = months.length;
-      const zoom = 4;
+      const zoom = 2;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
       const endRange = yearCount * monthCount * zoom;
       // Graphics constants
@@ -116,12 +143,22 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
           .append("rect")
           .attr("width", x(e.width))
           .attr("height", 30)
+          .attr("class", "overflow-hidden")
           .attr("x", x(e.x))
           .attr("y", y(e.y))
           .style("fill", e.background_color);
         bar
           .append("text")
-          .text(`${e.title} (${e.date})`)
+          .attr("class", "event-text")
+          .attr("width", x(e.width) - 10)
+          .text(() => {
+            const title = `${e.title} (${e.date})`;
+            if (title.length > x(e.width) - 10) {
+              return `${title.slice(0, title.length / 2)}...`;
+            }
+            return title;
+          })
+
           .attr("fill", "white")
           .attr("x", x(e.x) + 10)
           .attr("y", y(e.y) + 20);
@@ -149,6 +186,8 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
             tooltip.style("display", "none");
           });
       });
+
+      d3.selectAll(".event-text").call(truncateLongEventText);
     }
 
     return () => {
