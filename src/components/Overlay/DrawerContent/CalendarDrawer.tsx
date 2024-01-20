@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, MonthStateType } from "../../../types";
-import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
+import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd, sortEntities } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { FolderSelect } from "../../Complex";
@@ -71,7 +71,6 @@ function MonthsSection({
                       <div {...provided.dragHandleProps} className="self-end pb-2">
                         <Icon fontSize={24} icon={IconEnum.menu} />
                       </div>
-
                       <Input
                         label="Name (required)"
                         name={`[${index}].title`}
@@ -88,15 +87,6 @@ function MonthsSection({
                           value={item.days ?? 0}
                         />
                       </div>
-                      {/* <div className="w-1/4">
-                        <Input
-                          label="Leap days (optional)"
-                          name={`[${index}].leap_days`}
-                          onChange={handleChange}
-                          type="number"
-                          value={item.leap_days ?? 0}
-                        />
-                      </div> */}
                       <div className="h-10 self-end">
                         <Button
                           hasNoBackground
@@ -415,13 +405,21 @@ export function CalendarDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, leap_days: leapDays, tags: calendar.tags },
+        relations: {
+          months: months.map((m, i) => ({ ...m, sort: i })).sort(sortEntities),
+          leap_days: leapDays,
+          tags: calendar.tags,
+        },
       });
       await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
       const parsedData = UpdateCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
-        relations: { months, leap_days: leapDays, tags: calendar.tags },
+        relations: {
+          months: months.map((m, i) => ({ ...m, sort: i })).sort(sortEntities),
+          leap_days: leapDays,
+          tags: calendar.tags,
+        },
       });
 
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
