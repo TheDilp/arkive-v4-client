@@ -23,9 +23,13 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       timelineContainer?.current?.clientWidth &&
       timelineContainer?.current?.clientHeight
     ) {
+      // Calendar constants
       const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
       const monthCount = months.length;
+      const zoom = 4;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
+      const endRange = yearCount * monthCount * zoom;
+      // Graphics constants
       const padding = 100;
       const width = (timelineContainer?.current?.clientWidth || 1) * 2 || 1;
       const height = timelineContainer?.current?.clientHeight || 1;
@@ -33,7 +37,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const x = d3
         .scaleLinear()
-        .domain([0, yearCount * monthCount * 2])
+        .domain([0, endRange])
         .range([XAXISOFFSET, width / 2 - XAXISOFFSET]);
       const y = d3
         .scaleLinear()
@@ -42,24 +46,44 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(yearCount * monthCount * 2)
+        .ticks(endRange)
         .tickSize(10)
         .tickFormat((d) => {
           return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
         });
 
       // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
-      const points = events.map((e) => {
-        // const eventMonth = months?.[e.start_month];
-        // console.log(e);
-        return {
-          x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-          y: e.start_year + 0.5,
-          background_color: e.background_color || DefaultTagColor,
-          title: e.title,
-          description: e.description,
-        };
-      });
+      const points = events
+        .filter((e) => !e.end_year)
+        .map((e) => {
+          // const eventMonth = months?.[e.start_month];
+          // console.log(e);
+          return {
+            x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            y: e.start_year + 0.5,
+            background_color: e.background_color || DefaultTagColor,
+            title: e.title,
+            description: e.description,
+          };
+        });
+
+      const bars = events
+        .filter((e) => !!e.end_year)
+        .map((e) => {
+          // const eventMonth = months?.[e.start_month];
+          // console.log(e);
+          return {
+            x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            y: e.start_year + 0.5,
+            width: Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
+            background_color: e.background_color || DefaultTagColor,
+            title: e.title,
+            date: `${e.start_day} ${months[e.start_month].title} ${e.start_year} - ${e.end_day || ""} ${
+              months[e.end_month || 0].title
+            } ${e.end_year || ""}`,
+          };
+        });
+
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -68,7 +92,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const tooltip = d3
         .select(container.current)
-        .attr("class", "tooltip absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-4");
+        .attr("class", "tooltip absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2");
 
       const highlighter = svg
         .append("rect")
@@ -82,8 +106,26 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         highlighter.attr("transform", `translate(${e.clientX + container.current.scrollLeft - (isLg ? padding - 20 : 16)}, 0)`);
       });
 
+      const groupForBars = svg.append("g").attr("id", "groupForBars");
       const groupForCircles = svg.append("g").attr("id", "groupForCircles");
 
+      bars.forEach((e) => {
+        const bar = groupForBars.append("g");
+
+        bar
+          .append("rect")
+          .attr("width", x(e.width))
+          .attr("height", 30)
+          .attr("x", x(e.x))
+          .attr("y", y(e.y))
+          .style("fill", e.background_color);
+        bar
+          .append("text")
+          .text(`${e.title} (${e.date})`)
+          .attr("fill", "white")
+          .attr("x", x(e.x) + 10)
+          .attr("y", y(e.y) + 20);
+      });
       points.forEach((e) => {
         groupForCircles
           .append("g")
@@ -111,6 +153,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
     return () => {
       d3.select(timelineContainer.current).select("#groupForCircles").remove();
+      d3.select(timelineContainer.current).select("#groupForBars").remove();
       d3.select(timelineContainer.current).select(".axis--x").remove();
       d3.select(timelineContainer.current).select(".highlighter").remove();
       d3.select(timelineContainer.current).select(".tooltip").remove();
@@ -119,7 +162,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
   return (
     <div className="relative h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
-      <div ref={container} className="hidden" />
+      <div ref={container} className="hidden w-fit" />
       <div className="h-full w-[200%]">
         {events.length ? <svg ref={timelineContainer} className="block h-full min-w-full bg-zinc-900" /> : null}
       </div>
