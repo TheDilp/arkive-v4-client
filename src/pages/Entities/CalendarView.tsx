@@ -66,8 +66,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     month: ls.get(`calendar_${id ?? item_id}_month`) ?? 0,
     year: ls.get(`calendar_${id ?? item_id}_year`) ?? 1,
   });
-  const [view, setView] = useState<"calendar" | "timeline">("calendar");
-  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date]);
+  const [view, setView] = useState<"calendar" | "timeline">(ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar");
+  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, "events", item_id, date, view]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
     item_id || id,
@@ -86,6 +86,9 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
+      pagination: {
+        limit: 1000,
+      },
       fields: [
         "id",
         "title",
@@ -173,8 +176,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
-    setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null]);
-  }, [date]);
+    setQueryKey(["allEntities", project_id, "events", item_id ?? id, view, view === "calendar" ? date : null, date.year]);
+  }, [date, view]);
 
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
@@ -205,6 +208,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
 
   if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
   if (!calendar) return <Alert label="Calendar not found." variant="error" />;
+
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
@@ -249,11 +253,11 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
             name="view"
             onChange={({ value }) => {
               setView(value as "calendar" | "timeline");
-              // ls.set("timeline_view", value);
+              ls.set(`calendar_or_timeline_view_${item_id}`, value);
             }}
             options={[
               { label: "Calendar", value: "calendar", icon: IconEnum.calendar },
-              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt, isDisabled: true },
+              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt },
             ]}
             placeholder="View"
             value={view}
@@ -322,8 +326,11 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                   ?.filter(
                     (event) =>
                       (event.start_day === day + 1 || event.end_day === day + 1) &&
-                      (event.start_month === date.month || event?.end_month === date.month),
+                      (event.start_month === date.month || event?.end_month === date.month) &&
+                      event.start_year === date.year &&
+                      (typeof event.end_year === "number" ? event.end_year === date.year : true),
                   )
+
                   .map((event) => (
                     <Tooltip
                       key={event.id}
@@ -443,7 +450,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
             ))}
         </div>
       ) : (
-        <TimelineView events={events?.data || []} month_count={calendar?.months.length || 0} />
+        <TimelineView events={events?.data || []} months={calendar?.months || []} />
       )}
     </div>
   );
