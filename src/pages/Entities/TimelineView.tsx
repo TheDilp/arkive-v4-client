@@ -4,7 +4,7 @@ import { MouseEvent, MutableRefObject, useLayoutEffect, useRef } from "react";
 
 import { useBreakpoint } from "../../hooks";
 import { EventType, MonthType } from "../../types";
-import { DefaultTagColor } from "../../utils";
+import { DefaultTagColor, getDayOrdinal } from "../../utils";
 
 const circleRadius = 5;
 const XAXISOFFSET = 20;
@@ -39,7 +39,7 @@ function truncateLongEventText(texts: any) {
 export function TimelineView({ events, months }: { events: EventType[]; months: MonthType[] }) {
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
-
+  const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
   const { isLg } = useBreakpoint();
 
   // const firstRender = useRef(true);
@@ -65,7 +65,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       const x = d3
         .scaleLinear()
         .domain([0, endRange])
-        .range([XAXISOFFSET, width / 2 - XAXISOFFSET]);
+        .range([XAXISOFFSET, width - XAXISOFFSET]);
       const y = d3
         .scaleLinear()
         .domain([0, yearCount * 2])
@@ -82,14 +82,12 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
       const points = events
         .filter((e) => !e.end_year)
-        .map((e) => {
-          // const eventMonth = months?.[e.start_month];
-          // console.log(e);
+        .map((e, i) => {
           return {
             x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: e.start_year + 0.5,
+            y: e.start_year + e.start_month / 10 - i / 10,
             background_color: e.background_color || DefaultTagColor,
-            title: e.title,
+            title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year})`,
             description: e.description,
           };
         });
@@ -97,17 +95,14 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       const bars = events
         .filter((e) => !!e.end_year)
         .map((e) => {
-          // const eventMonth = months?.[e.start_month];
-          // console.log(e);
           return {
             x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
             y: e.start_year + 0.5,
             width: Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
             background_color: e.background_color || DefaultTagColor,
-            title: e.title,
-            date: `${e.start_day} ${months[e.start_month].title} ${e.start_year} - ${e.end_day || ""} ${
-              months[e.end_month || 0].title
-            } ${e.end_year || ""}`,
+            title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
+              e.end_day || ""
+            }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
           };
         });
 
@@ -130,7 +125,10 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .style("fill", "none")
         .on("mouseout", () => {});
       svg.on("mousemove", (e: MouseEvent) => {
-        highlighter.attr("transform", `translate(${e.clientX + container.current.scrollLeft - (isLg ? padding - 20 : 16)}, 0)`);
+        highlighter.attr(
+          "transform",
+          `translate(${e.clientX + scrollContainer.current.scrollLeft - (isLg ? padding - 20 : 16)}, 0)`,
+        );
       });
 
       const groupForBars = svg.append("g").attr("id", "groupForBars");
@@ -152,7 +150,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
           .attr("class", "event-text")
           .attr("width", x(e.width) - 10)
           .text(() => {
-            const title = `${e.title} (${e.date})`;
+            const title = `${e.title}`;
             if (title.length > x(e.width) - 10) {
               return `${title.slice(0, title.length / 2)}...`;
             }
@@ -200,10 +198,14 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
   }, [events]);
 
   return (
-    <div className="relative h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
+    <div ref={scrollContainer} className="relative h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
       <div ref={container} className="hidden w-fit" />
-      <div className="h-full w-[200%]">
-        {events.length ? <svg ref={timelineContainer} className="block h-full min-w-full bg-zinc-900" /> : null}
+      <div
+        className="h-full"
+        style={{
+          width: `${2000}rem`,
+        }}>
+        {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
       </div>
     </div>
   );

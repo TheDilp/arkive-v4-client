@@ -187,8 +187,9 @@ export function formatDateToString(
 }
 
 export function getDayOrdinal(day: number): "st" | "nd" | "rd" | "th" {
-  if (day === 1) return "st";
-  if (day === 2) return "nd";
-  if (day === 3) return "rd";
+  const dayString = day.toString();
+  if (dayString.endsWith("1")) return "st";
+  if (dayString.endsWith("2")) return "nd";
+  if (dayString.endsWith("3")) return "rd";
   return "th";
 }
