@@ -131,6 +131,26 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                   operator: "eq",
                 },
               ],
+
+        or:
+          view === "calendar" && existingCalendar?.data?.months?.[date.month]?.id
+            ? [
+                {
+                  id: "start_month_id",
+                  header_name: "Start month",
+                  field: "start_month_id",
+                  value: existingCalendar?.data?.months?.[date.month].id,
+                  operator: "eq",
+                },
+                {
+                  id: "end_month_id",
+                  header_name: "End month",
+                  field: "end_month_id",
+                  value: existingCalendar?.data?.months?.[date.month].id,
+                  operator: "eq",
+                },
+              ]
+            : [],
       },
       orderBy: [
         { field: "hours", sort: "asc" },
@@ -325,9 +345,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 {(isLoading ? [] : events?.data || [])
                   ?.filter(
                     (event) =>
-                      (event.start_day === day + 1 || event.end_day === day + 1) &&
-                      (event.start_month_id === calendar.months?.[date.month]?.id ||
-                        event.end_month_id === calendar.months?.[date.month]?.id) &&
+                      ((event.start_day === day + 1 && event.start_month_id === calendar.months?.[date.month]?.id) ||
+                        (event.end_month_id === calendar.months?.[date.month]?.id && event.end_day === day + 1)) &&
                       event.start_year === date.year &&
                       (typeof event.end_year === "number" ? event.end_year === date.year : true),
                   )
