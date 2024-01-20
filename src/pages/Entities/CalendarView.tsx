@@ -96,6 +96,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
         "background_color",
         "start_day",
         "start_month",
+        "start_month_id",
+        "end_month_id",
         "start_year",
         "end_day",
         "end_month",
@@ -326,7 +328,8 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                   ?.filter(
                     (event) =>
                       (event.start_day === day + 1 || event.end_day === day + 1) &&
-                      (event.start_month === date.month || event?.end_month === date.month) &&
+                      (event.start_month_id === calendar.months?.[date.month]?.id ||
+                        event.end_month_id === calendar.months?.[date.month]?.id) &&
                       event.start_year === date.year &&
                       (typeof event.end_year === "number" ? event.end_year === date.year : true),
                   )

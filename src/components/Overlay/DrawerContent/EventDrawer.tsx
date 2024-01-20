@@ -87,15 +87,7 @@ export function EventDrawer({ data }: Props) {
   );
 
   const existingMonths = calendar?.data?.months || [];
-  // const { data: existingMonths, isFetching: isFetchingMonths } = useGetEntities<MonthType>(
-  //   {
-  //     data: { parent_id: existingEvent?.data?.parent_id },
-  //     orderBy: [{ field: "sort", sort: "asc" }],
-  //     fields: ["id", "title", "days", "sort"],
-  //   },
-  //   "months",
-  //   { enabled: !!existingEvent?.data, staleTime: 5 * 60 * 1000 },
-  // );
+
   const { mutateAsync: createEvent, isLoading: isCreating } = useCreateSubEntity<{
     data: EventStateType & { parent_id: string };
   }>("events", project_id as string);
@@ -109,6 +101,7 @@ export function EventDrawer({ data }: Props) {
   const [event, setEvent] = useState<EventStateType>(
     existingEvent?.data ?? {
       start_month: data?.month ?? 0,
+      start_month_id: existingMonths?.[data?.month ?? 0]?.id,
       start_day: data?.day,
       start_year: data?.year,
       parent_id: item_id as string,
@@ -121,6 +114,12 @@ export function EventDrawer({ data }: Props) {
     }
   }, [existingEvent]);
 
+  useLayoutEffect(() => {
+    if (existingMonths.length) {
+      setEvent((prev) => ({ ...prev, start_month_id: existingMonths?.[data?.month ?? 0]?.id }));
+    }
+  }, [existingMonths]);
+
   const { handleChange } = useHandleChange({ data: event, setData: setEvent });
 
   function handleMonthChange({ name, value }: onChangeValue) {
@@ -129,7 +128,11 @@ export function EventDrawer({ data }: Props) {
       return;
     }
     const idx = existingMonths?.findIndex((month) => month.id === value) ?? -1;
-    if (idx > -1) handleChange({ name, value: idx });
+    if (idx > -1)
+      handleChange([
+        { name, value: idx },
+        { name: `${name}_id`, value: existingMonths[idx].id },
+      ]);
   }
 
   function handleImageChange({ name, label, value }: { name: string; label?: string; value: string }) {

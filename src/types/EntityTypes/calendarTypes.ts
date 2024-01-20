@@ -50,6 +50,8 @@ export interface EventType {
   image_id?: string | null;
   end_day?: number | null;
   start_day: number;
+  start_month_id: string;
+  end_month_id?: string | null;
   end_month?: number | null;
   end_year?: number | null;
   start_month: number;

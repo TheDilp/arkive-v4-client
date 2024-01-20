@@ -34,7 +34,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const y = d3
         .scaleLinear()
-        .domain([0, yearCount])
+        .domain([0, yearCount * 2])
         .range([height / 1.5, 0]);
 
       const axisBottom = d3
@@ -43,11 +43,16 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .tickSize(10)
         .tickFormat((d) => `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`);
 
-      const points = events.map((e) => ({
-        x: (e.start_year - 1) * monthCount,
-        y: e.start_year,
-        background_color: e.background_color || DefaultTagColor,
-      }));
+      // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
+      const points = events.map((e) => {
+        // const eventMonth = months?.[e.start_month];
+        // console.log(e);
+        return {
+          x: (e.start_year - 1) * monthCount + e.start_day * 0.01,
+          y: e.start_year + 0.5,
+          background_color: e.background_color || DefaultTagColor,
+        };
+      });
 
       svg
         .append("g")
