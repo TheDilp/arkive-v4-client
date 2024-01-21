@@ -80,7 +80,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const x = d3
         .scaleLinear()
         .domain([0, endRange])
-        .range([0, width - X_AXIS_OFFSET]);
+        .range([0, width - X_AXIS_OFFSET * 2]);
       const y = d3.scaleLinear().domain([0, endRange]).range([50, height]);
 
       const axisBottom = d3
