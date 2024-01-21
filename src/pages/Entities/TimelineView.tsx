@@ -1,11 +1,11 @@
 import * as d3 from "d3";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
 import { MouseEvent, MutableRefObject, useLayoutEffect, useRef } from "react";
 
 import { useBreakpoint } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import { DefaultTagColor, getDayOrdinal, userAtom } from "../../utils";
+import { DefaultTagColor, drawerAtom, getDayOrdinal, userAtom } from "../../utils";
 
 const CIRCLE_RADIUS = 5;
 const X_AXIS_OFFSET = 20;
@@ -46,6 +46,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
   const user = useAtomValue(userAtom);
+  const setDrawer = useSetAtom(drawerAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
@@ -110,6 +111,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .filter((e) => !e.end_year)
         .map((e, i) => {
           return {
+            id: e.id,
             x: isYearsOnly
               ? e.start_year - 1 + e.start_day * 0.01
               : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
@@ -124,11 +126,13 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .filter((e) => !!e.end_year)
         .map((e, i) => {
           return {
-            x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: e.start_year + Math.floor(i) * months[e.start_month].days + e.start_day,
-            width: isYearsOnly
-              ? getYearsOnlyEventWidth(e, monthCount)
-              : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
+            id: e.id,
+            start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            end_x: isYearsOnly
+              ? (e.end_year || 0) - 1
+              : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0) * 0.01,
+            y: e.start_year + Math.floor(i / 10) * 30 + e.start_day,
+
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
               e.end_day || ""
@@ -197,29 +201,41 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
 
       bars.forEach((e) => {
         const bar = groupForBars.append("g");
-
+        const bar_width = x(e.end_x - e.start_x);
         bar
           .append("rect")
-          .attr("width", x(e.width))
+          .on("click", () =>
+            setDrawer((prev) => ({
+              ...prev,
+              size: "lg",
+              title: `Edit event - ${e.title}`,
+              type: "events",
+              data: {
+                id: e.id,
+              },
+            })),
+          )
+          .attr("width", bar_width)
           .attr("height", 30)
           .attr("class", "overflow-hidden")
-          .attr("x", x(e.x))
+          .attr("x", x(e.start_x))
           .attr("y", y(e.y))
           .style("fill", e.background_color);
         bar
           .append("text")
+          .attr("pointer-events", "none")
           .attr("class", "event-text")
-          .attr("width", x(e.width) - 10)
+          .attr("width", bar_width - 10)
           .text(() => {
             const title = `${e.title}`;
-            if (title.length > x(e.width) - 10) {
+            if (title.length > bar_width - 10) {
               return `${title.slice(0, title.length / 2)}...`;
             }
             return title;
           })
 
           .attr("fill", "white")
-          .attr("x", x(e.x) + 10)
+          .attr("x", x(e.start_x) + 10)
           .attr("y", y(e.y) + 20);
       });
       points.forEach((e) => {
