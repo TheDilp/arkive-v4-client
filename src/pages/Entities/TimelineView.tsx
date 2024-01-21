@@ -1,10 +1,11 @@
 import * as d3 from "d3";
+import { useAtomValue } from "jotai";
 import groupBy from "lodash.groupby";
 import { MouseEvent, MutableRefObject, useLayoutEffect, useRef } from "react";
 
 import { useBreakpoint } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import { DefaultTagColor, getDayOrdinal } from "../../utils";
+import { DefaultTagColor, getDayOrdinal, userAtom } from "../../utils";
 
 const CIRCLE_RADIUS = 5;
 const X_AXIS_OFFSET = 20;
@@ -44,6 +45,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 }
 
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
+  const user = useAtomValue(userAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
@@ -162,7 +164,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const groupForBars = svg.append("g").attr("id", "groupForBars");
       const groupForCircles = svg.append("g").attr("id", "groupForCircles");
 
-      eraBars.forEach((e) => {
+      (user?.feature_flags?.show_eras_in_timelines ? eraBars : []).forEach((e) => {
         const bar = groupForEras.append("g");
 
         bar
