@@ -191,7 +191,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     },
     { enabled: !!subitem_id, isPublic },
   );
-  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string);
+  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {

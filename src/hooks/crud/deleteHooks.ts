@@ -54,7 +54,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   );
 }
 
-export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string) {
+export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string, parent_id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -123,6 +123,9 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
           icon: IconEnum.check,
           timer: 5,
         });
+        if (type === "events") {
+          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, parent_id] });
+        }
         queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
       },
       onError: (_, vars, context) => {

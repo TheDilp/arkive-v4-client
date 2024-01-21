@@ -65,13 +65,12 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const zoom = 2;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
       const isYearsOnly = yearCount > 5;
-      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * zoom;
+      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * (zoom / 2);
       // Graphics constants
       const padding = 100;
-      const width = (timelineContainer?.current?.clientWidth || 1) * 2 || 1;
+      const width = timelineContainer?.current?.clientWidth || 1 || 1;
       const height = timelineContainer?.current?.clientHeight || 1;
       const svg = d3.select(timelineContainer.current);
-
       const x = d3
         .scaleLinear()
         .domain([0, endRange])
@@ -90,19 +89,21 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
         });
 
-      const eraBars = eras.map((e, i) => {
-        return {
-          x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-          y: e.start_year + Math.floor(i / 10) * 30,
-          width: isYearsOnly
-            ? getYearsOnlyEventWidth(e, monthCount)
-            : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
-          background_color: e.color || DefaultTagColor,
-          title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
-            e.end_day || ""
-          }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
-        };
-      });
+      const eraBars = eras
+        .filter((e) => e.start_year <= endRange)
+        .map((e, i) => {
+          return {
+            x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            y: e.start_year + Math.floor(i / 10) * 30,
+            width: isYearsOnly
+              ? getYearsOnlyEventWidth(e, monthCount)
+              : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
+            background_color: e.color || DefaultTagColor,
+            title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
+              e.end_day || ""
+            }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
+          };
+        });
 
       // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
       const points = events
@@ -124,7 +125,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .map((e, i) => {
           return {
             x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: e.start_year + Math.floor(i / 10) * 30,
+            y: e.start_year + Math.floor(i) * months[e.start_month].days + e.start_day,
             width: isYearsOnly
               ? getYearsOnlyEventWidth(e, monthCount)
               : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
@@ -171,7 +172,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .append("rect")
           .attr("width", x(e.width))
           .attr("height", height / 1.05)
-          .attr("fill-opacity", "50%")
+          .attr("fill-opacity", "30%")
           .attr("x", x(e.x))
           .attr("y", 0)
           .style("fill", e.background_color);
@@ -266,7 +267,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       <div
         className="h-full"
         style={{
-          width: `${2000}rem`,
+          width: `${1000}rem`,
         }}>
         {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
       </div>
