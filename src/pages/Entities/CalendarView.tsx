@@ -84,7 +84,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
       },
     },
     {
-      enabled: !data,
+      enabled: !data && !!user,
       isPublic,
     },
   );
@@ -485,7 +485,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
             ))}
         </div>
       ) : (
-        <TimelineView events={events?.data || []} months={calendar?.months || []} />
+        <TimelineView eras={calendar?.eras || []} events={events?.data || []} months={calendar?.months || []} />
       )}
     </div>
   );
