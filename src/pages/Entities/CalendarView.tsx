@@ -1,4 +1,4 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { useLayoutEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import {
   getLeapDays,
   getStartingDayForMonth,
   IconEnum,
+  userAtom,
 } from "../../utils";
 import { TimelineView } from "./TimelineView";
 
@@ -59,6 +60,7 @@ export function DayNumber({
 }
 
 export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
+  const user = useAtomValue(userAtom);
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
@@ -75,7 +77,11 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     {
       data: { project_id },
       fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
-      relations: { eras: true, months: true, leap_days: true },
+      relations: {
+        eras: user?.feature_flags?.show_eras_in_calendars || user?.feature_flags?.show_eras_in_timelines || false,
+        months: true,
+        leap_days: true,
+      },
     },
     {
       enabled: !data,
@@ -338,7 +344,9 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
               className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 bg-opacity-85 hover:text-white"
               style={{
                 backgroundColor:
-                  matchingEra && (matchingEra.start_day <= day || matchingEra.end_day >= day)
+                  matchingEra &&
+                  user?.feature_flags?.show_eras_in_calendars &&
+                  (matchingEra.start_day <= day || matchingEra.end_day >= day)
                     ? `${matchingEra?.color || DefaultTagColor}aa`
                     : "transparent",
               }}>
