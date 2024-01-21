@@ -105,10 +105,10 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
 
       const bars = events
         .filter((e) => !!e.end_year)
-        .map((e) => {
+        .map((e, i) => {
           return {
             x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: e.start_year + 0.5,
+            y: e.start_year + Math.floor(i / 10) * 30,
             width: isYearsOnly
               ? getYearsOnlyEventWidth(e, monthCount)
               : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
