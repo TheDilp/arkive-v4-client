@@ -5,6 +5,7 @@ import { MouseEvent, MutableRefObject, useLayoutEffect, useRef, useState } from 
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
+import { Button } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
 import { contextMenuAtom, DefaultTagColor, drawerAtom, getDayOrdinal, IconEnum, userAtom } from "../../utils";
@@ -49,7 +50,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
   const { project_id, item_id } = useParams();
   const user = useAtomValue(userAtom);
-  const [zoom] = useState(2);
+  const [zoom, setZoom] = useState(2);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
@@ -71,7 +72,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const monthCount = months.length;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
       const isYearsOnly = yearCount > 5;
-      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * (zoom / 2);
+      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * zoom;
       // Graphics constants
       const padding = 100;
       const width = timelineContainer?.current?.clientWidth || 1;
@@ -79,7 +80,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const svg = d3.select(timelineContainer.current);
       const x = d3
         .scaleLinear()
-        .domain([0, endRange])
+        .domain([0, endRange * (zoom / 2)])
         .range([0, width - X_AXIS_OFFSET * 2]);
       const y = d3.scaleLinear().domain([0, endRange]).range([50, height]);
 
@@ -135,7 +136,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             end_x: isYearsOnly
               ? (e.end_year || 0) - 1
               : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
-            y: clamp({ min: 0, max: height / 1.05, value: i * 8 }),
+            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
             parent_id: e.parent_id,
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
@@ -211,7 +212,6 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
 
         event_bar
           .append("rect")
-
           .on("click", () =>
             setDrawer((prev) => ({
               ...prev,
@@ -409,17 +409,27 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       d3.select(timelineContainer.current).select(".highlighter").remove();
       d3.select(timelineContainer.current).select(".tooltip").remove();
     };
-  }, [events]);
+  }, [events, zoom]);
 
   return (
-    <div ref={scrollContainer} className="relative h-full w-full max-w-full overflow-x-auto overflow-y-hidden">
-      <div ref={container} className="hidden w-fit" />
-      <div
-        className="h-full"
-        style={{
-          width: `${zoom * 500}rem`,
-        }}>
-        {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
+    <div className="flex h-full flex-col gap-y-2">
+      <div className="flex w-full items-center">
+        <div className="h-8 w-8">
+          <Button icon={IconEnum.remove} onClick={() => setZoom((prev) => clamp({ min: 2, max: 100, value: prev + 5 }))} />
+        </div>
+        <div className="h-8 w-8">
+          <Button icon={IconEnum.add} onClick={() => setZoom((prev) => clamp({ min: 2, max: 100, value: prev - 5 }))} />
+        </div>
+      </div>
+      <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-hidden">
+        <div ref={container} className="hidden w-fit" />
+        <div
+          className="h-full"
+          style={{
+            width: `${zoom * 500}rem`,
+          }}>
+          {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
+        </div>
       </div>
     </div>
   );
