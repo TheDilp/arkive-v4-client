@@ -6,8 +6,8 @@ import { useBreakpoint } from "../../hooks";
 import { EventType, MonthType } from "../../types";
 import { DefaultTagColor, getDayOrdinal } from "../../utils";
 
-const circleRadius = 5;
-const XAXISOFFSET = 20;
+const CIRCLE_RADIUS = 5;
+const X_AXIS_OFFSET = 20;
 
 function truncateLongEventText(texts: any) {
   // eslint-disable-next-line func-names
@@ -36,6 +36,12 @@ function truncateLongEventText(texts: any) {
   });
 }
 
+function getYearsOnlyEventWidth(event: EventType, monthCount: number): number {
+  const yearDifference = Number(event.end_year ?? 0) - event.start_year;
+  const monthDifference = (Number(event.end_month ?? 0) - event.start_month) / monthCount - 1;
+  return yearDifference + Math.abs(monthDifference);
+}
+
 export function TimelineView({ events, months }: { events: EventType[]; months: MonthType[] }) {
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
@@ -55,7 +61,8 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       const monthCount = months.length;
       const zoom = 2;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
-      const endRange = yearCount * monthCount * zoom;
+      const isYearsOnly = yearCount > 5;
+      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * zoom;
       // Graphics constants
       const padding = 100;
       const width = (timelineContainer?.current?.clientWidth || 1) * 2 || 1;
@@ -65,7 +72,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
       const x = d3
         .scaleLinear()
         .domain([0, endRange])
-        .range([XAXISOFFSET, width - XAXISOFFSET]);
+        .range([0, width - X_AXIS_OFFSET]);
       const y = d3
         .scaleLinear()
         .domain([0, yearCount * 2])
@@ -76,6 +83,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .ticks(endRange)
         .tickSize(10)
         .tickFormat((d) => {
+          if (isYearsOnly) return (d as number).toString();
           return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
         });
 
@@ -84,8 +92,10 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .filter((e) => !e.end_year)
         .map((e, i) => {
           return {
-            x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: e.start_year + e.start_month / 10 - i / 10,
+            x: isYearsOnly
+              ? e.start_year - 1 + e.start_day * 0.01
+              : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            y: isYearsOnly ? e.start_day : e.start_year + e.start_month / 10 - i / 10,
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year})`,
             description: e.description,
@@ -96,9 +106,11 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .filter((e) => !!e.end_year)
         .map((e) => {
           return {
-            x: (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
             y: e.start_year + 0.5,
-            width: Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
+            width: isYearsOnly
+              ? getYearsOnlyEventWidth(e, monthCount)
+              : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
               e.end_day || ""
@@ -167,7 +179,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
           .append("circle")
           .attr("cx", x(e.x))
           .attr("cy", y(e.y))
-          .attr("r", circleRadius)
+          .attr("r", CIRCLE_RADIUS)
           .style("fill", e.background_color)
           .on("mouseover", (evt: MouseEvent) => {
             tooltip

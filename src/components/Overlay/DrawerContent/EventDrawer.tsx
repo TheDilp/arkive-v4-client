@@ -85,7 +85,10 @@ export function EventDrawer({ data }: Props) {
         "description",
       ],
     },
-    { enabled: !!data?.id },
+    {
+      queryKeyConcat: ["event_drawer"],
+      enabled: !!data?.id,
+    },
   );
 
   const existingMonths = calendar?.data?.months || [];
