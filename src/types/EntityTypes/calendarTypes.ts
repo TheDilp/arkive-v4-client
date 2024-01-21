@@ -10,6 +10,7 @@ export interface CalendarType extends BaseEntityType {
   hours?: number | null;
   minutes?: number | null;
   starts_on_day?: number | null;
+  eras: EraType[];
   months: MonthType[];
   leap_days: LeapDayType[];
   days: string[];
@@ -34,6 +35,27 @@ export interface LeapDayType {
     and?: { type: LeapDayConditionType; value: string | number }[];
     or?: { type: LeapDayConditionType; value: string | number }[];
   };
+}
+
+export interface EraBackgroundGradientType {
+  id: string;
+  start_stop: number;
+  end_stop: number;
+  color: string;
+}
+export interface EraType {
+  id: string;
+  title: string;
+  parent_id: string;
+  color: string;
+  start_day: number;
+  start_month_id: string;
+  start_month: number;
+  start_year: number;
+  end_day: number;
+  end_month_id: string;
+  end_month: number;
+  end_year: number;
 }
 
 export interface EventType {

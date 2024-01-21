@@ -75,7 +75,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     {
       data: { project_id },
       fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
-      relations: { months: true, leap_days: true },
+      relations: { eras: true, months: true, leap_days: true },
     },
     {
       enabled: !data,
@@ -199,6 +199,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     }
   }, [subitem_id, subitemEvent]);
 
+  const matchingEra = (calendar?.eras || []).find((era) => date.year >= era.start_year && date.year <= era.end_year);
   const monthDays = typeof calendar?.months?.[date.month]?.days === "number" ? calendar.months[date.month].days : 0;
   const leapDayCount = useMemo(() => getLeapDays(calendar?.leap_days || [], calendar?.months || [], date), [date, calendar]);
   const previousMonthLeapDayCount = useMemo(
@@ -332,7 +333,15 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
               </div>
             ))}
           {[...Array(monthDays + leapDayCount).keys()].map((day) => (
-            <div key={day} className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 hover:text-white">
+            <div
+              key={day}
+              className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 bg-opacity-85 hover:text-white"
+              style={{
+                backgroundColor:
+                  matchingEra && (matchingEra.start_day <= day || matchingEra.end_day >= day)
+                    ? `${matchingEra?.color || DefaultTagColor}aa`
+                    : "transparent",
+              }}>
               <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
               <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
                 {(isLoading ? [] : events?.data || [])

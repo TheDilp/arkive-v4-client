@@ -39,6 +39,7 @@ export const IconEnum = {
   edit_many_nodes_edges: "mdi:vector-polyline-edit",
   error: "ph:warning-circle",
   event: "ph:flag",
+  era: "ph:timer",
   export: "ph:export",
   eye: "ph:eye",
   eye_slash: "ph:eye-slash",

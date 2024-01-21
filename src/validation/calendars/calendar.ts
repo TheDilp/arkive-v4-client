@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { InsertEraSchema, UpdateEraSchema } from "./eras";
 import { InsertMonthSchema, UpdateMonthSchema } from "./month";
 
 export const InsertCalendarSchema = z.object({
@@ -25,15 +26,18 @@ export const InsertCalendarSchema = z.object({
     days: z.string().array().min(1),
   }),
   relations: z.object({
+    eras: InsertEraSchema.array().optional(),
     months: InsertMonthSchema.array().min(1),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
       .object({
-        parent_id: z.string(),
-        month_id: z.string(),
-        conditions: z.object({
-          and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
-          or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+        data: z.object({
+          parent_id: z.string(),
+          month_id: z.string(),
+          conditions: z.object({
+            and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+            or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+          }),
         }),
       })
       .array()
@@ -64,15 +68,18 @@ export const UpdateCalendarSchema = z.object({
       }),
   }),
   relations: z.object({
+    eras: UpdateEraSchema.array().or(UpdateEraSchema.array()).optional(),
     months: UpdateMonthSchema.array().min(1).or(InsertMonthSchema.array().min(1)),
     tags: z.object({ id: z.string() }).array().optional(),
     leap_days: z
       .object({
-        parent_id: z.string(),
-        month_id: z.string(),
-        conditions: z.object({
-          and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
-          or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+        data: z.object({
+          parent_id: z.string(),
+          month_id: z.string(),
+          conditions: z.object({
+            and: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+            or: z.object({ type: z.string(), value: z.string().or(z.number()) }).array(),
+          }),
         }),
       })
       .array()

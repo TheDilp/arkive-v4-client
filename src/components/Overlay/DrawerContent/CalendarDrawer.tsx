@@ -5,13 +5,14 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, MonthStateType } from "../../../types";
-import { capitalizeFirstLetter, drawerAtom, IconEnum, onDragEnd, sortEntities } from "../../../utils";
+import { capitalizeFirstLetter, DefaultTagColor, drawerAtom, IconEnum, onDragEnd, sortEntities } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { FolderSelect } from "../../Complex";
 import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Icon, Skeleton } from "../../Misc";
+import { ColorPicker } from "..";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -24,6 +25,21 @@ function isSaveDisabled(calendar: Partial<CalendarType>, months: MonthStateType[
   if (!days.length) return true;
   if (months.some((month) => !month.title || !month.days)) return true;
   if (days.some((day) => !day.title)) return true;
+  if (
+    calendar.eras?.length &&
+    calendar.eras.some((era) => {
+      if (!era.title) return true;
+      if (typeof era.start_day !== "number") return true;
+      if (typeof era.start_month !== "number") return true;
+      if (typeof era.start_year !== "number") return true;
+      if (typeof era.end_day !== "number") return true;
+      if (typeof era.end_month !== "number") return true;
+      if (typeof era.end_month !== "number") return true;
+      if (!era.color) return true;
+      return false;
+    })
+  )
+    return true;
   return false;
 }
 
@@ -361,7 +377,8 @@ function LeapDaysSection({
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Tags", icon: IconEnum.tags },
+  { id: "2", label: "Eras", icon: IconEnum.era },
+  { id: "3", label: "Tags", icon: IconEnum.tags },
 ];
 
 export function CalendarDrawer({ data }: Props) {
@@ -378,7 +395,7 @@ export function CalendarDrawer({ data }: Props) {
     "calendars",
     {
       fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public", "parent_id"],
-      relations: { months: true, leap_days: true, tags: true },
+      relations: { eras: true, months: true, leap_days: true, tags: true },
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
@@ -416,12 +433,14 @@ export function CalendarDrawer({ data }: Props) {
       const parsedData = UpdateCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: {
-          months: months.map((m, i) => ({ ...m, sort: i })).sort(sortEntities),
-          leap_days: leapDays,
+          eras: (calendar.eras || []).map((e) => ({
+            data: { ...e, background_gradient: JSON.stringify(e.color) },
+          })),
+          months: months.map((m, i) => ({ data: { ...m, sort: i } })).sort((a, b) => a.data.sort - b.data.sort),
+          leap_days: leapDays.map((ld) => ({ data: ld })),
           tags: calendar.tags,
         },
       });
-
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
     }
   }
@@ -490,8 +509,117 @@ export function CalendarDrawer({ data }: Props) {
           </Collapsible>
         </div>
       ) : null}
+      {selectedTab === 1 ? (
+        <div>
+          <div className="flex items-center justify-between">
+            <span>Add era:</span>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: "eras",
+                    value: (calendar.eras || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New era",
+                      parent_id: calendar.id as string,
+                      color: DefaultTagColor,
+                      start_day: 1,
+                      start_month: 0,
+                      start_year: 1,
+                      start_month_id: months[0].id,
+                      end_day: 1,
+                      end_month: 0,
+                      end_year: 1,
+                      end_month_id: months[0].id,
+                    }),
+                  })
+                }
+                variant="info"
+              />
+            </div>
+          </div>
 
-      {selectedTab === 1 ? <TagInput handleChange={handleChange} tags={calendar?.tags || []} /> : null}
+          {calendar.eras?.map((era, i) => (
+            <Collapsible
+              key={era.id}
+              actions={[
+                {
+                  icon: IconEnum.trash,
+                  variant: "error",
+                  isIconOnly: true,
+                  onClick: () => handleChange({ name: "eras", value: (calendar.eras || [])?.filter((e) => e.id !== era.id) }),
+                },
+              ]}
+              initialOpen={era.title === "New era"}
+              label={era.title}>
+              <div className="flex items-start justify-between gap-x-2 p-2">
+                <Input label="Title" name={`eras[${i}].title`} onChange={handleChange} value={era.title} />
+                <div className="mb-2 w-6 self-end">
+                  <ColorPicker name={`eras[${i}].color`} onChange={handleChange} value={era.color || DefaultTagColor} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-x-2 p-2">
+                <Input
+                  label="Start day (required)"
+                  max={months[era.start_month].days}
+                  min={1}
+                  name={`eras[${i}].start_day`}
+                  onChange={handleChange}
+                  type="number"
+                  value={era?.start_day || ""}
+                />
+                <Select
+                  label="Start month (required)"
+                  name={`eras[${i}].start_month_id`}
+                  onChange={(newData) => {
+                    const monthIdx = months.findIndex((m) => m.id === newData.value);
+                    handleChange([newData, { name: `eras[${i}].start_month`, value: monthIdx }]);
+                  }}
+                  options={months?.map((month) => ({ label: month.title, value: month.id })) || []}
+                  value={typeof era?.start_month === "number" ? months?.[era.start_month]?.id : undefined}
+                />
+                <Input
+                  label="Start year (required)"
+                  name={`eras[${i}].start_year`}
+                  onChange={handleChange}
+                  type="number"
+                  value={era?.start_year || ""}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-x-2 p-2">
+                <Input
+                  label="End day (required)"
+                  max={months[era.end_month].days}
+                  min={1}
+                  name={`eras[${i}].end_day`}
+                  onChange={handleChange}
+                  type="number"
+                  value={era?.end_day || ""}
+                />
+                <Select
+                  label="End month (required)"
+                  name={`eras[${i}].end_month_id`}
+                  onChange={(newData) => {
+                    const monthIdx = months.findIndex((m) => m.id === newData.value);
+                    handleChange([newData, { name: `eras[${i}].end_month`, value: monthIdx }]);
+                  }}
+                  options={months?.map((month) => ({ label: month.title, value: month.id })) || []}
+                  value={typeof era?.end_month === "number" ? months?.[era.end_month]?.id : undefined}
+                />
+                <Input
+                  label="End year (required)"
+                  name={`eras[${i}].end_year`}
+                  onChange={handleChange}
+                  type="number"
+                  value={era?.end_year || ""}
+                />
+              </div>
+            </Collapsible>
+          ))}
+        </div>
+      ) : null}
+      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={calendar?.tags || []} /> : null}
 
       <div>
         <Button
