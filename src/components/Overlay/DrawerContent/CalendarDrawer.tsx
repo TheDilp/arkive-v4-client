@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, MonthStateType } from "../../../types";
-import { capitalizeFirstLetter, DefaultTagColor, drawerAtom, IconEnum, onDragEnd, sortEntities } from "../../../utils";
+import { capitalizeFirstLetter, DefaultTagColor, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { FolderSelect } from "../../Complex";
@@ -423,8 +423,11 @@ export function CalendarDrawer({ data }: Props) {
       const parsedData = InsertCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },
         relations: {
-          months: months.map((m, i) => ({ ...m, sort: i })).sort(sortEntities),
-          leap_days: leapDays,
+          eras: (calendar.eras || []).map((e) => ({
+            data: { ...e, background_gradient: JSON.stringify(e.color) },
+          })),
+          months: months.map((m, i) => ({ data: { ...m, sort: i } })).sort((a, b) => a.data.sort - b.data.sort),
+          leap_days: leapDays.map((ld) => ({ data: ld })),
           tags: calendar.tags,
         },
       });
