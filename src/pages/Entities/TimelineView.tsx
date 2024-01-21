@@ -38,7 +38,8 @@ function truncateLongEventText(texts: any) {
 
 function getYearsOnlyEventWidth(event: EventType, monthCount: number): number {
   const yearDifference = Number(event.end_year ?? 0) - event.start_year;
-  const monthDifference = (Number(event.end_month ?? 0) - event.start_month) / monthCount - 1;
+  const monthDifference = monthCount === 1 ? 0 : (Number(event.end_month ?? 0) - event.start_month) / (monthCount - 1);
+
   return yearDifference + Math.abs(monthDifference);
 }
 
@@ -83,7 +84,7 @@ export function TimelineView({ events, months }: { events: EventType[]; months: 
         .ticks(endRange)
         .tickSize(10)
         .tickFormat((d) => {
-          if (isYearsOnly) return (d as number).toString();
+          if (isYearsOnly) return ((d as number) + 1).toString();
           return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
         });
 
