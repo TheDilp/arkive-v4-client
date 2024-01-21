@@ -168,6 +168,15 @@ function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatc
                         placeholder="Eg Saturday"
                         value={item.title}
                       />
+                      <div className="h-10 self-end">
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.trash}
+                          isIconOnly
+                          onClick={() => setDays((prev) => prev.filter((d) => d.id !== item.id))}
+                          variant="error"
+                        />
+                      </div>
                     </div>
                   )}
                 </Draggable>
