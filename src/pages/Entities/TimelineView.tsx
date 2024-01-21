@@ -2,12 +2,14 @@ import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
 import { MouseEvent, MutableRefObject, useLayoutEffect, useRef, useState } from "react";
+import { useParams } from "react-router";
+import { clamp } from "remirror";
 
-import { useBreakpoint } from "../../hooks";
+import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import { DefaultTagColor, drawerAtom, getDayOrdinal, userAtom } from "../../utils";
+import { contextMenuAtom, DefaultTagColor, drawerAtom, getDayOrdinal, IconEnum, userAtom } from "../../utils";
 
-const CIRCLE_RADIUS = 5;
+const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 20;
 
 function truncateLongEventText(texts: any) {
@@ -45,13 +47,16 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 }
 
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
+  const { project_id, item_id } = useParams();
   const user = useAtomValue(userAtom);
   const [zoom] = useState(2);
   const setDrawer = useSetAtom(drawerAtom);
+  const setContextMenu = useSetAtom(contextMenuAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
   const { isLg } = useBreakpoint();
+  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
 
   // const firstRender = useRef(true);
   useLayoutEffect(() => {
@@ -69,17 +74,14 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * (zoom / 2);
       // Graphics constants
       const padding = 100;
-      const width = timelineContainer?.current?.clientWidth || 1 || 1;
+      const width = timelineContainer?.current?.clientWidth || 1;
       const height = timelineContainer?.current?.clientHeight || 1;
       const svg = d3.select(timelineContainer.current);
       const x = d3
         .scaleLinear()
         .domain([0, endRange])
         .range([0, width - X_AXIS_OFFSET]);
-      const y = d3
-        .scaleLinear()
-        .domain([0, yearCount * 2])
-        .range([height / 1.5, 0]);
+      const y = d3.scaleLinear().domain([0, endRange]).range([50, height]);
 
       const axisBottom = d3
         .axisBottom(x)
@@ -112,6 +114,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .map((e, i) => {
           return {
             id: e.id,
+            parent_id: e.parent_id,
             x: isYearsOnly
               ? e.start_year - 1 + e.start_day * 0.01
               : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
@@ -127,12 +130,13 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .map((e, i) => {
           return {
             id: e.id,
-            start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
+            image_id: e.image_id,
             end_x: isYearsOnly
               ? (e.end_year || 0) - 1
-              : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0) * 0.01,
-            y: e.start_year + Math.floor(i / 10) * 30 + e.start_day,
-
+              : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
+            y: clamp({ min: 0, max: height / 1.05, value: i * 8 }),
+            parent_id: e.parent_id,
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
               e.end_day || ""
@@ -143,12 +147,15 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       svg
         .append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", `translate(0,${height / 1.05})`)
+        .attr("transform", `translate(${X_AXIS_OFFSET},${height / 1.05})`)
         .call(axisBottom);
 
       const tooltip = d3
         .select(container.current)
-        .attr("class", "tooltip absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2");
+        .attr(
+          "class",
+          "tooltip pointer-events-none absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2",
+        );
 
       const highlighter = svg
         .append("rect")
@@ -156,8 +163,8 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .attr("height", height)
         .attr("width", width)
         .style("pointer-events", "all")
-        .style("fill", "none")
-        .on("mouseout", () => {});
+        .style("fill", "none");
+
       svg.on("mousemove", (e: MouseEvent) => {
         highlighter.attr(
           "transform",
@@ -165,9 +172,9 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         );
       });
 
-      const groupForEras = svg.append("g").attr("id", "groupForEras");
-      const groupForBars = svg.append("g").attr("id", "groupForBars");
-      const groupForCircles = svg.append("g").attr("id", "groupForCircles");
+      const groupForEras = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForEras");
+      const groupForBars = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForBars");
+      const groupForCircles = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForCircles");
 
       (user?.feature_flags?.show_eras_in_timelines ? eraBars : []).forEach((e) => {
         const bar = groupForEras.append("g");
@@ -180,6 +187,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .attr("x", x(e.x))
           .attr("y", 0)
           .style("fill", e.background_color);
+
         bar
           .append("text")
           .attr("class", "event-text")
@@ -193,17 +201,17 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             }
             return title;
           })
-
           .attr("fill", "white")
           .attr("x", e.width)
           .attr("y", 30);
       });
-
       bars.forEach((e) => {
-        const bar = groupForBars.append("g");
+        const event_bar = groupForBars.append("g");
         const bar_width = x(e.end_x - e.start_x);
-        bar
+
+        event_bar
           .append("rect")
+
           .on("click", () =>
             setDrawer((prev) => ({
               ...prev,
@@ -215,13 +223,80 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
               },
             })),
           )
+          .on("contextmenu", (evt: MouseEvent) => {
+            evt.preventDefault();
+            setContextMenu({
+              event: evt as any,
+              items:
+                // id || isPublic
+                //   ? [
+                //       {
+                //         id: "1",
+                //         title: "Preview event",
+                //         icon: IconEnum.eye,
+                //         onClick: () =>
+                //           setDrawer((prev) => ({
+                //             ...prev,
+                //             title: "Preview event",
+                //             type: "entity_preview",
+                //             data: { id: event.id, entity_type: "events" },
+                //             size: "lg",
+                //           })),
+                //       },
+                //     ]
+                //   :
+
+                [
+                  {
+                    id: "1",
+                    title: "Edit event",
+                    icon: IconEnum.add,
+                    onClick: () =>
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: "Edit event",
+                        type: "events",
+                        data: { id: e.id },
+                        size: "lg",
+                      })),
+                  },
+                  {
+                    id: "2",
+                    title: "Delete event",
+                    icon: IconEnum.trash,
+                    onClick: () => {
+                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                    },
+                  },
+                ],
+            });
+          })
+          .on("mouseover", (evt: MouseEvent) => {
+            // Activate tooltip only if the text of the event
+            // has an ellipsis i.e. isn't fully visible
+            if (evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "...")
+              tooltip
+                .style("display", "block")
+                .style(
+                  "transform",
+                  `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
+                    Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
+                  }px)`,
+                )
+                .html(e.title);
+          })
+          .on("mouseout", () => {
+            tooltip.style("display", "none");
+          })
           .attr("width", bar_width)
           .attr("height", 30)
           .attr("class", "overflow-hidden")
           .attr("x", x(e.start_x))
           .attr("y", y(e.y))
+          .attr("cursor", "pointer")
           .style("fill", e.background_color);
-        bar
+
+        event_bar
           .append("text")
           .attr("pointer-events", "none")
           .attr("class", "event-text")
@@ -233,7 +308,6 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             }
             return title;
           })
-
           .attr("fill", "white")
           .attr("x", x(e.start_x) + 10)
           .attr("y", y(e.y) + 20);
@@ -242,6 +316,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         groupForCircles
           .append("g")
           .append("circle")
+          .attr("class", "cursor-pointer")
           .attr("cx", x(e.x))
           .attr("cy", y(e.y))
           .attr("r", CIRCLE_RADIUS)
@@ -261,6 +336,65 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           })
           .on("mouseout", () => {
             tooltip.style("display", "none");
+          })
+          .on("click", () =>
+            setDrawer((prev) => ({
+              ...prev,
+              size: "lg",
+              title: `Edit event - ${e.title}`,
+              type: "events",
+              data: {
+                id: e.id,
+              },
+            })),
+          )
+          .on("contextmenu", (evt: MouseEvent) => {
+            evt.preventDefault();
+            setContextMenu({
+              event: evt as any,
+              items:
+                // id || isPublic
+                //   ? [
+                //       {
+                //         id: "1",
+                //         title: "Preview event",
+                //         icon: IconEnum.eye,
+                //         onClick: () =>
+                //           setDrawer((prev) => ({
+                //             ...prev,
+                //             title: "Preview event",
+                //             type: "entity_preview",
+                //             data: { id: event.id, entity_type: "events" },
+                //             size: "lg",
+                //           })),
+                //       },
+                //     ]
+                //   :
+
+                [
+                  {
+                    id: "1",
+                    title: "Edit event",
+                    icon: IconEnum.add,
+                    onClick: () =>
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: "Edit event",
+                        type: "events",
+                        data: { id: e.id },
+                        size: "lg",
+                      })),
+                  },
+                  {
+                    id: "2",
+                    title: "Delete event",
+                    icon: IconEnum.trash,
+                    onClick: () => {
+                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                    },
+                  },
+                ],
+            });
           });
       });
 
