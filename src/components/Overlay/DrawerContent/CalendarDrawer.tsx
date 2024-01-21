@@ -214,13 +214,24 @@ function LeapDaysSection({
       <div className="flex flex-col">
         {leapDays.map((item, index) => (
           <div key={item.id} className="my-1 flex w-full flex-col flex-nowrap items-center gap-x-2 rounded bg-zinc-800 p-1">
-            <Select
-              label="Month"
-              name={`[${index}].month_id`}
-              onChange={handleChange}
-              options={months.map((month) => ({ label: month.title, value: month.id }))}
-              value={item.month_id}
-            />
+            <div className="flex w-full items-center justify-between gap-x-2">
+              <Select
+                label="Month"
+                name={`[${index}].month_id`}
+                onChange={handleChange}
+                options={months.map((month) => ({ label: month.title, value: month.id }))}
+                value={item.month_id}
+              />
+              <div className="mb-2 h-6 w-6 self-end">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.trash}
+                  isIconOnly
+                  onClick={() => setLeapDays((prev) => prev.filter((ld) => ld.id !== item.id))}
+                  variant="error"
+                />
+              </div>
+            </div>
             <div className="mt-2 flex w-full flex-col justify-start self-start">
               <div className="flex items-center justify-between">
                 <div className="w-full">
