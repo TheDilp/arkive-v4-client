@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
-import { MouseEvent, MutableRefObject, useLayoutEffect, useRef } from "react";
+import { MouseEvent, MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 
 import { useBreakpoint } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
@@ -46,6 +46,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
   const user = useAtomValue(userAtom);
+  const [zoom] = useState(2);
   const setDrawer = useSetAtom(drawerAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
@@ -63,7 +64,6 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       // Calendar constants
       const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
       const monthCount = months.length;
-      const zoom = 2;
       const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
       const isYearsOnly = yearCount > 5;
       const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * (zoom / 2);
@@ -283,7 +283,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       <div
         className="h-full"
         style={{
-          width: `${1000}rem`,
+          width: `${zoom * 500}rem`,
         }}>
         {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
       </div>
