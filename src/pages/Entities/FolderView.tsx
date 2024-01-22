@@ -155,16 +155,17 @@ function columns(
         centered: true,
         noLink: true,
       },
-      cell: ({ row }) => (
-        <Button
-          hasNoBackground
-          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-          isIconOnly
-          onClick={async () => {
-            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
-          }}
-        />
-      ),
+      cell: ({ row }) =>
+        row.original.is_folder ? null : (
+          <Button
+            hasNoBackground
+            icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+            isIconOnly
+            onClick={async () => {
+              await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            }}
+          />
+        ),
       minSize: 3.25,
       maxSize: 3.25,
     }),
