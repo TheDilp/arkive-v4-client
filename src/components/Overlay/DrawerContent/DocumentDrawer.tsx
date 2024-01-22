@@ -54,7 +54,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     },
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
-    existingDocument?.data || { project_id: project_id as string },
+    existingDocument?.data || { parent_id: item_id, project_id: project_id as string },
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
