@@ -160,8 +160,8 @@ export function Input({
                 return;
               }
             }
-            if (type === "number")
-              handleNumberChange({ name, newValue: e.currentTarget.valueAsNumber, min, max, step, onChange });
+            // if (type === "number")
+            //   handleNumberChange({ name, newValue: e.currentTarget.valueAsNumber, min, max, step, onChange });
             if (onKeyDown) onKeyDown(e);
           }}
           placeholder={placeholder}

@@ -258,7 +258,7 @@ export function EventDrawer({ data }: Props) {
                   name="start_hours"
                   onChange={handleChange}
                   type="number"
-                  value={event?.start_hours || 0}
+                  value={event?.start_hours ?? ""}
                 />
                 <Input
                   isReadOnly={data?.isReadOnly}
@@ -268,7 +268,7 @@ export function EventDrawer({ data }: Props) {
                   name="start_minutes"
                   onChange={handleChange}
                   type="number"
-                  value={event?.start_minutes || 0}
+                  value={event?.start_minutes ?? ""}
                 />
               </div>
             </div>
@@ -325,7 +325,7 @@ export function EventDrawer({ data }: Props) {
                   name="end_hours"
                   onChange={handleChange}
                   type="number"
-                  value={event?.start_hours || 0}
+                  value={event?.end_hours ?? ""}
                 />
                 <Input
                   isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
@@ -336,7 +336,7 @@ export function EventDrawer({ data }: Props) {
                   name="end_minutes"
                   onChange={handleChange}
                   type="number"
-                  value={event?.start_minutes || 0}
+                  value={event?.end_minutes ?? ""}
                 />
               </div>
             </div>
