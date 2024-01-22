@@ -238,7 +238,7 @@ function createColumns(
                 },
               },
             ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
           </Dropdown>
         </div>
       ),

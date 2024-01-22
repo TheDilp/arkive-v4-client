@@ -57,6 +57,7 @@ function DiceRoller() {
         <Button
           icon={IconEnum.d20}
           isDisabled={!diceRoll || !diceRoll.match(DiceRollRegex)}
+          isIconOnly
           label="Roll"
           onClick={async () => {
             Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
@@ -146,13 +147,13 @@ export function Navbar() {
           <div className="w-fit">
             <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
               <div className="h-full">
-                <Button hasNoBackground icon={IconEnum.d20} iconSize={24} onClick={undefined} />
+                <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
               </div>
             </Tooltip>
           </div>
           <div className="w-fit">
             <div className="h-full">
-              <Button hasNoBackground icon={IconEnum.search} iconSize={24} onClick={openSearchDrawer} />
+              <Button hasNoBackground icon={IconEnum.search} iconSize={24} isIconOnly onClick={openSearchDrawer} />
             </div>
           </div>
         </div>

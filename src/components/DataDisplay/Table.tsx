@@ -517,6 +517,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
       <Button
         hasNoBackground
         icon={orderBy?.sort === "asc" ? IconEnum.sort_asc : IconEnum.sort_desc}
+        isIconOnly
         onClick={onClick}
         variant={orderBy?.sort && orderBy?.field === id ? "primary" : "secondary"}
       />

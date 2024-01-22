@@ -6,16 +6,16 @@ import { Icon, Tooltip } from "..";
 
 const ButtonClasses = tv({
   slots: {
-    base: "font-lato cursor-pointer font-medium h-10 rounded border border-transparent active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate ",
+    base: "font-lato cursor-pointer font-medium h-10 rounded border active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate ",
     label: "hidden sm:block select-none truncate",
   },
   variants: {
     variant: {
       primary: {
-        base: "bg-zinc-900 text-white",
+        base: "bg-zinc-900 text-white border-zinc-700",
       },
       secondary: {
-        base: "bg-zinc-600 text-white",
+        base: "bg-zinc-600 text-white border-zinc-400",
       },
       info: {
         base: "bg-blue-600 text-white focus:border-blue-400",
@@ -54,6 +54,11 @@ const ButtonClasses = tv({
       variant: ["primary", "secondary", "info", "success", "warning", "error"],
       isDisabled: true,
       class: "cursor-not-allowed shadow-none active:opacity-100",
+    },
+    {
+      variant: ["primary", "secondary", "info", "success", "warning", "error"],
+      isIconOnly: true,
+      class: "border-transparent",
     },
 
     {
@@ -98,7 +103,14 @@ export function Button({
   tooltip,
   size = "md",
 }: ButtonType) {
-  const { base, label: labelClasses } = ButtonClasses({ variant, size, isDisabled, hasNoBackground, hasNoLabel: !label });
+  const { base, label: labelClasses } = ButtonClasses({
+    variant,
+    size,
+    isDisabled,
+    hasNoBackground,
+    hasNoLabel: !label,
+    isIconOnly: isIconOnly || !label || label?.length === 0,
+  });
   return (
     <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
       <button className={base()} disabled={isDisabled} onClick={onClick} type="button">
