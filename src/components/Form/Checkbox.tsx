@@ -7,14 +7,14 @@ import { Icon } from "../Misc/Icon";
 const CheckboxClasses = tv({
   slots: {
     base: "relative flex flex-col select-none items-center",
-    checkbox: "flex h-6 w-6 items-center justify-center bg-zinc-900 text-white cursor-pointer rounded-md border outline-none",
+    checkbox: "flex h-6 w-6 items-center justify-center bg-zinc-950 text-white cursor-pointer rounded-md border outline-none",
     label: "text-sm font-medium truncate block",
     helperText: "text-xs truncate block",
   },
   variants: {
     variant: {
       primary: {
-        checkbox: "border-zinc-800",
+        checkbox: "border-zinc-800 focus:border-zinc-700",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },

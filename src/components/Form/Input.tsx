@@ -9,7 +9,7 @@ const InputClasses = tv({
   slots: {
     base: "relative flex flex-col font-lato w-full max-w-full",
     inputContainer:
-      "flex items-center h-10 bg-zinc-900 text-white [&:has(:focus)]:bg-zinc-950 rounded-md border p-2 text-base outline-none",
+      "flex items-center h-10 bg-zinc-950 text-white [&:has(:focus)]:bg-black rounded-md border p-2 text-base outline-none",
     input: "flex w-full items-center justify-center placeholder:italic bg-transparent outline-none",
     label: "text-sm truncate block min-h-[20px]",
     helperText: "text-xs",
@@ -17,7 +17,7 @@ const InputClasses = tv({
   variants: {
     variant: {
       primary: {
-        inputContainer: "border-zinc-800 focus:border-zinc-500",
+        inputContainer: "border-zinc-800 [&:has(:focus)]:border-zinc-600",
         label: "text-zinc-300",
         helperText: "text-zinc-400",
       },

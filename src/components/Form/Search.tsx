@@ -32,8 +32,8 @@ interface ItemProps {
 
 const SearchClasses = tv({
   slots: {
-    base: "flex w-full bg-zinc-900 [&:has(input:focus)]:bg-zinc-950 [&>input:focus]:bg-zinc-950 text-white rounded-md items-center pl-2 h-10 border border-zinc-700",
-    input: "flex h-10 w-full items-center justify-center bg-zinc-900 pr-2 text-base outline-none placeholder:italic border-y",
+    base: "flex w-full bg-zinc-950 [&:has(input:focus)]:bg-black [&>input:focus]:bg-black text-white rounded-md items-center pl-2 h-10 border border-zinc-700",
+    input: "flex h-10 w-full items-center justify-center bg-zinc-950 pr-2 text-base outline-none placeholder:italic border-y",
     label: "text-sm truncate block min-h-[20px]",
     helperText: "text-xs truncate block",
     buttonContainer: "w-10 [&>button]:rounded-l-none [&>button]:shadow-none h-full",
@@ -43,8 +43,8 @@ const SearchClasses = tv({
   variants: {
     variant: {
       primary: {
-        base: "border-zinc-800",
-        input: "border-zinc-800",
+        base: "border-zinc-800 [&:has(input:focus)]:border-zinc-700",
+        input: "border-zinc-800 focus:border-zinc-700",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },

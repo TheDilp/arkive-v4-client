@@ -6,13 +6,13 @@ import { Icon, Tooltip } from "..";
 
 const ButtonClasses = tv({
   slots: {
-    base: "font-lato cursor-pointer font-medium h-10 rounded border active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate ",
+    base: "font-lato cursor-pointer font-medium h-10 rounded outline-none outline-0 focus:outline-none border active:opacity-80 transition-all p-2 flex items-center justify-center gap-x-1 max-w-full w-full shadow active:shadow-none focus-visible:outline-none truncate ",
     label: "hidden sm:block select-none truncate",
   },
   variants: {
     variant: {
       primary: {
-        base: "bg-zinc-900 text-white border-zinc-800",
+        base: "bg-zinc-950 text-white border-zinc-800 focus:border-zinc-700 ",
       },
       secondary: {
         base: "bg-zinc-600 text-white border-zinc-400",
