@@ -9,7 +9,25 @@ import { clamp } from "remirror";
 import { Button } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import { contextMenuAtom, DefaultTagColor, drawerAtom, getDayOrdinal, IconEnum, userAtom } from "../../utils";
+import {
+  closestDivisibleBy10,
+  contextMenuAtom,
+  DefaultTagColor,
+  drawerAtom,
+  getDayOrdinal,
+  IconEnum,
+  userAtom,
+} from "../../utils";
+
+type FormattedEvent = {
+  id: string;
+  start_x: number;
+  image_id: string;
+  end_x: number;
+  parent_id: string;
+  background_color: string;
+  title: string;
+};
 
 const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 20;
@@ -53,27 +71,6 @@ function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>
     ls.set(`timeline_${id}_zoom`, newZoom);
     return newZoom;
   });
-}
-
-function findClosestByHeight(currentElementEndX: number, currentElementY: number) {
-  // Assuming you have a D3 selection containing your elements
-  const elements = d3.selectAll(".event-bar");
-
-  // Use filter to check if any elements are between Y1 and Y2
-
-  const elementsBetweenY1Y2 = elements.enter().filter(() => {
-    // @ts-ignore
-    const elementY = Number(d3.select(this).attr("y")); // replace 'y' with the actual attribute you are checking
-    // const elementX = Number(d3.select(this).attr("x")); // replace 'x' with the actual attribute you are checking
-    return elementY <= currentElementY;
-  });
-
-  // Check if there are any elements between Y1 and Y2
-  if (elementsBetweenY1Y2.size() > 0) {
-    // console.log("There are elements between Y1 and Y2");
-  } else {
-    // console.log("No elements between Y1 and Y2");
-  }
 }
 
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
@@ -157,7 +154,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
 
       const event_bars = events
         .filter((e) => !!e.end_year)
-        .map((e, i) => {
+        .map((e) => {
           return {
             id: e.id,
             start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
@@ -165,15 +162,23 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             end_x: isYearsOnly
               ? (e.end_year || 0) - 1
               : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
-            y: clamp({ min: 0, max: height / 1.05, value: i * zoom }),
             parent_id: e.parent_id,
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
               e.end_day || ""
             }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
           };
-        });
-
+        })
+        // @ts-ignore
+        .reduce((accumulator: any, curr: FormattedEvent) => {
+          const closestDivisible = closestDivisibleBy10(curr.start_x).toString();
+          if (accumulator?.[closestDivisible]) {
+            accumulator[closestDivisible].push(curr);
+          } else {
+            accumulator[closestDivisible] = [curr];
+          }
+          return accumulator;
+        }, {} as Record<string, FormattedEvent[]>);
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -235,117 +240,120 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .attr("x", x(e.x) + 20)
           .attr("y", 30);
       });
-      event_bars.forEach((e) => {
-        const event_bar = groupForBars.append("g");
-        const bar_width = x(e.end_x - e.start_x);
+      Object.entries(event_bars)
+        // @ts-ignore
+        .map(([, value]) => value as FormattedEvent[])
+        .forEach((formattedEvents) => {
+          formattedEvents.forEach((e, j) => {
+            const event_bar = groupForBars.append("g");
+            const bar_width = x(e.end_x - e.start_x);
+            const yPosition = clamp({ min: 0, max: height / 1.05, value: j * zoom });
+            event_bar
+              .append("rect")
+              .on("click", () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: `Edit event - ${e.title}`,
+                  type: "events",
+                  data: {
+                    id: e.id,
+                  },
+                })),
+              )
+              .on("contextmenu", (evt: MouseEvent) => {
+                evt.preventDefault();
+                setContextMenu({
+                  event: evt as any,
+                  items:
+                    // id || isPublic
+                    //   ? [
+                    //       {
+                    //         id: "1",
+                    //         title: "Preview event",
+                    //         icon: IconEnum.eye,
+                    //         onClick: () =>
+                    //           setDrawer((prev) => ({
+                    //             ...prev,
+                    //             title: "Preview event",
+                    //             type: "entity_preview",
+                    //             data: { id: event.id, entity_type: "events" },
+                    //             size: "lg",
+                    //           })),
+                    //       },
+                    //     ]
+                    //   :
 
-        event_bar
-          .append("rect")
-          .on("click", () =>
-            setDrawer((prev) => ({
-              ...prev,
-              size: "lg",
-              title: `Edit event - ${e.title}`,
-              type: "events",
-              data: {
-                id: e.id,
-              },
-            })),
-          )
-          .on("contextmenu", (evt: MouseEvent) => {
-            evt.preventDefault();
-            setContextMenu({
-              event: evt as any,
-              items:
-                // id || isPublic
-                //   ? [
-                //       {
-                //         id: "1",
-                //         title: "Preview event",
-                //         icon: IconEnum.eye,
-                //         onClick: () =>
-                //           setDrawer((prev) => ({
-                //             ...prev,
-                //             title: "Preview event",
-                //             type: "entity_preview",
-                //             data: { id: event.id, entity_type: "events" },
-                //             size: "lg",
-                //           })),
-                //       },
-                //     ]
-                //   :
-
-                [
-                  {
-                    id: "1",
-                    title: "Edit event",
-                    icon: IconEnum.add,
-                    onClick: () =>
-                      setDrawer((prev) => ({
-                        ...prev,
+                    [
+                      {
+                        id: "1",
                         title: "Edit event",
-                        type: "events",
-                        data: { id: e.id },
-                        size: "lg",
-                      })),
-                  },
-                  {
-                    id: "2",
-                    title: "Delete event",
-                    icon: IconEnum.trash,
-                    onClick: () => {
-                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
-                    },
-                  },
-                ],
-            });
-          })
-          .on("mouseover", (evt: MouseEvent) => {
-            // Activate tooltip only if the text of the event
-            // has an ellipsis i.e. isn't fully visible
-            if (
-              evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
-              !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
-            )
-              tooltip
-                .style("display", "block")
-                .style(
-                  "transform",
-                  `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
-                    Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
-                  }px)`,
+                        icon: IconEnum.add,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Edit event",
+                            type: "events",
+                            data: { id: e.id },
+                            size: "lg",
+                          })),
+                      },
+                      {
+                        id: "2",
+                        title: "Delete event",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                        },
+                      },
+                    ],
+                });
+              })
+              .on("mouseover", (evt: MouseEvent) => {
+                // Activate tooltip only if the text of the event
+                // has an ellipsis i.e. isn't fully visible
+                if (
+                  evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
+                  !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
                 )
-                .html(e.title);
-          })
-          .on("mouseout", () => {
-            tooltip.style("display", "none");
-          })
-          .attr("width", bar_width)
-          .attr("height", 30)
-          .attr("class", "event-bar")
-          .attr("x", x(e.start_x))
-          .attr("y", y(e.y))
-          .attr("cursor", "pointer")
-          .style("fill", e.background_color);
+                  tooltip
+                    .style("display", "block")
+                    .style(
+                      "transform",
+                      `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
+                        Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
+                      }px)`,
+                    )
+                    .html(e.title);
+              })
+              .on("mouseout", () => {
+                tooltip.style("display", "none");
+              })
+              .attr("width", bar_width)
+              .attr("height", 30)
+              .attr("class", "event-bar")
+              .attr("x", x(e.start_x))
+              .attr("y", y(yPosition))
+              .attr("cursor", "pointer")
+              .style("fill", e.background_color);
 
-        findClosestByHeight(x(e.end_x), y(e.y));
-
-        event_bar
-          .append("text")
-          .attr("pointer-events", "none")
-          .attr("class", "event-text")
-          .attr("width", bar_width - 10)
-          .text(() => {
-            const title = `${e.title}`;
-            if (title.length > bar_width - 10) {
-              return `${title.slice(0, title.length / 2)}...`;
-            }
-            return title;
-          })
-          .attr("fill", "white")
-          .attr("x", x(e.start_x) + 10)
-          .attr("y", y(e.y) + 20);
-      });
+            event_bar
+              .append("text")
+              .attr("pointer-events", "none")
+              .attr("class", "event-text")
+              .attr("width", bar_width - 10)
+              .text(() => {
+                const title = `${e.title}`;
+                if (title.length > bar_width - 10) {
+                  return `${title.slice(0, title.length / 2)}...`;
+                }
+                return title;
+              })
+              .attr("fill", "white")
+              .attr("x", x(e.start_x) + 10)
+              .attr("y", y(yPosition) + 20);
+          });
+        });
       points.forEach((e) => {
         groupForCircles
           .append("g")
