@@ -317,6 +317,7 @@ export function EventDrawer({ data }: Props) {
               </div>
               <div className="flex items-center gap-x-2">
                 <Input
+                  isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
                   isReadOnly={data?.isReadOnly}
                   label="End hour (optional)"
                   max={calendar?.data?.hours ?? undefined}
@@ -327,6 +328,7 @@ export function EventDrawer({ data }: Props) {
                   value={event?.start_hours || 0}
                 />
                 <Input
+                  isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
                   isReadOnly={data?.isReadOnly}
                   label="End minutes (optional)"
                   max={calendar?.data?.minutes ?? undefined}
