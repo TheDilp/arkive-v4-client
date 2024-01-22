@@ -1,7 +1,8 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
 import groupBy from "lodash.groupby";
-import { MouseEvent, MutableRefObject, useLayoutEffect, useRef, useState } from "react";
+import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
@@ -19,7 +20,6 @@ function truncateLongEventText(texts: any) {
     // @ts-ignore
     const text = d3.select(this);
     const words = text.text().split(/\s+/);
-
     const ellipsis = text.text("").append("tspan").attr("class", "elip").text("...");
     const width = parseFloat(text.attr("width")) - (ellipsis?.node()?.getComputedTextLength() ?? 0);
     const numWords = words.length;
@@ -34,7 +34,7 @@ function truncateLongEventText(texts: any) {
       tspan.text(words.join(" "));
     }
 
-    if (words.length === numWords) {
+    if (words.length === numWords || Number(text.attr("width")) < 10) {
       ellipsis.remove();
     }
   });
@@ -47,10 +47,18 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
   return yearDifference + Math.abs(monthDifference);
 }
 
+function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
+  setZoom((prev) => {
+    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? -5 : 5) });
+    ls.set(`timeline_${id}_zoom`, newZoom);
+    return newZoom;
+  });
+}
+
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
   const { project_id, item_id } = useParams();
   const user = useAtomValue(userAtom);
-  const [zoom, setZoom] = useState(2);
+  const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
@@ -119,7 +127,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             x: isYearsOnly
               ? e.start_year - 1 + e.start_day * 0.01
               : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: isYearsOnly ? e.start_day : e.start_year + e.start_month / 10 - i / 10,
+            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year})`,
             description: e.description,
@@ -203,7 +211,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             return title;
           })
           .attr("fill", "white")
-          .attr("x", e.width)
+          .attr("x", x(e.width) / 2)
           .attr("y", 30);
       });
       bars.forEach((e) => {
@@ -274,7 +282,10 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .on("mouseover", (evt: MouseEvent) => {
             // Activate tooltip only if the text of the event
             // has an ellipsis i.e. isn't fully visible
-            if (evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "...")
+            if (
+              evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
+              !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
+            )
               tooltip
                 .style("display", "block")
                 .style(
@@ -415,10 +426,10 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center">
         <div className="h-8 w-8">
-          <Button icon={IconEnum.remove} onClick={() => setZoom((prev) => clamp({ min: 2, max: 100, value: prev + 5 }))} />
+          <Button icon={IconEnum.remove} onClick={() => changeZoom("out", setZoom, item_id as string)} />
         </div>
         <div className="h-8 w-8">
-          <Button icon={IconEnum.add} onClick={() => setZoom((prev) => clamp({ min: 2, max: 100, value: prev - 5 }))} />
+          <Button icon={IconEnum.add} onClick={() => changeZoom("in", setZoom, item_id as string)} />
         </div>
       </div>
       <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-hidden">
