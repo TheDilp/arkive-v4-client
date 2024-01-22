@@ -421,7 +421,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
             <div className="lg:w-52">
               <Button
                 icon={IconEnum.edit}
-                label="Edit current blueprint instance"
+                label="Edit current instance"
                 onClick={() => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -431,7 +431,7 @@ export default function BlueprintProfileView({ id, parent_id }: { id?: string; p
                     data: { id: id || (subitem_id as string), project_id: project_id as string },
                   }));
                 }}
-                tooltip={isMd ? undefined : "Edit current blueprint instance"}
+                tooltip={isMd ? undefined : "Edit current instance"}
               />
             </div>
           </div>

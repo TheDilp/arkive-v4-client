@@ -509,7 +509,7 @@ export function BlueprintInstanceView() {
     relationFilters: {},
   });
 
-  const { data: blueprint, isFetching } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+  const { data: blueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
     data: {
       id: item_id,
     },
@@ -547,24 +547,6 @@ export function BlueprintInstanceView() {
 
   return (
     <TablePageLayout>
-      <div className="flex w-full items-center justify-end gap-x-2">
-        <div className="w-52">
-          <Button
-            icon={IconEnum.add}
-            isDisabled={isFetching}
-            label={`Create ${blueprint?.data?.title ? `(${blueprint?.data?.title})` : ""}`}
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: {},
-                title: "Create new instance",
-                type: "blueprint_instances",
-                size: "lg",
-              }))
-            }
-          />
-        </div>
-      </div>
       <div>
         {blueprint?.data ? (
           <Table

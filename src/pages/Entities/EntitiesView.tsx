@@ -1,9 +1,9 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph } from "../../components";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
-import { drawerAtom, getSingularEntityType, IconEnum } from "../../utils";
+import { drawerAtom, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
 import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
@@ -14,6 +14,7 @@ export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const setDrawer = useSetAtom(drawerAtom);
+  const navbarTitle = useAtomValue(navbarTitleAtom);
 
   return (
     <div className="flex h-full flex-col gap-y-2">
@@ -21,20 +22,43 @@ export function EntitiesView() {
         <div className="flex w-full items-start justify-between">
           <Breadcrumbs />
           {item_id ? (
-            <div className="w-52">
-              <Button
-                icon={IconEnum.edit}
-                label={`Edit current ${entityName}`}
-                onClick={() => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    size: "lg",
-                    title: `Edit ${entityName}`,
-                    type: type as DrawerContentCreateNewType,
-                    data: { id: item_id as string, project_id: project_id as string },
-                  }));
-                }}
-              />
+            <div className="flex justify-end gap-x-2">
+              <div className="w-52">
+                <Button
+                  icon={IconEnum.edit}
+                  label={`Edit current ${entityName}`}
+                  onClick={() => {
+                    setDrawer((prev) => ({
+                      ...prev,
+                      size: "lg",
+                      title: `Edit ${entityName}`,
+                      type: type as DrawerContentCreateNewType,
+                      data: { id: item_id as string, project_id: project_id as string },
+                    }));
+                  }}
+                />
+              </div>
+              {type === "blueprints" ? (
+                <div className="w-52">
+                  <Button
+                    icon={IconEnum.add}
+                    isDisabled={!navbarTitle}
+                    isLoading={!navbarTitle}
+                    label={navbarTitle ? `Create ${navbarTitle.split("|").at(-1)}` : ""}
+                    onClick={() =>
+                      setDrawer((prev) => ({
+                        ...prev,
+                        data: {},
+                        title: `Create new ${navbarTitle.split("|").at(-1)}`,
+                        type: "blueprint_instances",
+                        size: "lg",
+                      }))
+                    }
+                  />
+                </div>
+              ) : (
+                false
+              )}
             </div>
           ) : null}
         </div>

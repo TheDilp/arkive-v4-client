@@ -585,6 +585,23 @@ export function FolderView() {
                   value={view}
                 />
               </div>
+              {isFolder && !isInitialLoadingFolder ? (
+                <div className="w-fit max-w-[208px] lg:w-52">
+                  <Button
+                    icon={IconEnum.edit}
+                    label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
+                    onClick={() => {
+                      setDrawer((prev) => ({
+                        ...prev,
+                        size: "lg",
+                        title: `Edit ${entityName}`,
+                        type: type as DrawerContentCreateNewType,
+                        data: { id: item_id as string, project_id: project_id as string },
+                      }));
+                    }}
+                  />
+                </div>
+              ) : null}
               <div className="w-fit lg:w-52">
                 <Dropdown
                   allowedPlacements={["bottom-end"]}
@@ -649,24 +666,6 @@ export function FolderView() {
                   </div>
                 </Dropdown>
               </div>
-
-              {isFolder ? (
-                <div className="w-fit max-w-[208px] lg:w-52">
-                  <Button
-                    icon={IconEnum.edit}
-                    label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
-                    onClick={() => {
-                      setDrawer((prev) => ({
-                        ...prev,
-                        size: "lg",
-                        title: `Edit ${entityName}`,
-                        type: type as DrawerContentCreateNewType,
-                        data: { id: item_id as string, project_id: project_id as string },
-                      }));
-                    }}
-                  />
-                </div>
-              ) : null}
             </div>
           ) : null}
         </div>
