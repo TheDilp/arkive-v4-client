@@ -139,6 +139,7 @@ function columns(
       minSize: 3.25,
       meta: {
         centered: true,
+        noLink: true,
       },
     }),
     columnHelper.display({
