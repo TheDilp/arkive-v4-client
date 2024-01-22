@@ -470,6 +470,19 @@ export function Select({
                             setIsOpen,
                           });
                       },
+                      onKeyDown: (e) => {
+                        if (e.key === "Enter") {
+                          onClick({
+                            isMultiple,
+                            name,
+                            index: activeIndex,
+                            onChange,
+                            options: filteredItems,
+                            value,
+                            setIsOpen,
+                          });
+                        }
+                      },
                     })}
                     key={`${opt}-${i.toFixed()}`}>
                     {opt?.image ? (
