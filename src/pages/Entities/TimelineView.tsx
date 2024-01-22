@@ -247,7 +247,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           formattedEvents.forEach((e, j) => {
             const event_bar = groupForBars.append("g");
             const bar_width = x(e.end_x - e.start_x);
-            const yPosition = clamp({ min: 0, max: height / 1.05, value: j * zoom });
+            const yPosition = clamp({ min: 0, max: height / 1.05, value: j * zoom * 1.05 });
             event_bar
               .append("rect")
               .on("click", () =>
