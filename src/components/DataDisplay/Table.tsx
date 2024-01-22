@@ -46,7 +46,7 @@ export { createColumnHelper } from "@tanstack/react-table";
 
 const TableClasses = tv({
   slots: {
-    head: "border-r border-t border-zinc-600 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] max-h-[3rem] h-12 sticky top-0 border-b select-none",
+    head: "border-r border-t border-zinc-700 z-40 shadow-lg bg-zinc-950 flex min-w-full w-fit mb-4 mih-h-[3rem] max-h-[3rem] h-12 sticky top-0 border-b select-none",
     select: "select-none z-20",
     sortableHeader: "flex cursor-pointer items-center gap-x-1",
     subheaderContainer: "py-0.5 max-h-[2.5rem] sticky top-0 left-0",
@@ -54,15 +54,15 @@ const TableClasses = tv({
     subheaderFilterBadges: "flex max-w-full items-center gap-x-2 overflow-x-hidden flex-1 sticky left-0 top-0",
     subheaderRowTitle: "font-medium",
     rowContainer:
-      "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.04rem] border-zinc-600",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-600",
+      "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.04rem] border-zinc-700",
+    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-700",
     hasLinkRow: "group-hover:bg-zinc-800 cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
-    content: "flex flex-1 items-center  px-2 border-zinc-600 border-r last:border-r-0 first:border-l",
+    content: "flex flex-1 items-center  px-2 border-zinc-700 border-r last:border-r-0 first:border-l",
     centeredContent: "flex items-center justify-center",
     paginationContainer:
-      "flex h-10 max-h-[2.5rem] min-h-[2.5rem] items-start justify-between border-zinc-600 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
+      "flex h-10 max-h-[2.5rem] min-h-[2.5rem] items-start justify-between border-zinc-700 pl-2 pt-0.5 sticky bottom-0 bg-zinc-950 pb-9 pt-1",
     pageCountContainer: "font-lato flex flex-nowrap items-center gap-x-2",
     pageCount: "w-max",
     showPageCount: "flex flex-nowrap items-center gap-x-2",
@@ -73,7 +73,7 @@ const TableClasses = tv({
   variants: {
     isSubheaderEnabled: {
       true: {
-        headerGroup: "border-b border-zinc-600",
+        headerGroup: "border-b border-zinc-700",
       },
     },
     hasNoHeaderGap: {
@@ -98,7 +98,7 @@ const TableFilterClasses = tv({
     columnFilterTitle: "font-lato text-center text-xl",
     columnFilterCategoryTitle: "font-lato w-full",
     columnFilterButtonContainer: "w-min [&>button]:h-8 [&>button]:w-8",
-    columnFilterDivider: "border-zinc-600",
+    columnFilterDivider: "border-zinc-700",
   },
 });
 
