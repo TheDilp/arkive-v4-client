@@ -8,6 +8,7 @@ import { DocumentType, DrawerAtomType, InsertDocumentType, UpdateDocumentType } 
 import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
+import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
@@ -95,14 +96,23 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               <IconPicker icon={document?.icon || IconEnum.document} name="icon" onChange={handleChange} />
             </div>
           </div>
-          <ImageSelect
-            isIconOnly
-            label="Document image (optional)"
-            name="image_id"
-            onChange={handleChange}
-            type="images"
-            value={document?.image_id}
-          />
+          {!document?.image?.id ? (
+            <ImageSelect
+              isIconOnly
+              name="image"
+              onChange={({ name, label, value }) => {
+                handleChange({ name, value: { id: value, title: label } });
+              }}
+              type="images"
+              value={document?.image?.id ?? ""}
+            />
+          ) : (
+            <ImagePreview
+              clearAction={() => handleChange({ name: "image", value: null })}
+              id={document?.image?.id}
+              title={document?.image?.title}
+            />
+          )}
           <Input
             helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
             isDisabled={exceptions?.createTemplate}

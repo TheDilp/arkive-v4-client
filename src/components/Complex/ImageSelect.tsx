@@ -12,7 +12,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
     <div className="flex w-full flex-col">
       <div className="truncate text-sm text-zinc-300">{label}</div>
       <div className="grid grid-cols-6 gap-x-2">
-        <div className="col-span-4">
+        <div className={isIconOnly ? "col-span-5" : "col-span-4"}>
           {value ? (
             <EntityPreview
               clearAction={
@@ -43,7 +43,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
           )}
         </div>
 
-        <div className="col-span-2">
+        <div className={isIconOnly ? "col-span-1" : "col-span-2"}>
           <Button
             icon={IconEnum.upload}
             isDisabled={isDisabled}
