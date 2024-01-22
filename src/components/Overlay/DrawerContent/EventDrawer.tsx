@@ -20,7 +20,7 @@ import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calend
 import { ImageSelect } from "../../Complex";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select, TagInput, Textarea } from "../../Form";
-import { DrawerLayout, Tabs } from "../../Layout";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
 
@@ -79,8 +79,10 @@ export function EventDrawer({ data }: Props) {
         "end_month",
         "end_month_id",
         "end_year",
-        "hours",
-        "minutes",
+        "start_hours",
+        "start_minutes",
+        "end_hours",
+        "end_minutes",
         "is_public",
         "description",
       ],
@@ -192,7 +194,7 @@ export function EventDrawer({ data }: Props) {
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
-        <>
+        <div className="flex flex-col gap-y-2">
           <div className="flex flex-nowrap gap-x-2">
             <Input
               isReadOnly={data?.isReadOnly}
@@ -215,104 +217,134 @@ export function EventDrawer({ data }: Props) {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-x-2">
-            <Input
-              isReadOnly={data?.isReadOnly}
-              label="Start day (required)"
-              max={existingMonths?.[event?.start_month || 0]?.days ?? 0}
-              min={1}
-              name="start_day"
-              onChange={handleChange}
-              type="number"
-              value={event?.start_day || ""}
-            />
-            <Select
-              isDisabled={isFetchingMonths}
-              isLoading={isFetchingMonths}
-              isReadOnly={data?.isReadOnly}
-              label="Start month (required)"
-              name="start_month"
-              onChange={handleMonthChange}
-              options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
-            />
-            <Input
-              isReadOnly={data?.isReadOnly}
-              label="Start year (required)"
-              name="start_year"
-              onChange={handleChange}
-              type="number"
-              value={event?.start_year || ""}
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-x-2">
-            <Input
-              helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
-              isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
-              label="End day (optional)"
-              max={typeof event.end_month === "number" ? existingMonths[event.end_month].days : 0}
-              min={1}
-              name="end_day"
-              onChange={handleChange}
-              placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
-              type="number"
-              value={event?.end_day || ""}
-              variant={isDayCorrect ? "primary" : "error"}
-            />
-            <Select
-              helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
-              isClearable
-              isDisabled={isFetchingMonths}
-              isLoading={isFetchingMonths}
-              isReadOnly={data?.isReadOnly}
-              label="End month (optional)"
-              name="end_month"
-              onChange={handleMonthChange}
-              options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
-              value={typeof event?.end_month === "number" ? existingMonths?.[event.end_month].id : undefined}
-              variant={isMonthCorrect ? "primary" : "error"}
-            />
-            <Input
-              helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-              isDisabled={typeof event?.end_month !== "number"}
-              isReadOnly={data?.isReadOnly}
-              label="End year (optional)"
-              name="end_year"
-              onChange={handleChange}
-              placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
-              type="number"
-              value={event?.end_year || ""}
-              variant={isYearCorrect ? "primary" : "error"}
-            />
-          </div>
+          <Collapsible initialOpen label="Start">
+            <div className="flex flex-col gap-y-2 p-2">
+              <div className="flex items-center justify-between gap-x-2">
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="Start day (required)"
+                  max={existingMonths?.[event?.start_month || 0]?.days ?? 0}
+                  min={1}
+                  name="start_day"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_day || ""}
+                />
+                <Select
+                  isDisabled={isFetchingMonths}
+                  isLoading={isFetchingMonths}
+                  isReadOnly={data?.isReadOnly}
+                  label="Start month (required)"
+                  name="start_month"
+                  onChange={handleMonthChange}
+                  options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+                  value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
+                />
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="Start year (required)"
+                  name="start_year"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_year || ""}
+                />
+              </div>
+              <div className="flex items-center gap-x-2">
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="Start hour (optional)"
+                  max={calendar?.data?.hours ?? undefined}
+                  min={0}
+                  name="start_hours"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_hours || 0}
+                />
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="Start minutes (optional)"
+                  max={calendar?.data?.minutes ?? undefined}
+                  min={0}
+                  name="start_minutes"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_minutes || 0}
+                />
+              </div>
+            </div>
+          </Collapsible>
+          <Collapsible label="End (optional)">
+            <div className="flex flex-col gap-y-2 p-2">
+              <div className="grid grid-cols-3 gap-x-2">
+                <Input
+                  helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
+                  isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
+                  label="End day (optional)"
+                  max={typeof event.end_month === "number" ? existingMonths[event.end_month].days : 0}
+                  min={1}
+                  name="end_day"
+                  onChange={handleChange}
+                  placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
+                  type="number"
+                  value={event?.end_day || ""}
+                  variant={isDayCorrect ? "primary" : "error"}
+                />
+                <Select
+                  helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
+                  isClearable
+                  isDisabled={isFetchingMonths}
+                  isLoading={isFetchingMonths}
+                  isReadOnly={data?.isReadOnly}
+                  label="End month (optional)"
+                  name="end_month"
+                  onChange={handleMonthChange}
+                  options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+                  value={typeof event?.end_month === "number" ? existingMonths?.[event.end_month].id : undefined}
+                  variant={isMonthCorrect ? "primary" : "error"}
+                />
+                <Input
+                  helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
+                  isDisabled={typeof event?.end_month !== "number"}
+                  isReadOnly={data?.isReadOnly}
+                  label="End year (optional)"
+                  name="end_year"
+                  onChange={handleChange}
+                  placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
+                  type="number"
+                  value={event?.end_year || ""}
+                  variant={isYearCorrect ? "primary" : "error"}
+                />
+              </div>
+              <div className="flex items-center gap-x-2">
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="End hour (optional)"
+                  max={calendar?.data?.hours ?? undefined}
+                  min={0}
+                  name="end_hours"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_hours || 0}
+                />
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="End minutes (optional)"
+                  max={calendar?.data?.minutes ?? undefined}
+                  min={0}
+                  name="end_minutes"
+                  onChange={handleChange}
+                  type="number"
+                  value={event?.start_minutes || 0}
+                />
+              </div>
+            </div>
+          </Collapsible>
 
-          <div className="flex items-center gap-x-2">
-            <Input
-              isReadOnly={data?.isReadOnly}
-              label="Hour (optional)"
-              max={calendar?.data?.hours ?? undefined}
-              min={0}
-              name="hours"
-              onChange={handleChange}
-              type="number"
-              value={event?.hours || 0}
-            />
-            <Input
-              isReadOnly={data?.isReadOnly}
-              label="Minutes (optional)"
-              max={calendar?.data?.minutes ?? undefined}
-              min={0}
-              name="minutes"
-              onChange={handleChange}
-              type="number"
-              value={event?.minutes || 0}
-            />
-          </div>
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox isDisabled={!!data} name="is_public" onChange={handleChange} value={event?.is_public ?? false} />
           </div>
-        </>
+        </div>
       ) : null}
 
       {selectedTab === 1 ? (

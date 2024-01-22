@@ -8,18 +8,18 @@ import {
 } from "../../types/EntityTypes/calendarTypes";
 
 export function sortEvents(a: EventType, b: EventType) {
-  if (a?.hours && b?.hours) {
-    if (a.hours > b.hours) return 1;
-    if (a.hours < b.hours) return -1;
-    if (a.hours === b.hours) {
-      if (a?.minutes && b?.minutes) {
-        if (a.minutes > b.minutes) return 1;
-        if (a.minutes < b.minutes) return -1;
+  if (a?.start_hours && b?.start_hours) {
+    if (a.start_hours > b.start_hours) return 1;
+    if (a.start_hours < b.start_hours) return -1;
+    if (a.start_hours === b.start_hours) {
+      if (a?.start_minutes && b?.start_minutes) {
+        if (a.start_minutes > b.start_minutes) return 1;
+        if (a.start_minutes < b.start_minutes) return -1;
         return 0;
       }
     }
-  } else if (a.hours && !b.hours) return -1;
-  else if (!a.hours && b.hours) return 1;
+  } else if (a.start_hours && !b.start_hours) return -1;
+  else if (!a.start_hours && b.start_hours) return 1;
   else {
     return 0;
   }

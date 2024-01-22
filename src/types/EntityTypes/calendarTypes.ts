@@ -65,8 +65,10 @@ export interface EventType {
   is_public: boolean | null;
   background_color?: string | null;
   text_color?: string | null;
-  hours?: number | null;
-  minutes?: number | null;
+  start_hours?: number | null;
+  start_minutes?: number | null;
+  end_hours?: number | null;
+  end_minutes?: number | null;
   parent_id: string;
   document_id?: string | null;
   image_id?: string | null;
