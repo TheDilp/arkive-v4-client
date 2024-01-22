@@ -55,6 +55,27 @@ function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>
   });
 }
 
+function findClosestByHeight(currentElementEndX: number, currentElementY: number) {
+  // Assuming you have a D3 selection containing your elements
+  const elements = d3.selectAll(".event-bar");
+
+  // Use filter to check if any elements are between Y1 and Y2
+
+  const elementsBetweenY1Y2 = elements.enter().filter(() => {
+    // @ts-ignore
+    const elementY = Number(d3.select(this).attr("y")); // replace 'y' with the actual attribute you are checking
+    // const elementX = Number(d3.select(this).attr("x")); // replace 'x' with the actual attribute you are checking
+    return elementY <= currentElementY;
+  });
+
+  // Check if there are any elements between Y1 and Y2
+  if (elementsBetweenY1Y2.size() > 0) {
+    // console.log("There are elements between Y1 and Y2");
+  } else {
+    // console.log("No elements between Y1 and Y2");
+  }
+}
+
 export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
   const { project_id, item_id } = useParams();
   const user = useAtomValue(userAtom);
@@ -134,7 +155,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           };
         });
 
-      const bars = events
+      const event_bars = events
         .filter((e) => !!e.end_year)
         .map((e, i) => {
           return {
@@ -144,7 +165,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             end_x: isYearsOnly
               ? (e.end_year || 0) - 1
               : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
-            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
+            y: clamp({ min: 0, max: height / 1.05, value: i * zoom }),
             parent_id: e.parent_id,
             background_color: e.background_color || DefaultTagColor,
             title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
@@ -211,10 +232,10 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             return title;
           })
           .attr("fill", "white")
-          .attr("x", x(e.width) / 2)
+          .attr("x", x(e.x) + 20)
           .attr("y", 30);
       });
-      bars.forEach((e) => {
+      event_bars.forEach((e) => {
         const event_bar = groupForBars.append("g");
         const bar_width = x(e.end_x - e.start_x);
 
@@ -301,11 +322,13 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           })
           .attr("width", bar_width)
           .attr("height", 30)
-          .attr("class", "overflow-hidden")
+          .attr("class", "event-bar")
           .attr("x", x(e.start_x))
           .attr("y", y(e.y))
           .attr("cursor", "pointer")
           .style("fill", e.background_color);
+
+        findClosestByHeight(x(e.end_x), y(e.y));
 
         event_bar
           .append("text")
