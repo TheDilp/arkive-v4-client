@@ -18,17 +18,17 @@ const ButtonClasses = tv({
         base: "bg-zinc-600 text-white border-zinc-400",
       },
       info: {
-        base: "bg-blue-600 text-white focus:border-blue-400",
+        base: "bg-blue-600 text-white focus:border-blue-400 border-green-600",
       },
       "info-bordered": {
         base: "text-blue-400 border-blue-400",
       },
       success: {
-        base: "bg-green-600 text-white focus:border-green-400",
+        base: "bg-green-600 text-white border-green-600 focus:border-green-400",
       },
-      warning: { base: "bg-orange-600 text-white" },
+      warning: { base: "bg-orange-600 text-white border-orange-600 focus:border-orange-400" },
       error: {
-        base: "bg-red-600 text-white",
+        base: "bg-red-600 text-white border-red-600 focus:border-red-400",
       },
     },
     size: {
