@@ -12,7 +12,7 @@ const ButtonClasses = tv({
   variants: {
     variant: {
       primary: {
-        base: "bg-zinc-900 text-white border-zinc-700",
+        base: "bg-zinc-900 text-white border-zinc-800",
       },
       secondary: {
         base: "bg-zinc-600 text-white border-zinc-400",

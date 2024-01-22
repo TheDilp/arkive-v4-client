@@ -43,8 +43,8 @@ const SearchClasses = tv({
   variants: {
     variant: {
       primary: {
-        base: "border-zinc-700",
-        input: "border-zinc-700",
+        base: "border-zinc-800",
+        input: "border-zinc-800",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
