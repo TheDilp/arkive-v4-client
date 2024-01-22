@@ -48,6 +48,7 @@ export function ProjectsView() {
         </div>
         <div className="h-16 w-full">
           <Button
+            hasNoBackground
             icon={IconEnum.add}
             iconSize={28}
             onClick={() =>

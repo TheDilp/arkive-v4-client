@@ -31,3 +31,7 @@ export function closestDivisibleBy50(x: number, y: number): [number, number] {
 
   return [closestX, closestY];
 }
+
+export function closestDivisibleBy10(number: number): number {
+  return Math.round(number / 20) * 20;
+}
