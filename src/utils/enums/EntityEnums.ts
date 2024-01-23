@@ -139,4 +139,10 @@ export const UserSidebarEntitiesEnabled = [
   "character_fields_templates",
 ];
 
-export const MiscellaneousSettings = ["sort_tags_alphabetically", "show_eras_in_calendars", "show_eras_in_timelines"];
+export const MiscellaneousSettings = [
+  "sort_tags_alphabetically",
+  "show_eras_in_calendars",
+  "show_eras_in_timelines",
+  "show_date_in_event_tooltip_in_calendar",
+  "show_date_in_event_tooltip_in_timeline",
+];
