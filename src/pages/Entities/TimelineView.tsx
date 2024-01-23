@@ -301,7 +301,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
                     Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
                   }px)`,
                 )
-                .html(e.title);
+                .html(`${e.title} ${e.date_string}`);
           })
           .on("mouseout", () => {
             tooltip.style("display", "none");
