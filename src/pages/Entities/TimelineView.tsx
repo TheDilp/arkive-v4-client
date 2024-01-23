@@ -158,6 +158,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
 
       const event_bars = events
         .filter((e) => !!e.end_year)
+        .sort((a, b) => Number(a.end_year || 0) - Number(b.end_year || 0))
         .map((e) => {
           return {
             id: e.id,
