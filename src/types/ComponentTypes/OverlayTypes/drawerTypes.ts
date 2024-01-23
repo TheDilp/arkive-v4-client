@@ -72,8 +72,7 @@ export type DrawerAtomType = {
         | "random_tables"
         | "random_table_option"
         | "character_relationship_types"
-        | "map_pin_types"
-        | "event_groups";
+        | "map_pin_types";
       data: { id?: string; project_id?: string };
     }
   | { type: "from_template"; data: { id: string; title: string } }

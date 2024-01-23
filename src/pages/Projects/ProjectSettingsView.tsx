@@ -63,7 +63,6 @@ const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "4", label: "Event groups", icon: IconEnum.event, isOwner: false },
   { id: "5", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "6", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
@@ -216,50 +215,7 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
     }),
   ];
 }
-function eventGroupsTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomType>>) {
-  return [
-    relationshipTypesColumnHelper.display({
-      id: "title",
-      header: "Title",
-      cell: ({ row }) => <b>{row.original.title}</b>,
-    }),
 
-    relationshipTypesColumnHelper.display({
-      id: "action",
-      header: "Actions",
-      meta: {
-        centered: true,
-      },
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Dropdown
-            allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "delete_relationship_type",
-                title: "Delete event group",
-                icon: IconEnum.trash,
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "event_groups",
-                    },
-                    title: "Delete event group",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-          </Dropdown>
-        </div>
-      ),
-    }),
-  ];
-}
 function membersColumns() {
   return [
     membersColumnHelper.display({
@@ -344,7 +300,6 @@ export function ProjectSettingsView() {
     {
       fields: ["id", "title", "image_id", "default_dice_color", "owner_id"],
       relations: {
-        event_groups: true,
         map_pin_types: true,
         character_relationship_types: true,
         members: true,
@@ -402,14 +357,7 @@ export function ProjectSettingsView() {
       data: { project_id },
     }));
   }
-  function handleOpenNewEventGroupDrawer() {
-    setDrawer((prev) => ({
-      ...prev,
-      title: "Create new event group",
-      type: "event_groups",
-      data: { project_id },
-    }));
-  }
+
   function handleOpenInviteToProjectDrawer() {
     setDrawer((prev) => ({
       ...prev,
@@ -479,11 +427,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {selectedTab === 3 ? (
-              <div className="ml-auto w-min">
-                <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewEventGroupDrawer} size="sm" variant="info" />
-              </div>
-            ) : null}
+
             {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button
@@ -558,18 +502,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 3 ? (
-            <div className="h-full">
-              <div className="h-fit w-full">
-                <Table
-                  columns={eventGroupsTableColumns(setDialog)}
-                  data={projectData?.data?.event_groups || []}
-                  dispatch={dispatch}
-                  type="character_relationship_types"
-                />
-              </div>
-            </div>
-          ) : null}
+
           {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">

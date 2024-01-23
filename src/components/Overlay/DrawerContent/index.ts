@@ -15,7 +15,6 @@ export * from "./EditMessageDrawer";
 export * from "./EditTags";
 export * from "./EntityPreviewDrawer";
 export * from "./EventDrawer";
-export * from "./EventGroupDrawer";
 export * from "./FieldTemplateDrawer";
 export * from "./FolderDrawer";
 export * from "./GraphDrawer";

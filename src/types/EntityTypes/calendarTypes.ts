@@ -17,12 +17,6 @@ export interface CalendarType extends BaseEntityType {
   tags: TagType[];
 }
 
-export interface EventGroupType {
-  id: string;
-  project_id: string;
-  title: string;
-}
-
 export interface MonthType {
   id: string;
   title: string;
@@ -83,7 +77,6 @@ export interface EventType {
   start_month_id: string;
   end_month_id?: string | null;
   end_month?: number | null;
-  event_group_id: string | null;
   end_year?: number | null;
   start_month: number;
   start_year: number;

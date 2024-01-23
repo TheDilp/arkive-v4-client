@@ -27,8 +27,7 @@ export type AvailableEntityType =
   | "character_relationship_types"
   | "tags"
   | "conversations"
-  | "webhooks"
-  | "event_groups";
+  | "webhooks";
 
 export type AvailableSubEntityType =
   | "alter_names"

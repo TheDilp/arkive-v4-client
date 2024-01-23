@@ -4,15 +4,8 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  useCreateSubEntity,
-  useGetEntities,
-  useGetEntity,
-  useGetSubEntity,
-  useHandleChange,
-  useUpdateSubEntity,
-} from "../../../hooks";
-import { AvailableEntityType, CalendarType, EventGroupType, EventStateType, EventType, onChangeValue } from "../../../types";
+import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
+import { AvailableEntityType, CalendarType, EventStateType, EventType, onChangeValue } from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
@@ -67,17 +60,6 @@ export function EventDrawer({ data }: Props) {
     },
   );
 
-  const { data: eventGroups, isFetching: isFetchingEventGroups } = useGetEntities<EventGroupType>(
-    {
-      data: {
-        project_id,
-      },
-      fields: ["id", "title"],
-    },
-    "event_groups",
-    { staleTime: 5 * 60 * 1000 },
-  );
-
   const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
     data?.id,
     "events",
@@ -96,7 +78,6 @@ export function EventDrawer({ data }: Props) {
         "end_day",
         "end_month",
         "end_month_id",
-        "event_group_id",
         "end_year",
         "start_hours",
         "start_minutes",
@@ -205,7 +186,7 @@ export function EventDrawer({ data }: Props) {
   const isDayCorrect = checkIfDayCorrect(event, isYearCorrect, isMonthCorrect);
   const isDateCorrect = isYearCorrect && isMonthCorrect && isDayCorrect;
 
-  const isLoading = isFetchingEvent || isFetchingMonths || isFetchingEventGroups;
+  const isLoading = isFetchingEvent || isFetchingMonths;
 
   if (isLoading) return <Skeleton type="drawer_form" />;
 
@@ -236,15 +217,7 @@ export function EventDrawer({ data }: Props) {
               </div>
             </div>
           </div>
-          <div>
-            <Select
-              label="Event group (optional)"
-              name="event_group_id"
-              onChange={handleChange}
-              options={(eventGroups?.data || []).map((group) => ({ label: group.title, value: group.id }))}
-              value={event.event_group_id || ""}
-            />
-          </div>
+
           <Collapsible initialOpen label="Start">
             <div className="flex flex-col gap-y-2 p-2">
               <div className="flex items-center justify-between gap-x-2">

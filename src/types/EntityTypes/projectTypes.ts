@@ -1,7 +1,7 @@
 import { UserType } from "../userTypes";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { BlueprintType } from "./blueprintTypes";
-import { CalendarType, EventGroupType, EventType } from "./calendarTypes";
+import { CalendarType, EventType } from "./calendarTypes";
 import { CharacterRelationshipType } from "./characterRelationshipTypes";
 import { CharacterType } from "./characterTypes";
 import { ConversationType } from "./conversationTypes";
@@ -23,7 +23,6 @@ export interface ProjectType {
   // show_image_table_view?: boolean;
   character_relationship_types?: CharacterRelationshipType[];
   map_pin_types?: MapPinTypesType[];
-  event_groups: EventGroupType[];
   members: UserType[];
 }
 
