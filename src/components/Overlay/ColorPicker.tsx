@@ -58,7 +58,7 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value, isDisabl
               onChange({ name, value: color });
               if (closeTooltip) closeTooltip();
             }}
-            style={{ backgroundColor: color }}
+            style={{ backgroundColor: color, border: color === value ? "solid white 1px" : "" }}
           />
         ))}
       </div>
