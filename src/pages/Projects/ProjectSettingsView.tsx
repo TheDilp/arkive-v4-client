@@ -63,8 +63,9 @@ const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
-  { id: "5", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
+  { id: "4", label: "Event groups", icon: IconEnum.event, isOwner: false },
+  { id: "5", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "6", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -426,7 +427,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {selectedTab === 3 ? (
+            {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.user_invite}
@@ -484,6 +485,18 @@ export function ProjectSettingsView() {
                   data={projectData?.data?.map_pin_types || []}
                   dispatch={dispatch}
                   type="map_pin_types"
+                />
+              </div>
+            </div>
+          ) : null}
+          {selectedTab === 2 ? (
+            <div className="h-full">
+              <div className="h-fit w-full">
+                <Table
+                  columns={relationshipTableColumns(setDialog)}
+                  data={projectData?.data?.character_relationship_types || []}
+                  dispatch={dispatch}
+                  type="character_relationship_types"
                 />
               </div>
             </div>
