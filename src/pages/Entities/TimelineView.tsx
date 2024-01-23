@@ -109,7 +109,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         .scaleLinear()
         .domain([0, endRange * (zoom / 2)])
         .range([0, width - X_AXIS_OFFSET * 2]);
-      const y = d3.scaleLinear().domain([0, endRange]).range([20, height]);
+      const y = d3.scaleLinear().domain([0, endRange]).range([50, height]);
 
       const axisBottom = d3
         .axisBottom(x)
@@ -337,7 +337,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
                   tooltip.style("display", "none");
                 })
                 .attr("width", bar_width)
-                .attr("height", y(10))
+                .attr("height", 30)
                 .attr("class", "event-bar")
                 .attr("x", x(e.start_x))
                 .attr("y", y(yPosition))
