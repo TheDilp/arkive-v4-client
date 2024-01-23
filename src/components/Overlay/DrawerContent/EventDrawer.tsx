@@ -273,7 +273,7 @@ export function EventDrawer({ data }: Props) {
               </div>
             </div>
           </Collapsible>
-          <Collapsible label="End (optional)">
+          <Collapsible initialOpen={!!event?.end_day && !!event?.end_month_id && !!event?.end_year} label="End (optional)">
             <div className="flex flex-col gap-y-2 p-2">
               <div className="grid grid-cols-3 gap-x-2">
                 <Input
