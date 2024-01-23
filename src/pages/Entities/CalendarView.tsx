@@ -103,6 +103,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
         "start_day",
         "start_month_id",
         "end_month_id",
+        "event_group_id",
         "start_year",
         "end_day",
         "end_year",

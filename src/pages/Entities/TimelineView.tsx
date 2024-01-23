@@ -140,27 +140,35 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             description: e.description,
           };
         });
-      const event_bars = events
-        .filter((e) => !!e.end_year)
-        .map((e, index) => {
-          return {
-            id: e.id,
-            start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
-            start_year: e.start_year,
-            image_id: e.image_id,
-            index,
-            end_x: isYearsOnly
-              ? (e.end_year || 0) - 1
-              : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
-            parent_id: e.parent_id,
-            background_color: e.background_color || DefaultTagColor,
-            date_string: `(${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
-              e.end_day || ""
-            }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
-            title: e.title,
-          };
-        });
 
+      const test = groupBy(
+        events.filter((e) => !!e.end_year),
+        "event_group_id",
+      );
+
+      const event_bars = Object.entries(test)
+        .map(([key, val], index) =>
+          val.map((e) => {
+            return {
+              id: e.id,
+              start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
+              start_year: e.start_year,
+              image_id: e.image_id,
+              group: key,
+              index,
+              end_x: isYearsOnly
+                ? (e.end_year || 0) - 1
+                : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
+              parent_id: e.parent_id,
+              background_color: e.background_color || DefaultTagColor,
+              date_string: `(${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
+                e.end_day || ""
+              }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
+              title: e.title,
+            };
+          }),
+        )
+        .flat();
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -310,7 +318,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .attr("height", 30)
           .attr("class", "event-bar")
           .attr("x", x(e.start_x))
-          .attr("y", j * 30 + 60)
+          .attr("y", (e.group === "null" ? j : e.index) * 30 + 50)
           .attr("cursor", "pointer")
           .style("fill", e.background_color);
 
@@ -328,7 +336,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           })
           .attr("fill", "white")
           .attr("x", x(e.start_x) + 10)
-          .attr("y", j * 30 + 80);
+          .attr("y", (e.group === "null" ? j : e.index) * 30 + 70);
       });
 
       points.forEach((e) => {

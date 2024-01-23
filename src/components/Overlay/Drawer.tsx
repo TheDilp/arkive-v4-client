@@ -26,6 +26,7 @@ import {
   EditTags,
   EntityPreviewDrawer,
   EventDrawer,
+  EventGroupDrawer,
   FieldTemplateDrawer,
   ImageDrawer,
   InsertEditorImageDrawer,
@@ -166,6 +167,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
+                {drawer.type === "event_groups" ? <EventGroupDrawer data={drawer?.data} /> : null}
               </>
             )}
           </div>

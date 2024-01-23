@@ -18,6 +18,7 @@ export const InsertEventSchema = z.object({
     end_year: z.number().optional().nullable(),
     start_hours: z.number().optional().nullable(),
     start_minutes: z.number().optional().nullable(),
+    event_group_id: z.string().optional().nullable(),
     end_hours: z.number().optional().nullable(),
     end_minutes: z.number().optional().nullable(),
 
@@ -51,6 +52,7 @@ export const UpdateEventSchema = z.object({
     start_minutes: z.number().optional().nullable(),
     end_hours: z.number().optional().nullable(),
     end_minutes: z.number().optional().nullable(),
+    event_group_id: z.string().optional().nullable(),
 
     document_id: z.string().optional().nullable(),
     image_id: z.string().optional().nullable(),
