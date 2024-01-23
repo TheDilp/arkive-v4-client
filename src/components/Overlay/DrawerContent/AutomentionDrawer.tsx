@@ -140,6 +140,11 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
     icon: IconEnum.map,
   },
   {
+    label: "Map pins",
+    value: "map_pins",
+    icon: IconEnum.map_pin,
+  },
+  {
     label: "Graph",
     value: "graphs",
     icon: IconEnum.graph,
