@@ -86,7 +86,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-      {isPublic ? null : (
+      {isPublic || isViewOnly ? null : (
         <div className="w-full">
           <div className="relative mb-3 ml-auto w-52">
             <Select
