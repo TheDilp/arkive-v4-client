@@ -56,9 +56,7 @@ export function EntitiesView() {
                     }
                   />
                 </div>
-              ) : (
-                false
-              )}
+              ) : null}
             </div>
           ) : null}
         </div>

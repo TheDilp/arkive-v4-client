@@ -810,6 +810,7 @@ export function FolderView() {
       {view === "table" ? (
         <div className="h-full w-full">
           <Table
+            key={type}
             columns={columns(
               setDrawer,
               setDialog,
