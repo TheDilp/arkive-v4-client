@@ -307,7 +307,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .attr("height", 30)
           .attr("class", "event-bar")
           .attr("x", x(e.start_x))
-          .attr("y", y(yPosition + j * 0.5))
+          .attr("y", y(yPosition))
           .attr("margin", 5)
           .attr("cursor", "pointer")
           .style("fill", e.background_color);
@@ -326,7 +326,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           })
           .attr("fill", "white")
           .attr("x", x(e.start_x) + 10)
-          .attr("y", y(yPosition + j * 0.5) + 20);
+          .attr("y", y(yPosition) + 20);
       });
 
       points.forEach((e) => {
