@@ -9,26 +9,7 @@ import { clamp } from "remirror";
 import { Button } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import {
-  closestDivisibleBy,
-  contextMenuAtom,
-  DefaultTagColor,
-  drawerAtom,
-  getDayOrdinal,
-  IconEnum,
-  userAtom,
-} from "../../utils";
-
-type FormattedEvent = {
-  id: string;
-  start_x: number;
-  start_year: number;
-  image_id: string;
-  end_x: number;
-  parent_id: string;
-  background_color: string;
-  title: string;
-};
+import { contextMenuAtom, DefaultTagColor, drawerAtom, getDayOrdinal, IconEnum, userAtom } from "../../utils";
 
 const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 20;
@@ -156,7 +137,6 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             description: e.description,
           };
         });
-
       const event_bars = events
         .filter((e) => !!e.end_year)
         .sort((a, b) => Number(a.end_year || 0) - Number(b.end_year || 0))
@@ -175,20 +155,8 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
               e.end_day || ""
             }${e.end_day ? getDayOrdinal(e.end_day) : ""} ${months[e.end_month || 0].title} ${e.end_year || ""})`,
           };
-        })
-        // @ts-ignore
-        .reduce((accumulator: any, curr: FormattedEvent) => {
-          const closestDivisible = closestDivisibleBy(
-            curr.start_x,
-            clamp({ min: 10, max: 100, value: zoom - (zoom % 5) / 2 }),
-          ).toString();
-          if (accumulator?.[closestDivisible]) {
-            accumulator[closestDivisible].push(curr);
-          } else {
-            accumulator[closestDivisible] = [curr];
-          }
-          return accumulator;
-        }, {} as Record<string, FormattedEvent[]>);
+        });
+
       svg
         .append("g")
         .attr("class", "axis axis--x")
@@ -250,123 +218,117 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
           .attr("x", x(e.x) + 20)
           .attr("y", 30);
       });
-      Object.entries(event_bars)
-        // @ts-ignore
-        .map(([, value]) => value as FormattedEvent[])
-        .forEach((formattedEvents) => {
-          formattedEvents
-            .sort((a, b) => b.start_x - b.end_x - a.start_x - a.end_x)
-            .forEach((e, j) => {
-              const event_bar = groupForBars.append("g");
-              const bar_width = x(e.end_x - e.start_x);
-              const yPosition = clamp({ min: 0, max: height / 1.05, value: zoom * (j + 1) });
-              event_bar
-                .append("rect")
-                .on("click", () =>
-                  setDrawer((prev) => ({
-                    ...prev,
-                    size: "lg",
-                    title: `Edit event - ${e.title}`,
-                    type: "events",
-                    data: {
-                      id: e.id,
+      event_bars.forEach((e, j) => {
+        const event_bar = groupForBars.append("g");
+        const bar_width = x(e.end_x - e.start_x);
+        const yPosition = zoom * (j + 1) + 30;
+        event_bar
+          .append("rect")
+          .on("click", () =>
+            setDrawer((prev) => ({
+              ...prev,
+              size: "lg",
+              title: `Edit event - ${e.title}`,
+              type: "events",
+              data: {
+                id: e.id,
+              },
+            })),
+          )
+          .on("contextmenu", (evt: MouseEvent) => {
+            evt.preventDefault();
+            setContextMenu({
+              event: evt as any,
+              items:
+                // id || isPublic
+                //   ? [
+                //       {
+                //         id: "1",
+                //         title: "Preview event",
+                //         icon: IconEnum.eye,
+                //         onClick: () =>
+                //           setDrawer((prev) => ({
+                //             ...prev,
+                //             title: "Preview event",
+                //             type: "entity_preview",
+                //             data: { id: event.id, entity_type: "events" },
+                //             size: "lg",
+                //           })),
+                //       },
+                //     ]
+                //   :
+
+                [
+                  {
+                    id: "1",
+                    title: "Edit event",
+                    icon: IconEnum.add,
+                    onClick: () =>
+                      setDrawer((prev) => ({
+                        ...prev,
+                        title: "Edit event",
+                        type: "events",
+                        data: { id: e.id },
+                        size: "lg",
+                      })),
+                  },
+                  {
+                    id: "2",
+                    title: "Delete event",
+                    icon: IconEnum.trash,
+                    onClick: () => {
+                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
                     },
-                  })),
-                )
-                .on("contextmenu", (evt: MouseEvent) => {
-                  evt.preventDefault();
-                  setContextMenu({
-                    event: evt as any,
-                    items:
-                      // id || isPublic
-                      //   ? [
-                      //       {
-                      //         id: "1",
-                      //         title: "Preview event",
-                      //         icon: IconEnum.eye,
-                      //         onClick: () =>
-                      //           setDrawer((prev) => ({
-                      //             ...prev,
-                      //             title: "Preview event",
-                      //             type: "entity_preview",
-                      //             data: { id: event.id, entity_type: "events" },
-                      //             size: "lg",
-                      //           })),
-                      //       },
-                      //     ]
-                      //   :
-
-                      [
-                        {
-                          id: "1",
-                          title: "Edit event",
-                          icon: IconEnum.add,
-                          onClick: () =>
-                            setDrawer((prev) => ({
-                              ...prev,
-                              title: "Edit event",
-                              type: "events",
-                              data: { id: e.id },
-                              size: "lg",
-                            })),
-                        },
-                        {
-                          id: "2",
-                          title: "Delete event",
-                          icon: IconEnum.trash,
-                          onClick: () => {
-                            deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
-                          },
-                        },
-                      ],
-                  });
-                })
-                .on("mouseover", (evt: MouseEvent) => {
-                  // Activate tooltip only if the text of the event
-                  // has an ellipsis i.e. isn't fully visible
-                  if (
-                    evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
-                    !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
-                  )
-                    tooltip
-                      .style("display", "block")
-                      .style(
-                        "transform",
-                        `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
-                          Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
-                        }px)`,
-                      )
-                      .html(e.title);
-                })
-                .on("mouseout", () => {
-                  tooltip.style("display", "none");
-                })
-                .attr("width", bar_width)
-                .attr("height", 30)
-                .attr("class", "event-bar")
-                .attr("x", x(e.start_x))
-                .attr("y", y(yPosition + j * 0.5))
-                .attr("margin", 5)
-                .attr("cursor", "pointer")
-                .style("fill", e.background_color);
-
-              event_bar
-                .append("text")
-                .attr("pointer-events", "none")
-                .attr("class", "event-text")
-                .attr("width", bar_width - 10)
-                .text(() => {
-                  const title = `${e.title}`;
-                  if (title.length > bar_width - 10) {
-                    return `${title.slice(0, title.length / 2)}...`;
-                  }
-                  return title;
-                })
-                .attr("fill", "white")
-                .attr("x", x(e.start_x) + 10)
-                .attr("y", y(yPosition + j * 0.5) + 20);
+                  },
+                ],
             });
-        });
+          })
+          .on("mouseover", (evt: MouseEvent) => {
+            // Activate tooltip only if the text of the event
+            // has an ellipsis i.e. isn't fully visible
+            if (
+              evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
+              !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
+            )
+              tooltip
+                .style("display", "block")
+                .style(
+                  "transform",
+                  `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
+                    Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
+                  }px)`,
+                )
+                .html(e.title);
+          })
+          .on("mouseout", () => {
+            tooltip.style("display", "none");
+          })
+          .attr("width", bar_width)
+          .attr("height", 30)
+          .attr("class", "event-bar")
+          .attr("x", x(e.start_x))
+          .attr("y", y(yPosition + j * 0.5))
+          .attr("margin", 5)
+          .attr("cursor", "pointer")
+          .style("fill", e.background_color);
+
+        event_bar
+          .append("text")
+          .attr("pointer-events", "none")
+          .attr("class", "event-text")
+          .attr("width", bar_width - 10)
+          .text(() => {
+            const title = `${e.title}`;
+            if (title.length > bar_width - 10) {
+              return `${title.slice(0, title.length / 2)}...`;
+            }
+            return title;
+          })
+          .attr("fill", "white")
+          .attr("x", x(e.start_x) + 10)
+          .attr("y", y(yPosition + j * 0.5) + 20);
+      });
+
       points.forEach((e) => {
         groupForCircles
           .append("g")
@@ -470,10 +432,14 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center">
         <div className="h-8 w-8">
-          <Button icon={IconEnum.remove} onClick={() => changeZoom("out", setZoom, item_id as string)} />
+          <Button
+            icon={IconEnum.remove}
+            isDisabled={zoom === 100}
+            onClick={() => changeZoom("out", setZoom, item_id as string)}
+          />
         </div>
         <div className="h-8 w-8">
-          <Button icon={IconEnum.add} onClick={() => changeZoom("in", setZoom, item_id as string)} />
+          <Button icon={IconEnum.add} isDisabled={zoom === 2} onClick={() => changeZoom("in", setZoom, item_id as string)} />
         </div>
       </div>
       <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-hidden">
