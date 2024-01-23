@@ -1,5 +1,6 @@
 import { QueryClient, UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
@@ -43,12 +44,12 @@ import {
   CharacterFieldTemplateType,
   CharacterFieldType,
   CharacterLocationType,
-  CharacterRelatedType,
   CharacterType,
   ConversationType,
   DialogAtomType,
   DocumentType,
   DrawerAtomType,
+  FormattedRelationship,
   ImageType,
   MapType,
   RandomTableOptionType,
@@ -74,7 +75,7 @@ import {
 import { RemoveFromCharacterSchema } from "../../validation";
 import { ConversationView } from ".";
 
-const relationshipColumnHelper = createColumnHelper<CharacterRelatedType>();
+const relationshipColumnHelper = createColumnHelper<FormattedRelationship>();
 const documentsColumnHelper = createColumnHelper<DocumentType & { is_main_page: boolean | null }>();
 const locationsColumnHelper = createColumnHelper<MapType>();
 const assetColumnHelper = createColumnHelper<ImageType>();
@@ -145,12 +146,16 @@ function relationshipTableColumns(
     }),
     relationshipColumnHelper.display({
       id: "relation_type",
-      header: "Relation",
+      header: "Relations",
       cell: ({ row }) => (
         <div className="truncate">
-          {row?.original?.relation_title
-            ? `${getSentenceCase(row?.original?.relation_title)} (${row.original?.relation_type_title || ""})`
-            : getSentenceCase(row.original?.relation_type_title || "")}
+          {(row?.original?.relationships || [])
+            .map((rel) => {
+              return rel?.relation_title
+                ? `${getSentenceCase(rel?.relation_title || "")} (${rel?.relation_type_title || ""})`
+                : getSentenceCase(rel?.relation_type_title || "");
+            })
+            .join(",")}
         </div>
       ),
       minSize: 20,
@@ -169,6 +174,12 @@ function relationshipTableColumns(
             items={[
               {
                 id: "1",
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} all relations`,
+                onClick: row.getToggleExpandedHandler(),
+                icon: IconEnum.family_tree,
+              },
+              {
+                id: "2",
                 title: `Preview profile of ${row.original.full_name}`,
                 icon: IconEnum.eye,
                 onClick: () =>
@@ -181,7 +192,7 @@ function relationshipTableColumns(
                   })),
               },
               {
-                id: "2",
+                id: "3",
                 title: `View profile of ${row.original.full_name}`,
                 icon: IconEnum.character,
                 onClick: isPreview
@@ -189,7 +200,7 @@ function relationshipTableColumns(
                   : () => navigate(`/projects/${project_id}/characters/${row.original.id}/resources`),
               },
               {
-                id: "3",
+                id: "4",
                 title: `View conversations of ${row.original.full_name}`,
                 icon: IconEnum.conversation,
                 onClick: () =>
@@ -994,21 +1005,14 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     setSelectedTab(getCharacterProfileTabFromType(type));
   }, [type]);
 
-  // const relationTypeArray = Object.values(
-  //   relationships.reduce((acc, obj) => {
-  //     const { relation_type_title } = obj;
-  //     if (!acc[relation_type_title]) {
-  //       acc[relation_type_title] = {
-  //         relation_type_title,
-  //         items: [],
-  //       };
-  //     }
-  //     acc[relation_type_title].items.push(obj);
-  //     return acc;
-  //   }, {}),
-  // );
-
-  // console.log(relationTypeArray);
+  const formattedRelationships: FormattedRelationship[] = Object.entries(groupBy(relationships, "id")).map(([key, value]) => {
+    return {
+      id: key,
+      portrait_id: value[0].portrait_id,
+      full_name: value[0].full_name,
+      relationships: value.map((v) => ({ relation_title: v.relation_title, relation_type_title: v.relation_type_title })),
+    };
+  });
 
   return (
     <div
@@ -1287,10 +1291,11 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                     columns={columns}
                     config={{
                       getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
+                      expandable: true,
                     }}
-                    data={relationships.toSorted(sortCharactersByName)}
+                    data={formattedRelationships.toSorted(sortCharactersByName)}
                     dispatch={dispatch}
-                    type="characters"
+                    type="relationships"
                   />
                 </div>
               )}

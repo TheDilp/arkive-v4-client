@@ -4,7 +4,14 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useGetEntities, useGetSubEntity, useSearch } from "../../../hooks";
-import { CharacterFieldType, CharacterType, SearchAllEntitiesByTagType, TableType, WordType } from "../../../types";
+import {
+  CharacterFieldType,
+  CharacterType,
+  FormattedRelationship,
+  SearchAllEntitiesByTagType,
+  TableType,
+  WordType,
+} from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
 import { getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
 import { Textarea } from "../../Form";
@@ -14,7 +21,7 @@ import { Badge } from "../../Misc/Badge";
 import { EntityPreview } from "../EntityPreview";
 
 const ExpandedTableRowClasses = tv({
-  base: "p-4 border-b border-zinc-600 bg-zinc-700 max-w-full w-full",
+  base: "p-4 border-b border-zinc-600 bg-zinc-800 max-w-full w-full",
 });
 
 function expandedTagRowTabs(counts: number[]) {
@@ -166,7 +173,25 @@ function ExpandedRandomOption({ random_table_suboptions }: { random_table_subopt
     </div>
   );
 }
-
+function ExpandedRelationships({ relationships }: { relationships: FormattedRelationship["relationships"] }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {(relationships || []).map((rel) => {
+        return (
+          <li key={`${rel.relation_title}${rel.relation_type_title}`} className="w-min">
+            <Badge
+              label={
+                rel?.relation_title
+                  ? `${getSentenceCase(rel?.relation_title || "")} (${rel?.relation_type_title || ""})`
+                  : getSentenceCase(rel?.relation_type_title || "")
+              }
+            />
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 function ExpandedTag({ id }: { id: string }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
@@ -243,6 +268,7 @@ export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType,
       {type === "random_table_options" ? (
         <ExpandedRandomOption random_table_suboptions={data?.random_table_suboptions || []} />
       ) : null}
+      {type === "relationships" ? <ExpandedRelationships relationships={data?.relationships || []} /> : null}
       {type === "words" ? <ExpandedWord id={data?.id} /> : null}
       {type === "tags" ? <ExpandedTag id={data?.id} /> : null}
     </div>

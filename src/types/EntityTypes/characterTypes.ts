@@ -39,6 +39,16 @@ export interface CharacterRelatedType {
   character_relationship_id: string;
 }
 
+export type FormattedRelationship = {
+  id: string;
+  portrait_id: string | undefined;
+  full_name: string;
+  relationships: {
+    relation_title: string | undefined;
+    relation_type_title: string | undefined;
+  }[];
+};
+
 export interface CharacterCharacterFieldType {
   id: string;
   title: string;
@@ -86,7 +96,6 @@ export interface CharacterCharacterFieldType {
   random_table_data: Pick<RandomTableType, "id" | "title">;
   value: string | number | null | string[] | number[];
 }
-
 export interface CharacterType {
   id: string;
   project_id: string;

@@ -86,7 +86,15 @@ export interface TableType {
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => Promise<void>;
   };
-  type: AvailableEntityType | AssetType | "random_table_options" | "icons" | "words" | "context" | "map_pin_types";
+  type:
+    | AvailableEntityType
+    | AssetType
+    | "random_table_options"
+    | "icons"
+    | "words"
+    | "context"
+    | "map_pin_types"
+    | "relationships";
   skeletonLimit?: number;
 }
 
