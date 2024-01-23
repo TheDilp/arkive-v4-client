@@ -63,8 +63,8 @@ const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "5", label: "Members", icon: IconEnum.users, isOwner: true },
-  { id: "6", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
+  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "5", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
