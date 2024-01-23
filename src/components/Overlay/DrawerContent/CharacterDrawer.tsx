@@ -391,6 +391,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           field: "tags",
         })),
       },
+      orderBy: [
+        {
+          field: "sort",
+          sort: "desc",
+        },
+      ],
     },
     "character_fields_templates",
     {

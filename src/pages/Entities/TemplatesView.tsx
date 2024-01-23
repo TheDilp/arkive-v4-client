@@ -100,7 +100,7 @@ export function TemplatesView() {
   const columns = createColumns(setDrawer, setDialog);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
-    orderBy: [{ field: "sort", sort: "asc" }],
+    orderBy: [{ field: "sort", sort: "desc" }],
     filters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},
