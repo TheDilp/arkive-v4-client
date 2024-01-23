@@ -32,6 +32,7 @@ type FormattedEvent = {
 
 const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 20;
+const ENVIRONMENT = import.meta.env;
 
 function truncateLongEventText(texts: any) {
   // eslint-disable-next-line func-names
@@ -107,7 +108,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const svg = d3.select(timelineContainer.current);
       const x = d3
         .scaleLinear()
-        .domain([0, endRange * (zoom / 2)])
+        .domain([0, (endRange * zoom) / 2])
         .range([0, width - X_AXIS_OFFSET * 2]);
       const y = d3
         .scaleLinear()
@@ -363,7 +364,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
                 })
                 .attr("fill", "white")
                 .attr("x", x(e.start_x) + 10)
-                .attr("y", y(yPosition + j * 0.5) + 20);
+                .attr("y", y(yPosition + j * 0.5) + (ENVIRONMENT.DEV ? 20 : 50));
             });
         });
       points.forEach((e) => {
