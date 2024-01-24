@@ -49,7 +49,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 
 function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
   setZoom((prev) => {
-    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? -5 : 5) });
+    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? 5 : -5) });
     ls.set(`timeline_${id}_zoom`, newZoom);
     return newZoom;
   });
@@ -76,11 +76,15 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       timelineContainer?.current?.clientHeight
     ) {
       // Calendar constants
-      const groupedEvents: Record<string, EventType[]> = groupBy(events, "start_year");
+      const groupedEvents: Record<string, EventType[]> = groupBy(events, "end_year");
       const monthCount = months.length;
-      const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key)) as number[]));
+      const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key === "null" ? 0 : key)) as number[]));
       const isYearsOnly = yearCount > 5;
-      const endRange = yearCount * (isYearsOnly ? 1 : monthCount) * zoom;
+      const endRange = clamp({
+        min: 1,
+        max: yearCount,
+        value: yearCount * (isYearsOnly ? 1 : monthCount),
+      });
       // Graphics constants
       const padding = 100;
       const width = timelineContainer?.current?.clientWidth || 1;
@@ -92,8 +96,8 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const svg = d3.select(timelineContainer.current);
       const x = d3
         .scaleLinear()
-        .domain([0, (endRange * zoom) / 2])
-        .range([0, width - X_AXIS_OFFSET * 2]);
+        .domain([0, endRange])
+        .range([0, width - X_AXIS_OFFSET - 30]);
       const y = d3
         .scaleLinear()
         .domain([0, (events.length * zoom) / 2])
@@ -101,7 +105,7 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
 
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(endRange)
+        .ticks(yearCount)
         .tickSize(10)
         .tickFormat((d) => {
           if (isYearsOnly) return ((d as number) + 1).toString();
@@ -442,12 +446,12 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         <div className="h-8 w-8">
           <Button
             icon={IconEnum.remove}
-            isDisabled={zoom === 100}
+            isDisabled={zoom === 2}
             onClick={() => changeZoom("out", setZoom, item_id as string)}
           />
         </div>
         <div className="h-8 w-8">
-          <Button icon={IconEnum.add} isDisabled={zoom === 2} onClick={() => changeZoom("in", setZoom, item_id as string)} />
+          <Button icon={IconEnum.add} isDisabled={zoom === 100} onClick={() => changeZoom("in", setZoom, item_id as string)} />
         </div>
       </div>
       <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-auto">
