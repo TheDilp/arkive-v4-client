@@ -1,12 +1,22 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useBlocker, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntity, useGetUser } from "../../hooks";
 import { ProjectType } from "../../types";
-import { contextMenuAtom, DefaultTagColor, projectAtom, userAtom } from "../../utils";
+import {
+  contextMenuAtom,
+  DefaultTagColor,
+  dialogAtom,
+  drawerAtom,
+  hasChangedDataAtom,
+  IconEnum,
+  projectAtom,
+  userAtom,
+} from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -43,13 +53,50 @@ export function ProjectLayout() {
   }, [userData?.data]);
 
   const setProjectAtom = useSetAtom(projectAtom);
+  const setDialog = useSetAtom(dialogAtom);
+  const hasChangedData = useAtomValue(hasChangedDataAtom);
+  const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
+
+  const resetDrawer = useResetAtom(drawerAtom);
+  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   useEffect(() => {
     if (data?.data) {
       setProjectAtom(data.data);
       ls.set("default_dice_color", data.data?.default_dice_color || DefaultTagColor);
     }
   }, [data?.data]);
+
+  const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
+    if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {
+      if (proceed) {
+        setDialog((prev) => ({
+          ...prev,
+          title: "You have unsaved changes - are you sure you want to proceed?",
+          confirm: {
+            label: "Proceed",
+            variant: "primary",
+            icon: IconEnum.chevron_right,
+            action: () => {
+              resetDrawer();
+              resetHasChangedData();
+              proceed();
+            },
+          },
+          cancel: {
+            label: "Cancel",
+            variant: "info",
+            action: reset,
+          },
+          isOverlay: true,
+        }));
+        return true;
+      }
+      return true;
+    }
+
+    return false;
+  });
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">

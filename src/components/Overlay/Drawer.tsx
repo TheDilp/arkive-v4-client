@@ -1,11 +1,11 @@
 import { autoUpdate, useFloating, useTransitionStyles } from "@floating-ui/react";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { drawerAtom, IconEnum } from "../../utils";
+import { drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
@@ -70,6 +70,7 @@ const DrawerClasses = tv({
 
 export function Drawer({ isPublic }: { isPublic?: boolean }) {
   const drawer = useAtomValue(drawerAtom);
+  const [hasChangedData, setHasChangedData] = useAtom(hasChangedDataAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { type, item_id } = useParams();
   const { base, title } = DrawerClasses({ size: drawer.size });
@@ -97,10 +98,11 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   });
   // Close drawer if the location changes
   useEffect(() => {
-    return () => {
+    if (!hasChangedData) {
       resetDrawerAtom();
-    };
-  }, [type, item_id]);
+      setHasChangedData(false);
+    }
+  }, [type, item_id, hasChangedData]);
 
   useEffect(() => {
     setIsOpen(!!drawer.type);

@@ -1,11 +1,14 @@
+import { useSetAtom } from "jotai";
 import cloneDeep from "lodash.clonedeep";
 import pick from "lodash.pick";
 import set from "lodash.set";
 import { useState } from "react";
 
 import { HandleChangePropsType } from "../../types";
+import { hasChangedDataAtom } from "../../utils";
 
 export function useHandleChange({ data, setData }: { data: any; setData: any }) {
+  const setHasChangedDataAtom = useSetAtom(hasChangedDataAtom);
   const [changedFields, setChangedFields] = useState<any[]>([]);
   const [changedData, setChangedData] = useState<any>();
   function handleChange(newData: HandleChangePropsType) {
@@ -44,6 +47,7 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
         }),
       ),
     );
+    if (changedData) setHasChangedDataAtom(true);
   }
 
   function resetChanges() {
