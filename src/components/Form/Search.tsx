@@ -13,6 +13,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { forwardRef, HTMLProps, MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -210,8 +211,8 @@ export function Search({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
-
-  const { data, isFetching, refetch } = useSearch<
+  const queryClient = useQueryClient();
+  const { data, isFetching, refetch, remove } = useSearch<
     {
       label: string;
       value: string;
@@ -284,6 +285,10 @@ export function Search({
         clearTimeout(timeout);
       };
     }
+    if (inputValue.length === 0) {
+      queryClient.removeQueries(["search", searchEntity]);
+      setOpen(false);
+    }
     return () => {};
   }, [isAutocomplete, inputValue, refetch]);
 
@@ -329,7 +334,7 @@ export function Search({
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
 
-              if ((!value || isMultiple) && activeIndex === null) {
+              if ((!value || isMultiple) && activeIndex === null && !data?.data.length) {
                 refetch();
               } else if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
                 const item = (manualResults || data?.data)?.[activeIndex || 0];
@@ -347,11 +352,15 @@ export function Search({
                   if (hasShownOption) setDisplayValue(item.label);
                   if (!isMultiple) {
                     setInputValue("");
+                    setOpen(false);
                   }
-                  setOpen(false);
+
                   inputRef.current?.focus();
                 }
               }
+            }
+            if (e.key === "Escape") {
+              if (isMultiple) remove();
             }
             if (e.key === "Backspace") {
               if (value || inputValue || displayValue) {
@@ -438,6 +447,8 @@ export function Search({
                         });
 
                         if (hasShownOption) setDisplayValue(item.label);
+                        if (!isMultiple) remove();
+
                         setOpen(false);
                         inputRef.current?.focus();
                       },
