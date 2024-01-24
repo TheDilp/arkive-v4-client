@@ -34,7 +34,7 @@ function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrec
   return false;
 }
 
-type Props = { data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } };
+type Props = { data: { id?: string; day?: number; month?: number; year?: number; parent_id?: string; isReadOnly?: boolean } };
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Details", icon: IconEnum.edit },
@@ -49,7 +49,7 @@ export function EventDrawer({ data }: Props) {
   const setDrawer = useSetAtom(drawerAtom);
 
   const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(
-    item_id as string,
+    (data?.parent_id as string) || (item_id as string),
     "calendars",
     {
       fields: ["hours", "minutes"],

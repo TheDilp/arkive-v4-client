@@ -99,8 +99,8 @@ export function DictionaryPreviewDrawer({ id }: { id?: string }) {
 export function CalendarPreviewDrawer({ id }: { id?: string }) {
   return <CalendarView id={id} />;
 }
-export function EventPreviewDrawer({ id }: { id?: string }) {
-  return <EventDrawer data={{ id, isReadOnly: true }} />;
+export function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string }) {
+  return <EventDrawer data={{ id, parent_id, isReadOnly: true }} />;
 }
 
 export function EntityPreviewDrawer({
@@ -123,7 +123,7 @@ export function EntityPreviewDrawer({
         {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
-        {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
       </div>
       {isPublic ? null : (
         <div className="">

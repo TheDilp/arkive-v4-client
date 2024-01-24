@@ -436,13 +436,15 @@ function eventsTableColumns(
               {
                 id: "preview",
                 title: "Preview content",
-                icon: IconEnum.document,
+                icon: IconEnum.event,
                 onClick: () =>
                   setDrawer((prev) => ({
                     ...prev,
                     data: {
                       id: row.original.id,
+                      parent_id: row.original.parent_id || undefined,
                       entity_type: "events",
+                      isReadOnly: true,
                     },
                     title: "Preview event",
                     type: "entity_preview",
