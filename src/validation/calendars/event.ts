@@ -28,6 +28,7 @@ export const InsertEventSchema = z.object({
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
       characters: z.object({ id: z.string() }).array().optional(),
+      map_pins: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });
@@ -60,6 +61,7 @@ export const UpdateEventSchema = z.object({
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
       characters: z.object({ id: z.string() }).array().optional(),
+      map_pins: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });

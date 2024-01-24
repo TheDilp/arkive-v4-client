@@ -8,7 +8,7 @@ const TextareaClasses = tv({
     textarea:
       "flex h-full w-full resize-none items-center justify-center bg-zinc-900 text-white focus:bg-zinc-950 rounded-md border p-2 text-base outline-none placeholder:text-sm placeholder:italic",
     label: "text-sm font-medium truncate block pl-1 min-h-[20px]",
-    helperText: "text-xs truncate block",
+    helperText: "text-xs truncate block min-h-4",
   },
   variants: {
     variant: {

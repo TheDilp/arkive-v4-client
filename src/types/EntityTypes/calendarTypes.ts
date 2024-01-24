@@ -2,6 +2,7 @@ import { BaseEntityType } from "./baseEntityTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
 import { ImageType } from "./imageTypes";
+import { MapPinType } from "./mapTypes";
 import { TagType } from "./tagTypes";
 
 /* eslint-disable no-use-before-define */
@@ -85,6 +86,7 @@ export interface EventType {
   image?: ImageType;
   tags: TagType[];
   characters: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
+  map_pins: Pick<MapPinType, "id" | "title" | "parent_id" | "icon" | "background_color" | "border_color" | "image_id">[];
 }
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;

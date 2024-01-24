@@ -65,7 +65,7 @@ export function EventDrawer({ data }: Props) {
     "events",
     {
       data: { project_id },
-      relations: { tags: true, image: true, document: true, characters: true },
+      relations: { tags: true, image: true, document: true, characters: true, map_pins: true },
       fields: [
         "id",
         "title",
@@ -153,6 +153,7 @@ export function EventDrawer({ data }: Props) {
         relations: {
           tags: event?.tags?.map((tag) => ({ id: tag.id })),
           characters: event?.characters?.map((char) => ({ id: char.id })),
+          map_pins: event?.map_pins?.map((pin) => ({ id: pin.id })),
         },
       });
 
@@ -172,6 +173,7 @@ export function EventDrawer({ data }: Props) {
         relations: {
           tags: event?.tags?.map((tag) => ({ id: tag.id })),
           characters: event?.characters?.map((char) => ({ id: char.id })),
+          map_pins: event?.map_pins?.map((pin) => ({ id: pin.id })),
         },
       });
       await updateEvent(parsedData, {
@@ -363,9 +365,10 @@ export function EventDrawer({ data }: Props) {
 
       {selectedTab === 1 ? (
         <>
-          <div>
+          <div className="h-fit py-2">
             <Textarea
-              isDisabled={data?.isReadOnly}
+              helperText={event?.document || event?.document_id ? "Note: using document instead of description." : ""}
+              isDisabled={data?.isReadOnly || !!event?.document || !!event?.document_id}
               label="Event description (optional)"
               name="description"
               onChange={handleChange}
@@ -430,43 +433,91 @@ export function EventDrawer({ data }: Props) {
               />
             )}
           </div>
-          <div>
-            <Search
-              isMultiple
-              label="Characters (optional)"
-              limit={10}
-              name="characters"
-              onChange={({ name, value, label, image }) => {
-                if ((event.characters || [])?.some((char) => char.id === value)) {
+          <Collapsible icon={IconEnum.character} initialOpen={false} label="Characters">
+            <div className="flex flex-col gap-y-1 p-2">
+              <Search
+                isMultiple
+                label="Characters (optional)"
+                limit={10}
+                name="characters"
+                onChange={({ name, value, label, image }) => {
+                  if ((event.characters || [])?.some((char) => char.id === value)) {
+                    handleChange({
+                      name,
+                      value: (event.characters || []).filter((t) => t.id !== value),
+                    });
+                    return;
+                  }
+
                   handleChange({
                     name,
-                    value: (event.characters || []).filter((t) => t.id !== value),
+                    value: (event.characters || []).concat({
+                      full_name: label || "",
+                      id: value,
+                      portrait_id: image,
+                    }),
                   });
-                  return;
-                }
+                }}
+                searchEntity="characters"
+                value={event.characters?.map((char) => char.id)}
+              />
+              {event.characters?.map((char) => (
+                <EntityPreview
+                  clearAction={(id) =>
+                    handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
+                  }
+                  id={char.id}
+                  image_id={char.portrait_id}
+                  title={char.full_name}
+                  type="characters"
+                />
+              ))}
+            </div>
+          </Collapsible>
+          <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+            <div className="flex flex-col gap-y-1 p-2">
+              <Search
+                isMultiple
+                label="Locations (optional)"
+                limit={10}
+                name="map_pins"
+                onChange={({ name, value, label, image, icon, parent_id }) => {
+                  if ((event.map_pins || [])?.some((char) => char.id === value)) {
+                    handleChange({
+                      name,
+                      value: (event.map_pins || []).filter((t) => t.id !== value),
+                    });
+                    return;
+                  }
 
-                handleChange({
-                  name,
-                  value: (event.characters || []).concat({
-                    full_name: label || "",
-                    id: value,
-                    portrait_id: image,
-                  }),
-                });
-              }}
-              searchEntity="characters"
-              value={event.characters?.map((char) => char.id)}
-            />
-          </div>
-          {event.characters?.map((char) => (
-            <EntityPreview
-              clearAction={(id) => handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })}
-              id={char.id}
-              image_id={char.portrait_id}
-              title={char.full_name}
-              type="characters"
-            />
-          ))}
+                  handleChange({
+                    name,
+                    value: (event.map_pins || []).concat({
+                      id: value,
+                      title: label || "",
+                      image_id: image,
+                      icon: icon || getDefaultEntityIcon("map_pins"),
+                      parent_id: parent_id || "",
+                      background_color: "#ffffff",
+                      border_color: "#ffffff",
+                    }),
+                  });
+                }}
+                searchEntity="map_pins"
+                value={event.map_pins?.map((pin) => pin.id)}
+              />
+              {event.map_pins?.map((pin) => (
+                <EntityPreview
+                  clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
+                  icon={pin.icon}
+                  id={pin.id}
+                  image_id={pin.image_id}
+                  title={pin.title || ""}
+                  type="map_pins"
+                />
+              ))}
+            </div>
+          </Collapsible>
         </>
       ) : null}
       {selectedTab === 2 ? (
