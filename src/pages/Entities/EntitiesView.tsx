@@ -38,7 +38,7 @@ export function EntitiesView() {
                   }}
                 />
               </div>
-              {type === "blueprints" ? (
+              {type === "blueprints" && item_id ? (
                 <div className="w-52">
                   <Button
                     icon={IconEnum.add}
