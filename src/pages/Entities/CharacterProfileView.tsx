@@ -49,6 +49,7 @@ import {
   DialogAtomType,
   DocumentType,
   DrawerAtomType,
+  EventType,
   FormattedRelationship,
   ImageType,
   MapType,
@@ -65,6 +66,7 @@ import {
   getCharacterFullName,
   getCharacterProfileTabFromType,
   getDefaultEntityIcon,
+  getEntityLink,
   getFirstLetters,
   getImageURL,
   getSentenceCase,
@@ -76,7 +78,8 @@ import { RemoveFromCharacterSchema } from "../../validation";
 import { ConversationView } from ".";
 
 const relationshipColumnHelper = createColumnHelper<FormattedRelationship>();
-const documentsColumnHelper = createColumnHelper<DocumentType & { is_main_page: boolean | null }>();
+const documentsColumnHelper = createColumnHelper<DocumentType>();
+const eventsColumnHelper = createColumnHelper<EventType>();
 const locationsColumnHelper = createColumnHelper<MapType>();
 const assetColumnHelper = createColumnHelper<ImageType>();
 const conversationColumnHelper = createColumnHelper<ConversationType>();
@@ -333,6 +336,118 @@ function documentsTableColumns(
                 onClick: async () => {
                   await removeItem({ relations: { documents: [{ id: row.original.id }] } });
                 },
+              },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+function eventsTableColumns(
+  updatePublic: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  queryClient: QueryClient,
+  project_id: string,
+  character_id: string,
+) {
+  return [
+    eventsColumnHelper.display({
+      id: "image_id",
+      header: "",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) =>
+        "image_id" in row.original && row.original?.image_id ? (
+          <Avatar
+            image={getImageURL(project_id, "images", (row.original?.image_id as string) || "")}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
+        ) : (
+          <Icon fontSize={24} icon={getDefaultEntityIcon("events")} />
+        ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
+    documentsColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
+    }),
+    documentsColumnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            queryClient.setQueryData<{ data: CharacterType }>(["characters", character_id], (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  events: (old.data.events || [])?.map((event) => {
+                    if (event.id === row.original.id) return { ...event, is_public: !row.original.is_public };
+                    return event;
+                  }),
+                },
+              };
+            });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
+
+    documentsColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "preview",
+                title: "Preview content",
+                icon: IconEnum.document,
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    data: {
+                      id: row.original.id,
+                      entity_type: "events",
+                    },
+                    title: "Preview event",
+                    type: "entity_preview",
+                    size: "half",
+                  })),
               },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
@@ -887,6 +1002,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         character_relationship_types: true,
         documents: true,
         images: true,
+        events: true,
       },
       fields: ["id", "full_name", "portrait_id", "age"],
     },
@@ -897,6 +1013,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
+  const { mutateAsync: updateEventsPublic } = useUpdateManyPublic("events", project_id as string);
 
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
@@ -1197,6 +1314,34 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                       data={existingCharacter?.data?.locations || []}
                       dispatch={dispatch}
                       type="documents"
+                    />
+                  ) : (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  )}
+                </div>
+              </Collapsible>
+              <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
+                <div className="mt-2 animate-in fade-in fill-mode-both">
+                  {existingCharacter?.data?.events?.length ? (
+                    <Table
+                      columns={eventsTableColumns(
+                        updateEventsPublic,
+                        setDrawer,
+                        queryClient,
+                        project_id as string,
+                        item_id as string,
+                      )}
+                      config={{
+                        expandable: true,
+                        hasNoHeaderGap: true,
+                        getLink: (rowData: EventType) =>
+                          getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id, isPublic),
+                      }}
+                      data={existingCharacter?.data?.events || []}
+                      dispatch={dispatch}
+                      type="events"
                     />
                   ) : (
                     <div className="mt-2 w-full">

@@ -119,6 +119,7 @@ export interface CharacterType {
   locations?: CharacterLocationType[];
   documents?: Pick<DocumentType, "id" | "title" | "icon">[];
   tags?: TagType[];
+  events?: EventType[];
 
   related_to?: CharacterRelatedType[];
   related_from?: CharacterRelatedType[];
