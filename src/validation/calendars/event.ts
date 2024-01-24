@@ -27,6 +27,7 @@ export const InsertEventSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
+      characters: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });
@@ -58,6 +59,7 @@ export const UpdateEventSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
+      characters: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
 });

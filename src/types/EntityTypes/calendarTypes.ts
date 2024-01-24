@@ -1,4 +1,5 @@
 import { BaseEntityType } from "./baseEntityTypes";
+import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
 import { ImageType } from "./imageTypes";
 import { TagType } from "./tagTypes";
@@ -83,6 +84,7 @@ export interface EventType {
   document?: DocumentType;
   image?: ImageType;
   tags: TagType[];
+  characters: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
 }
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;

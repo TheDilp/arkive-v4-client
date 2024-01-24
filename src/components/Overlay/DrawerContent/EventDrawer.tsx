@@ -65,7 +65,7 @@ export function EventDrawer({ data }: Props) {
     "events",
     {
       data: { project_id },
-      relations: { tags: true, image: true, document: true },
+      relations: { tags: true, image: true, document: true, characters: true },
       fields: [
         "id",
         "title",
@@ -150,7 +150,10 @@ export function EventDrawer({ data }: Props) {
     if (!data?.id) {
       const parsedData = InsertEventSchema.parse({
         data: { ...event, image_id: event?.image?.id, document_id: event?.document?.id },
-        relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
+        relations: {
+          tags: event?.tags?.map((tag) => ({ id: tag.id })),
+          characters: event?.characters?.map((char) => ({ id: char.id })),
+        },
       });
 
       await createEvent(parsedData, {
@@ -166,7 +169,10 @@ export function EventDrawer({ data }: Props) {
     } else {
       const parsedData = UpdateEventSchema.parse({
         data: { ...event, image_id: event?.image?.id, document_id: event?.document?.id },
-        relations: { tags: event?.tags?.map((tag) => ({ id: tag.id })) },
+        relations: {
+          tags: event?.tags?.map((tag) => ({ id: tag.id })),
+          characters: event?.characters?.map((char) => ({ id: char.id })),
+        },
       });
       await updateEvent(parsedData, {
         onSuccess: () => {
@@ -424,6 +430,43 @@ export function EventDrawer({ data }: Props) {
               />
             )}
           </div>
+          <div>
+            <Search
+              isMultiple
+              label="Characters (optional)"
+              limit={10}
+              name="characters"
+              onChange={({ name, value, label, image }) => {
+                if ((event.characters || [])?.some((char) => char.id === value)) {
+                  handleChange({
+                    name,
+                    value: (event.characters || []).filter((t) => t.id !== value),
+                  });
+                  return;
+                }
+
+                handleChange({
+                  name,
+                  value: (event.characters || []).concat({
+                    full_name: label || "",
+                    id: value,
+                    portrait_id: image,
+                  }),
+                });
+              }}
+              searchEntity="characters"
+              value={event.characters?.map((char) => char.id)}
+            />
+          </div>
+          {event.characters?.map((char) => (
+            <EntityPreview
+              clearAction={(id) => handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })}
+              id={char.id}
+              image_id={char.portrait_id}
+              title={char.full_name}
+              type="characters"
+            />
+          ))}
         </>
       ) : null}
       {selectedTab === 2 ? (
