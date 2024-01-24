@@ -358,6 +358,7 @@ export function chooseRandomItems(
 
 export function getIconUrlFromIconEnum(icon: string, color?: string): string {
   const iconComponents = icon.split(":");
+
   return `https://api.iconify.design/${iconComponents[0]}/${iconComponents[1]}.svg${
     color ? `?color=${color.replace("#", "%23")}` : ""
   }`;

@@ -1,4 +1,4 @@
-import { EventType } from "../../types";
+import { EventType, RequestFilterType } from "../../types";
 import {
   CalendarType,
   EventStateType,
@@ -192,4 +192,60 @@ export function getDayOrdinal(day: number): "st" | "nd" | "rd" | "th" {
   if (dayString.endsWith("2")) return "nd";
   if (dayString.endsWith("3")) return "rd";
   return "th";
+}
+
+export function getCalendarFilters(
+  type: "calendar" | "range" | "timeline",
+  calendar_id: string,
+  start_range: number | undefined,
+  end_range: number | undefined,
+  month_id: string,
+): { and: RequestFilterType[]; or: RequestFilterType[] } {
+  const filters: { and: RequestFilterType[]; or: RequestFilterType[] } = { and: [], or: [] };
+  filters.and.push({
+    id: "parent",
+    header_name: "Parent",
+    field: "parent_id",
+    value: calendar_id,
+    operator: "eq" as const,
+  });
+
+  if (type === "range" && typeof start_range === "number") {
+    filters.and.push({
+      id: "start_range",
+      header_name: "Start range",
+      field: "start_year",
+      value: start_range || 0,
+      operator: "gte" as const,
+    });
+    if (typeof end_range === "number") {
+      filters.and.push({
+        id: "end_range",
+        header_name: "End range",
+        field: "start_year",
+        value: end_range,
+        operator: "lte" as const,
+      });
+    }
+  }
+  if (type === "calendar") {
+    filters.or.push(
+      {
+        id: "start_month_id",
+        header_name: "Start month",
+        field: "start_month_id",
+        value: month_id,
+        operator: "eq",
+      },
+      {
+        id: "end_month_id",
+        header_name: "End month",
+        field: "end_month_id",
+        value: month_id,
+        operator: "eq",
+      },
+    );
+  }
+
+  return filters;
 }

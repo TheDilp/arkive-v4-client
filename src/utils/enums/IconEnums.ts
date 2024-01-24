@@ -84,6 +84,7 @@ export const IconEnum = {
   pdf: "ph:file-pdf",
   quote: "ph:quotes",
   random_table: "game-icons:perspective-dice-six-faces-random",
+  range: "ph:rows",
   remove: "ph:minus",
   save: "ph:floppy-disk",
   screen: "fluent:board-24-regular",

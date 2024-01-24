@@ -35,7 +35,6 @@ import {
   FetchFunction,
   getAvatarInitials,
   getBlueprintInstanceColumnWidth,
-  getCharacterFullName,
   getDayOrdinal,
   getImageURL,
   IconEnum,
@@ -97,7 +96,7 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
             image={getImageURL(project_id as string, "images", char?.character?.portrait_id || "")}
             initials={getAvatarInitials(char?.character?.full_name || "")}
             isBordered
-            label={getCharacterFullName(char?.character?.full_name || "")}
+            label={char?.character?.full_name || ""}
             size="sm"
             tooltipAllowedPlacements={["left", "right"]}
           />

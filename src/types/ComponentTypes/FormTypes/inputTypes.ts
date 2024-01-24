@@ -12,6 +12,7 @@ export interface InputType extends BaseFormComponentType {
   placeholder?: string;
   label?: string;
   isInline?: boolean;
+  isClearable?: boolean;
   onChange: ({ name, value }: InputOnChangeValue) => void;
   onKeyDown?: (e: KeyboardEvent) => void;
   onBlur?: FocusEventHandler<HTMLInputElement>;

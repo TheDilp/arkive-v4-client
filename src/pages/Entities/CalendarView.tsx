@@ -1,16 +1,23 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { useLayoutEffect, useMemo, useState } from "react";
+import groupBy from "lodash.groupby";
+import { Dispatch, useLayoutEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Alert, Badge, Button, Input, Select, Skeleton, Tooltip } from "../../components";
+import { Alert, Avatar, Badge, Button, Dropdown, EntityPreview, Input, Select, Skeleton, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import { DrawerAtomType } from "../../types";
 import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
   DefaultTagColor,
   drawerAtom,
+  getAvatarInitials,
+  getCalendarFilters,
+  getDefaultEntityIcon,
+  getEntityLink,
   getFillerDayNumber,
+  getIconUrlFromIconEnum,
   getImageURL,
   getLeapDays,
   getStartingDayForMonth,
@@ -59,6 +66,149 @@ export function DayNumber({
   );
 }
 
+export function CalendarRangeEvent({
+  events,
+  setDrawer,
+  isPublic,
+  deleteEvent,
+}: {
+  events: EventType[];
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+  isPublic: boolean;
+  deleteEvent: any;
+}) {
+  const { project_id } = useParams();
+  const grouped = groupBy(events, "start_year");
+
+  return Object.entries(grouped).map(([year, groupedEvents]) => {
+    return (
+      <div key={year} className="my-2">
+        <h3 className="font-merriweather text-xl">Year {year}</h3>
+        {groupedEvents.map((e) => (
+          <div
+            key={e.id}
+            className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2">
+            {e.title}
+            <div className="ml-auto flex items-center gap-x-10">
+              {e.document ? (
+                <div className="flex items-center">
+                  <EntityPreview
+                    hasNoBackground
+                    icon={e.document.icon || getDefaultEntityIcon("documents")}
+                    id={e.document.id}
+                    link={getEntityLink(project_id as string, "documents", e.document.id)}
+                    size="sm"
+                    title={e.document.title}
+                    type="documents"
+                  />
+                </div>
+              ) : null}
+              <div className="flex items-center -space-x-4">
+                {e?.map_pins?.slice(0, 5)?.map((pin) => (
+                  <Avatar
+                    key={pin.id}
+                    image={
+                      pin.image_id
+                        ? getImageURL(project_id as string, "images", pin.image_id)
+                        : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
+                    }
+                    initials={getAvatarInitials(pin.title || "")}
+                    isPreview
+                    label={pin.title || ""}
+                    size="xs"
+                    tooltipAllowedPlacements={["top"]}
+                  />
+                ))}
+                {e.characters && e.characters?.length && e.characters?.length > 5 ? (
+                  <Tooltip
+                    content={e.characters
+                      ?.slice(5)
+                      .map((char) => char.full_name || "")
+                      .join(", ")}>
+                    <div className="w-min max-w-min">
+                      <Badge label={`+${e.characters.length - 5}`} size="sm" variant="secondary" />
+                    </div>
+                  </Tooltip>
+                ) : null}
+              </div>
+              <div className="flex items-center -space-x-4">
+                {e?.characters?.slice(0, 5)?.map((char) => (
+                  <Avatar
+                    key={char.id}
+                    image={getImageURL(project_id as string, "images", char.portrait_id)}
+                    initials={getAvatarInitials(char.full_name)}
+                    label={char.full_name}
+                    size="xs"
+                    tooltipAllowedPlacements={["top"]}
+                  />
+                ))}
+                {e.characters && e.characters?.length && e.characters?.length > 5 ? (
+                  <Tooltip
+                    content={e.characters
+                      ?.slice(5)
+                      .map((char) => char.full_name || "")
+                      .join(", ")}>
+                    <div className="w-min max-w-min">
+                      <Badge label={`+${e.characters.length - 5}`} size="sm" variant="secondary" />
+                    </div>
+                  </Tooltip>
+                ) : null}
+              </div>
+              <div className="">
+                <Dropdown
+                  allowedPlacements={["left", "left-end", "left-start"]}
+                  items={
+                    isPublic
+                      ? [
+                          {
+                            id: "1",
+                            title: "Preview event",
+                            icon: IconEnum.eye,
+                            onClick: () =>
+                              setDrawer((prev) => ({
+                                ...prev,
+                                title: "Preview event",
+                                type: "entity_preview",
+                                data: { id: e.id, entity_type: "events" },
+                                size: "lg",
+                              })),
+                          },
+                        ]
+                      : [
+                          {
+                            id: "1",
+                            title: "Edit event",
+                            icon: IconEnum.edit,
+                            onClick: () =>
+                              setDrawer((prev) => ({
+                                ...prev,
+                                title: "Edit event",
+                                type: "events",
+                                data: { id: e.id },
+                                size: "lg",
+                              })),
+                          },
+                          {
+                            id: "2",
+                            title: "Delete event",
+                            icon: IconEnum.trash,
+                            onClick: () => {
+                              deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                            },
+                          },
+                        ]
+                  }>
+                  <Button hasNoBackground icon={IconEnum.actions} iconSize={24} isIconOnly onClick={undefined} />
+                </Dropdown>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  });
+}
+
 export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
   const user = useAtomValue(userAtom);
   const { project_id, item_id, subitem_id } = useParams();
@@ -68,8 +218,20 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     month: ls.get(`calendar_${id || item_id}_month`) ?? 0,
     year: ls.get(`calendar_${id || item_id}_year`) ?? 1,
   });
-  const [view, setView] = useState<"calendar" | "timeline">(ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar");
-  const [queryKey, setQueryKey] = useState<any[]>(["allEntities", project_id, item_id, "events", date, view]);
+  const [range, setRange] = useState<{ start: number; end: number | undefined }>({ start: 0, end: undefined });
+  const [view, setView] = useState<"calendar" | "range" | "timeline">(
+    ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
+  );
+  const [queryKey, setQueryKey] = useState<any[]>([
+    "allEntities",
+    project_id,
+    item_id,
+    "events",
+    date,
+    view,
+    range.start,
+    range.end,
+  ]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
     item_id || id,
@@ -109,48 +271,21 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
         "start_hours",
         "start_minutes",
       ],
-      filters: {
-        and:
-          view === "calendar"
-            ? [
-                {
-                  id: "parent",
-                  header_name: "Parent",
-                  field: "parent_id",
-                  value: (item_id || id) as string,
-                  operator: "eq",
-                },
-              ]
-            : [
-                {
-                  id: "parent",
-                  header_name: "Parent",
-                  field: "parent_id",
-                  value: item_id as string,
-                  operator: "eq",
-                },
-              ],
-
-        or:
-          view === "calendar" && existingCalendar?.data?.months?.[date.month]?.id
-            ? [
-                {
-                  id: "start_month_id",
-                  header_name: "Start month",
-                  field: "start_month_id",
-                  value: existingCalendar?.data?.months?.[date.month].id,
-                  operator: "eq",
-                },
-                {
-                  id: "end_month_id",
-                  header_name: "End month",
-                  field: "end_month_id",
-                  value: existingCalendar?.data?.months?.[date.month].id,
-                  operator: "eq",
-                },
-              ]
-            : [],
-      },
+      filters: getCalendarFilters(
+        view,
+        (id || item_id) as string,
+        range.start,
+        range.end,
+        calendar?.months?.[date.month]?.id as string,
+      ),
+      relations:
+        view === "range"
+          ? {
+              characters: true,
+              map_pins: true,
+              document: true,
+            }
+          : {},
       orderBy: [
         { field: "start_hours", sort: "asc" },
         { field: "start_minutes", sort: "asc" },
@@ -197,8 +332,23 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
-    setQueryKey(["allEntities", project_id, item_id ?? id, "events", view, view === "calendar" ? date : null, date.year]);
-  }, [date, view]);
+    const timeout = setTimeout(() => {
+      setQueryKey([
+        "allEntities",
+        project_id,
+        item_id ?? id,
+        "events",
+        view,
+        view === "calendar" ? date : null,
+        date.year,
+        range.start,
+        range.end,
+      ]);
+    }, 250);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [date, view, range]);
 
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
@@ -269,16 +419,41 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
           </>
         ) : null}
 
+        {view === "range" ? (
+          <>
+            <div className="w-32">
+              <Input
+                label="Start"
+                name="start_range"
+                onChange={({ value }) => setRange((prev) => ({ ...prev, start: value as number }))}
+                type="number"
+                value={range.start}
+              />
+            </div>
+            <div className="w-32">
+              <Input
+                isClearable
+                label="End"
+                name="end_range"
+                onChange={({ value }) => setRange((prev) => ({ ...prev, end: value as number }))}
+                type="number"
+                value={range.end}
+              />
+            </div>
+          </>
+        ) : null}
+
         <div className="w-32">
           <Select
             label="View"
             name="view"
             onChange={({ value }) => {
-              setView(value as "calendar" | "timeline");
+              setView(value as "calendar" | "range" | "timeline");
               ls.set(`calendar_or_timeline_view_${item_id}`, value);
             }}
             options={[
               { label: "Calendar", value: "calendar", icon: IconEnum.calendar },
+              { label: "Range", value: "range", icon: IconEnum.range },
               { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt },
             ]}
             placeholder="View"
@@ -418,7 +593,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                       {
                                         id: "1",
                                         title: "Edit event",
-                                        icon: IconEnum.add,
+                                        icon: IconEnum.edit,
                                         onClick: () =>
                                           setDrawer((prev) => ({
                                             ...prev,
@@ -486,9 +661,22 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
               </div>
             ))}
         </div>
-      ) : (
+      ) : null}
+
+      {view === "range" ? (
+        <div className="max-h-full overflow-y-auto">
+          <CalendarRangeEvent
+            deleteEvent={deleteEvent}
+            events={events?.data || []}
+            isPublic={!!isPublic}
+            setDrawer={setDrawer}
+          />
+        </div>
+      ) : null}
+
+      {view === "timeline" ? (
         <TimelineView eras={calendar?.eras || []} events={events?.data || []} months={calendar?.months || []} />
-      )}
+      ) : null}
     </div>
   );
 }

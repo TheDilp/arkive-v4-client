@@ -86,7 +86,7 @@ export interface EventType {
   image?: ImageType;
   tags: TagType[];
   characters: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
-  map_pins: Pick<MapPinType, "id" | "title" | "parent_id" | "icon" | "background_color" | "border_color" | "image_id">[];
+  map_pins: Pick<MapPinType, "id" | "title" | "parent_id" | "icon" | "color" | "border_color" | "image_id">[];
 }
 
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;

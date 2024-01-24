@@ -498,7 +498,7 @@ export function EventDrawer({ data }: Props) {
                       image_id: image,
                       icon: icon || getDefaultEntityIcon("map_pins"),
                       parent_id: parent_id || "",
-                      background_color: "#ffffff",
+                      color: "#ffffff",
                       border_color: "#ffffff",
                     }),
                   });
