@@ -107,6 +107,7 @@ export function Input({
   onKeyDown,
   onBlur,
   isDisabled,
+  isClearable,
   isReadOnly,
   placeholder,
   type = "text",
@@ -171,7 +172,7 @@ export function Input({
         />
         {suffix ? <span className="pl-1">{suffix}</span> : null}
 
-        {type === "search" && value ? (
+        {(type === "search" || isClearable) && typeof value === "number" ? (
           <span>
             <Button hasNoBackground icon={IconEnum.close} onClick={() => onChange({ name, value: "" })} />
           </span>
