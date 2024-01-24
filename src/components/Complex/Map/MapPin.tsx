@@ -53,6 +53,7 @@ export function MapPin({
           title: "Edit map pin",
           type: "map_pins",
           data: markerData,
+          size: "lg",
           exceptions: { characterPin: !!character && !!character_id },
         }));
     },

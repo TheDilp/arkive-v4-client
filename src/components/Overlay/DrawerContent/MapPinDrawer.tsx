@@ -9,7 +9,7 @@ import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Collapsible, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker, IconPicker } from "..";
 
@@ -76,6 +76,9 @@ export function MapPinDrawer({ data, exceptions }: Props) {
         "show_background",
         "show_border",
       ],
+      relations: {
+        events: true,
+      },
     },
     { enabled: !!data?.id },
   );
@@ -139,7 +142,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   isDisabled={!!character && !!mapPin.character_id}
                   name="character_id"
                   onChange={({ value: id, label, image: portrait_id }) => {
-                    setCharacter({ id, full_name: label, portrait_id });
+                    setCharacter({ id, full_name: label || "", portrait_id });
                   }}
                   placeholder="Type at least 2 characters"
                   searchEntity="characters"
@@ -327,6 +330,46 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           ) : null}
         </div>
       ) : null}
+
+      <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
+        <div className="flex flex-col gap-y-1 p-2">
+          <Search
+            isMultiple
+            label="Events (optional)"
+            limit={10}
+            name="events"
+            onChange={({ name, value, label, image, parent_id }) => {
+              if ((mapPin.events || [])?.some((event) => event.id === value)) {
+                handleChange({
+                  name,
+                  value: (mapPin.events || []).filter((t) => t.id !== value),
+                });
+                return;
+              }
+              handleChange({
+                name,
+                value: (mapPin.events || []).concat({
+                  id: value,
+                  title: label || "",
+                  image_id: image,
+                  parent_id: parent_id || "",
+                }),
+              });
+            }}
+            searchEntity="events"
+            value={mapPin.events?.map((pin) => pin.id)}
+          />
+          {mapPin.events?.map((event) => (
+            <EntityPreview
+              clearAction={(id) => handleChange({ name: "events", value: mapPin.events?.filter((c) => c.id !== id) })}
+              id={event.id}
+              image_id={event.image_id}
+              title={event.title || ""}
+              type="events"
+            />
+          ))}
+        </div>
+      </Collapsible>
 
       <Button
         icon={IconEnum.save}

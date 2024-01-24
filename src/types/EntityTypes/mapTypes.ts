@@ -1,3 +1,4 @@
+import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
 import { ImageType } from "./imageTypes";
@@ -53,6 +54,7 @@ export interface MapPinType {
   linked_map?: MapType;
   image?: ImageType;
   character?: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
+  events: Pick<EventType, "id" | "title" | "image_id" | "parent_id">[];
   map_pin_type?: MapPinType | null;
 }
 
