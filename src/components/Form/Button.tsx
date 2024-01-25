@@ -15,7 +15,7 @@ const ButtonClasses = tv({
         base: "bg-zinc-950 text-white border-zinc-800 focus:border-zinc-700 ",
       },
       secondary: {
-        base: "bg-zinc-600 text-white border-zinc-400",
+        base: "bg-zinc-600 text-white border-zinc-500",
       },
       info: {
         base: "bg-blue-600 text-white focus:border-blue-400 border-blue-600",

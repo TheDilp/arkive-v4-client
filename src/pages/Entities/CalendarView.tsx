@@ -4,14 +4,27 @@ import groupBy from "lodash.groupby";
 import { Dispatch, useLayoutEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Alert, Avatar, Badge, Button, Dropdown, EntityPreview, Input, Select, Skeleton, Tooltip } from "../../components";
+import {
+  Alert,
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+  EntityPreview,
+  Icon,
+  Input,
+  Select,
+  Skeleton,
+  Tooltip,
+} from "../../components";
 import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { CalendarFilters, CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
+import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
   DefaultTagColor,
   drawerAtom,
+  formatDateToString,
   getAvatarInitials,
   getCalendarFilters,
   getDefaultEntityIcon,
@@ -70,11 +83,13 @@ export function CalendarRangeEvent({
   setDrawer,
   isPublic,
   deleteEvent,
+  months,
 }: {
   events: EventType[];
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
   isPublic: boolean;
   deleteEvent: any;
+  months: MonthType[];
 }) {
   const { project_id } = useParams();
   const grouped = groupBy(events, "start_year");
@@ -87,7 +102,21 @@ export function CalendarRangeEvent({
           <div
             key={e.id}
             className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2">
-            {e.title}
+            <div className="flex items-center gap-x-2">
+              <span>{e.title}</span>
+              <Tooltip
+                content={`${formatDateToString(e.start_day, e.start_year, e.start_month_id, months)} ${
+                  e?.end_year ? `- ${formatDateToString(e.end_day || 0, e.end_year, e.end_month_id || "", months)}` : ""
+                }`}
+                customOffset={{
+                  mainAxis: 10,
+                }}>
+                <div>
+                  <Icon icon={IconEnum.calendar} />
+                </div>
+              </Tooltip>
+            </div>
+
             <div className="ml-auto flex items-center gap-x-10">
               {e.document ? (
                 <div className="flex items-center">
@@ -225,6 +254,11 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     filters: { and: [], or: [] },
     relationFilters: { and: [], or: [] },
   });
+  const hasFiltersEnabled =
+    filters.filters.and.length ||
+    filters.filters.or.length ||
+    filters.relationFilters.and.length ||
+    filters.relationFilters.or.length;
   const [queryKey, setQueryKey] = useState<any[]>([
     "allEntities",
     project_id,
@@ -394,7 +428,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
-        <div className="mr-auto self-end">
+        <div className="mr-auto flex items-center gap-x-2 self-end">
           <div className="h-11 w-11">
             <Button
               icon={IconEnum.filter}
@@ -411,6 +445,17 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
               tooltip="Filter events"
             />
           </div>
+          {hasFiltersEnabled ? (
+            <div>
+              <Button
+                icon={IconEnum.close}
+                label="Clear all"
+                onClick={() => setFilters({ filters: { and: [], or: [] }, relationFilters: { and: [], or: [] } })}
+                tooltip="Filter events"
+                variant="secondary"
+              />
+            </div>
+          ) : null}
         </div>
         {view === "calendar" ? (
           <>
@@ -697,6 +742,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
             deleteEvent={deleteEvent}
             events={events?.data || []}
             isPublic={!!isPublic}
+            months={calendar?.months || []}
             setDrawer={setDrawer}
           />
         </div>
