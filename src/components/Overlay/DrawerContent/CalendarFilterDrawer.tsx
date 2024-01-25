@@ -65,7 +65,12 @@ export function CalendarFilterDrawer({ data }: Props) {
             {
               id: "2",
               title: "Document filter",
-              onClick: () => {},
+              onClick: () =>
+                setCalendarFilters((prev) => ({
+                  ...prev,
+                  filters: prev.filters.concat({ type: "document_filters", and: [], or: [] }),
+                })),
+              isDisabled: calendarFilters.filters.some((f) => f.type === "document_filters"),
             },
             {
               id: "3",
@@ -270,6 +275,115 @@ export function CalendarFilterDrawer({ data }: Props) {
               </div>
             </Collapsible>
           );
+
+        if (filt.type === "document_filters")
+          return (
+            <Collapsible
+              key={filt.type}
+              actions={[
+                {
+                  icon: IconEnum.trash,
+                  variant: "error",
+                  onClick: () =>
+                    setCalendarFilters((prev) => ({
+                      ...prev,
+                      filters: prev.filters.filter((f) => f.type !== "document_filters"),
+                    })),
+                },
+              ]}
+              icon={IconEnum.document}
+              initialOpen
+              label="Document filters">
+              <div className="p-2">
+                <div className="flex items-center">
+                  <div className="flex-1">
+                    <Title isDrawerTitle label="OR filters (must match at least one condition)" />
+                  </div>
+                  <div className="h-6 w-6">
+                    <Button
+                      hasNoBackground
+                      icon={IconEnum.add}
+                      onClick={() =>
+                        handleChange({
+                          name: `filters.[${i}].or`,
+                          value: (filt.or || []).concat([
+                            {
+                              id: crypto.randomUUID(),
+                              header_name: "",
+                              field: "document_id",
+                              value: 0,
+                              operator: "eq",
+                            },
+                          ]),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                {filt.or.map((f, j) => (
+                  <div key={f.id} className="flex flex-col">
+                    {j > 0 ? (
+                      <div className="mt-1 flex w-full items-center justify-center">
+                        <div>
+                          <Badge label="OR" variant="info" />
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-1.5 flex w-full items-center gap-x-2">
+                      {f?.value ? (
+                        <div className="flex-1">
+                          <EntityPreview
+                            clearAction={() =>
+                              handleChange({
+                                name: `filters[${i}].or[${j}].value`,
+                                value: undefined,
+                              })
+                            }
+                            icon={f.relationalData?.icon}
+                            id={f?.value as string}
+                            image_id={f.relationalData?.image_id}
+                            title={f.relationalData?.title}
+                            type="documents"
+                          />
+                        </div>
+                      ) : (
+                        <Search
+                          isMultiple
+                          name={`filters[${i}].or[${j}]`}
+                          onChange={({ name, label, image, value, icon }) => {
+                            handleChange([
+                              {
+                                name: `${name}.relationalData`,
+                                value: { character_id: value, title: label, image_id: image, icon },
+                              },
+                              {
+                                name: `${name}.value`,
+                                value,
+                              },
+                            ]);
+                          }}
+                          searchEntity="documents"
+                        />
+                      )}
+                      <div>
+                        <Button
+                          hasNoBackground
+                          icon={IconEnum.trash}
+                          isIconOnly
+                          onClick={() =>
+                            handleChange({ name: `filters[${i}].or`, value: filt.or.filter((ff) => ff.id !== f.id) })
+                          }
+                          variant="error"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Collapsible>
+          );
+
         return null;
       })}
       {calendarFilters.relationFilters.map((filt, i) => {
