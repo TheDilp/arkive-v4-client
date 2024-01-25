@@ -213,8 +213,12 @@ export function getCalendarFilters(
   });
 
   if (filters.filters.and.length || filters.filters.or.length) {
-    finalFilters.and.concat(filters.filters.and);
-    finalFilters.or.concat(filters.filters.or);
+    for (let index = 0; index < filters.filters.and.length; index += 1) {
+      finalFilters.and.push(filters.filters.and[index]);
+    }
+    for (let index = 0; index < filters.filters.or.length; index += 1) {
+      finalFilters.or.push(filters.filters.or[index]);
+    }
     return finalFilters;
   }
 

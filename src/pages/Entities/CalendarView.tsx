@@ -254,7 +254,9 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
       isPublic,
     },
   );
+
   const calendar = data ?? existingCalendar?.data;
+
   const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
