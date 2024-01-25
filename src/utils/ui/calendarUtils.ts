@@ -1,5 +1,6 @@
 import { EventType, RequestFilterType } from "../../types";
 import {
+  CalendarFilters,
   CalendarType,
   EventStateType,
   LeapDayConditionType,
@@ -200,9 +201,10 @@ export function getCalendarFilters(
   start_range: number | undefined,
   end_range: number | undefined,
   month_id: string,
+  filters: CalendarFilters,
 ): { and: RequestFilterType[]; or: RequestFilterType[] } {
-  const filters: { and: RequestFilterType[]; or: RequestFilterType[] } = { and: [], or: [] };
-  filters.and.push({
+  const finalFilters: { and: RequestFilterType[]; or: RequestFilterType[] } = { and: [], or: [] };
+  finalFilters.and.push({
     id: "parent",
     header_name: "Parent",
     field: "parent_id",
@@ -210,8 +212,14 @@ export function getCalendarFilters(
     operator: "eq" as const,
   });
 
+  if (filters.filters.and.length || filters.filters.or.length) {
+    finalFilters.and.concat(filters.filters.and);
+    finalFilters.or.concat(filters.filters.or);
+    return finalFilters;
+  }
+
   if (type === "range" && typeof start_range === "number") {
-    filters.and.push({
+    finalFilters.and.push({
       id: "start_range",
       header_name: "Start range",
       field: "start_year",
@@ -219,7 +227,7 @@ export function getCalendarFilters(
       operator: "gte" as const,
     });
     if (typeof end_range === "number") {
-      filters.and.push({
+      finalFilters.and.push({
         id: "end_range",
         header_name: "End range",
         field: "start_year",
@@ -229,7 +237,7 @@ export function getCalendarFilters(
     }
   }
   if (type === "calendar") {
-    filters.or.push(
+    finalFilters.or.push(
       {
         id: "start_month_id",
         header_name: "Start month",
@@ -247,5 +255,5 @@ export function getCalendarFilters(
     );
   }
 
-  return filters;
+  return finalFilters;
 }

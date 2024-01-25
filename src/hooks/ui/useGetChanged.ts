@@ -7,7 +7,7 @@ import { useState } from "react";
 import { HandleChangePropsType } from "../../types";
 import { hasChangedDataAtom } from "../../utils";
 
-export function useHandleChange({ data, setData }: { data: any; setData: any }) {
+export function useHandleChange({ data, setData, ignoreDataChange }: { data: any; setData: any; ignoreDataChange?: boolean }) {
   const setHasChangedDataAtom = useSetAtom(hasChangedDataAtom);
   const [changedFields, setChangedFields] = useState<any[]>([]);
   const [changedData, setChangedData] = useState<any>();
@@ -47,7 +47,7 @@ export function useHandleChange({ data, setData }: { data: any; setData: any }) 
         }),
       ),
     );
-    if (changedData) setHasChangedDataAtom(true);
+    if (changedData && !ignoreDataChange) setHasChangedDataAtom(true);
   }
 
   function resetChanges() {

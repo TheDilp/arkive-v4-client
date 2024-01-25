@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { Alert, Avatar, Badge, Button, Dropdown, EntityPreview, Input, Select, Skeleton, Tooltip } from "../../components";
 import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
+import { CalendarFilters, CalendarType, CurrentDateType, EventType } from "../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
   DefaultTagColor,
@@ -65,7 +65,6 @@ export function DayNumber({
     </span>
   );
 }
-
 export function CalendarRangeEvent({
   events,
   setDrawer,
@@ -222,6 +221,10 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   const [view, setView] = useState<"calendar" | "range" | "timeline">(
     ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
   );
+  const [filters, setFilters] = useState<CalendarFilters>({
+    filters: { and: [], or: [] },
+    relationFilters: { and: [], or: [] },
+  });
   const [queryKey, setQueryKey] = useState<any[]>([
     "allEntities",
     project_id,
@@ -231,6 +234,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     view,
     range.start,
     range.end,
+    filters,
   ]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
@@ -277,7 +281,9 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
         range.start,
         range.end,
         calendar?.months?.[date.month]?.id as string,
+        filters,
       ),
+      relationFilters: filters.relationFilters || {},
       relations:
         view === "range"
           ? {
@@ -343,12 +349,13 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
         date.year,
         range.start,
         range.end,
+        filters,
       ]);
     }, 250);
     return () => {
       clearTimeout(timeout);
     };
-  }, [date, view, range]);
+  }, [date, view, range, filters]);
 
   useLayoutEffect(() => {
     if (subitem_id && subitemEvent?.data) {
@@ -357,8 +364,6 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     }
   }, [subitem_id, subitemEvent]);
 
-  const matchingEra = (calendar?.eras || []).find((era) => date.year >= era.start_year && date.year <= era.end_year);
-  const monthDays = typeof calendar?.months?.[date.month]?.days === "number" ? calendar.months[date.month].days : 0;
   const leapDayCount = useMemo(() => getLeapDays(calendar?.leap_days || [], calendar?.months || [], date), [date, calendar]);
   const previousMonthLeapDayCount = useMemo(
     () =>
@@ -368,7 +373,10 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
       }),
     [date, calendar],
   );
+
   if (!calendar) return null;
+  const matchingEra = (calendar?.eras || []).find((era) => date.year >= era.start_year && date.year <= era.end_year);
+  const monthDays = typeof calendar?.months?.[date.month]?.days === "number" ? calendar.months[date.month].days : 0;
   const startingDayForMonth = getStartingDayForMonth(
     calendar?.months,
     date?.year,
@@ -384,6 +392,24 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   return (
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
+        <div className="mr-auto self-end">
+          <div className="h-11 w-11">
+            <Button
+              icon={IconEnum.filter}
+              isIconOnly
+              onClick={() =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "calendar_filter",
+                  data: { setFilters },
+                  size: "lg",
+                  title: "Calendar filter",
+                }))
+              }
+              tooltip="Filter events"
+            />
+          </div>
+        </div>
         {view === "calendar" ? (
           <>
             <div className="w-32">

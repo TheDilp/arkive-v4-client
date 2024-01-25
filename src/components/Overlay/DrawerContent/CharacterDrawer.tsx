@@ -437,6 +437,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       setCharacter({
         id: "",
         first_name: "",
+        full_name: "",
         project_id: project_id as string,
         character_fields: [],
         tags: [],

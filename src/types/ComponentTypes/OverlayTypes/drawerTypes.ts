@@ -2,6 +2,7 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Dispatch, MouseEvent, SetStateAction } from "react";
 
 import { Size } from "../../baseTypes";
+import { RequestFilterType } from "../../CRUD";
 import {
   AllAvailableEntities,
   AvailableEntityType,
@@ -123,6 +124,23 @@ export type DrawerAtomType = {
   | { type: "invite_to_project" | null; data: null }
   | { type: "webhooks"; data: { id?: string } }
   | { type: "character_filter"; data: { dispatch: TableDispatch } }
+  | {
+      type: "calendar_filter";
+      data: {
+        setFilters: Dispatch<
+          SetStateAction<{
+            filters: {
+              and: RequestFilterType[];
+              or: RequestFilterType[];
+            };
+            relationFilters: {
+              and: RequestFilterType[];
+              or: RequestFilterType[];
+            };
+          }>
+        >;
+      };
+    }
 );
 
 export interface ContextMenuAtomType {

@@ -13,6 +13,7 @@ import {
   BlueprintDrawer,
   BlueprintInstanceDrawer,
   CalendarDrawer,
+  CalendarFilterDrawer,
   CharacterAddDrawer,
   CharacterDrawer,
   CharacterFilterDrawer,
@@ -167,6 +168,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "mentioned_in" ? <MentionedInDrawer data={drawer?.data} /> : null}
                 {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
+                {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
               </>
             )}

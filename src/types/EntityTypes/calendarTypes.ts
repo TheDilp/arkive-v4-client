@@ -1,3 +1,4 @@
+import { RequestFilterType } from "../CRUD";
 import { BaseEntityType } from "./baseEntityTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
@@ -18,6 +19,11 @@ export interface CalendarType extends BaseEntityType {
   days: string[];
   tags: TagType[];
 }
+
+export type CalendarFilters = {
+  filters: { and: RequestFilterType[]; or: RequestFilterType[] };
+  relationFilters: { and: RequestFilterType[]; or: RequestFilterType[] };
+};
 
 export interface MonthType {
   id: string;
