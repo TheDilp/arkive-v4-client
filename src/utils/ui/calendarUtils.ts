@@ -170,7 +170,13 @@ export function getFillerDayNumber(
   }
   return 0;
 }
-
+export function getDayOrdinal(day: number): "st" | "nd" | "rd" | "th" {
+  const dayString = day.toString();
+  if (dayString.endsWith("1")) return "st";
+  if (dayString.endsWith("2")) return "nd";
+  if (dayString.endsWith("3")) return "rd";
+  return "th";
+}
 export function formatDateToString(
   day: number | undefined,
   year: number | undefined,
@@ -182,17 +188,9 @@ export function formatDateToString(
   if (monthId === undefined) return "";
   const month = (months || []).find((m) => m.id === monthId);
   if (month) {
-    return `${day} ${month.title} ${year}`;
+    return `${day}${getDayOrdinal(day)} ${month.title} ${year}`;
   }
   return "";
-}
-
-export function getDayOrdinal(day: number): "st" | "nd" | "rd" | "th" {
-  const dayString = day.toString();
-  if (dayString.endsWith("1")) return "st";
-  if (dayString.endsWith("2")) return "nd";
-  if (dayString.endsWith("3")) return "rd";
-  return "th";
 }
 
 export function getCalendarFilters(

@@ -34,7 +34,7 @@ const DropdownClasses = tv({
   slots: {
     base: "z-30 font-lato min-w-fit outline-none",
     floatingBase:
-      "border max-h-[40rem] rounded overflow-y-auto border-zinc-700 z-[60] font-lato shadow-lg absolute top-0 left-0",
+      "border max-h-[40rem] rounded overflow-y-auto border-zinc-700 z-[9999] font-lato shadow-lg absolute top-0 left-0",
   },
 });
 const DropdownItemClasses = tv({
@@ -49,6 +49,9 @@ const DropdownItemClasses = tv({
     hasImage: {
       true: "justify-start gap-x-2",
     },
+    isEvent: {
+      true: " absolute",
+    },
   },
 });
 
@@ -60,7 +63,7 @@ export function DropdownComponent({
   event,
   isDisabled,
 }: DropdownType) {
-  const { base, floatingBase } = DropdownClasses();
+  const { base, floatingBase } = DropdownClasses({ isEvent: !!event });
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);

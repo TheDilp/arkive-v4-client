@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import groupBy from "lodash.groupby";
@@ -588,33 +590,33 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 />
               </div>
             ))}
-          {[...Array(monthDays + leapDayCount).keys()].map((day) => (
-            <div
-              key={day}
-              className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 bg-opacity-85 hover:text-white"
-              style={{
-                backgroundColor:
-                  matchingEra &&
-                  user?.feature_flags?.show_eras_in_calendars &&
-                  (matchingEra.start_day <= day || matchingEra.end_day >= day)
-                    ? `${matchingEra?.color || DefaultTagColor}aa`
-                    : "transparent",
-              }}>
-              <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
-              <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
-                {(isLoading ? [] : events?.data || [])
-                  ?.filter((event) => {
-                    return (
-                      (event.start_day === day + 1 &&
-                        event.start_month_id === calendar.months?.[date.month]?.id &&
-                        event.start_year === date.year) ||
-                      (event.end_month_id === calendar.months?.[date.month]?.id &&
-                        event.end_day === day + 1 &&
-                        event.end_year === date.year)
-                    );
-                  })
+          {[...Array(monthDays + leapDayCount).keys()].map((day) => {
+            const filteredEvents = (events?.data || [])?.filter((event) => {
+              return (
+                (event.start_day === day + 1 &&
+                  event.start_month_id === calendar.months?.[date.month]?.id &&
+                  event.start_year === date.year) ||
+                (event.end_month_id === calendar.months?.[date.month]?.id &&
+                  event.end_day === day + 1 &&
+                  event.end_year === date.year)
+              );
+            });
 
-                  .map((event) => {
+            return (
+              <div
+                key={day}
+                className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 bg-opacity-85 hover:text-white"
+                style={{
+                  backgroundColor:
+                    matchingEra &&
+                    user?.feature_flags?.show_eras_in_calendars &&
+                    (matchingEra.start_day <= day || matchingEra.end_day >= day)
+                      ? `${matchingEra?.color || DefaultTagColor}aa`
+                      : "transparent",
+                }}>
+                <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
+                <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
+                  {(isLoading ? [] : filteredEvents || []).slice(0, 7).map((event) => {
                     return (
                       <Tooltip
                         key={event.id}
@@ -712,9 +714,106 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                       </Tooltip>
                     );
                   })}
+                  {filteredEvents.length > 7 ? (
+                    <Tooltip
+                      arrowColor="#27272a"
+                      content={
+                        <div className="max-w-48 rounded-md bg-zinc-800 p-4 shadow shadow-zinc-700">
+                          <h4>
+                            {`Other events for ${formatDateToString(
+                              day + 1,
+                              date.year,
+                              calendar?.months?.[date.month]?.id,
+                              calendar?.months || [],
+                            )}`}
+                          </h4>
+                          <ul className="flex flex-col gap-y-0.5">
+                            {filteredEvents.slice(7).map((e) => (
+                              <li
+                                key={e.id}
+                                onClick={() =>
+                                  id || isPublic
+                                    ? setDrawer((prev) => ({
+                                        ...prev,
+                                        title: "Preview event",
+                                        type: "entity_preview",
+                                        data: { id: e.id, entity_type: "events" },
+                                        size: "lg",
+                                      }))
+                                    : setDrawer((prev) => ({
+                                        ...prev,
+                                        title: "Edit event",
+                                        type: "events",
+                                        data: { id: e.id, month: date.month, year: date.year },
+                                        size: "lg",
+                                      }))
+                                }
+                                onContextMenu={(evt: any) => {
+                                  evt.preventDefault();
+                                  setContextMenu({
+                                    event: evt,
+                                    items:
+                                      id || isPublic
+                                        ? [
+                                            {
+                                              id: "1",
+                                              title: "Preview event",
+                                              icon: IconEnum.eye,
+                                              onClick: () =>
+                                                setDrawer((prev) => ({
+                                                  ...prev,
+                                                  title: "Preview event",
+                                                  type: "entity_preview",
+                                                  data: { id: evt.id, entity_type: "events" },
+                                                  size: "lg",
+                                                })),
+                                            },
+                                          ]
+                                        : [
+                                            {
+                                              id: "1",
+                                              title: "Edit event",
+                                              icon: IconEnum.edit,
+                                              onClick: () =>
+                                                setDrawer((prev) => ({
+                                                  ...prev,
+                                                  title: "Edit event",
+                                                  type: "events",
+                                                  data: { id: evt.id, month: date.month, year: date.year },
+                                                  size: "lg",
+                                                })),
+                                            },
+                                            {
+                                              id: "2",
+                                              title: "Delete event",
+                                              icon: IconEnum.trash,
+                                              onClick: () => {
+                                                deleteEvent({ data: { id: evt.id, parent_id: evt.parent_id } });
+                                              },
+                                            },
+                                          ],
+                                  });
+                                }}>
+                                <Badge
+                                  customColor={e.background_color || DefaultTagColor}
+                                  label={`${e.title} ${e.start_day === day + 1 && !!e.end_day ? "(start)" : ""} ${
+                                    e.end_day === day + 1 ? "(end)" : ""
+                                  }`}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      }>
+                      <div>
+                        <Badge label={`+${filteredEvents.length - 7} events`} variant="secondary" />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {[
             ...Array(
               calendar?.days?.length
