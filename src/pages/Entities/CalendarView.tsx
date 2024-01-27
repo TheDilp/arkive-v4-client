@@ -3,7 +3,7 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import groupBy from "lodash.groupby";
-import { Dispatch, useLayoutEffect, useMemo, useState } from "react";
+import { Dispatch, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -258,6 +258,7 @@ export function CalendarRangeEvent({
 
 export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
   const user = useAtomValue(userAtom);
+  const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
@@ -278,17 +279,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     filters.filters.or.length ||
     filters.relationFilters.and.length ||
     filters.relationFilters.or.length;
-  const [queryKey, setQueryKey] = useState<any[]>([
-    "allEntities",
-    project_id,
-    item_id,
-    "events",
-    date,
-    view,
-    range.start,
-    range.end,
-    filters,
-  ]);
+  const [queryKey, setQueryKey] = useState<any[]>([]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
     item_id || id,
@@ -354,7 +345,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     },
     "events",
     {
-      enabled: !!calendar && !!(item_id || id),
+      enabled: !!calendar && !!(item_id || id) && !!queryKey.length,
       queryKeyOverwrite: queryKey,
       staleTime: 5 * 60 * 1000,
       isPublic,
@@ -393,22 +384,27 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
-    const timeout = setTimeout(() => {
-      setQueryKey([
-        "allEntities",
-        project_id,
-        item_id ?? id,
-        "events",
-        view,
-        view === "calendar" ? date : null,
-        date.year,
-        range.start,
-        range.end,
-        filters,
-      ]);
-    }, 250);
+    if (!firstRender.current) {
+      const timeout = setTimeout(() => {
+        setQueryKey([
+          "allEntities",
+          project_id,
+          item_id ?? id,
+          "events",
+          view,
+          view === "calendar" ? date : null,
+          date.year,
+          range.start,
+          range.end,
+          filters,
+        ]);
+      }, 250);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
     return () => {
-      clearTimeout(timeout);
+      firstRender.current = false;
     };
   }, [date, view, range, filters]);
 
