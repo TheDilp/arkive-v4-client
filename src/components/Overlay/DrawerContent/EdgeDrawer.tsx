@@ -23,7 +23,7 @@ import {
   useNotifications,
 } from "../../../utils";
 import { UpdateEdgeSchema } from "../../../validation";
-import { Badge, Button, Collapsible, Input, Range, Search, Select, Skeleton, Tabs, Title } from "../..";
+import { Alert, Badge, Button, Collapsible, Input, Range, Search, Select, Skeleton, Tabs, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type Props = { data: { id: string; parent_id: string } };
@@ -446,6 +446,7 @@ export function EdgeDrawer({ data }: Props) {
           variant="success"
         />
       </div>
+      {changedData ? <Alert label="You have unsaved changes." variant="warning-bordered" /> : null}
     </div>
   );
 }

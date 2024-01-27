@@ -513,7 +513,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           variant="success"
         />
       </div>
-      {changedData ? <Alert label="You have unsaved changes." variant="warning" /> : null}
+      {changedData ? <Alert label="You have unsaved changes." variant="warning-bordered" /> : null}
     </div>
   );
 }
