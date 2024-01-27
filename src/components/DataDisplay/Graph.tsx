@@ -681,13 +681,6 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     return () => {};
   }, [drawer]);
 
-  if (isFetching)
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <Spinner />
-      </div>
-    );
-
   return (
     <div
       className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center"
@@ -780,6 +773,9 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       //   }
       // }}
     >
+      <div className={`absolute z-10 flex h-full w-full items-center justify-center bg-black ${isFetching ? "" : "hidden"}`}>
+        {isFetching ? <Spinner /> : null}
+      </div>
       {isFamilyTreeView ? (
         <div className="ml-auto w-min">
           <Button
