@@ -29,7 +29,7 @@ import { Badge } from "../../Misc";
 import { Dropdown } from "../Dropdown";
 
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
-const resourceEntities = ["documents", "map_pins", "events", "images", "tags"];
+const resourceEntities = ["documents", "maps", "events", "images", "tags"];
 type CharacterFilterField = {
   id: string;
   field_id: string;
@@ -455,7 +455,7 @@ function CharacterResourceFiltersList({
     <li key={f.id} className="flex flex-col gap-x-1">
       <Collapsible
         actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
-        icon={getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)}
+        icon={f.id === "maps" ? IconEnum.map_pin : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)}
         label={f.template.title}>
         <div className="grid flex-1 grid-cols-12 gap-1 p-2">
           <div className="col-span-12 flex items-center justify-between">
@@ -522,6 +522,7 @@ function CharacterResourceFiltersList({
                     </div>
                   ) : (
                     <Search
+                      imageType={f.id === "maps" ? "map_images" : "images"}
                       limit={10}
                       name={`[${i}].fields.and[${fIdx}].filter.value`}
                       onChange={({ name, value, label, image, icon }) =>
@@ -618,6 +619,7 @@ function CharacterResourceFiltersList({
                     </div>
                   ) : (
                     <Search
+                      imageType={f.id === "maps" ? "map_images" : "images"}
                       limit={10}
                       name={`[${i}].fields.or[${fIdx}].filter.value`}
                       onChange={({ name, value, label, image, icon }) =>
@@ -709,8 +711,8 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                 onClick: () => {
                   setFilters((prev) =>
                     prev.concat({
-                      id: "map_pins",
-                      template: { id: "map_pins", title: "Locations" },
+                      id: "maps",
+                      template: { id: "maps", title: "Locations" },
                       fields: {
                         and: [],
                         or: [],
@@ -718,7 +720,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                     }),
                   );
                 },
-                isDisabled: filters.some((f) => f.id === "map_pins"),
+                isDisabled: filters.some((f) => f.id === "maps"),
               },
               {
                 id: "events",
