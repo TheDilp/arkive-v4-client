@@ -28,10 +28,12 @@ import {
   drawerAtom,
   formatDateToString,
   getAvatarInitials,
+  getCalendarFilterBadges,
   getCalendarFilters,
   getDefaultEntityIcon,
   getEntityLink,
   getFillerDayNumber,
+  getFilterTooltip,
   getIconUrlFromIconEnum,
   getImageURL,
   getLeapDays,
@@ -279,6 +281,9 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     filters.filters.or.length ||
     filters.relationFilters.and.length ||
     filters.relationFilters.or.length;
+
+  const filterBadges = getCalendarFilterBadges(filters);
+
   const [queryKey, setQueryKey] = useState<any[]>([]);
 
   const { data: existingCalendar, isInitialLoading: isInitalLoadingCalendar } = useGetEntity<CalendarType>(
@@ -458,6 +463,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 }))
               }
               tooltip="Filter events"
+              variant="primary"
             />
           </div>
           {hasFiltersEnabled ? (
@@ -466,11 +472,42 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 icon={IconEnum.close}
                 label="Clear all"
                 onClick={() => setFilters({ filters: { and: [], or: [] }, relationFilters: { and: [], or: [] } })}
+                size="xs"
                 tooltip="Filter events"
                 variant="secondary"
               />
             </div>
           ) : null}
+          {hasFiltersEnabled && filterBadges.fields.length
+            ? filterBadges.fields.map((badge) => (
+                <Tooltip
+                  key={badge}
+                  content={getFilterTooltip({
+                    and: filterBadges.andFiltersByField[badge],
+                    or: filterBadges.orFiltersByField[badge],
+                  })}>
+                  <div>
+                    <Badge label={badge} size="sm" variant="info" />
+                  </div>
+                </Tooltip>
+              ))
+            : null}
+          {hasFiltersEnabled && filterBadges.relationFields.length
+            ? filterBadges.relationFields.map((badge) => {
+                return (
+                  <Tooltip
+                    key={badge}
+                    content={getFilterTooltip({
+                      and: filterBadges.andRelationFiltersByField[badge],
+                      or: filterBadges.orRelationFiltersByField[badge],
+                    })}>
+                    <div>
+                      <Badge label={badge} size="sm" variant="info" />
+                    </div>
+                  </Tooltip>
+                );
+              })
+            : null}
         </div>
         {view === "calendar" ? (
           <>

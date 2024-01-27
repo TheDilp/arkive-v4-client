@@ -343,7 +343,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                             icon={f.relationalData?.icon}
                             id={f?.value as string}
                             image_id={f.relationalData?.image_id}
-                            title={f.relationalData?.title}
+                            title={f.relationalData?.label}
                             type="documents"
                           />
                         </div>
@@ -355,7 +355,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                             handleChange([
                               {
                                 name: `${name}.relationalData`,
-                                value: { character_id: value, title: label, image_id: image, icon },
+                                value: { character_id: value, label, image_id: image, icon },
                               },
                               {
                                 name: `${name}.value`,
@@ -423,7 +423,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                             header_name: getSentenceCase(filt.type),
                             field: getRelationFilterField(filt.type) || "",
                             value: "",
-                            operator: "eq",
+                            operator: "in",
                           },
                         ]),
                       })
@@ -454,7 +454,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                           icon={f.relationalData?.icon}
                           id={f?.value as string}
                           image_id={f.relationalData?.image_id}
-                          title={f.relationalData?.title}
+                          title={f.relationalData?.label}
                           type={filt.type === "character_filters" ? "characters" : "map_pins"}
                         />
                       </div>
@@ -466,7 +466,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                           handleChange([
                             {
                               name: `${name}.relationalData`,
-                              value: { character_id: value, title: label, image_id: image, icon },
+                              value: { character_id: value, label, image_id: image, icon },
                             },
                             {
                               name: `${name}.value`,
@@ -510,7 +510,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                             header_name: getSentenceCase(filt.type),
                             field: getRelationFilterField(filt.type) || "",
                             value: "",
-                            operator: "eq",
+                            operator: "in",
                           },
                         ]),
                       })
@@ -541,7 +541,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                           icon={f.relationalData?.icon}
                           id={f?.value as string}
                           image_id={f.relationalData?.image_id}
-                          title={f.relationalData?.title}
+                          title={f.relationalData?.label}
                           type={filt.type === "character_filters" ? "characters" : "map_pins"}
                         />
                       </div>
@@ -553,7 +553,7 @@ export function CalendarFilterDrawer({ data }: Props) {
                           handleChange([
                             {
                               name: `${name}.relationalData`,
-                              value: { character_id: value, title: label, image_id: image, icon },
+                              value: { character_id: value, label, image_id: image, icon },
                             },
                             {
                               name: `${name}.value`,

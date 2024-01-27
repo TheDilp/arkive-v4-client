@@ -7,6 +7,7 @@ import {
   LeapDayType,
   MonthType,
 } from "../../types/EntityTypes/calendarTypes";
+import { groupFiltersByHeader } from "./tableUtils";
 
 export function sortEvents(a: EventType, b: EventType) {
   if (a?.start_hours && b?.start_hours) {
@@ -258,4 +259,14 @@ export function getCalendarFilters(
   }
 
   return finalFilters;
+}
+
+export function getCalendarFilterBadges(filters: CalendarFilters) {
+  const andFiltersByField = groupFiltersByHeader(filters?.filters?.and || []);
+  const orFiltersByField = groupFiltersByHeader(filters?.filters?.or || []);
+  const andRelationFiltersByField = groupFiltersByHeader(filters?.relationFilters?.and || []);
+  const orRelationFiltersByField = groupFiltersByHeader(filters?.relationFilters?.or || []);
+  const fields = [...new Set(Object.keys(andFiltersByField).concat(Object.keys(orFiltersByField)))];
+  const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
+  return { andFiltersByField, orFiltersByField, andRelationFiltersByField, orRelationFiltersByField, fields, relationFields };
 }
