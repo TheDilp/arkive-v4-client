@@ -121,7 +121,11 @@ export function MapPinDrawer({ data, exceptions }: Props) {
 
   return (
     <div className="flex flex-col gap-y-2">
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <Tabs
+        onChange={(_, index) => setSelectedTab(index)}
+        selectedTab={selectedTab}
+        tabs={tabs.slice(0, exceptions?.characterPin ? 1 : 2)}
+      />
 
       {selectedTab === 0 ? (
         <div>
@@ -260,7 +264,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           )}
         </div>
       ) : null}
-      {selectedTab === 1 ? (
+      {selectedTab === 1 && !exceptions?.characterPin ? (
         <div className="flex flex-wrap gap-2">
           {mapPin?.document ? (
             <div className="w-full">
@@ -328,48 +332,52 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               searchEntity="maps"
             />
           ) : null}
+
+          {!exceptions?.characterPin ? (
+            <div className="w-full">
+              <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
+                <div className="flex flex-col gap-y-1 p-2">
+                  <Search
+                    isMultiple
+                    label="Events (optional)"
+                    limit={10}
+                    name="events"
+                    onChange={({ name, value, label, image, parent_id }) => {
+                      if ((mapPin.events || [])?.some((event) => event.id === value)) {
+                        handleChange({
+                          name,
+                          value: (mapPin.events || []).filter((t) => t.id !== value),
+                        });
+                        return;
+                      }
+                      handleChange({
+                        name,
+                        value: (mapPin.events || []).concat({
+                          id: value,
+                          title: label || "",
+                          image_id: image,
+                          parent_id: parent_id || "",
+                        }),
+                      });
+                    }}
+                    searchEntity="events"
+                    value={mapPin.events?.map((pin) => pin.id)}
+                  />
+                  {mapPin.events?.map((event) => (
+                    <EntityPreview
+                      clearAction={(id) => handleChange({ name: "events", value: mapPin.events?.filter((c) => c.id !== id) })}
+                      id={event.id}
+                      image_id={event.image_id}
+                      title={event.title || ""}
+                      type="events"
+                    />
+                  ))}
+                </div>
+              </Collapsible>
+            </div>
+          ) : null}
         </div>
       ) : null}
-
-      <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
-        <div className="flex flex-col gap-y-1 p-2">
-          <Search
-            isMultiple
-            label="Events (optional)"
-            limit={10}
-            name="events"
-            onChange={({ name, value, label, image, parent_id }) => {
-              if ((mapPin.events || [])?.some((event) => event.id === value)) {
-                handleChange({
-                  name,
-                  value: (mapPin.events || []).filter((t) => t.id !== value),
-                });
-                return;
-              }
-              handleChange({
-                name,
-                value: (mapPin.events || []).concat({
-                  id: value,
-                  title: label || "",
-                  image_id: image,
-                  parent_id: parent_id || "",
-                }),
-              });
-            }}
-            searchEntity="events"
-            value={mapPin.events?.map((pin) => pin.id)}
-          />
-          {mapPin.events?.map((event) => (
-            <EntityPreview
-              clearAction={(id) => handleChange({ name: "events", value: mapPin.events?.filter((c) => c.id !== id) })}
-              id={event.id}
-              image_id={event.image_id}
-              title={event.title || ""}
-              type="events"
-            />
-          ))}
-        </div>
-      </Collapsible>
 
       <Button
         icon={IconEnum.save}
