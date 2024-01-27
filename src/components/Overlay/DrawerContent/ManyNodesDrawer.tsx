@@ -201,11 +201,6 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
   return (
     <div className="flex flex-col gap-y-2 overflow-auto font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {changedData ? (
-        <div className="sticky top-0 z-10">
-          <Alert label="You have unsaved changes." variant="warning" />
-        </div>
-      ) : null}
 
       {selectedTab === 0 ? (
         <>
@@ -498,6 +493,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
           </div>
         </div>
       ) : null}
+
       <div className="sticky bottom-0 flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}
@@ -544,6 +540,11 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
           variant="success"
         />
       </div>
+      {changedData ? (
+        <div className="sticky top-0 z-10">
+          <Alert label="You have unsaved changes." variant="warning-bordered" />
+        </div>
+      ) : null}
     </div>
   );
 }
