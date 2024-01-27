@@ -483,7 +483,8 @@ function TableSubheaderFilterBadges({
             and: andRelationFiltersByField[field] || [],
             or: orRelationFiltersByField[field] || [],
           })}
-          isPortal>
+          isPortal
+          variant="secondary">
           <div>
             <Badge
               clearAction={() =>

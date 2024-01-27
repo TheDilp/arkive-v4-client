@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useGetEntities, useHandleChange } from "../../../hooks";
 import {
   AvailableEntityType,
+  AvailableSubEntityType,
   CharacterFieldTemplateType,
   FieldTypes,
   HandleChangePropsType,
@@ -12,8 +13,10 @@ import {
   TableDispatch,
 } from "../../../types";
 import {
+  getDefaultEntityIcon,
   getFieldValueFromType,
   getSearchType,
+  getSentenceCase,
   IconEnum,
   NumberFilters,
   relationFiltersList,
@@ -26,7 +29,7 @@ import { Badge } from "../../Misc";
 import { Dropdown } from "../Dropdown";
 
 const nonFilterableEntities = ["textarea", "date", "random_table", "dice_roll"];
-
+const resourceEntities = ["documents", "map_pins", "events", "images", "tags"];
 type CharacterFilterField = {
   id: string;
   field_id: string;
@@ -50,8 +53,8 @@ type CharacterFilter = {
 
 function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
   return {
-    id: field.field_id,
-    field: getFieldValueFromType(field.field_type as FieldTypes) || "",
+    id: field.field_id || field.field_type,
+    field: getFieldValueFromType(field.field_type as FieldTypes) || field.field_type || "",
     operator: field.filter.operator,
     header_name: field?.filter?.header_name || field.title,
     value: field.filter.value,
@@ -64,7 +67,7 @@ function isApplyDisabled(filters: CharacterFilter[]) {
   return false;
 }
 
-function CharacterFiltersList({
+function CharacterFieldsFiltersList({
   filters,
   existingTemplates,
   handleChange,
@@ -392,7 +395,6 @@ function CharacterFiltersList({
                           icon={field.filter.relationalData?.icon}
                           id={field.filter.relationalData?.value}
                           image_id={field.filter.relationalData?.image}
-                          size="sm"
                           title={field.filter.relationalData?.label}
                           type={getSearchType(field.field_type) as AvailableEntityType}
                         />
@@ -440,6 +442,221 @@ function CharacterFiltersList({
   ));
 }
 
+function CharacterResourceFiltersList({
+  filters,
+  handleChange,
+  removeTemplate,
+}: {
+  filters: CharacterFilter[];
+  handleChange: (newData: HandleChangePropsType) => void;
+  removeTemplate: (id: string) => void;
+}) {
+  return filters.map((f, i) => (
+    <li key={f.id} className="flex flex-col gap-x-1">
+      <Collapsible
+        actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
+        icon={getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)}
+        label={f.template.title}>
+        <div className="grid flex-1 grid-cols-12 gap-1 p-2">
+          <div className="col-span-12 flex items-center justify-between">
+            <div className="flex-1">
+              <Title isDrawerTitle label="AND filters" />
+            </div>
+            <div className="h-6 w-6">
+              <Button
+                hasNoBackground
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: `[${i}].fields.and`,
+                    value: (f?.fields.and || []).concat([
+                      {
+                        id: crypto.randomUUID(),
+                        field_type: f.id,
+                        field_id: "",
+                        title: "",
+                        filter: {
+                          id: crypto.randomUUID(),
+                          header_name: getSentenceCase(f.id),
+                          field: f.id,
+                          value: "",
+                          operator: "eq",
+                          relationalData: {},
+                        },
+                      },
+                    ]),
+                  })
+                }
+              />
+            </div>
+          </div>
+          {f.fields.and.map((field, fIdx) => (
+            <Fragment key={field.id}>
+              <div className="col-span-12">
+                {fIdx !== 0 ? (
+                  <div className="flex w-full justify-center">
+                    <div className="w-16">
+                      <Badge label="AND" variant="info" />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="col-span-11">
+                <div className="flex flex-1 items-center">
+                  {field?.filter?.value ? (
+                    <div className="w-full">
+                      <EntityPreview
+                        clearAction={() =>
+                          handleChange([
+                            { name: `[${i}].fields.and[${fIdx}].filter.value`, value: "" },
+                            { name: `[${i}].fields.and[${fIdx}].filter.relationalData`, value: undefined },
+                          ])
+                        }
+                        icon={field.filter.relationalData?.icon}
+                        id={field.filter.relationalData?.value}
+                        image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
+                        title={field.filter.relationalData?.label}
+                        type={f.id as AvailableEntityType}
+                      />
+                    </div>
+                  ) : (
+                    <Search
+                      limit={10}
+                      name={`[${i}].fields.and[${fIdx}].filter.value`}
+                      onChange={({ name, value, label, image, icon }) =>
+                        handleChange([
+                          { name, value },
+                          {
+                            name: `[${i}].fields.and[${fIdx}].filter.relationalData`,
+                            value: { value, label, image, icon },
+                          },
+                        ])
+                      }
+                      searchEntity={f.id as SearchableEntities}
+                      value={field?.filter?.value as string | undefined}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="w-10 self-center">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.trash}
+                  isIconOnly
+                  onClick={() => {
+                    handleChange({
+                      name: `[${i}].fields.and`,
+                      value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
+                    });
+                  }}
+                  variant="error"
+                />
+              </div>
+            </Fragment>
+          ))}
+          <div className="col-span-12 flex items-center justify-between">
+            <div className="flex-1">
+              <Title isDrawerTitle label="OR filters" />
+            </div>
+            <div className="h-6 w-6">
+              <Button
+                hasNoBackground
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: `[${i}].fields.or`,
+                    value: (f?.fields.or || []).concat([
+                      {
+                        id: crypto.randomUUID(),
+                        field_id: "",
+                        field_type: f.id,
+                        title: "",
+                        filter: {
+                          id: crypto.randomUUID(),
+                          header_name: getSentenceCase(f.id),
+                          field: f.id,
+                          value: "",
+                          operator: "eq",
+                          relationalData: {},
+                        },
+                      },
+                    ]),
+                  })
+                }
+              />
+            </div>
+          </div>
+          {f.fields.or.map((field, fIdx) => (
+            <Fragment key={field.id}>
+              <div className="col-span-12">
+                {fIdx !== 0 ? (
+                  <div className="flex w-full justify-center">
+                    <div className="w-16">
+                      <Badge label="OR" variant="info" />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <div className="col-span-11">
+                <div className="flex flex-1 items-center">
+                  {field?.filter?.value ? (
+                    <div className="w-full">
+                      <EntityPreview
+                        clearAction={() =>
+                          handleChange([
+                            { name: `[${i}].fields.or[${fIdx}].filter.value`, value: "" },
+                            { name: `[${i}].fields.or[${fIdx}].filter.relationalData`, value: undefined },
+                          ])
+                        }
+                        icon={field.filter.relationalData?.icon}
+                        id={field.filter.relationalData?.value}
+                        image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
+                        title={field.filter.relationalData?.label}
+                        type={f.id as AvailableEntityType}
+                      />
+                    </div>
+                  ) : (
+                    <Search
+                      limit={10}
+                      name={`[${i}].fields.or[${fIdx}].filter.value`}
+                      onChange={({ name, value, label, image, icon }) =>
+                        handleChange([
+                          { name, value },
+                          {
+                            name: `[${i}].fields.or[${fIdx}].filter.relationalData`,
+                            value: { value, label, image, icon },
+                          },
+                        ])
+                      }
+                      searchEntity={f.id as SearchableEntities}
+                      value={field?.filter?.value as string | undefined}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="h-10 w-10 self-center">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.trash}
+                  isIconOnly
+                  onClick={() => {
+                    handleChange({
+                      name: `[${i}].fields.or`,
+                      value: f.fields.or.filter((filtering_field) => field.id !== filtering_field.id),
+                    });
+                  }}
+                  variant="error"
+                />
+              </div>
+            </Fragment>
+          ))}
+        </div>
+      </Collapsible>
+    </li>
+  ));
+}
+
 export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatch } }) {
   const { project_id } = useParams();
   const { dispatch } = data;
@@ -457,11 +674,118 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
     "character_fields_templates",
   );
 
-  const { handleChange } = useHandleChange({ data: filters, setData: setFilters });
+  const { handleChange } = useHandleChange({ data: filters, setData: setFilters, ignoreDataChange: true });
 
   return (
     <DrawerLayout>
       <ul className="flex flex-col gap-y-2">
+        <li className="flex items-center justify-between">
+          <div>Add filters for resources:</div>
+          <Dropdown
+            allowedPlacements={["left"]}
+            items={[
+              {
+                id: "documents",
+                title: "Documents",
+                icon: IconEnum.document,
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: "documents",
+                      template: { id: "documents", title: "Documents" },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+                isDisabled: filters.some((f) => f.id === "documents"),
+              },
+              {
+                id: "locations",
+                title: "Locations",
+                icon: IconEnum.map_pin,
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: "map_pins",
+                      template: { id: "map_pins", title: "Locations" },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+                isDisabled: filters.some((f) => f.id === "map_pins"),
+              },
+              {
+                id: "events",
+                title: "Events",
+                icon: IconEnum.event,
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: "events",
+                      template: { id: "events", title: "Events" },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+                isDisabled: filters.some((f) => f.id === "events"),
+              },
+              {
+                id: "images",
+                title: "Images",
+                icon: IconEnum.image,
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: "images",
+                      template: { id: "images", title: "Images" },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+                isDisabled: filters.some((f) => f.id === "images"),
+              },
+              {
+                id: "tags",
+                title: "Tags",
+                icon: IconEnum.tags,
+                onClick: () => {
+                  setFilters((prev) =>
+                    prev.concat({
+                      id: "tags",
+                      template: { id: "tags", title: "Tags" },
+                      fields: {
+                        and: [],
+                        or: [],
+                      },
+                    }),
+                  );
+                },
+                isDisabled: filters.some((f) => f.id === "tags"),
+              },
+            ]}>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                isDisabled={!existingTemplates?.data?.length || isInitialLoading}
+                isLoading={isInitialLoading}
+                onClick={undefined}
+                variant="info"
+              />
+            </div>
+          </Dropdown>
+        </li>
         <li className="flex items-center justify-between">
           <div>Add filters for template:</div>
           <Dropdown
@@ -497,9 +821,21 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
             </div>
           </Dropdown>
         </li>
-        <CharacterFiltersList
+        <CharacterFieldsFiltersList
           existingTemplates={existingTemplates}
-          filters={filters}
+          filters={filters.filter((f) => !resourceEntities.includes(f.id))}
+          handleChange={handleChange}
+          removeTemplate={(id: string) =>
+            setFilters((prev) =>
+              prev.toSpliced(
+                prev.findIndex((p) => p.id === id),
+                1,
+              ),
+            )
+          }
+        />
+        <CharacterResourceFiltersList
+          filters={filters.filter((f) => resourceEntities.includes(f.id))}
           handleChange={handleChange}
           removeTemplate={(id: string) =>
             setFilters((prev) =>

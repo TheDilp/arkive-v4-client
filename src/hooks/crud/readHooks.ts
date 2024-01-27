@@ -262,7 +262,7 @@ export function useSearch<ReturnType>(
         body: JSON.stringify(request),
         isPublic: options?.isPublic,
       }),
-    options,
+    { ...options, enabled: !!type && !!options?.enabled },
   );
 }
 export function useGetCharacterFamily(

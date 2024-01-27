@@ -172,7 +172,7 @@ export function Input({
         />
         {suffix ? <span className="pl-1">{suffix}</span> : null}
 
-        {(type === "search" || isClearable) && typeof value === "number" ? (
+        {(type === "search" || isClearable) && !!value ? (
           <span>
             <Button hasNoBackground icon={IconEnum.close} onClick={() => onChange({ name, value: "" })} />
           </span>

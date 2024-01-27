@@ -371,6 +371,7 @@ export function CharactersView() {
         </div>
         <div className="w-52">
           <Input
+            isClearable
             name="quick_filter"
             onChange={({ value }) => setFilter(value as string)}
             placeholder="Quick search by first name"
