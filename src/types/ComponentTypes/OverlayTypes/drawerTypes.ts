@@ -98,6 +98,7 @@ export type DrawerAtomType = {
     }
   | { type: "autolinker"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string; title: string } }
   | { type: "map_pin_management"; data: { map_id: string } }
+  | { type: "event_management"; data: { date: { month: number; year: number }; event_ids: string[] } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } } }

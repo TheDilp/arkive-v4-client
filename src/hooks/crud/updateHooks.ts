@@ -347,7 +347,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
     async (updateItemValues: { data: { data: { id: string; parent_id?: string; [key: string]: any } }[] }) => {
       if (updateItemValues.data.length) {
         return FetchFunction({
-          url: `${baseURLS.baseServer}/${type}/update`,
+          url: `${baseURLS.baseServer}/bulk/update/${type}`,
           body: JSON.stringify(updateItemValues),
           method: "POST",
         });
@@ -381,6 +381,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
           if (type === "edges") setEdges((prev) => newData?.data?.edges || prev);
           return { old };
         }
+
         return { old: {} };
       },
       onError: (_, __, context) => {
@@ -677,7 +678,7 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/bulk/update/${type.toLowerCase()}`,
+        url: `${baseURLS.baseServer}/bulk/update/public/${type.toLowerCase()}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });

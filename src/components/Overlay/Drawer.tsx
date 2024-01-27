@@ -49,6 +49,7 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
+import EventManagementDrawer from "./DrawerContent/EventManagementDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -160,6 +161,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "images" ? <ImageDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_relationship_types" ? <CharacterRelationshipTypeDrawer /> : null}
                 {drawer.type === "map_pin_types" ? <MapPinTypeDrawer data={drawer?.data} /> : null}
+                {drawer.type === "event_management" ? <EventManagementDrawer data={drawer?.data} /> : null}
                 {drawer.type === "conversations" ? <ConversationDrawer data={drawer?.data} /> : null}
                 {drawer.type === "edit_message" ? <EditMessageDrawer data={drawer?.data} /> : null}
                 {drawer.type === "invite_to_project" ? <MemberAddDrawer /> : null}

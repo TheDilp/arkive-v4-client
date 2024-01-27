@@ -47,19 +47,36 @@ export function DayNumber({
   year,
   isFiller,
   isReadOnly,
+  event_ids,
 }: {
   dayNumber: number;
   monthNumber: number;
   year: number;
   isFiller?: boolean;
   isReadOnly?: boolean;
+  event_ids: string[];
 }) {
   const setDrawer = useSetAtom(drawerAtom);
   return (
     <span className={`${isFiller ? "text-zinc-800" : ""} flex select-none items-center p-1`}>
       {dayNumber + 1}
       {!isFiller && !isReadOnly ? (
-        <span className="ml-auto opacity-0 transition-all duration-100 hover:text-sky-400 group-hover:opacity-100">
+        <span className="ml-auto flex items-center gap-x-1 opacity-0 transition-all duration-100 hover:text-sky-400 group-hover:opacity-100">
+          <Button
+            hasNoBackground
+            icon={IconEnum.edit}
+            isIconOnly
+            onClick={() => {
+              if (!isFiller)
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "event_management",
+                  title: "Manage events",
+                  data: { date: { month: monthNumber, year }, event_ids },
+                  size: "lg",
+                }));
+            }}
+          />
           <Button
             hasNoBackground
             icon={IconEnum.add}
@@ -583,6 +600,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 <DayNumber
                   key={day}
                   dayNumber={getFillerDayNumber(calendar?.months, date.month, day, previousMonthLeapDayCount)}
+                  event_ids={[]}
                   isFiller
                   isReadOnly={isPublic}
                   monthNumber={date.month}
@@ -614,104 +632,105 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                       ? `${matchingEra?.color || DefaultTagColor}aa`
                       : "transparent",
                 }}>
-                <DayNumber key={day} dayNumber={day} isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
+                <DayNumber
+                  key={day}
+                  dayNumber={day}
+                  event_ids={filteredEvents.map((e) => e.id)}
+                  isReadOnly={isPublic}
+                  monthNumber={date.month}
+                  year={date.year}
+                />
                 <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
                   {(isLoading ? [] : filteredEvents || []).slice(0, 7).map((event) => {
                     return (
-                      <Tooltip
+                      <div
                         key={event.id}
-                        content={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
-                          event.end_day === day + 1 ? "(end)" : ""
-                        }`}
-                        variant="secondary">
-                        <div
-                          className="cursor-pointer"
-                          onClick={() =>
-                            id || isPublic
-                              ? setDrawer((prev) => ({
-                                  ...prev,
-                                  title: "Preview event",
-                                  type: "entity_preview",
-                                  data: { id: event.id, entity_type: "events" },
-                                  size: "lg",
-                                }))
-                              : setDrawer((prev) => ({
-                                  ...prev,
-                                  title: "Edit event",
-                                  type: "events",
-                                  data: { id: event.id, month: date.month, year: date.year },
-                                  size: "lg",
-                                }))
-                          }
-                          onContextMenu={(e: any) => {
-                            e.preventDefault();
-                            setContextMenu({
-                              event: e,
-                              items:
-                                id || isPublic
-                                  ? [
-                                      {
-                                        id: "1",
-                                        title: "Preview event",
-                                        icon: IconEnum.eye,
-                                        onClick: () =>
-                                          setDrawer((prev) => ({
-                                            ...prev,
-                                            title: "Preview event",
-                                            type: "entity_preview",
-                                            data: { id: event.id, entity_type: "events" },
-                                            size: "lg",
-                                          })),
+                        className="cursor-pointer"
+                        onClick={() =>
+                          id || isPublic
+                            ? setDrawer((prev) => ({
+                                ...prev,
+                                title: "Preview event",
+                                type: "entity_preview",
+                                data: { id: event.id, entity_type: "events" },
+                                size: "lg",
+                              }))
+                            : setDrawer((prev) => ({
+                                ...prev,
+                                title: "Edit event",
+                                type: "events",
+                                data: { id: event.id, month: date.month, year: date.year },
+                                size: "lg",
+                              }))
+                        }
+                        onContextMenu={(e: any) => {
+                          e.preventDefault();
+                          setContextMenu({
+                            event: e,
+                            items:
+                              id || isPublic
+                                ? [
+                                    {
+                                      id: "1",
+                                      title: "Preview event",
+                                      icon: IconEnum.eye,
+                                      onClick: () =>
+                                        setDrawer((prev) => ({
+                                          ...prev,
+                                          title: "Preview event",
+                                          type: "entity_preview",
+                                          data: { id: event.id, entity_type: "events" },
+                                          size: "lg",
+                                        })),
+                                    },
+                                  ]
+                                : [
+                                    {
+                                      id: "1",
+                                      title: "Edit event",
+                                      icon: IconEnum.edit,
+                                      onClick: () =>
+                                        setDrawer((prev) => ({
+                                          ...prev,
+                                          title: "Edit event",
+                                          type: "events",
+                                          data: { id: event.id, month: date.month, year: date.year },
+                                          size: "lg",
+                                        })),
+                                    },
+                                    {
+                                      id: "2",
+                                      title: "Delete event",
+                                      icon: IconEnum.trash,
+                                      onClick: () => {
+                                        deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
                                       },
-                                    ]
-                                  : [
-                                      {
-                                        id: "1",
-                                        title: "Edit event",
-                                        icon: IconEnum.edit,
-                                        onClick: () =>
-                                          setDrawer((prev) => ({
-                                            ...prev,
-                                            title: "Edit event",
-                                            type: "events",
-                                            data: { id: event.id, month: date.month, year: date.year },
-                                            size: "lg",
-                                          })),
-                                      },
-                                      {
-                                        id: "2",
-                                        title: "Delete event",
-                                        icon: IconEnum.trash,
-                                        onClick: () => {
-                                          deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
-                                        },
-                                      },
-                                    ],
-                            });
-                          }}
-                          onKeyDown={() => {}}
-                          role="button"
-                          tabIndex={-1}>
-                          {event.image_id ? (
-                            <div className="relative h-24 w-full overflow-hidden rounded-md">
-                              <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
-                              <div
-                                className="absolute h-full w-full bg-cover bg-center opacity-60 "
-                                style={{
-                                  backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <Badge
-                              customColor={event.background_color || DefaultTagColor}
-                              label={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
-                                event.end_day === day + 1 ? "(end)" : ""
-                              }`}
+                                    },
+                                  ],
+                          });
+                        }}
+                        onKeyDown={() => {}}
+                        role="button"
+                        tabIndex={-1}>
+                        {event.image_id ? (
+                          <div className="relative h-24 w-full overflow-hidden rounded-md">
+                            <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
+                            <div
+                              className="absolute h-full w-full bg-cover bg-center opacity-60 "
+                              style={{
+                                backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
+                              }}
                             />
-                          )}
-                        </div>
-                      </Tooltip>
+                          </div>
+                        ) : (
+                          <Badge
+                            customColor={event.background_color || DefaultTagColor}
+                            label={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
+                              event.end_day === day + 1 ? "(end)" : ""
+                            }`}
+                          />
+                        )}
+                      </div>
                     );
                   })}
                   {filteredEvents.length > 7 ? (
@@ -829,7 +848,15 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                 onKeyDown={() => {}}
                 role="button"
                 tabIndex={-1}>
-                <DayNumber key={day} dayNumber={idx} isFiller isReadOnly={isPublic} monthNumber={date.month} year={date.year} />
+                <DayNumber
+                  key={day}
+                  dayNumber={idx}
+                  event_ids={[]}
+                  isFiller
+                  isReadOnly={isPublic}
+                  monthNumber={date.month}
+                  year={date.year}
+                />
               </div>
             ))}
         </div>
