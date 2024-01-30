@@ -86,6 +86,7 @@ function CharacterFieldsFiltersList({
     <li key={f.id} className="flex flex-col gap-x-1">
       <Collapsible
         actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
+        initialOpen
         label={f.template.title}>
         <div className="grid flex-1 grid-cols-12 gap-1 p-2">
           <div className="col-span-12 flex items-center justify-between">
@@ -456,6 +457,7 @@ function CharacterResourceFiltersList({
       <Collapsible
         actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
         icon={f.id === "maps" ? IconEnum.map_pin : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)}
+        initialOpen
         label={f.template.title}>
         <div className="grid flex-1 grid-cols-12 gap-1 p-2">
           <div className="col-span-12 flex items-center justify-between">
