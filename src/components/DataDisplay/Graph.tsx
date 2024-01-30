@@ -209,16 +209,6 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                     );
                 },
               },
-              {
-                id: "4",
-                title: "Quick create from document",
-                icon: IconEnum.document_template,
-              },
-              {
-                id: "5",
-                title: "Quick create from image",
-                icon: IconEnum.image_template,
-              },
             ],
           });
         }
