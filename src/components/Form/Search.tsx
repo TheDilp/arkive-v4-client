@@ -447,9 +447,11 @@ export function Search({
                         });
 
                         if (hasShownOption) setDisplayValue(item.label);
-                        if (!isMultiple) remove();
+                        if (!isMultiple) {
+                          remove();
+                          setOpen(false);
+                        }
 
-                        setOpen(false);
                         inputRef.current?.focus();
                       },
                     })}
