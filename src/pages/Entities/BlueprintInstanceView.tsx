@@ -597,6 +597,26 @@ export function BlueprintInstanceView() {
                   },
                 },
                 {
+                  icon: IconEnum.tags,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Add/remove tags",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const instancesWithTags = (instances?.data || [])
+                      ?.filter((e) => ids.includes(e.id))
+                      .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
+
+                    setDrawer((prev) => ({
+                      ...prev,
+                      size: "lg",
+                      title: "Bulk edit tags",
+                      type: "bulk_tags",
+                      data: { items: instancesWithTags, type: "blueprint_instances" },
+                    }));
+                  },
+                },
+                {
                   icon: IconEnum.trash,
                   variant: "error",
                   hasNoBackground: true,

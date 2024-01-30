@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function BulkTagsDrawer({ data }: Props) {
-  const { project_id } = useParams();
+  const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
   const [tagsToAdd, setTagsToAdd] = useState<TagType[]>([]);
@@ -21,7 +21,7 @@ export function BulkTagsDrawer({ data }: Props) {
   const [tagsToRemove, setTagsToRemove] = useState<TagType[]>([]);
   const removedTagIds = tagsToRemove.map((t) => t.id);
 
-  const { mutate } = useBulkUpdateTags(data.type, project_id as string);
+  const { mutate } = useBulkUpdateTags(data.type, project_id as string, item_id as string);
 
   function handleSave() {
     const finalToAdd: { A: string; B: string }[] = [];

@@ -715,7 +715,7 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
 }
 
 // #region misc
-export function useBulkUpdateTags(type: AvailableEntityType, project_id: string) {
+export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntityType, project_id: string, parent_id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -737,6 +737,10 @@ export function useBulkUpdateTags(type: AvailableEntityType, project_id: string)
       },
       onSuccess: (data) => {
         if (data.ok) {
+          const parentEntityType = getParentEntityType(type as AvailableSubEntityType);
+          if (parentEntityType) {
+            queryClient.invalidateQueries([parentEntityType, parent_id]);
+          }
           queryClient.invalidateQueries(["allEntities", project_id, type]);
 
           createNotification({

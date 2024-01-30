@@ -34,6 +34,7 @@ import {
   DialogAtomType,
   DrawerAtomType,
   DrawerContentCreateNewType,
+  TagType,
   WebhookType,
 } from "../../types";
 import {
@@ -856,6 +857,29 @@ export function FolderView() {
                       },
                     ]
                   : []),
+
+                {
+                  icon: IconEnum.tags,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Add/remove tags",
+                  onClick: async () => {
+                    if (EntitiesWithTags.includes(type as AvailableEntityType)) {
+                      const ids = Object.values(selection || {}).flatMap((id) => id);
+                      const charactersWithTags = (base?.data || [])
+                        ?.filter((e) => ids.includes(e.id))
+                        .map((e) => ({ id: e.id, tags: "tags" in e ? ((e.tags as TagType[]) || []).map((t) => t.id) : [] }));
+
+                      setDrawer((prev) => ({
+                        ...prev,
+                        size: "lg",
+                        title: "Bulk edit tags",
+                        type: "bulk_tags",
+                        data: { items: charactersWithTags, type: type as AvailableEntityType },
+                      }));
+                    }
+                  },
+                },
                 {
                   icon: IconEnum.trash,
                   variant: "error",
