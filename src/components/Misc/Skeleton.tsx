@@ -304,7 +304,7 @@ function ProjectViewSkeleton({ limit = 4 }: { limit?: number }) {
 
 function SidebarSkeleton() {
   return (
-    <ul className="flex flex-col">
+    <ul className="flex flex-row lg:flex-col">
       <li className="flex h-16 w-16 items-center justify-center">
         <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-700" />
       </li>
