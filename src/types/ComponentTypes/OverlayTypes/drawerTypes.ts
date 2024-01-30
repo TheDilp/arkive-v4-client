@@ -142,6 +142,7 @@ export type DrawerAtomType = {
         >;
       };
     }
+  | { type: "nodes_from_characters" | "nodes_from_images"; data: null }
 );
 
 export interface ContextMenuAtomType {

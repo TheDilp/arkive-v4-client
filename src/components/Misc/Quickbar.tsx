@@ -4,7 +4,16 @@ import { useParams } from "react-router-dom";
 
 import { useDeleteMany, useUpdateManySubEntities } from "../../hooks";
 import { CurveStyleType } from "../../types";
-import { BoardReferenceAtom, BoardStateAtom, dialogAtom, edgesAtom, IconEnum, nodesAtom, useNotifications } from "../../utils";
+import {
+  BoardReferenceAtom,
+  BoardStateAtom,
+  dialogAtom,
+  drawerAtom,
+  edgesAtom,
+  IconEnum,
+  nodesAtom,
+  useNotifications,
+} from "../../utils";
 import { changeLockState, curveStyles, getCurveStyleIcon } from "../../utils/ui/graphUtils";
 import { Button, Tooltip } from "..";
 import { ColorPicker } from "../Overlay/ColorPicker";
@@ -20,7 +29,7 @@ function changeDrawMode(
     }>,
   ) => void,
 ) {
-  setBoardState((prev) => ({ ...prev, draw_mode }));
+  setBoardState((prev) => ({ ...prev, draw_mode, add_nodes: false }));
 }
 
 function changeCurveStyle(
@@ -49,6 +58,7 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
   const setEdges = useSetAtom(edgesAtom);
 
   const setDialog = useSetAtom(dialogAtom);
+  const setDrawer = useSetAtom(drawerAtom);
 
   const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
   const { mutate: updateManyEdges } = useUpdateManySubEntities("edges", item_id as string);
@@ -183,7 +193,24 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
         tooltip="Export graph"
       />
 
-      <div className="pl-2">
+      <Button
+        hasNoBackground
+        icon={IconEnum.character}
+        isIconOnly
+        onClick={() =>
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Nodes from characters",
+            type: "nodes_from_characters",
+            data: null,
+            size: "lg",
+          }))
+        }
+        tooltip="Create node from characters"
+      />
+      {/* <Button hasNoBackground icon={IconEnum.image} isIconOnly tooltip="Create node from images" /> */}
+
+      <div className="">
         <ColorPicker
           name="pickerColor"
           onChange={({ value }) => {

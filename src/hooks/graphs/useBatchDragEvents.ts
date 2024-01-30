@@ -26,7 +26,7 @@ function useBatchUpdateNodePositions(parent_id: string) {
     }, 350);
   }
 
-  return { addOrUpdateNode };
+  return { addOrUpdateNode, isMutating: updateManyNodePositions.isLoading };
 }
 
 export { useBatchUpdateNodePositions };

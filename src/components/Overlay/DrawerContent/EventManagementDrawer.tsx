@@ -17,7 +17,7 @@ type Props = {
   };
 };
 
-export default function EventManagementDrawer({ data }: Props) {
+export function EventManagementDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
   const queryClient = useQueryClient();

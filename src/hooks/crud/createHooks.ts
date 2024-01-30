@@ -240,14 +240,48 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
 
 export function useCreateSubEntities<InsertType extends { data: { data: { parent_id: string } }[] }>(
   type: AvailableSubEntityType,
+  parent_id: string,
 ) {
-  return useMutation(async (updateItemValues: InsertType) => {
-    return FetchFunction({
-      url: `${baseURLS.baseServer}/${type.toLowerCase()}/create`,
-      body: JSON.stringify(updateItemValues),
-      method: "POST",
-    });
-  });
+  const queryClient = useQueryClient();
+  const setNodes = useSetAtom(nodesAtom);
+  return useMutation(
+    async (updateItemValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/bulk/create/${type}`,
+        body: JSON.stringify(updateItemValues),
+        method: "POST",
+      });
+    },
+    {
+      onMutate: (vars) => {
+        const parentEntityType = getParentEntityType(type);
+        if (parentEntityType === "graphs") {
+          const old = queryClient.getQueryData([parentEntityType, parent_id]);
+          const newNodes = vars.data.map((item) => item.data) as NodeType[];
+          queryClient.setQueryData<{ data: GraphType }>([parentEntityType, parent_id], (oldData) =>
+            oldData
+              ? {
+                  ...oldData,
+                  data: {
+                    ...oldData?.data,
+                    [type]: (oldData.data?.nodes || []).concat(newNodes),
+                  },
+                }
+              : oldData,
+          );
+          if (type === "nodes") setNodes((prev) => [...(prev || [])].concat(newNodes));
+          return { old };
+        }
+        return {};
+      },
+      onError: (_, vars, context) => {
+        const parentEntityType = getParentEntityType(type);
+        if (parentEntityType === "graphs") {
+          queryClient.setQueryData([parentEntityType, parent_id], context?.old);
+        }
+      },
+    },
+  );
 }
 
 // #region misc

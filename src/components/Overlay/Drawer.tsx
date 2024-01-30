@@ -27,6 +27,7 @@ import {
   EditTags,
   EntityPreviewDrawer,
   EventDrawer,
+  EventManagementDrawer,
   FieldTemplateDrawer,
   ImageDrawer,
   InsertEditorImageDrawer,
@@ -40,6 +41,7 @@ import {
   MentionedInDocumentDrawer,
   MentionedInDrawer,
   NodeDrawer,
+  NodeFromCharactersDrawer,
   ProjectDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
@@ -49,7 +51,6 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
-import EventManagementDrawer from "./DrawerContent/EventManagementDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -172,6 +173,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
+                {drawer.type === "nodes_from_characters" ? <NodeFromCharactersDrawer /> : null}
               </>
             )}
           </div>
