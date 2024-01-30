@@ -445,7 +445,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         }
       });
       // Moving nodes
-      cyRef?.current?._cy.on("free", "node", function (evt: EventObject) {
+      cyRef?.current?._cy.on("dragfree", "node", function (evt: EventObject) {
         evt.preventDefault();
         evt.stopPropagation();
         evt.stopImmediatePropagation();
@@ -526,7 +526,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       });
     }
     return () => {
-      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap free");
+      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap dragfree");
     };
   }, [cyRef?.current?._cy, nodes, edges, item_id]);
   useEffect(() => {
