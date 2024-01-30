@@ -713,3 +713,47 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
     },
   );
 }
+
+// #region misc
+export function useBulkUpdateTags(type: AvailableEntityType, project_id: string) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (updateValues: { data: { add: { A: string; B: string }[]; remove: { A: string; B: string }[] } }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/bulk/tags/${type.toLowerCase()}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating these items.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+// #endregion misc

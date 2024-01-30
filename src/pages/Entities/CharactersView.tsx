@@ -519,6 +519,26 @@ export function CharactersView() {
                     }
                   },
                 },
+                {
+                  icon: IconEnum.tags,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Add/remove tags",
+                  onClick: async () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    const charactersWithTags = (data?.data || [])
+                      ?.filter((e) => ids.includes(e.id))
+                      .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
+
+                    setDrawer((prev) => ({
+                      ...prev,
+                      size: "lg",
+                      title: "Bulk edit tags",
+                      type: "bulk_tags",
+                      data: { items: charactersWithTags, type: "characters" },
+                    }));
+                  },
+                },
               ],
             }}
             data={data?.data || []}

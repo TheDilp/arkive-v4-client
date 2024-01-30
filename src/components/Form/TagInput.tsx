@@ -1,24 +1,25 @@
 import { useParams } from "react-router-dom";
 
-import { HandleChangePropsType, TagType } from "../../types";
+import { TagType } from "../../types";
 import { Badge } from "../Misc";
 import { Search } from "./Search";
 
 type Props = {
   label?: string;
+  isAutofocused?: boolean;
   tags: TagType[];
-  handleChange: (newData: HandleChangePropsType) => void;
+  handleChange: (newData: { name: string; value: TagType[] }) => void;
   isMultiple?: boolean;
   isDisabled?: boolean;
 };
 
-export function TagInput({ tags, label: componentLabel, handleChange, isMultiple, isDisabled }: Props) {
+export function TagInput({ tags, label: componentLabel, handleChange, isMultiple, isDisabled, isAutofocused }: Props) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
         isAutocomplete
-        isAutofocused
+        isAutofocused={isAutofocused ?? true}
         isDisabled={isDisabled}
         isMultiple={isMultiple}
         label={componentLabel || ""}
