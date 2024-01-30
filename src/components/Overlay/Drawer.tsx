@@ -41,7 +41,7 @@ import {
   MentionedInDocumentDrawer,
   MentionedInDrawer,
   NodeDrawer,
-  NodeFromCharactersDrawer,
+  NodeFromDrawer,
   ProjectDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
@@ -173,7 +173,9 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
-                {drawer.type === "nodes_from_characters" ? <NodeFromCharactersDrawer /> : null}
+                {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
+                  <NodeFromDrawer data={{ type: drawer?.type }} />
+                ) : null}
               </>
             )}
           </div>

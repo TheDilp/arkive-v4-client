@@ -208,7 +208,21 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
         }
         tooltip="Create node from characters"
       />
-      {/* <Button hasNoBackground icon={IconEnum.image} isIconOnly tooltip="Create node from images" /> */}
+      <Button
+        hasNoBackground
+        icon={IconEnum.image}
+        isIconOnly
+        onClick={() =>
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Nodes from images",
+            type: "nodes_from_images",
+            data: null,
+            size: "lg",
+          }))
+        }
+        tooltip="Create node from images"
+      />
 
       <div className="">
         <ColorPicker

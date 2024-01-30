@@ -9,55 +9,68 @@ import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
-export function NodeFromCharactersDrawer() {
+type NodeFromType = "nodes_from_characters" | "nodes_from_images";
+
+function getEntityFromType(type: NodeFromType) {
+  if (type === "nodes_from_characters") return "characters";
+  if (type === "nodes_from_images") return "images";
+  return "characters";
+}
+
+export function NodeFromDrawer({ data: { type } }: { data: { type: NodeFromType } }) {
   const { item_id } = useParams();
-  const { mutate: createNodes } = useCreateSubEntities("nodes", item_id as string);
+
+  const entity = getEntityFromType(type);
+
+  const { mutate: createNodes, isLoading: isMutating } = useCreateSubEntities("nodes", item_id as string);
   const resetDrawer = useResetAtom(drawerAtom);
-  const [selectedCharacters, setSelectedCharacters] = useState<{ label: string; id: string; image_id: string | undefined }[]>(
-    [],
-  );
+  const [selectedItems, setSelectedItems] = useState<{ label: string; id: string; image_id: string | undefined }[]>([]);
 
   return (
     <DrawerLayout>
       <Search
         isMultiple
         limit={10}
-        name="characters"
+        name={entity}
         onChange={({ label, image, value }) =>
-          setSelectedCharacters((prev) => prev.concat([{ id: value, image_id: image, label: label as string }]))
+          setSelectedItems((prev) =>
+            prev.concat([{ id: value, image_id: type === "nodes_from_characters" ? image : value, label: label as string }]),
+          )
         }
-        searchEntity="characters"
-        value={selectedCharacters.map((c) => c.id)}
+        searchEntity={entity}
+        value={selectedItems.map((c) => c.id)}
       />
       <div className="flex max-h-96 flex-col gap-y-1 overflow-y-auto">
-        {selectedCharacters.map((char, i) => (
+        {selectedItems.map((char, i) => (
           <EntityPreview
             key={char.id}
-            clearAction={() => setSelectedCharacters((prev) => prev.toSpliced(i, 1))}
+            clearAction={() => setSelectedItems((prev) => prev.toSpliced(i, 1))}
             id={char.id}
             image_id={char.image_id}
             title={char.label}
-            type="characters"
+            type={entity}
           />
         ))}
       </div>
 
       <Button
         icon={IconEnum.add}
+        isDisabled={isMutating}
+        isLoading={isMutating}
         label="Create"
         onClick={() => {
           const node = omit(DefaultNode, ["tags", "background_image"]);
           createNodes(
             {
-              data: selectedCharacters.map((char) => ({
+              data: selectedItems.map((item) => ({
                 data: {
                   ...node,
                   x: 0,
                   y: 0,
-                  image_id: char.image_id || null,
+                  image_id: item.image_id || null,
                   id: crypto.randomUUID(),
-                  character_id: char.id,
-                  label: char.label,
+                  character_id: type === "nodes_from_characters" ? item.id : null,
+                  label: item.label,
                   parent_id: item_id as string,
                 },
               })),

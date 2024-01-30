@@ -32,7 +32,7 @@ export * from "./MemberAddDrawer";
 export * from "./MentionedInDocumentDrawer";
 export * from "./MentionedInDrawer";
 export * from "./NodeDrawer";
-export * from "./NodeFromCharactersDrawer";
+export * from "./NodeFromDrawer";
 export * from "./ProjectDrawer";
 export * from "./RandomTableDrawer";
 export * from "./RandomTableOptionDrawer";
