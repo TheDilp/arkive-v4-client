@@ -173,7 +173,7 @@ export function PublicCharacter() {
             </div>
             <div className="h-full w-full flex-1 bg-zinc-800  lg:flex-1">
               <Routes>
-                <Route element={<PublicCalendar />} path="/events/:subitem_id/:event_id" />
+                <Route element={<PublicCalendar isCharacterCalendar />} path="/events/:subitem_id/:event_id" />
               </Routes>
             </div>
           </PublicCharacterResourceLayout>
