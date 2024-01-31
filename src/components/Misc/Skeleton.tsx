@@ -123,23 +123,23 @@ function EditorSkeleton() {
     <div className="flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800">
       <div className="relative flex h-full w-full flex-col content-start focus-visible:outline-none">
         <div className="flex flex-col gap-y-2 px-4 py-4">
-          <div className="h-3 w-[80rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[20rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[34rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[50rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[40rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[25rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[60rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[47rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[28rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[12rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[80rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[26rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[13rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[23rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[64rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[48rem] animate-pulse rounded-r bg-zinc-700 px-4" />
-          <div className="h-3 w-[30rem] animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[20rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[80rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[34rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[50rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[40rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[25rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[60rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[47rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[28rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[12rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[80rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[26rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[13rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[23rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[64rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[48rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
+          <div className="h-3 w-[30rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
         </div>
       </div>
     </div>
