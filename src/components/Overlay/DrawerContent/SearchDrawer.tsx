@@ -102,7 +102,7 @@ export function SearchDrawer() {
               value={undefined}
             />
             {selectedTab === 1 ? (
-              <div className="w-1/3">
+              <div className="w-[40%]">
                 <Select
                   label="Entity"
                   name="searchCategory"
