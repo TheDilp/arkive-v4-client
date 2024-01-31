@@ -6,5 +6,6 @@ export interface ImageType {
   project_id: string;
   project_image_id?: string;
   character_id?: string | null;
+  is_public?: boolean | null;
   type: AssetType;
 }

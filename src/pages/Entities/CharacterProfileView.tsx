@@ -383,12 +383,12 @@ function eventsTableColumns(
       minSize: 3.25,
       maxSize: 3.25,
     }),
-    documentsColumnHelper.display({
+    eventsColumnHelper.display({
       id: "title",
       header: "Title",
       cell: ({ row }) => <div className="w-full max-w-full truncate">{row.original.title}</div>,
     }),
-    documentsColumnHelper.display({
+    eventsColumnHelper.display({
       id: "is_public",
       header: "",
       meta: {
@@ -422,7 +422,7 @@ function eventsTableColumns(
       maxSize: 3.25,
     }),
 
-    documentsColumnHelper.display({
+    eventsColumnHelper.display({
       id: "action",
       header: "Actions",
       meta: {
@@ -515,6 +515,19 @@ function assetTableColumns(
     unknown
   >,
   webhooks: WebhookType[],
+  updatePublic: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
+  queryClient: QueryClient,
+  character_id: string,
 ) {
   return [
     assetColumnHelper.display({
@@ -544,7 +557,39 @@ function assetTableColumns(
       header: "Title",
       cell: (info) => info.getValue(),
     }),
-
+    assetColumnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            queryClient.setQueryData<{ data: CharacterType }>(["characters", character_id], (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  images: (old.data.images || [])?.map((image) => {
+                    if (image.id === row.original.id) return { ...image, is_public: !row.original.is_public };
+                    return image;
+                  }),
+                },
+              };
+            });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
     assetColumnHelper.display({
       id: "action",
       header: "Actions",
@@ -1015,6 +1060,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   );
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
+  const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
   const { mutateAsync: updateEventsPublic } = useUpdateManyPublic("events", project_id as string);
 
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
@@ -1376,7 +1422,15 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   <div className="mt-2 animate-in fade-in fill-mode-both">
                     {assetView === "table" ? (
                       <Table
-                        columns={assetTableColumns(downloadImage, project_id, removeItem, user?.webhooks || [])}
+                        columns={assetTableColumns(
+                          downloadImage,
+                          project_id,
+                          removeItem,
+                          user?.webhooks || [],
+                          updateImagesPublic,
+                          queryClient,
+                          existingCharacter?.data?.id,
+                        )}
                         config={{
                           hasNoHeaderGap: true,
                         }}
