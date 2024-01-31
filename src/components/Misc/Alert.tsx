@@ -6,7 +6,7 @@ import { Icon } from "./Icon";
 
 const AlertClasses = tv({
   slots: {
-    base: "flex items-center p-2 bg-zinc-900 overflow-hidden rounded",
+    base: "flex items-center p-2 bg-zinc-800 overflow-hidden rounded",
     label: "ml-3 text-base font-medium",
     icon: "text-xl",
   },
