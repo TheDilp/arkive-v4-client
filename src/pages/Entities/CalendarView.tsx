@@ -440,7 +440,7 @@ export function CalendarView({
   if (!calendar) return <Alert label="Calendar not found." variant="error" />;
 
   return (
-    <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
+    <div className="flex h-[calc(100%-2rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         <div className="mr-auto flex items-center gap-x-2 self-end">
           {isPublic ? null : (

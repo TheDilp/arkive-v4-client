@@ -194,7 +194,7 @@ export function TimelineView({
       svg
         .append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", `translate(${X_AXIS_OFFSET},${height / 1.05})`)
+        .attr("transform", `translate(${X_AXIS_OFFSET},${height / (isPublic ? 1.08 : 1.05)})`)
         .call(axisBottom);
 
       const tooltip = d3
@@ -219,7 +219,8 @@ export function TimelineView({
             max: Infinity,
             // Additional 32 for sidebar width on large screens
             value:
-              e.clientX -
+              e.clientX +
+              scrollContainer.current.scrollLeft -
               (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
               (isLg && !isPublic ? 32 : 0),
           })}, 0)`,
