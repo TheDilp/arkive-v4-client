@@ -52,6 +52,7 @@ export type SearchableEntities =
   | "by_tags"
   | "characters"
   | "documents"
+  | "documents_content"
   | "alter_names"
   | "maps"
   | "character_map_pins"

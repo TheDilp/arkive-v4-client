@@ -256,12 +256,16 @@ export function SearchDrawer() {
                       image_id={item.image}
                       link={getEntityLink(
                         project_id as string,
-                        searchCategory || "",
+                        searchCategory === "documents_content" ? "documents" : searchCategory || "",
                         item.value,
                         "parent_id" in item ? item?.parent_id : undefined,
                       )}
                       title={`${item.label} ${"parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""}`}
-                      type={searchCategory as AvailableEntityType | AvailableSubEntityType}
+                      type={
+                        searchCategory === "documents_content"
+                          ? "documents"
+                          : (searchCategory as AvailableEntityType | AvailableSubEntityType)
+                      }
                     />
                   )}
                 </li>

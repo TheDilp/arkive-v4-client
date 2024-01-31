@@ -267,24 +267,27 @@ export function CalendarView({
   data,
   isPublic,
   event_id,
+  isCharacterCalendar,
 }: {
   id?: string;
   data?: CalendarType;
   event_id?: string;
   isPublic?: boolean;
+  isCharacterCalendar?: boolean;
 }) {
   const user = useAtomValue(userAtom);
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
+
   const [date, setDate] = useState<CurrentDateType>({
     month: ls.get(`calendar_${id || item_id}_month`) ?? 0,
     year: ls.get(`calendar_${id || item_id}_year`) ?? 1,
   });
   const [range, setRange] = useState<{ start: number; end: number | undefined }>({ start: 0, end: undefined });
   const [view, setView] = useState<"calendar" | "range" | "timeline">(
-    ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
+    isCharacterCalendar ? "range" : ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
   );
   const [filters, setFilters] = useState<CalendarFilters>({
     filters: { and: [], or: [] },
@@ -440,7 +443,7 @@ export function CalendarView({
   if (!calendar) return <Alert label="Calendar not found." variant="error" />;
 
   return (
-    <div className="flex h-[calc(100%-2rem)] flex-col pb-4">
+    <div className={`flex flex-col pb-4 ${isPublic && view === "calendar" ? "h-[calc(100%-10rem)]" : "h-[calc(100%-2rem)]"}`}>
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         <div className="mr-auto flex items-center gap-x-2 self-end">
           {isPublic ? null : (
@@ -573,9 +576,9 @@ export function CalendarView({
               ls.set(`calendar_or_timeline_view_${item_id}`, value);
             }}
             options={[
-              { label: "Calendar", value: "calendar", icon: IconEnum.calendar },
+              { label: "Calendar", value: "calendar", icon: IconEnum.calendar, isDisabled: isCharacterCalendar },
               { label: "Range", value: "range", icon: IconEnum.range },
-              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt },
+              { label: "Timeline", value: "timeline", icon: IconEnum.timeline_gantt, isDisabled: isCharacterCalendar },
             ]}
             placeholder="View"
             value={view}

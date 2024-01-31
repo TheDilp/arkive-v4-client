@@ -3,6 +3,7 @@ import { SearchableEntities } from "../../types";
 export const SearchCategories: { label: string; value: SearchableEntities }[] = [
   { label: "Characters", value: "characters" },
   { label: "Documents", value: "documents" },
+  { label: "Document content", value: "documents_content" },
   { label: "Alter names", value: "alter_names" },
   { label: "Maps", value: "maps" },
   // { label: "Character map pins", value: "character_map_pins" },

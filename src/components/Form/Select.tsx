@@ -111,7 +111,7 @@ const SelectClasses = tv({
     {
       slots: ["select"],
       isOpen: true,
-      class: "bg-zinc-800",
+      class: "bg-zinc-700",
     },
     {
       slots: ["helperText"],
