@@ -110,7 +110,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
         manager.view.updateState(
           manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
         );
-      }, 1);
+      }, 0.0001);
     }
   }, [currentDocument, isRefetching]);
 
