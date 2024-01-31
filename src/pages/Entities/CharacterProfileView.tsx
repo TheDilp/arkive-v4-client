@@ -1051,7 +1051,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         images: true,
         events: true,
       },
-      fields: ["id", "full_name", "portrait_id", "age"],
+      fields: ["id", "full_name", "portrait_id", "age", "is_public"],
     },
     {
       staleTime: 60 * 1000,
@@ -1187,8 +1187,20 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           : "max-h-[calc(100vh-10rem)] min-h-[calc(100vh-10rem)] lg:max-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]"
       }`}>
       {isPreview ? null : (
-        <div className="flex h-12 min-h-[3rem] items-center justify-between">
+        <div className="flex h-12 min-h-[3rem] items-center justify-between gap-x-2">
           <Breadcrumbs />
+          {item_id ? (
+            <div className="ml-auto h-10 w-10">
+              <Button
+                icon={IconEnum.public}
+                isDisabled={!existingCharacter?.data?.is_public}
+                isIconOnly
+                onClick={() => navigate(`/public/${project_id}/characters/${existingCharacter?.data?.id}`)}
+                tooltip="View public page"
+                variant="info"
+              />
+            </div>
+          ) : null}
           {item_id ? (
             <div className="w-52">
               <Button

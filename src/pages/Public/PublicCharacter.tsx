@@ -90,7 +90,7 @@ export function PublicCharacter() {
               {(character.data?.documents || []).map((d) => (
                 <Link
                   key={d.id}
-                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg odd:border-b hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg hover:text-blue-400 ${
                     pathname.includes(d.id) ? "text-blue-400" : ""
                   }`}
                   to={`documents/${d.id}`}>
@@ -120,7 +120,7 @@ export function PublicCharacter() {
               {(character.data?.locations || []).map((l) => (
                 <Link
                   key={l.id}
-                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg last:border-none hover:text-blue-400 ${
                     pathname.includes(l.map_pin_id) ? "text-blue-400" : ""
                   }`}
                   to={`locations/${l.id}/${l.map_pin_id}`}>
@@ -152,7 +152,7 @@ export function PublicCharacter() {
               {(character.data?.events || []).map((e) => (
                 <Link
                   key={e.id}
-                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg last:border-none hover:text-blue-400 ${
                     pathname.includes(e.id) ? "text-blue-400" : ""
                   }`}
                   to={`events/${e.parent_id}/${e.id}`}>
