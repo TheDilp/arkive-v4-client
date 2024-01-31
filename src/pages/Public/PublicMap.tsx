@@ -7,9 +7,9 @@ import { MapView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicMap() {
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, subitem_id, map_pin_id } = useParams();
   const { data: map, error } = useGetEntity<MapType>(
-    item_id,
+    subitem_id || item_id,
     "maps",
     {
       data: {
@@ -31,10 +31,15 @@ export function PublicMap() {
   if (error) throw new Error("No public access");
 
   if (!map?.data) return <Skeleton type="editor" />;
-  if (!map?.data?.is_public) return <Navigate to={`/public/${project_id}/maps`} />;
+  if (!map?.data?.is_public) {
+    if (subitem_id) {
+      return <Navigate to="./" />;
+    }
+    return <Navigate to={`/public/${project_id}/maps`} />;
+  }
   return (
-    <PublicEntityLayout title={map?.data?.title}>
-      <MapView data={map?.data} />
+    <PublicEntityLayout title={subitem_id && map_pin_id ? "" : map?.data?.title}>
+      <MapView center_on={map_pin_id} data={map?.data} isPublic isReadOnly isViewOnly />
     </PublicEntityLayout>
   );
 }

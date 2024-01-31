@@ -7,9 +7,9 @@ import { DocumentType } from "../../types";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicDocument() {
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, subitem_id } = useParams();
   const { data: document, error } = useGetEntity<DocumentType>(
-    item_id,
+    subitem_id || item_id,
     "documents",
     {
       data: {
@@ -29,7 +29,7 @@ export function PublicDocument() {
   if (!document?.data) return <Skeleton type="editor" />;
   if (!document?.data?.is_public) return <Navigate to={`/public/${project_id}/documents`} />;
   return (
-    <PublicEntityLayout title={document?.data?.title}>
+    <PublicEntityLayout title={subitem_id ? "" : document?.data?.title}>
       <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />
     </PublicEntityLayout>
   );

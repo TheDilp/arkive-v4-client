@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import { RemirrorJSON } from "remirror";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { Gallery, Skeleton, StaticRender, Tabs } from "../../components";
+import { Gallery, Select, Skeleton, Tabs } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { CharacterType, DocumentType } from "../../types";
+import { CharacterType } from "../../types";
 import { IconEnum } from "../../utils";
+import { PublicDocument } from "./PublicDocument";
 import { PublicEntityLayout } from "./PublicLayout";
+import { PublicMap } from "./PublicMap";
 
 export function PublicCharacter() {
   const { project_id, item_id } = useParams();
+  const { pathname } = useLocation();
   const [selectedTab, setSelectedTab] = useState(0);
+  const navigate = useNavigate();
   const {
     data: character,
     // isLoading,
@@ -35,37 +38,28 @@ export function PublicCharacter() {
       isPublic: true,
     },
   );
-
   const tabs = [
-    ...(character?.data?.documents || []).map((doc) => ({
-      id: `document_${doc.id}`,
-      label: doc.title,
-      icon: doc.icon || IconEnum.document,
-    })),
+    { id: "documents", label: "Documents", icon: IconEnum.document },
+    { id: "locations", label: "Locations", icon: IconEnum.map_pin },
     { id: "gallery", label: "Gallery", icon: IconEnum.image },
   ];
-
-  const { data: viewingDocument } = useGetEntity<DocumentType>(
-    character?.data?.documents?.[selectedTab]?.id,
-    "documents",
-    {
-      fields: ["content"],
-    },
-    {
-      enabled: tabs[selectedTab].id.includes("document_"),
-      queryKeyConcat: [tabs[selectedTab].id],
-    },
-  );
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
   if (!character?.data?.is_public) return <Navigate to={`/public/${project_id}/characters`} />;
 
   return (
     <PublicEntityLayout title={character?.data?.full_name || ""}>
-      <div className="sticky top-0 z-10 bg-black p-2">
-        <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
+      <div className="sticky top-0 z-10 bg-black px-2.5">
+        <Tabs
+          onChange={(_, idx) => {
+            setSelectedTab(idx);
+            navigate("./");
+          }}
+          selectedTab={selectedTab}
+          tabs={tabs}
+        />
       </div>
-      <div className="h-full px-4">
+      <div className="h-full">
         {/* <div className="ml-auto flex w-48 flex-col border border-zinc-700">
         {character?.data?.portrait_id ? (
           <div className="w-full">
@@ -81,8 +75,66 @@ export function PublicCharacter() {
         ) : null}
       </div> */}
 
-        {tabs[selectedTab].id.includes("document_") ? (
-          <StaticRender content={viewingDocument?.data?.content as RemirrorJSON} />
+        {tabs[selectedTab].id === "documents" ? (
+          <div className="relative flex min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">
+            <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-y border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+              {(character.data?.documents || []).map((d) => (
+                <Link
+                  key={d.id}
+                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                    pathname.includes(d.id) ? "text-blue-400" : ""
+                  }`}
+                  to={`documents/${d.id}`}>
+                  <span className="rounded px-2">{d.title}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="lg:hidden">
+              <Select
+                name="douments"
+                onChange={({ value }) => navigate(`./documents/${value}`)}
+                options={(character?.data?.documents || []).map((d) => ({ label: d.title, value: d.id, icon: d.icon || "" }))}
+                value={pathname.split("/").at(-1)}
+              />
+            </div>
+            <div className="w-full bg-zinc-800 lg:flex-1">
+              <Routes>
+                <Route element={<PublicDocument />} path="/documents/:subitem_id" />
+              </Routes>
+            </div>
+          </div>
+        ) : null}
+        {tabs[selectedTab].id === "locations" ? (
+          <div className="relative flex h-full min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">
+            <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-t border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+              {(character.data?.locations || []).map((l) => (
+                <Link
+                  key={l.id}
+                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                    pathname.includes(l.map_pin_id) ? "text-blue-400" : ""
+                  }`}
+                  to={`locations/${l.id}/${l.map_pin_id}`}>
+                  <span className="rounded px-2">{l.title}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="lg:hidden">
+              <Select
+                name="maps"
+                onChange={({ value }) => navigate(`./locations/${value}`)}
+                options={(character?.data?.locations || []).map((l) => ({
+                  label: l.title,
+                  value: `${l.id}/${l.map_pin_id}`,
+                }))}
+                value={pathname.split("/").slice(-2).join("/")}
+              />
+            </div>
+            <div className="h-full w-full flex-1 bg-zinc-800 lg:flex-1">
+              <Routes>
+                <Route element={<PublicMap />} path="/locations/:subitem_id/:map_pin_id" />
+              </Routes>
+            </div>
+          </div>
         ) : null}
 
         {tabs[selectedTab].id === "gallery" ? (
