@@ -21,7 +21,7 @@ export function PublicLayout() {
 
 export function PublicEntityLayout({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="flex h-full w-full flex-col gap-y-2">
+    <div className="flex h-full max-h-full w-full flex-col gap-y-2 overflow-hidden">
       {title ? <h2 className="px-4 py-2 font-lato text-3xl">{title}</h2> : null}
       {children}
     </div>
@@ -29,12 +29,16 @@ export function PublicEntityLayout({ title, children }: { title: string; childre
 }
 
 export function PublicCharacterResourceLayout({ children }: { children: ReactNode | ReactNode[] }) {
-  return <div className="relative flex h-full min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">{children}</div>;
+  return (
+    <div className="relative flex h-full max-h-full flex-col overflow-y-auto overflow-x-hidden bg-zinc-900 lg:flex-row lg:flex-nowrap ">
+      {children}
+    </div>
+  );
 }
 
 export function PublicCharacterResourceLinksLayout({ children }: { children: ReactNode | ReactNode[] }) {
   return (
-    <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-y border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+    <div className="sticky top-8 hidden h-full max-h-full max-w-full flex-col gap-y-1 overflow-y-auto border-y border-zinc-800 bg-zinc-900 lg:flex lg:min-w-[20%] lg:max-w-[20%]">
       {children}
     </div>
   );

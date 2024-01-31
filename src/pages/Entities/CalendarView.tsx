@@ -49,6 +49,7 @@ export function DayNumber({
   year,
   isFiller,
   isReadOnly,
+
   event_ids,
 }: {
   dayNumber: number;
@@ -105,11 +106,14 @@ export function CalendarRangeEvent({
   isPublic,
   deleteEvent,
   months,
+  calendar_id,
 }: {
   events: EventType[];
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
   isPublic: boolean;
   deleteEvent: any;
+  calendar_id: string;
+
   months: MonthType[];
 }) {
   const { project_id } = useParams();
@@ -218,7 +222,7 @@ export function CalendarRangeEvent({
                                 ...prev,
                                 title: "Preview event",
                                 type: "entity_preview",
-                                data: { id: e.id, entity_type: "events" },
+                                data: { id: e.id, parent_id: calendar_id, entity_type: "events" },
                                 size: "lg",
                               })),
                           },
@@ -233,7 +237,7 @@ export function CalendarRangeEvent({
                                 ...prev,
                                 title: "Edit event",
                                 type: "events",
-                                data: { id: e.id },
+                                data: { id: e.id, parent_id: calendar_id },
                                 size: "lg",
                               })),
                           },
@@ -258,7 +262,17 @@ export function CalendarRangeEvent({
   });
 }
 
-export function CalendarView({ id, data, isPublic }: { id?: string; data?: CalendarType; isPublic?: boolean }) {
+export function CalendarView({
+  id,
+  data,
+  isPublic,
+  event_id,
+}: {
+  id?: string;
+  data?: CalendarType;
+  event_id?: string;
+  isPublic?: boolean;
+}) {
   const user = useAtomValue(userAtom);
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
@@ -357,33 +371,13 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
     },
   );
   const { data: subitemEvent } = useGetSubEntity<EventType>(
-    subitem_id,
+    event_id || subitem_id,
     "events",
     {
       data: { parent_id: item_id || id },
-      fields: [
-        "id",
-        "title",
-        "description",
-        "background_color",
-        "document_id",
-        "end_day",
-        "end_month",
-        "end_year",
-        "start_day",
-        "start_month",
-        "start_year",
-        "image_id",
-        "is_public",
-        "parent_id",
-        "start_minutes",
-        "start_hours",
-        "end_minutes",
-        "end_hours",
-        "text_color",
-      ],
+      fields: ["start_month", "start_year", "is_public"],
     },
-    { enabled: !!subitem_id, isPublic },
+    { enabled: event_id ? !!event_id : !!subitem_id, isPublic },
   );
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
@@ -685,14 +679,14 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                 ...prev,
                                 title: "Preview event",
                                 type: "entity_preview",
-                                data: { id: event.id, entity_type: "events" },
+                                data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
                                 size: "lg",
                               }))
                             : setDrawer((prev) => ({
                                 ...prev,
                                 title: "Edit event",
                                 type: "events",
-                                data: { id: event.id, month: date.month, year: date.year },
+                                data: { id: event.id, parent_id: calendar.id, month: date.month, year: date.year },
                                 size: "lg",
                               }))
                         }
@@ -712,7 +706,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                           ...prev,
                                           title: "Preview event",
                                           type: "entity_preview",
-                                          data: { id: event.id, entity_type: "events" },
+                                          data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
                                           size: "lg",
                                         })),
                                     },
@@ -727,7 +721,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                           ...prev,
                                           title: "Edit event",
                                           type: "events",
-                                          data: { id: event.id, month: date.month, year: date.year },
+                                          data: { id: event.id, parent_id: calendar.id, month: date.month, year: date.year },
                                           size: "lg",
                                         })),
                                     },
@@ -789,14 +783,14 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                         ...prev,
                                         title: "Preview event",
                                         type: "entity_preview",
-                                        data: { id: e.id, entity_type: "events" },
+                                        data: { id: e.id, parent_id: calendar.id, entity_type: "events" },
                                         size: "lg",
                                       }))
                                     : setDrawer((prev) => ({
                                         ...prev,
                                         title: "Edit event",
                                         type: "events",
-                                        data: { id: e.id, month: date.month, year: date.year },
+                                        data: { id: e.id, parent_id: calendar.id, month: date.month, year: date.year },
                                         size: "lg",
                                       }))
                                 }
@@ -816,7 +810,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                                   ...prev,
                                                   title: "Preview event",
                                                   type: "entity_preview",
-                                                  data: { id: evt.id, entity_type: "events" },
+                                                  data: { id: evt.id, parent_id: calendar.id, entity_type: "events" },
                                                   size: "lg",
                                                 })),
                                             },
@@ -831,7 +825,12 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
                                                   ...prev,
                                                   title: "Edit event",
                                                   type: "events",
-                                                  data: { id: evt.id, month: date.month, year: date.year },
+                                                  data: {
+                                                    id: evt.id,
+                                                    parent_id: calendar.id,
+                                                    month: date.month,
+                                                    year: date.year,
+                                                  },
                                                   size: "lg",
                                                 })),
                                             },
@@ -898,6 +897,7 @@ export function CalendarView({ id, data, isPublic }: { id?: string; data?: Calen
       {view === "range" ? (
         <div className="max-h-full overflow-y-auto">
           <CalendarRangeEvent
+            calendar_id={calendar.id}
             deleteEvent={deleteEvent}
             events={events?.data || []}
             isPublic={!!isPublic}

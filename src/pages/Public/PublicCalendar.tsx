@@ -7,15 +7,15 @@ import { CalendarView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicCalendar() {
-  const { project_id, item_id } = useParams();
-  const { data: graph, error } = useGetEntity<CalendarType>(
-    item_id,
+  const { project_id, item_id, subitem_id, event_id } = useParams();
+  const { data: calendar, error } = useGetEntity<CalendarType>(
+    subitem_id || item_id,
     "calendars",
     {
       data: {
         project_id,
       },
-      fields: ["title", "days", "is_public"],
+      fields: ["id", "title", "days", "is_public"],
       relations: {
         months: true,
       },
@@ -29,11 +29,16 @@ export function PublicCalendar() {
 
   if (error) throw new Error("No public access");
 
-  if (!graph?.data) return <Skeleton type="editor" />;
-  if (!graph?.data?.is_public) return <Navigate to={`/public/${project_id}/calendars`} />;
+  if (!calendar?.data) return <Skeleton type="editor" />;
+  if (!calendar?.data?.is_public) {
+    if (subitem_id) {
+      return <Navigate to="./" />;
+    }
+    return <Navigate to={`/public/${project_id}/calendars`} />;
+  }
   return (
-    <PublicEntityLayout title={graph?.data?.title}>
-      <CalendarView data={graph?.data} isPublic />
+    <PublicEntityLayout title={calendar?.data?.title}>
+      <CalendarView data={calendar?.data} event_id={event_id} id={subitem_id} isPublic />
     </PublicEntityLayout>
   );
 }

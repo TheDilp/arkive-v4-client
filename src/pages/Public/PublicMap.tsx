@@ -30,7 +30,7 @@ export function PublicMap() {
 
   if (error) throw new Error("No public access");
 
-  if (!map?.data) return <Skeleton type="editor" />;
+  if (!map?.data) return <Skeleton type="project_view" />;
   if (!map?.data?.is_public) {
     if (subitem_id) {
       return <Navigate to="./" />;

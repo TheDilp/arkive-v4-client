@@ -27,10 +27,17 @@ export function PublicDocument() {
   if (error) throw new Error("No public access");
 
   if (!document?.data) return <Skeleton type="editor" />;
-  if (!document?.data?.is_public) return <Navigate to={`/public/${project_id}/documents`} />;
+  if (!document?.data?.is_public) {
+    if (subitem_id) {
+      return <Navigate to="./" />;
+    }
+    return <Navigate to={`/public/${project_id}/documents`} />;
+  }
   return (
     <PublicEntityLayout title={subitem_id ? "" : document?.data?.title}>
-      <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />
+      <div className="max-h-[calc(100%-6.5rem)] overflow-y-auto">
+        <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />
+      </div>
     </PublicEntityLayout>
   );
 }

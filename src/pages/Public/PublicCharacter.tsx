@@ -5,6 +5,7 @@ import { Gallery, Select, Skeleton, Tabs } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { CharacterType } from "../../types";
 import { IconEnum } from "../../utils";
+import { PublicCalendar } from "./PublicCalendar";
 import { PublicDocument } from "./PublicDocument";
 import { PublicCharacterResourceLayout, PublicCharacterResourceLinksLayout, PublicEntityLayout } from "./PublicLayout";
 import { PublicMap } from "./PublicMap";
@@ -23,13 +24,14 @@ export function PublicCharacter() {
     "characters",
     {
       relations: {
-        tags: true,
         character_fields: true,
-        locations: true,
         relationships: true,
         character_relationship_types: true,
         documents: true,
+        locations: true,
+        events: true,
         images: true,
+        tags: true,
       },
       fields: ["id", "full_name", "portrait_id", "age", "is_public"],
     },
@@ -41,6 +43,7 @@ export function PublicCharacter() {
   const tabs = [
     { id: "documents", label: "Documents", icon: IconEnum.document },
     { id: "locations", label: "Locations", icon: IconEnum.map_pin },
+    { id: "events", label: "Events", icon: IconEnum.event },
     { id: "gallery", label: "Gallery", icon: IconEnum.image },
   ];
 
@@ -98,7 +101,7 @@ export function PublicCharacter() {
                 value={pathname.split("/").at(-1)}
               />
             </div>
-            <div className="w-full bg-zinc-800 lg:flex-1">
+            <div className="w-fit bg-zinc-800 lg:max-w-[80%] lg:flex-1">
               <Routes>
                 <Route element={<PublicDocument />} path="/documents/:subitem_id" />
               </Routes>
@@ -133,6 +136,38 @@ export function PublicCharacter() {
             <div className="h-full w-full flex-1 bg-zinc-800 lg:flex-1">
               <Routes>
                 <Route element={<PublicMap />} path="/locations/:subitem_id/:map_pin_id" />
+              </Routes>
+            </div>
+          </PublicCharacterResourceLayout>
+        ) : null}
+        {tabs[selectedTab].id === "events" ? (
+          <PublicCharacterResourceLayout>
+            <PublicCharacterResourceLinksLayout>
+              {(character.data?.events || []).map((e) => (
+                <Link
+                  key={e.id}
+                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                    pathname.includes(e.id) ? "text-blue-400" : ""
+                  }`}
+                  to={`events/${e.parent_id}/${e.id}`}>
+                  <span className="rounded px-2">{e.title}</span>
+                </Link>
+              ))}
+            </PublicCharacterResourceLinksLayout>
+            <div className="lg:hidden">
+              <Select
+                name="maps"
+                onChange={({ value }) => navigate(`./events/${value}`)}
+                options={(character?.data?.events || []).map((l) => ({
+                  label: l.title,
+                  value: `${l.parent_id}/${l.id}`,
+                }))}
+                value={pathname.split("/").slice(-2).join("/")}
+              />
+            </div>
+            <div className="h-full w-full flex-1 bg-zinc-800 lg:max-w-[80%] lg:flex-1">
+              <Routes>
+                <Route element={<PublicCalendar />} path="/events/:subitem_id/:event_id" />
               </Routes>
             </div>
           </PublicCharacterResourceLayout>

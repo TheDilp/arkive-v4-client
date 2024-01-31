@@ -66,8 +66,6 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
   const { isLg } = useBreakpoint();
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
-
-  // const firstRender = useRef(true);
   useLayoutEffect(() => {
     if (
       timelineContainer.current &&
@@ -129,21 +127,21 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
         });
 
       // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
-      const points = events
-        .filter((e) => !e.end_year)
-        .map((e, i) => {
-          return {
-            id: e.id,
-            parent_id: e.parent_id,
-            x: isYearsOnly
-              ? e.start_year - 1 + e.start_day * 0.01
-              : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
-            background_color: e.background_color || DefaultTagColor,
-            title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year})`,
-            description: e.description,
-          };
-        });
+      const points = (events?.filter((e) => !e.end_year) || [])?.map((e, i) => {
+        return {
+          id: e.id,
+          parent_id: e.parent_id,
+          x: isYearsOnly
+            ? e.start_year - 1 + e.start_day * 0.01
+            : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+          y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
+          background_color: e.background_color || DefaultTagColor,
+          title: `${e?.title || ""} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
+            e.start_year
+          })`,
+          description: e.description,
+        };
+      });
 
       const event_bars = events
         .filter((e) => !!e.end_year)
