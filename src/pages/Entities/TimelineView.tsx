@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import groupBy from "lodash.groupby";
 import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { clamp } from "remirror";
@@ -55,7 +54,19 @@ function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>
   });
 }
 
-export function TimelineView({ events, months, eras }: { events: EventType[]; months: MonthType[]; eras: EraType[] }) {
+export function TimelineView({
+  id,
+  isPublic,
+  events,
+  months,
+  eras,
+}: {
+  id?: string;
+  isPublic?: boolean;
+  events: EventType[];
+  months: MonthType[];
+  eras: EraType[];
+}) {
   const { project_id, item_id } = useParams();
   const user = useAtomValue(userAtom);
   const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
@@ -74,14 +85,27 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       timelineContainer?.current?.clientHeight
     ) {
       // Calendar constants
-      const groupedEvents: Record<string, EventType[]> = groupBy(events, "end_year");
+      const minYear = events.reduce((prev: number, curr) => {
+        if (curr?.start_year && curr.start_year < prev) return curr.start_year;
+        return prev;
+      }, Infinity);
+      const minYearCount = clamp({
+        min: minYear < 0 ? minYear - 5 : 0,
+        max: Infinity,
+        value: minYear === Infinity ? 0 : minYear - 10,
+      });
+      const maxYearCount = events.reduce((prev: number, curr) => {
+        if (curr?.end_year && curr.end_year > prev) return curr.end_year;
+        if (curr?.start_year && curr.start_year > prev) return curr.start_year;
+        return prev;
+      }, 0);
+
       const monthCount = months.length;
-      const yearCount = Math.max(...(Object.keys(groupedEvents).map((key) => Number(key === "null" ? 0 : key)) as number[]));
-      const isYearsOnly = yearCount > 5;
+      const isYearsOnly = maxYearCount > 5;
       const endRange = clamp({
         min: 1,
-        max: yearCount,
-        value: yearCount * (isYearsOnly ? 1 : monthCount),
+        max: maxYearCount,
+        value: maxYearCount * (isYearsOnly ? 1 : monthCount),
       });
       // Graphics constants
       const padding = 100;
@@ -94,16 +118,15 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       const svg = d3.select(timelineContainer.current);
       const x = d3
         .scaleLinear()
-        .domain([0, endRange])
+        .domain([minYearCount, endRange])
         .range([0, width - X_AXIS_OFFSET - 30]);
       const y = d3
         .scaleLinear()
         .domain([0, (events.length * zoom) / 2])
         .rangeRound([50, height * 1.05]);
-
       const axisBottom = d3
         .axisBottom(x)
-        .ticks(yearCount)
+        .ticks(Math.floor((maxYearCount - Math.abs(minYearCount)) / (clamp({ min: 2, max: 1000, value: zoom % 5 }) * 2)))
         .tickSize(10)
         .tickFormat((d) => {
           if (isYearsOnly) return ((d as number) + 1).toString();
@@ -192,7 +215,11 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
       svg.on("mousemove", (e: MouseEvent) => {
         highlighter.attr(
           "transform",
-          `translate(${e.clientX + scrollContainer.current.scrollLeft - (isLg ? padding - 20 : 16)}, 0)`,
+          `translate(${
+            e.clientX +
+            scrollContainer.current.scrollLeft -
+            (isLg ? padding - (20 - (isPublic ? scrollContainer.current.clientWidth * 0.58 : 0)) : 16)
+          }, 0)`,
         );
       });
 
@@ -250,47 +277,45 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             setContextMenu({
               event: evt as any,
               items:
-                // id || isPublic
-                //   ? [
-                //       {
-                //         id: "1",
-                //         title: "Preview event",
-                //         icon: IconEnum.eye,
-                //         onClick: () =>
-                //           setDrawer((prev) => ({
-                //             ...prev,
-                //             title: "Preview event",
-                //             type: "entity_preview",
-                //             data: { id: event.id, entity_type: "events" },
-                //             size: "lg",
-                //           })),
-                //       },
-                //     ]
-                //   :
-
-                [
-                  {
-                    id: "1",
-                    title: "Edit event",
-                    icon: IconEnum.add,
-                    onClick: () =>
-                      setDrawer((prev) => ({
-                        ...prev,
+                id || isPublic
+                  ? [
+                      {
+                        id: "1",
+                        title: "Preview event",
+                        icon: IconEnum.eye,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Preview event",
+                            type: "entity_preview",
+                            data: { id: e.id, parent_id: e.parent_id, entity_type: "events" },
+                            size: "lg",
+                          })),
+                      },
+                    ]
+                  : [
+                      {
+                        id: "1",
                         title: "Edit event",
-                        type: "events",
-                        data: { id: e.id },
-                        size: "lg",
-                      })),
-                  },
-                  {
-                    id: "2",
-                    title: "Delete event",
-                    icon: IconEnum.trash,
-                    onClick: () => {
-                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
-                    },
-                  },
-                ],
+                        icon: IconEnum.add,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Edit event",
+                            type: "events",
+                            data: { id: e.id, parent_id: e.parent_id },
+                            size: "lg",
+                          })),
+                      },
+                      {
+                        id: "2",
+                        title: "Delete event",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                        },
+                      },
+                    ],
             });
           })
           .on("mouseover", (evt: MouseEvent) => {
@@ -379,47 +404,45 @@ export function TimelineView({ events, months, eras }: { events: EventType[]; mo
             setContextMenu({
               event: evt as any,
               items:
-                // id || isPublic
-                //   ? [
-                //       {
-                //         id: "1",
-                //         title: "Preview event",
-                //         icon: IconEnum.eye,
-                //         onClick: () =>
-                //           setDrawer((prev) => ({
-                //             ...prev,
-                //             title: "Preview event",
-                //             type: "entity_preview",
-                //             data: { id: event.id, entity_type: "events" },
-                //             size: "lg",
-                //           })),
-                //       },
-                //     ]
-                //   :
-
-                [
-                  {
-                    id: "1",
-                    title: "Edit event",
-                    icon: IconEnum.add,
-                    onClick: () =>
-                      setDrawer((prev) => ({
-                        ...prev,
+                id || isPublic
+                  ? [
+                      {
+                        id: "1",
+                        title: "Preview event",
+                        icon: IconEnum.eye,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Preview event",
+                            type: "entity_preview",
+                            data: { id: e.id, parent_id: e.parent_id, entity_type: "events" },
+                            size: "lg",
+                          })),
+                      },
+                    ]
+                  : [
+                      {
+                        id: "1",
                         title: "Edit event",
-                        type: "events",
-                        data: { id: e.id },
-                        size: "lg",
-                      })),
-                  },
-                  {
-                    id: "2",
-                    title: "Delete event",
-                    icon: IconEnum.trash,
-                    onClick: () => {
-                      deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
-                    },
-                  },
-                ],
+                        icon: IconEnum.add,
+                        onClick: () =>
+                          setDrawer((prev) => ({
+                            ...prev,
+                            title: "Edit event",
+                            type: "events",
+                            data: { id: e.id, parent_id: e.parent_id },
+                            size: "lg",
+                          })),
+                      },
+                      {
+                        id: "2",
+                        title: "Delete event",
+                        icon: IconEnum.trash,
+                        onClick: () => {
+                          deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                        },
+                      },
+                    ],
             });
           });
       });

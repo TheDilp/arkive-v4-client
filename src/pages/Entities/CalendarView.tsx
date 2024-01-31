@@ -443,24 +443,26 @@ export function CalendarView({
     <div className="flex h-[calc(100%-6rem)] flex-col pb-4">
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         <div className="mr-auto flex items-center gap-x-2 self-end">
-          <div className="h-11 w-11">
-            <Button
-              icon={IconEnum.filter}
-              isIconOnly
-              onClick={() =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  type: "calendar_filter",
-                  data: { setFilters },
-                  size: "lg",
-                  title: "Calendar filter",
-                }))
-              }
-              tooltip="Filter events"
-              variant="primary"
-            />
-          </div>
-          {hasFiltersEnabled ? (
+          {isPublic ? null : (
+            <div className="h-11 w-11">
+              <Button
+                icon={IconEnum.filter}
+                isIconOnly
+                onClick={() =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    type: "calendar_filter",
+                    data: { setFilters },
+                    size: "lg",
+                    title: "Calendar filter",
+                  }))
+                }
+                tooltip="Filter events"
+                variant="primary"
+              />
+            </div>
+          )}
+          {hasFiltersEnabled && !isPublic ? (
             <div>
               <Button
                 icon={IconEnum.close}
@@ -472,7 +474,7 @@ export function CalendarView({
               />
             </div>
           ) : null}
-          {hasFiltersEnabled && filterBadges.fields.length
+          {hasFiltersEnabled && filterBadges.fields.length && !isPublic
             ? filterBadges.fields.map((badge) => (
                 <Tooltip
                   key={badge}
@@ -486,7 +488,7 @@ export function CalendarView({
                 </Tooltip>
               ))
             : null}
-          {hasFiltersEnabled && filterBadges.relationFields.length
+          {hasFiltersEnabled && filterBadges.relationFields.length && !isPublic
             ? filterBadges.relationFields.map((badge) => {
                 return (
                   <Tooltip
@@ -908,7 +910,13 @@ export function CalendarView({
       ) : null}
 
       {view === "timeline" ? (
-        <TimelineView eras={calendar?.eras || []} events={events?.data || []} months={calendar?.months || []} />
+        <TimelineView
+          eras={calendar?.eras || []}
+          events={events?.data || []}
+          id={id}
+          isPublic={isPublic}
+          months={calendar?.months || []}
+        />
       ) : null}
     </div>
   );
