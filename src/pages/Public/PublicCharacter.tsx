@@ -6,7 +6,7 @@ import { useGetEntity } from "../../hooks";
 import { CharacterType } from "../../types";
 import { IconEnum } from "../../utils";
 import { PublicDocument } from "./PublicDocument";
-import { PublicEntityLayout } from "./PublicLayout";
+import { PublicCharacterResourceLayout, PublicCharacterResourceLinksLayout, PublicEntityLayout } from "./PublicLayout";
 import { PublicMap } from "./PublicMap";
 
 export function PublicCharacter() {
@@ -76,19 +76,20 @@ export function PublicCharacter() {
       </div> */}
 
         {tabs[selectedTab].id === "documents" ? (
-          <div className="relative flex min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">
-            <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-y border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+          <PublicCharacterResourceLayout>
+            <PublicCharacterResourceLinksLayout>
               {(character.data?.documents || []).map((d) => (
                 <Link
                   key={d.id}
-                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg last:border-none odd:border-b hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-zinc-700 text-lg odd:border-b hover:text-blue-400 ${
                     pathname.includes(d.id) ? "text-blue-400" : ""
                   }`}
                   to={`documents/${d.id}`}>
                   <span className="rounded px-2">{d.title}</span>
                 </Link>
               ))}
-            </div>
+            </PublicCharacterResourceLinksLayout>
+
             <div className="lg:hidden">
               <Select
                 name="douments"
@@ -102,11 +103,11 @@ export function PublicCharacter() {
                 <Route element={<PublicDocument />} path="/documents/:subitem_id" />
               </Routes>
             </div>
-          </div>
+          </PublicCharacterResourceLayout>
         ) : null}
         {tabs[selectedTab].id === "locations" ? (
-          <div className="relative flex h-full min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">
-            <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-t border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+          <PublicCharacterResourceLayout>
+            <PublicCharacterResourceLinksLayout>
               {(character.data?.locations || []).map((l) => (
                 <Link
                   key={l.id}
@@ -117,7 +118,7 @@ export function PublicCharacter() {
                   <span className="rounded px-2">{l.title}</span>
                 </Link>
               ))}
-            </div>
+            </PublicCharacterResourceLinksLayout>
             <div className="lg:hidden">
               <Select
                 name="maps"
@@ -134,7 +135,7 @@ export function PublicCharacter() {
                 <Route element={<PublicMap />} path="/locations/:subitem_id/:map_pin_id" />
               </Routes>
             </div>
-          </div>
+          </PublicCharacterResourceLayout>
         ) : null}
 
         {tabs[selectedTab].id === "gallery" ? (

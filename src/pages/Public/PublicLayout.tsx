@@ -27,3 +27,15 @@ export function PublicEntityLayout({ title, children }: { title: string; childre
     </div>
   );
 }
+
+export function PublicCharacterResourceLayout({ children }: { children: ReactNode | ReactNode[] }) {
+  return <div className="relative flex h-full min-h-full flex-col bg-zinc-900 lg:flex-row lg:flex-nowrap">{children}</div>;
+}
+
+export function PublicCharacterResourceLinksLayout({ children }: { children: ReactNode | ReactNode[] }) {
+  return (
+    <div className="sticky top-8 hidden h-fit max-w-full flex-col gap-y-1 border-y border-zinc-800 bg-zinc-900 lg:flex lg:w-[20%]">
+      {children}
+    </div>
+  );
+}
