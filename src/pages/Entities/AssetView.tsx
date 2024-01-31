@@ -5,10 +5,18 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useDownloadImage, useGetImages, useGetInfiniteAssets, useTable } from "../../hooks";
+import {
+  useBreakpoint,
+  useDownloadImage,
+  useGetImages,
+  useGetInfiniteAssets,
+  useTable,
+  useUpdateManyPublic,
+} from "../../hooks";
 import { AssetType, DialogAtomType, DrawerAtomType, ImageType, WebhookType } from "../../types";
 import {
   baseURLS,
+  BooleanFilters,
   dialogAtom,
   drawerAtom,
   FetchFunction,
@@ -38,6 +46,17 @@ function createColumns(
   webhooks: WebhookType[],
   type: AssetType,
   project_id: string,
+  updatePublic: UseMutateAsyncFunction<
+    any,
+    unknown,
+    {
+      data: {
+        ids: string[];
+        is_public: boolean;
+      };
+    },
+    unknown
+  >,
 ) {
   return [
     columnHelper.display({
@@ -71,7 +90,27 @@ function createColumns(
         filterOptions: TextFilters,
       },
     }),
-
+    columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+        filterOptions: BooleanFilters,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isIconOnly
+          onClick={async () => {
+            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -153,6 +192,8 @@ export function AssetView() {
   const setDialog = useSetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
+  const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
+
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
   const [type, setType] = useState<AssetType>("images");
@@ -165,8 +206,8 @@ export function AssetView() {
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
     type,
-    { orderBy, fields: ["id", "title", "type"], filters, pagination },
-    { enabled: view === "table", prefetch: true },
+    { orderBy, fields: ["id", "title", "type", "is_public"], filters, pagination },
+    { enabled: view === "table", prefetch: false },
   );
 
   const {
@@ -314,7 +355,15 @@ export function AssetView() {
       ) : (
         <div className="h-full max-h-[95%] w-full overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, downloadImage, user?.webhooks || [], type, project_id as string)}
+            columns={createColumns(
+              setDrawer,
+              setDialog,
+              downloadImage,
+              user?.webhooks || [],
+              type,
+              project_id as string,
+              updateImagesPublic,
+            )}
             config={{
               hasSelect: true,
               orderBy,
