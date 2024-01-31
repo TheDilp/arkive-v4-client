@@ -148,7 +148,7 @@ export function PublicCharacter() {
         ) : null}
         {tabs[selectedTab].id === "events" ? (
           <PublicCharacterResourceLayout>
-            {/* <PublicCharacterResourceLinksLayout>
+            <PublicCharacterResourceLinksLayout>
               {(character.data?.events || []).map((e) => (
                 <Link
                   key={e.id}
@@ -159,7 +159,7 @@ export function PublicCharacter() {
                   <span className="rounded px-2">{e.title}</span>
                 </Link>
               ))}
-            </PublicCharacterResourceLinksLayout> */}
+            </PublicCharacterResourceLinksLayout>
             <div className="lg:hidden">
               <Select
                 name="maps"
@@ -171,7 +171,7 @@ export function PublicCharacter() {
                 value={pathname.split("/").slice(-2).join("/")}
               />
             </div>
-            <div className="h-full w-full flex-1 bg-zinc-800  lg:flex-1">
+            <div className="h-full w-full flex-1 bg-zinc-800 px-2 lg:flex-1">
               <Routes>
                 <Route element={<PublicCalendar isCharacterCalendar />} path="/events/:subitem_id/:event_id" />
               </Routes>
@@ -180,7 +180,9 @@ export function PublicCharacter() {
         ) : null}
 
         {tabs[selectedTab].id === "gallery" ? (
-          <Gallery columns={6} images={character?.data?.images || []} isOpenable type="images" />
+          <div className="h-full px-2">
+            <Gallery columns={6} images={character?.data?.images || []} isOpenable type="images" />
+          </div>
         ) : null}
       </div>
     </PublicEntityLayout>
