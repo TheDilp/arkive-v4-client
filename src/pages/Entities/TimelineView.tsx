@@ -72,6 +72,7 @@ export function TimelineView({
   const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
+  const timelineLayoutContainer = useRef() as MutableRefObject<HTMLDivElement>;
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
@@ -108,11 +109,10 @@ export function TimelineView({
         value: maxYearCount * (isYearsOnly ? 1 : monthCount),
       });
       // Graphics constants
-      const padding = 100;
       const width = timelineContainer?.current?.clientWidth || 1;
       const height = clamp({
-        min: timelineContainer?.current?.clientHeight,
-        max: 0,
+        min: timelineContainer?.current?.clientHeight || 0 - 5,
+        max: timelineContainer?.current?.clientHeight || 0 - 5,
         value: events.length * 30 || timelineContainer?.current?.clientHeight || 1,
       });
       const svg = d3.select(timelineContainer.current);
@@ -211,15 +211,18 @@ export function TimelineView({
         .attr("width", width)
         .style("pointer-events", "all")
         .style("fill", "none");
-
       svg.on("mousemove", (e: MouseEvent) => {
         highlighter.attr(
           "transform",
-          `translate(${
-            e.clientX +
-            scrollContainer.current.scrollLeft -
-            (isLg ? padding - (20 - (isPublic ? scrollContainer.current.clientWidth * 0.58 : 0)) : 16)
-          }, 0)`,
+          `translate(${clamp({
+            min: 0,
+            max: Infinity,
+            // Additional 32 for sidebar width on large screens
+            value:
+              e.clientX -
+              (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
+              (isLg && !isPublic ? 32 : 0),
+          })}, 0)`,
         );
       });
 
@@ -462,7 +465,7 @@ export function TimelineView({
   }, [events, zoom]);
 
   return (
-    <div className="flex h-full flex-col gap-y-2">
+    <div ref={timelineLayoutContainer} className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center">
         <div className="h-8 w-8">
           <Button

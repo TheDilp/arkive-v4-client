@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Gallery, Select, Skeleton, Tabs } from "../../components";
@@ -46,6 +46,12 @@ export function PublicCharacter() {
     { id: "events", label: "Events", icon: IconEnum.event },
     { id: "gallery", label: "Gallery", icon: IconEnum.image },
   ];
+
+  useLayoutEffect(() => {
+    if (pathname.includes("events")) {
+      setSelectedTab(2);
+    }
+  }, [pathname]);
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
   if (!character?.data?.is_public) return <Navigate to={`/public/${project_id}/characters`} />;
@@ -142,7 +148,7 @@ export function PublicCharacter() {
         ) : null}
         {tabs[selectedTab].id === "events" ? (
           <PublicCharacterResourceLayout>
-            <PublicCharacterResourceLinksLayout>
+            {/* <PublicCharacterResourceLinksLayout>
               {(character.data?.events || []).map((e) => (
                 <Link
                   key={e.id}
@@ -153,7 +159,7 @@ export function PublicCharacter() {
                   <span className="rounded px-2">{e.title}</span>
                 </Link>
               ))}
-            </PublicCharacterResourceLinksLayout>
+            </PublicCharacterResourceLinksLayout> */}
             <div className="lg:hidden">
               <Select
                 name="maps"
@@ -165,7 +171,7 @@ export function PublicCharacter() {
                 value={pathname.split("/").slice(-2).join("/")}
               />
             </div>
-            <div className="h-full w-full flex-1 bg-zinc-800 lg:max-w-[80%] lg:flex-1">
+            <div className="h-full w-full flex-1 bg-zinc-800  lg:flex-1">
               <Routes>
                 <Route element={<PublicCalendar />} path="/events/:subitem_id/:event_id" />
               </Routes>
