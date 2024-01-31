@@ -1,11 +1,11 @@
 import { autoUpdate, useFloating, useTransitionStyles } from "@floating-ui/react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
+import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
 import { Button } from "../Form";
 import {
@@ -75,7 +75,8 @@ const DrawerClasses = tv({
 export function Drawer({ isPublic }: { isPublic?: boolean }) {
   const drawer = useAtomValue(drawerAtom);
   const [hasChangedData, setHasChangedData] = useAtom(hasChangedDataAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawer = useResetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const { type, item_id } = useParams();
   const { base, title } = DrawerClasses({ size: drawer.size });
 
@@ -103,7 +104,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   // Close drawer if the location changes
   useEffect(() => {
     if (!hasChangedData) {
-      resetDrawerAtom();
+      resetDrawer();
       setHasChangedData(false);
     }
   }, [type, item_id, hasChangedData]);
@@ -121,7 +122,36 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
         <h3 className={title()}>
           <span className="truncate">{drawer.title}</span>
           <div className="w-min">
-            <Button hasNoBackground icon={IconEnum.close} iconSize={22} onClick={resetDrawerAtom} />
+            <Button
+              hasNoBackground
+              icon={IconEnum.close}
+              iconSize={22}
+              onClick={() => {
+                if (!hasChangedData) {
+                  resetDrawer();
+                } else {
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: "You have unsaved changes - are you sure you want to proceed?",
+                    confirm: {
+                      label: "Proceed",
+                      variant: "primary",
+                      icon: IconEnum.chevron_right,
+                      action: () => {
+                        resetDrawer();
+                        setHasChangedData(false);
+                      },
+                    },
+                    cancel: {
+                      label: "Cancel",
+                      variant: "info",
+                      action: () => {},
+                    },
+                    isOverlay: true,
+                  }));
+                }
+              }}
+            />
           </div>
         </h3>
         {renderContent ? (

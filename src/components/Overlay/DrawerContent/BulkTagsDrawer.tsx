@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateTags } from "../../../hooks";
-import { AvailableEntityType, TagType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, TagType } from "../../../types";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { Button, TagInput, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
 type Props = {
-  data: { items: { id: string; tags: string[] }[]; type: AvailableEntityType };
+  data: { items: { id: string; tags: string[] }[]; type: AvailableEntityType | AvailableSubEntityType };
 };
 
 export function BulkTagsDrawer({ data }: Props) {
