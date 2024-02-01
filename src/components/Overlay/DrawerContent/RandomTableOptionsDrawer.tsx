@@ -18,6 +18,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{ data: InsertRandomTableOptionType[] }>(
     "random_table_options",
+    data.parent_id,
   );
   const { handleChange } = useHandleChange({ data: options, setData: setOptions });
   return (
