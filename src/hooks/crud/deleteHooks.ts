@@ -141,7 +141,7 @@ export function useDeleteMany(type: AllAvailableEntities, project_id?: string | 
     async (vars: { data: { ids: string[] } }) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/bulk/delete/${type.toLowerCase()}`,
-        body: JSON.stringify(vars),
+        body: JSON.stringify(type === "images" ? { data: { ids: vars.data.ids, project_id } } : vars),
         method: "DELETE",
       });
     },

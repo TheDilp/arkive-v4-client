@@ -1,5 +1,6 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -7,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
 import {
   useBreakpoint,
+  useDeleteMany,
   useDownloadImage,
   useGetImages,
   useGetInfiniteAssets,
@@ -190,9 +192,11 @@ export function AssetView() {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const resetDialog = useResetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
+  const { mutate: deleteManyImages } = useDeleteMany("images", project_id);
 
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
@@ -201,6 +205,7 @@ export function AssetView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
+
   const user = useAtomValue(userAtom);
 
   const { data: assets, isLoading } = useGetImages(
@@ -370,6 +375,44 @@ export function AssetView() {
               orderBy,
               filters,
               selection,
+              selectedActions: [
+                {
+                  icon: IconEnum.trash,
+                  variant: "error",
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Delete selected rows.",
+                  onClick: () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+                    if (ids.length) {
+                      setDialog((prev) => ({
+                        ...prev,
+                        title: "Delete many",
+                        description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "image" : "images"}?`,
+                        warning: "This action cannot be undone.",
+                        isOverlay: true,
+                        cancel: {
+                          label: "Cancel",
+                          variant: "primary",
+                          action: resetDialog,
+                        },
+                        confirm: {
+                          label: "Delete",
+                          icon: IconEnum.trash,
+                          action: async () =>
+                            deleteManyImages(
+                              { data: { ids } },
+                              {
+                                onSuccess: () => dispatch({ type: "clearSelection" }),
+                              },
+                            ),
+                          variant: "error",
+                        },
+                      }));
+                    }
+                  },
+                },
+              ],
             }}
             data={assets?.data || []}
             dispatch={dispatch}
