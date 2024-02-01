@@ -19,16 +19,16 @@ export function PublicLayout() {
   );
 }
 
-export function PublicEntityLayout({ title, children }: { title: string; children: ReactNode }) {
+export function PublicEntityLayout({ hasImage, title, children }: { title: string; hasImage?: boolean; children: ReactNode }) {
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-y-2 overflow-hidden">
-      {title ? <h2 className="px-4 py-2 font-lato text-3xl">{title}</h2> : null}
+      {title ? <h2 className={`${hasImage ? "ml-20" : ""} px-4 pt-2 font-lato text-3xl`}>{title}</h2> : null}
       {children}
     </div>
   );
 }
 
-export function PublicCharacterResourceLayout({ children }: { children: ReactNode | ReactNode[] }) {
+export function PublicCharacterResourceLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex h-full max-h-full flex-col overflow-y-auto overflow-x-hidden bg-zinc-900 lg:flex-row lg:flex-nowrap ">
       {children}
@@ -38,7 +38,7 @@ export function PublicCharacterResourceLayout({ children }: { children: ReactNod
 
 export function PublicCharacterResourceLinksLayout({ children }: { children: ReactNode | ReactNode[] }) {
   return (
-    <div className="sticky top-8 hidden h-full max-h-full max-w-full flex-col gap-y-1 overflow-y-auto border-y border-r border-zinc-800 bg-zinc-900 lg:flex lg:min-w-[20%] lg:max-w-[20%]">
+    <div className="sticky top-8 hidden h-full max-h-full w-full max-w-full flex-col gap-y-1 overflow-y-auto border-y border-r border-zinc-800 bg-zinc-900 lg:flex lg:min-w-[20%] lg:max-w-[20%]">
       {children}
     </div>
   );

@@ -1,10 +1,10 @@
 import { useLayoutEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { Gallery, Select, Skeleton, Tabs } from "../../components";
+import { Avatar, Gallery, Select, Skeleton, Tabs } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { CharacterType } from "../../types";
-import { IconEnum } from "../../utils";
+import { getImageURL, IconEnum } from "../../utils";
 import { PublicCalendar } from "./PublicCalendar";
 import { PublicDocument } from "./PublicDocument";
 import { PublicCharacterResourceLayout, PublicCharacterResourceLinksLayout, PublicEntityLayout } from "./PublicLayout";
@@ -57,40 +57,32 @@ export function PublicCharacter() {
   if (!character?.data?.is_public) return <Navigate to={`/public/${project_id}/characters`} />;
 
   return (
-    <PublicEntityLayout title={character?.data?.full_name || ""}>
-      <div className="sticky top-0 z-10 bg-black px-2.5">
-        <Tabs
-          onChange={(_, idx) => {
-            setSelectedTab(idx);
-            navigate("./");
-          }}
-          selectedTab={selectedTab}
-          tabs={tabs}
-        />
-      </div>
-      <div className="h-full">
-        {/* <div className="ml-auto flex w-48 flex-col border border-zinc-700">
+    <PublicEntityLayout hasImage={!!character?.data?.portrait_id} title={character?.data?.full_name || ""}>
+      <div className="sticky top-0 z-10 flex items-center bg-black px-2.5">
         {character?.data?.portrait_id ? (
-          <div className="w-full">
-            <h3 className="flex h-10 items-center justify-center bg-sky-700 font-lato text-lg">
-              {character?.data?.full_name || ""}
-            </h3>
-            <img
-              alt={`Portrait of ${character?.data?.full_name || ""}`}
-              className="object-contain"
-              src={getImageURL(project_id as string, "images", character?.data?.portrait_id)}
-            />
+          <div className="absolute bottom-0 ml-auto flex w-20 flex-col">
+            <Avatar hasShowImage image={getImageURL(project_id as string, "images", character?.data?.portrait_id)} size="3xl" />
           </div>
         ) : null}
-      </div> */}
-
+        <div className={`${character?.data?.portrait_id ? "ml-20" : ""} flex-1`}>
+          <Tabs
+            onChange={(_, idx) => {
+              setSelectedTab(idx);
+              navigate("./");
+            }}
+            selectedTab={selectedTab}
+            tabs={tabs}
+          />
+        </div>
+      </div>
+      <div className="h-full">
         {tabs[selectedTab].id === "documents" ? (
           <PublicCharacterResourceLayout>
             <PublicCharacterResourceLinksLayout>
               {(character.data?.documents || []).map((d) => (
                 <Link
                   key={d.id}
-                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 pl-2 text-lg hover:text-blue-400 ${
                     pathname.includes(d.id) ? "text-blue-400" : ""
                   }`}
                   to={`documents/${d.id}`}>
@@ -107,7 +99,7 @@ export function PublicCharacter() {
                 value={pathname.split("/").at(-1)}
               />
             </div>
-            <div className="w-fit bg-zinc-800 lg:max-w-[80%] lg:flex-1">
+            <div className="h-full w-full overflow-hidden bg-zinc-800 lg:max-w-[80%] lg:flex-1">
               <Routes>
                 <Route element={<PublicDocument />} path="/documents/:subitem_id" />
               </Routes>
@@ -120,7 +112,7 @@ export function PublicCharacter() {
               {(character.data?.locations || []).map((l) => (
                 <Link
                   key={l.id}
-                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg last:border-none hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 pl-2 text-lg last:border-none hover:text-blue-400 ${
                     pathname.includes(l.map_pin_id) ? "text-blue-400" : ""
                   }`}
                   to={`locations/${l.id}/${l.map_pin_id}`}>
@@ -139,7 +131,7 @@ export function PublicCharacter() {
                 value={pathname.split("/").slice(-2).join("/")}
               />
             </div>
-            <div className="h-full w-full flex-1 bg-zinc-800 lg:flex-1">
+            <div className="h-full w-full flex-1 bg-zinc-800">
               <Routes>
                 <Route element={<PublicMap />} path="/locations/:subitem_id/:map_pin_id" />
               </Routes>
@@ -152,7 +144,7 @@ export function PublicCharacter() {
               {(character.data?.events || []).map((e) => (
                 <Link
                   key={e.id}
-                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 text-lg last:border-none hover:text-blue-400 ${
+                  className={`flex h-10 w-full items-center truncate border-b border-zinc-700 pl-2 text-lg last:border-none hover:text-blue-400 ${
                     pathname.includes(e.id) ? "text-blue-400" : ""
                   }`}
                   to={`events/${e.parent_id}/${e.id}`}>
