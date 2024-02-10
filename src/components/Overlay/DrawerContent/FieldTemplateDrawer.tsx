@@ -362,7 +362,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                             {(provided, draggableSnapshot) => (
                               <div
                                 ref={provided.innerRef}
-                                className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
+                                className={`my-1 flex flex-nowrap items-center gap-x-2  ${
                                   draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                                 }`}
                                 {...provided.draggableProps}
@@ -415,7 +415,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                                     }
                                     label={field?.title}>
                                     <div
-                                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-900 p-2 ${
+                                      className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-950 p-2 ${
                                         draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
                                       }`}
                                       {...provided.draggableProps}
