@@ -21,9 +21,10 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex h-56 max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           isAutocomplete
+          isMultiple
           name={name}
           onChange={({ value, label, image }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
@@ -52,6 +53,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
           }}
           placeholder="Press enter to search."
           searchEntity="characters"
+          value={currentValue?.map((c) => c.related_id)}
         />
         {(currentValue || [])?.map((val) => (
           <EntityPreview

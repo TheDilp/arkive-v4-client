@@ -26,17 +26,17 @@ import {
   TemplateBlueprintField,
   TemplateBooleanField,
   TemplateCharacterField,
+  TemplateDateField,
   TemplateDiceRollField,
   TemplateDocumentField,
   TemplateEventField,
   TemplateImageField,
   TemplateInputField,
+  TemplateLocationsField,
+  TemplateRandomTableField,
   TemplateSelectField,
   TemplateTextareaField,
 } from "../../Complex";
-import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
-import { TemplateLocationsField } from "../../Complex/TemplateFields/TemplateLocationsField";
-import { TemplateRandomTableField } from "../../Complex/TemplateFields/TemplateRandomTableField";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
