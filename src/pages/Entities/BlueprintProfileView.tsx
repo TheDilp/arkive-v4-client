@@ -295,13 +295,17 @@ function AdditionalFieldDisplay({
       ) : null}
       {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
         <div className="w-full">
-          <EntityPreview
-            id={blueprint_field_data.images[0].related_id as string}
-            image_id={blueprint_field_data?.images?.[0].image.id}
-            label={blueprint_field.title}
-            title={blueprint_field_data?.images?.[0].image.title}
-            type="images"
-            variant="primary"
+          <CarouselEntityPreview
+            field_label={blueprint_field.title}
+            items={[
+              {
+                id: blueprint_field_data.images[0].related_id as string,
+                image_id: blueprint_field_data?.images?.[0].image.id,
+                label: blueprint_field.title,
+                title: blueprint_field.title,
+                type: "images",
+              },
+            ]}
           />
         </div>
       ) : null}
