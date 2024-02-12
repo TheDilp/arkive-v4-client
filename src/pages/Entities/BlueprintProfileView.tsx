@@ -11,7 +11,6 @@ import {
   Button,
   CarouselEntityPreview,
   Collapsible,
-  EntityPreview,
   FormattedDate,
   Gallery,
   Input,
@@ -178,7 +177,6 @@ function AdditionalFieldDisplay({
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text", isPreview });
-  const setDrawer = useSetAtom(drawerAtom);
   return (
     <div className={fieldClasses}>
       {blueprint_field.field_type === "text" ||
@@ -210,32 +208,8 @@ function AdditionalFieldDisplay({
         </>
       ) : null}
       {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
-      {blueprint_field.field_type === "characters_single" ? (
-        <div className="w-full">
-          <EntityPreview
-            id={blueprint_field_data.characters?.[0]?.character.id}
-            image_id={blueprint_field_data.characters?.[0]?.character?.portrait_id}
-            label={blueprint_field.title}
-            previewAction={
-              blueprint_field_data.characters?.[0]?.character
-                ? (id, parent_id) => {
-                    setDrawer((prev) => ({
-                      ...prev,
-                      title: "Preview",
-                      data: { id, parent_id, entity_type: "characters" },
-                      type: "entity_preview",
-                      size: "half",
-                    }));
-                  }
-                : undefined
-            }
-            title={blueprint_field_data.characters?.[0]?.character?.full_name || ""}
-            type="characters"
-            variant="primary"
-          />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "characters_multiple" ? (
+
+      {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={blueprint_field.title}
