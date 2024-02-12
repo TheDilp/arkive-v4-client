@@ -275,8 +275,8 @@ function AdditionalFieldDisplay({
               {
                 id: blueprint_field_data.images[0].related_id as string,
                 image_id: blueprint_field_data?.images?.[0].image.id,
+                title: blueprint_field_data?.images?.[0].image.title,
                 label: blueprint_field.title,
-                title: blueprint_field.title,
                 type: "images",
               },
             ]}
