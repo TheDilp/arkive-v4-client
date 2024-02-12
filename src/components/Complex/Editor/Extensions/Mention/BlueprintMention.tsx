@@ -39,9 +39,11 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
           parent_id,
         )}>
         <div className="relative -top-[0.0625rem] flex items-start">
-          <span className="relative">
-            <Icon fontSize={14} icon={icon ?? IconEnum.blueprint} />
-          </span>
+          {icon ? (
+            <span className="relative">
+              <Icon fontSize={14} icon={icon ?? IconEnum.blueprint} />
+            </span>
+          ) : null}
           <span className="text-sm underline">{title || label}</span>
         </div>
       </Link>
