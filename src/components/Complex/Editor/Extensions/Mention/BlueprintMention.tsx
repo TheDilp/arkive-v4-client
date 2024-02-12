@@ -22,7 +22,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
       data: {
         id,
       },
-      fields: ["id", "title", "is_public"],
+      fields: ["id", "title", "is_public", "parent_id"],
     },
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
@@ -36,7 +36,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
           project_id as string,
           data?.data?.is_public ?? false,
           isPublic,
-          parent_id,
+          parent_id || data?.data?.parent_id,
         )}>
         <div className="relative -top-[0.0625rem] flex items-start">
           {icon ? (
