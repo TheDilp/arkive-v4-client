@@ -126,7 +126,7 @@ const fieldSizeClass = tv({
       text: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       select: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      characters_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      characters_single: "col-span-6 sm:col-span-6  md:col-span-6 xl:col-span-6",
       characters_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
       locations_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
       locations_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
