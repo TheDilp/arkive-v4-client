@@ -34,7 +34,7 @@ type Props = {
     getContext: ReactFrameworkOutput<Remirror.Extensions>;
   };
 };
-type matchItem = { id: string; title: string; image_id?: string; parent_id?: string };
+type matchItem = { id: string; title: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
 
 function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: SearchableMentionEntities | null): matchResult[] {
@@ -75,7 +75,15 @@ function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: Sea
           ? item.title.toLowerCase().includes(match[0].toLowerCase())
           : item.title.toLowerCase() === match[0].toLowerCase(),
       );
-      if (matchedItem) ranges.push({ from, to, id: matchedItem.id, title: matchedItem.title, image_id: matchedItem?.image_id });
+      if (matchedItem)
+        ranges.push({
+          from,
+          to,
+          id: matchedItem.id,
+          title: matchedItem.title,
+          icon: matchedItem.icon,
+          image_id: matchedItem?.image_id,
+        });
     }
 
     return false;
@@ -111,6 +119,7 @@ function createMentions(
         id: range.id,
         label: range.title,
         name: selectedEntity,
+        icon: range.icon,
         projectId: project_id,
         parent_id: range.parent_id,
       },
@@ -189,6 +198,7 @@ export function AutomentionDrawer({ data }: Props) {
       enabled: text.length > 0 && !!selectedEntity,
     },
   );
+
   const [ranges, setRanges] = useState<matchResult[]>([]);
 
   useLayoutEffect(() => {
@@ -305,8 +315,9 @@ export function AutomentionDrawer({ data }: Props) {
       </ul>
 
       {links?.data && !links?.data?.length ? <Alert label="No matches found." variant="info" /> : null}
-      <div className="flex flex-col-reverse gap-2 lg:flex-row lg:flex-nowrap">
+      <div className="flex flex-col gap-2 lg:flex-row lg:flex-nowrap">
         <Button
+          icon={IconEnum.close}
           label="Close"
           onClick={() => {
             const activeAnnotations = data.getContext.helpers.getAnnotations();
