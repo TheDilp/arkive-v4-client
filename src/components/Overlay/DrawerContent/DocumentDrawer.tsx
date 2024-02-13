@@ -142,7 +142,6 @@ export function DocumentDrawer({ data, exceptions }: Props) {
             placeholder={exceptions?.createTemplate ? "" : "Press enter to add an alternative name"}
             value={alterNameInput}
           />
-          <FolderSelect handleChange={handleChange} parent_id={document?.parent_id ?? null} type="documents" />
 
           <div className="flex flex-wrap gap-2">
             {document?.alter_names?.length
@@ -162,6 +161,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 ))
               : null}
           </div>
+          <FolderSelect handleChange={handleChange} parent_id={document?.parent_id ?? null} type="documents" />
+
           <div className="flex gap-x-2">
             <span>Dice color:</span>
             <div className="ml-auto self-end pb-2">
