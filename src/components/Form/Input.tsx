@@ -66,6 +66,7 @@ const InputClasses = tv({
       true: {
         base: "cursor-not-allowed",
         inputContainer: "cursor-not-allowed pointer-events-none",
+        input: "truncate",
       },
     },
     isInline: {
