@@ -9,10 +9,14 @@ import { DialogAtomType, ImageComponentType } from "../../types";
 import { dialogAtom, getImageURL } from "../../utils";
 
 const ImageClasses = tv({
-  base: "object-cover h-full w-full rounded object-center",
+  base: "h-full w-full rounded object-center",
   variants: {
     isOpenable: {
       true: "transition-all group-hover:scale-125 hover:shadow-md cursor-pointer duration-300",
+    },
+    objectFit: {
+      cover: "object-cover",
+      contain: "object-contain",
     },
   },
 });
@@ -21,10 +25,10 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
   setDialog((prev) => ({ ...prev, data: { image, title }, type: "image_view", title: "Image view" }));
 }
 
-export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type }: ImageComponentType) {
+export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, objectFit = "cover" }: ImageComponentType) {
   const { project_id } = useParams();
   const imageUrl = url || getImageURL(project_id as string, type, image.id);
-  const classes = ImageClasses({ isOpenable });
+  const classes = ImageClasses({ isOpenable, objectFit });
   const setDialog = useSetAtom(dialogAtom);
 
   return (

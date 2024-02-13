@@ -1,13 +1,21 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { useGetEntity } from "../../../hooks";
+import { useGetEntity, useGetImage } from "../../../hooks";
 import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import BlueprintProfileView from "../../../pages/Entities/BlueprintProfileView";
-import { AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
+import {
+  AssetType,
+  AvailableEntityType,
+  AvailableSubEntityType,
+  DocumentType,
+  GraphType,
+  ImageType,
+  MapType,
+} from "../../../types";
 import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
-import { Graph } from "../../DataDisplay";
+import { Graph, Image } from "../../DataDisplay";
 import { Button, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -102,13 +110,24 @@ export function CalendarPreviewDrawer({ id }: { id?: string }) {
 export function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string }) {
   return <EventDrawer data={{ id, parent_id, isReadOnly: true }} />;
 }
+export function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetType; project_id: string }) {
+  const { data, isFetching } = useGetImage<ImageType>(id, project_id, type, { fields: [] });
+  if (data?.data)
+    return (
+      <div className="flex h-full flex-1 items-center justify-center ">
+        <Image image={data?.data} objectFit="contain" type={type} />
+      </div>
+    );
+  if (!isFetching && !data?.data) return <Alert label="Could not find image." variant="error" />;
+  return null;
+}
 
 export function EntityPreviewDrawer({
   isPublic,
   data,
 }: {
   isPublic?: boolean;
-  data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType };
+  data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType; image_type?: AssetType };
 }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -124,6 +143,9 @@ export function EntityPreviewDrawer({
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
+        {data.entity_type === "images" && data?.image_type ? (
+          <ImagePreviewDrawer id={data.id} project_id={project_id as string} type={data.image_type} />
+        ) : null}
       </div>
       {isPublic ? null : (
         <div className="">

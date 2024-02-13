@@ -1,7 +1,7 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Dispatch, MouseEvent, SetStateAction } from "react";
 
-import { Size } from "../../baseTypes";
+import { AssetType, Size } from "../../baseTypes";
 import { RequestFilterType } from "../../CRUD";
 import {
   AllAvailableEntities,
@@ -121,7 +121,17 @@ export type DrawerAtomType = {
     }
   | {
       type: "entity_preview";
-      data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType };
+      data:
+        | {
+            id: string;
+            parent_id?: string;
+            entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType;
+          }
+        | {
+            id: string;
+            entity_type: "images";
+            image_type: AssetType;
+          };
     }
   | { type: "invite_to_project" | null; data: null }
   | { type: "webhooks"; data: { id?: string } }

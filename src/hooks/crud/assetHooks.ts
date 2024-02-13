@@ -118,7 +118,15 @@ export function useGetImages<InsertType>(
 
   return res;
 }
-
+export function useGetImage<InsertType>(id: string, project_id: string, type: AssetType, request: RequestBodyType<InsertType>) {
+  return useQuery<{ data: ImageType }, unknown>([type, id, project_id], async () =>
+    FetchFunction({
+      method: "POST",
+      body: JSON.stringify(request),
+      url: `${baseURLS.baseServer}/assets/${project_id}/${type}/${id}`,
+    }),
+  );
+}
 export function useUpdateImage<InsertType extends { data: { title: string } }>(
   id: string,
   project_id: string | undefined,

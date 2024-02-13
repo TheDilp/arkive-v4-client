@@ -36,7 +36,10 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
                       setDrawer((prev) => ({
                         ...prev,
                         title: "Preview",
-                        data: { id: item.id, parent_id: item.parent_id, entity_type: item.type as AvailableEntityType },
+                        data:
+                          item.type === "images"
+                            ? { id: item.id, entity_type: "images", image_type: "images" }
+                            : { id: item.id, parent_id: item.parent_id, entity_type: item.type as AvailableEntityType },
                         type: "entity_preview",
                         size: "half",
                       }));

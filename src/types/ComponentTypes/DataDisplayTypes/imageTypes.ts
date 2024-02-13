@@ -1,11 +1,12 @@
-import { AssetType, BaseComponentType } from "../../baseTypes";
+import { AssetType } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
-export interface ImageComponentType extends BaseComponentType {
+export interface ImageComponentType {
   image: ImageType;
   isOpenable?: boolean;
   hasTitle?: boolean;
   isLazyLoading?: boolean;
   url?: string;
+  objectFit?: "cover" | "contain";
   type: AssetType;
 }
