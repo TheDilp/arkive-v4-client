@@ -13,6 +13,10 @@ export function getEntityLink(
   if (name === "blueprint_instances") {
     return `/${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
+  if (name === "images") {
+    return `/${linkRoot}/${project_id}/assets`;
+  }
+
   let link_type = "";
   if (name === "alter_names") link_type = "documents";
   if (name === "words") link_type = "dictionaries";
@@ -22,7 +26,6 @@ export function getEntityLink(
   if (name === "documents" || name === "maps" || name === "calendars" || name === "dictionaries" || name === "blueprints")
     link_type = name;
   if (link_type) return `/${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
-
   return "#";
 }
 

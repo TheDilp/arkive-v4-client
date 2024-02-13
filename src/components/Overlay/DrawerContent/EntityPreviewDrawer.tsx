@@ -127,7 +127,13 @@ export function EntityPreviewDrawer({
   data,
 }: {
   isPublic?: boolean;
-  data: { id: string; parent_id?: string; entity_type: AvailableEntityType | AvailableSubEntityType; image_type?: AssetType };
+  data:
+    | { id: string; parent_id?: string; entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType }
+    | {
+        id: string;
+        entity_type: "images";
+        image_type?: AssetType;
+      };
 }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
@@ -135,15 +141,21 @@ export function EntityPreviewDrawer({
     <DrawerLayout>
       <div className="flex-1 overflow-y-auto">
         {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
-        {data.entity_type === "blueprint_instances" ? <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
+        {data.entity_type === "blueprint_instances" && "parent_id" in data ? (
+          <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} />
+        ) : null}
         {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
-        {data.entity_type === "map_pins" ? <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} /> : null}
+        {data.entity_type === "map_pins" && "parent_id" in data ? (
+          <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} />
+        ) : null}
         {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
-        {data.entity_type === "events" ? <EventPreviewDrawer id={data.id} parent_id={data.parent_id} /> : null}
-        {data.entity_type === "images" && data?.image_type ? (
+        {data.entity_type === "events" && "parent_id" in data ? (
+          <EventPreviewDrawer id={data.id} parent_id={data.parent_id} />
+        ) : null}
+        {data.entity_type === "images" && "image_type" in data && data?.image_type ? (
           <ImagePreviewDrawer id={data.id} project_id={project_id as string} type={data.image_type} />
         ) : null}
       </div>
@@ -151,8 +163,17 @@ export function EntityPreviewDrawer({
         <div className="">
           <Button
             icon={IconEnum.edit}
-            label={`Edit ${getSingularEntityType(data.entity_type).toLowerCase()}`}
-            onClick={() => navigate(getEntityLink(project_id as string, data.entity_type, data.id, data.parent_id))}
+            label={`Edit ${getSingularEntityType(data.entity_type as AvailableEntityType).toLowerCase()}`}
+            onClick={() =>
+              navigate(
+                getEntityLink(
+                  project_id as string,
+                  data.entity_type as AvailableEntityType,
+                  data.id,
+                  "parent_id" in data ? data?.parent_id || "" : "",
+                ),
+              )
+            }
             variant="info"
           />
         </div>
