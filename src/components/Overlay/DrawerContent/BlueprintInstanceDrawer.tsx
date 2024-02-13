@@ -409,7 +409,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       ) : null}
       {selectedTab === 1 ? (
         <div>
-          <TagInput handleChange={handleChange} isMultiple tags={instance?.tags || []} />
+          <TagInput handleChange={handleChange} tags={instance?.tags || []} />
         </div>
       ) : null}
       <div className="mt-auto w-full">
