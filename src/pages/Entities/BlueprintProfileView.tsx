@@ -36,6 +36,8 @@ const tabs = [
   //   { id: "4", label: "Conversations", icon: IconEnum.conversation },
 ];
 
+const tooltipFields = ["text", "number"];
+
 function RandomTableField({
   random_table_id,
   random_table_option_id,
@@ -178,133 +180,138 @@ function AdditionalFieldDisplay({
   const { project_id } = useParams();
   const fieldClasses = fieldSizeClass({ type: blueprint_field.field_type || "text", isPreview });
   return (
-    <div className={fieldClasses}>
-      {blueprint_field.field_type === "text" ||
-      blueprint_field.field_type === "number" ||
-      blueprint_field.field_type === "dice_roll" ? (
-        <Input
-          isReadOnly
-          label={blueprint_field.title}
-          name={blueprint_field.title}
-          onChange={() => {}}
-          value={(value as string | number | null) || ""}
-        />
-      ) : null}
-      {blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple" ? (
-        <Input
-          isReadOnly
-          label={blueprint_field.title}
-          name={blueprint_field.title}
-          onChange={() => {}}
-          value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
-        />
-      ) : null}
-      {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
-        <>
-          <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
-          <div className="rounded-md border border-zinc-700 bg-zinc-900">
-            <StaticRender content={(value || {}) as any} />
-          </div>
-        </>
-      ) : null}
-      {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
+    <Tooltip
+      allowedPlacements={["top", "bottom"]}
+      content={blueprint_field_data.value as string}
+      isDisabled={!tooltipFields.includes(blueprint_field.field_type)}>
+      <div className={fieldClasses}>
+        {blueprint_field.field_type === "text" ||
+        blueprint_field.field_type === "number" ||
+        blueprint_field.field_type === "dice_roll" ? (
+          <Input
+            isReadOnly
+            label={blueprint_field.title}
+            name={blueprint_field.title}
+            onChange={() => {}}
+            value={(value as string | number | null) || ""}
+          />
+        ) : null}
+        {blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple" ? (
+          <Input
+            isReadOnly
+            label={blueprint_field.title}
+            name={blueprint_field.title}
+            onChange={() => {}}
+            value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
+          />
+        ) : null}
+        {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
+          <>
+            <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
+            <div className="rounded-md border border-zinc-700 bg-zinc-900">
+              <StaticRender content={(value || {}) as any} />
+            </div>
+          </>
+        ) : null}
+        {blueprint_field.field_type === "date" ? <DateField field={blueprint_field} fieldData={blueprint_field_data} /> : null}
 
-      {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
-        <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
-            field_label={blueprint_field.title}
-            items={(blueprint_field_data.characters || []).map((char) => ({
-              id: char.related_id,
-              title: char.character.full_name || "",
-              image_id: char.character.portrait_id,
-              type: "characters",
-              link: `/projects/${project_id}/characters/${char.related_id}/resources`,
+        {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
+          <div className="grid w-full grid-cols-6 gap-1 truncate">
+            <CarouselEntityPreview
+              field_label={blueprint_field.title}
+              items={(blueprint_field_data.characters || []).map((char) => ({
+                id: char.related_id,
+                title: char.character.full_name || "",
+                image_id: char.character.portrait_id,
+                type: "characters",
+                link: `/projects/${project_id}/characters/${char.related_id}/resources`,
+              }))}
+            />
+          </div>
+        ) : null}
+        {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
+          <div className="w-full">
+            <CarouselEntityPreview
+              field_label={blueprint_field.title}
+              items={(blueprint_field_data.blueprint_instances || []).map((blueprint_instance) => ({
+                id: blueprint_instance.blueprint_instance.id,
+                parent_id: blueprint_instance.blueprint_instance.parent_id,
+                title: blueprint_instance.blueprint_instance.title || "",
+                icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
+                type: "blueprint_instances",
+                link: `/projects/${project_id}/blueprints/${blueprint_instance.blueprint_instance.parent_id}/${blueprint_instance.related_id}`,
+              }))}
+            />
+          </div>
+        ) : null}
+        {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
+          <div className="w-full">
+            <CarouselEntityPreview
+              field_label={blueprint_field.title}
+              items={(blueprint_field_data.documents || []).map((doc) => ({
+                id: doc.related_id,
+                title: doc.document.title,
+                icon: doc.document.icon || IconEnum.document,
+                type: "documents",
+                link: `/projects/${project_id}/documents/${doc.related_id}`,
+              }))}
+            />
+          </div>
+        ) : null}
+        {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
+          <div className="w-full">
+            <CarouselEntityPreview
+              field_label={blueprint_field.title}
+              items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
+                id: map_pin.map_pin.id,
+                parent_id: map_pin.map_pin.parent_id,
+                title: map_pin.map_pin.title || "",
+                icon: map_pin.map_pin.icon || IconEnum.document,
+                type: "map_pins",
+                link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
+              }))}
+            />
+          </div>
+        ) : null}
+        {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
+          <div className="w-full">
+            <CarouselEntityPreview
+              field_label={blueprint_field.title}
+              items={[
+                {
+                  id: blueprint_field_data.images[0].related_id as string,
+                  image_id: blueprint_field_data?.images?.[0].image.id,
+                  title: blueprint_field_data?.images?.[0].image.title,
+                  label: blueprint_field.title,
+                  type: "images",
+                },
+              ]}
+            />
+          </div>
+        ) : null}
+        {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
+          <Gallery
+            columns={6}
+            images={blueprint_field_data.images.map((img) => ({
+              id: img.image.id,
+              title: img.image.title,
+              project_id: project_id as string,
+              type: "images",
             }))}
+            isOpenable
+            type="images"
           />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
-        <div className="w-full">
-          <CarouselEntityPreview
-            field_label={blueprint_field.title}
-            items={(blueprint_field_data.blueprint_instances || []).map((blueprint_instance) => ({
-              id: blueprint_instance.blueprint_instance.id,
-              parent_id: blueprint_instance.blueprint_instance.parent_id,
-              title: blueprint_instance.blueprint_instance.title || "",
-              icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
-              type: "blueprint_instances",
-              link: `/projects/${project_id}/blueprints/${blueprint_instance.blueprint_instance.parent_id}/${blueprint_instance.related_id}`,
-            }))}
+        ) : null}
+        {blueprint_field.field_type === "random_table" ? (
+          <RandomTableField
+            random_table_id={blueprint_field_data?.random_table?.related_id}
+            random_table_option_id={blueprint_field_data?.random_table?.option_id as string | undefined}
+            suboptionValue={blueprint_field_data?.random_table?.suboption_id}
+            title={blueprint_field.title}
           />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
-        <div className="w-full">
-          <CarouselEntityPreview
-            field_label={blueprint_field.title}
-            items={(blueprint_field_data.documents || []).map((doc) => ({
-              id: doc.related_id,
-              title: doc.document.title,
-              icon: doc.document.icon || IconEnum.document,
-              type: "documents",
-              link: `/projects/${project_id}/documents/${doc.related_id}`,
-            }))}
-          />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
-        <div className="w-full">
-          <CarouselEntityPreview
-            field_label={blueprint_field.title}
-            items={(blueprint_field_data.map_pins || []).map((map_pin) => ({
-              id: map_pin.map_pin.id,
-              parent_id: map_pin.map_pin.parent_id,
-              title: map_pin.map_pin.title || "",
-              icon: map_pin.map_pin.icon || IconEnum.document,
-              type: "map_pins",
-              link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
-            }))}
-          />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0] ? (
-        <div className="w-full">
-          <CarouselEntityPreview
-            field_label={blueprint_field.title}
-            items={[
-              {
-                id: blueprint_field_data.images[0].related_id as string,
-                image_id: blueprint_field_data?.images?.[0].image.id,
-                title: blueprint_field_data?.images?.[0].image.title,
-                label: blueprint_field.title,
-                type: "images",
-              },
-            ]}
-          />
-        </div>
-      ) : null}
-      {blueprint_field.field_type === "images_multiple" && blueprint_field_data?.images?.length ? (
-        <Gallery
-          columns={6}
-          images={blueprint_field_data.images.map((img) => ({
-            id: img.image.id,
-            title: img.image.title,
-            project_id: project_id as string,
-            type: "images",
-          }))}
-          isOpenable
-          type="images"
-        />
-      ) : null}
-      {blueprint_field.field_type === "random_table" ? (
-        <RandomTableField
-          random_table_id={blueprint_field_data?.random_table?.related_id}
-          random_table_option_id={blueprint_field_data?.random_table?.option_id as string | undefined}
-          suboptionValue={blueprint_field_data?.random_table?.suboption_id}
-          title={blueprint_field.title}
-        />
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </Tooltip>
   );
 }
 
