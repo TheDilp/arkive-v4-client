@@ -15,7 +15,7 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   return (
-    <>
+    <div className="flex flex-col">
       <span className="col-span-6 text-sm text-zinc-200">{field_label}</span>
       {items.length === 0 ? (
         <div className="overflow-hidden [&>div>div:nth-child(2)]:truncate">
@@ -48,6 +48,6 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
           />
         </div>
       ))}
-    </>
+    </div>
   );
 }
