@@ -13,14 +13,13 @@ import { Tabs } from "../../Layout";
 const ImageUploadClasses = tv({
   slots: {
     imageUploadContainer: "sticky top-0 bg-zinc-700",
-    imagesList: "grid grid-cols-2 gap-2 overflow-y-auto",
+    imagesList: "grid grid-cols-2 gap-2 overflow-y-auto items-start",
   },
   variants: {
     size: {
       lg: {
         base: "h-[40rem] lg:w-[50rem] w-full",
         imageUploadContainer: "h-[15rem] max-h-[15rem]",
-        imagesList: "min-h-[10rem]",
       },
     },
   },
@@ -42,8 +41,9 @@ export function ImageUploadDialog({ size }: { size: Size }) {
   const [images, setImages] = useState<File[]>([]);
   const [mapImages, setMapImages] = useState<File[]>([]);
 
-  const imageUrls = getPreviewImageURLs(images);
-  const mapImageUrls = getPreviewImageURLs(mapImages);
+  const imageUrls = images.length ? getPreviewImageURLs(images) : [];
+  const mapImageUrls = mapImages.length ? getPreviewImageURLs(mapImages) : [];
+
   return (
     <div className="flex h-full flex-col justify-start gap-y-2 overflow-hidden p-2">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -56,8 +56,7 @@ export function ImageUploadDialog({ size }: { size: Size }) {
               <ImagePreview
                 key={`${img.name}${img.url}`}
                 clearAction={(name) => {
-                  if (selectedTab) setImages((prev) => prev.filter((f) => f.name !== name));
-                  else setMapImages((prev) => prev.filter((f) => f.name !== name));
+                  setImages((prev) => prev.filter((f) => f.name !== name));
                 }}
                 id={img.name}
                 title={img.name}
@@ -70,8 +69,7 @@ export function ImageUploadDialog({ size }: { size: Size }) {
               <ImagePreview
                 key={`${img.name}${img.url}`}
                 clearAction={(name) => {
-                  if (selectedTab) setImages((prev) => prev.filter((f) => f.name !== name));
-                  else setMapImages((prev) => prev.filter((f) => f.name !== name));
+                  setMapImages((prev) => prev.filter((f) => f.name !== name));
                 }}
                 id={img.name}
                 title={img.name}
