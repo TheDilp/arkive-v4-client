@@ -180,6 +180,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                       parent_id: item_id as string,
                       x: parseFloat(evt.position.x.toFixed(2)),
                       y: parseFloat(evt.position.y.toFixed(2)),
+                      type: existingGraphData?.data?.default_node_shape || "rectangle",
                     },
                   });
                 },
@@ -554,6 +555,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
             parent_id: item_id as string,
             x: parseFloat(evt.position.x.toFixed(2)),
             y: parseFloat(evt.position.y.toFixed(2)),
+            type: existingGraphData?.data?.default_node_shape || "rectangle",
             background_color: existingGraphData?.data?.default_node_color || DefaultNode.background_color,
           },
         });
