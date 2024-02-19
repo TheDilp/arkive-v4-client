@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
-import { Dialog, Drawer } from "../../components";
+import { Avatar, Dialog, Drawer } from "../../components";
+import { getImageURL } from "../../utils";
 import { PublicNavbar } from "./PublicNavbar";
 
 export function PublicLayout() {
@@ -19,10 +20,24 @@ export function PublicLayout() {
   );
 }
 
-export function PublicEntityLayout({ hasImage, title, children }: { title: string; hasImage?: boolean; children: ReactNode }) {
+export function PublicEntityLayout({
+  image_id,
+  title,
+  children,
+}: {
+  title: string;
+  image_id?: string | null | undefined;
+  children: ReactNode;
+}) {
+  const { project_id } = useParams();
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-y-2 overflow-hidden">
-      {title ? <h2 className={`${hasImage ? "ml-20" : ""} px-4 pt-2 font-lato text-3xl`}>{title}</h2> : null}
+      {title ? (
+        <h2 className="flex flex-nowrap items-start gap-x-4 px-4 pt-2 font-lato text-3xl">
+          {image_id ? <Avatar hasShowImage image={getImageURL(project_id as string, "images", image_id)} size="2xl" /> : null}
+          <span>{title}</span>
+        </h2>
+      ) : null}
       {children}
     </div>
   );
