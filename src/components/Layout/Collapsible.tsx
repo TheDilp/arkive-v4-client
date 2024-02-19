@@ -11,8 +11,17 @@ import { Button, Icon } from "..";
 const CollapsibleClasses = tv({
   slots: {
     label: "flex select-none items-center gap-x-2",
+    summary: "cursor-pointer flex items-center gap-x-2 border-b border-zinc-700 pb-1 font-lato",
   },
   variants: {
+    isDisabled: {
+      true: {
+        summary: "cursor-not-allowed text-zinc-600",
+      },
+      false: {
+        summary: "cursor-pointer",
+      },
+    },
     size: {
       md: {
         label: "text-base",
@@ -27,18 +36,19 @@ const CollapsibleClasses = tv({
   },
 });
 
-export function Collapsible({ label, icon, initialOpen, children, actions, size = "xl" }: CollapsibleType) {
-  const { label: labelClasses } = CollapsibleClasses({ size });
+export function Collapsible({ label, icon, initialOpen, isDisabled, children, actions, size = "xl" }: CollapsibleType) {
+  const { label: labelClasses, summary: summaryClasses } = CollapsibleClasses({ size, isDisabled });
   const [open, setOpen] = useState<boolean>(initialOpen ?? false);
   return (
     <details
       className="cursor-default select-none"
       onClick={(e) => {
         e.preventDefault();
+        if (isDisabled) return;
         setOpen((prev) => !prev);
       }}
       open={open}>
-      <summary className="flex cursor-pointer items-center gap-x-2 border-b border-zinc-700 pb-1 font-lato">
+      <summary className={summaryClasses()}>
         <span className={labelClasses()}>
           {icon ? (
             <span className="no-rotate">
