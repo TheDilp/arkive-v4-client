@@ -9,7 +9,7 @@ import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities
 import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
 import { ProjectsView } from "./pages/Projects";
 import { Dashboard } from "./pages/Projects/Dashboard";
-import { PublicEntitiesView } from "./pages/Public";
+import { PublicEntitiesView, PublicListView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
 
 const queryClient = new QueryClient({
@@ -73,7 +73,7 @@ export default function App() {
             <Route path="public/*">
               {/* <Route path="*" /> */}
               <Route element={<PublicLayout />} path=":project_id/*">
-                <Route path=":type" />
+                <Route element={<PublicListView />} path=":type" />
                 <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
                 <Route element={<PublicEntitiesView />} path=":type/:item_id/:subitem_id" />
               </Route>

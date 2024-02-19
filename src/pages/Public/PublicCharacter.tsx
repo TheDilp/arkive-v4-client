@@ -59,7 +59,7 @@ export function PublicCharacter() {
           <p>TEXT ABOUT THE CHAR</p>
         </div> */}
         <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.image} label="Images">
+          <Collapsible icon={IconEnum.image} isDisabled={!character?.data?.images?.length} label="Images">
             <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
           </Collapsible>
         </div>

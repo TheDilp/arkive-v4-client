@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
@@ -41,12 +41,14 @@ export function PublicNavbar() {
           <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
-              <li>Characters</li>
-              <li>Blueprints</li>
-              <li>Documents</li>
-              <li>Maps</li>
-              <li>Graphs</li>
-              <li>Dictionaries</li>
+              <li className="hover:text-blue-400">
+                <Link to={`/public/${project_id}/characters`}>Characters</Link>
+              </li>
+              <li className="hover:text-blue-400">Blueprints</li>
+              <li className="hover:text-blue-400">Documents</li>
+              <li className="hover:text-blue-400">Maps</li>
+              <li className="hover:text-blue-400">Graphs</li>
+              <li className="hover:text-blue-400">Dictionaries</li>
             </ul>
           </nav>
         </div>
