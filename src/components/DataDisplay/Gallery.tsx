@@ -52,7 +52,10 @@ const GalleryClasses = tv({
 
 function getRowSize(size: Size): number {
   if (size === "md") return 12;
-  if (size === "2xl") return 36;
+  if (size === "lg") return 18;
+  if (size === "xl") return 22;
+  if (size === "2xl") return 28;
+  if (size === "3xl") return 34;
   return 12;
 }
 
