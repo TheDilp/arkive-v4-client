@@ -41,19 +41,41 @@ export function PublicNavbar() {
           <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
-              <li className="hover:text-blue-400">
-                <Link to={`/public/${project_id}/characters`}>Characters</Link>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/characters`}>
+                  Characters
+                </Link>
               </li>
-              <li className="hover:text-blue-400">Blueprints</li>
-              <li className="hover:text-blue-400">Documents</li>
-              <li className="hover:text-blue-400">Maps</li>
-              <li className="hover:text-blue-400">Graphs</li>
-              <li className="hover:text-blue-400">Dictionaries</li>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/blueprints`}>
+                  Blueprints
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/documents`}>
+                  Documents
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/maps`}>
+                  Maps
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/graphs`}>
+                  Graphs
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-blue-400" to={`/public/${project_id}/dictionaries`}>
+                  Dictionaries
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
       </div>
-      <div className="relative mb-2 mt-auto h-8 min-h-[2rem]">
+      <div className="relative mb-2 mt-auto h-8 min-h-[2rem] w-56">
         {typeof search === "string" ? (
           <Search
             hasNoBackground
