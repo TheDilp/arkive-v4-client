@@ -186,9 +186,8 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       orderBy,
     },
     "words",
-    { enabled: !!data?.data && !isInitialLoading && !isPublic },
+    { enabled: !!data?.data && !isInitialLoading && !isPublic, isPublic },
   );
-
   useLayoutEffect(() => {
     if (!filter) {
       dispatch({
@@ -220,8 +219,10 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
+        {isPublic ? <h2 className="flex-1 font-lato text-3xl">{data?.data?.title || ""}</h2> : null}
         <div className="w-48">
           <Input
+            isClearable
             name="quick_filter"
             onChange={({ value }) => setFilter(value as string)}
             placeholder={`Search by ${filterType}`}
@@ -231,9 +232,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
         <div className="w-40">
           <Select
             name="filterType"
-            onChange={({ value }) => {
-              setFilterType(value as FilterType);
-            }}
+            onChange={({ value }) => setFilterType(value as FilterType)}
             options={[
               { label: "Title", value: "title", icon: IconEnum.word },
               { label: "Translation", value: "translation", icon: IconEnum.dictionary },
