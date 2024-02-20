@@ -4,7 +4,7 @@ import { Icon } from ".";
 
 function TableRow() {
   return (
-    <div className="flex h-12 w-full items-center gap-x-4">
+    <div className="flex h-[3.04rem] w-full items-center gap-x-4">
       <div className="ml-2 h-6 w-6 min-w-[1.5rem] rounded-md bg-zinc-700" />
       <div className="h-4 w-full rounded bg-zinc-700" />
       <div className="flex w-20 justify-center">
@@ -17,9 +17,9 @@ function TableRow() {
 function TableSkeleton({ limit = 10 }: { limit?: number }) {
   return (
     <div className="flex max-h-full animate-pulse flex-col ">
-      {/* <div className="mb-4 flex max-h-12  w-full items-center gap-x-4 border border-zinc-700 px-2 py-4">
+      {/* <div className="flex items-center w-full px-2 py-4 mb-4 border max-h-12 gap-x-4 border-zinc-700">
         <div className="h-6 w-6 min-w-[1.5rem] rounded-md bg-zinc-700" />
-        <div className="h-6 w-full rounded bg-zinc-700" />
+        <div className="w-full h-6 rounded bg-zinc-700" />
       </div> */}
       <div className="border-rounded flex flex-col divide-y divide-zinc-700 rounded border border-zinc-700">
         {[...Array(limit).keys()].map((key) => (
@@ -108,7 +108,7 @@ function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "ent
     <div className="grid h-full w-full animate-pulse grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
       {[...Array(limit).keys()].map((key) => (
         <div key={key} className="col-span-1 flex flex-col items-center">
-          {/* <div className="h-24 w-24"> */}
+          {/* <div className="w-24 h-24"> */}
           <Icon color="darkgrey" fontSize={100} icon={getDefaultEntityIcon(entity_type as AvailableEntityType)} />
           <div className="h-4 min-h-[0.125rem] w-full rounded bg-zinc-700" />
         </div>
