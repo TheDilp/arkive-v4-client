@@ -1,14 +1,23 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, createColumnHelper, Input, Table } from "../../components";
+import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
 import { useGetEntities, useTable } from "../../hooks";
-import { CharacterType } from "../../types";
-import { getAvatarInitials, getCharacterFullName, getEntityLink, getImageURL } from "../../utils";
+import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
+import {
+  getAvatarInitials,
+  getCharacterFullName,
+  getDefaultEntityIcon,
+  getEntityFields,
+  getEntityLink,
+  getImageURL,
+  IconEnum,
+} from "../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
+const columnHelper = createColumnHelper<BaseEntityType>();
 
-function createColumns(project_id: string) {
+function characterColumns(project_id: string) {
   return [
     characterColumnHelper.display({
       id: "portrait_id",
@@ -51,6 +60,47 @@ function createColumns(project_id: string) {
         sortable: true,
       },
       minSize: 12,
+    }),
+  ];
+}
+function columns(
+  entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+  project_id: string,
+) {
+  return [
+    columnHelper.display({
+      id: "is_folder",
+      header: "",
+      cell: ({ row }) =>
+        "image_id" in row.original && row.original?.image_id ? (
+          <Avatar
+            image={getImageURL(
+              project_id,
+              entityType === "maps" ? "map_images" : "images",
+              (row.original?.image_id as string) || "",
+            )}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
+        ) : (
+          <Icon
+            fontSize={24}
+            icon={row.original.is_folder ? IconEnum.folder : row.original.icon || getDefaultEntityIcon(entityType)}
+          />
+        ),
+      maxSize: 3.25,
+      minSize: 3.25,
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+    }),
+    columnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => <div className="truncate ">{row.original.title}</div>,
+      size: 15,
     }),
   ];
 }
@@ -126,7 +176,7 @@ function PublicCharacterList() {
         />
       </div>
       <Table
-        columns={createColumns(project_id as string)}
+        columns={characterColumns(project_id as string)}
         config={{
           orderBy,
           filters,
@@ -142,8 +192,76 @@ function PublicCharacterList() {
   );
 }
 
+function PublicEntitiesList({ type }: { type: "documents" }) {
+  const { project_id } = useParams();
+
+  const [, dispatch] = useTable({ selection: [] });
+
+  const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
+    {
+      pagination: {
+        limit: 10,
+        page: 0,
+      },
+      data: {
+        project_id,
+      },
+      filters: {
+        or: [
+          {
+            id: "folder",
+            header_name: "Folder",
+            field: "is_folder",
+            operator: "is",
+            value: null,
+          },
+          {
+            id: "folder2",
+            header_name: "Folder2",
+            field: "is_folder",
+            operator: "eq",
+            value: false,
+          },
+        ],
+      },
+      // @ts-ignore
+      fields: getEntityFields(type as AvailableEntityType),
+      orderBy: [
+        {
+          field: "title",
+          sort: "asc",
+        },
+      ],
+    },
+    type as AvailableEntityType,
+    {
+      isPublic: true,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  return (
+    <div className="h-full w-full p-2">
+      <Table
+        key={type}
+        columns={columns(
+          type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+          project_id as string,
+        )}
+        config={{
+          getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null, true),
+        }}
+        data={base?.data || []}
+        dispatch={dispatch}
+        isLoading={isInitialLoading}
+        type={type as AvailableEntityType}
+      />
+    </div>
+  );
+}
+
 export function PublicListView() {
   const { type } = useParams();
   if (type === "characters") return <PublicCharacterList />;
-  return null;
+  return <PublicEntitiesList type={type as "documents"} />;
 }
