@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { capitalCase } from "remirror";
 
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
 import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
+
+const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "dictionaries"];
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
@@ -12,7 +15,7 @@ export function PublicNavbar() {
     { name: string; result: { id: string; label: string; image?: string; parent_id?: string }[] }[] | null
   >(null);
 
-  const { project_id } = useParams();
+  const { project_id, type } = useParams();
   const { data: project } = useGetEntity<ProjectType>(
     project_id,
     "projects",
@@ -41,36 +44,13 @@ export function PublicNavbar() {
           <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/characters`}>
-                  Characters
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/blueprints`}>
-                  Blueprints
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/documents`}>
-                  Documents
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/maps`}>
-                  Maps
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/graphs`}>
-                  Graphs
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-blue-400" to={`/public/${project_id}/dictionaries`}>
-                  Dictionaries
-                </Link>
-              </li>
+              {navItems.map((item) => (
+                <li key={item} className={item === type ? "text-blue-400" : ""}>
+                  <Link className="hover:text-blue-400" to={`/public/${project_id}/${item}`}>
+                    {capitalCase(item || "")}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -97,8 +77,8 @@ export function PublicNavbar() {
               }),
             )}
             name="search"
-            onChange={({ type, value, parent_id }) => {
-              navigate(getEntityLink(project_id as string, type as string, value, parent_id, true));
+            onChange={({ type: searchType, value, parent_id }) => {
+              navigate(getEntityLink(project_id as string, searchType as string, value, parent_id, true));
               setResults(null);
             }}
             onSearch={(res) => setResults(res)}
