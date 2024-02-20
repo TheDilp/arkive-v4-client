@@ -64,7 +64,7 @@ function characterColumns(project_id: string) {
   ];
 }
 function columns(
-  entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+  entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
   project_id: string,
 ) {
   return [
@@ -192,10 +192,10 @@ function PublicCharacterList() {
   );
 }
 
-function PublicEntitiesList({ type }: { type: "documents" }) {
+function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints" }) {
   const { project_id } = useParams();
 
-  const [, dispatch] = useTable({ selection: [] });
+  const [{ pagination }, dispatch] = useTable({ selection: [], pagination: { limit: 10, page: 0 } });
 
   const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -207,25 +207,28 @@ function PublicEntitiesList({ type }: { type: "documents" }) {
         project_id,
       },
       filters: {
-        or: [
-          {
-            id: "folder",
-            header_name: "Folder",
-            field: "is_folder",
-            operator: "is",
-            value: null,
-          },
-          {
-            id: "folder2",
-            header_name: "Folder2",
-            field: "is_folder",
-            operator: "eq",
-            value: false,
-          },
-        ],
+        or:
+          type === "blueprints"
+            ? []
+            : [
+                {
+                  id: "folder",
+                  header_name: "Folder",
+                  field: "is_folder",
+                  operator: "is",
+                  value: null,
+                },
+                {
+                  id: "folder2",
+                  header_name: "Folder2",
+                  field: "is_folder",
+                  operator: "eq",
+                  value: false,
+                },
+              ],
       },
       // @ts-ignore
-      fields: getEntityFields(type as AvailableEntityType),
+      fields: type === "blueprints" ? ["id", "title"] : getEntityFields(type as AvailableEntityType),
       orderBy: [
         {
           field: "title",
@@ -245,7 +248,7 @@ function PublicEntitiesList({ type }: { type: "documents" }) {
       <Table
         key={type}
         columns={columns(
-          type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+          type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
           project_id as string,
         )}
         config={{
@@ -254,6 +257,7 @@ function PublicEntitiesList({ type }: { type: "documents" }) {
         data={base?.data || []}
         dispatch={dispatch}
         isLoading={isInitialLoading}
+        pagination={pagination}
         type={type as AvailableEntityType}
       />
     </div>
