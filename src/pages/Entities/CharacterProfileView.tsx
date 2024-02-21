@@ -4,6 +4,7 @@ import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { RemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
@@ -103,9 +104,10 @@ type GenerateDocumentType = UseMutateAsyncFunction<
 >;
 
 const tabs = [
-  { id: "1", label: "Resources", icon: IconEnum.document },
-  { id: "2", label: "Relationships", icon: IconEnum.family_tree },
-  { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "0", label: "Biography", icon: IconEnum.biography },
+  { id: "1", label: "Relationships", icon: IconEnum.family_tree },
+  { id: "2", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "3", label: "Resources", icon: IconEnum.document },
   { id: "4", label: "Conversations", icon: IconEnum.conversation },
 ];
 
@@ -1051,7 +1053,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         images: true,
         events: true,
       },
-      fields: ["id", "full_name", "portrait_id", "age", "is_public"],
+      fields: ["id", "full_name", "portrait_id", "age", "biography", "is_public"],
     },
     {
       staleTime: 60 * 1000,
@@ -1093,7 +1095,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       },
     },
     "character_fields_templates",
-    { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
+    { enabled: selectedTab === 3 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
   const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
@@ -1107,7 +1109,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       },
     },
     "conversations",
-    { enabled: selectedTab === 3 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] },
+    { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] },
   );
   function showRelationshipTree() {
     if (existingCharacter?.data)
@@ -1209,7 +1211,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 onClick={() => {
                   setDrawer((prev) => ({
                     ...prev,
-                    size: "lg",
+                    size: "2xl",
                     title: "Edit character",
                     type: "characters",
                     data: { id: id || (item_id as string), project_id: project_id as string },
@@ -1253,14 +1255,15 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
-                tabs={isPublic ? tabs.slice(0, 3) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
+                tabs={isPublic ? tabs.slice(0, 4) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
               />
             </div>
           </div>
         ) : null}
         {!isLoading && !isLg ? (
-          <div className="mb-2 w-full">
+          <div className="mb-2 w-full [&>div>ul>li>button]:bg-black">
             <Tabs
+              hasArrowNav
               onChange={(tab, index) => {
                 if (!isPreview) {
                   navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
@@ -1268,7 +1271,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
-              tabs={isPublic ? tabs.slice(0, 3) : tabs}
+              tabs={isPublic ? tabs.slice(0, 4) : tabs}
             />
           </div>
         ) : null}
@@ -1315,7 +1318,64 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
               </div>
             ) : null}
           </h2>
-          {(isPreview ? selectedTab === 0 : type === "resources") ? (
+          {(isPreview ? selectedTab === 0 : type === "biography") ? (
+            <div className="[&>.staticRendererContainer]:p-0">
+              <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
+            </div>
+          ) : null}
+          {(isPreview ? selectedTab === 1 : type === "relationships") ? (
+            <div className="h-full">
+              {isFetching ? (
+                <div className="pt-10">
+                  <Skeleton limit={5} type="table" />
+                </div>
+              ) : (
+                <div className="h-fit w-full">
+                  <Table
+                    columns={columns}
+                    config={{
+                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
+                      expandable: true,
+                    }}
+                    data={formattedRelationships.toSorted(sortCharactersByName)}
+                    dispatch={dispatch}
+                    type="relationships"
+                  />
+                </div>
+              )}
+            </div>
+          ) : null}
+          {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
+            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
+              {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
+              {(existingTemplates?.data || []).map((t) => {
+                return (
+                  <Collapsible key={t.id} label={t.title}>
+                    <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
+                      {t.character_fields.map((template_field) => {
+                        const characterField = existingCharacter?.data?.character_fields?.find(
+                          (f) => f.id === template_field.id,
+                        );
+                        return (
+                          <AdditionalFieldDisplay
+                            key={template_field.id}
+                            character_field={template_field}
+                            character_field_data={characterField ?? null}
+                            isPreview={!!id}
+                          />
+                        );
+                      })}
+                    </div>
+                  </Collapsible>
+                );
+              })}
+
+              {!isFetchingTemplates && !existingTemplates?.data?.length ? (
+                <Alert label="There are no templates available." variant="info" />
+              ) : null}
+            </ul>
+          ) : null}
+          {(isPreview ? selectedTab === 3 : type === "resources") ? (
             <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
                 actions={
@@ -1492,59 +1552,8 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
               </Collapsible>
             </div>
           ) : null}
-          {(isPreview ? selectedTab === 1 : type === "relationships") ? (
-            <div className="h-full">
-              {isFetching ? (
-                <div className="pt-10">
-                  <Skeleton limit={5} type="table" />
-                </div>
-              ) : (
-                <div className="h-fit w-full">
-                  <Table
-                    columns={columns}
-                    config={{
-                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
-                      expandable: true,
-                    }}
-                    data={formattedRelationships.toSorted(sortCharactersByName)}
-                    dispatch={dispatch}
-                    type="relationships"
-                  />
-                </div>
-              )}
-            </div>
-          ) : null}
-          {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
-            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
-              {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
-              {(existingTemplates?.data || []).map((t) => {
-                return (
-                  <Collapsible key={t.id} label={t.title}>
-                    <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
-                      {t.character_fields.map((template_field) => {
-                        const characterField = existingCharacter?.data?.character_fields?.find(
-                          (f) => f.id === template_field.id,
-                        );
-                        return (
-                          <AdditionalFieldDisplay
-                            key={template_field.id}
-                            character_field={template_field}
-                            character_field_data={characterField ?? null}
-                            isPreview={!!id}
-                          />
-                        );
-                      })}
-                    </div>
-                  </Collapsible>
-                );
-              })}
 
-              {!isFetchingTemplates && !existingTemplates?.data?.length ? (
-                <Alert label="There are no templates available." variant="info" />
-              ) : null}
-            </ul>
-          ) : null}
-          {(isPreview ? selectedTab === 3 : type === "conversations") ? (
+          {(isPreview ? selectedTab === 4 : type === "conversations") ? (
             <div className="flex-1">
               {subitem_id && !isPreview ? null : (
                 <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
