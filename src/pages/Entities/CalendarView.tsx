@@ -285,7 +285,10 @@ export function CalendarView({
     month: ls.get(`calendar_${id || item_id}_month`) ?? 0,
     year: ls.get(`calendar_${id || item_id}_year`) ?? 1,
   });
-  const [range, setRange] = useState<{ start: number; end: number | undefined }>({ start: 0, end: undefined });
+  const [range, setRange] = useState<{ start: number | undefined; end: number | undefined }>({
+    start: undefined,
+    end: undefined,
+  });
   const [view, setView] = useState<"calendar" | "range" | "timeline">(
     isCharacterCalendar ? "range" : ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
   );
@@ -543,10 +546,11 @@ export function CalendarView({
           </>
         ) : null}
 
-        {view === "range" ? (
+        {view === "range" || view === "timeline" ? (
           <>
             <div className="w-32">
               <Input
+                isClearable={view === "timeline"}
                 label="Start"
                 name="start_range"
                 onChange={({ value }) => setRange((prev) => ({ ...prev, start: value as number }))}

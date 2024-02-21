@@ -221,12 +221,12 @@ export function getCalendarFilters(
     return finalFilters;
   }
 
-  if (type === "range" && typeof start_range === "number") {
+  if ((type === "range" || type === "timeline") && typeof start_range === "number") {
     finalFilters.and.push({
       id: "start_range",
       header_name: "Start range",
       field: "start_year",
-      value: start_range || 0,
+      value: start_range,
       operator: "gte" as const,
     });
     if (typeof end_range === "number") {
@@ -239,6 +239,7 @@ export function getCalendarFilters(
       });
     }
   }
+
   if (type === "calendar") {
     finalFilters.or.push(
       {
@@ -270,3 +271,206 @@ export function getCalendarFilterBadges(filters: CalendarFilters) {
   const relationFields = [...new Set(Object.keys(andRelationFiltersByField).concat(Object.keys(orRelationFiltersByField)))];
   return { andFiltersByField, orFiltersByField, andRelationFiltersByField, orRelationFiltersByField, fields, relationFields };
 }
+
+export const timelineZoomOptions = [
+  {
+    label: "2",
+    value: "2",
+  },
+  {
+    label: "4",
+    value: "4",
+  },
+  {
+    label: "6",
+    value: "6",
+  },
+  {
+    label: "8",
+    value: "8",
+  },
+  {
+    label: "10",
+    value: "10",
+  },
+  {
+    label: "12",
+    value: "12",
+  },
+  {
+    label: "14",
+    value: "14",
+  },
+  {
+    label: "16",
+    value: "16",
+  },
+  {
+    label: "18",
+    value: "18",
+  },
+  {
+    label: "20",
+    value: "20",
+  },
+  {
+    label: "22",
+    value: "22",
+  },
+  {
+    label: "24",
+    value: "24",
+  },
+  {
+    label: "26",
+    value: "26",
+  },
+  {
+    label: "28",
+    value: "28",
+  },
+  {
+    label: "30",
+    value: "30",
+  },
+  {
+    label: "32",
+    value: "32",
+  },
+  {
+    label: "34",
+    value: "34",
+  },
+  {
+    label: "36",
+    value: "36",
+  },
+  {
+    label: "38",
+    value: "38",
+  },
+  {
+    label: "40",
+    value: "40",
+  },
+  {
+    label: "42",
+    value: "42",
+  },
+  {
+    label: "44",
+    value: "44",
+  },
+  {
+    label: "46",
+    value: "46",
+  },
+  {
+    label: "48",
+    value: "48",
+  },
+  {
+    label: "50",
+    value: "50",
+  },
+  {
+    label: "52",
+    value: "52",
+  },
+  {
+    label: "54",
+    value: "54",
+  },
+  {
+    label: "56",
+    value: "56",
+  },
+  {
+    label: "58",
+    value: "58",
+  },
+  {
+    label: "60",
+    value: "60",
+  },
+  {
+    label: "62",
+    value: "62",
+  },
+  {
+    label: "64",
+    value: "64",
+  },
+  {
+    label: "66",
+    value: "66",
+  },
+  {
+    label: "68",
+    value: "68",
+  },
+  {
+    label: "70",
+    value: "70",
+  },
+  {
+    label: "72",
+    value: "72",
+  },
+  {
+    label: "74",
+    value: "74",
+  },
+  {
+    label: "76",
+    value: "76",
+  },
+  {
+    label: "78",
+    value: "78",
+  },
+  {
+    label: "80",
+    value: "80",
+  },
+  {
+    label: "82",
+    value: "82",
+  },
+  {
+    label: "84",
+    value: "84",
+  },
+  {
+    label: "86",
+    value: "86",
+  },
+  {
+    label: "88",
+    value: "88",
+  },
+  {
+    label: "90",
+    value: "90",
+  },
+  {
+    label: "92",
+    value: "92",
+  },
+  {
+    label: "94",
+    value: "94",
+  },
+  {
+    label: "96",
+    value: "96",
+  },
+  {
+    label: "98",
+    value: "98",
+  },
+  {
+    label: "100",
+    value: "100",
+  },
+];

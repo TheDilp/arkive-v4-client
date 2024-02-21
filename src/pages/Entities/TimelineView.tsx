@@ -5,10 +5,18 @@ import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useLayoutEffect
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
-import { Button } from "../../components";
+import { Button, Select } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
-import { contextMenuAtom, DefaultTagColor, drawerAtom, getDayOrdinal, IconEnum, userAtom } from "../../utils";
+import {
+  contextMenuAtom,
+  DefaultTagColor,
+  drawerAtom,
+  getDayOrdinal,
+  IconEnum,
+  timelineZoomOptions,
+  userAtom,
+} from "../../utils";
 
 const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 30;
@@ -48,7 +56,7 @@ function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number):
 
 function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
   setZoom((prev) => {
-    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? 2.5 : -2.5) });
+    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? 2 : -2) });
     ls.set(`timeline_${id}_zoom`, newZoom);
     return newZoom;
   });
@@ -127,9 +135,9 @@ export function TimelineView({
         .rangeRound([50, height * 1.05]);
 
       const numOfTicks = Math.floor(
-        (maxYearCount - Math.abs(minYearCount)) / (clamp({ min: 2, max: 1000, value: zoom % 2.5 }) * 2),
+        (maxYearCount - Math.abs(minYearCount)) / (clamp({ min: 2, max: 1000, value: zoom % 2 }) * 2),
       );
-      if (numberOfTicks === 0) {
+      if (numberOfTicks !== numOfTicks) {
         setNumberOfTicks(numOfTicks);
       } else {
         const axisBottom = d3
@@ -481,16 +489,28 @@ export function TimelineView({
   }, [events, zoom, numberOfTicks]);
   return (
     <div ref={timelineLayoutContainer} className="flex h-full flex-col gap-y-2">
-      <div className="flex w-full items-center">
-        <div className="h-8 w-8">
+      <div className="flex w-full items-center gap-x-1">
+        <div className="h-10 w-10 self-end">
           <Button
             icon={IconEnum.remove}
             isDisabled={zoom === 2}
             onClick={() => changeZoom("out", setZoom, item_id as string)}
           />
         </div>
-        <div className="h-8 w-8">
+        <div className="h-10 w-10 self-end">
           <Button icon={IconEnum.add} isDisabled={zoom === 100} onClick={() => changeZoom("in", setZoom, item_id as string)} />
+        </div>
+        <div className="w-20">
+          <Select
+            label="Zoom"
+            name="zoom"
+            onChange={({ value }) => {
+              setZoom(Number(value || 2));
+              ls.set(`timeline_${id}_zoom`, Number(value || 2));
+            }}
+            options={timelineZoomOptions}
+            value={zoom.toString()}
+          />
         </div>
       </div>
       <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-auto">
