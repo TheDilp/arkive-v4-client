@@ -13,7 +13,7 @@ export function PublicEntitiesView() {
   if (type === "graphs") return <PublicGraph />;
   if (type === "calendars")
     return (
-      <div className="p-2">
+      <div className="h-full p-2">
         <PublicCalendar />
       </div>
     );
