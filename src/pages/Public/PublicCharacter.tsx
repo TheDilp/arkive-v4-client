@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-import { Collapsible, EntityPreview, Gallery, Skeleton, Tabs } from "../../components";
+import { Alert, Collapsible, EntityPreview, Gallery, Skeleton, StaticRender, Tabs } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { CharacterType } from "../../types";
 import { getEntityLink, IconEnum } from "../../utils";
@@ -41,7 +41,7 @@ export function PublicCharacter() {
         images: true,
         tags: true,
       },
-      fields: ["id", "full_name", "portrait_id", "age", "is_public"],
+      fields: ["id", "full_name", "portrait_id", "age", "biography", "is_public"],
     },
     {
       staleTime: 60 * 1000,
@@ -55,12 +55,22 @@ export function PublicCharacter() {
   return (
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>
       <div className="flex h-full flex-1 flex-col gap-y-2 px-2">
-        {/* <div className="">
-          <p>TEXT ABOUT THE CHAR</p>
-        </div> */}
         <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.image} isDisabled={!character?.data?.images?.length} label="Images">
-            <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
+          <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
+            {character?.data?.biography ? (
+              <StaticRender content={character?.data?.biography ?? undefined} />
+            ) : (
+              <Alert label="Nothing has been written yet." />
+            )}
+          </Collapsible>
+        </div>
+        <div className="flex flex-col px-2">
+          <Collapsible icon={IconEnum.image} label="Images">
+            {character?.data?.images?.length ? (
+              <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
+            ) : (
+              <Alert label="This character has no public images available." />
+            )}
           </Collapsible>
         </div>
         <div className="flex flex-col px-2">

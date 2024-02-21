@@ -1,3 +1,5 @@
+import { RemirrorJSON } from "remirror";
+
 import {
   BlueprintInstanceType,
   CharacterLocationType,
@@ -105,7 +107,7 @@ export interface CharacterType {
   last_name?: string | null;
   nickname?: string | null;
   full_name: string;
-  biography: string | null;
+  biography: RemirrorJSON | null;
   images?: ImageType[];
   portrait_id?: string | null;
   portrait?: ImageType;
