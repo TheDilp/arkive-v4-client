@@ -3,8 +3,9 @@ import { z } from "zod";
 export const InsertCharacterSchema = z.object({
   data: z.object({
     first_name: z.string(),
-    project_id: z.string(),
     last_name: z.string().nullable().optional(),
+    biography: z.string().nullable().optional(),
+    project_id: z.string(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     portrait_id: z
@@ -75,6 +76,7 @@ export const UpdateCharacterSchema = z.object({
     id: z.string().optional(),
     first_name: z.string().optional(),
     last_name: z.string().nullable().optional(),
+    biography: z.string().nullable().optional(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),

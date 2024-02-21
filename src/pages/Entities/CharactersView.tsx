@@ -404,7 +404,7 @@ export function CharactersView() {
                 data: { project_id },
                 title: "Create new character",
                 type: "characters",
-                size: "lg",
+                size: "2xl",
               }))
             }
             tooltip={isMd ? undefined : "Create new character"}

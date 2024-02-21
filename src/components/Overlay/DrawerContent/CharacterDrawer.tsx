@@ -20,6 +20,7 @@ import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, Upda
 import {
   DrawerLayout,
   Dropdown,
+  Editor,
   EntityPreview,
   ImagePreview,
   Skeleton,
@@ -344,9 +345,10 @@ export function AdditionalFieldsTab({
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Relationships", icon: IconEnum.family_tree },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-  { id: "4", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "2", label: "Biography", icon: IconEnum.biography },
+  { id: "3", label: "Relationships", icon: IconEnum.family_tree },
+  { id: "4", label: "Tags", icon: IconEnum.tags },
+  { id: "5", label: "Additional fields", icon: IconEnum.additional_fields },
 ];
 
 export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
@@ -437,6 +439,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       setCharacter({
         id: "",
         first_name: "",
+        biography: null,
         full_name: "",
         project_id: project_id as string,
         character_fields: [],
@@ -448,7 +451,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {selectedTab === 0 ? (
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
@@ -503,6 +506,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         </>
       ) : null}
       {selectedTab === 1 ? (
+        <Editor initialContent={character?.biography || undefined} name="biography" onChange={handleChange} />
+      ) : null}
+      {selectedTab === 2 ? (
         <div className="flex flex-col gap-y-2 p-2">
           <div className="flex flex-nowrap items-center justify-between">
             <span>Insert new type:</span>
@@ -710,12 +716,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           )}
         </div>
       ) : null}
-      {selectedTab === 2 ? (
+      {selectedTab === 3 ? (
         <div className="flex flex-col gap-y-2">
           <TagInput handleChange={handleChange} tags={character?.tags || []} />
         </div>
       ) : null}
-      {selectedTab === 3 ? (
+      {selectedTab === 4 ? (
         <AdditionalFieldsTab
           character_fields={character?.character_fields || []}
           handleChange={handleChange}

@@ -105,6 +105,7 @@ export interface CharacterType {
   last_name?: string | null;
   nickname?: string | null;
   full_name: string;
+  biography: string | null;
   images?: ImageType[];
   portrait_id?: string | null;
   portrait?: ImageType;
