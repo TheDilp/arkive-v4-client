@@ -6,9 +6,12 @@
 }
 
 .editor-component {
-  @apply h-full  max-h-[30rem] overflow-auto;
+  @apply h-full max-h-[30rem] overflow-auto transition-colors duration-200;
   .remirror-editor.ProseMirror {
     @apply overflow-hidden !important;
+  }
+  &:has(*:focus) {
+    @apply bg-zinc-800;
   }
 }
 
