@@ -154,7 +154,7 @@ function PublicCharacterList() {
             },
           });
         }
-      }, 750);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);

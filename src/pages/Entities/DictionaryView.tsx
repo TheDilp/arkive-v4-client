@@ -208,7 +208,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
             },
           });
         }
-      }, 750);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);
