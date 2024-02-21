@@ -7,7 +7,7 @@ import { useGetEntity } from "../../hooks";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
 import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
 
-const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "dictionaries"];
+const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");

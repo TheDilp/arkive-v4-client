@@ -11,7 +11,12 @@ export function PublicEntitiesView() {
   if (type === "documents") return <PublicDocument />;
   if (type === "maps") return <PublicMap />;
   if (type === "graphs") return <PublicGraph />;
-  if (type === "calendars") return <PublicCalendar />;
+  if (type === "calendars")
+    return (
+      <div className="p-2">
+        <PublicCalendar />
+      </div>
+    );
   if (type === "dictionaries")
     return (
       <div className="p-2">

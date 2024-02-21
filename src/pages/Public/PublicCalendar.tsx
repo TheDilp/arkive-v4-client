@@ -9,7 +9,7 @@ import { PublicEntityLayout } from "./PublicLayout";
 export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: boolean }) {
   const { project_id, item_id, subitem_id, event_id } = useParams();
   const { data: calendar, error } = useGetEntity<CalendarType>(
-    subitem_id || item_id,
+    item_id,
     "calendars",
     {
       data: {
@@ -38,13 +38,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
   }
   return (
     <PublicEntityLayout title={calendar?.data?.title}>
-      <CalendarView
-        data={calendar?.data}
-        event_id={event_id}
-        id={subitem_id}
-        isCharacterCalendar={isCharacterCalendar}
-        isPublic
-      />
+      <CalendarView data={calendar?.data} event_id={event_id} id={item_id} isCharacterCalendar={isCharacterCalendar} isPublic />
     </PublicEntityLayout>
   );
 }
