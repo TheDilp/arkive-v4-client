@@ -265,7 +265,7 @@ export function AssetView() {
             },
           });
         }
-      }, 750);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);
