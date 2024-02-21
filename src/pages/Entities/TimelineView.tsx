@@ -47,13 +47,6 @@ function truncateLongEventText(texts: any) {
   });
 }
 
-function getYearsOnlyEventWidth(event: EventType | EraType, monthCount: number): number {
-  const yearDifference = Number(event.end_year ?? 0) - event.start_year;
-  const monthDifference = monthCount === 1 ? 0 : (Number(event.end_month ?? 0) - event.start_month) / (monthCount - 1);
-
-  return yearDifference + Math.abs(monthDifference);
-}
-
 function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
   setZoom((prev) => {
     const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? 2 : -2) });
@@ -156,7 +149,7 @@ export function TimelineView({
               x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
               y: e.start_year + Math.floor(i / 10) * 30,
               width: isYearsOnly
-                ? getYearsOnlyEventWidth(e, monthCount)
+                ? Number(e?.end_year) - e.start_year - 30
                 : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
               background_color: e.color || DefaultTagColor,
               title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
