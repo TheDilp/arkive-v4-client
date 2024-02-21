@@ -340,7 +340,7 @@ export function CharactersView() {
             },
           });
         }
-      }, 750);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);
@@ -449,7 +449,7 @@ export function CharactersView() {
               relationFilters,
               selection,
 
-              getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/resources`,
+              getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/biography`,
               setFavorite: async (rowData: any) => {
                 await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
               },
