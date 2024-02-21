@@ -364,7 +364,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     {
       relations: { character_fields: true, relationships: true, portrait: true, tags: true },
-      fields: ["id", "first_name", "last_name", "nickname", "age", "portrait_id", "is_favorite", "is_public"],
+      fields: ["id", "first_name", "last_name", "nickname", "biography", "age", "portrait_id", "is_favorite", "is_public"],
     },
     {
       enabled: !!data?.id,
@@ -752,6 +752,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 if (dataToParse?.data?.portrait?.id) {
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
+                if (dataToParse?.data?.biography) {
+                  dataToParse.data.biography = JSON.stringify(dataToParse.data.biography);
+                }
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
 
                 await update(parsedData, {
@@ -772,6 +775,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 };
                 if (dataToParse?.data?.portrait?.id) {
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+                }
+                if (dataToParse?.data?.biography) {
+                  dataToParse.data.biography = JSON.stringify(dataToParse.data.biography);
                 }
                 const parsedData = InsertCharacterSchema.parse(dataToParse);
                 await create(parsedData, {
