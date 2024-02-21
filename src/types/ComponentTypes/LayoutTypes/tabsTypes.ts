@@ -6,6 +6,7 @@ export type TabType = {
 export interface TabsTypes {
   selectedTab: number;
   tabs: TabType[];
+  hasArrowNav?: boolean;
   onChange?: (tab: TabType, index: number) => void;
   isVertical?: boolean;
 }

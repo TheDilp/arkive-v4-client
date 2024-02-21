@@ -1,6 +1,9 @@
+import { MutableRefObject, useRef } from "react";
 import { tv } from "tailwind-variants";
 
 import { TabsTypes } from "../../types";
+import { IconEnum } from "../../utils";
+import { Button } from "../Form";
 import { Icon } from "../Misc";
 
 const TabsClasses = tv({
@@ -22,11 +25,27 @@ const TabsClasses = tv({
   },
 });
 
-export function Tabs({ tabs, selectedTab, onChange, isVertical }: TabsTypes) {
+export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: TabsTypes) {
+  const tabsContainerRef = useRef() as MutableRefObject<HTMLUListElement>;
   const { base, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses({ isVertical });
+
   return (
     <div className={base()}>
-      <ul className={tabsContainer()}>
+      <ul ref={tabsContainerRef} className={tabsContainer()}>
+        {hasArrowNav ? (
+          <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-10 [&>button]:rounded-none [&>button]:bg-zinc-900 [&>button]:shadow-none">
+            <Button
+              icon={IconEnum.chevron_left}
+              iconThickness="bold"
+              onClick={() => {
+                tabsContainerRef.current.scrollBy({
+                  left: -tabsContainerRef.current.clientWidth * (tabs.length / 10),
+                  behavior: "smooth",
+                });
+              }}
+            />
+          </li>
+        ) : null}
         {tabs.map((tab, index) => (
           <li
             key={tab.id}
@@ -42,6 +61,23 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical }: TabsTypes) {
             {tab?.icon ? <Icon icon={tab.icon} /> : null}
           </li>
         ))}
+        {hasArrowNav ? (
+          <li
+            className="sticky right-0 [&>button:active]:opacity-100 [&>button]:w-10 [&>button]:rounded-none [&>button]:bg-zinc-900
+          [&>button]:shadow-none
+          ">
+            <Button
+              icon={IconEnum.chevron_right}
+              iconThickness="bold"
+              onClick={() => {
+                tabsContainerRef.current.scrollBy({
+                  left: tabsContainerRef.current.clientWidth * (tabs.length / 10),
+                  behavior: "smooth",
+                });
+              }}
+            />
+          </li>
+        ) : null}
       </ul>
     </div>
   );
