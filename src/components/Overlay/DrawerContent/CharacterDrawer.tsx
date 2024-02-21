@@ -752,9 +752,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 if (dataToParse?.data?.portrait?.id) {
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
-                if (dataToParse?.data?.biography) {
-                  dataToParse.data.biography = JSON.stringify(dataToParse.data.biography);
-                }
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
 
                 await update(parsedData, {
@@ -775,9 +772,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 };
                 if (dataToParse?.data?.portrait?.id) {
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-                }
-                if (dataToParse?.data?.biography) {
-                  dataToParse.data.biography = JSON.stringify(dataToParse.data.biography);
                 }
                 const parsedData = InsertCharacterSchema.parse(dataToParse);
                 await create(parsedData, {

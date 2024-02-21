@@ -4,7 +4,7 @@ export const InsertCharacterSchema = z.object({
   data: z.object({
     first_name: z.string(),
     last_name: z.string().nullable().optional(),
-    biography: z.string().nullable().optional(),
+    biography: z.any().nullable().optional(),
     project_id: z.string(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
@@ -76,7 +76,7 @@ export const UpdateCharacterSchema = z.object({
     id: z.string().optional(),
     first_name: z.string().optional(),
     last_name: z.string().nullable().optional(),
-    biography: z.string().nullable().optional(),
+    biography: z.any().nullable().optional(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     is_favorite: z.boolean().nullable().optional(),
