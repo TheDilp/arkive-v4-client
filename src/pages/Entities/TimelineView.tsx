@@ -215,29 +215,6 @@ export function TimelineView({
             "tooltip pointer-events-none absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2",
           );
 
-        const highlighter = svg
-          .append("rect")
-          .attr("class", "highlighter stroke-blue-400 w-[1px]")
-          .attr("height", height)
-          .attr("width", width)
-          .style("pointer-events", "all")
-          .style("fill", "none");
-        svg.on("mousemove", (e: MouseEvent) => {
-          highlighter.attr(
-            "transform",
-            `translate(${clamp({
-              min: 0,
-              max: Infinity,
-              // Additional 32 for sidebar width on large screens
-              value:
-                e.clientX +
-                scrollContainer.current.scrollLeft -
-                (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
-                (isLg && !isPublic ? 32 : 0),
-            })}, 0)`,
-          );
-        });
-
         const groupForEras = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForEras");
         const groupForBars = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForBars");
         const groupForCircles = svg
@@ -466,6 +443,60 @@ export function TimelineView({
         });
 
         d3.selectAll(".event-text").call(truncateLongEventText);
+
+        const highlighter = svg
+          .append("rect")
+          .attr("class", "highlighter stroke-blue-400 w-[1px]")
+          .attr("height", height)
+          .attr("width", width)
+          .style("pointer-events", "all")
+          .style("fill", "none");
+
+        const yearText = svg
+          .append("text")
+          .attr("class", "year-highlighter-text")
+
+          .attr("font-size", "12")
+          .attr("font-family", "Merriweather")
+          .text("Test")
+          .attr("x", -12)
+          .attr("y", 20)
+          .attr("fill", "white");
+
+        svg.on("mousemove", (e: MouseEvent) => {
+          highlighter.attr(
+            "transform",
+            `translate(${clamp({
+              min: 0,
+              max: Infinity,
+              // Additional 32 for sidebar width on large screens
+              value:
+                e.clientX +
+                scrollContainer.current.scrollLeft -
+                (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
+                (isLg && !isPublic ? 32 : 0),
+            })}, 0)`,
+          );
+          yearText
+            // eslint-disable-next-line func-names
+            .attr("transform", function () {
+              return `translate(${clamp({
+                min: 0,
+                max: Infinity,
+                // Additional 32 for sidebar width on large screens
+                value:
+                  e.clientX +
+                  // eslint-disable-next-line react/no-this-in-sfc
+                  Number(this.clientWidth) / 2 +
+                  scrollContainer.current.scrollLeft -
+                  (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
+                  (isLg && !isPublic ? 32 : 0),
+              })}, 0)`;
+            })
+            .text(() => {
+              return Math.round(x.invert(e.clientX - 30 - X_AXIS_OFFSET - zoom + scrollContainer.current.scrollLeft));
+            });
+        });
       }
 
       return () => {
@@ -476,6 +507,7 @@ export function TimelineView({
         d3.select(timelineContainer.current).select(".axis--y").remove();
         d3.select(timelineContainer.current).select(".highlighter").remove();
         d3.select(timelineContainer.current).select(".tooltip").remove();
+        d3.select(timelineContainer.current).select(".year-highlighter-text").remove();
       };
     }
     return () => {};
