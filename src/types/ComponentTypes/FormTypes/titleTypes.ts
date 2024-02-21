@@ -1,8 +1,7 @@
-import { ButtonType, Size } from "../..";
+import { BaseComponentType, ButtonType } from "../..";
 
-export interface TitleType {
+export interface TitleType extends BaseComponentType {
   label: string;
-  size?: Size;
   isDrawerTitle?: boolean;
   actions?: ButtonType[];
 }

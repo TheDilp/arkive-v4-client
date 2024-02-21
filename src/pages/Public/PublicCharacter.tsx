@@ -1,9 +1,19 @@
 import { useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-import { Alert, Collapsible, EntityPreview, Gallery, Skeleton, StaticRender, Tabs } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { CharacterType } from "../../types";
+import {
+  AdditionalFieldDisplay,
+  Alert,
+  Collapsible,
+  EntityPreview,
+  Gallery,
+  Skeleton,
+  StaticRender,
+  Tabs,
+  Title,
+} from "../../components";
+import { useGetEntities, useGetEntity } from "../../hooks";
+import { CharacterFieldTemplateType, CharacterType } from "../../types";
 import { getEntityLink, IconEnum } from "../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
@@ -49,6 +59,26 @@ export function PublicCharacter() {
     },
   );
 
+  const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
+    {
+      data: { project_id },
+      fields: ["id", "title"],
+      relations: { character_fields: true },
+      relationFilters: {
+        or: (character?.data?.tags || [])?.map((t) => ({
+          id: "tags",
+          header_name: "Tags",
+          operator: "in",
+          value: t.id,
+          relationalData: { blueprint_field_id: "tags" },
+          field: "tags",
+        })),
+      },
+    },
+    "character_fields_templates",
+    { enabled: !!character?.data?.tags?.length, staleTime: 5 * 60 * 1000, isPublic: true },
+  );
+
   if (!character?.data) return <Skeleton type="character_profile_main" />;
   if (!character?.data?.is_public) return <Navigate to={`/public/${project_id}/characters`} />;
   const relatedEntities = getRelatedEntities(character, selectedTab);
@@ -62,6 +92,39 @@ export function PublicCharacter() {
             ) : (
               <Alert label="Nothing has been written yet." />
             )}
+          </Collapsible>
+        </div>
+        <div className="flex flex-col px-2">
+          <Collapsible icon={IconEnum.additional_fields} label="Additional fields">
+            <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
+              {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
+              {(existingTemplates?.data || []).map((t) => {
+                return (
+                  <div key={t.id} className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
+                    <div className="col-span-6">
+                      <Title isDrawerTitle label={t.title} size="lg" variant="secondary" />
+                    </div>
+                    {t.character_fields.map((template_field) => {
+                      const characterField = character?.data?.character_fields?.find((f) => f.id === template_field.id);
+                      if (characterField)
+                        return (
+                          <AdditionalFieldDisplay
+                            key={template_field.id}
+                            character_field={template_field}
+                            character_field_data={characterField ?? null}
+                            isPreview={false}
+                          />
+                        );
+                      return null;
+                    })}
+                  </div>
+                );
+              })}
+
+              {!isFetchingTemplates && !existingTemplates?.data?.length ? (
+                <Alert label="There is no additional information." variant="info" />
+              ) : null}
+            </div>
           </Collapsible>
         </div>
         <div className="flex flex-col px-2">
