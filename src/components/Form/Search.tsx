@@ -279,7 +279,7 @@ export function Search({
       setSearchTerm(inputValue);
       const timeout = setTimeout(() => {
         refetch();
-      }, 700);
+      }, 500);
 
       return () => {
         clearTimeout(timeout);
