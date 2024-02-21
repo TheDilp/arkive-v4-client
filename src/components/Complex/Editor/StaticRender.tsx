@@ -167,6 +167,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       }
       return null;
     },
+    undefined: () => null,
   };
 }
 
