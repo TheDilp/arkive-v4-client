@@ -448,6 +448,7 @@ export function CharactersView() {
               filters,
               relationFilters,
               selection,
+
               getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/resources`,
               setFavorite: async (rowData: any) => {
                 await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });

@@ -105,7 +105,6 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   useEffect(() => {
     if (!hasChangedData) {
       resetDrawer();
-      setHasChangedData(false);
     }
   }, [type, item_id, hasChangedData]);
 

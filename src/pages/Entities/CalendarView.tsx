@@ -100,7 +100,7 @@ export function DayNumber({
     </span>
   );
 }
-export function CalendarRangeEvent({
+export function CalendarRangeEvents({
   events,
   setDrawer,
   isPublic,
@@ -226,6 +226,20 @@ export function CalendarRangeEvent({
                                 size: "lg",
                               })),
                           },
+                          {
+                            id: "2",
+                            title: "Preview document",
+                            icon: IconEnum.text_align_justify,
+                            isDisabled: !e.document_id,
+                            onClick: () =>
+                              setDrawer((prev) => ({
+                                ...prev,
+                                title: "Preview document",
+                                type: "entity_preview",
+                                size: "lg",
+                                data: { id: e.document_id as string, entity_type: "documents" },
+                              })),
+                          },
                         ]
                       : [
                           {
@@ -243,6 +257,20 @@ export function CalendarRangeEvent({
                           },
                           {
                             id: "2",
+                            title: "Preview document",
+                            icon: IconEnum.text_align_justify,
+                            isDisabled: !e.document_id,
+                            onClick: () =>
+                              setDrawer((prev) => ({
+                                ...prev,
+                                title: "Preview document",
+                                type: "entity_preview",
+                                size: "lg",
+                                data: { id: e.document_id as string, entity_type: "documents" },
+                              })),
+                          },
+                          {
+                            id: "3",
                             title: "Delete event",
                             icon: IconEnum.trash,
                             onClick: () => {
@@ -345,6 +373,7 @@ export function CalendarView({
         "end_year",
         "start_hours",
         "start_minutes",
+        "document_id",
       ],
       filters: getCalendarFilters(
         view,
@@ -905,7 +934,7 @@ export function CalendarView({
 
       {view === "range" ? (
         <div className="max-h-full overflow-y-auto">
-          <CalendarRangeEvent
+          <CalendarRangeEvents
             calendar_id={calendar.id}
             deleteEvent={deleteEvent}
             events={events?.data || []}
