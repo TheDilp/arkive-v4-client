@@ -180,8 +180,11 @@ const markMap: MarkMap = {
   },
 };
 
-export function StaticRender({ content, isPublicView }: { content: RemirrorJSON; isPublicView?: boolean }) {
+export function StaticRender({ content, isPublicView }: { content: RemirrorJSON | undefined; isPublicView?: boolean }) {
   const { project_id } = useParams();
+
+  if (!content) return null;
+
   const parsedContent = deleteObjectPropsRecursive(content, ["style", "closed", "resizable", "nested"]);
   if (!parsedContent) return null;
   return (
