@@ -210,10 +210,11 @@ export function TimelineView({
             if (a.end_x - a.start_x < b.end_x - b.start_x) return 1;
             return 0;
           });
-        svg
+
+        d3.select("#xAxisContainer")
           .append("g")
           .attr("class", "axis axis--x")
-          .attr("transform", `translate(${X_AXIS_OFFSET},${height / (isPublic ? 1.08 : 1.05)})`)
+          .attr("transform", `translate(${X_AXIS_OFFSET},${0})`)
           .call(axisBottom);
 
         const tooltip = d3
@@ -224,7 +225,11 @@ export function TimelineView({
           );
 
         const groupForEras = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForEras");
-        const groupForBars = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForBars");
+        const groupForBars = svg
+          .append("g")
+          .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
+          .attr("id", "groupForBars")
+          .attr("height", events.length * 300);
         const groupForCircles = svg
           .append("g")
           .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
@@ -345,7 +350,7 @@ export function TimelineView({
             .attr("height", 30)
             .attr("class", "event-bar")
             .attr("x", x(e.start_x))
-            .attr("y", j * 30 + 50)
+            .attr("y", j * 30 + 80)
             .attr("cursor", "pointer")
             .style("fill", e.background_color);
 
@@ -363,7 +368,7 @@ export function TimelineView({
             })
             .attr("fill", "white")
             .attr("x", x(e.start_x) + 10)
-            .attr("y", j * 30 + 70);
+            .attr("y", j * 30 + 100);
         });
 
         points.forEach((e) => {
@@ -473,7 +478,7 @@ export function TimelineView({
         d3.select(timelineContainer.current).select("#groupForEras").remove();
         d3.select(timelineContainer.current).select("#groupForBars").remove();
         d3.select(timelineContainer.current).select("#groupForCircles").remove();
-        d3.select(timelineContainer.current).select(".axis--x").remove();
+        d3.select(".axis--x").remove();
         d3.select(timelineContainer.current).select(".axis--y").remove();
         d3.select(timelineContainer.current).select(".highlighter").remove();
         d3.select(timelineContainer.current).select(".tooltip").remove();
@@ -508,15 +513,21 @@ export function TimelineView({
           />
         </div>
       </div>
-      <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto overflow-y-auto">
+      <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto ">
         <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
-          className="h-full min-w-full"
+          className="h-full min-w-full "
           style={{
+            height: events.length * 50,
             width: `${zoom * numberOfTicks}rem`,
           }}>
-          {events.length ? <svg ref={timelineContainer} className="block h-full w-full min-w-full bg-zinc-900" /> : null}
+          {events.length ? (
+            <>
+              <svg className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black" id="xAxisContainer" />
+              <svg ref={timelineContainer} className="block  min-h-full w-full min-w-full overflow-y-auto bg-zinc-900" />
+            </>
+          ) : null}
         </div>
       </div>
     </div>
