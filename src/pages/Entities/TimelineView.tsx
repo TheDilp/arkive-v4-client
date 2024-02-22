@@ -142,6 +142,14 @@ export function TimelineView({
             return `${months[Number(d) % monthCount].title} ${Math.floor(Number(d) / monthCount) + 1}`;
           });
 
+        const highlighter = svg
+          .append("rect")
+          .attr("class", "highlighter stroke-blue-400 w-[1px]")
+          .attr("height", height)
+          .attr("width", width)
+          .style("pointer-events", "all")
+          .style("fill", "none");
+
         const eraBars = eras
           .filter((e) => e.start_year <= endRange)
           .map((e, i) => {
@@ -444,25 +452,6 @@ export function TimelineView({
 
         d3.selectAll(".event-text").call(truncateLongEventText);
 
-        const highlighter = svg
-          .append("rect")
-          .attr("class", "highlighter stroke-blue-400 w-[1px]")
-          .attr("height", height)
-          .attr("width", width)
-          .style("pointer-events", "all")
-          .style("fill", "none");
-
-        const yearText = svg
-          .append("text")
-          .attr("class", "year-highlighter-text")
-
-          .attr("font-size", "12")
-          .attr("font-family", "Merriweather")
-          .text("Test")
-          .attr("x", -12)
-          .attr("y", 20)
-          .attr("fill", "white");
-
         svg.on("mousemove", (e: MouseEvent) => {
           highlighter.attr(
             "transform",
@@ -477,25 +466,6 @@ export function TimelineView({
                 (isLg && !isPublic ? 32 : 0),
             })}, 0)`,
           );
-          yearText
-            // eslint-disable-next-line func-names
-            .attr("transform", function () {
-              return `translate(${clamp({
-                min: 0,
-                max: Infinity,
-                // Additional 32 for sidebar width on large screens
-                value:
-                  e.clientX +
-                  // eslint-disable-next-line react/no-this-in-sfc
-                  Number(this.clientWidth) / 2 +
-                  scrollContainer.current.scrollLeft -
-                  (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
-                  (isLg && !isPublic ? 32 : 0),
-              })}, 0)`;
-            })
-            .text(() => {
-              return Math.round(x.invert(e.clientX - 30 - X_AXIS_OFFSET - zoom + scrollContainer.current.scrollLeft));
-            });
         });
       }
 
