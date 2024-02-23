@@ -33,7 +33,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
     <div className={base()}>
       <ul ref={tabsContainerRef} className={tabsContainer()}>
         {hasArrowNav ? (
-          <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-10 [&>button]:rounded-none  [&>button]:shadow-none">
+          <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none  [&>button]:shadow-none">
             <Button
               icon={IconEnum.chevron_left}
               iconThickness="bold"
@@ -63,7 +63,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
         ))}
         {hasArrowNav ? (
           <li
-            className="sticky right-0 [&>button:active]:opacity-100 [&>button]:w-10 [&>button]:rounded-none 
+            className="sticky right-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none 
           [&>button]:shadow-none
           ">
             <Button
