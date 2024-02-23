@@ -513,11 +513,11 @@ export function TimelineView({
           />
         </div>
       </div>
-      <div ref={scrollContainer} className="relative h-full w-full max-w-full flex-1 overflow-x-auto ">
+      <div ref={scrollContainer} className="relative max-h-[calc(78%)] w-full max-w-full flex-1 overflow-x-auto ">
         <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
-          className="h-full min-w-full "
+          className=" min-w-full"
           style={{
             height: events.length * 50,
             width: `${zoom * numberOfTicks}rem`,
