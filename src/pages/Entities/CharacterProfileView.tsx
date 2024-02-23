@@ -957,13 +957,15 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)
                   : undefined
               }
-              initials={getFirstLetters(existingCharacter?.data?.full_name || "")}
+              initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
               isTooltipDisabled
               size="4xl"
             />
 
             <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="text-center font-merriweather text-lg">{`${existingCharacter?.data?.full_name}`.trimEnd()}</h2>
+              <h2 className="text-center font-merriweather text-lg">
+                {`${existingCharacter?.data?.full_name || ""}`.trimEnd()}
+              </h2>
               {existingCharacter?.data?.nickname ? (
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
