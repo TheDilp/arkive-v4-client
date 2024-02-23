@@ -272,7 +272,7 @@ export function TimelineView({
         });
         event_bars.forEach((e, j) => {
           const event_bar = groupForBars.append("g");
-          const bar_width = x(e.end_x - e.start_x);
+          const bar_width = x(e.end_x) - x(e.start_x);
           event_bar
             .append("rect")
             .on("click", () =>
@@ -344,7 +344,7 @@ export function TimelineView({
                   .style(
                     "transform",
                     `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
-                      Number(evt.currentTarget.getAttribute("y")) - 10 ?? 0
+                      Number(evt.currentTarget.getAttribute("y")) - 25 ?? 0
                     }px)`,
                   )
                   .html(`${e.title} ${e.date_string}`);
@@ -497,7 +497,7 @@ export function TimelineView({
       };
     }
     return () => {};
-  }, [events, zoom, goToYear, numberOfTicks]);
+  }, [events, zoom, numberOfTicks]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
