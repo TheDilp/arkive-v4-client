@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useLayoutEffect, useRef, useState } from "react";
+import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
-import { Button, Select } from "../../components";
+import { Button, Input, Select } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
 import { EraType, EventType, MonthType } from "../../types";
 import {
@@ -69,16 +69,18 @@ export function TimelineView({
   eras: EraType[];
 }) {
   const { project_id, item_id } = useParams();
+  const { isLg } = useBreakpoint();
+
   const user = useAtomValue(userAtom);
   const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
   const [numberOfTicks, setNumberOfTicks] = useState(0);
+  const [goToYear, setGoToYear] = useState(1);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const timelineLayoutContainer = useRef() as MutableRefObject<HTMLDivElement>;
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
-  const { isLg } = useBreakpoint();
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useLayoutEffect(() => {
     if (
@@ -122,6 +124,7 @@ export function TimelineView({
         .scaleLinear()
         .domain([minYearCount, endRange])
         .range([0, width - X_AXIS_OFFSET - 30]);
+
       const y = d3
         .scaleLinear()
         .domain([0, (events.length * zoom) / 2])
@@ -241,7 +244,7 @@ export function TimelineView({
           bar
             .append("rect")
             .attr("width", x(e.width))
-            .attr("height", height / 1.05)
+            .attr("height", scrollContainer.current.scrollHeight)
             .attr("fill-opacity", "30%")
             .attr("x", x(e.x))
             .attr("y", 0)
@@ -472,6 +475,11 @@ export function TimelineView({
             })}, 0)`,
           );
         });
+        const ticks = d3.selectAll(".axis--x .tick text");
+        // @ts-ignore
+        ticks.attr("class", (d: number) => {
+          return `_${d + 1}`;
+        });
       }
 
       return () => {
@@ -486,7 +494,19 @@ export function TimelineView({
       };
     }
     return () => {};
-  }, [events, zoom, numberOfTicks]);
+  }, [events, zoom, goToYear, numberOfTicks]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const tick = document.querySelector(`._${goToYear}`);
+      if (tick) {
+        tick.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [goToYear]);
+
   return (
     <div ref={timelineLayoutContainer} className="flex h-full flex-col gap-y-2">
       <div className="flex w-full items-center gap-x-1">
@@ -512,8 +532,21 @@ export function TimelineView({
             value={zoom.toString()}
           />
         </div>
+        <div className="w-20">
+          <Input
+            label="Go to year"
+            name="goToYear"
+            onChange={({ value }) => {
+              setGoToYear(Number(value || 1));
+            }}
+            type="number"
+            value={goToYear}
+          />
+        </div>
       </div>
-      <div ref={scrollContainer} className="relative max-h-[calc(78%)] w-full max-w-full flex-1 overflow-x-auto ">
+      <div
+        ref={scrollContainer}
+        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}>
         <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
