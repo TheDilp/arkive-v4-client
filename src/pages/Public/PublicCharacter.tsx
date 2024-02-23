@@ -88,7 +88,7 @@ export function PublicCharacter() {
         <div className="flex flex-col px-2">
           <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
             {character?.data?.biography ? (
-              <StaticRender content={character?.data?.biography ?? undefined} />
+              <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
             ) : (
               <Alert label="Nothing has been written yet." />
             )}
@@ -142,19 +142,21 @@ export function PublicCharacter() {
               <Tabs onChange={(_, tab) => setSelectedTab(tab)} selectedTab={selectedTab} tabs={tabs} />
               <div className="grid grid-cols-1 gap-2 py-2 md:grid-cols-3 xl:grid-cols-6">
                 {(relatedEntities.items || []).map((d) => (
-                  <EntityPreview
-                    id={d.id}
-                    image_id={"image_id" in d ? d.image_id : ""}
-                    link={getEntityLink(
-                      project_id as string,
-                      relatedEntities.type,
-                      d.id,
-                      "parent_id" in d ? d.parent_id : null,
-                      true,
-                    )}
-                    title={d.title}
-                    type={relatedEntities.type}
-                  />
+                  <div key={d.id} className="col-span-1 xl:col-span-2">
+                    <EntityPreview
+                      id={d.id}
+                      image_id={"image_id" in d ? d.image_id : ""}
+                      link={getEntityLink(
+                        project_id as string,
+                        relatedEntities.type,
+                        d.id,
+                        "parent_id" in d ? d.parent_id : null,
+                        true,
+                      )}
+                      title={d.title}
+                      type={relatedEntities.type}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
