@@ -75,6 +75,7 @@ export function TimelineView({
   const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
   const [numberOfTicks, setNumberOfTicks] = useState(0);
   const [goToYear, setGoToYear] = useState(1);
+  const [borders, setBorders] = useState({ start: 0, end: 0 });
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const timelineLayoutContainer = useRef() as MutableRefObject<HTMLDivElement>;
@@ -112,6 +113,8 @@ export function TimelineView({
         max: maxYearCount,
         value: maxYearCount * (isYearsOnly ? 1 : monthCount),
       });
+      setBorders({ start: minYearCount, end: endRange });
+
       // Graphics constants
       const width = timelineContainer?.current?.clientWidth || 1;
       const height = clamp({
@@ -341,7 +344,7 @@ export function TimelineView({
                   .style(
                     "transform",
                     `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
-                      Number(evt.currentTarget.getAttribute("y")) - 45 ?? 0
+                      Number(evt.currentTarget.getAttribute("y")) - 10 ?? 0
                     }px)`,
                   )
                   .html(`${e.title} ${e.date_string}`);
@@ -501,6 +504,19 @@ export function TimelineView({
       const tick = document.querySelector(`._${goToYear}`);
       if (tick) {
         tick.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      } else {
+        let closestTick: Element | null = null;
+
+        for (let index = goToYear; index < borders.end; index += 1) {
+          const t = document.querySelector(`._${index}`);
+          if (t) {
+            closestTick = t;
+            break;
+          }
+        }
+        if (closestTick) {
+          closestTick.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
       }
     }, 500);
 
@@ -535,9 +551,10 @@ export function TimelineView({
         <div className="w-20">
           <Input
             label="Go to year"
+            min={-Infinity}
             name="goToYear"
             onChange={({ value }) => {
-              setGoToYear(Number(value || 1));
+              setGoToYear(Number(value));
             }}
             type="number"
             value={goToYear}
