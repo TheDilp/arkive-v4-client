@@ -54,7 +54,7 @@ export function getTableColumns(
   if (hasTags) {
     if (finalColumns.some((c) => c.id === "is_public")) {
       finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning));
-    } else if (finalColumns.some((c) => c.id === "actions")) {
+    } else if (finalColumns.some((c) => c.id === "action")) {
       finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
     } else {
       finalColumns.splice(finalColumns.length, 0, TagColumn(config?.hasTagsWarning));
