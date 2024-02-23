@@ -34,7 +34,17 @@ function isSaveDisabled(event: EventStateType, { isDateCorrect }: { isDateCorrec
   return false;
 }
 
-type Props = { data: { id?: string; day?: number; month?: number; year?: number; parent_id?: string; isReadOnly?: boolean } };
+type Props = {
+  data: {
+    id?: string;
+    day?: number;
+    month?: number;
+    year?: number;
+    parent_id?: string;
+    isReadOnly?: boolean;
+    isPublic?: boolean;
+  };
+};
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Details", icon: IconEnum.edit },
@@ -56,6 +66,7 @@ export function EventDrawer({ data }: Props) {
       relations: { months: true },
     },
     {
+      isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
     },
   );
@@ -88,6 +99,7 @@ export function EventDrawer({ data }: Props) {
       ],
     },
     {
+      isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
       enabled: !!data?.id,
     },
