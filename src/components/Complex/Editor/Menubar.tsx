@@ -198,6 +198,8 @@ function menuBarItems({
         {
           id: "callout_custom",
           label: "Custom",
+          icon: IconEnum.brush,
+          allowedPlacements: ["right", "right-end"],
           subItems: ColorPresets.map((color) => ({
             id: color,
             child: (
@@ -335,7 +337,7 @@ export function Menubar({
       {items.map((item) => (
         <div key={item.icon}>
           {item?.subItems?.length ? (
-            <Dropdown allowedPlacements={["top", "bottom"]} items={item?.subItems}>
+            <Dropdown allowedPlacements={["top", "bottom", "right"]} items={item?.subItems}>
               <div className="flex items-center">
                 <Button
                   hasNoBackground
