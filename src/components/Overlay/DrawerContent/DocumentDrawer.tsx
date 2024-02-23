@@ -189,7 +189,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               const documentToUpdate = { ...(changedData || {}), id: document.id, parent_id: document.parent_id };
               const { alter_names, tags, image, ...rest } = documentToUpdate;
               const parsedData = UpdateDocumentSchema.parse({
-                data: { ...rest, image_id: image.id },
+                data: { ...rest, image_id: image?.id },
                 relations: {
                   tags,
                   alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
