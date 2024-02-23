@@ -8,4 +8,4 @@ COPY . .
 # run the app
 USER bun
 EXPOSE 5173/tcp
-ENTRYPOINT [ "bun", "run", "/usr/src/app/index.ts" ]
+ENTRYPOINT [ "bun", "start"]
