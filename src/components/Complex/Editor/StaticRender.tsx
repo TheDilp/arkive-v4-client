@@ -41,8 +41,12 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     doc: Doc,
     hardBreak: "br",
     heading: (args: any) => {
-      // @ts-ignore
-      return <div style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>{Heading(args)}</div>;
+      return (
+        <div id={args?.node?.attrs?.id} style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>
+          {/* @ts-ignore */}
+          {Heading(args)}
+        </div>
+      );
     },
     link: "a",
     listItem: "li",

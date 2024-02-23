@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 
@@ -43,18 +44,16 @@ class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
         <h2 className="font-merriweather underline">Table of contents</h2>
         {headings?.length ? (
           headings.map((heading, i) => (
-            <li
-              key={`${heading}+${i.toString()}`}
-              className="pointer-events-auto font-lato"
-              onClick={() => {
-                const el = document.getElementById(heading.id);
-                if (el) {
-                  const editor = document.getElementById("editor");
-                  if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
-                }
-              }}>
+            <li key={`${heading}+${i.toString()}`} className="pointer-events-auto font-lato">
               <span
-                className="pointer-events-auto cursor-pointer hover:text-blue-400"
+                className="pointer-events-auto cursor-pointer select-none hover:text-blue-400"
+                onClick={() => {
+                  const el = document.getElementById(heading.id);
+                  if (el) {
+                    const editor = document.getElementById("editor");
+                    if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+                  }
+                }}
                 style={{
                   paddingLeft: `${0.45 * (heading.level - 1)}rem`,
                 }}>
@@ -133,24 +132,26 @@ declare global {
   }
 }
 
+// Needed for static render
+
 export function TableOfContents({ headings }: { headings: TOCHeadingType[] }) {
   return (
     <ul className="tableOfContentsList m-0 flex list-none flex-col border border-zinc-600">
       <h2 className="font-merriweather underline">Table of contents</h2>
       {headings?.length ? (
         headings.map((heading, i) => (
-          <li
-            key={`${heading}+${i.toString()}`}
-            className="pointer-events-auto font-lato"
-            onClick={() => {
-              const el = document.getElementById(heading.id);
-              if (el) {
-                const editor = document.getElementById("editor");
-                if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
-              }
-            }}>
+          <li key={`${heading}+${i.toString()}`} className="pointer-events-auto font-lato">
             <span
-              className="pointer-events-auto cursor-pointer hover:text-blue-400"
+              className="pointer-events-auto cursor-pointer select-none hover:text-blue-400"
+              onClick={() => {
+                const el = document.getElementById(heading.id);
+
+                if (el) {
+                  const editor = document.querySelector(".staticRendererContainer")?.parentElement;
+
+                  if (editor) editor.scrollTo({ top: el.offsetTop - 130, behavior: "smooth" });
+                }
+              }}
               style={{
                 paddingLeft: `${0.45 * (heading.level - 1)}rem`,
               }}>
