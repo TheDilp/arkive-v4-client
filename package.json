@@ -93,7 +93,6 @@
     "start": "vite",
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "prepare": "husky install",
     "precommit": "bun run lint --fix"
   },
   "type": "module",
