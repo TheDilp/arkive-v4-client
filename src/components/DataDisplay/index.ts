@@ -1,3 +1,4 @@
+export * from "./AdditionalBlueprintFieldDisplay";
 export * from "./AdditionalFieldDisplay";
 export * from "./CarouselEntityPreview";
 export * from "./EntityPreview";
