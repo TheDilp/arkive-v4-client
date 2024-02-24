@@ -32,7 +32,6 @@ import {
   EventManagementDrawer,
   FieldTemplateDrawer,
   ImageDrawer,
-  InsertEditorImageDrawer,
   ManyEdgesDrawer,
   ManyNodesDrawer,
   MapDrawer,
@@ -183,7 +182,6 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
                 {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "tags" ? <TagsDrawer data={drawer?.data} /> : null}
-                {drawer.type === "insert_image" ? <InsertEditorImageDrawer data={drawer?.data} /> : null}
                 {drawer.type === "map_pin_management" ? <MapPinManagementDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_add" ? <CharacterAddDrawer data={drawer?.data} /> : null}
                 {drawer.type === "search" ? <SearchDrawer /> : null}

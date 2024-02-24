@@ -17,7 +17,7 @@
 
 .remirror-editor,
 .staticRendererContainer {
-  @apply p-4 font-lato focus-visible:outline-none;
+  @apply max-w-full p-4 font-lato focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;
@@ -219,6 +219,7 @@
   }
 }
 .staticRendererContainer {
+  @apply w-full;
   p {
     @apply min-h-[1rem];
   }
@@ -227,6 +228,9 @@
   }
   hr {
     @apply border-zinc-600 !important;
+  }
+  img {
+    @apply inline-block max-w-full !important;
   }
   .spoiler {
     @apply cursor-pointer bg-zinc-700 px-2 text-zinc-700 transition-none;

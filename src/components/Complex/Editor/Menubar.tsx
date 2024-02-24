@@ -3,8 +3,8 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { DrawerAtomType, Size, Variant } from "../../../types";
-import { AvailableIcons, ColorPresets, drawerAtom, IconEnum } from "../../../utils";
+import { DialogAtomType, DrawerAtomType, Size, Variant } from "../../../types";
+import { AvailableIcons, ColorPresets, dialogAtom, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
@@ -13,6 +13,7 @@ function menuBarItems({
   active,
   chain,
   setDrawer,
+  setDialog,
   getContext,
   title,
   id,
@@ -22,6 +23,7 @@ function menuBarItems({
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>;
   getContext: ReactFrameworkOutput<Remirror.Extensions>;
   title?: string;
   id?: string;
@@ -220,7 +222,7 @@ function menuBarItems({
       id: "insert_image",
       icon: IconEnum.image,
       onClick: () =>
-        setDrawer({
+        setDialog({
           data: { getContext },
           type: "insert_image",
           title: "Insert image",
@@ -325,9 +327,10 @@ export function Menubar({
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const active = useActive();
   const items = useMemo(
-    () => menuBarItems({ active, chain, setDrawer, getContext, title, id, icon, isEditorMenubar }),
+    () => menuBarItems({ active, chain, setDrawer, setDialog, getContext, title, id, icon, isEditorMenubar }),
     [chain, isEditorMenubar, id, title],
   );
 

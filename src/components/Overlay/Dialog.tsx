@@ -8,7 +8,14 @@ import { tv } from "tailwind-variants";
 
 import { dialogAtom, IconEnum } from "../../utils";
 import { Button } from "../Form/Button";
-import { DeleteEntityDialog, ExportGraphDialog, FamilyTreeDialog, ImageUploadDialog, ImageViewDialog } from "./DialogContent";
+import {
+  DeleteEntityDialog,
+  ExportGraphDialog,
+  FamilyTreeDialog,
+  ImageUploadDialog,
+  ImageViewDialog,
+  InsertEditorImageDialog,
+} from "./DialogContent";
 
 const DialogClasses = tv({
   slots: {
@@ -123,6 +130,7 @@ export function Dialog() {
         ) : null}
         {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} /> : null}
         {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
+        {dialog.type === "insert_image" ? <InsertEditorImageDialog data={dialog.data} /> : null}
         {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
         {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
         {dialog?.cancel || dialog?.confirm ? (

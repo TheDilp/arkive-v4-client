@@ -167,9 +167,9 @@ export function DefaultEditorExtensions(
     new CustomImageExtension({
       enableResizing: true,
       extraAttributes: {
-        test: {
-          default: "ABC",
-          toDOM: () => ["data-test"],
+        id: {
+          default: "",
+          toDOM: () => ["data-id"],
         },
       },
       nodeOverride: {

@@ -99,10 +99,6 @@ export type DrawerAtomType = {
       data: { items: { id: string; title: string }[]; dispatch: TableDispatch; type: EntitiesWithFolders };
     }
   | {
-      type: "insert_image";
-      data: { getContext: ReactFrameworkOutput<Remirror.Extensions> };
-    }
-  | {
       type: "mentioned_in_document";
       data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string };
     }

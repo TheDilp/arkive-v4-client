@@ -12,12 +12,13 @@ type Props = {
   };
 };
 
-export function InsertEditorImageDrawer({ data }: Props) {
+export function InsertEditorImageDialog({ data }: Props) {
   const { project_id } = useParams();
   const [selectedImages, setSelectedImages] = useState<{ label: string; value: string }[]>([]);
   return (
     <div>
       <Search
+        isMultiple
         name="images"
         onChange={({ label, value }) => {
           if (selectedImages.some((img) => img.value === value)) {
@@ -26,6 +27,7 @@ export function InsertEditorImageDrawer({ data }: Props) {
           setSelectedImages(selectedImages.concat({ label: label as string, value }));
         }}
         searchEntity="images"
+        value={selectedImages.map((img) => img.value)}
       />
       <div className="my-2 flex flex-col gap-y-2">
         <Title isDrawerTitle label="Images to insert" size="xl" />
@@ -51,6 +53,7 @@ export function InsertEditorImageDrawer({ data }: Props) {
                 alt: image.label,
                 title: image.label,
                 align: "right",
+                id: image.value,
               })
               ?.run();
           }

@@ -9,7 +9,8 @@ export type DialogContentType =
   | "export_graph"
   | "archive_entity"
   | "delete_entity"
-  | "image_view";
+  | "image_view"
+  | "insert_image";
 export interface DialogAtomType {
   data: any | null;
   title: string;

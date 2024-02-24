@@ -23,7 +23,6 @@ export * from "./FieldTemplateDrawer";
 export * from "./FolderDrawer";
 export * from "./GraphDrawer";
 export * from "./ImageDrawer";
-export * from "./InsertEditorImageDrawer";
 export * from "./ManyEdgesDrawer";
 export * from "./ManyNodesDrawer";
 export * from "./MapDrawer";
