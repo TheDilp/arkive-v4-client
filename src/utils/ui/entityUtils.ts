@@ -11,9 +11,9 @@ import {
   FieldTypes,
   RandomTableOptionType,
 } from "../../types";
-import { IconEnum } from "..";
+import { AvailableIcons, IconEnum } from "..";
 
-export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType) {
+export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType): AvailableIcons {
   if (type === "characters") return IconEnum.character;
   if (type === "documents") return IconEnum.document;
   if (type === "maps") return IconEnum.map;

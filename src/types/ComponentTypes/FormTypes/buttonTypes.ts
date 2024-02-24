@@ -1,10 +1,11 @@
+import { AvailableIcons } from "../../../utils";
 import { BaseFormComponentType } from "../../baseTypes";
 import { IconPosition, IconThickness, TooltipContentType } from "..";
 
 export interface ButtonType extends BaseFormComponentType {
   onClick: ((...vars: any) => void) | undefined;
   label?: string;
-  icon?: string;
+  icon?: AvailableIcons;
   iconSize?: number;
   iconThickness?: IconThickness;
   iconPos?: IconPosition;
