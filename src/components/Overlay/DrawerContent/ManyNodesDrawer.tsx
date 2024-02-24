@@ -52,7 +52,10 @@ function UpdateGraphNodes({
           set(newNodes, `[${idx}]`, {
             ...alteredNodeData,
             label: getNodeLabel(alteredNodeData as NodeType),
-            background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+            background_image: getNodeImage(alteredNodeData as NodeType, project_id as string, {
+              width: alteredNodeData.width || 50,
+              height: alteredNodeData.height || 50,
+            }),
           });
         }
       }
@@ -86,7 +89,12 @@ function RestoreGraphNodes({
           set(newNodes, `[${idx}]`, {
             ...alteredNodeData,
             label: getNodeLabel(alteredNodeData as NodeType),
-            background_image: nodes[index].image ? getNodeImage(alteredNodeData as NodeType, project_id as string) : [],
+            background_image: nodes[index].image
+              ? getNodeImage(alteredNodeData as NodeType, project_id as string, {
+                  width: nodes[index].width || 50,
+                  height: nodes[index].height || 50,
+                })
+              : [],
           });
         }
       }

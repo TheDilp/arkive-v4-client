@@ -4,11 +4,11 @@ import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 
 import { slashMenuItem } from "../../../types";
-import { defaultSlashItems, drawerAtom } from "../../../utils";
+import { defaultSlashItems, dialogAtom } from "../../../utils";
 
 export function SlashMenu() {
   const chain = useChainedCommands();
-  const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const context = useRemirrorContext();
   const [itemsType, setItemsType] = useState<"commands">("commands");
   const { change, exit } = useSuggest({
@@ -40,7 +40,7 @@ export function SlashMenu() {
         chain.delete(range).toggleSecret().run();
       } else if (cmd.type === "image") {
         chain.delete(range).run();
-        setDrawer({
+        setDialog({
           data: { getContext: context },
           type: "insert_image",
           title: "Insert image",

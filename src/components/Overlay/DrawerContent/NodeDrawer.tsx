@@ -64,7 +64,10 @@ function UpdateGraphNodes({
         set(newNodes, `[${idx}]`, {
           ...alteredNodeData,
           label: getNodeLabel(alteredNodeData as NodeType),
-          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string),
+          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string, {
+            width: alteredNodeData.width || 50,
+            height: alteredNodeData.height || 50,
+          }),
         });
         return newNodes;
       }

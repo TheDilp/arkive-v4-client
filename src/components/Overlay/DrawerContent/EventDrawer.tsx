@@ -154,7 +154,7 @@ export function EventDrawer({ data }: Props) {
       ]);
   }
 
-  function handleImageChange({ name, label, value }: { name: string; label?: string; value: string }) {
+  function handleImageChange({ name, label, value }: { name: string; label?: string; value: string | null }) {
     handleChange({ name, value: { id: value, title: label } });
   }
 
