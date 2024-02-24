@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 import { DocumentType, EdgeType } from "../../../types";
-import { baseURLS, FetchFunction } from "../../../utils";
+import { AvailableIcons, baseURLS, FetchFunction } from "../../../utils";
 import { Graph } from "../../DataDisplay";
 import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -28,7 +28,7 @@ type Props = {
   data: {
     id: string;
     title: string;
-    icon?: string;
+    icon?: AvailableIcons;
     isAll?: boolean;
   };
 };

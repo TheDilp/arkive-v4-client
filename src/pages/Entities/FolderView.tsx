@@ -186,7 +186,7 @@ function columns(
         const actions: {
           id: string;
           title: string;
-          icon: string;
+          icon: AvailableIcons;
           onClick?: () => void;
           isDisabled?: boolean;
           subItems?: {
@@ -204,8 +204,8 @@ function columns(
                 row.original.is_folder
                   ? {
                       ...prev,
-                      data: { id: row.original.id, type: entityType as AvailableEntityType },
-                      title: "test",
+                      data: { id: row.original.id, type: entityType as EntitiesWithFolders },
+                      title: `Edit folder - ${row.original.title}`,
                       size: "sm",
                       type: "folder",
                     }
@@ -561,7 +561,7 @@ export function FolderView() {
                           size: "half",
                           type: "mentioned_in",
                           title: "All document mentions",
-                          data: { id: "", title: "", icon: "", isAll: true },
+                          data: { id: "", title: "", icon: undefined, isAll: true },
                         }))
                       }
                       tooltip="View all document connections"
@@ -639,7 +639,7 @@ export function FolderView() {
                         setDrawer((prev) => ({
                           ...prev,
                           title: `Create new ${entityName} folder`,
-                          data: { project_id, type: type as AvailableEntityType },
+                          data: { project_id, type: type as EntitiesWithFolders },
                           type: "folder",
                           size: "sm",
                         }));
@@ -713,7 +713,7 @@ export function FolderView() {
                             size: "lg",
                             title: `Edit ${entityName} - ${item.title}`,
                             type: "folder",
-                            data: { id, type: type as AvailableEntityType },
+                            data: { id, type: type as EntitiesWithFolders },
                           }));
                         else
                           setDrawer((prev) => ({
@@ -774,7 +774,7 @@ export function FolderView() {
                               size: "sm",
                               title: `Edit ${entityName} - ${item.title}`,
                               type: "folder",
-                              data: { id, type: type as AvailableEntityType },
+                              data: { id, type: type as EntitiesWithFolders },
                             }));
                           else
                             setDrawer((prev) => ({

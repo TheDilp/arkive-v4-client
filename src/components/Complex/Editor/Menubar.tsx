@@ -4,7 +4,7 @@ import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
 import { DrawerAtomType, Size, Variant } from "../../../types";
-import { ColorPresets, drawerAtom, IconEnum } from "../../../utils";
+import { AvailableIcons, ColorPresets, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
@@ -25,7 +25,7 @@ function menuBarItems({
   getContext: ReactFrameworkOutput<Remirror.Extensions>;
   title?: string;
   id?: string;
-  icon?: string;
+  icon?: AvailableIcons;
   isEditorMenubar?: boolean;
 }) {
   const options = [
@@ -262,6 +262,7 @@ function menuBarItems({
     options.push(
       {
         id: "autolinker",
+        // @ts-ignore
         icon: IconEnum.mention,
         onClick: () =>
           setDrawer((prev) => ({
@@ -272,6 +273,7 @@ function menuBarItems({
             data: { getContext, title: title || "", id: id || "" },
           })),
         tooltip: "Automention",
+        variant: "primary",
       },
       {
         id: "show_mentioned",
@@ -296,7 +298,7 @@ function menuBarItems({
           setDrawer((prev) => ({
             ...prev,
             title: "Document mentioned in",
-            data: { getContext, id: id || "", title: title || "", icon },
+            data: { id: "", title: "", icon, isAll: true },
             type: "mentioned_in",
             size: "half",
           })),
@@ -317,7 +319,7 @@ export function Menubar({
   size: Size;
   title?: string;
   id?: string;
-  icon?: string;
+  icon?: AvailableIcons;
   isEditorMenubar?: boolean;
 }) {
   const chain = useChainedCommands();

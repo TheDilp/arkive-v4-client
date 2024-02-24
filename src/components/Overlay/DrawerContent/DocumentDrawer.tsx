@@ -5,7 +5,7 @@ import { RemirrorJSON } from "remirror";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { DocumentType, DrawerAtomType, InsertDocumentType, UpdateDocumentType } from "../../../types";
-import { DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { AvailableIcons, DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { ImagePreview } from "../../DataDisplay";
@@ -196,7 +196,14 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 },
               });
               await update(
-                { ...parsedData, data: { ...parsedData.data, content: parsedData.data.content as RemirrorJSON } },
+                {
+                  ...parsedData,
+                  data: {
+                    ...parsedData.data,
+                    icon: parsedData.data.icon as AvailableIcons | null,
+                    content: parsedData.data.content as RemirrorJSON,
+                  },
+                },
                 {
                   onSuccess: resetDrawerAtom,
                 },
@@ -212,7 +219,14 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               dataToParse.data.parent_id = item_id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);
               await create(
-                { ...parsedData, data: { ...parsedData.data, content: parsedData.data.content as RemirrorJSON } },
+                {
+                  ...parsedData,
+                  data: {
+                    ...parsedData.data,
+                    icon: parsedData.data.icon as AvailableIcons | null,
+                    content: parsedData.data.content as RemirrorJSON,
+                  },
+                },
                 {
                   onSuccess: resetDrawerAtom,
                 },

@@ -71,7 +71,7 @@ export function MapPinTypeDrawer({ data }: Props) {
         <span>Default icon:</span>
         <div className="flex w-8 justify-center">
           <IconPicker
-            icon={mapPinType.default_icon || ""}
+            icon={mapPinType.default_icon || undefined}
             iconColor={mapPinType.default_icon_color || DefaultTagColor}
             name="default_icon"
             onChange={handleChange}

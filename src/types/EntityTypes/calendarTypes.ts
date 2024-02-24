@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../utils";
 import { RequestFilterType } from "../CRUD";
 import { BaseEntityType } from "./baseEntityTypes";
 import { CharacterType } from "./characterTypes";
@@ -8,7 +9,7 @@ import { TagType } from "./tagTypes";
 
 /* eslint-disable no-use-before-define */
 export interface CalendarType extends BaseEntityType {
-  icon: string | null;
+  icon: AvailableIcons | null;
   offset: number;
   hours?: number | null;
   minutes?: number | null;

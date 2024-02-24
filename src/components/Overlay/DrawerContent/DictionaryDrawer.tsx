@@ -63,7 +63,7 @@ export function DictionaryDrawer({ data }: Props) {
           value={dictionary?.title || ""}
         />
         <span className="h-8 self-end">
-          <IconPicker icon={dictionary?.icon || ""} name="icon" onChange={handleChange} />
+          <IconPicker icon={dictionary?.icon || undefined} name="icon" onChange={handleChange} />
         </span>
       </div>
 

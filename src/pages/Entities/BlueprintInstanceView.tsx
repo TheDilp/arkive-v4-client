@@ -612,7 +612,7 @@ export function BlueprintInstanceView() {
                       size: "lg",
                       title: "Bulk edit tags",
                       type: "bulk_tags",
-                      data: { items: instancesWithTags, type: "blueprint_instances" },
+                      data: { items: instancesWithTags, dispatch, type: "blueprint_instances" },
                     }));
                   },
                 },

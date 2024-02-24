@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../../utils";
 import { PositionType } from "../../baseTypes";
 import { InputOnChangeValue } from "../FormTypes";
 
@@ -10,7 +11,7 @@ export interface IconPickerType {
   };
   allowedPlacements?: PositionType;
   onChange: (newValue: InputOnChangeValue) => void;
-  icon?: string;
+  icon?: AvailableIcons;
   iconColor?: string;
   isDisabled?: boolean;
   closeOnClick?: boolean;

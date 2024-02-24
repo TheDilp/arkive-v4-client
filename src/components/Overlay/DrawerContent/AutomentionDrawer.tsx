@@ -15,6 +15,7 @@ import { findElementAtPosition, FromToProps } from "remirror";
 
 import { SearchableMentionEntities } from "../../../types";
 import {
+  AvailableIcons,
   baseURLS,
   drawerAtom,
   FetchFunction,
@@ -127,7 +128,7 @@ function createMentions(
   }
 }
 
-const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: string }[] = [
+const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: AvailableIcons }[] = [
   {
     label: "Characters",
     value: "characters",

@@ -16,6 +16,7 @@ import { Fragment, useEffect, useState } from "react";
 
 import { useGetIcons } from "../../hooks";
 import { IconCategories, IconPickerType } from "../../types";
+import { AvailableIcons } from "../../utils";
 import { iconCategories } from "../../utils/enums/IconPickerEnums";
 import { Button, Input, Select } from "../Form";
 import { Icon } from "../Misc";
@@ -139,7 +140,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
                       }}>
                       <Button
                         hasNoBackground
-                        icon={`${category}:${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}`}
+                        icon={`${category}:${filteredIcons[virtualRow.index * 6 + virtualColumn.index]}` as AvailableIcons}
                         iconSize={32}
                         isIconOnly
                         onClick={() => {

@@ -1,7 +1,9 @@
+import { AvailableIcons } from "../../../utils";
+
 export type TabType = {
   id: string;
   label: string;
-  icon?: string;
+  icon?: AvailableIcons;
 };
 export interface TabsTypes {
   selectedTab: number;

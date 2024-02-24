@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../utils";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { BlueprintFieldTypes } from "./fieldsTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
@@ -21,7 +22,7 @@ export interface BlueprintType {
   id: string;
   title: string;
   title_name: string;
-  icon?: string;
+  icon?: AvailableIcons;
 
   // title_width: FieldWidthType;
   project_id: string;

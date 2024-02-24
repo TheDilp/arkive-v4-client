@@ -1,3 +1,5 @@
+import { AvailableIcons } from "../../utils";
+
 export interface BaseEntityType {
   id: string;
   title: string;
@@ -7,7 +9,7 @@ export interface BaseEntityType {
   children?: (BaseEntityType & { image_id?: string })[];
   is_folder?: boolean | null;
   is_public?: boolean | null;
-  icon?: string | null;
+  icon?: AvailableIcons | null;
 }
 export type AvailableEntityType =
   | "projects"

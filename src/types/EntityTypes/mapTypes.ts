@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../utils";
 import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
@@ -41,7 +42,7 @@ export interface MapPinType {
   color: string | null;
   border_color: string | null;
   background_color: string | null;
-  icon: string;
+  icon: AvailableIcons;
   show_background: boolean;
   show_border: boolean;
   is_public: boolean | null;
@@ -62,7 +63,7 @@ export interface MapPinTypesType {
   id: string;
   title: string;
   project_id: string;
-  default_icon?: string | null;
+  default_icon?: AvailableIcons | null;
   default_icon_color?: string | null;
 }
 

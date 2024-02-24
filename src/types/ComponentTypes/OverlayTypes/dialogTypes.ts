@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../../utils";
 import { Size, Variant } from "../../baseTypes";
 
 export type DialogPosition = "center" | "top" | "right" | "left" | "bottom" | "top-right" | "top-left";
@@ -19,13 +20,13 @@ export interface DialogAtomType {
   position?: DialogPosition;
   cancel?: {
     action: () => void;
-    icon?: string;
+    icon?: AvailableIcons;
     label?: string;
     variant?: Variant;
   };
   confirm?: {
     action: () => void;
-    icon?: string;
+    icon?: AvailableIcons;
     label?: string;
     variant?: Variant;
   };

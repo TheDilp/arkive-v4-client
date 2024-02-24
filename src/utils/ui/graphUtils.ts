@@ -3,7 +3,7 @@ import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
 import { CurveStyleType, EdgeType, GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { getCharacterFullName, getIconUrlFromIconEnum, getImageURL } from "..";
+import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, IconEnum } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -242,9 +242,9 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
 }
 export const edgeArrowTypes = ["source", "target", "midsource", "mid_target"];
 export const curveStyles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
-export function getCurveStyleIcon(curve_style: CurveStyleType): string {
-  if (curve_style === "straight") return "cil:graph";
-  if (curve_style === "taxi") return "icon-park-outline:chart-graph";
-  if (curve_style === "unbundled-bezier") return "ph:bezier-curve";
-  return "cil:graph";
+export function getCurveStyleIcon(curve_style: CurveStyleType): AvailableIcons {
+  if (curve_style === "straight") return IconEnum.straight_edges;
+  if (curve_style === "taxi") return IconEnum.taxi_edges;
+  if (curve_style === "unbundled-bezier") return IconEnum.unbundled_bezier_edges;
+  return IconEnum.straight_edges;
 }

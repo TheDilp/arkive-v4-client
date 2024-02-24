@@ -27,7 +27,7 @@ function getColumns(project_id: string, setDialog: Dispatch<SetStateAction<Dialo
               size="sm"
             />
           ) : (
-            <Icon fontSize={32} icon={row?.original?.icon as string} />
+            <Icon fontSize={32} icon={row?.original?.icon} />
           )}
         </div>
       ),

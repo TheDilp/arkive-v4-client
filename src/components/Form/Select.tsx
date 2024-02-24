@@ -188,7 +188,7 @@ function RightIcon({
   optionsLength: number | undefined;
 }) {
   if (isLoading) return <Spinner />;
-  if (optionsLength) return <Icon color="white" icon={isOpen ? "ph-caret-up" : "ph:caret-down"} />;
+  if (optionsLength) return <Icon color="white" icon={isOpen ? IconEnum.chevron_up : IconEnum.chevron_down} />;
   return null;
 }
 

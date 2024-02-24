@@ -1,6 +1,7 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Dispatch, MouseEvent, SetStateAction } from "react";
 
+import { AvailableIcons } from "../../../utils";
 import { AssetType, Size } from "../../baseTypes";
 import { RequestFilterType } from "../../CRUD";
 import {
@@ -81,7 +82,7 @@ export type DrawerAtomType = {
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
   | { type: "many_nodes" | "many_edges"; data: { ids: string[]; parent_id: string } }
   | { type: "random_table_options"; data: { parent_id: string } }
-  | { type: "folder"; data: { id?: string; type: AvailableEntityType } }
+  | { type: "folder"; data: { id?: string; type: EntitiesWithFolders } }
   | { type: "map_pins"; data: { lat: number; lng: number } & Partial<MapPinType> }
   | { type: "map_character_placement"; data: { lat: number; lng: number; map_id: string } }
   | { type: "tags"; data: TagType | { project_id: string } }
@@ -107,7 +108,7 @@ export type DrawerAtomType = {
     }
   | {
       type: "mentioned_in";
-      data: { id: string; title: string; icon?: string; isAll?: boolean };
+      data: { id: string; title: string; icon?: AvailableIcons; isAll?: boolean };
     }
   | { type: "autolinker"; data: { getContext: ReactFrameworkOutput<Remirror.Extensions>; id: string; title: string } }
   | { type: "map_pin_management"; data: { map_id: string } }

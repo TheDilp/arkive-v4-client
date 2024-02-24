@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../../utils";
 import { Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
@@ -17,7 +18,7 @@ export interface NotificationType {
   title: string;
   description?: string;
   timer: number;
-  icon?: string;
+  icon?: AvailableIcons;
   image_id?: string;
   image_url?: string;
   variant?: Variant;

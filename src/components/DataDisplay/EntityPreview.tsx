@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { ItemPreviewType } from "../../types/ComponentTypes/DataDisplayTypes/itemPreviewTypes";
-import { getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
+import { AvailableIcons, getDefaultEntityIcon, getImageURL, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
 
@@ -87,7 +87,7 @@ export function EntityPreview({
         ) : null}
         {!image_id && type !== "images" ? (
           <span>
-            <Icon fontSize={size === "md" ? 32 : 24} icon={icon || getDefaultEntityIcon(type)} />
+            <Icon fontSize={size === "md" ? 32 : 24} icon={(icon as AvailableIcons) || getDefaultEntityIcon(type)} />
           </span>
         ) : null}
         <Link className={linkClasses()} to={link || "#"}>
@@ -125,7 +125,7 @@ export function EntityPreview({
           <div className={otherActionClasses()}>
             <Button
               hasNoBackground
-              icon={otherActionIcon || IconEnum.warning}
+              icon={(otherActionIcon as AvailableIcons) || IconEnum.warning}
               isIconOnly
               onClick={(e) => {
                 e.preventDefault();

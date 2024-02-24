@@ -197,7 +197,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                     </div>
                     <div className="w-1/2">
                       <IconPicker
-                        icon={mapPin.icon || ""}
+                        icon={mapPin.icon || undefined}
                         iconColor={mapPin.color || "#ffffff"}
                         name="icon"
                         onChange={handleChange}

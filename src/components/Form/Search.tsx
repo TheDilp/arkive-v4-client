@@ -21,7 +21,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { getImageURL, IconEnum } from "../../utils";
+import { AvailableIcons, getImageURL, IconEnum } from "../../utils";
 import { Avatar, Icon } from "..";
 import { Button } from ".";
 
@@ -219,7 +219,7 @@ export function Search({
       color?: string;
       image?: string;
       full_name?: string;
-      icon?: string;
+      icon?: AvailableIcons;
       parent_id?: string;
       type?: AllAvailableEntities;
     }[]
@@ -475,7 +475,7 @@ export function Search({
                         size="xs"
                       />
                     ) : null}
-                    {item?.icon && !item?.image ? <Icon icon={item?.icon} /> : null}
+                    {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
                     <span className="truncate">{item.label}</span>
                   </Item>
                 ))}

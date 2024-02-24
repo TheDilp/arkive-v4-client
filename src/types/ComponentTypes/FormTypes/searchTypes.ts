@@ -1,5 +1,6 @@
 import { OffsetOptions } from "@floating-ui/react";
 
+import { AvailableIcons } from "../../../utils";
 import {
   AllAvailableEntities,
   AssetType,
@@ -81,7 +82,7 @@ export interface SearchType extends BaseFormComponentType {
     color?: string;
     image?: string;
     full_name?: string;
-    icon?: string;
+    icon?: AvailableIcons;
     parent_id?: string;
     type?: AllAvailableEntities;
   }[];
@@ -101,7 +102,7 @@ export interface SearchType extends BaseFormComponentType {
     color?: string;
     image?: string;
     parent_id?: string;
-    icon?: string;
+    icon?: AvailableIcons;
     type?: AllAvailableEntities;
   }) => void;
 }

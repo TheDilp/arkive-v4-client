@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../../utils";
 import { BaseFormComponentType, onChangeValue } from "../../baseTypes";
 import { AvatarShape } from "../MiscTypes";
 
@@ -5,7 +6,7 @@ export interface SelectOptionType {
   label: string;
   value: string;
   image?: { link: string; shape?: AvatarShape };
-  icon?: string;
+  icon?: AvailableIcons;
   isDisabled?: boolean;
 }
 export interface SelectType extends BaseFormComponentType {

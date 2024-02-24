@@ -8,7 +8,15 @@ import { isRemirrorJSON, RemirrorJSON } from "remirror";
 import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
 import { useDeleteSubEntity, useGetEntity, useGetInfiniteEntities } from "../../hooks";
 import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
-import { drawerAtom, getAvatarInitials, getImageURL, IconEnum, messageEditorHooks, MessageTypeOptions } from "../../utils";
+import {
+  AvailableIcons,
+  drawerAtom,
+  getAvatarInitials,
+  getImageURL,
+  IconEnum,
+  messageEditorHooks,
+  MessageTypeOptions,
+} from "../../utils";
 
 type DeleteMessageType = UseMutateAsyncFunction<
   any,
@@ -88,7 +96,7 @@ export function PlaceMessage({
   id: string;
   project_id: string;
   parent_id: string | undefined;
-  content: { title?: string; image_id?: string; icon?: string };
+  content: { title?: string; image_id?: string; icon?: AvailableIcons };
   handleEditMessageDrawer: (message_id: string) => void;
   deleteMessage: DeleteMessageType;
 }) {

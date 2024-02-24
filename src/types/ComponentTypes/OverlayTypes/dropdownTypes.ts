@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { AvailableIcons } from "../../../utils";
 import { PositionType } from "../../baseTypes";
 import { IconThickness } from "../MiscTypes";
 
@@ -7,7 +8,7 @@ export interface DropdownItemType {
   id: string;
   title?: string;
   child?: ReactNode;
-  icon?: string;
+  icon?: AvailableIcons;
   image?: string;
   iconColor?: string;
   iconThickness?: IconThickness;

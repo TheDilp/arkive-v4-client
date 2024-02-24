@@ -499,7 +499,7 @@ export function CharactersView() {
                       size: "lg",
                       title: "Bulk edit tags",
                       type: "bulk_tags",
-                      data: { items: charactersWithTags, type: "characters" },
+                      data: { items: charactersWithTags, dispatch, type: "characters" },
                     }));
                   },
                 },

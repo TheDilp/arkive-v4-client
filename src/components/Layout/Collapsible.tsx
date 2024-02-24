@@ -5,7 +5,7 @@ import { useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { CollapsibleType } from "../../types";
-import { IconEnum } from "../../utils";
+import { AvailableIcons, IconEnum } from "../../utils";
 import { Button, Icon } from "..";
 
 const CollapsibleClasses = tv({
@@ -52,7 +52,7 @@ export function Collapsible({ label, icon, initialOpen, isDisabled, children, ac
         <span className={labelClasses()}>
           {icon ? (
             <span className="no-rotate">
-              <Icon icon={icon} />
+              <Icon icon={icon as AvailableIcons} />
             </span>
           ) : null}
           {label}
