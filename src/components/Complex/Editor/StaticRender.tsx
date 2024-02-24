@@ -6,6 +6,7 @@ import { ComponentType, ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
+import { useGetImage } from "../../../hooks";
 import { deleteObjectPropsRecursive, dialogAtom, IconEnum } from "../../../utils";
 import { Collapsible } from "../../Layout";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
@@ -15,22 +16,37 @@ import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExt
 
 export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
 
-function StaticRenderImage({ data }: { data: any }) {
+function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }) {
   const setDialog = useSetAtom(dialogAtom);
+  const { project_id } = useParams();
+  const { data: imageData, isInitialLoading } = useGetImage(
+    data.node.attrs.id,
+    project_id as string,
+    "images",
+    {
+      fields: ["is_public"],
+    },
+    { enabled: isPublic, isPublic },
+  );
+
+  if (isInitialLoading) return null;
+  if (!imageData?.data?.is_public && isPublic) return null;
   if (data?.node?.attrs)
     return (
-      <img
-        {...data.node.attrs}
-        alt={data.node.attrs.title}
-        className="cursor-pointer"
-        onClick={() =>
-          setDialog({
-            title: data.node.attrs.title,
-            type: "image_view",
-            data: { title: data.node.attrs.title, image: data.node.attrs.src },
-          })
-        }
-      />
+      <div className="inline-block max-w-full">
+        <img
+          {...data.node.attrs}
+          alt={data.node.attrs.title}
+          className="cursor-pointer"
+          onClick={() =>
+            setDialog({
+              title: data.node.attrs.title,
+              type: "image_view",
+              data: { title: data.node.attrs.title, image: data.node.attrs.src },
+            })
+          }
+        />
+      </div>
     );
   return null;
 }
@@ -50,7 +66,9 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     },
     link: "a",
     listItem: "li",
-    paragraph: "p",
+    paragraph: (data: any) => {
+      return <p data-node-text-align="center">{data?.children ?? null}</p>;
+    },
     orderedList: "ol",
     text: TextHandler,
     blockquote: "blockquote",
@@ -85,7 +103,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       );
     },
 
-    image: (data: any) => StaticRenderImage({ data }),
+    image: (data: any) => StaticRenderImage({ data, isPublic: isPublicView }),
     table: (...props: any) => {
       return (
         <div className="h-min w-full">
