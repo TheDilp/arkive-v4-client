@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { BaseCardType, CharacterType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
 import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
-import { Icon } from "../Misc";
+import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
 export function ProjectCard({ id, title, image }: ProjectCardType) {
@@ -109,13 +109,22 @@ export function CharacterCard({
   );
 }
 
-export function Card({ title, subtitle, children, image }: BaseCardType & { children: JSX.Element | JSX.Element[] | null }) {
+export function Card({
+  title,
+  subtitle,
+  children,
+  image,
+  avatar,
+}: BaseCardType & { avatar?: string; children: JSX.Element | JSX.Element[] | null }) {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-md border border-zinc-800 bg-zinc-700 p-4 shadow">
       {image ? (
         <div className="mb-4 h-64 w-full bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${image})` }} />
       ) : null}
-      <h2 className="pointer-events-none w-full text-center text-3xl text-white">{title}</h2>
+      <h2 className="pointer-events-none flex w-full items-center justify-center gap-x-2 text-center text-3xl text-white">
+        {avatar ? <Avatar image={avatar} size="md" /> : null}
+        <span>{title}</span>
+      </h2>
       {subtitle ? <h2 className="w-full text-center text-lg text-zinc-400">{subtitle}</h2> : null}
       {children}
     </div>
