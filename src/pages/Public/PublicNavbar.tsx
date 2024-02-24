@@ -31,9 +31,9 @@ export function PublicNavbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-2 flex items-center justify-between gap-x-2 text-lg">
+    <div className="mb-2 flex h-24 items-center justify-between gap-x-2 text-lg">
       <div className="flex flex-nowrap gap-x-2">
-        <div className="max-h-fit max-w-[56px]">
+        <div className="max-h-24 max-w-[56px]">
           <img
             alt="Logo"
             className="object-contain"

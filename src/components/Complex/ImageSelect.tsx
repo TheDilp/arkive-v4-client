@@ -19,7 +19,7 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
                 isDisabled
                   ? undefined
                   : () => {
-                      onChange({ name, value: "" });
+                      onChange({ name, value: null });
                     }
               }
               id={value as string}
