@@ -269,14 +269,16 @@ export function useGetCharacterFamily(
   character_id: string | undefined,
   relationship_type_id: string,
   count?: string,
-  options?: UseQueryOptions,
+  options?: UseQueryOptions & { isPublic?: boolean },
 ) {
   return useQuery(
     ["family", character_id, relationship_type_id, count || "5"],
     async () =>
       FetchFunction({
         method: "GET",
-        url: `${baseURLS.baseServer}/characters/family/${relationship_type_id}/${character_id}/${count || "5"}`,
+        url: `${
+          options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer
+        }/characters/family/${relationship_type_id}/${character_id}/${count || "5"}`,
       }),
     {
       enabled: options?.enabled && !!character_id,

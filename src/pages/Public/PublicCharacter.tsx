@@ -6,6 +6,7 @@ import {
   Alert,
   Collapsible,
   EntityPreview,
+  FamilyTreeDialog,
   Gallery,
   Skeleton,
   StaticRender,
@@ -43,8 +44,6 @@ export function PublicCharacter() {
     {
       relations: {
         character_fields: true,
-        relationships: true,
-        character_relationship_types: true,
         documents: true,
         locations: true,
         events: true,
@@ -84,84 +83,81 @@ export function PublicCharacter() {
   const relatedEntities = getRelatedEntities(character, selectedTab);
   return (
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>
-      <div className="flex h-full flex-1 flex-col gap-y-2 px-2">
-        <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
-            {character?.data?.biography ? (
-              <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
-            ) : (
-              <Alert label="Nothing has been written yet." />
-            )}
-          </Collapsible>
-        </div>
-        <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.additional_fields} label="Additional fields">
-            <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
-              {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
-              {(existingTemplates?.data || []).map((t) => {
-                return (
-                  <div key={t.id} className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
-                    <div className="col-span-6">
-                      <Title isDrawerTitle label={t.title} size="lg" variant="secondary" />
-                    </div>
-                    {t.character_fields.map((template_field) => {
-                      const characterField = character?.data?.character_fields?.find((f) => f.id === template_field.id);
-                      if (characterField)
-                        return (
-                          <AdditionalFieldDisplay
-                            key={template_field.id}
-                            character_field={template_field}
-                            character_field_data={characterField ?? null}
-                            isPreview={false}
-                          />
-                        );
-                      return null;
-                    })}
+      <div className="flex h-full flex-1 flex-col gap-y-2 overflow-auto px-2">
+        <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
+          {character?.data?.biography ? (
+            <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
+          ) : (
+            <Alert label="Nothing has been written yet." />
+          )}
+        </Collapsible>
+        <Collapsible icon={IconEnum.additional_fields} label="Additional fields">
+          <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
+            {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
+            {(existingTemplates?.data || []).map((t) => {
+              return (
+                <div key={t.id} className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
+                  <div className="col-span-6">
+                    <Title isDrawerTitle label={t.title} size="lg" variant="secondary" />
                   </div>
-                );
-              })}
+                  {t.character_fields.map((template_field) => {
+                    const characterField = character?.data?.character_fields?.find((f) => f.id === template_field.id);
+                    if (characterField)
+                      return (
+                        <AdditionalFieldDisplay
+                          key={template_field.id}
+                          character_field={template_field}
+                          character_field_data={characterField ?? null}
+                          isPreview={false}
+                        />
+                      );
+                    return null;
+                  })}
+                </div>
+              );
+            })}
 
-              {!isFetchingTemplates && !existingTemplates?.data?.length ? (
-                <Alert label="There is no additional information." variant="info" />
-              ) : null}
+            {!isFetchingTemplates && !existingTemplates?.data?.length ? (
+              <Alert label="There is no additional information." variant="info" />
+            ) : null}
+          </div>
+        </Collapsible>
+        <Collapsible icon={IconEnum.family_tree} label="Relationships">
+          <div className="h-96 p-2">
+            {character?.data?.id ? <FamilyTreeDialog data={{ id: character.data.id, isPublic: true }} /> : null}
+          </div>
+        </Collapsible>
+        <Collapsible icon={IconEnum.image} label="Images">
+          {character?.data?.images?.length ? (
+            <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
+          ) : (
+            <Alert label="This character has no public images available." />
+          )}
+        </Collapsible>
+        <Collapsible icon={IconEnum.search} label="Explore">
+          <div className="h-full flex-1 p-2">
+            <Tabs onChange={(_, tab) => setSelectedTab(tab)} selectedTab={selectedTab} tabs={tabs} />
+            <div className="grid grid-cols-1 gap-2 py-2 md:grid-cols-3 xl:grid-cols-6">
+              {(relatedEntities.items || []).map((d) => (
+                <div key={d.id} className="col-span-1 xl:col-span-2">
+                  <EntityPreview
+                    id={d.id}
+                    image_id={"image_id" in d ? d.image_id : ""}
+                    link={getEntityLink(
+                      project_id as string,
+                      relatedEntities.type,
+                      d.id,
+                      "parent_id" in d ? d.parent_id : null,
+                      true,
+                    )}
+                    title={d.title}
+                    type={relatedEntities.type}
+                  />
+                </div>
+              ))}
             </div>
-          </Collapsible>
-        </div>
-        <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.image} label="Images">
-            {character?.data?.images?.length ? (
-              <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
-            ) : (
-              <Alert label="This character has no public images available." />
-            )}
-          </Collapsible>
-        </div>
-        <div className="flex flex-col px-2">
-          <Collapsible icon={IconEnum.search} label="Explore">
-            <div className="h-full flex-1 p-2">
-              <Tabs onChange={(_, tab) => setSelectedTab(tab)} selectedTab={selectedTab} tabs={tabs} />
-              <div className="grid grid-cols-1 gap-2 py-2 md:grid-cols-3 xl:grid-cols-6">
-                {(relatedEntities.items || []).map((d) => (
-                  <div key={d.id} className="col-span-1 xl:col-span-2">
-                    <EntityPreview
-                      id={d.id}
-                      image_id={"image_id" in d ? d.image_id : ""}
-                      link={getEntityLink(
-                        project_id as string,
-                        relatedEntities.type,
-                        d.id,
-                        "parent_id" in d ? d.parent_id : null,
-                        true,
-                      )}
-                      title={d.title}
-                      type={relatedEntities.type}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Collapsible>
-        </div>
+          </div>
+        </Collapsible>
       </div>
     </PublicEntityLayout>
   );
