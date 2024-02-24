@@ -58,8 +58,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
 
   useEffect(() => {
     if (currentMap && currentMap?.image_id && !bounds) {
-      // setLoading(true);
-
       const img = new Image();
       img.src = getImageURL(project_id as string, "map_images", currentMap?.image_id);
       img.onload = () => {
@@ -77,7 +75,9 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
         }
       };
       setTimeout(() => {
-        firstRender.current = false;
+        if (mapRef.current) {
+          firstRender.current = false;
+        }
       }, 200);
     }
   }, [currentMap, project_id]);

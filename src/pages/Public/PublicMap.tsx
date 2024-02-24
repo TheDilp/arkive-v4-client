@@ -8,7 +8,11 @@ import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicMap() {
   const { project_id, item_id, subitem_id, map_pin_id } = useParams();
-  const { data: map, error } = useGetEntity<MapType>(
+  const {
+    data: map,
+    error,
+    isInitialLoading,
+  } = useGetEntity<MapType>(
     subitem_id || item_id,
     "maps",
     {
@@ -39,7 +43,11 @@ export function PublicMap() {
   }
   return (
     <PublicEntityLayout title={subitem_id && map_pin_id ? "" : map?.data?.title}>
-      <MapView center_on={map_pin_id} data={map?.data} isPublic isReadOnly isViewOnly />
+      {isInitialLoading ? (
+        <Skeleton type="project_view" />
+      ) : (
+        <MapView center_on={map_pin_id} data={map?.data} isPublic isReadOnly isViewOnly />
+      )}
     </PublicEntityLayout>
   );
 }
