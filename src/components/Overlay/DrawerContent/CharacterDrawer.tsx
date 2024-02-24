@@ -413,7 +413,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_relationship_types",
     {
-      enabled: selectedTab === 1,
+      enabled: selectedTab === 2,
       staleTime: 5 * 60 * 1000,
     },
   );
