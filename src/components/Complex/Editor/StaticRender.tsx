@@ -67,7 +67,13 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     link: "a",
     listItem: "li",
     paragraph: (data: any) => {
-      return <p data-node-text-align="center">{data?.children ?? null}</p>;
+      return (
+        // @ts-ignore
+        // eslint-disable-next-line react/no-unknown-property
+        <p data-node-text-align={data?.node?.attrs?.nodetextalignment} nodetextalignment={data?.node?.attrs?.nodetextalignment}>
+          {data?.children ?? null}
+        </p>
+      );
     },
     orderedList: "ol",
     text: TextHandler,
