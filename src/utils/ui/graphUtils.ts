@@ -3,7 +3,7 @@ import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
 import { CurveStyleType, EdgeType, GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
-import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, IconEnum } from "..";
+import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, getThumbnailUrl, IconEnum } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
@@ -128,15 +128,15 @@ export function getNodeLabel(node: NodeType): string {
   return "";
 }
 
-export function getNodeImage(node: NodeType, project_id: string) {
+export function getNodeImage(node: NodeType, project_id: string, { width, height }: { width: number; height: number }) {
   if (node?.image_id) {
-    return getImageURL(project_id as string, "images", node.image_id, true);
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image_id, true), { width, height });
   }
   if (node?.document?.image) {
-    return getImageURL(project_id as string, "images", node.document.image_id, true);
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.document.image_id, true), { width, height });
   }
   if (node?.character?.portrait_id) {
-    return getImageURL(project_id as string, "images", node.character.portrait_id, true);
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.character.portrait_id, true), { width, height });
   }
 
   if (node?.icon) {
@@ -181,7 +181,8 @@ export function mapNodes(nodes: NodeType[], project_id: string, isReadOnly?: boo
 
         tags: node.tags,
 
-        background_image: getNodeImage(node, project_id) || [],
+        background_image:
+          getNodeImage(node, project_id, { width: (node.width || 50) * 3, height: (node.height || 50) * 3 }) || [],
         doc_id: node?.doc_id,
         character_id: node?.character_id,
       },

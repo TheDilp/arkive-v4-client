@@ -38,7 +38,7 @@ export function getSearchURL(type: SearchableEntities) {
 }
 
 export function getThumbnailUrl(url: string, dimensions?: { width: number; height: number }) {
-  const sizedUrl = `${dimensions?.width || 35}x${dimensions?.width || 35}/${url}`;
+  const sizedUrl = `${dimensions?.width || 35}x${dimensions?.height || 35}/${url}`;
   const hash = createHmac("sha1", import.meta.env.VITE_THUMBNAIL_SECRET)
     .update(sizedUrl)
     .digest("base64")
