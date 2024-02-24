@@ -448,6 +448,7 @@ export function ProjectSettingsView() {
                 </div>
                 <div className="col-span-12 lg:col-span-4">
                   <ImageSelect
+                    helperText="Ideal image size is 56x56"
                     isIconOnly={isLg}
                     label="Project image"
                     name="image_id"

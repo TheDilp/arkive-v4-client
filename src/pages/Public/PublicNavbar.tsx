@@ -31,12 +31,12 @@ export function PublicNavbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-2 flex h-24 items-center justify-between gap-x-2 text-lg">
+    <div className="mb-2 flex h-14 max-h-14 items-center justify-between gap-x-2 text-lg">
       <div className="flex flex-nowrap gap-x-2">
-        <div className="max-h-24 max-w-[56px]">
+        <div className="max-h-14 max-w-14 overflow-hidden">
           <img
             alt="Logo"
-            className="object-contain"
+            className="h-14 w-14 object-contain"
             src={getImageURL(project_id as string, "images", project?.data?.image_id) || "/Logo.webp"}
           />
         </div>
