@@ -361,7 +361,7 @@ export function CharactersView() {
                   ...prev,
                   type: "character_filter",
                   data: { dispatch },
-                  size: "lg",
+                  size: "xl",
                   title: "Character filter",
                 }))
               }

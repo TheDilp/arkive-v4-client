@@ -132,7 +132,7 @@ function CharacterFieldsFiltersList({
                   </div>
                 ) : null}
               </div>
-              <div className="col-span-4">
+              <div className="col-span-5">
                 <Select
                   label="Field"
                   name={`[${i}].fields.and[${fIdx}]`}
@@ -167,7 +167,7 @@ function CharacterFieldsFiltersList({
                 />
               </div>
               {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-3">
+                <div className="col-span-6">
                   <Select
                     label="Filter type"
                     name={`[${i}].fields.and[${fIdx}].filter.operator`}
@@ -178,8 +178,27 @@ function CharacterFieldsFiltersList({
                 </div>
               ) : null}
 
+              {field.field_type !== "select" && field.field_type !== "select_multiple" ? (
+                <div className="col-span-1">
+                  <div className="mt-5 h-10 w-10 self-center">
+                    <Button
+                      hasNoBackground
+                      icon={IconEnum.trash}
+                      isIconOnly
+                      onClick={() => {
+                        handleChange({
+                          name: `[${i}].fields.and`,
+                          value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
+                        });
+                      }}
+                      variant="error"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-4">
+                <div className="col-span-12">
                   <Input
                     label="Filter value"
                     name={`[${i}].fields.and[${fIdx}].filter.value`}
@@ -190,7 +209,7 @@ function CharacterFieldsFiltersList({
                 </div>
               ) : null}
               {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
-                <div className="col-span-7">
+                <div className="col-span-6">
                   <Select
                     label="Filter value"
                     name={`[${i}].fields.and[${fIdx}].filter.value`}
@@ -204,6 +223,24 @@ function CharacterFieldsFiltersList({
                     options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
                     value={(field?.filter?.value || "") as string | number}
                   />
+                </div>
+              ) : null}
+              {field.field_type === "select" || field.field_type === "select_multiple" ? (
+                <div className="col-span-1">
+                  <div className="mt-5 h-10 w-10 self-center">
+                    <Button
+                      hasNoBackground
+                      icon={IconEnum.trash}
+                      isIconOnly
+                      onClick={() => {
+                        handleChange({
+                          name: `[${i}].fields.and`,
+                          value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
+                        });
+                      }}
+                      variant="error"
+                    />
+                  </div>
                 </div>
               ) : null}
               {relationFiltersList.includes(field?.field_type) ? (
@@ -245,22 +282,6 @@ function CharacterFieldsFiltersList({
                   </div>
                 </div>
               ) : null}
-              <div className="col-span-1">
-                <div className="mt-5 h-10 w-10 self-center">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.trash}
-                    isIconOnly
-                    onClick={() => {
-                      handleChange({
-                        name: `[${i}].fields.and`,
-                        value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
-                      });
-                    }}
-                    variant="error"
-                  />
-                </div>
-              </div>
             </Fragment>
           ))}
           <div className="col-span-12 flex items-center justify-between">
