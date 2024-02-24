@@ -2,7 +2,7 @@ import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { Dispatch, MouseEvent, useLayoutEffect, useState } from "react";
+import { Dispatch, MouseEvent, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import {
@@ -34,10 +34,12 @@ import {
   DialogAtomType,
   DrawerAtomType,
   DrawerContentCreateNewType,
+  EntitiesWithFolders,
   TagType,
   WebhookType,
 } from "../../types";
 import {
+  AvailableIcons,
   baseURLS,
   breadcrumbsAtom,
   capitalizeFirstLetter,
@@ -133,7 +135,11 @@ function columns(
         ) : (
           <Icon
             fontSize={24}
-            icon={row.original.is_folder ? IconEnum.folder : row.original.icon || getDefaultEntityIcon(entityType)}
+            icon={
+              row.original.is_folder
+                ? IconEnum.folder
+                : (row.original.icon as AvailableIcons) || getDefaultEntityIcon(entityType)
+            }
           />
         ),
       maxSize: 3.25,
@@ -386,7 +392,7 @@ function EntityItem({
               src={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             />
           ) : (
-            <Icon fontSize={100} icon={is_folder ? IconEnum.folder : icon || getDefaultEntityIcon(type)} />
+            <Icon fontSize={100} icon={is_folder ? IconEnum.folder : (icon as AvailableIcons) || getDefaultEntityIcon(type)} />
           )}
         </div>
         <span className="max-w-full truncate font-lato text-white hover:text-white">{title}</span>
@@ -525,6 +531,10 @@ export function FolderView() {
       setBreadcrumbs({ items: data?.data?.parents, type: type as AvailableEntityType });
     }
   }, [data, type, setBreadcrumbs, item_id]);
+
+  useEffect(() => {
+    dispatch({ type: "clearSelection" });
+  }, [item_id]);
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
@@ -857,13 +867,35 @@ export function FolderView() {
                       },
                     ]
                   : []),
-
+                ...(EntitiesWithTags.includes(type as AvailableEntityType)
+                  ? [
+                      {
+                        icon: IconEnum.folder,
+                        hasNoBackground: true,
+                        isIconOnly: true,
+                        tooltip: "Move to folder",
+                        onClick: () => {
+                          const ids = Object.values(selection || {}).flatMap((id) => id);
+                          const items = (base?.data || [])
+                            ?.filter((e) => ids.includes(e.id))
+                            .map((e) => ({ id: e.id, title: e.title }));
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: "lg",
+                            title: "Bulk move to folder",
+                            type: "bulk_folder",
+                            data: { items, type: type as EntitiesWithFolders },
+                          }));
+                        },
+                      },
+                    ]
+                  : []),
                 {
                   icon: IconEnum.tags,
                   hasNoBackground: true,
                   isIconOnly: true,
                   tooltip: "Add/remove tags",
-                  onClick: async () => {
+                  onClick: () => {
                     if (EntitiesWithTags.includes(type as AvailableEntityType)) {
                       const ids = Object.values(selection || {}).flatMap((id) => id);
                       const charactersWithTags = (base?.data || [])
@@ -880,6 +912,7 @@ export function FolderView() {
                     }
                   },
                 },
+
                 {
                   icon: IconEnum.trash,
                   variant: "error",
