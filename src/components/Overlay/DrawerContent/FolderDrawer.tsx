@@ -1,16 +1,18 @@
+/* eslint-disable react/prop-types */
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { AvailableEntityType, TagType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { EntitiesWithFolders, TagType } from "../../../types";
+import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { FolderSelect } from "../../Complex";
 import { Button, Input } from "../../Form";
 
 type Props = {
   data: {
     id?: string;
-    type: AvailableEntityType;
+    type: EntitiesWithFolders;
   };
 };
 type ExistingFolderType = {
@@ -31,10 +33,11 @@ export function FolderDrawer({ data }: Props) {
     parent_id: item_id,
     tags: [],
   });
+  const createNotification = useNotifications();
 
   const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity(data.type);
   const { mutateAsync: updateFolder, isLoading: isUpdating } = useUpdateEntity<{
-    data: { id: string; title: string };
+    data: { id: string; title: string; parent_id: string | null };
     relations?: { tags: { id: string }[] };
   }>(data.type, project_id as string);
   const { data: existingFolder } = useGetEntity<ExistingFolderType>(
@@ -42,7 +45,7 @@ export function FolderDrawer({ data }: Props) {
     data.type,
     {
       data: {},
-      fields: ["id", "is_folder", "title"],
+      fields: ["id", "is_folder", "title", "parent_id"],
       relations: data.type === "random_tables" ? {} : { tags: true },
     },
     {
@@ -64,9 +67,9 @@ export function FolderDrawer({ data }: Props) {
       if (data?.id) {
         await updateFolder(
           data.type === "random_tables"
-            ? { data: { id: data.id, title: folder.title } }
+            ? { data: { id: data.id, title: folder.title, parent_id: folder?.parent_id || null } }
             : {
-                data: { id: data.id, title: folder.title },
+                data: { id: data.id, title: folder.title, parent_id: folder?.parent_id || null },
                 relations: { tags: folder.tags || [] },
               },
           {
@@ -93,6 +96,26 @@ export function FolderDrawer({ data }: Props) {
         }}
         value={folder.title}
       />
+
+      <FolderSelect
+        handleChange={(props) => {
+          if (!Array.isArray(props)) {
+            if (folder.id && props?.value === folder.id) {
+              createNotification({
+                title: "Cannot move a folder to itself.",
+                variant: "error",
+                timer: 3,
+                icon: IconEnum.error,
+              });
+              return;
+            }
+          }
+          handleChange(props);
+        }}
+        parent_id={folder?.parent_id ?? null}
+        type={data.type}
+      />
+
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
         isDisabled={!folder.title || isCreating || isUpdating}
