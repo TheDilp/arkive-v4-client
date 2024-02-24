@@ -38,7 +38,7 @@ export function ProjectCard({ id, title, image }: ProjectCardType) {
         ))}
       </div>
       <div
-        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-center transition-all group-hover:brightness-75"
+        className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
         style={{
           backgroundImage: `url(${image})`,
         }}
