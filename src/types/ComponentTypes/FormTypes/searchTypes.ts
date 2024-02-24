@@ -76,6 +76,7 @@ export interface SearchType extends BaseFormComponentType {
   initialDisplayValue?: string;
   imageType?: AssetType;
   limit?: number;
+  parent_id?: string;
   manualResults?: {
     label: string;
     value: string;

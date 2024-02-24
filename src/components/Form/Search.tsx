@@ -187,6 +187,7 @@ export function Search({
   onSearch,
   size,
   isPublic,
+  parent_id,
 }: SearchType) {
   const { project_id } = useParams();
   const {
@@ -224,7 +225,7 @@ export function Search({
       type?: AllAvailableEntities;
     }[]
   >(
-    { data: { search_term: inputValue, project_id: project_id as string }, limit: limit ?? 0 },
+    { data: { search_term: inputValue, project_id: project_id as string, parent_id }, limit: limit ?? 0 },
     searchEntity,
     project_id as string,
     {

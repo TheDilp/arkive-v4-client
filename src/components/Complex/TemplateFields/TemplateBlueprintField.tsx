@@ -14,9 +14,19 @@ type Props = {
   fieldType: "blueprints_single" | "blueprints_multiple";
   isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
+  blueprint_id: string | null | undefined;
 };
 
-export function TemplateBlueprintField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
+export function TemplateBlueprintField({
+  title,
+  name,
+  handleChange,
+  id,
+  blueprint_id,
+  fieldType,
+  currentValue,
+  isCollapsible,
+}: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
@@ -50,6 +60,7 @@ export function TemplateBlueprintField({ title, name, handleChange, id, fieldTyp
               },
             ]);
           }}
+          parent_id={blueprint_id || undefined}
           placeholder="Press enter to search."
           searchEntity="blueprint_instances"
         />

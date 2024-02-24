@@ -246,7 +246,10 @@ export function useGetInfiniteEntities<ReturnType>(
 
 // #region misc
 export function useSearch<ReturnType>(
-  request: { data: { search_term: string; project_id: string } | { tag_ids: string[]; match: "all" | "any" }; limit: number },
+  request: {
+    data: { search_term: string; project_id: string; parent_id?: string } | { tag_ids: string[]; match: "all" | "any" };
+    limit: number;
+  },
   type: SearchableEntities,
   project_id: string,
   options?: UseQueryOptions<any> & { queryKeyConcat?: string[]; isPublic?: boolean; isFolders?: boolean },

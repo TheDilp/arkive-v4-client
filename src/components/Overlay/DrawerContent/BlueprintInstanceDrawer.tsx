@@ -229,6 +229,7 @@ function FieldTemplateRows({
             return (
               <TemplateBlueprintField
                 key={template_field.id}
+                blueprint_id={template_field.blueprint_id}
                 currentValue={
                   blueprint_fields_data[`${blueprintValueIndex < 0 ? blueprint_fields_data.length : blueprintValueIndex}`]
                     ?.blueprint_instances
