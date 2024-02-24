@@ -12,6 +12,7 @@ import {
   AutomentionDrawer,
   BlueprintDrawer,
   BlueprintInstanceDrawer,
+  BulkFolderDrawer,
   BulkTagsDrawer,
   CalendarDrawer,
   CalendarFilterDrawer,
@@ -202,6 +203,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
                 {drawer.type === "bulk_tags" ? <BulkTagsDrawer data={drawer?.data} /> : null}
+                {drawer.type === "bulk_folder" ? <BulkFolderDrawer data={drawer?.data} /> : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}
