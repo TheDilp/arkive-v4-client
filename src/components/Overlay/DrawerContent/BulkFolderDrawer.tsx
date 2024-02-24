@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdate, useHandleChange } from "../../../hooks";
-import { EntitiesWithFolders } from "../../../types";
+import { EntitiesWithFolders, TableDispatch } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { FolderSelect } from "../../Complex";
 import { Button } from "../../Form";
@@ -13,6 +13,7 @@ import { Tooltip } from "../Tooltip";
 type Props = {
   data: {
     items: { id: string; title: string }[];
+    dispatch: TableDispatch;
     type: EntitiesWithFolders;
   };
 };
@@ -26,6 +27,7 @@ export function BulkFolderDrawer({ data }: Props) {
   function handleSave() {
     const itemsToUpdate = folder.parent_id ? data.items.filter((item) => item.id !== folder.parent_id) : data.items;
     mutate({ data: itemsToUpdate.map((item) => ({ data: { id: item.id, parent_id: folder.parent_id } })) });
+    data.dispatch({ type: "clearSelection" });
   }
 
   return (

@@ -884,7 +884,7 @@ export function FolderView() {
                             size: "lg",
                             title: "Bulk move to folder",
                             type: "bulk_folder",
-                            data: { items, type: type as EntitiesWithFolders },
+                            data: { items, dispatch, type: type as EntitiesWithFolders },
                           }));
                         },
                       },
@@ -907,7 +907,7 @@ export function FolderView() {
                         size: "lg",
                         title: "Bulk edit tags",
                         type: "bulk_tags",
-                        data: { items: charactersWithTags, type: type as AvailableEntityType },
+                        data: { items: charactersWithTags, dispatch, type: type as AvailableEntityType },
                       }));
                     }
                   },
