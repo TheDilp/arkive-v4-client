@@ -760,4 +760,41 @@ export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntity
     },
   );
 }
+
+export function useBulkUpdate(project_id: string, type: AvailableEntityType) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (updateItemValues: { data: { data: { id: string; parent_id?: string | null; [key: string]: any } }[] }) => {
+      if (updateItemValues.data.length) {
+        return FetchFunction({
+          url: `${baseURLS.baseServer}/bulk/update/${type}`,
+          body: JSON.stringify(updateItemValues),
+          method: "POST",
+        });
+      }
+      return null;
+    },
+    {
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
 // #endregion misc
