@@ -1,12 +1,8 @@
-import React from "react";
-
 import { useGetEntity } from "../../hooks";
 import { EntitiesWithFolders, HandleChangePropsType } from "../../types";
 import { IconEnum } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Search } from "../Form";
-import { Icon } from "../Misc";
-import { Tooltip } from "../Overlay";
 
 type Props = {
   type: EntitiesWithFolders;
@@ -33,28 +29,19 @@ export function FolderSelect({ handleChange, type, parent_id }: Props) {
   return (
     <div className="flex flex-nowrap items-center gap-x-2">
       {!!parentData?.data?.parents?.length && parent_id ? (
-        <div className="flex-1">
+        <div className="flex-1 [&>div>span>a>span]:overflow-visible [&>div>span>a>span]:whitespace-normal [&>div>span>a>span]:break-words [&>div>span>a]:max-h-fit [&>div>span>a]:min-h-fit [&>div>span]:h-fit [&>div>span]:max-h-fit [&>div>span]:min-h-fit [&>div>span]:py-0">
           <EntityPreview
             clearAction={() => handleChange({ name: "parent_id", value: null })}
             icon={IconEnum.folder}
             id="parent"
             label="Folder"
-            title={parentData?.data?.parents?.at(-1)?.title || ""}
+            title={`${parentData?.data?.parents?.map((p) => p.title).join(" / ") || ""}`}
             type={type}
           />
         </div>
       ) : (
         <Search isFolders label="Folder" name="parent_id" onChange={handleChange} searchEntity={type} />
       )}
-
-      <Tooltip
-        allowedPlacements={["left"]}
-        content={`root/${parentData?.data?.parents?.map((p) => p.title).join("/") || ""}`}
-        isInline>
-        <div className="mb-1.5 h-6 w-6 self-end">
-          <Icon fontSize={24} icon={IconEnum.info_circle} />
-        </div>
-      </Tooltip>
     </div>
   );
 }
