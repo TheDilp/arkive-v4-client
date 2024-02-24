@@ -1,9 +1,10 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdate, useHandleChange } from "../../../hooks";
 import { EntitiesWithFolders, TableDispatch } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { FolderSelect } from "../../Complex";
 import { Button } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -23,11 +24,12 @@ export function BulkFolderDrawer({ data }: Props) {
   const [folder, setFolder] = useState<{ parent_id: string | null }>({ parent_id: null });
   const { mutate } = useBulkUpdate(project_id as string, data.type);
   const { handleChange } = useHandleChange({ data: folder, setData: setFolder });
-
+  const resetDrawer = useResetAtom(drawerAtom);
   function handleSave() {
     const itemsToUpdate = folder.parent_id ? data.items.filter((item) => item.id !== folder.parent_id) : data.items;
     mutate({ data: itemsToUpdate.map((item) => ({ data: { id: item.id, parent_id: folder.parent_id } })) });
     data.dispatch({ type: "clearSelection" });
+    resetDrawer();
   }
 
   return (
