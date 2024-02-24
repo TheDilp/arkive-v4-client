@@ -219,6 +219,7 @@ function FieldTemplateRows({
             return (
               <TemplateBlueprintField
                 key={template_field.id}
+                blueprint_id={undefined}
                 currentValue={
                   character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
                     ?.blueprint_instances
