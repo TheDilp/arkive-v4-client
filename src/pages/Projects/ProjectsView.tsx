@@ -67,7 +67,7 @@ export function ProjectsView() {
         <div className="w-full">
           <Navbar />
         </div>
-        <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 2xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
           {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
           {data?.data
             ? data.data.map((project) => (
