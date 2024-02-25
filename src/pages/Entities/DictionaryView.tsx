@@ -147,7 +147,7 @@ function createColumns(
 }
 
 export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boolean }) {
-  const { item_id } = useParams();
+  const { project_id, item_id } = useParams();
   const [filter, setFilter] = useState("");
   const user = useAtomValue(userAtom);
   const [filterType, setFilterType] = useState<FilterType>("title");
@@ -165,9 +165,6 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     "dictionaries",
     {
       fields: ["id", "title", "is_public"],
-      relations: {
-        words: !!isPublic,
-      },
     },
     {
       staleTime: 5 * 60 * 1000,
@@ -186,7 +183,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       orderBy,
     },
     "words",
-    { enabled: !!data?.data && !isInitialLoading && !isPublic, isPublic },
+    { queryKeyOverwrite: ["allEntities", project_id as string, "words"], isPublic },
   );
   useLayoutEffect(() => {
     if (!filter) {
@@ -269,7 +266,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
             selection,
             expandable: true,
           }}
-          data={words?.data || data?.data?.words || []}
+          data={words?.data || []}
           dispatch={dispatch}
           isLoading={isInitialLoading || isInitialLoadingWords}
           pagination={pagination}

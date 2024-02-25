@@ -143,7 +143,6 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
             return { old };
           }
         }
-
         if (parentEntityType === "graphs") {
           const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
           queryClient.setQueryData<{ data: GraphType }>([parentEntityType, vars.data.parent_id], (oldData) =>
@@ -181,9 +180,10 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
           queryClient.invalidateQueries(["allEntities", project_id, vars.data.parent_id]);
           queryClient.invalidateQueries([parentEntityType, vars.data.parent_id]);
         }
-        if (type === "blueprint_instances") {
+        if (type === "blueprint_instances" || type === "words") {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
         }
+
         createNotification({
           title: data?.message || getEntityCRUDNotification(type, "create"),
           variant: "success",

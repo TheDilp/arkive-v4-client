@@ -7,12 +7,10 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   ConversationType,
-  DictionaryType,
   MapLayerType,
   MapPinType,
   MapType,
   MessageType,
-  WordType,
 } from "../../types";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
@@ -98,35 +96,22 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
           });
           return { old };
         }
-        if (type === "words") {
-          const old = queryClient.getQueryData<DictionaryType>(["dictionaries", vars.data.parent_id]);
-          queryClient.setQueryData<{ data: DictionaryType }>(["dictionaries", vars.data.parent_id], (oldData) => {
-            if (oldData) {
-              const temp = cloneDeep(oldData);
-              set(
-                temp,
-                `data.${type}`,
-                ((temp?.data?.[type] as WordType[]) || [])?.filter((item) => item?.id !== vars.data.id),
-              );
-              return temp;
-            }
-            return oldData;
-          });
-          return { old };
-        }
+
         return { old: {} };
       },
       onSuccess: (data) => {
+        if (type === "events") {
+          queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
+        }
+
+        queryClient.invalidateQueries(["allEntities", project_id, type]);
+
         createNotification({
           title: data?.message || getEntityCRUDNotification(type, "delete"),
           variant: "success",
           icon: IconEnum.check,
           timer: 5,
         });
-        if (type === "events") {
-          queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, parent_id] });
-        }
-        queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, type] });
       },
       onError: (_, vars, context) => {
         queryClient.setQueryData(["dictionaries", vars.data.parent_id], context?.old);
