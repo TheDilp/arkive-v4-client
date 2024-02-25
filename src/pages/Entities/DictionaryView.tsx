@@ -1,11 +1,21 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
-import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, TextFilters, userAtom } from "../../utils";
+import {
+  baseURLS,
+  dialogAtom,
+  drawerAtom,
+  FetchFunction,
+  getPluralEntityType,
+  IconEnum,
+  TextFilters,
+  userAtom,
+} from "../../utils";
 
 type FilterType = "title" | "translation";
 const columnHelper = createColumnHelper<WordType>();
@@ -153,6 +163,8 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   const [filterType, setFilterType] = useState<FilterType>("title");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const resetDialogAtom = useResetAtom(dialogAtom);
+  const { mutateAsync: deleteMany } = useDeleteMany("words", project_id);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
@@ -265,6 +277,44 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
             filters,
             selection,
             expandable: true,
+            selectedActions: [
+              {
+                icon: IconEnum.trash,
+                variant: "error",
+                hasNoBackground: true,
+                isIconOnly: true,
+                tooltip: "Delete selected rows.",
+                onClick: () => {
+                  const ids = Object.values(selection || {}).flatMap((i) => i);
+                  if (ids.length) {
+                    setDialog((prev) => ({
+                      ...prev,
+                      title: "Delete many",
+                      description: `Are you sure you want to delete ${ids.length} ${getPluralEntityType("words")}?`,
+                      warning: "This action cannot be undone.",
+                      isOverlay: true,
+                      cancel: {
+                        label: "Cancel",
+                        variant: "primary",
+                        action: resetDialogAtom,
+                      },
+                      confirm: {
+                        label: "Delete",
+                        icon: IconEnum.trash,
+                        action: async () =>
+                          deleteMany(
+                            { data: { ids } },
+                            {
+                              onSuccess: () => dispatch({ type: "clearSelection" }),
+                            },
+                          ),
+                        variant: "error",
+                      },
+                    }));
+                  }
+                },
+              },
+            ],
           }}
           data={words?.data || []}
           dispatch={dispatch}
