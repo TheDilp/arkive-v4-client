@@ -85,7 +85,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
       ) : null}
       {selectedTab === 1 ? (
         <div className="mt-2 flex flex-col gap-y-2 pr-2">
-          <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-800">
+          <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-900">
             <span>Insert new layer:</span>
             <div className="h-8 w-8">
               <Button
@@ -119,13 +119,14 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                       {(provided, draggableSnapshot) => (
                         <div
                           ref={provided.innerRef}
-                          className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-800 ${
-                            draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
+                          className={`my-1 flex w-full flex-nowrap items-center gap-x-2 ${
+                            draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                           }`}
                           {...provided.draggableProps}
                           style={{
                             ...provided.draggableProps.style,
-                            left: 16,
+                            left: "calc(100%-3px)",
+                            right: 24,
                           }}>
                           <div {...provided.dragHandleProps} className="self-end pb-2">
                             <Icon fontSize={24} icon={IconEnum.menu} />

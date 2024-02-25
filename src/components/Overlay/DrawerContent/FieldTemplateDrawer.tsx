@@ -135,7 +135,7 @@ function FieldRow({
                           left: "calc(100%-3px)",
                           right: 24,
                         }}>
-                        <div {...provided.dragHandleProps} className="self-center">
+                        <div {...provided.dragHandleProps} className="self-end pb-2">
                           <Icon fontSize={24} icon={IconEnum.menu} />
                         </div>
                         <div className="w-full">
