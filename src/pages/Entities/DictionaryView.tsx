@@ -195,8 +195,9 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       orderBy,
     },
     "words",
-    { queryKeyOverwrite: ["allEntities", project_id as string, "words"], isPublic },
+    { queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || ""], isPublic },
   );
+
   useLayoutEffect(() => {
     if (!filter) {
       dispatch({
