@@ -30,6 +30,9 @@ const ButtonClasses = tv({
       error: {
         base: "bg-red-600 text-white border-red-600 focus:border-red-400",
       },
+      "error-bordered": {
+        base: "text-red-700 border-red-700",
+      },
     },
     size: {
       xs: "h-6 text-sm",

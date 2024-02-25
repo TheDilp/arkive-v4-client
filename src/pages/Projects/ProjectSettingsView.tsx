@@ -1,7 +1,7 @@
 import { useUser } from "@clerk/clerk-react";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { deepMerge } from "remirror";
 
 import {
@@ -23,6 +23,7 @@ import {
 } from "../../components";
 import {
   useBreakpoint,
+  useDeleteEntity,
   useDeleteWebhook,
   useGetEntities,
   useGetEntity,
@@ -93,15 +94,14 @@ function mapPinTypeTableColumns(
     mapPinTypesColumnHelper.display({
       id: "default_icon_color",
       header: "Default icon color",
-      cell: ({ row }) =>
-        row.original.default_icon_color ? (
-          <div className="flex w-full justify-center">
-            <div
-              className="h-6 w-6 select-none rounded-full shadow"
-              style={{ backgroundColor: row.original.default_icon_color }}
-            />
-          </div>
-        ) : null,
+      cell: ({ row }) => (
+        <div className="flex w-full justify-center">
+          <div
+            className="h-6 w-6 select-none rounded-full shadow"
+            style={{ backgroundColor: row.original.default_icon_color || DefaultTagColor }}
+          />
+        </div>
+      ),
       meta: {
         centered: true,
       },
@@ -276,7 +276,7 @@ export function ProjectSettingsView() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
 
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
@@ -330,6 +330,7 @@ export function ProjectSettingsView() {
     { enabled: !!user?.id && finalTabs[selectedTab].label === "User settings" },
   );
   const { mutateAsync: deleteWebhook } = useDeleteWebhook();
+  const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
   useLayoutEffect(() => {
     if (projectData?.data) setProject(projectData.data);
@@ -476,6 +477,51 @@ export function ProjectSettingsView() {
                   <span>Show images in table folder view:</span>
                   <Checkbox name="show_image_table_view" onChange={handleChange} value={false} />
                 </div>
+              </div>
+
+              <div>
+                <Collapsible label="Delete project" size="xl">
+                  <div className="flex items-center justify-end py-2">
+                    <div>
+                      <Button
+                        icon={IconEnum.trash}
+                        label="Delete project (permanent)"
+                        onClick={() => {
+                          setDialog((prev) => ({
+                            ...prev,
+                            title: `Delete project - ${project?.title || ""}`,
+                            description:
+                              "Are you sure you wish to delete this project? All data aassociated with this project will be PERMANENTLY deleted.",
+                            warning: "THIS ACTION IS IRREVERSABLE! ONCE DELETED DATA CANNOT BE RECOVERED!",
+                            cancel: {
+                              action: () => {},
+                              variant: "info",
+                              label: "Delete (permanent)",
+                              icon: IconEnum.close,
+                            },
+                            confirm: {
+                              action: async () => {
+                                await deleteProject(
+                                  { data: { id: project_id as string } },
+                                  {
+                                    onSuccess: () => {
+                                      navigate("/");
+                                    },
+                                  },
+                                );
+                              },
+                              variant: "error-bordered",
+                              label: "Delete (permanent)",
+                              icon: IconEnum.trash,
+                            },
+                            isOverlay: true,
+                          }));
+                        }}
+                        variant="error"
+                      />
+                    </div>
+                  </div>
+                </Collapsible>
               </div>
             </div>
           ) : null}
