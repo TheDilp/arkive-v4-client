@@ -14,7 +14,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   parent_id: string,
   webhooks: WebhookType[],
-  is_public: boolean,
+  is_public?: boolean,
 ) {
   const actions = [
     columnHelper.accessor("title", {
@@ -261,13 +261,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       </div>
       <div className="h-fit w-full">
         <Table
-          columns={createColumns(
-            setDrawer,
-            setDialog,
-            (item_id || id) as string,
-            user?.webhooks || [],
-            data?.data?.is_public || false,
-          )}
+          columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [], isPublic)}
           config={{
             hasSelect: !id && !isPublic,
             orderBy,
