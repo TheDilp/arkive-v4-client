@@ -409,15 +409,12 @@ export function FolderView() {
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const isFolder = pathname.includes("/folder/");
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
-  const [{ selection }, dispatch] = useTable({ selection: [] });
+  const [{ selection, pagination }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
   const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
   const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
-      pagination: {
-        limit: 10,
-        page: 0,
-      },
+      pagination,
       data: {
         project_id,
         item_id,
@@ -492,6 +489,7 @@ export function FolderView() {
       data: {
         project_id,
       },
+      pagination,
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
@@ -960,6 +958,7 @@ export function FolderView() {
             data={base?.data || []}
             dispatch={dispatch}
             isLoading={isInitialLoading || isInitialLoadingFolder}
+            pagination={pagination}
             type={type as AvailableEntityType}
           />
         </div>
