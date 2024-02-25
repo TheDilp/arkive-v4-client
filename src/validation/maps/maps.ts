@@ -16,7 +16,16 @@ export const InsertMapSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
-      map_layers: InsertMapLayerSchema.array().optional(),
+      map_layers: z
+        .object({
+          data: z.object({
+            title: z.string(),
+            is_public: z.boolean().nullable().optional(),
+            image_id: z.string(),
+          }),
+        })
+        .array()
+        .optional(),
     })
     .optional(),
 });
