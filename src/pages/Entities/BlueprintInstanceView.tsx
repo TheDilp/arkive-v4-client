@@ -443,7 +443,7 @@ function createColumns(
                 id: "2",
                 title: "View public page",
                 icon: IconEnum.public,
-                onClick: () => navigate(`/public/${project_id}/documents/${row.original.id}`),
+                onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
                 isDisabled: !row.original.is_public,
               },
               {
