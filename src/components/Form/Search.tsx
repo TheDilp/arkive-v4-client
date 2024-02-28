@@ -373,6 +373,9 @@ export function Search({
               if (displayValue) {
                 setDisplayValue("");
               }
+              if (!inputValue && value) {
+                onChange({ name, value: "" });
+              }
             }
             if (e.key === "ArrowUp") {
               if (activeIndex === 0 && data?.data) {
