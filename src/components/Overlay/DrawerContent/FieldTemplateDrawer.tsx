@@ -51,6 +51,8 @@ function FieldRow({
   random_table_id,
   random_table,
   isLoading,
+  blueprint,
+  blueprint_id,
   changeField,
 }: (Omit<CharacterFieldType, "options"> & { options?: { id: string; value: string }[] }) & {
   index: number;
@@ -213,6 +215,20 @@ function FieldRow({
             onChange={changeField}
             searchEntity="calendars"
             value={calendar_id || ""}
+          />
+        </div>
+      ) : null}
+      {field_type === "blueprints_single" || field_type === "blueprints_multiple" ? (
+        <div className="flex flex-col gap-y-2 pl-8">
+          <Search
+            hasShownOption
+            initialDisplayValue={blueprint?.title || ""}
+            isDisabled={isLoading}
+            label="Blueprint"
+            name={`character_fields[${index}].blueprint_id`}
+            onChange={changeField}
+            searchEntity="blueprints"
+            value={blueprint_id || ""}
           />
         </div>
       ) : null}
@@ -429,6 +445,8 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
                                       <FieldRow
                                         key={field.id}
+                                        blueprint={field?.blueprint}
+                                        blueprint_id={field?.blueprint_id}
                                         calendar={field?.calendar}
                                         calendar_id={field?.calendar_id}
                                         changeField={handleChange}

@@ -1,3 +1,4 @@
+import { BlueprintType } from "./blueprintTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
 import { TagType } from "./tagTypes";
 
@@ -52,6 +53,8 @@ export interface CharacterFieldType {
   formula?: string | null;
   random_table_id?: string | null;
   calendar_id?: string | null;
+  blueprint_id?: string | null;
+  blueprint?: Pick<BlueprintType, "id" | "title" | "icon">;
   options?: { id: string; value: string }[];
   random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string; random_table_options: RandomTableOptionType[] };
