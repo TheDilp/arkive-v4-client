@@ -230,11 +230,6 @@ function membersColumns() {
       header: "Email",
       cell: ({ row }) => row.original.email,
     }),
-    membersColumnHelper.display({
-      id: "nickname",
-      header: "Nickname",
-      cell: ({ row }) => row.original.nickname,
-    }),
     relationshipTypesColumnHelper.display({
       id: "action",
       header: "Actions",
@@ -479,50 +474,54 @@ export function ProjectSettingsView() {
                 </div>
               </div>
 
-              <div>
-                <Collapsible label="Delete project" size="xl">
-                  <div className="flex items-center justify-end py-2">
-                    <div>
-                      <Button
-                        icon={IconEnum.trash}
-                        label="Delete project (permanent)"
-                        onClick={() => {
-                          setDialog((prev) => ({
-                            ...prev,
-                            title: `Delete project - ${project?.title || ""}`,
-                            description:
-                              "Are you sure you wish to delete this project? All data aassociated with this project will be PERMANENTLY deleted.",
-                            warning: "THIS ACTION IS IRREVERSABLE! ONCE DELETED DATA CANNOT BE RECOVERED!",
-                            cancel: {
-                              action: () => {},
-                              variant: "info",
-                              label: "Delete (permanent)",
-                              icon: IconEnum.close,
-                            },
-                            confirm: {
-                              action: async () => {
-                                await deleteProject(
-                                  { data: { id: project_id as string } },
-                                  {
-                                    onSuccess: () => {
-                                      navigate("/");
-                                    },
-                                  },
-                                );
+              {isProjectOwner ? (
+                <div>
+                  <Collapsible label="Delete project" size="xl">
+                    <div className="flex items-center justify-end py-2">
+                      <div>
+                        <Button
+                          icon={IconEnum.trash}
+                          label="Delete project (permanent)"
+                          onClick={() => {
+                            setDialog((prev) => ({
+                              ...prev,
+                              title: `Delete project - ${project?.title || ""}`,
+                              description:
+                                "Are you sure you wish to delete this project? All data aassociated with this project will be PERMANENTLY deleted.",
+                              warning: "THIS ACTION IS IRREVERSABLE! ONCE DELETED DATA CANNOT BE RECOVERED!",
+                              cancel: {
+                                action: () => {},
+                                variant: "info",
+                                label: "Delete (permanent)",
+                                icon: IconEnum.close,
                               },
-                              variant: "error-bordered",
-                              label: "Delete (permanent)",
-                              icon: IconEnum.trash,
-                            },
-                            isOverlay: true,
-                          }));
-                        }}
-                        variant="error"
-                      />
+                              confirm: {
+                                action: async () => {
+                                  await deleteProject(
+                                    { data: { id: project_id as string } },
+                                    {
+                                      onSuccess: () => {
+                                        navigate("/");
+                                      },
+                                    },
+                                  );
+                                },
+                                variant: "error-bordered",
+                                label: "Delete (permanent)",
+                                icon: IconEnum.trash,
+                              },
+                              isOverlay: true,
+                            }));
+                          }}
+                          variant="error"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </Collapsible>
-              </div>
+                  </Collapsible>
+                </div>
+              ) : (
+                false
+              )}
             </div>
           ) : null}
           {selectedTab === 1 ? (
