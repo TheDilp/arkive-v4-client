@@ -3,11 +3,14 @@ import { Navigate, useParams } from "react-router-dom";
 import { Skeleton } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { MapType } from "../../types";
+import { IconEnum, useNotifications } from "../../utils";
 import { MapView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicMap() {
   const { project_id, item_id, subitem_id, map_pin_id } = useParams();
+  const createNotification = useNotifications();
+
   const {
     data: map,
     error,
@@ -32,13 +35,9 @@ export function PublicMap() {
     },
   );
 
-  if (error) throw new Error("No public access");
-
   if (!map?.data) return <Skeleton type="project_view" />;
-  if (!map?.data?.is_public) {
-    if (subitem_id) {
-      return <Navigate to="./" />;
-    }
+  if (!map?.data?.is_public || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/public/${project_id}/maps`} />;
   }
   return (

@@ -1,15 +1,15 @@
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import { AdditionalBlueprintFieldDisplay, Collapsible } from "../../components";
 import { useGetEntity, useGetSubEntity } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { IconEnum } from "../../utils";
+import { IconEnum, useNotifications } from "../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicBlueprint() {
-  const { item_id } = useParams();
-
-  const { data: blueprint_instance } = useGetSubEntity<BlueprintInstanceType>(
+  const { project_id, item_id } = useParams();
+  const createNotification = useNotifications();
+  const { data: blueprint_instance, error } = useGetSubEntity<BlueprintInstanceType>(
     item_id,
     "blueprint_instances",
     {
@@ -36,9 +36,17 @@ export function PublicBlueprint() {
         blueprint_fields: true,
       },
     },
-    { enabled: !!blueprint_instance?.data?.parent_id, isPublic: true, staleTime: 3 * 60 * 1000 },
+    {
+      enabled: !!blueprint_instance?.data?.parent_id && blueprint_instance?.data?.is_public,
+      isPublic: true,
+      staleTime: 3 * 60 * 1000,
+    },
   );
 
+  if (!blueprint_instance?.data?.is_public || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
+    return <Navigate to={`/public/${project_id}/blueprints`} />;
+  }
   return (
     <PublicEntityLayout title={blueprint_instance?.data?.title || ""}>
       <div className="flex flex-col px-2">

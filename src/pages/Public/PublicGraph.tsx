@@ -3,10 +3,12 @@ import { Navigate, useParams } from "react-router-dom";
 import { Graph, Skeleton } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { GraphType } from "../../types";
+import { IconEnum, useNotifications } from "../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicGraph() {
   const { project_id, item_id } = useParams();
+  const createNotification = useNotifications();
   const { data: graph, error } = useGetEntity<GraphType>(
     item_id,
     "graphs",
@@ -27,10 +29,11 @@ export function PublicGraph() {
     },
   );
 
-  if (error) throw new Error("No public access");
-
   if (!graph?.data) return <Skeleton type="editor" />;
-  if (!graph?.data?.is_public) return <Navigate to={`/public/${project_id}/graphs`} />;
+  if (!graph?.data?.is_public || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
+    return <Navigate to={`/public/${project_id}/graphs`} />;
+  }
   return (
     <PublicEntityLayout title={graph?.data?.title}>
       <Graph data={graph?.data} isPublic isReadOnly isViewOnly />

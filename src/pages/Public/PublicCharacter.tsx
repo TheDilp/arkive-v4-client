@@ -15,7 +15,7 @@ import {
 } from "../../components";
 import { useGetEntities, useGetEntity } from "../../hooks";
 import { CharacterFieldTemplateType, CharacterType } from "../../types";
-import { getEntityLink, IconEnum } from "../../utils";
+import { getEntityLink, IconEnum, useNotifications } from "../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 const tabs = [
@@ -34,8 +34,10 @@ function getRelatedEntities(character: { data: CharacterType }, tab: number) {
 export function PublicCharacter() {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
+  const createNotification = useNotifications();
   const {
     data: character,
+    error,
     // isLoading,
     // isFetching,
   } = useGetEntity<CharacterType>(
@@ -79,7 +81,11 @@ export function PublicCharacter() {
   );
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
-  if (!character?.data?.is_public) return <Navigate to={`/public/${project_id}/characters`} />;
+  if (!character?.data?.is_public || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
+
+    return <Navigate to={`/public/${project_id}/characters`} />;
+  }
   const relatedEntities = getRelatedEntities(character, selectedTab);
   return (
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>

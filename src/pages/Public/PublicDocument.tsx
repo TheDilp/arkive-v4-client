@@ -4,10 +4,12 @@ import { RemirrorJSON } from "remirror";
 import { Skeleton, StaticRender } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { DocumentType } from "../../types";
+import { IconEnum, useNotifications } from "../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicDocument() {
   const { project_id, item_id, subitem_id } = useParams();
+  const createNotification = useNotifications();
   const { data: document, error } = useGetEntity<DocumentType>(
     subitem_id || item_id,
     "documents",
@@ -24,13 +26,10 @@ export function PublicDocument() {
     },
   );
 
-  if (error) throw new Error("No public access");
-
   if (!document?.data) return <Skeleton type="editor" />;
-  if (!document?.data?.is_public) {
-    if (subitem_id) {
-      return <Navigate to="./" />;
-    }
+  if (!document?.data?.is_public || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
+
     return <Navigate to={`/public/${project_id}/documents`} />;
   }
   return (

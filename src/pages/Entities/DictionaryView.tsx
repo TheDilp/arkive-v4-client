@@ -1,7 +1,7 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
@@ -14,6 +14,7 @@ import {
   getPluralEntityType,
   IconEnum,
   TextFilters,
+  useNotifications,
   userAtom,
 } from "../../utils";
 
@@ -158,6 +159,7 @@ function createColumns(
 
 export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boolean }) {
   const { project_id, item_id } = useParams();
+  const createNotification = useNotifications();
   const [filter, setFilter] = useState("");
   const user = useAtomValue(userAtom);
   const [filterType, setFilterType] = useState<FilterType>("title");
@@ -172,7 +174,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     selection: {},
   });
 
-  const { data, isInitialLoading } = useGetEntity<DictionaryType>(
+  const { data, isInitialLoading, error } = useGetEntity<DictionaryType>(
     item_id || id,
     "dictionaries",
     {
@@ -226,6 +228,13 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     }
     return () => {};
   }, [filter, dispatch, filterType]);
+
+  if ((isPublic && !data?.data?.is_public) || error) {
+    createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
+
+    return <Navigate to={`/public/${project_id}/dictionaries`} />;
+  }
+
   return (
     <TablePageLayout>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">

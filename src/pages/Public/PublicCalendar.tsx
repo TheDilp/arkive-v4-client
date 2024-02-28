@@ -3,11 +3,13 @@ import { Navigate, useParams } from "react-router-dom";
 import { Skeleton } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { CalendarType } from "../../types";
+import { IconEnum, useNotifications } from "../../utils";
 import { CalendarView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: boolean }) {
-  const { project_id, item_id, subitem_id, event_id } = useParams();
+  const { project_id, item_id, event_id } = useParams();
+  const createNotiifcation = useNotifications();
   const { data: calendar, error } = useGetEntity<CalendarType>(
     item_id,
     "calendars",
@@ -31,9 +33,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
 
   if (!calendar?.data) return <Skeleton type="editor" />;
   if (!calendar?.data?.is_public) {
-    if (subitem_id) {
-      return <Navigate to="./" />;
-    }
+    createNotiifcation({ title: "This entity is not public.", timer: 3, variant: "error", icon: IconEnum.error });
     return <Navigate to={`/public/${project_id}/calendars`} />;
   }
   return (
