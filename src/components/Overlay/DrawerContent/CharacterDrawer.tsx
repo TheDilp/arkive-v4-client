@@ -403,7 +403,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_fields_templates",
     {
-      enabled: selectedTab === 3 && !!character?.tags?.length,
+      enabled: selectedTab === 4 && !!character?.tags?.length,
       staleTime: 5 * 60 * 1000,
     },
   );
