@@ -1,6 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { AdditionalBlueprintFieldDisplay, Collapsible } from "../../components";
+import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../components";
 import { useGetEntity, useGetSubEntity } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { IconEnum, useNotifications } from "../../utils";
@@ -43,6 +43,7 @@ export function PublicBlueprint() {
     },
   );
 
+  if (!blueprint_instance?.data) return <Skeleton type="character_profile_main" />;
   if (!blueprint_instance?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/public/${project_id}/blueprints`} />;
