@@ -51,6 +51,7 @@ export const IconEnum = {
   fit: "icon-park-outline:off-screen-one" as const,
   flow_arrow: "ph:flow-arrow" as const,
   folder: "ph:folder-light" as const,
+  forbidden: "ph:prohibit" as const,
   graph: "ph:graph-light" as const,
   grid: "ph:grid-four" as const,
   heading: "ph:text-h" as const,

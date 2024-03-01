@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
-import { Outlet, useBlocker, useParams } from "react-router-dom";
+import { Navigate, Outlet, useBlocker, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntity, useGetUser } from "../../hooks";
 import { ProjectType } from "../../types";
@@ -15,6 +15,7 @@ import {
   hasChangedDataAtom,
   IconEnum,
   projectAtom,
+  useNotifications,
   userAtom,
 } from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
@@ -24,17 +25,19 @@ import { Sidebar } from "./Sidebar";
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
-  const { data } = useGetEntity<ProjectType>(
+  const { data, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
     {
       fields: ["id", "title", "owner_id"],
+      relations: {
+        members: true,
+      },
     },
     { staleTime: 60 * 60 * 1 },
   );
   const { user } = useUser();
-
-  const { data: userData } = useGetUser(
+  const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id },
       relations: {
@@ -57,7 +60,7 @@ export function ProjectLayout() {
   const hasChangedData = useAtomValue(hasChangedDataAtom);
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
-
+  const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
   const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   useEffect(() => {
@@ -97,6 +100,21 @@ export function ProjectLayout() {
 
     return false;
   });
+
+  if (isInitialLoading || isInitialLoadingUser) return null;
+
+  if (
+    data?.data?.owner_id !== userData?.data?.id &&
+    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id !== userData?.data?.id))
+  ) {
+    createNotification({
+      title: "You do not have access to this project.",
+      variant: "error",
+      icon: IconEnum.forbidden,
+      timer: 5,
+    });
+    return <Navigate to="/" />;
+  }
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">

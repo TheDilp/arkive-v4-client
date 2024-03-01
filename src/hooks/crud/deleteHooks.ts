@@ -191,3 +191,38 @@ export function useDeleteWebhook() {
     },
   );
 }
+
+export function useKickMember() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (vars: { data: { user_id: string; project_id: string } }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/users/kick`,
+        method: "POST",
+        body: JSON.stringify(vars),
+      });
+    },
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries(["projects"]);
+
+          createNotification({
+            title: "User removed from project.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 5,
+          });
+        } else
+          createNotification({
+            title: "There was an error removing this user from this project.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}

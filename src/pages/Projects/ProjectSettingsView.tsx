@@ -1,4 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
+import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,6 +29,7 @@ import {
   useGetEntities,
   useGetEntity,
   useHandleChange,
+  useKickMember,
   useTable,
   useUpdateEntity,
   useUpdateUser,
@@ -60,6 +62,17 @@ import {
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
+type kickUserMutationType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      user_id: string;
+      project_id: string;
+    };
+  },
+  unknown
+>;
 const tabs = [
   { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
@@ -216,7 +229,11 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
   ];
 }
 
-function membersColumns() {
+function membersColumns(
+  kickUser: kickUserMutationType,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  project_id: string,
+) {
   return [
     membersColumnHelper.display({
       id: "image",
@@ -236,7 +253,7 @@ function membersColumns() {
       meta: {
         centered: true,
       },
-      cell: () => (
+      cell: ({ row }) => (
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
@@ -246,16 +263,18 @@ function membersColumns() {
                 title: "Remove member from project",
                 icon: IconEnum.user_remove,
                 onClick: () => {
-                  // setDialog((prev) => ({
-                  //   ...prev,
-                  //   data: {
-                  //     ...row.original,
-                  //     entity_title: "character_relationship_types",
-                  //   },
-                  //   title: "Delete character",
-                  //   size: "sm",
-                  //   type: "delete_entity",
-                  // }));
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: "Are you sure you wish to remove this member from this project?",
+                    cancel: { action: () => {} },
+                    confirm: {
+                      variant: "info-bordered",
+                      action: () => {
+                        kickUser({ data: { project_id, user_id: row.original.id } });
+                      },
+                    },
+                    size: "sm",
+                  }));
                 },
               },
             ]}>
@@ -273,6 +292,7 @@ export function ProjectSettingsView() {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
+  const { mutate: kickUser } = useKickMember();
 
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
 
@@ -309,7 +329,6 @@ export function ProjectSettingsView() {
     project_id as string,
   );
   const { mutate: updateUser } = useUpdateUser(user?.id || "", authUser?.id || "");
-
   function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
     const newFeatureFlags = deepMerge(user?.feature_flags || {}, { [newValue.name]: newValue.value });
     updateUser({
@@ -553,7 +572,7 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
-                  columns={membersColumns()}
+                  columns={membersColumns(kickUser, setDialog, project_id as string)}
                   data={projectData?.data?.members || []}
                   dispatch={dispatch}
                   type="character_relationship_types"
