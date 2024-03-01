@@ -21,7 +21,7 @@
 	}
 
 	# health check for railway
-	respond /health_check 200
+	respond /health 200
 
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
 	root * dist
