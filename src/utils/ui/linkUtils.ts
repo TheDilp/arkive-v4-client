@@ -11,6 +11,7 @@ export function getEntityLink(
     return `/${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "blueprint_instances") {
+    if (isPublic) return `/${linkRoot}/${project_id}/blueprints/${item_id}`;
     return `/${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "images") {
