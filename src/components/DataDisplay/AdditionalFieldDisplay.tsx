@@ -184,20 +184,22 @@ export function AdditionalFieldDisplay({
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
-            items={(character_field_data?.blueprint_instances || []).map((blueprint_instance) => ({
-              id: blueprint_instance.blueprint_instance.id,
-              parent_id: blueprint_instance.blueprint_instance.parent_id,
-              title: blueprint_instance.blueprint_instance.title || "",
-              icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
-              type: "blueprint_instances",
-              link: getEntityLink(
-                project_id as string,
-                "blueprint_instances",
-                blueprint_instance.related_id,
-                blueprint_instance.blueprint_instance.parent_id,
-                isPublic,
-              ),
-            }))}
+            items={(character_field_data?.blueprint_instances || [])
+              .filter((blueprint_instance) => !!blueprint_instance.blueprint_instance)
+              .map((blueprint_instance) => ({
+                id: blueprint_instance.blueprint_instance.id,
+                parent_id: blueprint_instance.blueprint_instance.parent_id,
+                title: blueprint_instance.blueprint_instance.title || "",
+                icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
+                type: "blueprint_instances",
+                link: getEntityLink(
+                  project_id as string,
+                  "blueprint_instances",
+                  blueprint_instance.related_id,
+                  blueprint_instance.blueprint_instance.parent_id,
+                  isPublic,
+                ),
+              }))}
           />
         </div>
       ) : null}
@@ -206,13 +208,15 @@ export function AdditionalFieldDisplay({
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
-            items={(character_field_data?.documents || []).map((doc) => ({
-              id: doc.related_id,
-              title: doc.document.title,
-              icon: doc.document.icon || IconEnum.document,
-              type: "documents" as const,
-              link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
-            }))}
+            items={(character_field_data?.documents || [])
+              .filter((doc) => !!doc.document)
+              .map((doc) => ({
+                id: doc.related_id,
+                title: doc.document.title,
+                icon: doc.document.icon || IconEnum.document,
+                type: "documents" as const,
+                link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
+              }))}
           />
         </div>
       ) : null}
@@ -221,14 +225,16 @@ export function AdditionalFieldDisplay({
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
-            items={(character_field_data?.map_pins || []).map((map_pin) => ({
-              id: map_pin.map_pin.id,
-              parent_id: map_pin.map_pin.parent_id,
-              title: map_pin.map_pin.title || "",
-              icon: map_pin.map_pin.icon || IconEnum.document,
-              type: "map_pins",
-              link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id, isPublic),
-            }))}
+            items={(character_field_data?.map_pins || [])
+              .filter((map_pin) => !!map_pin.map_pin)
+              .map((map_pin) => ({
+                id: map_pin.map_pin.id,
+                parent_id: map_pin.map_pin.parent_id,
+                title: map_pin.map_pin.title || "",
+                icon: map_pin.map_pin.icon || IconEnum.document,
+                type: "map_pins",
+                link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id, isPublic),
+              }))}
           />
         </div>
       ) : null}
@@ -237,14 +243,16 @@ export function AdditionalFieldDisplay({
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
-            items={(character_field_data?.events || []).map((event) => ({
-              id: event.event.id,
-              parent_id: event.event.parent_id,
-              title: event.event.title || "",
-              icon: IconEnum.event,
-              type: "events",
-              link: getEntityLink(project_id as string, "events", event.related_id, event.event.parent_id, isPublic),
-            }))}
+            items={(character_field_data?.events || [])
+              .filter((event) => !!event.event)
+              .map((event) => ({
+                id: event.event.id,
+                parent_id: event.event.parent_id,
+                title: event.event.title || "",
+                icon: IconEnum.event,
+                type: "events",
+                link: getEntityLink(project_id as string, "events", event.related_id, event.event.parent_id, isPublic),
+              }))}
           />
         </div>
       ) : null}
