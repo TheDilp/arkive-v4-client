@@ -65,6 +65,7 @@ export function PublicBlueprint() {
                         blueprint_field={blueprintField}
                         blueprint_field_data={blueprint_field}
                         isPreview={!!item_id}
+                        isPublic
                       />
                     );
                   })

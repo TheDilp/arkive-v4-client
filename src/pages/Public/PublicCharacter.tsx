@@ -115,6 +115,7 @@ export function PublicCharacter() {
                           character_field={template_field}
                           character_field_data={characterField ?? null}
                           isPreview={false}
+                          isPublic
                         />
                       );
                     return null;

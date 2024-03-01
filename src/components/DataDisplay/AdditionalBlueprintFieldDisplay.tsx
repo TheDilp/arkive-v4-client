@@ -4,7 +4,7 @@ import { tv } from "tailwind-variants";
 
 import { useGetSubEntity } from "../../hooks";
 import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, RandomTableOptionType } from "../../types";
-import { formatDateToString, IconEnum } from "../../utils";
+import { formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { StaticRender } from "../Complex";
 import { Input } from "../Form";
 import { FormattedDate } from "../Misc";
@@ -145,10 +145,12 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
 
 export function AdditionalBlueprintFieldDisplay({
   isPreview,
+  isPublic,
   blueprint_field,
   blueprint_field_data,
 }: {
   isPreview: boolean;
+  isPublic?: boolean;
   blueprint_field: BlueprintFieldType;
   blueprint_field_data: BlueprintInstanceBlueprintFieldType;
 }) {
@@ -202,7 +204,7 @@ export function AdditionalBlueprintFieldDisplay({
                   title: char.character.full_name || "",
                   image_id: char.character.portrait_id,
                   type: "characters",
-                  link: `/projects/${project_id}/characters/${char.related_id}/resources`,
+                  link: getEntityLink(project_id as string, "characters", char.related_id, undefined, isPublic),
                 }))}
             />
           </div>
@@ -219,7 +221,13 @@ export function AdditionalBlueprintFieldDisplay({
                   title: blueprint_instance.blueprint_instance.title || "",
                   icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
                   type: "blueprint_instances",
-                  link: `/projects/${project_id}/blueprints/${blueprint_instance.blueprint_instance.parent_id}/${blueprint_instance.related_id}`,
+                  link: getEntityLink(
+                    project_id as string,
+                    "blueprint_instances",
+                    blueprint_instance.related_id,
+                    blueprint_instance.blueprint_instance.parent_id,
+                    isPublic,
+                  ),
                 }))}
             />
           </div>
@@ -235,7 +243,7 @@ export function AdditionalBlueprintFieldDisplay({
                   title: doc.document.title,
                   icon: doc.document.icon || IconEnum.document,
                   type: "documents",
-                  link: `/projects/${project_id}/documents/${doc.related_id}`,
+                  link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
                 }))}
             />
           </div>
@@ -252,7 +260,13 @@ export function AdditionalBlueprintFieldDisplay({
                   title: map_pin.map_pin.title || "",
                   icon: map_pin.map_pin.icon || IconEnum.document,
                   type: "map_pins",
-                  link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
+                  link: getEntityLink(
+                    project_id as string,
+                    "map_pins",
+                    map_pin.related_id,
+                    map_pin.map_pin.parent_id,
+                    isPublic,
+                  ),
                 }))}
             />
           </div>

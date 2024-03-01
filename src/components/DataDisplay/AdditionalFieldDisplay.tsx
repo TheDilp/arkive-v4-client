@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 
 import { useGetSubEntity } from "../../hooks";
 import { CharacterCharacterFieldType, CharacterFieldType, RandomTableOptionType } from "../../types";
-import { formatDateToString, IconEnum } from "../../utils";
+import { formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { CarouselEntityPreview, EntityPreview, FormattedDate, Gallery, Input, StaticRender, Tooltip } from "..";
 
 function RandomTableField({
@@ -135,10 +135,12 @@ const fieldSizeClass = tv({
 
 export function AdditionalFieldDisplay({
   isPreview,
+  isPublic,
   character_field,
   character_field_data,
 }: {
   isPreview: boolean;
+  isPublic?: boolean;
   character_field: CharacterFieldType;
   character_field_data: CharacterCharacterFieldType | null;
 }) {
@@ -187,7 +189,13 @@ export function AdditionalFieldDisplay({
               title: blueprint_instance.blueprint_instance.title || "",
               icon: blueprint_instance.blueprint_instance.icon || IconEnum.document,
               type: "blueprint_instances",
-              link: `/projects/${project_id}/blueprints/${blueprint_instance.blueprint_instance.parent_id}/${blueprint_instance.related_id}`,
+              link: getEntityLink(
+                project_id as string,
+                "blueprint_instances",
+                blueprint_instance.related_id,
+                blueprint_instance.blueprint_instance.parent_id,
+                isPublic,
+              ),
             }))}
           />
         </div>
@@ -200,8 +208,8 @@ export function AdditionalFieldDisplay({
               id: doc.related_id,
               title: doc.document.title,
               icon: doc.document.icon || IconEnum.document,
-              type: "documents",
-              link: `/projects/${project_id}/documents/${doc.related_id}`,
+              type: "documents" as const,
+              link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
             }))}
           />
         </div>
@@ -216,7 +224,7 @@ export function AdditionalFieldDisplay({
               title: map_pin.map_pin.title || "",
               icon: map_pin.map_pin.icon || IconEnum.document,
               type: "map_pins",
-              link: `/projects/${project_id}/maps/${map_pin.map_pin.parent_id}/${map_pin.related_id}`,
+              link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id, isPublic),
             }))}
           />
         </div>
@@ -231,7 +239,7 @@ export function AdditionalFieldDisplay({
               title: event.event.title || "",
               icon: IconEnum.event,
               type: "events",
-              link: `/projects/${project_id}/calendars/${event.event.parent_id}/${event.related_id}`,
+              link: getEntityLink(project_id as string, "events", event.related_id, event.event.parent_id, isPublic),
             }))}
           />
         </div>
