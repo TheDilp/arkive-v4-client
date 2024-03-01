@@ -348,7 +348,7 @@ export function useGenerateDocument<
 }
 export function useInviteUserToProject() {
   const createNotification = useNotifications();
-
+  const queryClient = useQueryClient();
   return useMutation(
     async (newGraph: { data: { project_id: string; email: string } }) =>
       FetchFunction({
@@ -359,6 +359,7 @@ export function useInviteUserToProject() {
 
     {
       onSuccess: () => {
+        queryClient.invalidateQueries(["projects"]);
         createNotification({
           title: "Invitation sent.",
           variant: "success",
