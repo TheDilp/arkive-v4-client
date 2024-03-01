@@ -183,6 +183,7 @@ export function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
+            isPublic={isPublic}
             items={(character_field_data?.blueprint_instances || []).map((blueprint_instance) => ({
               id: blueprint_instance.blueprint_instance.id,
               parent_id: blueprint_instance.blueprint_instance.parent_id,
@@ -204,6 +205,7 @@ export function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
+            isPublic={isPublic}
             items={(character_field_data?.documents || []).map((doc) => ({
               id: doc.related_id,
               title: doc.document.title,
@@ -218,6 +220,7 @@ export function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
+            isPublic={isPublic}
             items={(character_field_data?.map_pins || []).map((map_pin) => ({
               id: map_pin.map_pin.id,
               parent_id: map_pin.map_pin.parent_id,
@@ -233,6 +236,7 @@ export function AdditionalFieldDisplay({
         <div className="w-full">
           <CarouselEntityPreview
             field_label={character_field.title}
+            isPublic={isPublic}
             items={(character_field_data?.events || []).map((event) => ({
               id: event.event.id,
               parent_id: event.event.parent_id,

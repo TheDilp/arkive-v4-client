@@ -197,6 +197,7 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
+              isPublic={isPublic}
               items={(blueprint_field_data.characters || [])
                 .filter((char) => !!char.character)
                 .map((char) => ({
@@ -213,6 +214,7 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="w-full">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
+              isPublic={isPublic}
               items={(blueprint_field_data.blueprint_instances || [])
                 .filter((bpi) => !!bpi.blueprint_instance)
                 .map((blueprint_instance) => ({
@@ -236,6 +238,7 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="w-full">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
+              isPublic={isPublic}
               items={(blueprint_field_data.documents || [])
                 .filter((d) => !!d.document)
                 .map((doc) => ({
@@ -252,6 +255,7 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="w-full">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
+              isPublic={isPublic}
               items={(blueprint_field_data.map_pins || [])
                 .filter((m) => !!m.map_pin)
                 .map((map_pin) => ({
@@ -275,6 +279,7 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="w-full">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
+              isPublic={isPublic}
               items={[
                 {
                   id: blueprint_field_data.images[0].related_id as string,

@@ -9,9 +9,10 @@ import { EntityPreview } from "./EntityPreview";
 type Props = {
   items: ItemPreviewType[];
   field_label: string;
+  isPublic?: boolean;
 };
 
-export function CarouselEntityPreview({ items, field_label }: Props) {
+export function CarouselEntityPreview({ items, field_label, isPublic }: Props) {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   return (
@@ -29,7 +30,7 @@ export function CarouselEntityPreview({ items, field_label }: Props) {
               icon={item ? item?.icon : undefined}
               id={item?.id}
               image_id={item?.image_id}
-              link={getEntityLink(project_id as string, item.type, item.id, item.parent_id)}
+              link={item.link || getEntityLink(project_id as string, item.type, item.id, item.parent_id, isPublic)}
               previewAction={
                 items.length
                   ? () => {
