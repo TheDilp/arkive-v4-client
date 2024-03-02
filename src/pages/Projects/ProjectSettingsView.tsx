@@ -267,6 +267,7 @@ function membersColumns(
                     ...prev,
                     title: "Are you sure you wish to remove this member from this project?",
                     cancel: { action: () => {} },
+                    isOverlay: true,
                     confirm: {
                       variant: "info-bordered",
                       action: () => {
