@@ -1,7 +1,8 @@
 import { ImageUploadType } from "../../types";
-import { changeImagesForUpload } from "../../utils";
+import { changeImagesForUpload, IconEnum, useNotifications } from "../../utils";
 
 export function ImageUpload({ images, onChange }: ImageUploadType) {
+  const createNotification = useNotifications();
   return (
     <div
       className="flex h-full w-full select-none items-center justify-center"
@@ -12,8 +13,25 @@ export function ImageUpload({ images, onChange }: ImageUploadType) {
         e.preventDefault();
         const { files } = e.dataTransfer;
         if (files.length) {
+          const filesToUpload = Array.from(files);
+          let count = 0;
+          for (let index = 0; index < files.length; index += 1) {
+            if (filesToUpload[index].size > 100 * 1024 * 1024) {
+              filesToUpload.splice(index, 1);
+              count += 1;
+            }
+          }
+          if (count > 0) {
+            createNotification({
+              title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+              hasNoTruncate: true,
+              variant: "warning",
+              icon: IconEnum.warning,
+              timer: 5,
+            });
+          }
           const existingFileNames = images.map((f) => f.name);
-          changeImagesForUpload(onChange, existingFileNames, Array.from(files));
+          changeImagesForUpload(onChange, existingFileNames, filesToUpload);
         }
       }}>
       <label
@@ -32,6 +50,7 @@ export function ImageUpload({ images, onChange }: ImageUploadType) {
             <span className="font-semibold">Click to upload</span> or drag and drop
           </p>
           <span className="text-xs text-zinc-500 dark:text-zinc-400">Image files are converted to the WEBP format.</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">Maximum image size is 100 MB.</span>
         </div>
         <input
           accept="image/*"
@@ -41,6 +60,22 @@ export function ImageUpload({ images, onChange }: ImageUploadType) {
           onChange={(e) => {
             if (e.target.files?.length) {
               const files = Array.from(e.target.files);
+              let count = 0;
+              for (let index = 0; index < files.length; index += 1) {
+                if (files[index].size > 100 * 1024 * 1024) {
+                  files.splice(index, 1);
+                  count += 1;
+                }
+              }
+              if (count > 0) {
+                createNotification({
+                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                  hasNoTruncate: true,
+                  variant: "warning",
+                  icon: IconEnum.warning,
+                  timer: 5,
+                });
+              }
               const existingFileNames = images.map((f) => f.name);
               changeImagesForUpload(onChange, existingFileNames, files);
             }

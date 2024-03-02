@@ -24,14 +24,22 @@ export function useUploadAsset(type: AssetType, project_id: string) {
     },
     {
       onSettled: (data) => {
-        if (data?.ok)
+        if (data?.ok) {
           createNotification({
             title: data?.message || `${type === "images" ? "Images" : "Maps"} uploaded successfully.`,
             variant: "success",
             icon: IconEnum.check_circle,
             timer: 5,
           });
-        queryClient.invalidateQueries(["allEntities", project_id, type]);
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+        } else {
+          createNotification({
+            title: "There was an error uploading the image(s).",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+        }
       },
     },
   );
