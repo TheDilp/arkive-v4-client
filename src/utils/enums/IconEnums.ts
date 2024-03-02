@@ -34,6 +34,7 @@ export const IconEnum = {
   divider: "radix-icons:divider-horizontal" as const,
   document: "ph:files-fill" as const,
   document_template: "ph:file-dashed" as const,
+  document_outline: "bi:list-nested" as const,
   download: "ph:download" as const,
   drag: "ph:dots-six-vertical" as const,
   d20: "game-icons:dice-twenty-faces-twenty" as const,

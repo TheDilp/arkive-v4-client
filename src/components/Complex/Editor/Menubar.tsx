@@ -253,6 +253,14 @@ function menuBarItems({
       tooltip: "Divider",
     },
     {
+      id: "outline",
+      icon: IconEnum.document_outline,
+      onClick: () => {},
+      isDisabled: true,
+      tooltip: "Outline",
+      variant: "secondary" as const,
+    },
+    {
       id: "secret",
       icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
       variant: active.secret() ? ("info" as Variant) : ("primary" as Variant),
@@ -360,6 +368,7 @@ export function Menubar({
               hasNoBackground
               icon={item.icon}
               iconSize={size === "md" ? 20 : 16}
+              isDisabled={item.isDisabled}
               onClick={item.onClick}
               tooltip={item?.tooltip}
               variant={item?.variant || ("primary" as Variant)}
