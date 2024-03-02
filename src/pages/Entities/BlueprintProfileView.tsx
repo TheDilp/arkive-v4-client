@@ -99,7 +99,7 @@ export default function BlueprintProfileView({
 
   return (
     <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2 ">
-      {item_id ? (
+      {item_id && !isPublic ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
           <div className="flex flex-nowrap gap-x-2">
