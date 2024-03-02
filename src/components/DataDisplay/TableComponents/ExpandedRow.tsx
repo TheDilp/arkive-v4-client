@@ -66,7 +66,7 @@ function ExpandedRowTagListWrapper({
                 key={item.id}
                 id={item.id}
                 image_id={item.portrait_id}
-                link={`/projects/${project_id}/characters/${item.id}/resources`}
+                link={`/projects/${project_id}/characters/${item.id}/biography`}
                 title={item?.full_name || ""}
                 type="characters"
               />

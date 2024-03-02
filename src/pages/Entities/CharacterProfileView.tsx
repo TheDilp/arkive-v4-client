@@ -192,7 +192,7 @@ function relationshipTableColumns(
                 icon: IconEnum.character,
                 onClick: isPreview
                   ? () => {}
-                  : () => navigate(`/projects/${project_id}/characters/${row.original.id}/resources`),
+                  : () => navigate(`/projects/${project_id}/characters/${row.original.id}/biography`),
               },
               {
                 id: "4",

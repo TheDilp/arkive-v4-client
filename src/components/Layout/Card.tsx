@@ -90,7 +90,7 @@ export function CharacterCard({
   return (
     <Link
       className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
-      to={`${id}/resources`}>
+      to={`${id}/biography`}>
       {is_favorite ? (
         <div className="absolute right-0 top-0 z-10 m-4">
           <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />

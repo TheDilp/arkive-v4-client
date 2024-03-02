@@ -8,7 +8,7 @@ export function getEntityLink(
   if (name === "") return "#";
   const linkRoot = isPublic ? "public" : "projects";
   if (name === "characters") {
-    return `/${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
+    return `/${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/biography`;
   }
   if (name === "blueprint_instances") {
     if (isPublic) return `/${linkRoot}/${project_id}/blueprints/${item_id}`;
