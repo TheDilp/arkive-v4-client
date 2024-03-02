@@ -110,6 +110,10 @@ export function Navbar() {
     notification_type: string;
   }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
 
+  const { lastJsonMessage: versionMessage } = useWebSocket<{
+    timestamp: string;
+  }>(`${baseURLS.baseWebsocketServer}/ws/version`);
+
   useLayoutEffect(() => {
     if (lastJsonMessage) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
@@ -132,6 +136,26 @@ export function Navbar() {
       }
     }
   }, [lastJsonMessage]);
+
+  useLayoutEffect(() => {
+    if (versionMessage) {
+      const currentTimestamp: string | null = ls.get("version_timestamp");
+      const oldDate = currentTimestamp ? new Date(currentTimestamp) : null;
+      const newDate = new Date(versionMessage.timestamp);
+      if (!oldDate || oldDate.getTime() < newDate.getTime()) {
+        createNotification({
+          title:
+            "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
+          timer: 10,
+          variant: "success",
+          icon: IconEnum.reload,
+          hasNoTruncate: true,
+        });
+      }
+
+      ls.set("version_timestamp", versionMessage.timestamp);
+    }
+  }, [versionMessage]);
 
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
