@@ -146,7 +146,7 @@ export function Navbar() {
         createNotification({
           title:
             "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
-          timer: 10,
+          timer: 600,
           variant: "success",
           icon: IconEnum.reload,
           hasNoTruncate: true,
