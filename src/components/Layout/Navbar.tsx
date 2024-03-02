@@ -111,7 +111,7 @@ export function Navbar() {
   }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
 
   const { lastJsonMessage: versionMessage } = useWebSocket<{
-    timestamp: string;
+    timestamp: number;
   }>(`${baseURLS.baseWebsocketServer}/ws/version`);
 
   useLayoutEffect(() => {
@@ -139,10 +139,9 @@ export function Navbar() {
 
   useLayoutEffect(() => {
     if (versionMessage) {
-      const currentTimestamp: string | null = ls.get("version_timestamp");
-      const oldDate = currentTimestamp ? new Date(currentTimestamp) : null;
-      const newDate = new Date(versionMessage.timestamp);
-      if (!oldDate || oldDate.getTime() < newDate.getTime()) {
+      const currentTimestamp: number | null = ls.get("version_timestamp");
+      const oldDate = currentTimestamp ?? null;
+      if (!oldDate || oldDate < versionMessage.timestamp) {
         createNotification({
           title:
             "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
