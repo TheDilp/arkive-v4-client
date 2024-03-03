@@ -43,7 +43,7 @@ class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
         <h2 className="font-merriweather underline">Table of contents</h2>
         {headings?.length ? (
           headings.map((heading, i) => (
-            <li key={`${heading}+${i.toString()}`} className="pointer-events-auto font-lato">
+            <li key={heading.id || i.toString()} className="pointer-events-auto font-lato">
               <span
                 className="pointer-events-auto cursor-pointer select-none hover:text-blue-400"
                 onClick={() => {
