@@ -110,9 +110,9 @@ export function Navbar() {
     notification_type: string;
   }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
 
-  const { lastJsonMessage: versionMessage } = useWebSocket<{
-    timestamp: number;
-  }>(`${baseURLS.baseWebsocketServer}/ws/version`);
+  // const { lastJsonMessage: versionMessage } = useWebSocket<{
+  //   timestamp: number;
+  // }>(`${baseURLS.baseWebsocketServer}/ws/version`);
 
   useLayoutEffect(() => {
     if (lastJsonMessage) {
@@ -137,24 +137,24 @@ export function Navbar() {
     }
   }, [lastJsonMessage]);
 
-  useLayoutEffect(() => {
-    if (versionMessage) {
-      const currentTimestamp: number | null = ls.get("version_timestamp");
-      const oldDate = currentTimestamp ?? null;
-      if (!oldDate || oldDate < versionMessage.timestamp) {
-        createNotification({
-          title:
-            "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
-          timer: 600,
-          variant: "success",
-          icon: IconEnum.reload,
-          hasNoTruncate: true,
-        });
-      }
+  // useLayoutEffect(() => {
+  //   if (versionMessage) {
+  //     const currentTimestamp: number | null = ls.get("version_timestamp");
+  //     const oldDate = currentTimestamp ?? null;
+  //     if (!oldDate || oldDate < versionMessage.timestamp) {
+  //       createNotification({
+  //         title:
+  //           "There's an update available for the app! Please save your progress and refresh the page to get the latest version.",
+  //         timer: 600,
+  //         variant: "success",
+  //         icon: IconEnum.reload,
+  //         hasNoTruncate: true,
+  //       });
+  //     }
 
-      ls.set("version_timestamp", versionMessage.timestamp);
-    }
-  }, [versionMessage]);
+  //     ls.set("version_timestamp", versionMessage.timestamp);
+  //   }
+  // }, [versionMessage]);
 
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
