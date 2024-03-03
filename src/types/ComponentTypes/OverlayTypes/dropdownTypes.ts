@@ -6,6 +6,7 @@ import { IconThickness } from "../MiscTypes";
 
 export interface DropdownItemType {
   id: string;
+  allowedPlacements?: PositionType;
   title?: string;
   child?: ReactNode;
   icon?: AvailableIcons;

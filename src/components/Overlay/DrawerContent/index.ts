@@ -13,6 +13,7 @@ export * from "./ConversationDrawer";
 export * from "./DictionaryDrawer";
 export * from "./DocumentDrawer";
 export * from "./DocumentFromTemplate";
+export * from "./DocumentOutlineDrawer";
 export * from "./EdgeDrawer";
 export * from "./EditMessageDrawer";
 export * from "./EditTags";

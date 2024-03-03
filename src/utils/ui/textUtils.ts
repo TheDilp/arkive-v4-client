@@ -14,7 +14,6 @@ export function getAvatarInitials(full_name: string): string {
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
-
 export function getNavbarEntityType(type: AvailableEntityType | "settings") {
   if (type === "random_tables") {
     return "random tables";
@@ -25,20 +24,16 @@ export function getNavbarEntityType(type: AvailableEntityType | "settings") {
   if (type === "settings") return "Project settings";
   return type;
 }
-
 export function capitalizeSentence(sentence: string): string {
   return sentence.toUpperCase();
 }
-
 export function getCharacterFullName(first_name: string, nickname?: string | null, last_name?: string | null): string {
   return `${first_name?.trim()}${nickname ? ` ${nickname?.trim()}` : ""}${last_name ? ` ${last_name?.trim()}` : ""}`;
 }
-
 export function getSentenceCase(field: string) {
   const result = field?.replaceAll("_", " ")?.replace(/([A-Z])/g, " $1") || "";
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
-
 export function getSingularEntityType(type: AvailableEntityType | AvailableSubEntityType | AssetType) {
   if (type === "alter_names") return "alter name";
   if (type === "character_fields") return "character field";
@@ -53,7 +48,15 @@ export function getSingularEntityType(type: AvailableEntityType | AvailableSubEn
 export function getPluralEntityType(type: AvailableEntityType | AvailableSubEntityType | AssetType) {
   return type.replaceAll("_", " ");
 }
-
 export function validateHexCode(hex: string) {
   return /^#[0-9A-F]{6}$/i.test(hex);
+}
+export function getTextSizeFromHeadingLevel(level: number): string {
+  if (level === 1) return "text-3xl";
+  if (level === 2) return "text-2xl";
+  if (level === 3) return "text-xl";
+  if (level === 4) return "text-lg";
+  if (level === 5) return "text-base";
+  if (level === 6) return "text-sm";
+  return "text-base";
 }

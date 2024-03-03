@@ -114,6 +114,7 @@ export type DrawerAtomType = {
   | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } } }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } }
   | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
+  | { type: "document_outline"; data: { headings: { id: string; title: string; level: number }[] } }
   | {
       type: "edit_message";
       data: {

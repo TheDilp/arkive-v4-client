@@ -3,7 +3,7 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
-import { DialogAtomType, DrawerAtomType, Size, Variant } from "../../../types";
+import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant } from "../../../types";
 import { AvailableIcons, ColorPresets, dialogAtom, drawerAtom, IconEnum } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
@@ -30,7 +30,7 @@ function menuBarItems({
   icon?: AvailableIcons;
   isEditorMenubar?: boolean;
 }) {
-  const options = [
+  const options: (DropdownItemType & { variant?: Variant; tooltip: string })[] = [
     {
       id: "text_bold",
       icon: IconEnum.text_bold,
@@ -110,35 +110,35 @@ function menuBarItems({
       id: "align_text",
       icon: IconEnum.text_align_justify,
       onClick: undefined,
-      label: "Align text",
+      title: "Align text",
       tooltip: "Align text",
       subItems: [
         {
           id: "align_text_left",
           icon: IconEnum.text_align_left,
           onClick: () => chain?.leftAlign()?.run(),
-          label: "Align left",
+          title: "Align left",
           iconThickness: "light" as const,
         },
         {
           id: "align_text_center",
           icon: IconEnum.text_align_center,
           onClick: () => chain?.centerAlign()?.run(),
-          label: "Align center",
+          title: "Align center",
           iconThickness: "light" as const,
         },
         {
           id: "align_text_right",
           icon: IconEnum.text_align_right,
           onClick: () => chain?.rightAlign()?.run(),
-          label: "Align right",
+          title: "Align right",
           iconThickness: "light" as const,
         },
         {
           id: "align_text_justify",
           icon: IconEnum.text_align_justify,
           onClick: () => chain?.justifyAlign()?.run(),
-          label: "Align justify",
+          title: "Align justify",
           iconThickness: "light" as const,
         },
       ],
@@ -167,39 +167,39 @@ function menuBarItems({
           id: "clear_callout",
           icon: IconEnum.callout,
           onClick: () => chain?.toggleCallout()?.run(),
-          label: "Clear" as Variant,
+          title: "Clear" as Variant,
         },
         {
           id: "callout_info",
           icon: IconEnum.info_circle,
           onClick: () => chain?.toggleCallout({ type: "info" as Variant })?.run(),
-          label: "Info" as Variant,
+          title: "Info" as Variant,
           iconColor: "#60a5fa",
         },
         {
           id: "callout_error",
           icon: IconEnum.error,
           onClick: () => chain?.toggleCallout({ type: "error" })?.run(),
-          label: "Error",
+          title: "Error",
           iconColor: "#b91c1c",
         },
         {
           id: "callout_warning",
           icon: IconEnum.warning,
           onClick: () => chain?.toggleCallout({ type: "warning" })?.run(),
-          label: "Warning",
+          title: "Warning",
           iconColor: "#fb923c",
         },
         {
           id: "callout_success",
           onClick: () => chain?.toggleCallout({ type: "success" })?.run(),
           icon: IconEnum.check_circle,
-          label: "Success",
+          title: "Success",
           iconColor: "#4ade80",
         },
         {
           id: "callout_custom",
-          label: "Custom",
+          title: "Custom",
           icon: IconEnum.brush,
           allowedPlacements: ["right", "right-end"],
           subItems: ColorPresets.map((color) => ({
@@ -241,7 +241,7 @@ function menuBarItems({
         {
           id: "create_basic_table",
           icon: IconEnum.table_add,
-          label: "Create table",
+          title: "Create table",
           onClick: () => chain?.createTable({ rowsCount: 3, columnsCount: 3, withHeaderRow: true })?.run(),
         },
       ],
@@ -252,14 +252,7 @@ function menuBarItems({
       onClick: () => chain?.insertHorizontalRule()?.run(),
       tooltip: "Divider",
     },
-    {
-      id: "outline",
-      icon: IconEnum.document_outline,
-      onClick: () => {},
-      isDisabled: true,
-      tooltip: "Outline",
-      variant: "secondary" as const,
-    },
+
     {
       id: "secret",
       icon: active.secret() ? IconEnum.eye_slash : IconEnum.eye,
@@ -270,6 +263,28 @@ function menuBarItems({
   ];
   if (!isEditorMenubar) {
     options.push(
+      {
+        id: "outline",
+        // @ts-ignore
+        icon: IconEnum.document_outline,
+        onClick: () => {
+          const headings: { id: string; title: string; level: number }[] = [];
+          getContext.view.state.doc.forEach((n) => {
+            if (n.type.name === "heading" && n.textContent) {
+              headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
+            }
+          });
+          if (headings.length)
+            setDrawer((prev) => ({
+              ...prev,
+              title: "Document outline",
+              data: { headings },
+              type: "document_outline",
+              size: "lg",
+            }));
+        },
+        tooltip: "Outline",
+      },
       {
         id: "autolinker",
         // @ts-ignore
@@ -368,7 +383,6 @@ export function Menubar({
               hasNoBackground
               icon={item.icon}
               iconSize={size === "md" ? 20 : 16}
-              isDisabled={item.isDisabled}
               onClick={item.onClick}
               tooltip={item?.tooltip}
               variant={item?.variant || ("primary" as Variant)}
