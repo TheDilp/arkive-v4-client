@@ -298,6 +298,10 @@ export function useGetIcons(type: IconCategories | null) {
       });
 
       const data = await res.json();
+      if (type === "line-md") {
+        const icons = Object.values(data?.categories || {}).flatMap((cat) => cat);
+        return { uncategorized: icons, total: icons.length };
+      }
       if (!data) {
         throw new Error("There was an error with your request.");
       }

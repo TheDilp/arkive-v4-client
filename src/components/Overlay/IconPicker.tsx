@@ -27,7 +27,6 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
   const [category, setCategory] = useState<IconCategories | null>("game-icons");
   const { data } = useGetIcons(category);
   const [filteredIcons, setFilteredIcons] = useState<string[]>(data?.uncategorized || []);
-
   const { floatingStyles, refs, context } = useFloating({
     open,
     onOpenChange: (o, event) => {

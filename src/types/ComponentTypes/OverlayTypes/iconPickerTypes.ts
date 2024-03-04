@@ -19,4 +19,4 @@ export interface IconPickerType {
   customOffset?: { mainAxis?: number; crossAxis?: number };
 }
 
-export type IconCategories = "game-icons" | "ph" | "meteocons";
+export type IconCategories = "game-icons" | "ph" | "meteocons" | "line-md";
