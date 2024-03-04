@@ -1,16 +1,84 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useEffect, useLayoutEffect } from "react";
+import ls from "localstorage-slim";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import { Button, Drawer, Navbar, ProjectCard, Skeleton } from "../../components";
-import { useChangeNavbarTitle, useGetAllProjects, useGetUser } from "../../hooks";
-import { DrawerAtomType } from "../../types";
-import { drawerAtom, getImageURL, IconEnum, projectAtom, userAtom } from "../../utils";
+import {
+  Avatar,
+  Button,
+  createColumnHelper,
+  Drawer,
+  Navbar,
+  ProjectCard,
+  Skeleton,
+  Table,
+  TablePageLayout,
+} from "../../components";
+import { useChangeNavbarTitle, useGetAllProjects, useGetUser, useTable } from "../../hooks";
+import { DrawerAtomType, ProjectType } from "../../types";
+import { drawerAtom, getAvatarInitials, getImageURL, IconEnum, projectAtom, projectCardNavItems, userAtom } from "../../utils";
+
+const columnHelper = createColumnHelper<ProjectType>();
+
+const createColumns = [
+  columnHelper.display({
+    id: "image_id",
+    header: "Image",
+    cell: ({ row }) => (
+      <div className="flex w-full items-center justify-center">
+        <Avatar
+          hasShowImage
+          image={getImageURL(row.original.id, "images", row.original.image_id)}
+          initials={getAvatarInitials(row.original.title)}
+          isBordered
+          isTooltipDisabled
+          size="sm"
+        />
+      </div>
+    ),
+    meta: {
+      pinned: true,
+      noLink: true,
+      centered: true,
+    },
+    minSize: 4.5,
+    maxSize: 4.5,
+  }),
+
+  columnHelper.accessor("title", {
+    id: "title",
+    header: "Title",
+    cell: (info) => info.getValue(),
+    meta: {
+      sortable: true,
+    },
+  }),
+  columnHelper.display({
+    id: "links",
+    header: "Shortcuts",
+    cell: ({ row }) => (
+      <div className="flex w-full flex-1 items-center justify-between gap-x-4">
+        {projectCardNavItems.map((item) => (
+          <Link key={item.icon} to={`/projects/${row.original.id}/${item.navigate}`}>
+            <Button hasNoBackground icon={item.icon} iconSize={32} isIconOnly onClick={() => {}} />
+          </Link>
+        ))}
+      </div>
+    ),
+    meta: {
+      pinned: true,
+      noLink: true,
+      centered: true,
+    },
+    minSize: 12,
+  }),
+];
 
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
-
+  const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useChangeNavbarTitle("The Arkive");
 
   const { user } = useUser();
@@ -31,6 +99,7 @@ export function ProjectsView() {
   );
   const setUserAtom = useSetAtom(userAtom);
   const resetProjectAtom = useResetAtom(projectAtom);
+  const [, dispatch] = useTable({});
 
   useEffect(() => {
     if (userData) {
@@ -67,25 +136,47 @@ export function ProjectsView() {
             }
             tooltip="Create new project"
           />
+          <Button
+            hasNoBackground
+            icon={view ? IconEnum.table : IconEnum.card}
+            iconSize={28}
+            onClick={() => {
+              ls.set("projects_view", !view);
+              setView(!view);
+            }}
+            tooltip="Change view"
+          />
         </div>
       </div>
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isLoading || isInitialLoadingUser} />
         </div>
-        <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
-          {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
-          {data?.data
-            ? data.data.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  id={project.id}
-                  image={getImageURL(project.id, "images", project.image_id)}
-                  title={project.title}
-                />
-              ))
-            : null}
-        </div>
+        {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
+        {view ? (
+          <div className="flex-1 p-4">
+            <TablePageLayout>
+              <Table
+                columns={createColumns}
+                config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
+                data={data?.data || []}
+                dispatch={dispatch}
+                type="projects"
+              />
+            </TablePageLayout>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
+            {(data?.data || []).map((project) => (
+              <ProjectCard
+                key={project.id}
+                id={project.id}
+                image={getImageURL(project.id, "images", project.image_id)}
+                title={project.title}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
