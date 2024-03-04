@@ -132,7 +132,7 @@ export function BlueprintView() {
 
   return (
     <TablePageLayout>
-      <div className="flex h-full w-full flex-col gap-y-2">
+      <div className="flex h-full w-full flex-col">
         <div className="flex h-12 w-full items-center justify-end gap-x-2">
           <div className="w-fit">
             <Button
