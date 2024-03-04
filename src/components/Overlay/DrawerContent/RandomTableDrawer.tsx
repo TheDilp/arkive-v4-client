@@ -186,6 +186,7 @@ export function RandomTableDrawer({ data }: Props) {
                     hasNoBackground: true,
                   },
                 ]}
+                initialOpen={option.title === "New option"}
                 label={option.title}>
                 <div className="flex flex-col gap-y-2 p-2">
                   <OptionInput
