@@ -126,7 +126,7 @@ export function RandomTableDrawer({ data }: Props) {
               label="Random table title (required)"
               name="title"
               onChange={handleChange}
-              placeholder="Eg. Family tree"
+              placeholder="Eg. Character classes"
               value={randomTable?.title || ""}
             />
           </div>
