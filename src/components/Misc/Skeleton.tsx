@@ -16,7 +16,7 @@ function TableRow() {
 
 function TableSkeleton({ limit = 10 }: { limit?: number }) {
   return (
-    <div className="mt-4 flex max-h-full animate-pulse flex-col">
+    <div className="flex max-h-full animate-pulse flex-col">
       {/* <div className="flex items-center w-full px-2 py-4 mb-4 border max-h-12 gap-x-4 border-zinc-700">
         <div className="h-6 w-6 min-w-[1.5rem] rounded-md bg-zinc-700" />
         <div className="w-full h-6 rounded bg-zinc-700" />
