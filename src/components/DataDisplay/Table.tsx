@@ -73,6 +73,7 @@ const TableClasses = tv({
   variants: {
     isSubheaderEnabled: {
       true: {
+        head: "mb-0",
         headerGroup: "border-b border-zinc-800",
       },
     },
