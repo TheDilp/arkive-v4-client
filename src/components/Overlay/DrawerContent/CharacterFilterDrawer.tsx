@@ -36,6 +36,7 @@ type CharacterFilterField = {
   field_type: string;
   title: string;
   options?: { id: string; value: string }[];
+  blueprint_id?: string;
   filter: RequestFilterType;
 };
 
@@ -114,6 +115,7 @@ function CharacterFieldsFilters({
                   field_type: templateField.field_type,
                   title: templateField.title,
                   options: templateField.options,
+                  blueprint_id: templateField.blueprint_id,
                   filter: {
                     operator: "eq",
                   },
@@ -243,7 +245,7 @@ function CharacterFieldsFilters({
                     },
                   ])
                 }
-                parent_id={f.template.id}
+                parent_id={field.blueprint_id}
                 searchEntity={getSearchType(field.field_type) as SearchableEntities}
                 value={field?.filter?.value as string | undefined}
               />
