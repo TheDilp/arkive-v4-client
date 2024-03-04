@@ -553,7 +553,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     showPageCount,
     showPageCountSelectContainer,
     paginationButtonsContainer,
-  } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap, hasNoData: data?.length === 0 });
+  } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap, hasNoData: data?.length === 0 && !isSubheaderEnabled });
 
   const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
   const headerRef = useRef() as MutableRefObject<HTMLDivElement>;
