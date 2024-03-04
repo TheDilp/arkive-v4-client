@@ -70,7 +70,7 @@ function DiceRoller() {
   );
 }
 
-export function Navbar() {
+export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
@@ -115,7 +115,7 @@ export function Navbar() {
   // }>(`${baseURLS.baseWebsocketServer}/ws/version`);
 
   useLayoutEffect(() => {
-    if (lastJsonMessage) {
+    if (lastJsonMessage && !isDisabled) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
         if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
@@ -162,27 +162,29 @@ export function Navbar() {
       <h1 className="flex h-full max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
-      {project_id ? (
-        <div className="ml-auto flex items-center gap-x-2 pr-4">
-          <div className="w-fit">
-            <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
-          </div>
-          <div className="w-fit">
-            <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
-              <div className="h-full">
-                <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
-              </div>
-            </Tooltip>
-          </div>
-          <div className="w-fit">
-            <div className="h-full">
-              <Button hasNoBackground icon={IconEnum.search} iconSize={24} isIconOnly onClick={openSearchDrawer} />
+      <div className="ml-auto flex items-center gap-x-2 pr-4">
+        {project_id && !isDisabled ? (
+          <>
+            <div className="w-fit">
+              <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
             </div>
-          </div>
+            <div className="w-fit">
+              <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
+                <div className="h-full">
+                  <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
+                </div>
+              </Tooltip>
+            </div>
+            <div className="w-fit">
+              <div className="h-full">
+                <Button hasNoBackground icon={IconEnum.search} iconSize={24} isIconOnly onClick={openSearchDrawer} />
+              </div>
+            </div>
+          </>
+        ) : null}
+        <div className="ml-auto flex items-center">
+          <UserButton />
         </div>
-      ) : null}
-      <div className={`mr-4 flex items-center ${project_id ? "" : "ml-auto"}`}>
-        <UserButton />
       </div>
     </div>
   );

@@ -101,11 +101,11 @@ export function ProjectLayout() {
     return false;
   });
 
-  if (isInitialLoading || isInitialLoadingUser) return null;
-
   if (
     data?.data?.owner_id !== userData?.data?.id &&
-    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id !== userData?.data?.id))
+    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id !== userData?.data?.id)) &&
+    !isInitialLoading &&
+    !isInitialLoadingUser
   ) {
     createNotification({
       title: "You do not have access to this project.",
@@ -127,10 +127,10 @@ export function ProjectLayout() {
       {isLg ? <Sidebar /> : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
-        <Navbar />
+        <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          <Outlet />
+          {isInitialLoading || isInitialLoadingUser ? null : <Outlet />}
         </div>
         {!isLg ? <Sidebar /> : null}
       </div>

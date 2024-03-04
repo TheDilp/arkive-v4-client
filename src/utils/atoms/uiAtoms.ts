@@ -4,7 +4,7 @@ import { atomWithReset } from "jotai/utils";
 import { ContextMenuAtomType, DialogAtomType, DrawerAtomType, NotificationType, ProjectType } from "../../types";
 import { BreadCrumbsType as BreadcrumbsType } from "../../types/ComponentTypes/LayoutTypes/breadcrumbsTypes";
 
-export const projectAtom = atom<ProjectType | null>(null);
+export const projectAtom = atomWithReset<ProjectType | null>(null);
 
 export const navbarTitleAtom = atom<string>("");
 export const breadcrumbsAtom = atom<BreadcrumbsType>({ items: [], type: null });

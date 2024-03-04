@@ -1,11 +1,12 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
-import { useEffect } from "react";
+import { useResetAtom } from "jotai/utils";
+import { useEffect, useLayoutEffect } from "react";
 
 import { Button, Drawer, Navbar, ProjectCard, Skeleton } from "../../components";
 import { useChangeNavbarTitle, useGetAllProjects, useGetUser } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { drawerAtom, getImageURL, IconEnum, userAtom } from "../../utils";
+import { drawerAtom, getImageURL, IconEnum, projectAtom, userAtom } from "../../utils";
 
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
@@ -18,7 +19,7 @@ export function ProjectsView() {
     fields: ["id", "title", "image_id"],
   });
 
-  const { data: userData } = useGetUser(
+  const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id },
       relations: {
@@ -29,12 +30,17 @@ export function ProjectsView() {
     { enabled: !!user?.id },
   );
   const setUserAtom = useSetAtom(userAtom);
+  const resetProjectAtom = useResetAtom(projectAtom);
 
   useEffect(() => {
     if (userData) {
       setUserAtom(userData.data);
     }
   }, [userData?.data]);
+
+  useLayoutEffect(() => {
+    resetProjectAtom();
+  }, []);
 
   return (
     <div className="flex h-screen w-screen">
@@ -65,7 +71,7 @@ export function ProjectsView() {
       </div>
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
-          <Navbar />
+          <Navbar isDisabled={isLoading || isInitialLoadingUser} />
         </div>
         <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
           {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
