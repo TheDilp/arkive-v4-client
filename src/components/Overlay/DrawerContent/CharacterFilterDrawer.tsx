@@ -65,6 +65,19 @@ function formatCharacterFilter(field: CharacterFilterField): RequestFilterType {
 
 function isApplyDisabled(filters: CharacterFilter[]) {
   if (!filters.length) return true;
+  if (filters.some((filt) => !filt.fields.and.length && !filt.fields.or.length)) return true;
+  for (let index = 0; index < filters.length; index += 1) {
+    for (let andIndex = 0; andIndex < filters[index].fields.and.length; andIndex += 1) {
+      if (!filters[index].fields.and[andIndex].filter.value) {
+        return true;
+      }
+    }
+    for (let orIndex = 0; orIndex < filters[index].fields.or.length; orIndex += 1) {
+      if (!filters[index].fields.or[orIndex].filter.value) {
+        return true;
+      }
+    }
+  }
   return false;
 }
 
@@ -743,7 +756,6 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
           }
         />
       </ul>
-
       <div>
         <Button
           icon={IconEnum.filter}
