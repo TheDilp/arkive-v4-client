@@ -243,6 +243,7 @@ function CharacterFieldsFilters({
                     },
                   ])
                 }
+                parent_id={f.template.id}
                 searchEntity={getSearchType(field.field_type) as SearchableEntities}
                 value={field?.filter?.value as string | undefined}
               />
