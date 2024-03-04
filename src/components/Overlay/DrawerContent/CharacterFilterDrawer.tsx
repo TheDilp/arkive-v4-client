@@ -67,6 +67,211 @@ function isApplyDisabled(filters: CharacterFilter[]) {
   return false;
 }
 
+function CharacterFieldsFilters({
+  filterFields,
+  existingTemplates,
+  handleChange,
+  i,
+  f,
+  type,
+}: {
+  filterFields: CharacterFilterField[];
+  existingTemplates:
+    | {
+        data: CharacterFieldTemplateType[];
+      }
+    | undefined;
+  handleChange: (newData: HandleChangePropsType) => void;
+  i: number;
+  f: CharacterFilter;
+  type: "and" | "or";
+}) {
+  return filterFields.map((field, fIdx) => (
+    <Fragment key={field.id}>
+      <div className="col-span-12">
+        {fIdx !== 0 ? (
+          <div className="mt-1.5 flex w-full justify-center">
+            <div className="w-16">
+              <Badge label={type.toUpperCase()} variant="info" />
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div className="col-span-5">
+        <Select
+          label="Field"
+          name={`[${i}].fields.${type}[${fIdx}]`}
+          onChange={({ name, value }) => {
+            const templateField = existingTemplates?.data
+              ?.find((t) => t.id === f.template.id)
+              ?.character_fields?.find((char_field) => char_field.id === value);
+            if (templateField) {
+              handleChange({
+                name,
+                value: {
+                  id: field.id,
+                  field_id: templateField.id,
+                  field_type: templateField.field_type,
+                  title: templateField.title,
+                  options: templateField.options,
+                  filter: {
+                    operator: "eq",
+                  },
+                },
+              });
+            }
+          }}
+          options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
+            (opt) => ({
+              value: opt.id,
+              label: opt.title,
+              isDisabled: nonFilterableEntities.includes(opt.field_type),
+            }),
+          )}
+          value={field?.field_id}
+        />
+      </div>
+      {field?.field_type === "number" || field?.field_type === "text" ? (
+        <div className="col-span-6">
+          <Select
+            label="Filter type"
+            name={`[${i}].fields.${type}[${fIdx}].filter.operator`}
+            onChange={handleChange}
+            options={field?.field_type === "number" ? NumberFilters : TextFilters}
+            value={(field?.filter?.operator || "") as string | number}
+          />
+        </div>
+      ) : null}
+
+      {field.field_type !== "select" &&
+      field.field_type !== "select_multiple" &&
+      !relationFiltersList.includes(field.field_type) ? (
+        <div className="col-span-1">
+          <div className="mt-5 h-10 w-10 self-center">
+            <Button
+              hasNoBackground
+              icon={IconEnum.trash}
+              isIconOnly
+              onClick={() => {
+                handleChange({
+                  name: `[${i}].fields.${type}`,
+                  value: f.fields[type].filter((filtering_field) => field.id !== filtering_field.id),
+                });
+              }}
+              variant="error"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {field?.field_type === "number" || field?.field_type === "text" ? (
+        <div className="col-span-12">
+          <Input
+            label="Filter value"
+            name={`[${i}].fields.${type}[${fIdx}].filter.value`}
+            onChange={handleChange}
+            type={field?.field_type}
+            value={(field?.filter?.value || "") as string | number}
+          />
+        </div>
+      ) : null}
+      {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
+        <div className="col-span-6">
+          <Select
+            label="Filter value"
+            name={`[${i}].fields.${type}[${fIdx}].filter.value`}
+            onChange={(newValue) => {
+              const opt = field.options?.find((o) => o.id === newValue.value);
+              handleChange([
+                newValue,
+                { name: `[${i}].fields.${type}[${fIdx}].filter.relationalData.label`, value: opt?.value },
+              ]);
+            }}
+            options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
+            value={(field?.filter?.value || "") as string | number}
+          />
+        </div>
+      ) : null}
+      {field.field_type === "select" || field.field_type === "select_multiple" ? (
+        <div className="col-span-1">
+          <div className="mt-5 h-10 w-10 self-center">
+            <Button
+              hasNoBackground
+              icon={IconEnum.trash}
+              isIconOnly
+              onClick={() => {
+                handleChange({
+                  name: `[${i}].fields.${type}`,
+                  value: f.fields[type].filter((filtering_field) => field.id !== filtering_field.id),
+                });
+              }}
+              variant="error"
+            />
+          </div>
+        </div>
+      ) : null}
+      {relationFiltersList.includes(field?.field_type) ? (
+        <div className="col-span-6">
+          <div className="flex items-center [&>div>*>span>a>span]:max-w-[5.5rem]">
+            {field?.filter?.value ? (
+              <div className="w-full">
+                <EntityPreview
+                  clearAction={() =>
+                    handleChange([
+                      { name: `[${i}].fields.${type}[${fIdx}].filter.value`, value: "" },
+                      { name: `[${i}].fields.${type}[${fIdx}].filter.relationalData`, value: undefined },
+                    ])
+                  }
+                  icon={field.filter.relationalData?.icon}
+                  id={field.filter.relationalData?.value}
+                  image_id={field.filter.relationalData?.image}
+                  label="Includes"
+                  title={field.filter.relationalData?.label}
+                  type={getSearchType(field.field_type) as AvailableEntityType}
+                />
+              </div>
+            ) : (
+              <Search
+                label="Includes"
+                name={`[${i}].fields.${type}[${fIdx}].filter.value`}
+                onChange={({ name, value, label, image, icon }) =>
+                  handleChange([
+                    { name, value },
+                    {
+                      name: `[${i}].fields.${type}[${fIdx}].filter.relationalData`,
+                      value: { value, label, image, icon, character_field_id: field.id },
+                    },
+                  ])
+                }
+                searchEntity={getSearchType(field.field_type) as SearchableEntities}
+                value={field?.filter?.value as string | undefined}
+              />
+            )}
+          </div>
+        </div>
+      ) : null}
+      {relationFiltersList.includes(field.field_type) ? (
+        <div className="col-span-1">
+          <div className="mt-5 h-10 w-10 self-center">
+            <Button
+              hasNoBackground
+              icon={IconEnum.trash}
+              isIconOnly
+              onClick={() => {
+                handleChange({
+                  name: `[${i}].fields.${type}`,
+                  value: f.fields[type].filter((filtering_field) => field.id !== filtering_field.id),
+                });
+              }}
+              variant="error"
+            />
+          </div>
+        </div>
+      ) : null}
+    </Fragment>
+  ));
+}
+
 function CharacterFieldsFiltersList({
   filters,
   existingTemplates,
@@ -121,169 +326,22 @@ function CharacterFieldsFiltersList({
               />
             </div>
           </div>
-          {f.fields.and.map((field, fIdx) => (
-            <Fragment key={field.id}>
-              <div className="col-span-12">
-                {fIdx !== 0 ? (
-                  <div className="mt-1.5 flex w-full justify-center">
-                    <div className="w-16">
-                      <Badge label="AND" variant="info" />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-              <div className="col-span-5">
-                <Select
-                  label="Field"
-                  name={`[${i}].fields.and[${fIdx}]`}
-                  onChange={({ name, value }) => {
-                    const templateField = existingTemplates?.data
-                      ?.find((t) => t.id === f.template.id)
-                      ?.character_fields?.find((char_field) => char_field.id === value);
-                    if (templateField) {
-                      handleChange({
-                        name,
-                        value: {
-                          id: field.id,
-                          field_id: templateField.id,
-                          field_type: templateField.field_type,
-                          title: templateField.title,
-                          options: templateField.options,
-                          filter: {
-                            operator: "eq",
-                          },
-                        },
-                      });
-                    }
-                  }}
-                  options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
-                    (opt) => ({
-                      value: opt.id,
-                      label: opt.title,
-                      isDisabled: nonFilterableEntities.includes(opt.field_type),
-                    }),
-                  )}
-                  value={field?.field_id}
-                />
-              </div>
-              {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-6">
-                  <Select
-                    label="Filter type"
-                    name={`[${i}].fields.and[${fIdx}].filter.operator`}
-                    onChange={handleChange}
-                    options={field?.field_type === "number" ? NumberFilters : TextFilters}
-                    value={(field?.filter?.operator || "") as string | number}
-                  />
-                </div>
-              ) : null}
-
-              {field.field_type !== "select" && field.field_type !== "select_multiple" ? (
-                <div className="col-span-1">
-                  <div className="mt-5 h-10 w-10 self-center">
-                    <Button
-                      hasNoBackground
-                      icon={IconEnum.trash}
-                      isIconOnly
-                      onClick={() => {
-                        handleChange({
-                          name: `[${i}].fields.and`,
-                          value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
-                        });
-                      }}
-                      variant="error"
-                    />
-                  </div>
-                </div>
-              ) : null}
-
-              {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-12">
-                  <Input
-                    label="Filter value"
-                    name={`[${i}].fields.and[${fIdx}].filter.value`}
-                    onChange={handleChange}
-                    type={field?.field_type}
-                    value={(field?.filter?.value || "") as string | number}
-                  />
-                </div>
-              ) : null}
-              {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
-                <div className="col-span-6">
-                  <Select
-                    label="Filter value"
-                    name={`[${i}].fields.and[${fIdx}].filter.value`}
-                    onChange={(newValue) => {
-                      const opt = field.options?.find((o) => o.id === newValue.value);
-                      handleChange([
-                        newValue,
-                        { name: `[${i}].fields.and[${fIdx}].filter.relationalData.label`, value: opt?.value },
-                      ]);
-                    }}
-                    options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
-                    value={(field?.filter?.value || "") as string | number}
-                  />
-                </div>
-              ) : null}
-              {field.field_type === "select" || field.field_type === "select_multiple" ? (
-                <div className="col-span-1">
-                  <div className="mt-5 h-10 w-10 self-center">
-                    <Button
-                      hasNoBackground
-                      icon={IconEnum.trash}
-                      isIconOnly
-                      onClick={() => {
-                        handleChange({
-                          name: `[${i}].fields.and`,
-                          value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
-                        });
-                      }}
-                      variant="error"
-                    />
-                  </div>
-                </div>
-              ) : null}
-              {relationFiltersList.includes(field?.field_type) ? (
-                <div className="col-span-7 grid grid-cols-3">
-                  <div className="col-span-1 mt-5 flex items-center justify-center">Includes</div>
-                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[5.5rem]">
-                    {field?.filter?.value ? (
-                      <div className="w-full">
-                        <EntityPreview
-                          clearAction={() =>
-                            handleChange([
-                              { name: `[${i}].fields.and[${fIdx}].filter.value`, value: "" },
-                              { name: `[${i}].fields.and[${fIdx}].filter.relationalData`, value: undefined },
-                            ])
-                          }
-                          icon={field.filter.relationalData?.icon}
-                          id={field.filter.relationalData?.value}
-                          image_id={field.filter.relationalData?.image}
-                          title={field.filter.relationalData?.label}
-                          type={getSearchType(field.field_type) as AvailableEntityType}
-                        />
-                      </div>
-                    ) : (
-                      <Search
-                        name={`[${i}].fields.and[${fIdx}].filter.value`}
-                        onChange={({ name, value, label, image, icon }) =>
-                          handleChange([
-                            { name, value },
-                            {
-                              name: `[${i}].fields.and[${fIdx}].filter.relationalData`,
-                              value: { value, label, image, icon, character_field_id: field.id },
-                            },
-                          ])
-                        }
-                        searchEntity={getSearchType(field.field_type) as SearchableEntities}
-                        value={field?.filter?.value as string | undefined}
-                      />
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </Fragment>
-          ))}
+          <CharacterFieldsFilters
+            existingTemplates={existingTemplates}
+            f={f}
+            filterFields={f.fields.and}
+            handleChange={handleChange}
+            i={i}
+            type="and"
+          />
+          <CharacterFieldsFilters
+            existingTemplates={existingTemplates}
+            f={f}
+            filterFields={f.fields.or}
+            handleChange={handleChange}
+            i={i}
+            type="or"
+          />
           <div className="col-span-12 flex items-center justify-between">
             <div className="flex-1">
               <Title isDrawerTitle label="OR filters" />
@@ -316,151 +374,90 @@ function CharacterFieldsFiltersList({
               />
             </div>
           </div>
-          {f.fields.or.map((field, fIdx) => (
-            <Fragment key={field.id}>
-              <div className="col-span-12">
-                {fIdx !== 0 ? (
-                  <div className="mt-1.5 flex w-full justify-center">
-                    <div className="w-16">
-                      <Badge label="OR" variant="info" />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-              <div className="col-span-4">
-                <Select
-                  label="Field"
-                  name={`[${i}].fields.or[${fIdx}]`}
-                  onChange={({ name, value }) => {
-                    const templateField = existingTemplates?.data
-                      ?.find((t) => t.id === f.template.id)
-                      ?.character_fields?.find((char_field) => char_field.id === value);
-                    if (templateField) {
-                      handleChange({
-                        name,
-                        value: {
-                          id: field.id,
-                          field_id: templateField.id,
-                          field_type: templateField.field_type,
-                          title: templateField.title,
-                          options: templateField.options,
-                          filter: {
-                            operator: "eq",
-                          },
-                        },
-                      });
-                    }
-                  }}
-                  options={((existingTemplates?.data || [])?.find((t) => t.id === f.template.id)?.character_fields || [])?.map(
-                    (opt) => ({
-                      value: opt.id,
-                      label: opt.title,
-                      isDisabled: nonFilterableEntities.includes(opt.field_type),
-                    }),
-                  )}
-                  value={field?.field_id}
-                />
-              </div>
-              {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-3">
-                  <Select
-                    label="Filter type"
-                    name={`[${i}].fields.or[${fIdx}].filter.operator`}
-                    onChange={handleChange}
-                    options={field?.field_type === "number" ? NumberFilters : TextFilters}
-                    value={(field?.filter?.operator || "") as string | number}
-                  />
-                </div>
-              ) : null}
-
-              {field?.field_type === "number" || field?.field_type === "text" ? (
-                <div className="col-span-4">
-                  <Input
-                    label="Filter value"
-                    name={`[${i}].fields.or[${fIdx}].filter.value`}
-                    onChange={handleChange}
-                    type={field?.field_type}
-                    value={(field?.filter?.value || "") as string | number}
-                  />
-                </div>
-              ) : null}
-              {field?.field_type === "select" || field?.field_type === "select_multiple" ? (
-                <div className="col-span-7">
-                  <Select
-                    label="Filter value"
-                    name={`[${i}].fields.or[${fIdx}].filter.value`}
-                    onChange={(newValue) => {
-                      const opt = field.options?.find((o) => o.id === newValue.value);
-                      handleChange([
-                        newValue,
-                        { name: `[${i}].fields.or[${fIdx}].filter.relationalData.label`, value: opt?.value },
-                      ]);
-                    }}
-                    options={(field.options || []).map((opt) => ({ label: opt.value, value: opt.id }))}
-                    value={(field?.filter?.value || "") as string | number}
-                  />
-                </div>
-              ) : null}
-              {relationFiltersList.includes(field?.field_type) ? (
-                <div className="col-span-7 grid grid-cols-3">
-                  <div className="col-span-1 mt-5 flex items-center justify-center">Includes</div>
-                  <div className="col-span-2 mt-5 flex items-center [&>div>*>span>a>span]:max-w-[8rem] ">
-                    {field?.filter?.value ? (
-                      <div className="w-full">
-                        <EntityPreview
-                          clearAction={() =>
-                            handleChange([
-                              { name: `[${i}].fields.or[${fIdx}].filter.value`, value: "" },
-                              { name: `[${i}].fields.or[${fIdx}].filter.relationalData`, value: undefined },
-                            ])
-                          }
-                          icon={field.filter.relationalData?.icon}
-                          id={field.filter.relationalData?.value}
-                          image_id={field.filter.relationalData?.image}
-                          title={field.filter.relationalData?.label}
-                          type={getSearchType(field.field_type) as AvailableEntityType}
-                        />
-                      </div>
-                    ) : (
-                      <Search
-                        name={`[${i}].fields.or[${fIdx}].filter.value`}
-                        onChange={({ name, value, label, image, icon }) =>
-                          handleChange([
-                            { name, value },
-                            {
-                              name: `[${i}].fields.or[${fIdx}].filter.relationalData`,
-                              value: { value, label, image, icon, character_field_id: field.id },
-                            },
-                          ])
-                        }
-                        searchEntity={getSearchType(field.field_type) as SearchableEntities}
-                        value={field?.filter?.value as string | undefined}
-                      />
-                    )}
-                  </div>
-                </div>
-              ) : null}
-              <div className="col-span-1">
-                <div className="mt-5 h-10 w-10 self-center">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.trash}
-                    isIconOnly
-                    onClick={() => {
-                      handleChange({
-                        name: `[${i}].fields.or`,
-                        value: f.fields.or.filter((filtering_field) => field.id !== filtering_field.id),
-                      });
-                    }}
-                    variant="error"
-                  />
-                </div>
-              </div>
-            </Fragment>
-          ))}
         </div>
       </Collapsible>
     </li>
+  ));
+}
+
+function CharacterResourceFilter({
+  filterFields,
+  handleChange,
+  i,
+  type,
+  f,
+}: {
+  filterFields: CharacterFilterField[];
+  handleChange: (newData: HandleChangePropsType) => void;
+  i: number;
+  f: CharacterFilter;
+  type: "and" | "or";
+}) {
+  return filterFields.map((field, fIdx) => (
+    <Fragment key={field.id}>
+      <div className="col-span-12">
+        {fIdx !== 0 ? (
+          <div className="flex w-full justify-center">
+            <div className="w-16">
+              <Badge label={type.toUpperCase()} variant="info" />
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="col-span-11">
+        <div className="flex flex-1 items-center">
+          {field?.filter?.value ? (
+            <div className="w-full">
+              <EntityPreview
+                clearAction={() =>
+                  handleChange([
+                    { name: `[${i}].fields.${type}[${fIdx}].filter.value`, value: "" },
+                    { name: `[${i}].fields.${type}[${fIdx}].filter.relationalData`, value: undefined },
+                  ])
+                }
+                icon={field.filter.relationalData?.icon}
+                id={field.filter.relationalData?.value}
+                image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
+                title={field.filter.relationalData?.label}
+                type={f.id as AvailableEntityType}
+              />
+            </div>
+          ) : (
+            <Search
+              imageType={f.id === "maps" ? "map_images" : "images"}
+              limit={10}
+              name={`[${i}].fields.${type}[${fIdx}].filter.value`}
+              onChange={({ name, value, label, image, icon }) =>
+                handleChange([
+                  { name, value },
+                  {
+                    name: `[${i}].fields.${type}[${fIdx}].filter.relationalData`,
+                    value: { value, label, image, icon },
+                  },
+                ])
+              }
+              searchEntity={f.id as SearchableEntities}
+              value={field?.filter?.value as string | undefined}
+            />
+          )}
+        </div>
+      </div>
+      <div className="w-10 self-center">
+        <Button
+          hasNoBackground
+          icon={IconEnum.trash}
+          isIconOnly
+          onClick={() => {
+            handleChange({
+              name: `[${i}].fields.${type}`,
+              value: f.fields[type].filter((filtering_field) => field.id !== filtering_field.id),
+            });
+          }}
+          variant="error"
+        />
+      </div>
+    </Fragment>
   ));
 }
 
@@ -513,72 +510,7 @@ function CharacterResourceFiltersList({
               />
             </div>
           </div>
-          {f.fields.and.map((field, fIdx) => (
-            <Fragment key={field.id}>
-              <div className="col-span-12">
-                {fIdx !== 0 ? (
-                  <div className="flex w-full justify-center">
-                    <div className="w-16">
-                      <Badge label="AND" variant="info" />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="col-span-11">
-                <div className="flex flex-1 items-center">
-                  {field?.filter?.value ? (
-                    <div className="w-full">
-                      <EntityPreview
-                        clearAction={() =>
-                          handleChange([
-                            { name: `[${i}].fields.and[${fIdx}].filter.value`, value: "" },
-                            { name: `[${i}].fields.and[${fIdx}].filter.relationalData`, value: undefined },
-                          ])
-                        }
-                        icon={field.filter.relationalData?.icon}
-                        id={field.filter.relationalData?.value}
-                        image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
-                        title={field.filter.relationalData?.label}
-                        type={f.id as AvailableEntityType}
-                      />
-                    </div>
-                  ) : (
-                    <Search
-                      imageType={f.id === "maps" ? "map_images" : "images"}
-                      limit={10}
-                      name={`[${i}].fields.and[${fIdx}].filter.value`}
-                      onChange={({ name, value, label, image, icon }) =>
-                        handleChange([
-                          { name, value },
-                          {
-                            name: `[${i}].fields.and[${fIdx}].filter.relationalData`,
-                            value: { value, label, image, icon },
-                          },
-                        ])
-                      }
-                      searchEntity={f.id as SearchableEntities}
-                      value={field?.filter?.value as string | undefined}
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="w-10 self-center">
-                <Button
-                  hasNoBackground
-                  icon={IconEnum.trash}
-                  isIconOnly
-                  onClick={() => {
-                    handleChange({
-                      name: `[${i}].fields.and`,
-                      value: f.fields.and.filter((filtering_field) => field.id !== filtering_field.id),
-                    });
-                  }}
-                  variant="error"
-                />
-              </div>
-            </Fragment>
-          ))}
+          <CharacterResourceFilter f={f} filterFields={f.fields.and} handleChange={handleChange} i={i} type="and" />
           <div className="col-span-12 flex items-center justify-between">
             <div className="flex-1">
               <Title isDrawerTitle label="OR filters" />
@@ -611,71 +543,7 @@ function CharacterResourceFiltersList({
               />
             </div>
           </div>
-          {f.fields.or.map((field, fIdx) => (
-            <Fragment key={field.id}>
-              <div className="col-span-12">
-                {fIdx !== 0 ? (
-                  <div className="flex w-full justify-center">
-                    <div className="w-16">
-                      <Badge label="OR" variant="info" />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-              <div className="col-span-11">
-                <div className="flex flex-1 items-center">
-                  {field?.filter?.value ? (
-                    <div className="w-full">
-                      <EntityPreview
-                        clearAction={() =>
-                          handleChange([
-                            { name: `[${i}].fields.or[${fIdx}].filter.value`, value: "" },
-                            { name: `[${i}].fields.or[${fIdx}].filter.relationalData`, value: undefined },
-                          ])
-                        }
-                        icon={field.filter.relationalData?.icon}
-                        id={field.filter.relationalData?.value}
-                        image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
-                        title={field.filter.relationalData?.label}
-                        type={f.id as AvailableEntityType}
-                      />
-                    </div>
-                  ) : (
-                    <Search
-                      imageType={f.id === "maps" ? "map_images" : "images"}
-                      limit={10}
-                      name={`[${i}].fields.or[${fIdx}].filter.value`}
-                      onChange={({ name, value, label, image, icon }) =>
-                        handleChange([
-                          { name, value },
-                          {
-                            name: `[${i}].fields.or[${fIdx}].filter.relationalData`,
-                            value: { value, label, image, icon },
-                          },
-                        ])
-                      }
-                      searchEntity={f.id as SearchableEntities}
-                      value={field?.filter?.value as string | undefined}
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="h-10 w-10 self-center">
-                <Button
-                  hasNoBackground
-                  icon={IconEnum.trash}
-                  isIconOnly
-                  onClick={() => {
-                    handleChange({
-                      name: `[${i}].fields.or`,
-                      value: f.fields.or.filter((filtering_field) => field.id !== filtering_field.id),
-                    });
-                  }}
-                  variant="error"
-                />
-              </div>
-            </Fragment>
-          ))}
+          <CharacterResourceFilter f={f} filterFields={f.fields.or} handleChange={handleChange} i={i} type="or" />
         </div>
       </Collapsible>
     </li>
