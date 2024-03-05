@@ -220,10 +220,9 @@ function FieldTemplateRows({
               <TemplateBlueprintField
                 key={template_field.id}
                 blueprint_id={template_field.blueprint_id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.blueprint_instances
-                }
+                currentValue={character_fields_data
+                  .filter((f) => f.id === template_field.id)
+                  .flatMap((f) => f.blueprint_instances)}
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
@@ -236,10 +235,7 @@ function FieldTemplateRows({
             return (
               <TemplateDocumentField
                 key={template_field.id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.documents
-                }
+                currentValue={character_fields_data.filter((f) => f.id === template_field.id).flatMap((f) => f.documents)}
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
@@ -252,10 +248,7 @@ function FieldTemplateRows({
             return (
               <TemplateLocationsField
                 key={template_field.id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
-                    ?.map_pins
-                }
+                currentValue={character_fields_data.filter((f) => f.id === template_field.id).flatMap((f) => f.map_pins)}
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
@@ -268,9 +261,7 @@ function FieldTemplateRows({
             return (
               <TemplateImageField
                 key={template_field.id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.images
-                }
+                currentValue={character_fields_data.filter((f) => f.id === template_field.id).flatMap((f) => f.images)}
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
@@ -283,9 +274,7 @@ function FieldTemplateRows({
             return (
               <TemplateEventField
                 key={template_field.id}
-                currentValue={
-                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]?.events
-                }
+                currentValue={character_fields_data.filter((f) => f.id === template_field.id).flatMap((f) => f.events)}
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
