@@ -350,14 +350,7 @@ function CharacterFieldsFiltersList({
             i={i}
             type="and"
           />
-          <CharacterFieldsFilters
-            existingTemplates={existingTemplates}
-            f={f}
-            filterFields={f.fields.or}
-            handleChange={handleChange}
-            i={i}
-            type="or"
-          />
+
           <div className="col-span-12 flex items-center justify-between">
             <div className="flex-1">
               <Title isDrawerTitle label="OR filters" />
@@ -390,6 +383,14 @@ function CharacterFieldsFiltersList({
               />
             </div>
           </div>
+          <CharacterFieldsFilters
+            existingTemplates={existingTemplates}
+            f={f}
+            filterFields={f.fields.or}
+            handleChange={handleChange}
+            i={i}
+            type="or"
+          />
         </div>
       </Collapsible>
     </li>
