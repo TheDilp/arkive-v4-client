@@ -1,9 +1,8 @@
 import { useParams } from "react-router-dom";
-import { tv } from "tailwind-variants";
 
 import { useGetSubEntity } from "../../hooks";
 import { CharacterCharacterFieldType, CharacterFieldType, RandomTableOptionType } from "../../types";
-import { formatDateToString, getEntityLink, IconEnum } from "../../utils";
+import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { CarouselEntityPreview, EntityPreview, FormattedDate, Gallery, Input, StaticRender, Tooltip } from "..";
 
 function RandomTableField({
@@ -88,59 +87,6 @@ function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldTyp
   );
 }
 
-const fieldSizeClass = tv({
-  base: "flex flex-col justify-center mt-1 p-0.5",
-  variants: {
-    type: {
-      dice_roll: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      text: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      select: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      locations_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
-      locations_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      blueprints_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      blueprints_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
-      events_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      events_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
-      documents_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      documents_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
-      images_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      images_multiple: "col-span-6 sm:col-span-6 lg:col-span-6",
-      number: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      random_table: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      textarea: "col-span-6 bg-transparent rounded-none shadow-none",
-      date: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-      boolean: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
-    },
-  },
-  compoundVariants: [
-    {
-      type: [
-        "dice_roll",
-        "text",
-        "select",
-        "select_multiple",
-        "characters_single",
-        "characters_multiple",
-        "documents_single",
-        "documents_multiple",
-        "events_single",
-        "events_multiple",
-        "locations_single",
-        "locations_multiple",
-        "blueprints_single",
-        "blueprints_multiple",
-        "images_single",
-        "number",
-        "date",
-        "boolean",
-      ],
-      isPreview: true,
-      className: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
-    },
-  ],
-});
-
 export function AdditionalFieldDisplay({
   isPreview,
   isPublic,
@@ -154,7 +100,8 @@ export function AdditionalFieldDisplay({
 }) {
   const value = character_field_data?.value;
   const { project_id } = useParams();
-  const fieldClasses = fieldSizeClass({ type: character_field.field_type || "text", isPreview });
+  const fieldClasses = FieldClasses({ type: character_field.field_type || "text", isPreview });
+
   return (
     <div className={fieldClasses}>
       {character_field.field_type === "text" ||
@@ -188,7 +135,7 @@ export function AdditionalFieldDisplay({
       {character_field.field_type === "date" ? <DateField field={character_field} fieldData={character_field_data} /> : null}
 
       {character_field.field_type === "blueprints_single" || character_field.field_type === "blueprints_multiple" ? (
-        <div className="w-full">
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
@@ -212,7 +159,7 @@ export function AdditionalFieldDisplay({
         </div>
       ) : null}
       {character_field.field_type === "documents_single" || character_field.field_type === "documents_multiple" ? (
-        <div className="w-full">
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
@@ -229,7 +176,7 @@ export function AdditionalFieldDisplay({
         </div>
       ) : null}
       {character_field.field_type === "locations_single" || character_field.field_type === "locations_multiple" ? (
-        <div className="w-full">
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
@@ -247,7 +194,7 @@ export function AdditionalFieldDisplay({
         </div>
       ) : null}
       {character_field.field_type === "events_single" || character_field.field_type === "events_multiple" ? (
-        <div className="w-full">
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
@@ -265,7 +212,7 @@ export function AdditionalFieldDisplay({
         </div>
       ) : null}
       {character_field.field_type === "images_single" && character_field_data?.images?.[0] ? (
-        <div className="w-full">
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
           <EntityPreview
             id={character_field_data.images[0].related_id as string}
             image_id={character_field_data?.images?.[0].image.id}

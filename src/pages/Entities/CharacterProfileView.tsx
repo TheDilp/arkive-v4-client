@@ -1077,7 +1077,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
               {(existingTemplates?.data || []).map((t) => {
                 return (
                   <Collapsible key={t.id} label={t.title}>
-                    <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
+                    <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
                       {t.character_fields.map((template_field) => {
                         const characterField = existingCharacter?.data?.character_fields?.find(
                           (f) => f.id === template_field.id,

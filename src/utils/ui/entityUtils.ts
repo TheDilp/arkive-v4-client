@@ -1,4 +1,5 @@
 import { isEqual, isRemirrorJSON } from "remirror";
+import { tv } from "tailwind-variants";
 
 import {
   AvailableEntityType,
@@ -369,3 +370,50 @@ export function getEntityTypeFromNotificationType(notification_type: string): st
   const entityType = notification_type.replace("_notification", "").replace(/_(create|update|delete)/, "");
   return entityType;
 }
+
+export const FieldClasses = tv({
+  base: "flex flex-col justify-center mt-1 p-0.5",
+  variants: {
+    type: {
+      dice_roll: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      text: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      select: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      characters_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      characters_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+      locations_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      locations_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+      blueprints_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      blueprints_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+      images_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      images_multiple: "col-span-6 sm:col-span-6 lg:col-span-6",
+      number: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      random_table: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      textarea: "col-span-6 bg-transparent rounded-none shadow-none",
+      date: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+      boolean: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
+    },
+  },
+  compoundVariants: [
+    {
+      type: [
+        "dice_roll",
+        "text",
+        "select",
+        "select_multiple",
+        "characters_single",
+        "characters_multiple",
+        "locations_single",
+        "locations_multiple",
+        "blueprints_single",
+        "blueprints_multiple",
+        "images_single",
+        "number",
+        "date",
+        "boolean",
+      ],
+      isPreview: true,
+      className: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+    },
+  ],
+});
