@@ -153,7 +153,7 @@ export function ProjectsView() {
           <Navbar isDisabled={isLoading || isInitialLoadingUser} />
         </div>
         {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
-        {view ? (
+        {view && !isLoading && !isInitialLoadingUser ? (
           <div className="flex-1 p-4">
             <TablePageLayout>
               <Table
@@ -165,7 +165,9 @@ export function ProjectsView() {
               />
             </TablePageLayout>
           </div>
-        ) : (
+        ) : null}
+
+        {!view && !isLoading && !isInitialLoadingUser ? (
           <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
             {(data?.data || []).map((project) => (
               <ProjectCard
@@ -176,7 +178,7 @@ export function ProjectsView() {
               />
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
