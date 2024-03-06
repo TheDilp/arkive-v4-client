@@ -56,7 +56,7 @@ import {
 
 const DrawerClasses = tv({
   slots: {
-    base: "bg-zinc-900 absolute right-0 border-l border-zinc-700 top-0 h-full transition-transform px-4 pb-4 z-[60] duration-500 ease-in-out max-h-full w-0 w-24",
+    base: "transition-all ease-in-out duration-500 bg-zinc-900 absolute right-0 border-l border-zinc-700 top-0 h-full px-4 pb-4 z-[60] max-h-full",
     title:
       "font-merriweather text-white h-16 max-h-[4rem] text-2xl text-center border-b items-center border-zinc-700 mb-4 flex justify-between flex-nowrap",
   },
@@ -70,6 +70,9 @@ const DrawerClasses = tv({
       half: "w-full lg:w-1/2",
       full: "w-full",
     },
+    isExpanded: {
+      true: "w-full mg:w-full lg:w-full",
+    },
   },
 });
 
@@ -79,9 +82,9 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   const resetDrawer = useResetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { type, item_id } = useParams();
-  const { base, title } = DrawerClasses({ size: drawer.size });
 
   const [isOpen, setIsOpen] = useState(!!drawer.type);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [renderContent, setRenderContent] = useState(false);
   const { refs, context } = useFloating({
     placement: "right",
@@ -92,6 +95,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   const { isMounted, styles } = useTransitionStyles(context, {
     initial: {
       transform: "translateX(100%)",
+      width: isExpanded ? "100%" : "10rem",
     },
     common: ({ side }) => ({
       transformOrigin: {
@@ -102,6 +106,9 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
       }[side],
     }),
   });
+
+  const { base, title } = DrawerClasses({ size: drawer.size, isExpanded });
+
   // Close drawer if the location changes
   useEffect(() => {
     if (!hasChangedData) {
@@ -121,37 +128,44 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
       <div ref={refs.setFloating} className={base()} style={styles}>
         <h3 className={title()}>
           <span className="truncate">{drawer.title}</span>
-          <div className="w-min">
-            <Button
-              hasNoBackground
-              icon={IconEnum.close}
-              iconSize={22}
-              onClick={() => {
-                if (!hasChangedData) {
-                  resetDrawer();
-                } else {
-                  setDialog((prev) => ({
-                    ...prev,
-                    title: "You have unsaved changes - are you sure you want to proceed?",
-                    confirm: {
-                      label: "Proceed",
-                      variant: "primary",
-                      icon: IconEnum.chevron_right,
-                      action: () => {
-                        resetDrawer();
-                        setHasChangedData(false);
+          <div className="flex items-center gap-x-2">
+            <div className="w-min">
+              <Button hasNoBackground icon={IconEnum.expand} iconSize={22} onClick={() => setIsExpanded((prev) => !prev)} />
+            </div>
+            <div className="w-min">
+              <Button
+                hasNoBackground
+                icon={IconEnum.close}
+                iconSize={22}
+                onClick={() => {
+                  if (!hasChangedData) {
+                    resetDrawer();
+                    setIsExpanded(false);
+                  } else {
+                    setDialog((prev) => ({
+                      ...prev,
+                      title: "You have unsaved changes - are you sure you want to proceed?",
+                      confirm: {
+                        label: "Proceed",
+                        variant: "primary",
+                        icon: IconEnum.chevron_right,
+                        action: () => {
+                          resetDrawer();
+                          setHasChangedData(false);
+                          setIsExpanded(false);
+                        },
                       },
-                    },
-                    cancel: {
-                      label: "Cancel",
-                      variant: "info",
-                      action: () => {},
-                    },
-                    isOverlay: true,
-                  }));
-                }
-              }}
-            />
+                      cancel: {
+                        label: "Cancel",
+                        variant: "info",
+                        action: () => {},
+                      },
+                      isOverlay: true,
+                    }));
+                  }
+                }}
+              />
+            </div>
           </div>
         </h3>
         {renderContent ? (
