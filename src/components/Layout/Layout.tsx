@@ -100,10 +100,9 @@ export function ProjectLayout() {
 
     return false;
   });
-
   if (
     data?.data?.owner_id !== userData?.data?.id &&
-    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id !== userData?.data?.id)) &&
+    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id === userData?.data?.id)) &&
     !isInitialLoading &&
     !isInitialLoadingUser
   ) {
