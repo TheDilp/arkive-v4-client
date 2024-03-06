@@ -8,14 +8,15 @@ import {
   CharacterFieldType,
   CharacterType,
   FormattedRelationship,
+  PermissionType,
   SearchAllEntitiesByTagType,
   TableType,
   WordType,
 } from "../../../types";
 import { RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { getSentenceCase, IconEnum, sortCharacters } from "../../../utils";
+import { capitalizeFirstLetter, getSentenceCase, IconEnum, permissionsByEntity, sortCharacters } from "../../../utils";
 import { Textarea } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Collapsible, Tabs } from "../../Layout";
 import { Alert, Skeleton, Spinner } from "../../Misc";
 import { Badge } from "../../Misc/Badge";
 import { EntityPreview } from "../EntityPreview";
@@ -257,6 +258,24 @@ function ExpandedWord({ id }: { id: string }) {
   if (isFetching) return <Spinner />;
   return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description} />;
 }
+function ExpandedRole({ permissions }: { permissions: PermissionType[] }) {
+  const formatted = permissionsByEntity(permissions || []);
+  return (
+    <div className="flex w-full flex-col gap-x-2">
+      {formatted.map((p) => (
+        <Collapsible key={p.title} label={capitalizeFirstLetter(getSentenceCase(p.title))}>
+          <div className="flex gap-x-2 p-2">
+            {p.permissions.map((perm) => (
+              <div key={perm.id}>
+                <Badge label={perm.title} variant="info" />
+              </div>
+            ))}
+          </div>
+        </Collapsible>
+      ))}
+    </div>
+  );
+}
 
 export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
   return (
@@ -271,6 +290,9 @@ export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType,
       {type === "relationships" ? <ExpandedRelationships relationships={data?.relationships || []} /> : null}
       {type === "words" ? <ExpandedWord id={data?.id} /> : null}
       {type === "tags" ? <ExpandedTag id={data?.id} /> : null}
+      {/* Roles have permissions fetched with them */}
+      {/* Therefore they can be passed as prop directly, instead of using an id to fetch them */}
+      {type === "roles" ? <ExpandedRole permissions={data?.permissions} /> : null}
     </div>
   );
 }

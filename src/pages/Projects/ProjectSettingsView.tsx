@@ -300,9 +300,20 @@ const rolesColumns = [
     meta: {
       centered: true,
     },
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex items-center justify-center">
-        <Dropdown allowedPlacements={["left", "left-start", "left-end"]} items={[]}>
+        <Dropdown
+          allowedPlacements={["left", "left-start", "left-end"]}
+          items={[
+            { id: "1", title: "Edit role", icon: IconEnum.edit },
+            {
+              id: "expand",
+              title: `${!row.getIsExpanded() ? "Show" : "Hide"} permissions`,
+              icon: IconEnum.permissions,
+              onClick: row.getToggleExpandedHandler(),
+            },
+            { id: "3", title: "Delete role", icon: IconEnum.trash },
+          ]}>
           <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
         </Dropdown>
       </div>
@@ -626,7 +637,13 @@ export function ProjectSettingsView() {
           {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
-                <Table columns={rolesColumns} data={roles?.data || []} dispatch={dispatch} type="roles" />
+                <Table
+                  columns={rolesColumns}
+                  config={{ expandable: true }}
+                  data={roles?.data || []}
+                  dispatch={dispatch}
+                  type="roles"
+                />
               </div>
             </div>
           ) : null}
