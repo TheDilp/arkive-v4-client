@@ -30,7 +30,9 @@ export type AvailableEntityType =
   | "tags"
   | "conversations"
   | "webhooks"
-  | "images";
+  | "images"
+  | "roles"
+  | "permissions";
 
 export type AvailableSubEntityType =
   | "alter_names"

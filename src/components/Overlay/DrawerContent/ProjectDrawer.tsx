@@ -7,6 +7,7 @@ import { ProjectType } from "../../../types";
 import { drawerAtom, IconEnum, userAtom } from "../../../utils";
 import { InsertProjectSchema, InsertProjectType } from "../../../validation/project";
 import { Button, Input } from "../../Form";
+import { DrawerLayout } from "../../Layout";
 
 export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: string } | null }) {
   const user = useAtomValue(userAtom);
@@ -18,7 +19,7 @@ export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: str
   const { mutateAsync, isLoading: isMutating } = useCreateProject<InsertProjectType>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   return (
-    <>
+    <DrawerLayout>
       <Input
         label="Project title"
         name="title"
@@ -42,6 +43,6 @@ export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: str
         }}
         variant="success"
       />
-    </>
+    </DrawerLayout>
   );
 }

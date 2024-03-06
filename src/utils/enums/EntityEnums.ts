@@ -146,3 +146,258 @@ export const MiscellaneousSettings = [
   "show_date_in_event_tooltip_in_calendar",
   "show_date_in_event_tooltip_in_timeline",
 ];
+
+export const RolePermissions = [
+  {
+    title: "Characters",
+    permissions: [
+      {
+        title: "Create characters",
+        code: "create_characters",
+      },
+      {
+        title: "View characters",
+        code: "read_characters",
+      },
+      {
+        title: "Edit characters",
+        code: "update_characters",
+      },
+      {
+        title: "Delete characters",
+        code: "delete_characters",
+      },
+    ],
+  },
+  {
+    title: "Blueprints",
+    permissions: [
+      {
+        title: "Create blueprints",
+        code: "create_blueprints",
+      },
+      {
+        title: "View blueprints",
+        code: "read_blueprints",
+      },
+      {
+        title: "Edit blueprints",
+        code: "update_blueprints",
+      },
+      {
+        title: "Delete blueprints",
+        code: "delete_blueprints",
+      },
+    ],
+  },
+  {
+    title: "Blueprint instances",
+    permissions: [
+      {
+        title: "Create blueprint instances",
+        code: "create_blueprint_instances",
+      },
+      {
+        title: "View blueprint instances",
+        code: "read_blueprint_instances",
+      },
+      {
+        title: "Edit blueprint instances",
+        code: "update_blueprint_instances",
+      },
+      {
+        title: "Delete blueprint instances",
+        code: "delete_blueprint_instances",
+      },
+    ],
+  },
+  {
+    title: "Documents",
+    permissions: [
+      {
+        title: "Create documents",
+        code: "create_documents",
+      },
+      {
+        title: "View documents",
+        code: "read_documents",
+      },
+      {
+        title: "Edit documents",
+        code: "update_documents",
+      },
+      {
+        title: "Delete documents",
+        code: "delete_documents",
+      },
+    ],
+  },
+  {
+    title: "Maps",
+    permissions: [
+      {
+        title: "Create maps",
+        code: "create_maps",
+      },
+      {
+        title: "View maps",
+        code: "read_maps",
+      },
+      {
+        title: "Edit maps",
+        code: "update_maps",
+      },
+      {
+        title: "Delete maps",
+        code: "delete_maps",
+      },
+    ],
+  },
+  {
+    title: "Graphs",
+    permissions: [
+      {
+        title: "Create graphs",
+        code: "create_graphs",
+      },
+      {
+        title: "View graphs",
+        code: "read_graphs",
+      },
+      {
+        title: "Edit graphs",
+        code: "update_graphs",
+      },
+      {
+        title: "Delete graphs",
+        code: "delete_graphs",
+      },
+    ],
+  },
+  {
+    title: "Calendars",
+    permissions: [
+      {
+        title: "Create calendars",
+        code: "create_calendars",
+      },
+      {
+        title: "View calendars",
+        code: "read_calendars",
+      },
+      {
+        title: "Edit calendars",
+        code: "update_calendars",
+      },
+      {
+        title: "Delete calendars",
+        code: "delete_calendars",
+      },
+    ],
+  },
+  {
+    title: "Dictionaries",
+    permissions: [
+      {
+        title: "Create dictionaries",
+        code: "create_dictionaries",
+      },
+      {
+        title: "View dictionaries",
+        code: "read_dictionaries",
+      },
+      {
+        title: "Edit dictionaries",
+        code: "update_dictionaries",
+      },
+      {
+        title: "Delete dictionaries",
+        code: "delete_dictionaries",
+      },
+    ],
+  },
+  {
+    title: "Random tables",
+    permissions: [
+      {
+        title: "Create random tables",
+        code: "create_random_tables",
+      },
+      {
+        title: "View random tables",
+        code: "read_random_tables",
+      },
+      {
+        title: "Edit random tables",
+        code: "update_random_tables",
+      },
+      {
+        title: "Delete random tables",
+        code: "delete_random_tables",
+      },
+    ],
+  },
+  {
+    title: "Tags",
+    permissions: [
+      {
+        title: "Create tags",
+        code: "create_tags",
+      },
+      {
+        title: "View tags",
+        code: "read_tags",
+      },
+      {
+        title: "Edit tags",
+        code: "update_tags",
+      },
+      {
+        title: "Delete tags",
+        code: "delete_tags",
+      },
+    ],
+  },
+  {
+    title: "Character templates",
+    permissions: [
+      {
+        title: "Create character templates",
+        code: "create_character_fields_templates",
+      },
+      {
+        title: "View character templates",
+        code: "read_character_fields_templates",
+      },
+      {
+        title: "Edit character templates",
+        code: "update_character_fields_templates",
+      },
+      {
+        title: "Delete character templates",
+        code: "delete_character_fields_templates",
+      },
+    ],
+  },
+  {
+    title: "Assets",
+    permissions: [
+      {
+        title: "Upload assets",
+        code: "create_assets",
+      },
+      {
+        title: "View assets",
+        code: "read_assets",
+      },
+      {
+        title: "Edit assets",
+        code: "update_assets",
+      },
+      {
+        title: "Delete assets",
+        code: "delete_assets",
+      },
+    ],
+  },
+];

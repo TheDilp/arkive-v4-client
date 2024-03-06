@@ -405,6 +405,15 @@ export function ProjectSettingsView() {
       data: null,
     }));
   }
+  function handleOpenRolesDrawer() {
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Role",
+      type: "roles",
+      size: "xl",
+      data: null,
+    }));
+  }
   return (
     <div className="flex h-full min-h-full flex-col gap-y-2">
       <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
@@ -481,7 +490,7 @@ export function ProjectSettingsView() {
             ) : null}
             {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
               <div className="ml-auto w-min">
-                <Button icon={IconEnum.add} label="Create" onClick={() => {}} size="sm" variant="info" />
+                <Button icon={IconEnum.add} label="Create" onClick={handleOpenRolesDrawer} size="sm" variant="info" />
               </div>
             ) : null}
           </h2>
@@ -623,7 +632,7 @@ export function ProjectSettingsView() {
                   {UserNotificationEntities.map((entity) => (
                     <div
                       key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
                       <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
                       <div className="flex w-52 items-center justify-between gap-x-2 text-center">
                         <Checkbox
@@ -654,7 +663,7 @@ export function ProjectSettingsView() {
                   {UserSidebarEntitiesEnabled.map((entity) => (
                     <div
                       key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
                       <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
@@ -673,7 +682,7 @@ export function ProjectSettingsView() {
                   {MiscellaneousSettings.map((setting) => (
                     <div
                       key={setting}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 py-1 pt-0 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
                       <span>{getSentenceCase(setting)}:</span>
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox

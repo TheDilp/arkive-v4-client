@@ -39,6 +39,7 @@ export * from "./ProjectDrawer";
 export * from "./RandomTableDrawer";
 export * from "./RandomTableOptionDrawer";
 export * from "./RandomTableOptionsDrawer";
+export * from "./RolesAndPermissionsDrawer";
 export * from "./SearchDrawer";
 export * from "./TagsDrawer";
 export * from "./WebhookDrawer";
