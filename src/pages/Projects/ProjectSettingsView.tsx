@@ -367,6 +367,11 @@ export function ProjectSettingsView() {
     "webhooks",
     { enabled: !!user?.id && finalTabs[selectedTab].label === "User settings" },
   );
+  const { data: roles } = useGetEntities<RoleType>(
+    { data: { project_id }, fields: ["id", "title"], relations: { permissions: true } },
+    "roles",
+    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].id === "5" },
+  );
   const { mutateAsync: deleteWebhook } = useDeleteWebhook();
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
@@ -621,7 +626,7 @@ export function ProjectSettingsView() {
           {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
-                <Table columns={rolesColumns} data={projectData?.data?.roles || []} dispatch={dispatch} type="roles" />
+                <Table columns={rolesColumns} data={roles?.data || []} dispatch={dispatch} type="roles" />
               </div>
             </div>
           ) : null}
