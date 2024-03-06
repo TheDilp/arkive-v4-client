@@ -78,7 +78,8 @@ const tabs = [
   { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
-  { id: "5", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
+  { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
+  { id: "6", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -413,8 +414,10 @@ export function ProjectSettingsView() {
 
         <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
-            {finalTabs[selectedTab].label}
-            {selectedTab === 0 ? (
+            <span className="flex items-center gap-x-2">
+              <Icon icon={finalTabs[selectedTab].icon} /> {finalTabs[selectedTab].label}
+            </span>
+            {finalTabs[selectedTab].id === "1" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.save}
@@ -427,12 +430,12 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {selectedTab === 1 ? (
+            {finalTabs[selectedTab].id === "2" ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewMapPinTypeDrawer} size="sm" variant="info" />
               </div>
             ) : null}
-            {selectedTab === 2 ? (
+            {finalTabs[selectedTab].id === "3" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.add}
@@ -443,8 +446,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-
-            {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
+            {finalTabs[selectedTab].id === "4" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.user_invite}
@@ -456,7 +458,7 @@ export function ProjectSettingsView() {
               </div>
             ) : null}
           </h2>
-          {selectedTab === 0 ? (
+          {finalTabs[selectedTab].id === "1" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
               <div className=" grid grid-cols-12 gap-2">
                 <div className="col-span-12 lg:col-span-8">
@@ -544,7 +546,7 @@ export function ProjectSettingsView() {
               )}
             </div>
           ) : null}
-          {selectedTab === 1 ? (
+          {finalTabs[selectedTab].id === "2" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -556,7 +558,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === 2 ? (
+          {finalTabs[selectedTab].id === "3" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -569,7 +571,7 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
 
-          {selectedTab === finalTabs.length - 2 && isProjectOwner ? (
+          {finalTabs[selectedTab].id === "4" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -581,7 +583,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {selectedTab === finalTabs.length - 1 ? (
+          {finalTabs[selectedTab].id === "6" ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible label="Notifications from other project members">
                 <div className="bg-zinc-900">
