@@ -45,6 +45,7 @@ export const IconEnum = {
   event: "ph:flag" as const,
   era: "ph:timer" as const,
   export: "ph:export" as const,
+  expand: "ph:arrows-horizontal" as const,
   eye: "ph:eye" as const,
   eye_slash: "ph:eye-slash" as const,
   family_tree: "ph:tree-structure" as const,
