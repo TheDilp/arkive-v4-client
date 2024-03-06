@@ -136,9 +136,9 @@ export function useGetEntities<ReturnType>(
       body: JSON.stringify(finalRequest),
       url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
     });
-    if (data?.role_access === false) {
+    if (!data?.role_access) {
       createNotification({
-        title: "Your current role in this project does not have access for this action.",
+        title: "Your current role in this project does not have permission for this action.",
         timer: 5,
         hasNoTruncate: true,
         variant: "error",
