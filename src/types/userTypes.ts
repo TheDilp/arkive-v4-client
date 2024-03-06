@@ -1,4 +1,4 @@
-import { ProjectType, WebhookType } from "./EntityTypes";
+import { PermissionType, ProjectType, RoleType, WebhookType } from "./EntityTypes";
 
 export interface UserType {
   id: string;
@@ -9,4 +9,6 @@ export interface UserType {
   feature_flags: Record<string, boolean>;
   projects: ProjectType[];
   webhooks: WebhookType[];
+  roles: RoleType[];
+  permissions: PermissionType[];
 }

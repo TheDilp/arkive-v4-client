@@ -41,6 +41,7 @@ import {
   DrawerAtomType,
   MapPinTypesType,
   ProjectType,
+  RoleType,
   UserType,
   WebhookType,
 } from "../../types";
@@ -85,6 +86,7 @@ const tabs = [
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
 const membersColumnHelper = createColumnHelper<UserType>();
+const rolesColumnHelper = createColumnHelper<RoleType>();
 
 function mapPinTypeTableColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
@@ -229,7 +231,6 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
     }),
   ];
 }
-
 function membersColumns(
   kickUser: kickUserMutationType,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
@@ -287,6 +288,27 @@ function membersColumns(
     }),
   ];
 }
+const rolesColumns = [
+  rolesColumnHelper.display({
+    id: "title",
+    header: "Title",
+    cell: ({ row }) => row.original.title,
+  }),
+  relationshipTypesColumnHelper.display({
+    id: "action",
+    header: "Actions",
+    meta: {
+      centered: true,
+    },
+    cell: () => (
+      <div className="flex items-center justify-center">
+        <Dropdown allowedPlacements={["left", "left-start", "left-end"]} items={[]}>
+          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+        </Dropdown>
+      </div>
+    ),
+  }),
+];
 
 export function ProjectSettingsView() {
   const { project_id } = useParams();
@@ -457,6 +479,11 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
+            {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
+              <div className="ml-auto w-min">
+                <Button icon={IconEnum.add} label="Create" onClick={() => {}} size="sm" variant="info" />
+              </div>
+            ) : null}
           </h2>
           {finalTabs[selectedTab].id === "1" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
@@ -570,7 +597,6 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-
           {finalTabs[selectedTab].id === "4" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
@@ -580,6 +606,13 @@ export function ProjectSettingsView() {
                   dispatch={dispatch}
                   type="character_relationship_types"
                 />
+              </div>
+            </div>
+          ) : null}
+          {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
+            <div className="h-full">
+              <div className="h-fit w-full">
+                <Table columns={rolesColumns} data={projectData?.data?.roles || []} dispatch={dispatch} type="roles" />
               </div>
             </div>
           ) : null}

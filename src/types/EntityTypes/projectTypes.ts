@@ -11,6 +11,7 @@ import { GraphType } from "./graphTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinTypesType, MapType } from "./mapTypes";
 import { RandomTableType } from "./randomTableTypes";
+import { RoleType } from "./rolesTypes";
 
 export interface ProjectType {
   id: string;
@@ -19,11 +20,10 @@ export interface ProjectType {
   image_id: string | null;
   images?: ImageType[];
   default_dice_color?: string;
-  // show_image_folder_view?: boolean;
-  // show_image_table_view?: boolean;
   character_relationship_types?: CharacterRelationshipType[];
   map_pin_types?: MapPinTypesType[];
   members: UserType[];
+  roles: RoleType[];
 }
 
 export type ProjectDashboardType = [

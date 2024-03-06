@@ -86,7 +86,7 @@ export interface TableType {
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => Promise<void>;
   };
-  type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships";
+  type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships" | "roles";
   skeletonLimit?: number;
 }
 
