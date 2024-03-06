@@ -27,7 +27,7 @@ const SidebarClasses = tv({
   },
 });
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
-export function Sidebar() {
+export function Sidebar({ isLoading }: { isLoading: boolean }) {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
@@ -59,18 +59,21 @@ export function Sidebar() {
               <img alt="Arkive Logo" className="h-12" height={48} src="/Logo.webp" width={64} />
             </Link>
           </li>
-          {user?.feature_flags ? (
-            sidebarItems
-              .filter(
-                (item) => enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate),
-              )
-              .map((item) => {
-                return (
-                  <Link
-                    key={item.icon}
-                    className={`${listItemLink()} ${
-                      item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
-                    }
+          {isLoading
+            ? null
+            : sidebarItems
+                .filter((item) =>
+                  user?.feature_flags
+                    ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
+                    : alwaysEnabledItems.includes(item.navigate),
+                )
+                .map((item) => {
+                  return (
+                    <Link
+                      key={item.icon}
+                      className={`${listItemLink()} ${
+                        item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
+                      }
                 ${item.navigate === "blueprints" && pathname.includes("blueprints") ? selectedListItem() : ""}
                 ${item.navigate === type && type !== "settings" ? selectedListItem() : ""}
                  ${item.navigate === "settings" && type === "settings" ? selectedSettingsListItem() : ""}
@@ -78,21 +81,19 @@ export function Sidebar() {
                 ${item.navigate === "settings" ? listSettingsItem() : ""}
                 
                 `}
-                    to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
-                    <Tooltip
-                      allowedPlacements={[isLg ? "right" : "top"]}
-                      content={item.tooltip}
-                      isDisabled={item.navigate === type}>
-                      <li className={listItem()}>
-                        <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
-                      </li>
-                    </Tooltip>
-                  </Link>
-                );
-              })
-          ) : (
-            <Skeleton type="sidebar" />
-          )}
+                      to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
+                      <Tooltip
+                        allowedPlacements={[isLg ? "right" : "top"]}
+                        content={item.tooltip}
+                        isDisabled={item.navigate === type}>
+                        <li className={listItem()}>
+                          <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
+                        </li>
+                      </Tooltip>
+                    </Link>
+                  );
+                })}
+          {isLoading ? <Skeleton type="sidebar" /> : null}
         </ul>
       </nav>
     </div>

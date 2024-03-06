@@ -123,7 +123,7 @@ export function ProjectLayout() {
       </SignedOut>
 
       <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
-      {isLg ? <Sidebar /> : null}
+      {isLg ? <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} /> : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
@@ -131,7 +131,7 @@ export function ProjectLayout() {
           <Drawer />
           {isInitialLoading || isInitialLoadingUser ? null : <Outlet />}
         </div>
-        {!isLg ? <Sidebar /> : null}
+        {!isLg ? <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} /> : null}
       </div>
     </div>
   );
