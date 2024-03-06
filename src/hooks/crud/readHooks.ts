@@ -29,7 +29,7 @@ export function useGetAllProjects(request: RequestBodyType<ProjectType>, options
 
 export function useGetProjectDashboard(project_id: string, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectDashboardType }>(
-    ["allEntities", "project", "dashboard"],
+    ["allEntities", "project", "dashboard", project_id],
     async () =>
       FetchFunction({
         method: "GET",
