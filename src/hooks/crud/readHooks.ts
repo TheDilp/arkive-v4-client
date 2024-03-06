@@ -9,7 +9,7 @@ import {
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
-import { baseURLS, FetchFunction, getSearchURL } from "../../utils";
+import { baseURLS, FetchFunction, getSearchURL, IconEnum, useNotifications } from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
@@ -119,6 +119,7 @@ export function useGetEntities<ReturnType>(
     isPublic?: boolean;
   },
 ) {
+  const createNotification = useNotifications();
   const baseQueryKey = [
     "allEntities",
     request.data?.project_id,
@@ -130,11 +131,22 @@ export function useGetEntities<ReturnType>(
   ];
   let mainRequestQueryKey = [...baseQueryKey];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
-    return FetchFunction({
+    const data: { data: any; message: string; ok: boolean; role_access?: boolean } = await FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
       url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
     });
+    if (data?.role_access === false) {
+      createNotification({
+        title: "Your current role in this project does not have access for this action.",
+        timer: 5,
+        hasNoTruncate: true,
+        variant: "error",
+        icon: IconEnum.forbidden,
+      });
+      return { data: [], message: "NO_ROLE_ACCESS", ok: true };
+    }
+    return data;
   }
   const configuredOptions = {
     enabled: options?.enabled ?? true,

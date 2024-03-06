@@ -35,6 +35,8 @@ export async function FetchFunction({
       window?.Clerk?.signOut();
     } else if (data.message === "NO_PUBLIC_ACCESS" && res.status === 403) {
       throw new Error("No public access");
+    } else if (data.message === "NO_ROLE_ACCESS") {
+      return { role_access: false, ok: false };
     }
 
     throw new Error("There was an error with your request.");

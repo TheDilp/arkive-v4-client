@@ -51,6 +51,13 @@ export function ProjectLayout() {
 
   useEffect(() => {
     if (userData) {
+      if (user)
+        user?.update({
+          unsafeMetadata: {
+            user_id: userData.data.id,
+            project_id,
+          },
+        });
       setUserAtom(userData.data);
     }
   }, [userData?.data]);

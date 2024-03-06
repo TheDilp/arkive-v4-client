@@ -103,6 +103,13 @@ export function ProjectsView() {
 
   useEffect(() => {
     if (userData) {
+      if (user)
+        user?.update({
+          unsafeMetadata: {
+            user_id: userData.data.id,
+            project_id: null,
+          },
+        });
       setUserAtom(userData.data);
     }
   }, [userData?.data]);
