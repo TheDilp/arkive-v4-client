@@ -9,7 +9,7 @@ import { Icon } from "../Misc";
 const TabsClasses = tv({
   slots: {
     base: "border-b border-zinc-200",
-    tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden flex-nowrap overflow-auto text-lg -mb-px",
+    tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden relative flex-nowrap overflow-auto text-lg -mb-px",
     tab: "px-2 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
     tabSelected: "inline-block border-blue-500 border-b",
   },
@@ -33,7 +33,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
     <div className={base()}>
       <ul ref={tabsContainerRef} className={tabsContainer()}>
         {hasArrowNav ? (
-          <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none  [&>button]:shadow-none">
+          <li className="sticky left-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none [&>button]:shadow-none">
             <Button
               icon={IconEnum.chevron_left}
               iconThickness="bold"
@@ -63,7 +63,7 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
         ))}
         {hasArrowNav ? (
           <li
-            className="sticky right-0 [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none 
+            className="sticky right-0 ml-auto [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none 
           [&>button]:shadow-none
           ">
             <Button
