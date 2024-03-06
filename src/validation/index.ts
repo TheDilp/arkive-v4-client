@@ -16,5 +16,6 @@ export * from "./maps/maps";
 export * from "./messages";
 export * from "./project";
 export * from "./random_tables";
+export * from "./roles";
 export * from "./timelines";
 export * from "./webhooks";

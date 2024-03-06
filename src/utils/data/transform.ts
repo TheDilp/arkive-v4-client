@@ -1,3 +1,5 @@
+import { PermissionType } from "../../types";
+
 export function removeFalsy(object: { [key: string]: any }) {
   return Object.keys(object).reduce((accumulator: { [key: string]: any }, key) => {
     if (object[key]) {
@@ -34,4 +36,27 @@ export function closestDivisibleBy50(x: number, y: number): [number, number] {
 
 export function closestDivisibleBy(number: number, divisible: number): number {
   return Math.round(number / divisible) * divisible;
+}
+
+export function permissionsByEntity(permissions: PermissionType[]) {
+  const formatted = permissions.reduce(
+    (accumulator: Record<string, { title: string; permissions: PermissionType[] }>, permission) => {
+      let entity = permission.title.split(" ")[1].toLowerCase(); // Extracting the entity from the title
+      if (entity === "blueprint") {
+        entity = "blueprint_instances";
+      } else if (entity === "random") {
+        entity = "random_tables";
+      } else if (entity === "character") {
+        entity = "character_fields_templates";
+      }
+      if (!accumulator[entity]) {
+        accumulator[entity] = { title: entity, permissions: [] };
+      }
+      accumulator[entity].permissions.push(permission);
+      return accumulator;
+    },
+    {},
+  );
+
+  return Object.values(formatted);
 }
