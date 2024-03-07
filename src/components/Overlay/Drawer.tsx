@@ -219,7 +219,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "bulk_tags" ? <BulkTagsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_folder" ? <BulkFolderDrawer data={drawer?.data} /> : null}
                 {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
-                {drawer.type === "roles" ? <RolesAndPermissionsDrawer /> : null}
+                {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}

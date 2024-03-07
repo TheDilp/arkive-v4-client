@@ -9,7 +9,7 @@ import {
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
-import { baseURLS, FetchFunction, getSearchURL, IconEnum, useNotifications } from "../../utils";
+import { baseURLS, FetchFunction, getPluralEntityType, getSearchURL, IconEnum, useNotifications } from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
@@ -64,6 +64,7 @@ export function useGetEntity<EntityType>(
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[]; isPublic?: boolean },
 ) {
+  const createNotification = useNotifications();
   let queryKey = [type, id];
   if (options?.queryKeyConcat) {
     queryKey = queryKey.concat(options.queryKeyConcat);
@@ -73,13 +74,25 @@ export function useGetEntity<EntityType>(
   }
   return useQuery<{ data: EntityType }>(
     queryKey,
-    async () =>
-      FetchFunction({
+    async () => {
+      const data = await FetchFunction({
         method: "POST",
         body: JSON.stringify(body),
         url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
         isPublic: options?.isPublic,
-      }),
+      });
+      if (!data?.role_access) {
+        createNotification({
+          title: `Your current role in this project does not have permission to view ${getPluralEntityType(type)}.`,
+          timer: 5,
+          hasNoTruncate: true,
+          variant: "error",
+          icon: IconEnum.forbidden,
+        });
+        return { data: [], message: "NO_ROLE_ACCESS", ok: true };
+      }
+      return data;
+    },
     {
       retry: options?.retry,
       enabled: options?.enabled,
@@ -138,7 +151,7 @@ export function useGetEntities<ReturnType>(
     });
     if (!data?.role_access) {
       createNotification({
-        title: "Your current role in this project does not have permission for this action.",
+        title: `Your current role in this project does not have permission to view ${getPluralEntityType(type)}.`,
         timer: 5,
         hasNoTruncate: true,
         variant: "error",

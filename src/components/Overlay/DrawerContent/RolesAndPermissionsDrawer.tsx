@@ -1,38 +1,62 @@
 import { useResetAtom } from "jotai/utils";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntities, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { PermissionType, RoleType } from "../../../types";
 import { capitalizeFirstLetter, drawerAtom, getSentenceCase, IconEnum, permissionsByEntity } from "../../../utils";
-import { InsertRoleSchema } from "../../../validation";
+import { InsertRoleSchema, UpdateRoleSchema } from "../../../validation";
 import { Button, Checkbox, Input } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
+import { Skeleton } from "../../Misc";
 
-export function RolesAndPermissionsDrawer() {
+export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const [role, setRole] = useState<
     Partial<Pick<RoleType, "id" | "title" | "project_id"> & { permissions: Record<string, boolean> }>
   >({
     id: "",
-    title: "New role",
+    title: "",
     permissions: {},
     project_id: project_id as string,
   });
   const { handleChange } = useHandleChange({ data: role, setData: setRole });
-  const { data: permissions } = useGetEntities<PermissionType>({ fields: ["id", "title"] }, "permissions", {
-    staleTime: Infinity,
-  });
-  const { mutateAsync, isLoading: isMutating } = useCreateEntity<{
+  const { data: permissions, isInitialLoading: isLoadingPermissions } = useGetEntities<PermissionType>(
+    { fields: ["id", "title"] },
+    "permissions",
+    {
+      staleTime: Infinity,
+    },
+  );
+  const { data: existingRole, isInitialLoading: isLoadingRole } = useGetEntity<RoleType>(
+    data?.id,
+    "roles",
+    { fields: ["id", "title"], relations: { permissions: true } },
+    { enabled: !!data?.id },
+  );
+  const { mutate: createRole, isLoading: isCreating } = useCreateEntity<{
     data: {
       title: string;
       project_id: string;
       permissions: string[];
     };
   }>("roles");
+  const { mutate: updateRole, isLoading: isUpdating } = useUpdateEntity("roles", project_id as string);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const formattedPermissions = permissionsByEntity(permissions?.data || []);
+
+  useLayoutEffect(() => {
+    if (existingRole?.data && !role?.id) {
+      const existingPermissions: Record<string, boolean> = {};
+      for (let index = 0; index < existingRole?.data?.permissions?.length; index += 1) {
+        existingPermissions[existingRole?.data?.permissions[index].id] = true;
+      }
+      setRole({ title: existingRole?.data?.title, id: existingRole?.data?.id, permissions: existingPermissions });
+    }
+  }, [existingRole]);
+
+  if (isLoadingPermissions || isLoadingRole) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -55,21 +79,33 @@ export function RolesAndPermissionsDrawer() {
       ))}
       <div>
         <Button
-          icon={IconEnum.add}
-          isDisabled={!role?.title || isMutating}
-          isLoading={isMutating}
-          label="Create role"
+          icon={data?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={!role?.title || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={data?.id ? "Update" : "Create"}
           onClick={async () => {
             if (role) {
               const formattedRole = {
                 title: role.title,
                 project_id: role.project_id,
-                permissions: Object.keys(role.permissions ?? {}),
+                permissions: Object.entries(role.permissions ?? {})
+                  .map(([key, value]) => {
+                    if (value) return key;
+                    return null;
+                  })
+                  .filter((k) => !!k),
               };
-              const parsed = InsertRoleSchema.parse({ data: formattedRole });
-              await mutateAsync(parsed, {
-                onSuccess: resetDrawerAtom,
-              });
+              if (data?.id) {
+                const parsed = UpdateRoleSchema.parse({ data: { ...formattedRole, id: data.id } });
+                updateRole(parsed, {
+                  onSuccess: resetDrawerAtom,
+                });
+              } else {
+                const parsed = InsertRoleSchema.parse({ data: formattedRole });
+                createRole(parsed, {
+                  onSuccess: resetDrawerAtom,
+                });
+              }
             }
           }}
           variant="success"

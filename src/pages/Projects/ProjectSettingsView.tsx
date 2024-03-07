@@ -319,39 +319,52 @@ function membersColumns(
     }),
   ];
 }
-const rolesColumns = [
-  rolesColumnHelper.display({
-    id: "title",
-    header: "Title",
-    cell: ({ row }) => row.original.title,
-  }),
-  rolesColumnHelper.display({
-    id: "action",
-    header: "Actions",
-    meta: {
-      centered: true,
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Dropdown
-          allowedPlacements={["left", "left-start", "left-end"]}
-          items={[
-            { id: "1", title: "Edit role", icon: IconEnum.edit },
-            {
-              id: "expand",
-              title: `${!row.getIsExpanded() ? "Show" : "Hide"} permissions`,
-              icon: IconEnum.permissions,
-              onClick: row.getToggleExpandedHandler(),
-            },
-            { id: "3", title: "Delete role", icon: IconEnum.trash },
-          ]}>
-          <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
-        </Dropdown>
-      </div>
-    ),
-  }),
-];
-
+function rolesColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
+  return [
+    rolesColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => row.original.title,
+    }),
+    rolesColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                title: "Edit role",
+                icon: IconEnum.edit,
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "xl",
+                    title: "Edit role",
+                    data: { id: row.original.id },
+                    type: "roles",
+                  })),
+              },
+              {
+                id: "expand",
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} permissions`,
+                icon: IconEnum.permissions,
+                onClick: row.getToggleExpandedHandler(),
+              },
+              { id: "3", title: "Delete role", icon: IconEnum.trash },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
 export function ProjectSettingsView() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
@@ -408,7 +421,7 @@ export function ProjectSettingsView() {
   const { data: webhooks } = useGetEntities<WebhookType>(
     { data: { user_id: user?.id }, fields: ["id", "title", "user_id"] },
     "webhooks",
-    { enabled: !!user?.id && finalTabs[selectedTab].label === "User settings" },
+    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].label === "6" },
   );
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title"], relations: { permissions: true } },
@@ -459,7 +472,7 @@ export function ProjectSettingsView() {
       title: "Role",
       type: "roles",
       size: "xl",
-      data: null,
+      data: {},
     }));
   }
   return (
@@ -670,7 +683,7 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
-                  columns={rolesColumns}
+                  columns={rolesColumns(setDrawer)}
                   config={{ expandable: true }}
                   data={roles?.data || []}
                   dispatch={dispatch}
@@ -750,54 +763,56 @@ export function ProjectSettingsView() {
                   ))}
                 </div>
               </Collapsible>
-              <Collapsible
-                actions={[
-                  {
-                    icon: IconEnum.add,
-                    tooltip: "Add webhook",
-                    onClick: () =>
-                      setDrawer((prev) => ({ ...prev, type: "webhooks", data: {}, title: "Create webhook", size: "md" })),
-                  },
-                ]}
-                label="Webhooks">
-                <div className="flex flex-col gap-y-2">
-                  {webhooks?.data?.length ? (
-                    (webhooks?.data || [])?.map((webhook) => (
-                      <div key={webhook.id} className="flex items-center justify-between py-2">
-                        <Title label={webhook.title} size="md" />
-                        <div className="flex items-center">
-                          <div className="h-8 w-8">
-                            <Button
-                              hasNoBackground
-                              icon={IconEnum.edit}
-                              onClick={() =>
-                                setDrawer((prev) => ({
-                                  ...prev,
-                                  type: "webhooks",
-                                  data: { id: webhook.id },
-                                  title: "Create webhook",
-                                  size: "md",
-                                }))
-                              }
-                              variant="primary"
-                            />
-                          </div>
-                          <div className="h-8 w-8">
-                            <Button
-                              hasNoBackground
-                              icon={IconEnum.trash}
-                              onClick={async () => deleteWebhook({ data: { id: webhook.id } })}
-                              variant="error"
-                            />
+              {isProjectOwner ? (
+                <Collapsible
+                  actions={[
+                    {
+                      icon: IconEnum.add,
+                      tooltip: "Add webhook",
+                      onClick: () =>
+                        setDrawer((prev) => ({ ...prev, type: "webhooks", data: {}, title: "Create webhook", size: "md" })),
+                    },
+                  ]}
+                  label="Webhooks">
+                  <div className="flex flex-col gap-y-2">
+                    {webhooks?.data?.length ? (
+                      (webhooks?.data || [])?.map((webhook) => (
+                        <div key={webhook.id} className="flex items-center justify-between py-2">
+                          <Title label={webhook.title} size="md" />
+                          <div className="flex items-center">
+                            <div className="h-8 w-8">
+                              <Button
+                                hasNoBackground
+                                icon={IconEnum.edit}
+                                onClick={() =>
+                                  setDrawer((prev) => ({
+                                    ...prev,
+                                    type: "webhooks",
+                                    data: { id: webhook.id },
+                                    title: "Create webhook",
+                                    size: "md",
+                                  }))
+                                }
+                                variant="primary"
+                              />
+                            </div>
+                            <div className="h-8 w-8">
+                              <Button
+                                hasNoBackground
+                                icon={IconEnum.trash}
+                                onClick={async () => deleteWebhook({ data: { id: webhook.id } })}
+                                variant="error"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    <Alert label="There are no available webhooks for this user." variant="info" />
-                  )}
-                </div>
-              </Collapsible>
+                      ))
+                    ) : (
+                      <Alert label="There are no available webhooks for this user." variant="info" />
+                    )}
+                  </div>
+                </Collapsible>
+              ) : null}
             </div>
           ) : null}
         </div>

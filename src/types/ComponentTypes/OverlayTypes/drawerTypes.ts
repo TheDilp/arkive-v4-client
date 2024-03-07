@@ -144,7 +144,7 @@ export type DrawerAtomType = {
           };
     }
   | { type: "invite_to_project" | null; data: null }
-  | { type: "webhooks"; data: { id?: string } }
+  | { type: "webhooks" | "roles"; data: { id?: string } }
   | { type: "character_filter"; data: { dispatch: TableDispatch } }
   | {
       type: "calendar_filter";
@@ -164,7 +164,6 @@ export type DrawerAtomType = {
       };
     }
   | { type: "nodes_from_characters" | "nodes_from_images"; data: null }
-  | { type: "roles" }
 );
 
 export interface ContextMenuAtomType {
