@@ -5,6 +5,7 @@ import {
   CharacterLocationType,
   CharacterRelationshipType,
   DocumentType,
+  EntityPermissionType,
   EventType,
   FieldTypes,
   MapPinType,
@@ -127,4 +128,5 @@ export interface CharacterType {
   related_to?: CharacterRelatedType[];
   related_from?: CharacterRelatedType[];
   related_other?: CharacterRelatedType[];
+  permissions?: EntityPermissionType[];
 }

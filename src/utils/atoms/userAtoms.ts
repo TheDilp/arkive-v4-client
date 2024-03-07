@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 
 import { UserType } from "../../types";
-import { projectAtom } from "./uiAtoms";
+import { projectAtom } from ".";
 
 export const userAtom = atom<UserType | null>(null);
 export const userSettingsAtom = atom(() => {

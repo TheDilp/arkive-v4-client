@@ -5,8 +5,8 @@ import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useParams } from "react-router-dom";
 
-import { useBreakpoint, useGetEntity, useGetUser } from "../../hooks";
-import { ProjectType } from "../../types";
+import { useBreakpoint, useGetEntities, useGetEntity, useGetUser } from "../../hooks";
+import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
   DefaultTagColor,
@@ -14,6 +14,7 @@ import {
   drawerAtom,
   hasChangedDataAtom,
   IconEnum,
+  permissionsAtom,
   projectAtom,
   useNotifications,
   userAtom,
@@ -32,11 +33,21 @@ export function ProjectLayout() {
       fields: ["id", "title", "owner_id"],
       relations: {
         members: true,
+        roles: true,
       },
     },
     { staleTime: 60 * 60 * 1 },
   );
   const { user } = useUser();
+  const setProjectAtom = useSetAtom(projectAtom);
+  const setDialog = useSetAtom(dialogAtom);
+  const setPermissions = useSetAtom(permissionsAtom);
+  const hasChangedData = useAtomValue(hasChangedDataAtom);
+  const drawer = useAtomValue(drawerAtom);
+  const contextMenu = useAtomValue(contextMenuAtom);
+  const createNotification = useNotifications();
+  const resetDrawer = useResetAtom(drawerAtom);
+  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id },
@@ -47,6 +58,11 @@ export function ProjectLayout() {
     },
     { enabled: !!user?.id },
   );
+
+  const { data: permissions } = useGetEntities<PermissionType>({ fields: ["id", "title", "code"] }, "permissions", {
+    staleTime: Infinity,
+  });
+
   const setUserAtom = useSetAtom(userAtom);
 
   useEffect(() => {
@@ -62,20 +78,18 @@ export function ProjectLayout() {
     }
   }, [userData?.data]);
 
-  const setProjectAtom = useSetAtom(projectAtom);
-  const setDialog = useSetAtom(dialogAtom);
-  const hasChangedData = useAtomValue(hasChangedDataAtom);
-  const drawer = useAtomValue(drawerAtom);
-  const contextMenu = useAtomValue(contextMenuAtom);
-  const createNotification = useNotifications();
-  const resetDrawer = useResetAtom(drawerAtom);
-  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   useEffect(() => {
     if (data?.data) {
       setProjectAtom(data.data);
       ls.set("default_dice_color", data.data?.default_dice_color || DefaultTagColor);
     }
   }, [data?.data]);
+
+  useEffect(() => {
+    if (permissions?.data) {
+      setPermissions(permissions?.data);
+    }
+  }, [permissions]);
 
   const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
     if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {

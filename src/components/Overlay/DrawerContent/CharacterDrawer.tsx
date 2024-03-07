@@ -36,6 +36,7 @@ import {
   TemplateSelectField,
   TemplateTextareaField,
 } from "../..";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImageSelect } from "../../Complex/ImageSelect";
 import { TemplateDateField } from "../../Complex/TemplateFields/TemplateDateField";
 import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
@@ -350,6 +351,7 @@ const tabs = [
   { id: "3", label: "Relationships", icon: IconEnum.family_tree },
   { id: "4", label: "Tags", icon: IconEnum.tags },
   { id: "5", label: "Additional fields", icon: IconEnum.additional_fields },
+  { id: "6", label: "Access", icon: IconEnum.permissions },
 ];
 
 export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
@@ -365,6 +367,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     {
       relations: { character_fields: true, relationships: true, portrait: true, tags: true },
+      permissions: true,
       fields: ["id", "first_name", "last_name", "nickname", "biography", "age", "portrait_id", "is_favorite", "is_public"],
     },
     {
@@ -403,7 +406,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_fields_templates",
     {
-      enabled: selectedTab === 4 && !!character?.tags?.length,
+      enabled: tabs[selectedTab].id === "5" && !!character?.tags?.length,
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -414,7 +417,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_relationship_types",
     {
-      enabled: selectedTab === 2,
+      enabled: tabs[selectedTab].id === "3",
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -453,7 +456,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   return (
     <DrawerLayout>
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <div className="flex w-full flex-col gap-2 lg:flex-row lg:flex-nowrap lg:items-center">
             <div className="w-full lg:w-1/2">
@@ -506,10 +509,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           </ul>
         </>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <Editor initialContent={character?.biography || undefined} name="biography" onChange={handleChange} />
       ) : null}
-      {selectedTab === 2 ? (
+      {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
           <div className="flex flex-nowrap items-center justify-between">
             <span>Insert new type:</span>
@@ -717,18 +720,26 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           )}
         </div>
       ) : null}
-      {selectedTab === 3 ? (
+      {tabs[selectedTab].id === "4" ? (
         <div className="flex flex-col gap-y-2">
           <TagInput handleChange={handleChange} tags={character?.tags || []} />
         </div>
       ) : null}
-      {selectedTab === 4 ? (
+      {tabs[selectedTab].id === "5" ? (
         <AdditionalFieldsTab
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
+        />
+      ) : null}
+      {tabs[selectedTab].id === "6" ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={character?.permissions || []}
+          related_id={character?.id || ""}
+          selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
         />
       ) : null}
       <div>
@@ -742,6 +753,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               if (character?.id && existingCharacter?.data) {
                 const dataToParse = {
                   data: character,
+                  permissions: character?.permissions,
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
                     character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
@@ -754,7 +766,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
                 const parsedData = UpdateCharacterSchema.parse(dataToParse);
-
                 await update(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) resetDrawerAtom();

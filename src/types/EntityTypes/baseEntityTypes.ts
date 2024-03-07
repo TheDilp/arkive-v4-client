@@ -11,6 +11,22 @@ export interface BaseEntityType {
   is_public?: boolean | null;
   icon?: AvailableIcons | null;
 }
+
+export type EntityPermissionType = {
+  related_id: string;
+} & (
+  | {
+      user_id: string;
+      permission_id: string;
+      role_id: null;
+    }
+  | {
+      user_id: null;
+      permission_id: null;
+      role_id: string;
+    }
+);
+
 export type AvailableEntityType =
   | "projects"
   | "characters"
