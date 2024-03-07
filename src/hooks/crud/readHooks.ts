@@ -89,7 +89,7 @@ export function useGetEntity<EntityType>(
           variant: "error",
           icon: IconEnum.forbidden,
         });
-        return { data: [], message: "NO_ROLE_ACCESS", ok: true };
+        return { data: [], message: "NO_ROLE_ACCESS", ok: false };
       }
       return data;
     },

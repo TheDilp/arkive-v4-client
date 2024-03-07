@@ -18,6 +18,7 @@ import {
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
+  getPluralEntityType,
   IconEnum,
   nodesAtom,
   useNotifications,
@@ -65,12 +66,25 @@ export function useCreateEntity<
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newItemValues: InsertType) =>
-      FetchFunction({
+    async (newItemValues: InsertType) => {
+      const data = await FetchFunction({
         url: `${baseURLS.baseServer}/${type}/create${isTemplate ? "/template" : ""}`,
         body: JSON.stringify(newItemValues),
         method: "POST",
-      }),
+      });
+
+      if (!data?.role_access) {
+        createNotification({
+          title: `Your current role in this project does not have permission to create ${getPluralEntityType(type)}.`,
+          timer: 5,
+          hasNoTruncate: true,
+          variant: "error",
+          icon: IconEnum.forbidden,
+        });
+        return { data: [], message: "NO_ROLE_ACCESS", ok: false };
+      }
+      return data;
+    },
 
     {
       onSuccess: (data, vars) => {
