@@ -50,11 +50,11 @@ export function ProjectLayout() {
   const setUserAtom = useSetAtom(userAtom);
 
   useEffect(() => {
-    if (userData) {
+    if (userData?.data) {
       if (user)
         user?.update({
           unsafeMetadata: {
-            user_id: userData.data.id,
+            user_id: userData?.data?.id,
             project_id,
           },
         });

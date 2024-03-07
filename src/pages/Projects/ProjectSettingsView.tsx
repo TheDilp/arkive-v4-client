@@ -23,6 +23,7 @@ import {
   Title,
 } from "../../components";
 import {
+  useAssignRole,
   useBreakpoint,
   useDeleteEntity,
   useDeleteWebhook,
@@ -70,6 +71,18 @@ type kickUserMutationType = UseMutateFunction<
     data: {
       user_id: string;
       project_id: string;
+    };
+  },
+  unknown
+>;
+
+type assignRoleMutationType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      user_id: string;
+      role_id: string;
     };
   },
   unknown
@@ -234,6 +247,8 @@ function relationshipTableColumns(setDialog: Dispatch<SetStateAction<DialogAtomT
 function membersColumns(
   kickUser: kickUserMutationType,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  roles: RoleType[],
+  assignRole: assignRoleMutationType,
   project_id: string,
 ) {
   return [
@@ -249,7 +264,13 @@ function membersColumns(
       header: "Email",
       cell: ({ row }) => row.original.email,
     }),
-    relationshipTypesColumnHelper.display({
+    membersColumnHelper.display({
+      id: "role",
+      header: "Role",
+      cell: ({ row }) => row.original.role.title,
+      maxSize: 15,
+    }),
+    membersColumnHelper.display({
       id: "action",
       header: "Actions",
       meta: {
@@ -260,6 +281,16 @@ function membersColumns(
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
             items={[
+              {
+                id: "assign_role_user",
+                title: "Assign role",
+                icon: IconEnum.permissions,
+                subItems: roles.map((role) => ({
+                  id: role.id,
+                  title: role.title,
+                  onClick: () => assignRole({ data: { user_id: row.original.id, role_id: role.id } }),
+                })),
+              },
               {
                 id: "remove_member",
                 title: "Remove member from project",
@@ -294,7 +325,7 @@ const rolesColumns = [
     header: "Title",
     cell: ({ row }) => row.original.title,
   }),
-  relationshipTypesColumnHelper.display({
+  rolesColumnHelper.display({
     id: "action",
     header: "Actions",
     meta: {
@@ -364,6 +395,7 @@ export function ProjectSettingsView() {
     project_id as string,
   );
   const { mutate: updateUser } = useUpdateUser(user?.id || "", authUser?.id || "");
+  const { mutate: assignRole } = useAssignRole();
   function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
     const newFeatureFlags = deepMerge(user?.feature_flags || {}, { [newValue.name]: newValue.value });
     updateUser({
@@ -381,7 +413,7 @@ export function ProjectSettingsView() {
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title"], relations: { permissions: true } },
     "roles",
-    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].id === "5" },
+    { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") },
   );
   const { mutateAsync: deleteWebhook } = useDeleteWebhook();
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
@@ -626,7 +658,7 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
-                  columns={membersColumns(kickUser, setDialog, project_id as string)}
+                  columns={membersColumns(kickUser, setDialog, roles?.data || [], assignRole, project_id as string)}
                   data={projectData?.data?.members || []}
                   dispatch={dispatch}
                   type="character_relationship_types"

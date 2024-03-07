@@ -628,48 +628,6 @@ export function useUpdateTags<
   );
 }
 
-export function useUpdateUser<InsertType extends { data: Pick<UserType, "feature_flags"> }>(id: string, auth_id: string) {
-  const queryClient = useQueryClient();
-  const createNotification = useNotifications();
-
-  return useMutation(
-    async (updateValues: InsertType) => {
-      return FetchFunction({
-        url: `${baseURLS.baseServer}/users/update/${id}`,
-        body: JSON.stringify(updateValues),
-        method: "POST",
-      });
-    },
-    {
-      onError: () => {
-        createNotification({
-          title: "There was an error updating this item.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries(["user", auth_id]);
-        if (data.ok) {
-          createNotification({
-            title: data?.message || "User succesfully updated.",
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-          });
-        } else
-          createNotification({
-            title: data?.message || "There was an error updating this user.",
-            variant: "error",
-            icon: IconEnum.error,
-            timer: 5,
-          });
-      },
-    },
-  );
-}
-
 export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; is_public: boolean } }>(
   type: AvailableEntityType | AvailableSubEntityType,
   project_id: string,
@@ -791,6 +749,90 @@ export function useBulkUpdate(project_id: string, type: AvailableEntityType) {
         } else
           createNotification({
             title: data?.message || "There was an error updating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+
+export function useUpdateUser<InsertType extends { data: Pick<UserType, "feature_flags"> }>(id: string, auth_id: string) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/users/update/${id}`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error updating this item.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(["user", auth_id]);
+        if (data.ok) {
+          createNotification({
+            title: data?.message || "User succesfully updated.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating this user.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+
+export function useAssignRole<InsertType extends { data: { user_id: string; role_id: string } }>() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (updateValues: InsertType) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/users/assign_role`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error assigning this role for this user.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(["user"]);
+        if (data.ok) {
+          createNotification({
+            title: data?.message || "Role succesfully assigned to user.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error assigning this role for this user.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,

@@ -9,6 +9,6 @@ export interface UserType {
   feature_flags: Record<string, boolean>;
   projects: ProjectType[];
   webhooks: WebhookType[];
-  roles: RoleType[];
+  role: RoleType;
   permissions: PermissionType[];
 }
