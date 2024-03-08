@@ -15,8 +15,14 @@ export const BulkAccessUpdateSchema = z.object({
           })
           .or(z.object({ role_id: z.string(), permission_id: z.null(), user_id: z.null() })),
       )
-      .array()
-      .optional()
-      .nullable(),
+      .or(
+        z.object({
+          related_id: z.string(),
+          role_id: z.null(),
+          permission_id: z.null(),
+          user_id: z.null(),
+        }),
+      )
+      .array(),
   }),
 });

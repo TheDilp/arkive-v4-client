@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { useHandleChange } from "../../../hooks";
+import { useBulkUpdateAccess, useHandleChange } from "../../../hooks";
 import { EntityPermissionType, PermissionCodeType } from "../../../types";
 import { IconEnum } from "../../../utils";
-// import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
+import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -11,8 +12,10 @@ import { DrawerLayout } from "../../Layout";
 type Props = { data: { ids: string[]; selectablePermissions: PermissionCodeType[] } };
 
 export function BulkAccessDrawer({ data }: Props) {
+  const { project_id } = useParams();
   const [permissions, setPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
   const { handleChange } = useHandleChange({ data, setData: setPermissions });
+  const { mutate } = useBulkUpdateAccess(project_id, "characters");
   return (
     <DrawerLayout>
       <EntityPermission
@@ -25,29 +28,45 @@ export function BulkAccessDrawer({ data }: Props) {
       <Button
         icon={IconEnum.save}
         label="Change access"
-        onClick={async () => {
-          // const formattedPermissions: EntityPermissionType[] = [];
-          // for (let i = 0; i < data.ids.length; i += 1) {
-          //   for (let j = 0; j < permissions.permissions.length; j += 1) {
-          //     const permissionToInsert = permissions.permissions[j];
-          //     if (permissionToInsert.user_id && permissionToInsert.permission_id) {
-          //       formattedPermissions.push({
-          //         permission_id: permissionToInsert.permission_id,
-          //         user_id: permissionToInsert.user_id,
-          //         role_id: null,
-          //         related_id: data.ids[i],
-          //       });
-          //     } else if (permissionToInsert.role_id) {
-          //       formattedPermissions.push({
-          //         permission_id: null,
-          //         user_id: null,
-          //         role_id: permissionToInsert.role_id,
-          //         related_id: data.ids[i],
-          //       });
-          //     }
-          //   }
-          // }
-          // const parsedData = BulkAccessUpdateSchema.parse({ data: { permissions: formattedPermissions } });
+        onClick={() => {
+          const formattedPermissions: (
+            | EntityPermissionType
+            | { related_id: string; permission_id: null; user_id: null; role_id: null }
+          )[] = [];
+          if (permissions.permissions.length === 0) {
+            for (let i = 0; i < data.ids.length; i += 1) {
+              formattedPermissions.push({
+                permission_id: null,
+                user_id: null,
+                role_id: null,
+                related_id: data.ids[i],
+              });
+            }
+          } else {
+            for (let i = 0; i < data.ids.length; i += 1) {
+              for (let j = 0; j < permissions.permissions.length; j += 1) {
+                const permissionToInsert = permissions.permissions[j];
+                if (permissionToInsert.user_id && permissionToInsert.permission_id) {
+                  formattedPermissions.push({
+                    permission_id: permissionToInsert.permission_id,
+                    user_id: permissionToInsert.user_id,
+                    role_id: null,
+                    related_id: data.ids[i],
+                  });
+                } else if (permissionToInsert.role_id) {
+                  formattedPermissions.push({
+                    permission_id: null,
+                    user_id: null,
+                    role_id: permissionToInsert.role_id,
+                    related_id: data.ids[i],
+                  });
+                }
+              }
+            }
+          }
+          const parsedData = BulkAccessUpdateSchema.parse({ data: { permissions: formattedPermissions } });
+
+          mutate(parsedData);
         }}
         variant="success"
       />

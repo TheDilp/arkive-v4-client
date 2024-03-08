@@ -9,6 +9,7 @@ import {
   CharacterType,
   ConversationType,
   DocumentType,
+  EntityPermissionType,
   GraphType,
   MapType,
   MessagePlaceContentType,
@@ -734,6 +735,57 @@ export function useBulkUpdate(project_id: string, type: AvailableEntityType) {
         });
       }
       return null;
+    },
+    {
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
+
+          createNotification({
+            title: getEntityCRUDNotification(type, "update"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        } else
+          createNotification({
+            title: data?.message || "There was an error updating these items.",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+      },
+    },
+  );
+}
+export function useBulkUpdateAccess(project_id: string | undefined, type: AvailableEntityType) {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (updateItemValues: {
+      data: {
+        permissions: (EntityPermissionType | { related_id: string; permission_id: null; user_id: null; role_id: null })[];
+      };
+    }) => {
+      if (updateItemValues.data.permissions.length) {
+        const res = await FetchFunction({
+          url: `${baseURLS.baseServer}/bulk/update/access/${type}`,
+          body: JSON.stringify(updateItemValues),
+          method: "POST",
+        });
+        if (!res?.role_access) {
+          createNotification({
+            title: "Only project owners or entity owners can update permissions.",
+            timer: 5,
+            hasNoTruncate: true,
+            variant: "error",
+            icon: IconEnum.forbidden,
+          });
+          return { data: [], message: "NO_ROLE_ACCESS", ok: false };
+        }
+        return res;
+      }
+      return { ok: false, message: "No entities selected." };
     },
     {
       onSuccess: (data) => {
