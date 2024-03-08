@@ -1,9 +1,10 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateAccess, useHandleChange } from "../../../hooks";
 import { EntityPermissionType, PermissionCodeType } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button } from "../../Form";
@@ -16,6 +17,7 @@ export function BulkAccessDrawer({ data }: Props) {
   const [permissions, setPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
   const { handleChange } = useHandleChange({ data, setData: setPermissions });
   const { mutate } = useBulkUpdateAccess(project_id, "characters");
+  const resetDrawer = useResetAtom(drawerAtom);
   return (
     <DrawerLayout>
       <EntityPermission
@@ -66,7 +68,7 @@ export function BulkAccessDrawer({ data }: Props) {
           }
           const parsedData = BulkAccessUpdateSchema.parse({ data: { permissions: formattedPermissions } });
 
-          mutate(parsedData);
+          mutate(parsedData, { onSuccess: resetDrawer });
         }}
         variant="success"
       />

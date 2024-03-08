@@ -21,6 +21,7 @@ import {
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
+  getSingularEntityType,
   IconEnum,
   MentionableEntites,
   nodesAtom,
@@ -114,13 +115,22 @@ export function useUpdateEntity<
             icon: IconEnum.check,
             timer: 2,
           });
-        } else
+        } else if (!data?.role_access) {
+          createNotification({
+            title: `You do not have permission to edit this ${getSingularEntityType(type).toLowerCase()}.`,
+            timer: 5,
+            hasNoTruncate: true,
+            variant: "error",
+            icon: IconEnum.forbidden,
+          });
+        } else {
           createNotification({
             title: data?.message || "There was an error updating this item.",
             variant: "error",
             icon: IconEnum.error,
             timer: 5,
           });
+        }
       },
     },
   );

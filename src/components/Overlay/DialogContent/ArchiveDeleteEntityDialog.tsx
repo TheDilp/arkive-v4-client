@@ -73,7 +73,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
             if (data?.id && project_id && data?.entity_title) {
               if (data?.entity_title === "images") {
                 deleteAsset({ data: { id: data?.id } });
-              } else if (data?.entity_title satisfies AvailableSubEntityType) {
+              } else if (data?.entity_title && data?.parent_id) {
                 deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
               } else {
                 deleteEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });

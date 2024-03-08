@@ -12,7 +12,14 @@ import {
   MapType,
   MessageType,
 } from "../../types";
-import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
+import {
+  baseURLS,
+  FetchFunction,
+  getEntityCRUDNotification,
+  getSingularEntityType,
+  IconEnum,
+  useNotifications,
+} from "../../utils";
 
 export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
   const queryClient = useQueryClient();
@@ -39,6 +46,14 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
             variant: "success",
             icon: IconEnum.check,
             timer: 5,
+          });
+        } else if (!data?.role_access) {
+          createNotification({
+            title: `You do not have permission to delete this ${getSingularEntityType(type).toLowerCase()}.`,
+            timer: 5,
+            hasNoTruncate: true,
+            variant: "error",
+            icon: IconEnum.forbidden,
           });
         } else
           createNotification({
