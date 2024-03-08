@@ -12,6 +12,7 @@ import {
   ImageType,
   MapPinType,
   MessageType,
+  PermissionCodeType,
   TagType,
 } from "../../EntityTypes";
 import { TableDispatch } from "../DataDisplayTypes";
@@ -97,6 +98,10 @@ export type DrawerAtomType = {
   | {
       type: "bulk_folder";
       data: { items: { id: string; title: string }[]; dispatch: TableDispatch; type: EntitiesWithFolders };
+    }
+  | {
+      type: "bulk_access";
+      data: { ids: string[]; selectablePermissions: PermissionCodeType[] };
     }
   | {
       type: "mentioned_in_document";

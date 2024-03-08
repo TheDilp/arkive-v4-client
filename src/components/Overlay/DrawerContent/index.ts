@@ -1,6 +1,7 @@
 export * from "./AutomentionDrawer";
 export * from "./BlueprintDrawer";
 export * from "./BlueprintInstanceDrawer";
+export * from "./BulkAccessDrawer";
 export * from "./BulkFolderDrawer";
 export * from "./BulkTagsDrawer";
 export * from "./CalendarDrawer";

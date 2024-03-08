@@ -482,13 +482,12 @@ export function CharactersView() {
                     }
                   },
                 },
-
                 {
                   icon: IconEnum.tags,
                   hasNoBackground: true,
                   isIconOnly: true,
                   tooltip: "Add/remove tags",
-                  onClick: async () => {
+                  onClick: () => {
                     const ids = Object.values(selection || {}).flatMap((id) => id);
                     const charactersWithTags = (data?.data || [])
                       ?.filter((e) => ids.includes(e.id))
@@ -500,6 +499,26 @@ export function CharactersView() {
                       title: "Bulk edit tags",
                       type: "bulk_tags",
                       data: { items: charactersWithTags, dispatch, type: "characters" },
+                    }));
+                  },
+                },
+                {
+                  icon: IconEnum.permissions,
+                  hasNoBackground: true,
+                  isIconOnly: true,
+                  tooltip: "Change access",
+                  onClick: () => {
+                    const ids = Object.values(selection || {}).flatMap((id) => id);
+
+                    setDrawer((prev) => ({
+                      ...prev,
+                      size: "lg",
+                      title: "Edit access",
+                      type: "bulk_access",
+                      data: {
+                        ids,
+                        selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+                      },
                     }));
                   },
                 },
