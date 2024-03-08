@@ -39,7 +39,7 @@ export function EntityPermission({ related_id, permissions, handleChange, select
                   content={`Anyone with this roll will have permission to ${role.permissions
                     .filter((p) => selectablePermissions.includes(p.code as string))
                     .map((p) => p.title.split(" ")[0])
-                    .join(", ")} this character.`}
+                    .join("/")} this character.`}
                   isInline={false}>
                   <div>
                     <Icon fontSize={20} icon={IconEnum.permissions} />
