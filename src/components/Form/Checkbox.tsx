@@ -14,7 +14,7 @@ const CheckboxClasses = tv({
   variants: {
     variant: {
       primary: {
-        checkbox: "border-zinc-800 focus:border-zinc-700",
+        checkbox: "border-zinc-600 focus:border-zinc-500",
         label: "text-zinc-300",
         helperText: "text-zinc-300",
       },
