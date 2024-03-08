@@ -1,9 +1,13 @@
 import { useAtomValue } from "jotai";
+import { useParams } from "react-router-dom";
 
-import { EntityPermissionType, HandleChangePropsType } from "../../types";
-import { IconEnum, membersAtom, permissionsAtom, rolesAtom } from "../../utils";
+import { useGetEntities } from "../../hooks";
+import { EntityPermissionType, HandleChangePropsType, RoleType } from "../../types";
+import { IconEnum, membersAtom, permissionsAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
+import { Icon } from "../Misc";
+import { Tooltip } from "../Overlay";
 
 type Props = {
   related_id: string;
@@ -13,17 +17,34 @@ type Props = {
 };
 
 export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions }: Props) {
-  const roles = useAtomValue(rolesAtom);
+  const { project_id } = useParams();
+  const { data: roles } = useGetEntities<RoleType>(
+    { data: { project_id }, fields: ["id"], relations: { permissions: true } },
+    "roles",
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
   const members = useAtomValue(membersAtom);
-  const availablePermissions = useAtomValue(permissionsAtom).filter((p) => selectablePermissions.includes(p.code));
+  const availablePermissions = useAtomValue(permissionsAtom).filter((p) => selectablePermissions.includes(p.code as string));
   return (
     <div className="flex flex-col gap-y-2">
       <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
         <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
-          {roles.map((role) => (
+          {(roles?.data || [])?.map((role) => (
             <li key={role.id} className="flex items-center justify-between">
               <span>{role.title}</span>
-              <div>
+              <div className="flex items-center justify-end gap-x-4">
+                <Tooltip
+                  content={`Anyone with this roll will have permission to ${role.permissions
+                    .filter((p) => selectablePermissions.includes(p.code as string))
+                    .map((p) => p.title.split(" ")[0])
+                    .join(", ")} this character.`}
+                  isInline={false}>
+                  <div>
+                    <Icon fontSize={20} icon={IconEnum.permissions} />
+                  </div>
+                </Tooltip>
                 <Checkbox
                   name="permissions"
                   onChange={(e) => {

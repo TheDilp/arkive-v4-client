@@ -108,7 +108,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     nickname?: string;
     userImageUrl?: string;
     notification_type: string;
-  }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`);
+  }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`, { reconnectInterval: 5000, reconnectAttempts: 10 });
 
   // const { lastJsonMessage: versionMessage } = useWebSocket<{
   //   timestamp: number;
