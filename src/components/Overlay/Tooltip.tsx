@@ -30,7 +30,7 @@ const defaultTooltipClasses = tv({
       primary: "bg-black",
       secondary: "bg-zinc-700",
     },
-    inline: {
+    isInline: {
       true: "max-w-fit min-w-fit",
       false: "max-w-[200px]",
     },
