@@ -518,6 +518,7 @@ export function CharactersView() {
                       data: {
                         ids,
                         selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+                        type: "characters",
                       },
                     }));
                   },
