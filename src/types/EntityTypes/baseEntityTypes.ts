@@ -1,17 +1,5 @@
 import { AvailableIcons } from "../../utils";
 
-export interface BaseEntityType {
-  id: string;
-  title: string;
-  project_id: string;
-  parent_id?: string | null;
-  parents?: { id: string; title: string; is_folder: boolean; parent_id: string | null }[];
-  children?: (BaseEntityType & { image_id?: string })[];
-  is_folder?: boolean | null;
-  is_public?: boolean | null;
-  icon?: AvailableIcons | null;
-}
-
 export type EntityPermissionType = {
   related_id: string;
 } & (
@@ -26,6 +14,18 @@ export type EntityPermissionType = {
       role_id: string;
     }
 );
+export interface BaseEntityType {
+  id: string;
+  title: string;
+  project_id: string;
+  parent_id?: string | null;
+  parents?: { id: string; title: string; is_folder: boolean; parent_id: string | null }[];
+  children?: (BaseEntityType & { image_id?: string })[];
+  is_folder?: boolean | null;
+  is_public?: boolean | null;
+  icon?: AvailableIcons | null;
+  permissions: EntityPermissionType[];
+}
 
 export type AvailableEntityType =
   | "projects"

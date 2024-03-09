@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
+
 export const InsertCharacterSchema = z.object({
   data: z.object({
     first_name: z.string(),
@@ -69,6 +71,7 @@ export const InsertCharacterSchema = z.object({
     related_from: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
     related_other: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateCharacterSchema = z.object({
@@ -149,22 +152,7 @@ export const UpdateCharacterSchema = z.object({
       .array()
       .optional(),
   }),
-  permissions: z
-    .object({
-      related_id: z.string(),
-    })
-    .and(
-      z
-        .object({
-          permission_id: z.string(),
-          user_id: z.string(),
-          role_id: z.null(),
-        })
-        .or(z.object({ role_id: z.string(), permission_id: z.null(), user_id: z.null() })),
-    )
-    .array()
-    .optional()
-    .nullable(),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export const AddToCharacterSchema = z.object({

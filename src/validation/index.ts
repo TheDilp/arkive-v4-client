@@ -1,5 +1,6 @@
 export * from "./blueprint_instances";
 export * from "./blueprints";
+export * from "./bulk/bulk_access";
 export * from "./calendars";
 export * from "./character";
 export * from "./character_relationship_types";
@@ -14,6 +15,7 @@ export * from "./maps/map_pin_types";
 export * from "./maps/map_pins";
 export * from "./maps/maps";
 export * from "./messages";
+export * from "./permissions";
 export * from "./project";
 export * from "./random_tables";
 export * from "./roles";

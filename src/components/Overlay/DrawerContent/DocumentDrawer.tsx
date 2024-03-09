@@ -8,6 +8,7 @@ import { DocumentType, DrawerAtomType, InsertDocumentType, UpdateDocumentType } 
 import { AvailableIcons, DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
@@ -35,6 +36,7 @@ type documentRelationsType = {
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
   { id: "2", label: "Tags", icon: IconEnum.tags },
+  { id: "3", label: "Access", icon: IconEnum.permissions },
 ];
 export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
@@ -48,6 +50,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     {
       data: {},
       relations: { alter_names: true, tags: true },
+      permissions: true,
       fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public"],
     },
     {
@@ -82,7 +85,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <div className="flex flex-col gap-y-2">
           <div className="flex flex-nowrap gap-x-2">
             <Input
@@ -177,7 +180,16 @@ export function DocumentDrawer({ data, exceptions }: Props) {
         </div>
       ) : null}
 
-      {selectedTab === 1 ? <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} /> : null}
+      {tabs[selectedTab].id === "2" ? <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} /> : null}
+      {tabs[selectedTab].id === "3" ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={document?.permissions || []}
+          related_id={document?.id || ""}
+          selectablePermissions={["read_documents", "update_documents", "delete_documents"]}
+          type="documents"
+        />
+      ) : null}
       <Button
         icon={document?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled({ title: document?.title }) || isCreating || isUpdating}
@@ -194,6 +206,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   tags,
                   alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
                 },
+                permissions: document.permissions,
               });
               await update(
                 {
@@ -215,6 +228,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   alter_names: document?.alter_names,
                   tags: document?.tags,
                 },
+                permissions: document.permissions,
               };
               dataToParse.data.parent_id = item_id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);

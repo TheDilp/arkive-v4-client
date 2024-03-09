@@ -2,8 +2,8 @@ import { useAtomValue } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { useGetEntities } from "../../hooks";
-import { EntityPermissionType, HandleChangePropsType, RoleType } from "../../types";
-import { IconEnum, membersAtom, permissionsAtom } from "../../utils";
+import { AvailableEntityType, EntityPermissionType, HandleChangePropsType, RoleType } from "../../types";
+import { getSingularEntityType, IconEnum, membersAtom, permissionsAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
 import { Icon } from "../Misc";
@@ -14,9 +14,10 @@ type Props = {
   permissions: EntityPermissionType[];
   handleChange: (newData: HandleChangePropsType) => void;
   selectablePermissions: string[];
+  type: AvailableEntityType;
 };
 
-export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions }: Props) {
+export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, type }: Props) {
   const { project_id } = useParams();
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id"], relations: { permissions: true } },
@@ -39,7 +40,7 @@ export function EntityPermission({ related_id, permissions, handleChange, select
                   content={`Anyone with this roll will have permission to ${role.permissions
                     .filter((p) => selectablePermissions.includes(p.code as string))
                     .map((p) => p.title.split(" ")[0])
-                    .join("/")} this character.`}
+                    .join("/")} this ${getSingularEntityType(type).toLowerCase()}.`}
                   isInline={false}>
                   <div>
                     <Icon fontSize={20} icon={IconEnum.permissions} />

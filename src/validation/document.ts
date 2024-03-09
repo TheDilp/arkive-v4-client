@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { UpdateEntityPermissionSchema } from "./permissions";
+
 export const InsertDocumentSchema = z.object({
   data: z.object({
     id: z.string().optional(),
@@ -40,6 +42,7 @@ export const UpdateDocumentSchema = z.object({
       alter_names: z.object({ title: z.string(), project_id: z.string() }).array().optional(),
     })
     .optional(),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export type InsertDocumentType = z.infer<typeof InsertDocumentSchema>;

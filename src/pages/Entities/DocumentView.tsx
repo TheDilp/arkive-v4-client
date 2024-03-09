@@ -31,6 +31,7 @@ import {
   drawerAtom,
   FetchFunction,
   IconEnum,
+  isProjectOwnerAtom,
   mentionPositionAtom,
   useNotifications,
   userAtom,
@@ -45,11 +46,12 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
   const drawer = useAtomValue(drawerAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
-    enabled: !!user?.id,
+    enabled: !!user?.id && isProjectOwner,
     staleTime: Infinity,
   });
 

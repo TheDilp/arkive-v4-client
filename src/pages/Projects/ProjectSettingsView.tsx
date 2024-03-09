@@ -500,7 +500,7 @@ export function ProjectSettingsView() {
         ) : null}
         {!isLoading && !isLg ? (
           <div className="w-full">
-            <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={finalTabs} />
+            <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={finalTabs} />
           </div>
         ) : null}
 
