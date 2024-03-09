@@ -603,23 +603,25 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
-          <div className="flex flex-nowrap items-center justify-between">
-            <span>Insert new type:</span>
-            <Dropdown
-              allowedPlacements={["left", "left-start", "left-end"]}
-              items={(relationshipTypes?.data || [])
-                .filter((rt) => !relationGroupIds.includes(rt.id))
-                .map((rt) => ({
-                  id: rt.id,
-                  title: rt.title,
-                  isDisabled: relationGroupIds.includes(rt.id),
-                  onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
-                }))}>
-              <div className="h-8 w-8">
-                <Button icon={IconEnum.add} onClick={undefined} variant="info" />
-              </div>
-            </Dropdown>
-          </div>
+          {drawerPermissions?.update_characters ? (
+            <div className="flex flex-nowrap items-center justify-between">
+              <span>Insert new type:</span>
+              <Dropdown
+                allowedPlacements={["left", "left-start", "left-end"]}
+                items={(relationshipTypes?.data || [])
+                  .filter((rt) => !relationGroupIds.includes(rt.id))
+                  .map((rt) => ({
+                    id: rt.id,
+                    title: rt.title,
+                    isDisabled: relationGroupIds.includes(rt.id),
+                    onClick: () => setRelationGroupIds((prev) => prev.concat(rt.id)),
+                  }))}>
+                <div className="h-8 w-8">
+                  <Button icon={IconEnum.add} onClick={undefined} variant="info" />
+                </div>
+              </Dropdown>
+            </div>
+          ) : null}
           {isFetchingRelationshipTypes ? (
             <Skeleton type="drawer_form" />
           ) : (
