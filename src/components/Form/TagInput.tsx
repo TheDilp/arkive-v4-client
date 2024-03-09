@@ -53,9 +53,13 @@ export function TagInput({ tags, label: componentLabel, handleChange, isMultiple
           ? tags.map((tag) => (
               <div key={tag.id} className="w-fit">
                 <Badge
-                  clearAction={() => {
-                    handleChange({ name: "tags", value: (tags || []).filter((t) => t.id !== tag.id) });
-                  }}
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : () => {
+                          handleChange({ name: "tags", value: (tags || []).filter((t) => t.id !== tag.id) });
+                        }
+                  }
                   customColor={tag.color}
                   label={tag.title}
                   size="lg"

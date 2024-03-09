@@ -109,6 +109,7 @@ export interface CharacterType {
   nickname?: string | null;
   full_name: string;
   biography: RemirrorJSON | null;
+  owner_id: string;
   images?: ImageType[];
   portrait_id?: string | null;
   portrait?: ImageType;

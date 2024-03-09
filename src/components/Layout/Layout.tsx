@@ -9,6 +9,7 @@ import { useBreakpoint, useGetEntities, useGetEntity, useGetUser } from "../../h
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
+  currentUserPermissions,
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
@@ -41,6 +42,7 @@ export function ProjectLayout() {
   const setProjectAtom = useSetAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
+  const setUserPermissions = useSetAtom(currentUserPermissions);
   const hasChangedData = useAtomValue(hasChangedDataAtom);
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
@@ -49,13 +51,14 @@ export function ProjectLayout() {
   const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id },
+      data: { auth_id: user?.id, project_id },
       relations: {
         webhooks: true,
+        roles: true,
       },
       fields: ["id", "feature_flags"],
     },
-    { enabled: !!user?.id },
+    { enabled: !!user?.id && !!project_id },
   );
 
   const { data: permissions } = useGetEntities<PermissionType>({ fields: ["id", "title", "code"] }, "permissions", {
@@ -74,6 +77,7 @@ export function ProjectLayout() {
           },
         });
       setUserAtom(userData.data);
+      setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
     }
   }, [userData?.data]);
 

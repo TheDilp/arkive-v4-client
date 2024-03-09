@@ -4,3 +4,4 @@ export * from "./useGetChanged";
 export * from "./useMentionAtom";
 export * from "./useNoDataChangedDrawer";
 export * from "./useTable";
+export * from "./useUserHasPermissions";

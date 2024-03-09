@@ -4,7 +4,14 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { uniqueBy } from "remirror";
 
-import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntities,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useUpdateEntity,
+} from "../../../hooks";
 import {
   CharacterCharacterFieldType,
   CharacterFieldTemplateType,
@@ -13,7 +20,9 @@ import {
   CharacterRelationshipType,
   CharacterType,
   HandleChangePropsType,
+  TabType,
   TagType,
+  UserHasPermissionsType,
 } from "../../../types";
 import { drawerAtom, getDifferenceForCharacterFields, getFieldValueFromType, IconEnum, useNotifications } from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
@@ -44,9 +53,11 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
 
-function isSaveDisabled(character: CharacterType | null) {
+function isSaveDisabled(character: CharacterType | null, permissions: UserHasPermissionsType) {
   if (!character) return true;
   if (!character?.first_name) return true;
+  if (!character?.id && !permissions?.create_characters) return true;
+  if (character?.id && !permissions?.update_characters) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
   }
@@ -345,14 +356,23 @@ export function AdditionalFieldsTab({
 }
 // #endregion tabs
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Biography", icon: IconEnum.biography },
-  { id: "3", label: "Relationships", icon: IconEnum.family_tree },
-  { id: "4", label: "Tags", icon: IconEnum.tags },
-  { id: "5", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "6", label: "Access", icon: IconEnum.permissions },
-];
+function getTabs(permissions: UserHasPermissionsType): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Biography", icon: IconEnum.biography },
+    { id: "3", label: "Relationships", icon: IconEnum.family_tree },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "4", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.read_character_fields_templates) {
+    tabs.push({ id: "5", label: "Additional fields", icon: IconEnum.additional_fields });
+  }
+  if (permissions?.is_owner) {
+    tabs.push({ id: "6", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
   const { project_id } = useParams();
@@ -368,7 +388,18 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     {
       relations: { character_fields: true, relationships: true, portrait: true, tags: true },
       permissions: true,
-      fields: ["id", "first_name", "last_name", "nickname", "biography", "age", "portrait_id", "is_favorite", "is_public"],
+      fields: [
+        "id",
+        "first_name",
+        "last_name",
+        "nickname",
+        "biography",
+        "age",
+        "portrait_id",
+        "is_favorite",
+        "is_public",
+        "owner_id",
+      ],
     },
     {
       enabled: !!data?.id,
@@ -376,6 +407,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
   );
 
+  const drawerPermissions = useHasPermissions(
+    ["read_characters", "update_characters", "read_tags", "read_character_fields_templates"],
+    existingCharacter?.data?.owner_id,
+  );
+  const tabs = getTabs(drawerPermissions);
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
@@ -445,6 +481,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         first_name: "",
         biography: null,
         full_name: "",
+        owner_id: "",
         project_id: project_id as string,
         character_fields: [],
         tags: [],
@@ -462,6 +499,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="w-full lg:w-1/2">
               <Input
                 isAutofocused
+                isDisabled={!drawerPermissions?.update_characters}
                 label="First name"
                 name="first_name"
                 onChange={handleChange}
@@ -469,16 +507,29 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               />
             </div>
             <div className="w-full lg:w-1/2">
-              <Input label="Nickname (optional)" name="nickname" onChange={handleChange} value={character?.nickname || ""} />
+              <Input
+                isDisabled={!drawerPermissions?.update_characters}
+                label="Nickname (optional)"
+                name="nickname"
+                onChange={handleChange}
+                value={character?.nickname || ""}
+              />
             </div>
             <div className="w-full lg:w-1/2">
-              <Input label="Last name (optional)" name="last_name" onChange={handleChange} value={character?.last_name || ""} />
+              <Input
+                isDisabled={!drawerPermissions?.update_characters}
+                label="Last name (optional)"
+                name="last_name"
+                onChange={handleChange}
+                value={character?.last_name || ""}
+              />
             </div>
           </div>
           <div>
             <span className="text-sm text-zinc-300">Character image (optional)</span>
             {!character?.portrait?.id ? (
               <ImageSelect
+                isDisabled={!drawerPermissions?.update_characters}
                 isIconOnly
                 name="portrait"
                 onChange={({ name, label, value }) => {
@@ -495,22 +546,44 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               />
             )}
           </div>
-          <Input label="Age (optional)" name="age" onChange={handleChange} type="number" value={character?.age || ""} />
+          <Input
+            isDisabled={!drawerPermissions?.update_characters}
+            label="Age (optional)"
+            name="age"
+            onChange={handleChange}
+            type="number"
+            value={character?.age || ""}
+          />
 
           <ul className="flex w-full flex-col gap-y-2">
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
-              <Checkbox name="is_favorite" onChange={handleChange} value={character?.is_favorite ?? false} />
+              <Checkbox
+                isDisabled={!drawerPermissions?.update_characters}
+                name="is_favorite"
+                onChange={handleChange}
+                value={character?.is_favorite ?? false}
+              />
             </li>
             <div className="flex w-full items-center justify-between">
               <span>Is public:</span>
-              <Checkbox name="is_public" onChange={handleChange} value={character?.is_public ?? false} />
+              <Checkbox
+                isDisabled={!drawerPermissions?.update_characters}
+                name="is_public"
+                onChange={handleChange}
+                value={character?.is_public ?? false}
+              />
             </div>
           </ul>
         </>
       ) : null}
       {tabs[selectedTab].id === "2" ? (
-        <Editor initialContent={character?.biography || undefined} name="biography" onChange={handleChange} />
+        <Editor
+          initialContent={character?.biography || undefined}
+          isDisabled={!drawerPermissions?.update_characters}
+          name="biography"
+          onChange={handleChange}
+        />
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
@@ -720,9 +793,13 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           )}
         </div>
       ) : null}
-      {tabs[selectedTab].id === "4" ? (
+      {tabs[selectedTab].id === "4" && drawerPermissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} tags={character?.tags || []} />
+          <TagInput
+            handleChange={handleChange}
+            isDisabled={!drawerPermissions?.update_characters}
+            tags={character?.tags || []}
+          />
         </div>
       ) : null}
       {tabs[selectedTab].id === "5" ? (
@@ -746,7 +823,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character) || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character, drawerPermissions) || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {

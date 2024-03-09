@@ -134,6 +134,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           queryClient.invalidateQueries(["allEntities", project_id, entityType]);
         }
       } else if (lastJsonMessage.event_type === "ROLE_UPDATED") {
+        queryClient.invalidateQueries(["user", project_id, authUser?.id]);
         queryClient.invalidateQueries(["allEntities", project_id]);
       }
     }

@@ -1,4 +1,4 @@
-import { PermissionType, ProjectType, RoleType, WebhookType } from "./EntityTypes";
+import { PermissionCodeType, PermissionType, ProjectType, RoleType, WebhookType } from "./EntityTypes";
 
 export interface UserType {
   id: string;
@@ -12,3 +12,5 @@ export interface UserType {
   role: RoleType;
   permissions: PermissionType[];
 }
+
+export type UserHasPermissionsType = Partial<Record<PermissionCodeType | "is_owner", boolean>>;

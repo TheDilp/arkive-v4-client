@@ -1,6 +1,6 @@
 import { RolePermissionCodes } from "../../utils";
 
-export type PermissionCodeType = (typeof RolePermissionCodes)[keyof typeof RolePermissionCodes];
+export type PermissionCodeType = (typeof RolePermissionCodes)[number];
 
 export interface PermissionType {
   id: string;

@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-import { UserType } from "../../types";
+import { PermissionCodeType, UserType } from "../../types";
 import { projectAtom } from ".";
 
 export const userAtom = atom<UserType | null>(null);
@@ -18,3 +18,4 @@ export const isProjectOwnerAtom = atom((get) => {
   if (owner_id && user_id) return owner_id === user_id;
   return false;
 });
+export const currentUserPermissions = atom<PermissionCodeType[]>([]);
