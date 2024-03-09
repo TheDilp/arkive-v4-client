@@ -1,7 +1,7 @@
 import { ImageUploadType } from "../../types";
 import { changeImagesForUpload, IconEnum, useNotifications } from "../../utils";
 
-export function ImageUpload({ images, onChange }: ImageUploadType) {
+export function ImageUpload({ images, onChange, isDisabled }: ImageUploadType) {
   const createNotification = useNotifications();
   return (
     <div
@@ -9,31 +9,35 @@ export function ImageUpload({ images, onChange }: ImageUploadType) {
       id="dropzone-container"
       onDragOver={(e) => e.preventDefault()}
       onDragStart={(e) => e.dataTransfer.setData("text/plain", e.currentTarget.id)}
-      onDrop={(e) => {
-        e.preventDefault();
-        const { files } = e.dataTransfer;
-        if (files.length) {
-          const filesToUpload = Array.from(files);
-          let count = 0;
-          for (let index = 0; index < files.length; index += 1) {
-            if (filesToUpload[index].size > 100 * 1024 * 1024) {
-              filesToUpload.splice(index, 1);
-              count += 1;
+      onDrop={
+        isDisabled
+          ? () => {}
+          : (e) => {
+              e.preventDefault();
+              const { files } = e.dataTransfer;
+              if (files.length) {
+                const filesToUpload = Array.from(files);
+                let count = 0;
+                for (let index = 0; index < files.length; index += 1) {
+                  if (filesToUpload[index].size > 100 * 1024 * 1024) {
+                    filesToUpload.splice(index, 1);
+                    count += 1;
+                  }
+                }
+                if (count > 0) {
+                  createNotification({
+                    title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                    hasNoTruncate: true,
+                    variant: "warning",
+                    icon: IconEnum.warning,
+                    timer: 5,
+                  });
+                }
+                const existingFileNames = images.map((f) => f.name);
+                changeImagesForUpload(onChange, existingFileNames, filesToUpload);
+              }
             }
-          }
-          if (count > 0) {
-            createNotification({
-              title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
-              hasNoTruncate: true,
-              variant: "warning",
-              icon: IconEnum.warning,
-              timer: 5,
-            });
-          }
-          const existingFileNames = images.map((f) => f.name);
-          changeImagesForUpload(onChange, existingFileNames, filesToUpload);
-        }
-      }}>
+      }>
       <label
         className="flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-400 bg-zinc-600 hover:bg-zinc-500"
         htmlFor="dropzone-file">
@@ -55,6 +59,7 @@ export function ImageUpload({ images, onChange }: ImageUploadType) {
         <input
           accept="image/*"
           className="hidden"
+          disabled={isDisabled}
           id="dropzone-file"
           multiple
           onChange={(e) => {

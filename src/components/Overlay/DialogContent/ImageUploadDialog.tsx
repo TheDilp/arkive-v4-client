@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useUploadAsset } from "../../../hooks";
+import { useHasPermissions, useUploadAsset } from "../../../hooks";
 import { Size } from "../../../types";
 import { dialogAtom, getPreviewImageURLs, IconEnum } from "../../../utils";
 import { ImagePreview } from "../../DataDisplay/ImagePreview";
@@ -40,7 +40,7 @@ export function ImageUploadDialog({ size }: { size: Size }) {
   const { mutateAsync: uploadMapImages, isLoading: isUploadingMapImages } = useUploadAsset("map_images", project_id as string);
   const [images, setImages] = useState<File[]>([]);
   const [mapImages, setMapImages] = useState<File[]>([]);
-
+  const permissions = useHasPermissions(["create_assets"], undefined);
   const imageUrls = images.length ? getPreviewImageURLs(images) : [];
   const mapImageUrls = mapImages.length ? getPreviewImageURLs(mapImages) : [];
 
@@ -48,7 +48,11 @@ export function ImageUploadDialog({ size }: { size: Size }) {
     <div className="flex h-full flex-col justify-start gap-y-2 overflow-hidden p-2">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       <div className={imageUploadContainer()}>
-        <ImageUpload images={selectedTab ? mapImages : images} onChange={selectedTab ? setMapImages : setImages} />
+        <ImageUpload
+          images={selectedTab ? mapImages : images}
+          isDisabled={!permissions?.create_assets}
+          onChange={selectedTab ? setMapImages : setImages}
+        />
       </div>
       <div className={imagesList()}>
         {imageUrls?.length && !isUploadingImages && selectedTab === 0
@@ -81,7 +85,7 @@ export function ImageUploadDialog({ size }: { size: Size }) {
       <div className="mt-auto">
         <Button
           icon={IconEnum.upload}
-          isDisabled={isUploadingImages || isUploadingMapImages}
+          isDisabled={isUploadingImages || isUploadingMapImages || !permissions?.create_assets}
           isLoading={isUploadingImages || isUploadingMapImages}
           label={isUploadingImages || isUploadingMapImages ? "Uploading..." : "Upload"}
           onClick={async () => {
