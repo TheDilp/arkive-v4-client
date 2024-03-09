@@ -817,7 +817,7 @@ export function FolderView() {
         </div>
       ) : null}
       {view === "table" ? (
-        <div className="h-full w-full">
+        <div className="w-full flex-1 overflow-hidden">
           <Table
             key={type}
             columns={columns(
