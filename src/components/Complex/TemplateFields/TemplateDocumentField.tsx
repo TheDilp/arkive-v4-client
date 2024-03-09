@@ -83,7 +83,7 @@ export function TemplateDocumentField({
             }
             icon={val?.document?.icon || ""}
             id={val?.related_id}
-            link={getEntityLink(project_id as string, "map_pins", id, undefined, false)}
+            link={getEntityLink(project_id as string, "documents", val?.related_id, undefined, false)}
             title={val?.document?.title}
             type="documents"
           />
