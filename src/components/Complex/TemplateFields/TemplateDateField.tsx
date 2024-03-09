@@ -13,9 +13,10 @@ type Props = {
   currentValue: BlueprintInstanceBlueprintFieldType["calendar"] | null;
   calendar?: BlueprintFieldType["calendar"];
   isCollapsible?: boolean;
+  isDisabled?: boolean;
 };
 
-export function TemplateDateField({ title, name, handleChange, id, currentValue, calendar, isCollapsible }: Props) {
+export function TemplateDateField({ title, name, handleChange, id, currentValue, calendar, isCollapsible, isDisabled }: Props) {
   const startMonthIdx = currentValue?.start_month_id
     ? calendar?.months?.findIndex((m) => m.id === currentValue?.start_month_id) ?? undefined
     : undefined;
@@ -55,7 +56,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center justify-between gap-x-2">
           <Input
-            isDisabled={typeof startMonthIdx !== "number"}
+            isDisabled={isDisabled || typeof startMonthIdx !== "number"}
             label="Start day"
             max={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx]?.days : 0}
             min={1}
@@ -73,6 +74,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
           />
           <Select
             isClearable
+            isDisabled={isDisabled}
             label="Start month"
             name="start_month"
             onChange={({ value }) =>
@@ -86,6 +88,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
             value={typeof startMonthIdx === "number" ? calendar?.months?.[startMonthIdx].id : undefined}
           />
           <Input
+            isDisabled={isDisabled}
             label="Start year "
             name="start_year"
             onChange={({ value }) =>
@@ -102,7 +105,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
         <div className="grid grid-cols-3 gap-x-2">
           <Input
             helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
-            isDisabled={typeof endMonthIdx !== "number"}
+            isDisabled={isDisabled || typeof endMonthIdx !== "number"}
             label="End day (optional)"
             max={typeof endMonthIdx === "number" ? calendar?.months?.[endMonthIdx].days : 0}
             min={1}
@@ -122,6 +125,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
           <Select
             helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
             isClearable
+            isDisabled={isDisabled}
             label="End month (optional)"
             name="end_month"
             onChange={({ value }) =>
@@ -137,7 +141,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
           />
           <Input
             helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-            isDisabled={typeof endMonthIdx !== "number"}
+            isDisabled={isDisabled || typeof endMonthIdx !== "number"}
             label="End year (optional)"
             name="end_year"
             onChange={({ value }) =>

@@ -15,6 +15,7 @@ type Props = {
   isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
   blueprint_id: string | null | undefined;
+  isDisabled?: boolean;
 };
 
 export function TemplateBlueprintField({
@@ -25,6 +26,7 @@ export function TemplateBlueprintField({
   blueprint_id,
   fieldType,
   currentValue,
+  isDisabled,
   isCollapsible,
 }: Props) {
   const createNotification = useNotifications();
@@ -32,49 +34,56 @@ export function TemplateBlueprintField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        <Search
-          label={isCollapsible ? "" : title}
-          name={name}
-          onChange={({ value, label, icon }) => {
-            if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
-              createNotification({
-                timer: 3,
-                title: "Cannot add the same blueprint instance more than once.",
-                variant: "warning",
-                icon: IconEnum.warning,
-              });
-              return;
-            }
-            handleChange([
-              { name: `${name}.id`, value: id },
-              {
-                name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                value: {
-                  related_id: value,
-                  blueprint_instance: {
-                    id: value,
-                    title: label,
-                    icon,
-                  },
-                },
-              },
-            ]);
-          }}
-          parent_id={blueprint_id || undefined}
-          placeholder="Press enter to search."
-          searchEntity="blueprint_instances"
-        />
-        {(currentValue || [])?.map((val) => (
-          <EntityPreview
-            key={val.related_id}
-            clearAction={(instance_id) => {
+        {isDisabled ? null : (
+          <Search
+            isDisabled={isDisabled}
+            label={isCollapsible ? "" : title}
+            name={name}
+            onChange={({ value, label, icon }) => {
+              if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
+                createNotification({
+                  timer: 3,
+                  title: "Cannot add the same blueprint instance more than once.",
+                  variant: "warning",
+                  icon: IconEnum.warning,
+                });
+                return;
+              }
               handleChange([
+                { name: `${name}.id`, value: id },
                 {
-                  name: `${name}.blueprint_instances`,
-                  value: currentValue.filter((c) => c.related_id !== instance_id),
+                  name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                  value: {
+                    related_id: value,
+                    blueprint_instance: {
+                      id: value,
+                      title: label,
+                      icon,
+                    },
+                  },
                 },
               ]);
             }}
+            parent_id={blueprint_id || undefined}
+            placeholder="Press enter to search."
+            searchEntity="blueprint_instances"
+          />
+        )}
+        {(currentValue || [])?.map((val) => (
+          <EntityPreview
+            key={val.related_id}
+            clearAction={
+              isDisabled
+                ? undefined
+                : (instance_id) => {
+                    handleChange([
+                      {
+                        name: `${name}.blueprint_instances`,
+                        value: currentValue.filter((c) => c.related_id !== instance_id),
+                      },
+                    ]);
+                  }
+            }
             icon={val?.blueprint_instance?.icon}
             id={val?.related_id}
             link={getEntityLink(project_id as string, "blueprint_instances", id, val?.blueprint_instance?.parent_id, false)}

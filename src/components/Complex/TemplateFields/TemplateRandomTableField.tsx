@@ -9,11 +9,21 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   isCollapsible?: boolean;
+  isDisabled?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
 };
 
-export function TemplateRandomTableField({ title, name, id, currentValue, handleChange, random_table, isCollapsible }: Props) {
+export function TemplateRandomTableField({
+  title,
+  name,
+  id,
+  currentValue,
+  handleChange,
+  random_table,
+  isCollapsible,
+  isDisabled,
+}: Props) {
   const availableSuboptions = random_table?.random_table_options?.find(
     (opt) => opt?.id === currentValue?.option_id,
   )?.random_table_suboptions;
@@ -25,6 +35,7 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
           <Select
             hasSearch
             isClearable
+            isDisabled={isDisabled}
             isReadOnly
             name={`${name}`}
             onChange={({ value }) => {
@@ -50,6 +61,7 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
               hasNoBackground
               icon={IconEnum.d20}
               iconSize={24}
+              isDisabled={isDisabled}
               isIconOnly
               onClick={() => {
                 const items = chooseRandomItems(random_table?.random_table_options || [], 1);
@@ -78,6 +90,7 @@ export function TemplateRandomTableField({ title, name, id, currentValue, handle
             <div className="flex flex-nowrap gap-x-2">
               <Select
                 isClearable
+                isDisabled={isDisabled}
                 name={name}
                 onChange={({ value }) =>
                   handleChange([

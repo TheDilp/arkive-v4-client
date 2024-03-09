@@ -104,10 +104,12 @@ function FieldTemplateRows({
   character_fields = [],
   character_fields_data = [],
   handleChange,
+  permissions,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
+  permissions: UserHasPermissionsType;
 }) {
   return (
     <li className="flex flex-col first:mt-0">
@@ -146,6 +148,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -161,6 +164,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -175,6 +179,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -190,6 +195,7 @@ function FieldTemplateRows({
                 formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -205,6 +211,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -220,6 +227,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -239,6 +247,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -255,6 +264,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -271,6 +281,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -286,6 +297,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -301,6 +313,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!permissions?.update_characters}
                 name={baseName}
                 title={template_field.title}
               />
@@ -321,6 +334,7 @@ export function AdditionalFieldsTab({
   character_fields,
   isLoading,
   tags,
+  permissions,
 }: {
   templates:
     | {
@@ -331,6 +345,7 @@ export function AdditionalFieldsTab({
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   tags?: TagType[];
+  permissions: UserHasPermissionsType;
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
@@ -346,6 +361,7 @@ export function AdditionalFieldsTab({
                 character_fields={t.character_fields}
                 character_fields_data={character_fields || []}
                 handleChange={handleChange}
+                permissions={permissions}
               />
             </div>
           </Collapsible>
@@ -807,6 +823,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
           isLoading={isFetching || isFetchingTemplates}
+          permissions={drawerPermissions}
           tags={character?.tags}
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />

@@ -11,14 +11,26 @@ type Props = {
   currentValue: string | string[] | null;
   options: { id: string; value: string }[];
   isCollapsible?: boolean;
+  isDisabled?: boolean;
 };
 
-export function TemplateSelectField({ title, name, handleChange, id, fieldType, currentValue, options, isCollapsible }: Props) {
+export function TemplateSelectField({
+  title,
+  name,
+  handleChange,
+  id,
+  fieldType,
+  currentValue,
+  options,
+  isCollapsible,
+  isDisabled,
+}: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <Select
         hasSearch
         isClearable
+        isDisabled={isDisabled}
         isMultiple={fieldType === "select_multiple"}
         label={title}
         name={name}

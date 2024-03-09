@@ -14,15 +14,26 @@ type Props = {
   formula: string;
   currentValue: string | number | null;
   isCollapsible?: boolean;
+  isDisabled?: boolean;
 };
 const defaultDiceColor = ls.get("default_dice_color");
-export function TemplateDiceRollField({ title, name, formula, handleChange, id, currentValue, isCollapsible }: Props) {
+export function TemplateDiceRollField({
+  title,
+  isDisabled,
+  name,
+  formula,
+  handleChange,
+  id,
+  currentValue,
+  isCollapsible,
+}: Props) {
   const createNotification = useNotifications();
   const [isRolling, setIsRolling] = useState(false);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex flex-nowrap items-center gap-x-2">
         <Input
+          isDisabled={isDisabled}
           name={name}
           onChange={({ value }) =>
             handleChange([
