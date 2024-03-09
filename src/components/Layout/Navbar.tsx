@@ -6,6 +6,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
+import { useHasPermissions } from "../../hooks";
 import { AllAvailableEntities, WebsocketEventType } from "../../types";
 import {
   baseURLS,
@@ -77,6 +78,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const { user: authUser } = useUser();
+  const permissions = useHasPermissions(["create_assets"], undefined);
   const user = useAtomValue(userAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -86,16 +88,17 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     setDrawer((prev) => ({ ...prev, title: "Search", size: "lg", type: "search", data: null }));
   }
   function openImageUploadDialog() {
-    setDialog((prev) => ({
-      ...prev,
-      type: "image_upload",
-      title: "Upload images",
-      size: "lg",
-      isOverlay: true,
-      data: {
-        type: "images",
-      },
-    }));
+    if (permissions.create_assets)
+      setDialog((prev) => ({
+        ...prev,
+        type: "image_upload",
+        title: "Upload images",
+        size: "lg",
+        isOverlay: true,
+        data: {
+          type: "images",
+        },
+      }));
   }
 
   const { lastJsonMessage } = useWebSocket<{
@@ -168,9 +171,11 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
       <div className="ml-auto flex items-center gap-x-2 pr-4">
         {project_id && !isDisabled ? (
           <>
-            <div className="w-fit">
-              <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
-            </div>
+            {permissions?.create_assets ? (
+              <div className="w-fit">
+                <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
+              </div>
+            ) : null}
             <div className="w-fit">
               <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
                 <div className="h-full">

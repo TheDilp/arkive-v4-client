@@ -12,7 +12,7 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
   const userPermissions = useAtomValue(currentUserPermissions);
 
   useEffect(() => {
-    if (owner_id && user?.id) {
+    if (user?.id) {
       const finalPermissions: UserHasPermissionsType = {};
       finalPermissions.is_owner = isProjectOwner || user?.id === owner_id;
       for (let index = 0; index < requiredPermissions.length; index += 1) {
