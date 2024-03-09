@@ -556,7 +556,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               />
             ) : (
               <ImagePreview
-                clearAction={() => handleChange({ name: "portrait", value: null })}
+                clearAction={
+                  drawerPermissions?.update_characters ? () => handleChange({ name: "portrait", value: null }) : undefined
+                }
                 id={character?.portrait?.id}
                 title={character?.portrait?.title}
               />
