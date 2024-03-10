@@ -22,6 +22,7 @@ import {
   useDeleteMany,
   useGetEntities,
   useGetInfiniteEntities,
+  useHasPermissions,
   useTable,
   useUpdateEntity,
   useUpdateManyPublic,
@@ -253,6 +254,7 @@ export function CharactersView() {
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
+  const permissions = useHasPermissions(["create_characters"], undefined);
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -397,6 +399,7 @@ export function CharactersView() {
         <div className="lg:w-52">
           <Button
             icon={IconEnum.add}
+            isDisabled={!permissions?.create_characters}
             label="Create new character"
             onClick={() =>
               setDrawer((prev) => ({
