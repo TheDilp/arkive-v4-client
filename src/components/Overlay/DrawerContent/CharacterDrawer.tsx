@@ -24,7 +24,14 @@ import {
   TagType,
   UserHasPermissionsType,
 } from "../../../types";
-import { drawerAtom, getDifferenceForCharacterFields, getFieldValueFromType, IconEnum, useNotifications } from "../../../utils";
+import {
+  createOrEditPermission,
+  drawerAtom,
+  getDifferenceForCharacterFields,
+  getFieldValueFromType,
+  IconEnum,
+  useNotifications,
+} from "../../../utils";
 import { InsertCharacterSchema, InsertCharacterType, UpdateCharacterSchema, UpdateCharacterType } from "../../../validation";
 import {
   DrawerLayout,
@@ -104,12 +111,12 @@ function FieldTemplateRows({
   character_fields = [],
   character_fields_data = [],
   handleChange,
-  permissions,
+  canCreateOrEdit,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
-  permissions: UserHasPermissionsType;
+  canCreateOrEdit: boolean;
 }) {
   return (
     <li className="flex flex-col first:mt-0">
@@ -131,6 +138,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -148,7 +156,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -164,7 +172,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -179,7 +187,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -195,7 +203,7 @@ function FieldTemplateRows({
                 formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -211,7 +219,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -227,7 +235,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -247,7 +255,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -264,7 +272,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -281,7 +289,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -297,7 +305,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -313,7 +321,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!permissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -334,7 +342,7 @@ export function AdditionalFieldsTab({
   character_fields,
   isLoading,
   tags,
-  permissions,
+  canCreateOrEdit,
 }: {
   templates:
     | {
@@ -345,7 +353,7 @@ export function AdditionalFieldsTab({
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   tags?: TagType[];
-  permissions: UserHasPermissionsType;
+  canCreateOrEdit: boolean;
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
@@ -358,10 +366,10 @@ export function AdditionalFieldsTab({
           <Collapsible key={t.id} label={t.title}>
             <div className="p-2">
               <FieldTemplateRows
+                canCreateOrEdit={canCreateOrEdit}
                 character_fields={t.character_fields}
                 character_fields_data={character_fields || []}
                 handleChange={handleChange}
-                permissions={permissions}
               />
             </div>
           </Collapsible>
@@ -423,16 +431,22 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
   );
 
-  const drawerPermissions = useHasPermissions(
-    ["read_characters", "update_characters", "read_tags", "read_character_fields_templates"],
+  const permissions = useHasPermissions(
+    ["read_characters", "create_characters", "update_characters", "read_tags", "read_character_fields_templates"],
     existingCharacter?.data?.owner_id,
   );
-  const tabs = getTabs(drawerPermissions);
+  const tabs = getTabs(permissions);
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
     project_id as string,
+  );
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_characters,
+    permissions?.update_characters,
+    permissions?.is_owner,
+    data?.id,
   );
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
@@ -515,7 +529,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="w-full lg:w-1/2">
               <Input
                 isAutofocused
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 label="First name"
                 name="first_name"
                 onChange={handleChange}
@@ -524,7 +538,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 label="Nickname (optional)"
                 name="nickname"
                 onChange={handleChange}
@@ -533,7 +547,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 label="Last name (optional)"
                 name="last_name"
                 onChange={handleChange}
@@ -545,7 +559,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <span className="text-sm text-zinc-300">Character image (optional)</span>
             {!character?.portrait?.id ? (
               <ImageSelect
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 isIconOnly
                 name="portrait"
                 onChange={({ name, label, value }) => {
@@ -556,16 +570,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               />
             ) : (
               <ImagePreview
-                clearAction={
-                  drawerPermissions?.update_characters ? () => handleChange({ name: "portrait", value: null }) : undefined
-                }
+                clearAction={permissions?.update_characters ? () => handleChange({ name: "portrait", value: null }) : undefined}
                 id={character?.portrait?.id}
                 title={character?.portrait?.title}
               />
             )}
           </div>
           <Input
-            isDisabled={!drawerPermissions?.update_characters}
+            isDisabled={!canCreateOrEdit}
             label="Age (optional)"
             name="age"
             onChange={handleChange}
@@ -577,7 +589,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
               <Checkbox
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name="is_favorite"
                 onChange={handleChange}
                 value={character?.is_favorite ?? false}
@@ -586,7 +598,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="flex w-full items-center justify-between">
               <span>Is public:</span>
               <Checkbox
-                isDisabled={!drawerPermissions?.update_characters}
+                isDisabled={!canCreateOrEdit}
                 name="is_public"
                 onChange={handleChange}
                 value={character?.is_public ?? false}
@@ -598,14 +610,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       {tabs[selectedTab].id === "2" ? (
         <Editor
           initialContent={character?.biography || undefined}
-          isDisabled={!drawerPermissions?.update_characters}
+          isDisabled={!canCreateOrEdit}
           name="biography"
           onChange={handleChange}
         />
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
-          {drawerPermissions?.update_characters ? (
+          {canCreateOrEdit ? (
             <div className="flex flex-nowrap items-center justify-between">
               <span>Insert new type:</span>
               <Dropdown
@@ -638,6 +650,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
+                          isDisabled={!canCreateOrEdit}
                           name="related_other"
                           onChange={({ label, value, image }) => {
                             if (character?.id && character.id === value) {
@@ -679,11 +692,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                           {otherCharactersToShow?.map((char) => (
                             <RelationshipRow
                               character_name={char.full_name}
-                              handleRemove={(character_b_id: string) =>
-                                handleChange({
-                                  name: "related_other",
-                                  value: (character?.related_other || []).filter((r) => r.id !== character_b_id),
-                                })
+                              handleRemove={
+                                canCreateOrEdit
+                                  ? (character_b_id: string) =>
+                                      handleChange({
+                                        name: "related_other",
+                                        value: (character?.related_other || []).filter((r) => r.id !== character_b_id),
+                                      })
+                                  : () => {}
                               }
                               {...char}
                               key={char.id}
@@ -694,6 +710,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     ) : (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
+                          isDisabled={!canCreateOrEdit}
                           label="Ascendants"
                           name="related_to"
                           onChange={({ value, image, label }) => {
@@ -738,11 +755,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             .map((char) => (
                               <RelationshipRow
                                 character_name={char.full_name}
-                                handleRemove={(character_b_id: string) =>
-                                  handleChange({
-                                    name: "related_to",
-                                    value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
-                                  })
+                                handleRemove={
+                                  canCreateOrEdit
+                                    ? (character_b_id: string) =>
+                                        handleChange({
+                                          name: "related_to",
+                                          value: (character?.related_to || []).filter((r) => r.id !== character_b_id),
+                                        })
+                                    : () => {}
                                 }
                                 {...char}
                                 key={char.id}
@@ -750,6 +770,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             ))}
                         </div>
                         <Search
+                          isDisabled={!canCreateOrEdit}
                           label="Descendants"
                           name="related_from"
                           onChange={({ label, value, image }) => {
@@ -793,11 +814,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             .map((char) => (
                               <RelationshipRow
                                 character_name={char.full_name}
-                                handleRemove={(character_b_id: string) =>
-                                  handleChange({
-                                    name: "related_from",
-                                    value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
-                                  })
+                                handleRemove={
+                                  canCreateOrEdit
+                                    ? (character_b_id: string) =>
+                                        handleChange({
+                                          name: "related_from",
+                                          value: (character?.related_from || []).filter((r) => r.id !== character_b_id),
+                                        })
+                                    : () => {}
                                 }
                                 {...char}
                                 key={char.id}
@@ -813,26 +837,22 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           )}
         </div>
       ) : null}
-      {tabs[selectedTab].id === "4" && drawerPermissions?.read_tags ? (
+      {tabs[selectedTab].id === "4" && permissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
-          <TagInput
-            handleChange={handleChange}
-            isDisabled={!drawerPermissions?.update_characters}
-            tags={character?.tags || []}
-          />
+          <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} tags={character?.tags || []} />
         </div>
       ) : null}
-      {tabs[selectedTab].id === "5" ? (
+      {tabs[selectedTab].id === "5" && permissions?.read_character_fields_templates ? (
         <AdditionalFieldsTab
+          canCreateOrEdit={canCreateOrEdit && permissions?.read_character_fields_templates}
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
           isLoading={isFetching || isFetchingTemplates}
-          permissions={drawerPermissions}
           tags={character?.tags}
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />
       ) : null}
-      {tabs[selectedTab].id === "6" ? (
+      {tabs[selectedTab].id === "6" && permissions?.is_owner ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={character?.permissions || []}
@@ -844,7 +864,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character, drawerPermissions) || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character, permissions) || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
