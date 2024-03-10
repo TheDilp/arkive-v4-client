@@ -56,8 +56,9 @@ const ButtonClasses = tv({
     {
       variant: ["primary", "secondary", "info", "success", "warning", "error"],
       isDisabled: true,
-      class: "cursor-not-allowed shadow-none active:opacity-100 border-zinc-300",
+      class: "cursor-not-allowed shadow-none border-zinc-300",
     },
+
     {
       variant: ["primary", "secondary", "info", "success", "warning", "error"],
       isIconOnly: true,
@@ -84,6 +85,11 @@ const ButtonClasses = tv({
       hasNoBackground: true,
       isDisabled: true,
       class: "bg-transparent",
+    },
+    {
+      variant: ["error"],
+      isDisabled: true,
+      class: "text-red-900",
     },
   ],
   defaultVariants: {
