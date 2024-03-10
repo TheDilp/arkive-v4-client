@@ -1,3 +1,5 @@
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
+
 export type Size = "4xl" | "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type Variant =
   | "primary"
@@ -75,3 +77,26 @@ export type DiceRollType = {
 };
 
 export type WebsocketEventType = "NEW_MESSAGE" | "NEW_NOTIFICATION" | "ROLE_UPDATED";
+
+export type UpdatePublicManyType = UseMutateAsyncFunction<
+  any,
+  unknown,
+  {
+    data: {
+      ids: string[];
+      is_public: boolean;
+    };
+  },
+  unknown
+>;
+
+export type DeleteManyType = UseMutateAsyncFunction<
+  any,
+  unknown,
+  {
+    data: {
+      ids: string[];
+    };
+  },
+  unknown
+>;

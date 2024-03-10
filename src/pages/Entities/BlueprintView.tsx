@@ -5,7 +5,15 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType } from "../../types";
+import {
+  DeleteManyType,
+  DialogAtomType,
+  DrawerAtomType,
+  TableDispatch,
+  TableSelectedAction,
+  TableSelectionType,
+  UserHasPermissionsType,
+} from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, TextFilters } from "../../utils";
 
@@ -101,11 +109,95 @@ function createColumns(
   ];
 }
 
+function getSelectedActions(
+  permissions: UserHasPermissionsType,
+  {
+    selection,
+    resetDialogAtom,
+    deleteMany,
+    dispatch,
+    setDrawer,
+    setDialog,
+  }: {
+    deleteMany: DeleteManyType;
+    selection: TableSelectionType | undefined;
+    setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+    setDialog: Dispatch<SetStateAction<DialogAtomType>>;
+    resetDialogAtom: () => unknown;
+    dispatch: TableDispatch;
+  },
+) {
+  const selectedActions: TableSelectedAction[] = [];
+  if (permissions?.is_owner) {
+    selectedActions.push({
+      icon: IconEnum.permissions,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Change access",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+
+        setDrawer((prev) => ({
+          ...prev,
+          size: "lg",
+          title: "Edit access",
+          type: "bulk_access",
+          data: {
+            ids,
+            selectablePermissions: ["read_blueprints", "update_blueprints", "delete_blueprints"],
+            type: "blueprints",
+          },
+        }));
+      },
+    });
+  }
+  if (permissions?.delete_blueprints) {
+    selectedActions.push({
+      icon: IconEnum.trash,
+      variant: "error",
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Delete selected rows.",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Delete many",
+            description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "blueprint" : "blueprints"}?`,
+            warning: "This action cannot be undone.",
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: "Delete",
+              icon: IconEnum.trash,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    });
+  }
+
+  return selectedActions;
+}
+
 export function BlueprintView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
   useChangeNavbarTitle("Blueprints");
-  const permissions = useHasPermissions(["create_blueprints"], undefined);
+  const permissions = useHasPermissions(["create_blueprints", "update_blueprints", "delete_blueprints"], undefined);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
@@ -130,6 +222,15 @@ export function BlueprintView() {
     },
     "blueprints",
   );
+
+  const selectedActions = getSelectedActions(permissions, {
+    deleteMany,
+    selection,
+    resetDialogAtom,
+    setDialog,
+    setDrawer,
+    dispatch,
+  });
 
   return (
     <TablePageLayout>
@@ -162,46 +263,7 @@ export function BlueprintView() {
             selection,
             orderBy,
             getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
-            selectedActions: [
-              {
-                icon: IconEnum.trash,
-                variant: "error",
-                hasNoBackground: true,
-                isIconOnly: true,
-                tooltip: "Delete selected rows.",
-                onClick: () => {
-                  const ids = Object.values(selection || {}).flatMap((id) => id);
-                  if (ids.length) {
-                    setDialog((prev) => ({
-                      ...prev,
-                      title: "Delete many",
-                      description: `Are you sure you want to delete ${ids.length} ${
-                        ids.length === 1 ? "blueprint" : "blueprints"
-                      }?`,
-                      warning: "This action cannot be undone.",
-                      isOverlay: true,
-                      cancel: {
-                        label: "Cancel",
-                        variant: "primary",
-                        action: resetDialogAtom,
-                      },
-                      confirm: {
-                        label: "Delete",
-                        icon: IconEnum.trash,
-                        action: async () =>
-                          deleteMany(
-                            { data: { ids } },
-                            {
-                              onSuccess: () => dispatch({ type: "clearSelection" }),
-                            },
-                          ),
-                        variant: "error",
-                      },
-                    }));
-                  }
-                },
-              },
-            ],
+            selectedActions,
           }}
           data={data?.data || []}
           dispatch={dispatch}
