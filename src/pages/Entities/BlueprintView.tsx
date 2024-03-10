@@ -4,7 +4,7 @@ import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
 import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, TextFilters } from "../../utils";
@@ -105,6 +105,7 @@ export function BlueprintView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
   useChangeNavbarTitle("Blueprints");
+  const permissions = useHasPermissions(["create_blueprints"], undefined);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog);
@@ -137,6 +138,7 @@ export function BlueprintView() {
           <div className="w-fit">
             <Button
               icon={IconEnum.add}
+              isDisabled={!permissions?.create_blueprints}
               label="Create new blueprint"
               onClick={() =>
                 setDrawer((prev) => ({
