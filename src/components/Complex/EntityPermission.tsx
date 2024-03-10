@@ -10,8 +10,8 @@ import { Icon } from "../Misc";
 import { Tooltip } from "../Overlay";
 
 type Props = {
-  related_id: string;
-  permissions: EntityPermissionType[];
+  related_id: string | null;
+  permissions: (Pick<EntityPermissionType, "permission_id" | "role_id" | "user_id"> & { related_id: string | null })[];
   handleChange: (newData: HandleChangePropsType) => void;
   selectablePermissions: string[];
   type: AvailableEntityType;
@@ -40,10 +40,14 @@ export function EntityPermission({ related_id, permissions, handleChange, select
                 <span>{role.title}</span>
                 <div className="flex items-center justify-end gap-x-4">
                   <Tooltip
-                    content={`Anyone with this roll will have permission to ${role.permissions
-                      .filter((p) => selectablePermissions.includes(p.code as string))
-                      .map((p) => p.title.split(" ")[0])
-                      .join("/")} this ${getSingularEntityType(type).toLowerCase()}.`}
+                    content={
+                      role.permissions.length
+                        ? `Anyone with this roll will have permission to ${role.permissions
+                            .filter((p) => selectablePermissions.includes(p.code as string))
+                            .map((p) => p.title.split(" ")[0])
+                            .join("/")} this ${getSingularEntityType(type).toLowerCase()}.`
+                        : `This role does not grant any permissions for ${type.replaceAll("_", " ")}.`
+                    }
                     isInline={false}>
                     <div>
                       <Icon fontSize={20} icon={IconEnum.permissions} />

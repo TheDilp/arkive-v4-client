@@ -173,7 +173,7 @@ function createColumns(
                     ...prev,
                     data: row.original,
                     title: `Edit character - ${getCharacterFullName(row.original.first_name, "", row.original?.last_name)}`,
-                    size: "lg",
+                    size: "2xl",
                     type: "characters",
                   }));
                 },

@@ -856,7 +856,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         <EntityPermission
           handleChange={handleChange}
           permissions={character?.permissions || []}
-          related_id={character?.id || ""}
+          related_id={character?.id || null}
           selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
           type="characters"
         />
@@ -893,6 +893,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               } else {
                 const dataToParse = {
                   data: character,
+                  permissions: character?.permissions,
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
                     character_fields: character?.character_fields || [],

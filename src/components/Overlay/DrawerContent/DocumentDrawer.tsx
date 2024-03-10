@@ -247,7 +247,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
         <EntityPermission
           handleChange={handleChange}
           permissions={document?.permissions || []}
-          related_id={document?.id || ""}
+          related_id={document?.id || null}
           selectablePermissions={["read_documents", "update_documents", "delete_documents"]}
           type="documents"
         />
@@ -268,7 +268,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   tags,
                   alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
                 },
-                permissions: document.permissions,
+                permissions: document?.permissions,
               });
               await update(
                 {
@@ -290,7 +290,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   alter_names: document?.alter_names,
                   tags: document?.tags,
                 },
-                permissions: document.permissions,
+                permissions: document?.permissions,
               };
               dataToParse.data.parent_id = item_id;
               dataToParse.data.owner_id = user?.id;
