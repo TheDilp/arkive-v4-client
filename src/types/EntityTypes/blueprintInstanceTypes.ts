@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+import { EntityPermissionType } from "./baseEntityTypes";
 import { BlueprintType } from "./blueprintTypes";
 import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
@@ -62,8 +63,10 @@ export interface BlueprintInstanceType {
   id: string;
   title: string;
   parent_id: string;
+  owner_id: string;
   is_public?: boolean;
   blueprint?: BlueprintType;
   tags: TagType[];
   blueprint_fields: BlueprintInstanceBlueprintFieldType[];
+  permissions: EntityPermissionType[];
 }

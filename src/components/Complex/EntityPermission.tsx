@@ -2,7 +2,13 @@ import { useAtomValue } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { useGetEntities } from "../../hooks";
-import { AvailableEntityType, EntityPermissionType, HandleChangePropsType, RoleType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  EntityPermissionType,
+  HandleChangePropsType,
+  RoleType,
+} from "../../types";
 import { getSingularEntityType, IconEnum, isProjectOwnerAtom, membersAtom, permissionsAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
@@ -14,7 +20,7 @@ type Props = {
   permissions: (Pick<EntityPermissionType, "permission_id" | "role_id" | "user_id"> & { related_id: string | null })[];
   handleChange: (newData: HandleChangePropsType) => void;
   selectablePermissions: string[];
-  type: AvailableEntityType;
+  type: AvailableEntityType | AvailableSubEntityType;
 };
 
 export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, type }: Props) {

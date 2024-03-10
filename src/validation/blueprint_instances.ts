@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
+
 export const InsertBlueprintInstanceSchema = z.object({
   data: z.object({
     parent_id: z.string(),
@@ -54,6 +56,7 @@ export const InsertBlueprintInstanceSchema = z.object({
       .array()
       .optional(),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 export const UpdateBlueprintInstanceSchema = z.object({
   data: z.object({
@@ -107,4 +110,5 @@ export const UpdateBlueprintInstanceSchema = z.object({
       .array()
       .optional(),
   }),
+  permissions: UpdateEntityPermissionSchema,
 });

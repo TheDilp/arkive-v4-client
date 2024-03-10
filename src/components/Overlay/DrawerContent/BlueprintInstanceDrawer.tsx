@@ -2,7 +2,14 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
+import {
+  useCreateSubEntity,
+  useGetEntity,
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useUpdateSubEntity,
+} from "../../../hooks";
 import {
   BlueprintFieldType,
   BlueprintInstanceBlueprintFieldType,
@@ -10,6 +17,8 @@ import {
   BlueprintType,
   EventStateType,
   HandleChangePropsType,
+  TabType,
+  UserHasPermissionsType,
 } from "../../../types";
 import {
   checkIfDayCorrect,
@@ -37,6 +46,7 @@ import {
   TemplateSelectField,
   TemplateTextareaField,
 } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
@@ -319,10 +329,19 @@ function FieldTemplateRows({
   );
 }
 
-const tabs = [
-  { id: "1", label: "Fields", icon: IconEnum.additional_fields },
-  { id: "2", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Fields", icon: IconEnum.additional_fields },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner) {
+    tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function BlueprintInstanceDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
@@ -356,7 +375,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     "blueprint_instances",
     {
       data: { id: data?.id },
-      fields: ["id", "title", "parent_id", "is_public"],
+      fields: ["id", "title", "parent_id", "is_public", "owner_id"],
       relations: {
         blueprint_fields: true,
         tags: true,
@@ -371,19 +390,23 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       setInstance({
         id: "",
         title: "",
+        owner_id: "",
         blueprint_fields: [],
+        permissions: [],
         parent_id: item_id as string,
         tags: [],
       });
     }
   }, [existingInstance?.data]);
+  const permissions = useHasPermissions(["create_blueprint_instances", "update_blueprint_instances", "read_tags"], data?.id);
+  const tabs = getTabs(permissions);
 
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <ul className="flex max-h-[90%] flex-col overflow-y-auto">
           {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
           <div>
@@ -399,20 +422,31 @@ export function BlueprintInstanceDrawer({ data }: Props) {
             <span>Is public:</span>
             <Checkbox name="is_public" onChange={handleChange} value={instance?.is_public ?? false} />
           </div>
-          {blueprint?.data?.blueprint_fields?.length ? (
-            <FieldTemplateRows
-              blueprint_fields={blueprint.data.blueprint_fields}
-              blueprint_fields_data={instance.blueprint_fields}
-              handleChange={handleChange}
-            />
-          ) : null}
         </ul>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" && blueprint?.data?.blueprint_fields?.length ? (
+        <FieldTemplateRows
+          blueprint_fields={blueprint.data.blueprint_fields}
+          blueprint_fields_data={instance.blueprint_fields}
+          handleChange={handleChange}
+        />
+      ) : null}
+      {tabs[selectedTab].id === "3" ? (
         <div>
           <TagInput handleChange={handleChange} tags={instance?.tags || []} />
         </div>
       ) : null}
+
+      {tabs[selectedTab].id === "4" ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={existingInstance?.data?.permissions || []}
+          related_id={existingInstance?.data?.id || null}
+          selectablePermissions={["read_blueprint_instanes", "update_blueprint_instances", "delete_blueprint_instances"]}
+          type="blueprint_instances"
+        />
+      ) : null}
+
       <div className="mt-auto w-full">
         <Button
           icon={instance?.id ? IconEnum.save : IconEnum.add}
@@ -435,6 +469,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: getDifferenceForBlueprintInstance(existingInstance?.data, instance),
                   },
+                  permissions: existingInstance?.data?.permissions,
                 };
 
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
@@ -454,6 +489,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: instance?.blueprint_fields,
                   },
+                  permissions: existingInstance?.data?.permissions,
                 };
                 const parsedData = InsertBlueprintInstanceSchema.parse(dataToParse);
 
