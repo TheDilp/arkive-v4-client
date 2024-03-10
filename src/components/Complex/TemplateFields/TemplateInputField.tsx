@@ -10,12 +10,23 @@ type Props = {
   fieldType: "text" | "number";
   currentValue: string | number | null;
   isCollapsible?: boolean;
+  isDisabled?: boolean;
 };
 
-export function TemplateInputField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
+export function TemplateInputField({
+  title,
+  name,
+  handleChange,
+  id,
+  fieldType,
+  currentValue,
+  isCollapsible,
+  isDisabled,
+}: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <Input
+        isDisabled={isDisabled}
         label={isCollapsible ? "" : title}
         name={name}
         onChange={({ value }) =>
