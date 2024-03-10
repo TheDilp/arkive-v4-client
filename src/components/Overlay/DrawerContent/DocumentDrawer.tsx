@@ -1,11 +1,27 @@
+import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { DocumentType, DrawerAtomType, InsertDocumentType, UpdateDocumentType } from "../../../types";
-import { AvailableIcons, DefaultTagColor, drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  DocumentType,
+  DrawerAtomType,
+  InsertDocumentType,
+  TabType,
+  UpdateDocumentType,
+  UserHasPermissionsType,
+} from "../../../types";
+import {
+  AvailableIcons,
+  createOrEditPermission,
+  DefaultTagColor,
+  drawerAtom,
+  IconEnum,
+  useNotifications,
+  userAtom,
+} from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -18,6 +34,7 @@ import { IconPicker } from "../IconPicker";
 
 function isSaveDisabled(document: Partial<DocumentType>) {
   if (!document.title) return true;
+
   return false;
 }
 
@@ -33,15 +50,22 @@ type documentRelationsType = {
   alter_names?: { title: string }[];
 };
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Tags", icon: IconEnum.tags },
-  { id: "3", label: "Access", icon: IconEnum.permissions },
-];
+function getTabs(permissions: UserHasPermissionsType) {
+  const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
+
+  if (permissions?.read_tags) {
+    tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(0);
+  const user = useAtomValue(userAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const { data: existingDocument, isFetching } = useGetEntity<DocumentType>(
@@ -51,11 +75,21 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       data: {},
       relations: { alter_names: true, tags: true },
       permissions: true,
-      fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public"],
+      fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public", "owner_id"],
     },
     {
       enabled: !!data?.id,
     },
+  );
+  const permissions = useHasPermissions(
+    ["create_documents", "update_documents", "read_tags"],
+    existingDocument?.data?.owner_id,
+  );
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_documents,
+    permissions?.update_documents,
+    permissions?.is_owner,
+    data?.id,
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
     existingDocument?.data || { parent_id: item_id, project_id: project_id as string },
@@ -71,7 +105,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   }>("documents", project_id as string);
 
   const [alterNameInput, setAlterNameInput] = useState("");
-
+  const tabs = useMemo(() => getTabs(permissions), [permissions]);
   const currentAlterNames = document?.alter_names?.map((alter_name) => alter_name.title);
 
   const { changedData, handleChange } = useHandleChange({ data: document, setData: setDocument });
@@ -89,6 +123,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
         <div className="flex flex-col gap-y-2">
           <div className="flex flex-nowrap gap-x-2">
             <Input
+              isDisabled={!canCreateOrEdit}
               label="Document title (required)"
               name="title"
               onChange={handleChange}
@@ -96,11 +131,17 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               value={document?.title || ""}
             />
             <div className="self-end pb-1.5">
-              <IconPicker icon={document?.icon || IconEnum.document} name="icon" onChange={handleChange} />
+              <IconPicker
+                icon={document?.icon || IconEnum.document}
+                isDisabled={!canCreateOrEdit}
+                name="icon"
+                onChange={handleChange}
+              />
             </div>
           </div>
           {!document?.image?.id ? (
             <ImageSelect
+              isDisabled={!canCreateOrEdit}
               isIconOnly
               name="image"
               onChange={({ name, label, value }) => {
@@ -111,14 +152,14 @@ export function DocumentDrawer({ data, exceptions }: Props) {
             />
           ) : (
             <ImagePreview
-              clearAction={() => handleChange({ name: "image", value: null })}
+              clearAction={!canCreateOrEdit ? undefined : () => handleChange({ name: "image", value: null })}
               id={document?.image?.id}
               title={document?.image?.title}
             />
           )}
           <Input
             helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
-            isDisabled={exceptions?.createTemplate}
+            isDisabled={exceptions?.createTemplate || !canCreateOrEdit}
             label="Alternative names"
             name="alter_names"
             onChange={({ value }) => setAlterNameInput(value as string)}
@@ -151,12 +192,16 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               ? document.alter_names.map((alter_name) => (
                   <div key={alter_name.title} className="w-fit">
                     <Badge
-                      clearAction={() => {
-                        handleChange({
-                          name: "alter_names",
-                          value: (document?.alter_names || []).filter((a_n) => a_n.title !== alter_name.title),
-                        });
-                      }}
+                      clearAction={
+                        canCreateOrEdit
+                          ? () => {
+                              handleChange({
+                                name: "alter_names",
+                                value: (document?.alter_names || []).filter((a_n) => a_n.title !== alter_name.title),
+                              });
+                            }
+                          : undefined
+                      }
                       label={alter_name.title}
                       size="lg"
                     />
@@ -164,24 +209,41 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 ))
               : null}
           </div>
-          <FolderSelect handleChange={handleChange} parent_id={document?.parent_id ?? null} type="documents" />
+          <FolderSelect
+            handleChange={handleChange}
+            isDisabled={!canCreateOrEdit}
+            parent_id={document?.parent_id ?? null}
+            type="documents"
+          />
 
           <div className="flex gap-x-2">
             <span>Dice color:</span>
             <div className="ml-auto self-end pb-2">
-              <ColorPicker name="dice_color" onChange={handleChange} value={document?.dice_color || DefaultTagColor} />
+              <ColorPicker
+                isDisabled={!canCreateOrEdit}
+                name="dice_color"
+                onChange={handleChange}
+                value={document?.dice_color || DefaultTagColor}
+              />
             </div>
           </div>
 
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
-            <Checkbox name="is_public" onChange={handleChange} value={document?.is_public ?? false} />
+            <Checkbox
+              isDisabled={!canCreateOrEdit}
+              name="is_public"
+              onChange={handleChange}
+              value={document?.is_public ?? false}
+            />
           </div>
         </div>
       ) : null}
 
-      {tabs[selectedTab].id === "2" ? <TagInput handleChange={handleChange} isMultiple tags={document?.tags || []} /> : null}
-      {tabs[selectedTab].id === "3" ? (
+      {tabs[selectedTab].id === "2" && permissions?.read_tags ? (
+        <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} isMultiple tags={document?.tags || []} />
+      ) : null}
+      {tabs[selectedTab].id === "3" && permissions.is_owner ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={document?.permissions || []}
@@ -192,7 +254,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       ) : null}
       <Button
         icon={document?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled({ title: document?.title }) || isCreating || isUpdating}
+        isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={document?.id ? "Update" : "Create"}
         onClick={async () => {
@@ -231,6 +293,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 permissions: document.permissions,
               };
               dataToParse.data.parent_id = item_id;
+              dataToParse.data.owner_id = user?.id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);
               await create(
                 {
