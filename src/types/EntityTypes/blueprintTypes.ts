@@ -1,4 +1,5 @@
 import { AvailableIcons } from "../../utils";
+import { EntityPermissionType } from "./baseEntityTypes";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { BlueprintFieldTypes } from "./fieldsTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
@@ -23,11 +24,12 @@ export interface BlueprintType {
   title: string;
   title_name: string;
   icon?: AvailableIcons;
-
+  owner_id: string;
   // title_width: FieldWidthType;
   project_id: string;
   blueprint_instances: BlueprintInstanceType[];
   blueprint_fields: BlueprintFieldType[];
+  permissions: EntityPermissionType[];
 }
 
 export type BlueprintStateType = Partial<

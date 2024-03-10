@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
+
 const BlueprintFieldTypeSchema = z.union([
   z.literal("text"),
   z.literal("textarea"),
@@ -30,7 +32,7 @@ export const InsertBlueprintSchema = z.object({
     title: z.string(),
     title_name: z.string(),
     icon: z.string().optional().nullable(),
-    // title_width: z.literal("half").or(z.literal("full")),
+    owner_id: z.string(),
   }),
   relations: z.object({
     blueprint_fields: z
@@ -48,6 +50,7 @@ export const InsertBlueprintSchema = z.object({
       .array(),
     // tags: z.object({ id: z.string() }).array().min(1),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateBlueprintSchema = z
@@ -75,13 +78,8 @@ export const UpdateBlueprintSchema = z
         })
         .array()
         .optional(),
-      //   tags: z
-      //     .object({
-      //       id: z.string(),
-      //     })
-      //     .array()
-      //     .optional(),
     }),
+    permissions: UpdateEntityPermissionSchema,
   })
   .strict();
 
