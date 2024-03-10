@@ -10,6 +10,7 @@ export * from "./entityUtils";
 export * from "./graphUtils";
 export * from "./linkUtils";
 export * from "./notificationUtils";
+export * from "./permissionUtils";
 export * from "./tableUtils";
 export * from "./tabUtils";
 export * from "./textUtils";
