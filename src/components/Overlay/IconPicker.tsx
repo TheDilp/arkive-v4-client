@@ -79,7 +79,7 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
     <>
       <div {...getReferenceProps({ ref: refs.setReference })}>
         {icon ? (
-          <div className="cursor-pointer">
+          <div className={`${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}>
             <Icon color={iconColor || "#ffffff"} fontSize={32} icon={icon} />
           </div>
         ) : (
