@@ -121,7 +121,7 @@ export function Button({
         {label && !isIconOnly ? <span className={labelClasses()}>{label}</span> : null}
         {(iconPos === "right" && icon) || isLoading ? (
           <Icon
-            className={isLoading ? "animate-spin" : ""}
+            className={isLoading ? "animate-spin" : "pointer-events-none"}
             fontSize={iconSize}
             icon={isLoading ? IconEnum.loading : icon || IconEnum.error}
             thickness={iconThickness}
