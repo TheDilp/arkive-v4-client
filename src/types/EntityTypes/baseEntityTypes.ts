@@ -25,6 +25,7 @@ export interface BaseEntityType {
   is_public?: boolean | null;
   icon?: AvailableIcons | null;
   permissions: EntityPermissionType[];
+  owner_id: string;
 }
 
 export type AvailableEntityType =
