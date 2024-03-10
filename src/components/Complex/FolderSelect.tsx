@@ -7,12 +7,13 @@ import { Search } from "../Form";
 type Props = {
   type: EntitiesWithFolders;
   parent_id: string | null;
+  isDisabled?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
 };
 
 type EntityWithParent = { id: string; title: string; parent_id: string; is_folder: boolean };
 
-export function FolderSelect({ handleChange, type, parent_id }: Props) {
+export function FolderSelect({ handleChange, type, parent_id, isDisabled }: Props) {
   const { data: parentData } = useGetEntity<EntityWithParent & { parents: EntityWithParent[] }>(
     parent_id as string,
     type,
@@ -31,7 +32,7 @@ export function FolderSelect({ handleChange, type, parent_id }: Props) {
       {!!parentData?.data?.parents?.length && parent_id ? (
         <div className="flex-1 [&>div>span>a>span]:overflow-visible [&>div>span>a>span]:whitespace-normal [&>div>span>a>span]:break-words [&>div>span>a]:max-h-fit [&>div>span>a]:min-h-fit [&>div>span]:h-fit [&>div>span]:max-h-fit [&>div>span]:min-h-fit [&>div>span]:py-0">
           <EntityPreview
-            clearAction={() => handleChange({ name: "parent_id", value: null })}
+            clearAction={isDisabled ? undefined : () => handleChange({ name: "parent_id", value: null })}
             icon={IconEnum.folder}
             id="parent"
             label="Folder"
@@ -40,7 +41,7 @@ export function FolderSelect({ handleChange, type, parent_id }: Props) {
           />
         </div>
       ) : (
-        <Search isFolders label="Folder" name="parent_id" onChange={handleChange} searchEntity={type} />
+        <Search isDisabled={isDisabled} isFolders label="Folder" name="parent_id" onChange={handleChange} searchEntity={type} />
       )}
     </div>
   );
