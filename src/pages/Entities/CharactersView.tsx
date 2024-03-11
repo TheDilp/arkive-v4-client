@@ -73,6 +73,7 @@ function createColumns(
   isMd: boolean,
   webhooks: WebhookType[],
   project_id: string,
+  permissions: UserHasPermissionsType,
 ) {
   return [
     columnHelper.display({
@@ -179,6 +180,7 @@ function createColumns(
                 id: "1",
                 title: "Edit character",
                 icon: IconEnum.edit,
+                isDisabled: !permissions?.update_characters,
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -235,6 +237,7 @@ function createColumns(
                 id: "delete_character",
                 title: "Delete character",
                 icon: IconEnum.trash,
+                isDisabled: !permissions?.delete_characters,
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -605,7 +608,15 @@ export function CharactersView() {
       ) : (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={createColumns(setDrawer, setDialog, updatePublicMany, isMd, user?.webhooks || [], project_id as string)}
+            columns={createColumns(
+              setDrawer,
+              setDialog,
+              updatePublicMany,
+              isMd,
+              user?.webhooks || [],
+              project_id as string,
+              permissions,
+            )}
             config={{
               hasSelect: true,
               hasFavorite: true,
