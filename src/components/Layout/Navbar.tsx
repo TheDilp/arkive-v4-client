@@ -106,6 +106,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     message: string;
     image_id?: string;
     conversation_id?: string;
+    entity_id?: string;
     entity: AllAvailableEntities;
     userId: string;
     nickname?: string;
@@ -140,6 +141,15 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           }
         }
       } else if (lastJsonMessage.event_type === "ROLE_UPDATED") {
+        if (!!lastJsonMessage?.entity_id && user?.role?.id === lastJsonMessage?.entity_id) {
+          createNotification({
+            icon: getDefaultEntityIcon(lastJsonMessage.entity),
+            title: "Your role's permissions have been updated by the project's owner.",
+            variant: "info",
+            timer: 5,
+            hasNoTruncate: true,
+          });
+        }
         queryClient.invalidateQueries(["user", project_id, authUser?.id]);
         queryClient.invalidateQueries(["allEntities", project_id]);
       }
