@@ -60,11 +60,9 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
 
-function isSaveDisabled(character: CharacterType | null, permissions: UserHasPermissionsType) {
+function isSaveDisabled(character: CharacterType | null) {
   if (!character) return true;
   if (!character?.first_name) return true;
-  if (!character?.id && !permissions?.create_characters) return true;
-  if (character?.id && !permissions?.update_characters) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
   }
@@ -864,7 +862,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character, permissions) || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character) || !canCreateOrEdit || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
