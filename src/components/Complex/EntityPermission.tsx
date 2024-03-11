@@ -42,44 +42,46 @@ export function EntityPermission({ related_id, permissions, handleChange, select
       {isProjectOwner ? (
         <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
           <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
-            {(roles?.data || [])?.map((role) => (
-              <li key={role.id} className="flex items-center justify-between">
-                <span>{role.title}</span>
-                <div className="flex items-center justify-end gap-x-4">
-                  <Tooltip
-                    content={
-                      role.permissions.length
-                        ? `Anyone with this roll will have permission to ${role.permissions
-                            .filter((p) => selectablePermissions.includes(p.code as string))
-                            .map((p) => p.title.split(" ")[0])
-                            .join("/")} this ${getSingularEntityType(type).toLowerCase()}.`
-                        : `This role does not grant any permissions for ${type.replaceAll("_", " ")}.`
-                    }
-                    isInline={false}>
-                    <div>
-                      <Icon fontSize={20} icon={IconEnum.permissions} />
-                    </div>
-                  </Tooltip>
-                  <Checkbox
-                    name="permissions"
-                    onChange={(e) => {
-                      if (e.value) {
-                        handleChange({
-                          name: "permissions",
-                          value: permissions.concat({ related_id, role_id: role.id, permission_id: null, user_id: null }),
-                        });
-                      } else {
-                        handleChange({
-                          name: "permissions",
-                          value: permissions.filter((p) => p.role_id !== role.id),
-                        });
+            {(roles?.data || [])?.map((role) => {
+              const availableRolePermissions = role.permissions.filter((p) => selectablePermissions.includes(p.code as string));
+              return (
+                <li key={role.id} className="flex items-center justify-between">
+                  <span>{role.title}</span>
+                  <div className="flex items-center justify-end gap-x-4">
+                    <Tooltip
+                      content={
+                        availableRolePermissions.length
+                          ? `Anyone with this roll will have permission to ${availableRolePermissions
+                              .map((p) => p.title.split(" ")[0])
+                              .join("/")} this ${getSingularEntityType(type).toLowerCase()}.`
+                          : `This role does not grant any permissions for ${type.replaceAll("_", " ")}.`
                       }
-                    }}
-                    value={permissions.some((p) => p.role_id === role.id)}
-                  />
-                </div>
-              </li>
-            ))}
+                      isInline={false}>
+                      <div>
+                        <Icon fontSize={20} icon={IconEnum.permissions} />
+                      </div>
+                    </Tooltip>
+                    <Checkbox
+                      name="permissions"
+                      onChange={(e) => {
+                        if (e.value) {
+                          handleChange({
+                            name: "permissions",
+                            value: permissions.concat({ related_id, role_id: role.id, permission_id: null, user_id: null }),
+                          });
+                        } else {
+                          handleChange({
+                            name: "permissions",
+                            value: permissions.filter((p) => p.role_id !== role.id),
+                          });
+                        }
+                      }}
+                      value={permissions.some((p) => p.role_id === role.id)}
+                    />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </Collapsible>
       ) : null}

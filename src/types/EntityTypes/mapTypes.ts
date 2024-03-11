@@ -1,4 +1,5 @@
 import { AvailableIcons } from "../../utils";
+import { EntityPermissionType } from "./baseEntityTypes";
 import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
@@ -16,11 +17,11 @@ export interface MapType {
   project_id: string;
   parent_id?: string | null;
   image_id: string | null;
-
+  owner_id: string;
   map_pins?: MapPinType[];
   map_layers?: MapLayerType[];
   characters: CharacterType[];
-
+  permissions: EntityPermissionType[];
   tags?: TagType[];
 }
 

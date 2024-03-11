@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
 import { InsertMapLayerSchema, UpdateMapLayerSchema } from "./map_layers";
 
 export const InsertMapSchema = z.object({
@@ -28,6 +29,7 @@ export const InsertMapSchema = z.object({
         .optional(),
     })
     .optional(),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateMapSchema = z.object({
@@ -47,6 +49,7 @@ export const UpdateMapSchema = z.object({
       map_layers: InsertMapLayerSchema.array().or(UpdateMapLayerSchema.array()).optional(),
     })
     .optional(),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export type InsertMapType = z.infer<typeof InsertMapSchema>;

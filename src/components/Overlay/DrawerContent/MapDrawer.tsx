@@ -3,11 +3,12 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { MapType } from "../../../types";
-import { drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import { MapType, TabType, UserHasPermissionsType } from "../../../types";
+import { createOrEditPermission, drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { FolderSelect, ImageSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Tabs } from "../../Layout";
@@ -23,11 +24,19 @@ function isDisabled(map: Partial<MapType> & { project_id: string }) {
   return false;
 }
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Map layers", icon: IconEnum.map_layers },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Map layers", icon: IconEnum.map_layers },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner) {
+    tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function MapDrawer({ data }: { data: { id?: string } }) {
   const { project_id, item_id } = useParams();
@@ -36,11 +45,23 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
     data?.id,
     "maps",
     {
-      fields: ["id", "icon", "title", "cluster_pins", "image_id", "is_public"],
+      fields: ["id", "icon", "title", "cluster_pins", "image_id", "is_public", "owner_id"],
       relations: { map_pins: true, map_layers: true },
+      permissions: true,
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
+
+  const permissions = useHasPermissions(["read_maps", "create_maps", "update_maps", "read_tags"], existingMap?.data?.owner_id);
+
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_maps,
+    permissions?.update_maps,
+    permissions?.is_owner,
+    data?.id,
+  );
+
+  const tabs = getTabs(permissions);
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
     existingMap?.data || { project_id: project_id as string },
@@ -60,10 +81,17 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, indx) => setSelectedTab(indx)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
-          <Input label="Title (required)" name="title" onChange={handleChange} value={map?.title || ""} />
+          <Input
+            isDisabled={!canCreateOrEdit}
+            label="Title (required)"
+            name="title"
+            onChange={handleChange}
+            value={map?.title || ""}
+          />
           <ImageSelect
+            isDisabled={!canCreateOrEdit}
             isIconOnly
             label="Map image (required)"
             name="image_id"
@@ -71,25 +99,36 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             type="map_images"
             value={map?.image_id}
           />
-          <FolderSelect handleChange={handleChange} parent_id={map?.parent_id ?? null} type="maps" />
+          <FolderSelect
+            handleChange={handleChange}
+            isDisabled={!canCreateOrEdit}
+            parent_id={map?.parent_id ?? null}
+            type="maps"
+          />
           <div className="flex flex-nowrap justify-between">
             <span>Cluster pins:</span>
-            <Checkbox name="cluster_pins" onChange={handleChange} value={map?.cluster_pins ?? false} />
+            <Checkbox
+              isDisabled={!canCreateOrEdit}
+              name="cluster_pins"
+              onChange={handleChange}
+              value={map?.cluster_pins ?? false}
+            />
           </div>
 
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
-            <Checkbox name="is_public" onChange={handleChange} value={map?.is_public ?? false} />
+            <Checkbox isDisabled={!canCreateOrEdit} name="is_public" onChange={handleChange} value={map?.is_public ?? false} />
           </div>
         </>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" && canCreateOrEdit ? (
         <div className="mt-2 flex flex-col gap-y-2 pr-2">
           <div className="sticky top-0 z-20 flex flex-nowrap items-center justify-between bg-zinc-900">
             <span>Insert new layer:</span>
             <div className="h-8 w-8">
               <Button
                 icon={IconEnum.add}
+                isDisabled={!canCreateOrEdit}
                 isIconOnly
                 onClick={() => {
                   handleChange({
@@ -108,14 +147,23 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             </div>
           </div>
           <DragDropContext
-            onDragEnd={(result) =>
-              onDragEnd(result, map?.map_layers || [], (newLayers) => handleChange({ name: "map_layers", value: newLayers }))
+            onDragEnd={
+              canCreateOrEdit
+                ? (result) =>
+                    onDragEnd(result, map?.map_layers || [], (newLayers) =>
+                      handleChange({ name: "map_layers", value: newLayers }),
+                    )
+                : () => {}
             }>
-            <Droppable droppableId="droppable">
+            <Droppable droppableId="droppable" isDropDisabled={!canCreateOrEdit}>
               {(providedDroppable) => (
                 <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                   {map?.map_layers?.map((item, index) => (
-                    <Draggable key={item.id} draggableId={item.id || item.title + index} index={index}>
+                    <Draggable
+                      key={item.id}
+                      draggableId={item.id || item.title + index}
+                      index={index}
+                      isDragDisabled={!canCreateOrEdit}>
                       {(provided, draggableSnapshot) => (
                         <div
                           ref={provided.innerRef}
@@ -133,6 +181,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                           </div>
                           <div>
                             <Input
+                              isDisabled={!canCreateOrEdit}
                               label="Layer name (required)"
                               name={`map_layers[${index}].title`}
                               onChange={handleChange}
@@ -144,7 +193,11 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                             <div className="flex w-full flex-col">
                               <span className="font-lato text-sm text-zinc-300">Layer image (required)</span>
                               <ImagePreview
-                                clearAction={() => handleChange({ name: `map_layers[${index}].image`, value: null })}
+                                clearAction={
+                                  canCreateOrEdit
+                                    ? () => handleChange({ name: `map_layers[${index}].image`, value: null })
+                                    : undefined
+                                }
                                 id={item?.image?.id}
                                 title={item.image.title}
                                 url={getImageURL(project_id as string, "map_images", item?.image?.id)}
@@ -152,6 +205,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                             </div>
                           ) : (
                             <ImageSelect
+                              isDisabled={!canCreateOrEdit}
                               isIconOnly
                               label="Layer image (required)"
                               name={`map_layers[${index}].image`}
@@ -165,6 +219,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
                             <Button
                               hasNoBackground
                               icon={IconEnum.trash}
+                              isDisabled={!canCreateOrEdit}
                               isIconOnly
                               onClick={() =>
                                 handleChange({
@@ -186,10 +241,21 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
           </DragDropContext>
         </div>
       ) : null}
-      {selectedTab === 2 ? <TagInput handleChange={handleChange} isMultiple tags={map?.tags || []} /> : null}
+      {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
+        <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} isMultiple tags={map?.tags || []} />
+      ) : null}
+      {tabs[selectedTab].id === "4" && permissions?.is_owner ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={map?.permissions || []}
+          related_id={data?.id || null}
+          selectablePermissions={["read_maps", "update_maps", "delete_maps"]}
+          type="maps"
+        />
+      ) : null}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isDisabled(map) || isCreating || isUpdating}
+        isDisabled={isDisabled(map) || isCreating || isUpdating || !canCreateOrEdit}
         isLoading={isCreating || isUpdating}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {
@@ -207,6 +273,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
             const parsedData = InsertMapSchema.parse({
               data: rest,
               relations: { tags, map_layers: formattedMapLayers },
+              permissions: rest.permissions,
             });
             await create(parsedData);
           } else {
@@ -220,7 +287,11 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
               },
             }));
 
-            const parsedData = UpdateMapSchema.parse({ data: rest, relations: { tags, map_layers: formattedMapLayers } });
+            const parsedData = UpdateMapSchema.parse({
+              data: rest,
+              relations: { tags, map_layers: formattedMapLayers },
+              permissions: rest.permissions,
+            });
             await update(parsedData);
           }
 

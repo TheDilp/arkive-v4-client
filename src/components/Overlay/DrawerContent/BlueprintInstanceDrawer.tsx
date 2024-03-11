@@ -470,7 +470,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         </div>
       ) : null}
 
-      {tabs[selectedTab].id === "4" ? (
+      {tabs[selectedTab].id === "4" && permissions?.is_owner ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={instance?.permissions || []}
