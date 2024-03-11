@@ -345,7 +345,7 @@ function FieldTemplateRows({
   );
 }
 
-function getTabs(permissions: UserHasPermissionsType): TabType[] {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
     { id: "2", label: "Fields", icon: IconEnum.additional_fields },
@@ -353,7 +353,7 @@ function getTabs(permissions: UserHasPermissionsType): TabType[] {
   if (permissions?.read_tags) {
     tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
   }
-  if (permissions?.is_owner) {
+  if (permissions?.is_owner || !id) {
     tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
@@ -425,7 +425,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     permissions?.is_owner,
     data?.id,
   );
-  const tabs = getTabs(permissions);
+  const tabs = getTabs(permissions, data?.id);
 
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
 
@@ -470,7 +470,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         </div>
       ) : null}
 
-      {tabs[selectedTab].id === "4" && permissions?.is_owner ? (
+      {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={instance?.permissions || []}

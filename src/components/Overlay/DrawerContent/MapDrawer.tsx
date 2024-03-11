@@ -24,7 +24,7 @@ function isDisabled(map: Partial<MapType> & { project_id: string }) {
   return false;
 }
 
-function getTabs(permissions: UserHasPermissionsType): TabType[] {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
     { id: "2", label: "Map layers", icon: IconEnum.map_layers },
@@ -32,7 +32,7 @@ function getTabs(permissions: UserHasPermissionsType): TabType[] {
   if (permissions?.read_tags) {
     tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
   }
-  if (permissions?.is_owner) {
+  if (permissions?.is_owner || !id) {
     tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
@@ -61,7 +61,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
     data?.id,
   );
 
-  const tabs = getTabs(permissions);
+  const tabs = getTabs(permissions, data?.id);
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
     existingMap?.data || { project_id: project_id as string },
@@ -244,7 +244,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
       {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
         <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} isMultiple tags={map?.tags || []} />
       ) : null}
-      {tabs[selectedTab].id === "4" && permissions?.is_owner ? (
+      {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={map?.permissions || []}

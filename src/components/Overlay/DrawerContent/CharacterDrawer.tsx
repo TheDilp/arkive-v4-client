@@ -378,7 +378,7 @@ export function AdditionalFieldsTab({
 }
 // #endregion tabs
 
-function getTabs(permissions: UserHasPermissionsType): TabType[] {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
     { id: "2", label: "Biography", icon: IconEnum.biography },
@@ -390,7 +390,7 @@ function getTabs(permissions: UserHasPermissionsType): TabType[] {
   if (permissions?.read_character_fields_templates) {
     tabs.push({ id: "5", label: "Additional fields", icon: IconEnum.additional_fields });
   }
-  if (permissions?.is_owner) {
+  if (permissions?.is_owner || !id) {
     tabs.push({ id: "6", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
@@ -433,7 +433,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     ["read_characters", "create_characters", "update_characters", "read_tags", "read_character_fields_templates"],
     existingCharacter?.data?.owner_id,
   );
-  const tabs = getTabs(permissions);
+  const tabs = getTabs(permissions, data?.id);
   const [character, setCharacter] = useState<CharacterType | null>(null);
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
@@ -850,7 +850,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
         />
       ) : null}
-      {tabs[selectedTab].id === "6" && permissions?.is_owner ? (
+      {tabs[selectedTab].id === "6" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={character?.permissions || []}

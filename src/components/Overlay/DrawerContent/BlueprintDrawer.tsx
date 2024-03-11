@@ -45,13 +45,13 @@ function isSaveDisabled(blueprint: BlueprintStateType) {
   return false;
 }
 
-function getTabs(permissions: UserHasPermissionsType) {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
     { id: "2", label: "Fields", icon: IconEnum.additional_fields },
   ];
 
-  if (permissions?.is_owner) {
+  if (permissions?.is_owner || !id) {
     tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
@@ -297,7 +297,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     permissions?.is_owner,
     data?.id,
   );
-  const tabs = getTabs(permissions);
+  const tabs = getTabs(permissions, data?.id);
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
     title: "",
     project_id: project_id as string,
@@ -519,7 +519,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
         </>
       ) : null}
 
-      {tabs[selectedTab].id === "3" && permissions.is_owner ? (
+      {tabs[selectedTab].id === "3" && (permissions.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={blueprint?.permissions || []}

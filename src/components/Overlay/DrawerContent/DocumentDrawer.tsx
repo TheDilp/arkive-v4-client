@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -50,13 +50,13 @@ type documentRelationsType = {
   alter_names?: { title: string }[];
 };
 
-function getTabs(permissions: UserHasPermissionsType) {
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 
   if (permissions?.read_tags) {
     tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
   }
-  if (permissions?.is_owner) {
+  if (permissions?.is_owner || !id) {
     tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
@@ -105,7 +105,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   }>("documents", project_id as string);
 
   const [alterNameInput, setAlterNameInput] = useState("");
-  const tabs = useMemo(() => getTabs(permissions), [permissions]);
+  const tabs = getTabs(permissions, data?.id);
   const currentAlterNames = document?.alter_names?.map((alter_name) => alter_name.title);
 
   const { changedData, handleChange } = useHandleChange({ data: document, setData: setDocument });
@@ -243,7 +243,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       {tabs[selectedTab].id === "2" && permissions?.read_tags ? (
         <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} isMultiple tags={document?.tags || []} />
       ) : null}
-      {tabs[selectedTab].id === "3" && permissions.is_owner ? (
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
           permissions={document?.permissions || []}
