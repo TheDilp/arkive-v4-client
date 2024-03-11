@@ -13,10 +13,20 @@ type Props = {
   id: string;
   fieldType: "characters_single" | "characters_multiple";
   isCollapsible?: boolean;
+  isDisabled?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
 
-export function TemplateCharacterField({ title, name, handleChange, id, fieldType, currentValue, isCollapsible }: Props) {
+export function TemplateCharacterField({
+  title,
+  name,
+  handleChange,
+  id,
+  fieldType,
+  currentValue,
+  isCollapsible,
+  isDisabled,
+}: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
@@ -24,6 +34,7 @@ export function TemplateCharacterField({ title, name, handleChange, id, fieldTyp
       <div className="flex h-56 max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           isAutocomplete
+          isDisabled={isDisabled}
           isMultiple
           name={name}
           onChange={({ value, label, image }) => {
