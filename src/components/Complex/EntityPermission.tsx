@@ -9,7 +9,7 @@ import {
   HandleChangePropsType,
   RoleType,
 } from "../../types";
-import { getSingularEntityType, IconEnum, isProjectOwnerAtom, membersAtom, permissionsAtom } from "../../utils";
+import { getSingularEntityType, IconEnum, isProjectOwnerAtom, membersAtom, permissionsAtom, userAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
 import { Icon } from "../Misc";
@@ -26,6 +26,7 @@ type Props = {
 export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, type }: Props) {
   const { project_id } = useParams();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const user = useAtomValue(userAtom);
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id"], relations: { permissions: true } },
     "roles",
@@ -85,41 +86,49 @@ export function EntityPermission({ related_id, permissions, handleChange, select
 
       <Collapsible icon={IconEnum.user} initialOpen label="Member access">
         <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto px-2">
-          {members.map((member) => (
-            <li key={member.id} className="flex flex-col">
-              <Title isDrawerTitle label={member.email} size="lg" />
-              <div className="grid grid-cols-4">
-                {availablePermissions.map((p) => (
-                  <div key={p.id} className="flex flex-col items-center">
-                    <span>{p.title.split(" ").at(0) || ""}</span>
-                    <Checkbox
-                      name="permissions"
-                      onChange={(e) => {
-                        if (e.value && !permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)) {
-                          handleChange({
-                            name: "permissions",
-                            value: permissions.concat({ related_id, permission_id: p.id, user_id: member.id, role_id: null }),
-                          });
-                        }
-                        if (!e.value && permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)) {
-                          handleChange({
-                            name: "permissions",
-                            value: permissions.filter((perm) => {
-                              if (perm.user_id === member.id) {
-                                return p.id !== perm.permission_id;
-                              }
-                              return true;
-                            }),
-                          });
-                        }
-                      }}
-                      value={permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </li>
-          ))}
+          {members
+            .filter((member) => member.id !== user?.id)
+            .map((member) => (
+              <li key={member.id} className="flex flex-col">
+                <Title isDrawerTitle label={member.email} size="lg" />
+                <div className="grid grid-cols-4">
+                  {availablePermissions.map((p) => (
+                    <div key={p.id} className="flex flex-col items-center">
+                      <span>{p.title.split(" ").at(0) || ""}</span>
+                      <Checkbox
+                        name="permissions"
+                        onChange={(e) => {
+                          if (
+                            e.value &&
+                            !permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)
+                          ) {
+                            handleChange({
+                              name: "permissions",
+                              value: permissions.concat({ related_id, permission_id: p.id, user_id: member.id, role_id: null }),
+                            });
+                          }
+                          if (
+                            !e.value &&
+                            permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)
+                          ) {
+                            handleChange({
+                              name: "permissions",
+                              value: permissions.filter((perm) => {
+                                if (perm.user_id === member.id) {
+                                  return p.id !== perm.permission_id;
+                                }
+                                return true;
+                              }),
+                            });
+                          }
+                        }}
+                        value={permissions.some((perm) => perm.permission_id === p.id && perm.user_id === member.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
         </ul>
       </Collapsible>
     </div>
