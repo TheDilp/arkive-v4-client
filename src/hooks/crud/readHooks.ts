@@ -51,7 +51,7 @@ export function useGetProjectDashboard(project_id: string, options?: UseQueryOpt
 }
 
 export function useGetUser(
-  request: RequestBodyType<UserType> & { data: { auth_id?: string; project_id: string | undefined } },
+  request: RequestBodyType<UserType> & { data: { auth_id: string; project_id?: string | undefined } },
   options?: UseQueryOptions,
 ) {
   return useQuery<{ data: UserType }>(
@@ -60,7 +60,7 @@ export function useGetUser(
       FetchFunction({
         method: "POST",
         body: JSON.stringify(request),
-        url: `${baseURLS.baseServer}/users/${request.data.project_id}/${request.data.auth_id}`,
+        url: `${baseURLS.baseServer}/users/${request.data.auth_id}`,
       }),
     {
       enabled: options?.enabled,

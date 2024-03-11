@@ -89,7 +89,7 @@ export function ProjectsView() {
 
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id },
+      data: { auth_id: user?.id as string },
       relations: {
         webhooks: true,
       },
