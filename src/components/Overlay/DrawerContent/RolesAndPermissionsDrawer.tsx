@@ -16,7 +16,7 @@ import {
 import { InsertRoleSchema, UpdateRoleSchema } from "../../../validation";
 import { Button, Checkbox, Input } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
-import { Skeleton } from "../../Misc";
+import { Alert, Skeleton } from "../../Misc";
 
 export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
@@ -63,7 +63,10 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
   return (
     <DrawerLayout>
       <Input label="Role title" name="title" onChange={handleChange} placeholder="New project" value={role?.title || ""} />
-
+      <Alert
+        label="The role will grant a user permission for a group of entities in general. They will be able to view, update and delete only entities they've created - otherwise, they must be granted explcit permissions by the project's or entity's owner."
+        variant="info-bordered"
+      />
       {formattedPermissions.map((permission) => (
         <Collapsible key={permission.title} label={capitalizeFirstLetter(getSentenceCase(permission.title))}>
           <div className="grid grid-cols-2 gap-2 p-2 text-center">
