@@ -1,4 +1,4 @@
-import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
+import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
@@ -24,18 +24,27 @@ import {
   useDeleteMany,
   useGetEntities,
   useGetEntity,
+  useHasPermissions,
   useTable,
   useUpdateEntity,
   useUpdateManyPublic,
 } from "../../hooks";
 import {
   AvailableEntityType,
+  AvailableSubEntityType,
   BaseEntityType,
+  DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
   DrawerContentCreateNewType,
   EntitiesWithFolders,
+  PermissionCodeType,
+  TableDispatch,
+  TableSelectedAction,
+  TableSelectionType,
   TagType,
+  UpdatePublicManyType,
+  UserHasPermissionsType,
   WebhookType,
 } from "../../types";
 import {
@@ -52,6 +61,7 @@ import {
   getEntityFields,
   getImageURL,
   getNavbarEntityType,
+  getPermissionsForTypeView,
   getPluralEntityType,
   getSingularEntityType,
   IconEnum,
@@ -103,17 +113,7 @@ function columns(
   project_id: string,
   is_document_template: boolean,
   webhooks: WebhookType[],
-  updatePublic: UseMutateAsyncFunction<
-    any,
-    unknown,
-    {
-      data: {
-        ids: string[];
-        is_public: boolean;
-      };
-    },
-    unknown
-  >,
+  updatePublicMany: UpdatePublicManyType,
   show_image?: boolean,
 ) {
   return [
@@ -169,7 +169,7 @@ function columns(
             icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
             isIconOnly
             onClick={async () => {
-              await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+              await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
             }}
           />
         ),
@@ -401,6 +401,179 @@ function EntityItem({
   );
 }
 
+function getSelectedActions(
+  permissions: UserHasPermissionsType,
+  {
+    selection,
+    updatePublicMany,
+    resetDialogAtom,
+    deleteMany,
+    dispatch,
+    data,
+    setDrawer,
+    setDialog,
+    type,
+  }: {
+    updatePublicMany: UpdatePublicManyType;
+    deleteMany: DeleteManyType;
+    selection: TableSelectionType | undefined;
+    setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+    setDialog: Dispatch<SetStateAction<DialogAtomType>>;
+    resetDialogAtom: () => unknown;
+    data: any[];
+    dispatch: TableDispatch;
+    type: AvailableEntityType | AvailableSubEntityType;
+  },
+) {
+  const selectedActions: TableSelectedAction[] = [];
+  if (permissions?.[`update_${type}` as PermissionCodeType]) {
+    selectedActions.push(
+      ...(PublicEntities.includes(type as AvailableEntityType)
+        ? [
+            {
+              icon: IconEnum.eye,
+              hasNoBackground: true,
+              isIconOnly: true,
+              tooltip: "Set public",
+              onClick: async () => {
+                const ids = Object.values(selection || {}).flatMap((id) => id);
+                const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
+                if (entitesNotFolders.length) {
+                  await updatePublicMany({ data: { ids, is_public: true } });
+                  dispatch({ type: "clearSelection" });
+                }
+              },
+            },
+            {
+              icon: IconEnum.eye_slash,
+              hasNoBackground: true,
+              isIconOnly: true,
+              tooltip: "Set private",
+              onClick: async () => {
+                const ids = Object.values(selection || {}).flatMap((id) => id);
+                const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
+                if (entitesNotFolders.length) {
+                  await updatePublicMany({ data: { ids, is_public: false } });
+                  dispatch({ type: "clearSelection" });
+                }
+              },
+            },
+          ]
+        : []),
+
+      {
+        icon: IconEnum.folder,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Move to folder",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const items = (data || [])?.filter((e) => ids.includes(e.id)).map((e) => ({ id: e.id, title: e.title }));
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Bulk move to folder",
+            type: "bulk_folder",
+            data: { items, dispatch, type: type as EntitiesWithFolders },
+          }));
+        },
+      },
+      ...(EntitiesWithTags.includes(type as AvailableEntityType)
+        ? [
+            {
+              icon: IconEnum.tags,
+              hasNoBackground: true,
+              isIconOnly: true,
+              tooltip: "Add/remove tags",
+              onClick: () => {
+                if (EntitiesWithTags.includes(type as AvailableEntityType)) {
+                  const ids = Object.values(selection || {}).flatMap((id) => id);
+                  const charactersWithTags = (data || [])
+                    ?.filter((e) => ids.includes(e.id))
+                    .map((e) => ({
+                      id: e.id,
+                      tags: "tags" in e ? ((e.tags as TagType[]) || []).map((t) => t.id) : [],
+                    }));
+
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: "Bulk edit tags",
+                    type: "bulk_tags",
+                    data: { items: charactersWithTags, dispatch, type: type as AvailableEntityType },
+                  }));
+                }
+              },
+            },
+          ]
+        : []),
+    );
+  }
+  if (permissions?.is_owner) {
+    selectedActions.push({
+      icon: IconEnum.permissions,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Change access",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+
+        setDrawer((prev) => ({
+          ...prev,
+          size: "lg",
+          title: "Edit access",
+          type: "bulk_access",
+          data: {
+            ids,
+            selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+            type: "characters",
+          },
+        }));
+      },
+    });
+  }
+  if (permissions?.[`delete_${type}` as PermissionCodeType]) {
+    selectedActions.push({
+      icon: IconEnum.trash,
+      variant: "error",
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Delete selected rows.",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Delete many",
+            description: `Are you sure you want to delete ${ids.length} ${getPluralEntityType(type as AvailableEntityType)}?`,
+            warning: "This action cannot be undone.",
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: "Delete",
+              icon: IconEnum.trash,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    });
+  }
+
+  return selectedActions;
+}
+
 export function FolderView() {
   const { project_id, type, item_id } = useParams();
   const { pathname } = useLocation();
@@ -408,6 +581,12 @@ export function FolderView() {
   const user = useAtomValue(userAtom);
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const isFolder = pathname.includes("/folder/");
+
+  const permissions = useHasPermissions(
+    getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
+    undefined,
+  );
+
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection, pagination }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
@@ -503,7 +682,7 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     },
   );
-  const { mutateAsync } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
 
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
   const setDrawer = useSetAtom(drawerAtom);
@@ -511,6 +690,18 @@ export function FolderView() {
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
 
   const resetDialogAtom = useResetAtom(dialogAtom);
+
+  const selectedActions = getSelectedActions(permissions, {
+    selection,
+    setDialog,
+    setDrawer,
+    deleteMany,
+    resetDialogAtom,
+    updatePublicMany,
+    type: type as AvailableEntityType | AvailableSubEntityType,
+    dispatch,
+    data: base?.data || [],
+  });
 
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
@@ -552,6 +743,7 @@ export function FolderView() {
                   <div className="w-10">
                     <Button
                       icon={IconEnum.graph}
+                      isDisabled={!permissions?.read_documents}
                       isIconOnly
                       onClick={() =>
                         setDrawer((prev) => ({
@@ -567,6 +759,7 @@ export function FolderView() {
                   </div>
                   <div className="w-32">
                     <Select
+                      isDisabled={!permissions?.read_documents}
                       name="documentType"
                       onChange={({ value }) => {
                         setDocumentType(value as "documents" | "templates");
@@ -598,6 +791,7 @@ export function FolderView() {
                 <div className="w-fit max-w-[208px] lg:w-52">
                   <Button
                     icon={IconEnum.edit}
+                    isDisabled={!permissions?.[`read_${type}` as PermissionCodeType]}
                     label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
                     onClick={() => {
                       setDrawer((prev) => ({
@@ -614,6 +808,7 @@ export function FolderView() {
               <div className="w-fit lg:w-52">
                 <Dropdown
                   allowedPlacements={["bottom-end"]}
+                  isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
                   items={[
                     {
                       id: "1",
@@ -668,6 +863,7 @@ export function FolderView() {
                   <div className="w-fit lg:w-52">
                     <Button
                       icon={IconEnum.add}
+                      isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
                       label={`Create new ${entityName}`}
                       onClick={undefined}
                       tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
@@ -704,6 +900,7 @@ export function FolderView() {
                       id: "1",
                       title: `Edit ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.edit,
+                      isDisabled: !permissions?.[`update_${type}` as PermissionCodeType],
                       onClick: () => {
                         if (item?.is_folder)
                           setDrawer((prev) => ({
@@ -728,6 +925,7 @@ export function FolderView() {
 
                       title: `Delete ${item.is_folder ? "folder" : entityName}`,
                       icon: IconEnum.trash,
+                      isDisabled: !permissions?.[`delete_${type}` as PermissionCodeType],
                       onClick: () =>
                         setDialog((prev) => ({
                           ...prev,
@@ -765,6 +963,8 @@ export function FolderView() {
                         id: "1",
                         title: `Edit ${item.is_folder ? "folder" : entityName}`,
                         icon: IconEnum.edit,
+                        isDisabled: !permissions?.[`update_${type}` as PermissionCodeType],
+
                         onClick: () => {
                           if (item?.is_folder)
                             setDrawer((prev) => ({
@@ -788,6 +988,8 @@ export function FolderView() {
                         id: "2",
                         title: `Delete ${entityName}`,
                         icon: IconEnum.trash,
+                        isDisabled: !permissions?.[`delete_${type}` as PermissionCodeType],
+
                         onClick: () =>
                           setDialog((prev) => ({
                             ...prev,
@@ -828,128 +1030,11 @@ export function FolderView() {
               project_id as string,
               documentType === "templates" && type === "documents",
               user?.webhooks || [],
-              mutateAsync,
+              updatePublicMany,
               show_image_table_view,
             )}
             config={{
-              selectedActions: [
-                ...(PublicEntities.includes(type as AvailableEntityType)
-                  ? [
-                      {
-                        icon: IconEnum.eye,
-                        hasNoBackground: true,
-                        isIconOnly: true,
-                        tooltip: "Set public",
-                        onClick: async () => {
-                          const ids = Object.values(selection || {}).flatMap((id) => id);
-                          const entitesNotFolders = (base?.data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
-                          if (entitesNotFolders.length) {
-                            await mutateAsync({ data: { ids, is_public: true } });
-                            dispatch({ type: "clearSelection" });
-                          }
-                        },
-                      },
-                      {
-                        icon: IconEnum.eye_slash,
-                        hasNoBackground: true,
-                        isIconOnly: true,
-                        tooltip: "Set private",
-                        onClick: async () => {
-                          const ids = Object.values(selection || {}).flatMap((id) => id);
-                          const entitesNotFolders = (base?.data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
-                          if (entitesNotFolders.length) {
-                            await mutateAsync({ data: { ids, is_public: false } });
-                            dispatch({ type: "clearSelection" });
-                          }
-                        },
-                      },
-                    ]
-                  : []),
-                ...(EntitiesWithTags.includes(type as AvailableEntityType)
-                  ? [
-                      {
-                        icon: IconEnum.folder,
-                        hasNoBackground: true,
-                        isIconOnly: true,
-                        tooltip: "Move to folder",
-                        onClick: () => {
-                          const ids = Object.values(selection || {}).flatMap((id) => id);
-                          const items = (base?.data || [])
-                            ?.filter((e) => ids.includes(e.id))
-                            .map((e) => ({ id: e.id, title: e.title }));
-                          setDrawer((prev) => ({
-                            ...prev,
-                            size: "lg",
-                            title: "Bulk move to folder",
-                            type: "bulk_folder",
-                            data: { items, dispatch, type: type as EntitiesWithFolders },
-                          }));
-                        },
-                      },
-                    ]
-                  : []),
-                {
-                  icon: IconEnum.tags,
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Add/remove tags",
-                  onClick: () => {
-                    if (EntitiesWithTags.includes(type as AvailableEntityType)) {
-                      const ids = Object.values(selection || {}).flatMap((id) => id);
-                      const charactersWithTags = (base?.data || [])
-                        ?.filter((e) => ids.includes(e.id))
-                        .map((e) => ({ id: e.id, tags: "tags" in e ? ((e.tags as TagType[]) || []).map((t) => t.id) : [] }));
-
-                      setDrawer((prev) => ({
-                        ...prev,
-                        size: "lg",
-                        title: "Bulk edit tags",
-                        type: "bulk_tags",
-                        data: { items: charactersWithTags, dispatch, type: type as AvailableEntityType },
-                      }));
-                    }
-                  },
-                },
-
-                {
-                  icon: IconEnum.trash,
-                  variant: "error",
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Delete selected rows.",
-                  onClick: () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    if (ids.length) {
-                      setDialog((prev) => ({
-                        ...prev,
-                        title: "Delete many",
-                        description: `Are you sure you want to delete ${ids.length} ${getPluralEntityType(
-                          type as AvailableEntityType,
-                        )}?`,
-                        warning: "This action cannot be undone.",
-                        isOverlay: true,
-                        cancel: {
-                          label: "Cancel",
-                          variant: "primary",
-                          action: resetDialogAtom,
-                        },
-                        confirm: {
-                          label: "Delete",
-                          icon: IconEnum.trash,
-                          action: async () =>
-                            deleteMany(
-                              { data: { ids } },
-                              {
-                                onSuccess: () => dispatch({ type: "clearSelection" }),
-                              },
-                            ),
-                          variant: "error",
-                        },
-                      }));
-                    }
-                  },
-                },
-              ],
+              selectedActions,
               hasSelect: true,
               hasTags: EntitiesWithTags.includes(type as string),
               selection,

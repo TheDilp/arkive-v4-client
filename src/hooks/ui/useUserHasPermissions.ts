@@ -1,10 +1,12 @@
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { PermissionCodeType, UserHasPermissionsType } from "../../types";
 import { currentUserPermissions, isProjectOwnerAtom, userAtom } from "../../utils";
 
 export function useHasPermissions(requiredPermissions: PermissionCodeType[], owner_id: string | undefined) {
+  const { type } = useParams();
   const [permissions, setPermissions] = useState<UserHasPermissionsType>({});
 
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
@@ -20,6 +22,6 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
       }
       setPermissions(finalPermissions);
     }
-  }, [owner_id, user]);
+  }, [owner_id, user, type]);
   return permissions;
 }
