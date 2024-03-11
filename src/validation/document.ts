@@ -15,7 +15,6 @@ export const InsertDocumentSchema = z.object({
     parent_id: z.string().nullable().optional(),
     image_id: z.string().nullable().optional(),
     dice_color: z.string().nullable().optional(),
-    owner_id: z.string(),
   }),
   relations: z
     .object({

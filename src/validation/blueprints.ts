@@ -32,7 +32,6 @@ export const InsertBlueprintSchema = z.object({
     title: z.string(),
     title_name: z.string(),
     icon: z.string().optional().nullable(),
-    owner_id: z.string(),
   }),
   relations: z.object({
     blueprint_fields: z
