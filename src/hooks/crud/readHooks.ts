@@ -9,7 +9,15 @@ import {
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
-import { baseURLS, FetchFunction, getPluralEntityType, getSearchURL, IconEnum, useNotifications } from "../../utils";
+import {
+  baseURLS,
+  FetchFunction,
+  getPluralEntityType,
+  getSearchURL,
+  getSingularEntityType,
+  IconEnum,
+  useNotifications,
+} from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
   return useQuery<{ data: ProjectType[] }>(
@@ -86,7 +94,7 @@ export function useGetEntity<EntityType>(
       });
       if (!data?.role_access) {
         createNotification({
-          title: `Your current role in this project does not have permission to view ${getPluralEntityType(type)}.`,
+          title: `Your current role in this project does not have permission to view this ${getSingularEntityType(type)}.`,
           timer: 5,
           hasNoTruncate: true,
           variant: "error",

@@ -24,6 +24,7 @@ import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
   checkIfYearCorrect,
+  createOrEditPermission,
   drawerAtom,
   getDifferenceForBlueprintInstance,
   getFieldValueFromType,
@@ -91,10 +92,12 @@ function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_field
 function FieldTemplateRows({
   blueprint_fields = [],
   blueprint_fields_data = [],
+  isDisabled,
   handleChange,
 }: {
   blueprint_fields?: BlueprintFieldType[] | undefined;
   blueprint_fields_data: BlueprintInstanceBlueprintFieldType[];
+  isDisabled?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
   return (
@@ -117,6 +120,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -133,6 +137,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -149,6 +154,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -164,6 +170,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -180,6 +187,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -196,6 +204,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -212,6 +221,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -230,6 +240,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -248,6 +259,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -265,6 +277,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -282,6 +295,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -299,6 +313,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -316,6 +331,7 @@ function FieldTemplateRows({
                 handleChange={handleChange}
                 id={template_field.id}
                 isCollapsible
+                isDisabled={isDisabled}
                 name={baseName}
                 title={template_field.title}
               />
@@ -380,6 +396,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         blueprint_fields: true,
         tags: true,
       },
+      permissions: true,
     },
     { enabled: !!data?.id && !!blueprint?.data, queryKeyConcat: ["drawer"] },
   );
@@ -398,7 +415,16 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       });
     }
   }, [existingInstance?.data]);
-  const permissions = useHasPermissions(["create_blueprint_instances", "update_blueprint_instances", "read_tags"], data?.id);
+  const permissions = useHasPermissions(
+    ["create_blueprint_instances", "update_blueprint_instances", "read_tags"],
+    existingInstance?.data?.owner_id,
+  );
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_blueprint_instances,
+    permissions?.update_blueprint_instances,
+    permissions?.is_owner,
+    data?.id,
+  );
   const tabs = getTabs(permissions);
 
   if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
@@ -411,6 +437,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
           <div>
             <Input
+              isDisabled={!canCreateOrEdit}
               label={`${blueprint?.data?.title_name} (required)`}
               name="title"
               onChange={handleChange}
@@ -420,7 +447,12 @@ export function BlueprintInstanceDrawer({ data }: Props) {
 
           <div className="mt-2 flex w-full items-center justify-between">
             <span>Is public:</span>
-            <Checkbox name="is_public" onChange={handleChange} value={instance?.is_public ?? false} />
+            <Checkbox
+              isDisabled={!canCreateOrEdit}
+              name="is_public"
+              onChange={handleChange}
+              value={instance?.is_public ?? false}
+            />
           </div>
         </ul>
       ) : null}
@@ -429,20 +461,21 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           blueprint_fields={blueprint.data.blueprint_fields}
           blueprint_fields_data={instance.blueprint_fields}
           handleChange={handleChange}
+          isDisabled={!canCreateOrEdit}
         />
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div>
-          <TagInput handleChange={handleChange} tags={instance?.tags || []} />
+          <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} tags={instance?.tags || []} />
         </div>
       ) : null}
 
       {tabs[selectedTab].id === "4" ? (
         <EntityPermission
           handleChange={handleChange}
-          permissions={existingInstance?.data?.permissions || []}
-          related_id={existingInstance?.data?.id || null}
-          selectablePermissions={["read_blueprint_instanes", "update_blueprint_instances", "delete_blueprint_instances"]}
+          permissions={instance?.permissions || []}
+          related_id={instance?.id || null}
+          selectablePermissions={["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"]}
           type="blueprint_instances"
         />
       ) : null}
@@ -451,7 +484,11 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         <Button
           icon={instance?.id ? IconEnum.save : IconEnum.add}
           isDisabled={
-            !instance?.title || isSaveDisabled(instance?.blueprint_fields || [], blueprint?.data) || isCreating || isUpdating
+            !instance?.title ||
+            isSaveDisabled(instance?.blueprint_fields || [], blueprint?.data) ||
+            isCreating ||
+            isUpdating ||
+            !canCreateOrEdit
           }
           isLoading={isCreating || isUpdating}
           label={instance?.id ? "Update" : "Create"}
@@ -469,7 +506,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: getDifferenceForBlueprintInstance(existingInstance?.data, instance),
                   },
-                  permissions: existingInstance?.data?.permissions,
+                  permissions: instance?.permissions,
                 };
 
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
@@ -489,7 +526,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
                     blueprint_fields: instance?.blueprint_fields,
                   },
-                  permissions: existingInstance?.data?.permissions,
+                  permissions: instance?.permissions,
                 };
                 const parsedData = InsertBlueprintInstanceSchema.parse(dataToParse);
 
