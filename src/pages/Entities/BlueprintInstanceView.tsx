@@ -2,7 +2,7 @@ import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
-import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Avatar,
@@ -15,7 +15,15 @@ import {
   TablePageLayout,
   Tooltip,
 } from "../../components";
-import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable, useUpdateManyPublic } from "../../hooks";
+import {
+  useChangeNavbarTitle,
+  useDeleteMany,
+  useGetEntities,
+  useGetEntity,
+  useHasPermissions,
+  useTable,
+  useUpdateManyPublic,
+} from "../../hooks";
 import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
@@ -207,7 +215,6 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
-  navigate: NavigateFunction,
   updatePublicMany: UseMutateAsyncFunction<
     any,
     unknown,
@@ -220,6 +227,8 @@ function createColumns(
     unknown
   >,
   webhooks: WebhookType[],
+  can_update_bpi: boolean | undefined,
+  can_delete_bpi: boolean | undefined,
 ) {
   const fieldColumns = [
     columnHelper.accessor("title", {
@@ -429,6 +438,7 @@ function createColumns(
                 id: "1",
                 title: "Edit instance",
                 icon: IconEnum.edit,
+                isDisabled: !can_update_bpi,
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -468,6 +478,7 @@ function createColumns(
                 id: "delete_instance",
                 title: "Delete instance",
                 icon: IconEnum.trash,
+                isDisabled: !can_delete_bpi,
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -498,8 +509,8 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
+  const permissions = useHasPermissions(["update_blueprint_instances", "delete_blueprint_instances"], undefined);
   const createNotification = useNotifications();
-  const navigate = useNavigate();
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
@@ -518,7 +529,6 @@ export function BlueprintInstanceView() {
     fields: ["id", "title", "title_name"],
   });
   useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
-
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("blueprint_instances", project_id as string);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", project_id);
 
@@ -556,9 +566,10 @@ export function BlueprintInstanceView() {
               setDrawer,
               setDialog,
               createNotification,
-              navigate,
               updatePublicMany,
               user?.webhooks || [],
+              permissions?.update_blueprint_instances,
+              permissions?.delete_blueprint_instances,
             )}
             config={{
               hasSelect: true,

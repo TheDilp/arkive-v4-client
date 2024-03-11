@@ -2,8 +2,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph } from "../../components";
+import { useHasPermissions } from "../../hooks";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
-import { drawerAtom, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
+import { drawerAtom, getPermissionsForTypeView, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
 import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
@@ -15,6 +16,7 @@ export function EntitiesView() {
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const setDrawer = useSetAtom(drawerAtom);
   const navbarTitle = useAtomValue(navbarTitleAtom);
+  const permissions = useHasPermissions(getPermissionsForTypeView("blueprint_instances"), undefined);
 
   return (
     <div className="flex h-full flex-col gap-y-2">
@@ -26,6 +28,7 @@ export function EntitiesView() {
               <div className="w-52">
                 <Button
                   icon={IconEnum.edit}
+                  isDisabled={!permissions?.update_blueprints}
                   label={`Edit current ${entityName}`}
                   onClick={() => {
                     setDrawer((prev) => ({
@@ -42,7 +45,7 @@ export function EntitiesView() {
                 <div className="w-52">
                   <Button
                     icon={IconEnum.add}
-                    isDisabled={!navbarTitle}
+                    isDisabled={!navbarTitle || !permissions?.create_blueprint_instances}
                     isLoading={!navbarTitle}
                     label={navbarTitle ? `Create ${navbarTitle.split("|").at(-1)}` : ""}
                     onClick={() =>
