@@ -114,6 +114,7 @@ function columns(
   is_document_template: boolean,
   webhooks: WebhookType[],
   updatePublicMany: UpdatePublicManyType,
+  permissions: UserHasPermissionsType,
   show_image?: boolean,
 ) {
   return [
@@ -199,6 +200,7 @@ function columns(
             id: "1",
             title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
             icon: IconEnum.edit,
+            isDisabled: !permissions[`update_${entityType}` as PermissionCodeType],
             onClick: () => {
               setDrawer((prev) =>
                 row.original.is_folder
@@ -225,6 +227,7 @@ function columns(
             id: "mentioned_in",
             title: "Mentioned in",
             icon: IconEnum.graph,
+            isDisabled: !permissions?.read_documents,
             onClick: () => {
               setDrawer((prev) => ({
                 ...prev,
@@ -270,6 +273,7 @@ function columns(
             id: "create_from_template",
             title: "Create document from template",
             icon: IconEnum.document_template,
+            isDisabled: !permissions?.read_documents,
             onClick: () =>
               setDrawer((prev) => ({
                 ...prev,
@@ -280,21 +284,24 @@ function columns(
               })),
           });
         }
-        if (entityType === "dictionaries") {
-          actions.push({
-            id: "download_dictionary",
-            title: "Download PDF dictionary",
-            icon: IconEnum.pdf,
-            isDisabled: true,
-            // onClick: () => savePDF(row.original.title, row.original.id),
-          });
-        }
+        // if (entityType === "dictionaries") {
+        //   actions.push({
+        //     id: "download_dictionary",
+        //     isDisabled: permissions[`update_${type}` as PermissionCodeType],
+
+        //     title: "Download PDF dictionary",
+        //     icon: IconEnum.pdf,
+        //     isDisabled: true,
+        //     // onClick: () => savePDF(row.original.title, row.original.id),
+        //   });
+        // }
 
         // ALWAYS GOES LAST
         actions.push({
           id: "delete_entity",
           title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
           icon: IconEnum.trash,
+          isDisabled: !permissions[`delete_${entityType}` as PermissionCodeType],
           onClick: () => {
             setDialog((prev) => ({
               ...prev,
@@ -1031,6 +1038,7 @@ export function FolderView() {
               documentType === "templates" && type === "documents",
               user?.webhooks || [],
               updatePublicMany,
+              permissions,
               show_image_table_view,
             )}
             config={{
