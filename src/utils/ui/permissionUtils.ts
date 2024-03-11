@@ -13,6 +13,8 @@ export function createOrEditPermission(
 }
 
 export function getPermissionsForTypeView(type: AvailableEntityType | AvailableSubEntityType): PermissionCodeType[] {
+  if (type === "blueprints")
+    return ["create_blueprint_instances", "create_blueprints", "delete_blueprints", "update_blueprints"];
   if (type === "blueprint_instances") return ["create_blueprint_instances", "update_blueprint_instances", "update_blueprints"];
   return [];
 }
