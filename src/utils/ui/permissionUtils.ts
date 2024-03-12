@@ -36,10 +36,11 @@ export function getPermissionsForTypeView(type: AvailableEntityType | AvailableS
 
 export function hasActionPermission(
   isProjectOwner: boolean,
+  isEntityOwner: boolean,
   userPermissions: UserHasPermissionsType,
   entityPermissions: EntityPermissionType[],
   required_permission: PermissionCodeType,
 ) {
-  if (isProjectOwner) return true;
+  if (isProjectOwner || isEntityOwner) return true;
   return userPermissions?.[required_permission] && entityPermissions?.some((perm) => perm?.code === required_permission);
 }

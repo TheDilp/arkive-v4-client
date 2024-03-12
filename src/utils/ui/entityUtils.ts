@@ -64,7 +64,7 @@ export function getEntityLinkType(type: AvailableEntityType | AvailableSubEntity
 }
 
 export function getEntityFields(type: AvailableEntityType): string[] {
-  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id"];
+  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id", "owner_id"];
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
   if (
     type === "documents" ||

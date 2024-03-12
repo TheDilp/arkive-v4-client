@@ -65,7 +65,9 @@ import {
   getPermissionsForTypeView,
   getPluralEntityType,
   getSingularEntityType,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   PublicEntities,
   useNotifications,
   userAtom,
@@ -117,6 +119,8 @@ function columns(
   webhooks: WebhookType[],
   updatePublicMany: UpdatePublicManyType,
   permissions: UserHasPermissionsType,
+  isProjectOwner: boolean,
+  user_id: string,
   show_image?: boolean,
 ) {
   return [
@@ -202,7 +206,13 @@ function columns(
             id: "1",
             title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
             icon: IconEnum.edit,
-            isDisabled: !permissions[`update_${entityType}` as PermissionCodeType],
+            isDisabled: !hasActionPermission(
+              isProjectOwner,
+              user_id === row.original.owner_id,
+              permissions,
+              row.original?.permissions || [],
+              `update_${entityType}` as PermissionCodeType,
+            ),
             onClick: () => {
               setDrawer((prev) =>
                 row.original.is_folder
@@ -229,7 +239,13 @@ function columns(
             id: "mentioned_in",
             title: "Mentioned in",
             icon: IconEnum.graph,
-            isDisabled: !permissions?.read_documents,
+            isDisabled: !hasActionPermission(
+              isProjectOwner,
+              user_id === row.original.owner_id,
+              permissions,
+              row.original?.permissions || [],
+              "read_documents",
+            ),
             onClick: () => {
               setDrawer((prev) => ({
                 ...prev,
@@ -275,7 +291,13 @@ function columns(
             id: "create_from_template",
             title: "Create document from template",
             icon: IconEnum.document_template,
-            isDisabled: !permissions?.read_documents,
+            isDisabled: !hasActionPermission(
+              isProjectOwner,
+              user_id === row.original.owner_id,
+              permissions,
+              row.original?.permissions || [],
+              "create_documents",
+            ),
             onClick: () =>
               setDrawer((prev) => ({
                 ...prev,
@@ -303,7 +325,13 @@ function columns(
           id: "delete_entity",
           title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
           icon: IconEnum.trash,
-          isDisabled: !permissions[`delete_${entityType}` as PermissionCodeType],
+          isDisabled: !hasActionPermission(
+            isProjectOwner,
+            user_id === row.original.owner_id,
+            permissions,
+            row.original?.permissions || [],
+            "delete_documents",
+          ),
           onClick: () => {
             setDialog((prev) => ({
               ...prev,
@@ -589,6 +617,7 @@ export function FolderView() {
   const breakpoints = useBreakpoint();
   const user = useAtomValue(userAtom);
   const entityName = getSingularEntityType(type as AvailableEntityType);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const isFolder = pathname.includes("/folder/");
   const createNotification = useNotifications();
   const permissions = useHasPermissions(
@@ -1067,6 +1096,8 @@ export function FolderView() {
               user?.webhooks || [],
               updatePublicMany,
               permissions,
+              isProjectOwner,
+              user?.id as string,
               show_image_table_view,
             )}
             config={{
