@@ -524,8 +524,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           handleChange={handleChange}
           permissions={blueprint?.permissions || []}
           related_id={blueprint?.id || ""}
-          selectablePermissions={["read_documents", "update_documents", "delete_documents"]}
-          type="documents"
+          selectablePermissions={["read_blueprints", "update_blueprints", "delete_blueprints"]}
+          type="blueprints"
         />
       ) : null}
       <div className="mt-auto">
