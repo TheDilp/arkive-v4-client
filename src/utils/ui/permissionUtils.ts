@@ -41,6 +41,9 @@ export function hasActionPermission(
   entityPermissions: EntityPermissionType[],
   required_permission: PermissionCodeType,
 ) {
-  if (isProjectOwner || isEntityOwner) return true;
-  return userPermissions?.[required_permission] && entityPermissions?.some((perm) => perm?.code === required_permission);
+  if (isProjectOwner) return true;
+  return (
+    userPermissions?.[required_permission] &&
+    (isEntityOwner || entityPermissions?.some((perm) => perm?.code === required_permission))
+  );
 }
