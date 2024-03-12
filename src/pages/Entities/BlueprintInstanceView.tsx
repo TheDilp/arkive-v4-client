@@ -509,7 +509,10 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
-  const permissions = useHasPermissions(["update_blueprint_instances", "delete_blueprint_instances"], undefined);
+  const permissions = useHasPermissions(
+    ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
+    undefined,
+  );
   const createNotification = useNotifications();
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
     selection: {},

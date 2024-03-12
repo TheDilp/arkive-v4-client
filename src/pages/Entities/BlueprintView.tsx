@@ -202,7 +202,7 @@ export function BlueprintView() {
   const { isMd } = useBreakpoint();
   useChangeNavbarTitle("Blueprints");
   const permissions = useHasPermissions(
-    ["create_blueprints", "update_blueprints", "delete_blueprints", "create_blueprint_instances"],
+    ["create_blueprints", "read_blueprints", "update_blueprints", "delete_blueprints", "create_blueprint_instances"],
     undefined,
   );
   const setDrawer = useSetAtom(drawerAtom);

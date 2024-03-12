@@ -14,6 +14,7 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
   const userPermissions = useAtomValue(currentUserPermissions);
 
   useEffect(() => {
+    setPermissions({});
     if (user?.id) {
       const finalPermissions: UserHasPermissionsType = {};
       finalPermissions.is_owner = isProjectOwner || user?.id === owner_id;

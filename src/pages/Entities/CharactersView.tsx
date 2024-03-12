@@ -408,7 +408,10 @@ export function CharactersView() {
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
-  const permissions = useHasPermissions(["create_characters", "update_characters", "delete_characters"], undefined);
+  const permissions = useHasPermissions(
+    ["read_characters", "create_characters", "update_characters", "delete_characters"],
+    undefined,
+  );
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -431,7 +434,7 @@ export function CharactersView() {
     {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
-      enabled: view === "table",
+      enabled: view === "table" && !!permissions?.read_characters,
     },
   );
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
@@ -463,7 +466,7 @@ export function CharactersView() {
     },
     "characters",
     {
-      enabled: view === "card",
+      enabled: view === "card" && permissions?.read_characters,
       keepPreviousData: true,
       getNextPageParam: (_, allPages) => {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;

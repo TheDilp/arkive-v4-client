@@ -55,6 +55,7 @@ import {
   contextMenuAtom,
   dialogAtom,
   drawerAtom,
+  EntitiesWithFoldersEnum,
   EntitiesWithTags,
   FetchFunction,
   getDefaultEntityIcon,
@@ -66,6 +67,7 @@ import {
   getSingularEntityType,
   IconEnum,
   PublicEntities,
+  useNotifications,
   userAtom,
   userSettingsAtom,
 } from "../../utils";
@@ -588,7 +590,7 @@ export function FolderView() {
   const user = useAtomValue(userAtom);
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const isFolder = pathname.includes("/folder/");
-
+  const createNotification = useNotifications();
   const permissions = useHasPermissions(
     getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
     undefined,
@@ -664,7 +666,11 @@ export function FolderView() {
     },
     type as AvailableEntityType,
     {
-      enabled: (!item_id || isFolder) && !!type && !noFetchTypes.includes(type),
+      enabled:
+        (!item_id || isFolder) &&
+        !!type &&
+        !noFetchTypes.includes(type) &&
+        !!permissions?.[`read_${type}` as PermissionCodeType],
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -684,7 +690,12 @@ export function FolderView() {
       },
     },
     {
-      enabled: !!item_id && !!type && !noFetchTypes.includes(type) && isFolder,
+      enabled:
+        !!item_id &&
+        !!type &&
+        !noFetchTypes.includes(type) &&
+        isFolder &&
+        !!permissions?.[`read_${type}` as PermissionCodeType],
       staleTime: 5 * 60 * 1000,
       queryKeyConcat: [item_id as string],
     },
@@ -731,6 +742,23 @@ export function FolderView() {
   useEffect(() => {
     dispatch({ type: "clearSelection" });
   }, [item_id]);
+  useEffect(() => {
+    if (
+      EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&
+      Object.keys(permissions).length > 1 &&
+      !permissions?.[`read_${type}` as PermissionCodeType]
+    ) {
+      createNotification({
+        title: `Your current role in this project does not have permission to view ${getPluralEntityType(
+          type as AvailableEntityType,
+        )}.`,
+        timer: 5,
+        hasNoTruncate: true,
+        variant: "error",
+        icon: IconEnum.forbidden,
+      });
+    }
+  }, [permissions]);
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;

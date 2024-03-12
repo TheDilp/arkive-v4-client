@@ -18,10 +18,12 @@ export function getPermissionsForTypeView(type: AvailableEntityType | AvailableS
   if (type === "blueprint_instances")
     return ["create_blueprint_instances", "update_blueprint_instances", "update_blueprints", "delete_blueprint_instances"];
   if (type === "documents") return ["read_documents", "create_documents", "update_documents", "delete_documents"];
-  if (type === "maps") return ["create_maps", "update_maps", "delete_maps"];
-  if (type === "graphs") return ["create_graphs", "update_graphs", "delete_graphs"];
-  if (type === "calendars") return ["create_calendars", "update_calendars", "delete_calendars"];
-  if (type === "dictionaries") return ["create_dictionaries", "update_dictionaries", "delete_dictionaries"];
-  if (type === "random_tables") return ["create_random_tables", "update_random_tables", "delete_random_tables"];
+  if (type === "maps") return ["read_maps", "create_maps", "update_maps", "delete_maps"];
+  if (type === "graphs") return ["read_graphs", "create_graphs", "update_graphs", "delete_graphs"];
+  if (type === "calendars") return ["read_calendars", "create_calendars", "update_calendars", "delete_calendars"];
+  if (type === "dictionaries")
+    return ["read_dictionaries", "create_dictionaries", "update_dictionaries", "delete_dictionaries"];
+  if (type === "random_tables")
+    return ["read_random_tables", "create_random_tables", "update_random_tables", "delete_random_tables"];
   return [];
 }

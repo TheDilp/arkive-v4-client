@@ -100,6 +100,8 @@ export const MessageTypeOptions = [
 
 export const MentionableEntites = ["characters", "blueprint_instances", "documents", "maps", "graphs", "words"];
 
+export const EntitiesWithFoldersEnum = ["documents", "maps", "graphs", "calendars", "dictionaries", "random_tables"];
+
 export const PublicEntities = [
   "characters",
   "blueprint_instances",
