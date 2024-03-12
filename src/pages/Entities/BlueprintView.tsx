@@ -23,6 +23,7 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   TextFilters,
+  userAtom,
 } from "../../utils";
 
 const columnHelper = createColumnHelper<BlueprintType>();
@@ -32,6 +33,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
+  user_id: string,
 ) {
   return [
     columnHelper.display({
@@ -70,6 +72,7 @@ function createColumns(
                 icon: IconEnum.edit,
                 isDisabled: !hasActionPermission(
                   isProjectOwner,
+                  user_id === row.original.owner_id,
                   permissions,
                   row.original?.permissions || [],
                   "update_blueprints",
@@ -106,6 +109,7 @@ function createColumns(
                 icon: IconEnum.trash,
                 isDisabled: !hasActionPermission(
                   isProjectOwner,
+                  user_id === row.original.owner_id,
                   permissions,
                   row.original?.permissions || [],
                   "delete_blueprints",
@@ -225,9 +229,10 @@ export function BlueprintView() {
     undefined,
   );
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner);
+  const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
@@ -242,7 +247,7 @@ export function BlueprintView() {
       filters,
       orderBy,
       pagination,
-      fields: ["id", "title", "title_name", "icon"],
+      fields: ["id", "title", "title_name", "icon", "owner_id"],
       data: {
         project_id,
       },

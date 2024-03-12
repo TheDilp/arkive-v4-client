@@ -66,6 +66,7 @@ function createColumns(
   project_id: string,
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
+  user_id: string,
 ) {
   return [
     columnHelper.display({
@@ -174,6 +175,7 @@ function createColumns(
                 icon: IconEnum.edit,
                 isDisabled: !hasActionPermission(
                   isProjectOwner,
+                  user_id === row.original.owner_id,
                   permissions,
                   row.original?.permissions || [],
                   "update_characters",
@@ -194,6 +196,7 @@ function createColumns(
                 icon: IconEnum.family_tree,
                 isDisabled: !hasActionPermission(
                   isProjectOwner,
+                  user_id === row.original.owner_id,
                   permissions,
                   row.original?.permissions || [],
                   "read_characters",
@@ -242,6 +245,7 @@ function createColumns(
                 icon: IconEnum.trash,
                 isDisabled: !hasActionPermission(
                   isProjectOwner,
+                  user_id === row.original.owner_id,
                   permissions,
                   row.original?.permissions || [],
                   "delete_characters",
@@ -437,7 +441,7 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
-      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "is_public", "age"],
+      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "is_public", "age", "owner_id"],
       permissions: true,
     },
     "characters",
@@ -462,7 +466,7 @@ export function CharactersView() {
       relations: {
         portrait: true,
       },
-      fields: ["id", "full_name", "portrait_id", "is_favorite", "age"],
+      fields: ["id", "full_name", "portrait_id", "is_favorite", "age", "owner_id"],
       filters,
       pagination: {
         limit: 12,
@@ -631,6 +635,7 @@ export function CharactersView() {
               project_id as string,
               permissions,
               isProjectOwner,
+              user?.id as string,
             )}
             config={{
               hasSelect: true,
@@ -640,7 +645,6 @@ export function CharactersView() {
               filters,
               relationFilters,
               selection,
-
               getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/biography`,
               setFavorite: async (rowData: any) => {
                 await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
