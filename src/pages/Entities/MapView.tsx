@@ -4,7 +4,7 @@ import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { MapImage, Select } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntities, useGetEntity, useHasPermissions } from "../../hooks";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
 import { getImageURL } from "../../utils";
 
@@ -36,7 +36,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     "maps",
     {
       data: {},
-      fields: ["id", "image_id", "icon", "cluster_pins"],
+      fields: ["id", "image_id", "icon", "cluster_pins", "owner_id"],
       relations: { map_pins: true, map_layers: true },
     },
     {
@@ -44,7 +44,10 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
       isPublic,
     },
   );
+
   const currentMap = data || existingMap?.data;
+  const permissions = useHasPermissions(["read_maps", "update_maps"], currentMap?.owner_id);
+
   useChangeNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
 
   function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
@@ -108,7 +111,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
         </div>
       )}
       {isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && !isFetching && !!bounds ? (
+      {currentMap && !isFetching && !!bounds && permissions?.read_maps ? (
         <div className="min-h-full min-w-full">
           <MapContainer
             ref={(node) => {

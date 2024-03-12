@@ -1,4 +1,10 @@
-import { AvailableEntityType, AvailableSubEntityType, PermissionCodeType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  EntityPermissionType,
+  PermissionCodeType,
+  UserHasPermissionsType,
+} from "../../types";
 
 export function createOrEditPermission(
   create: boolean | undefined,
@@ -26,4 +32,14 @@ export function getPermissionsForTypeView(type: AvailableEntityType | AvailableS
   if (type === "random_tables")
     return ["read_random_tables", "create_random_tables", "update_random_tables", "delete_random_tables"];
   return [];
+}
+
+export function hasActionPermission(
+  isProjectOwner: boolean,
+  userPermissions: UserHasPermissionsType,
+  entityPermissions: EntityPermissionType[],
+  required_permission: PermissionCodeType,
+) {
+  if (isProjectOwner) return true;
+  return userPermissions?.[required_permission] && entityPermissions?.some((perm) => perm?.code === required_permission);
 }

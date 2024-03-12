@@ -1,7 +1,9 @@
 import { AvailableIcons } from "../../utils";
+import { PermissionCodeType } from "./permissionsTypes";
 
 export type EntityPermissionType = {
   related_id: string;
+  code: PermissionCodeType;
 } & (
   | {
       user_id: string;

@@ -1,4 +1,3 @@
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
@@ -48,7 +47,9 @@ import {
   getAvatarInitials,
   getCharacterFullName,
   getImageURL,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   NumberFilters,
   TextFilters,
   userAtom,
@@ -59,21 +60,12 @@ const columnHelper = createColumnHelper<CharacterType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
-  updatePublicMany: UseMutateAsyncFunction<
-    any,
-    unknown,
-    {
-      data: {
-        ids: string[];
-        is_public: boolean;
-      };
-    },
-    unknown
-  >,
+  updatePublicMany: UpdatePublicManyType,
   isMd: boolean,
   webhooks: WebhookType[],
   project_id: string,
   permissions: UserHasPermissionsType,
+  isProjectOwner: boolean,
 ) {
   return [
     columnHelper.display({
@@ -180,7 +172,12 @@ function createColumns(
                 id: "1",
                 title: "Edit character",
                 icon: IconEnum.edit,
-                isDisabled: !permissions?.update_characters,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_characters",
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -237,7 +234,12 @@ function createColumns(
                 id: "delete_character",
                 title: "Delete character",
                 icon: IconEnum.trash,
-                isDisabled: !permissions?.delete_characters,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_characters",
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -408,6 +410,7 @@ export function CharactersView() {
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["read_characters", "create_characters", "update_characters", "delete_characters"],
     undefined,
@@ -429,6 +432,7 @@ export function CharactersView() {
       relationFilters,
       pagination,
       fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "is_public", "age"],
+      permissions: true,
     },
     "characters",
     {
@@ -463,6 +467,7 @@ export function CharactersView() {
           sort: "asc",
         },
       ],
+      permissions: true,
     },
     "characters",
     {
@@ -619,6 +624,7 @@ export function CharactersView() {
               user?.webhooks || [],
               project_id as string,
               permissions,
+              isProjectOwner,
             )}
             config={{
               hasSelect: true,

@@ -428,7 +428,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       queryKeyConcat: ["drawer"],
     },
   );
-
   const permissions = useHasPermissions(
     ["read_characters", "create_characters", "update_characters", "read_tags", "read_character_fields_templates"],
     existingCharacter?.data?.owner_id,
