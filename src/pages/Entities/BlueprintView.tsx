@@ -1,4 +1,4 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
@@ -15,7 +15,15 @@ import {
   UserHasPermissionsType,
 } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
-import { dialogAtom, drawerAtom, getDefaultEntityIcon, IconEnum, TextFilters } from "../../utils";
+import {
+  dialogAtom,
+  drawerAtom,
+  getDefaultEntityIcon,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  TextFilters,
+} from "../../utils";
 
 const columnHelper = createColumnHelper<BlueprintType>();
 
@@ -23,6 +31,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   permissions: UserHasPermissionsType,
+  isProjectOwner: boolean,
 ) {
   return [
     columnHelper.display({
@@ -59,7 +68,12 @@ function createColumns(
                 id: "1",
                 title: "Edit blueprint",
                 icon: IconEnum.edit,
-                isDisabled: !permissions?.update_blueprints,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_blueprints",
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -90,7 +104,12 @@ function createColumns(
                 id: "3",
                 title: "Delete blueprint",
                 icon: IconEnum.trash,
-                isDisabled: !permissions?.delete_blueprints,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_blueprints",
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -205,9 +224,10 @@ export function BlueprintView() {
     ["create_blueprints", "read_blueprints", "update_blueprints", "delete_blueprints", "create_blueprint_instances"],
     undefined,
   );
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const columns = createColumns(setDrawer, setDialog, permissions);
+  const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
@@ -226,6 +246,7 @@ export function BlueprintView() {
       data: {
         project_id,
       },
+      permissions: true,
     },
     "blueprints",
   );
