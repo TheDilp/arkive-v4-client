@@ -30,6 +30,7 @@ import {
   DialogAtomType,
   DrawerAtomType,
   NotificationType,
+  UserHasPermissionsType,
   WebhookType,
 } from "../../types";
 import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
@@ -45,7 +46,9 @@ import {
   getBlueprintInstanceColumnWidth,
   getDayOrdinal,
   getImageURL,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   rollDiceWithNotification,
   TextFilters,
   useNotifications,
@@ -227,8 +230,10 @@ function createColumns(
     unknown
   >,
   webhooks: WebhookType[],
-  can_update_bpi: boolean | undefined,
-  can_delete_bpi: boolean | undefined,
+  permissions: UserHasPermissionsType,
+  isProjectOwner: boolean,
+  user_id: string,
+  user_role_id: string | undefined,
 ) {
   const fieldColumns = [
     columnHelper.accessor("title", {
@@ -438,7 +443,14 @@ function createColumns(
                 id: "1",
                 title: "Edit instance",
                 icon: IconEnum.edit,
-                isDisabled: !can_update_bpi,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_blueprint_instances",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -478,7 +490,14 @@ function createColumns(
                 id: "delete_instance",
                 title: "Delete instance",
                 icon: IconEnum.trash,
-                isDisabled: !can_delete_bpi,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_blueprint_instances",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -509,6 +528,7 @@ export function BlueprintInstanceView() {
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
     undefined,
@@ -571,8 +591,10 @@ export function BlueprintInstanceView() {
               createNotification,
               updatePublicMany,
               user?.webhooks || [],
-              permissions?.update_blueprint_instances,
-              permissions?.delete_blueprint_instances,
+              permissions,
+              isProjectOwner,
+              user?.id as string,
+              user?.role?.id,
             )}
             config={{
               hasSelect: true,

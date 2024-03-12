@@ -121,6 +121,7 @@ function columns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
+  user_role_id: string | undefined,
   show_image?: boolean,
 ) {
   return [
@@ -212,6 +213,7 @@ function columns(
               permissions,
               row.original?.permissions || [],
               `update_${entityType}` as PermissionCodeType,
+              user_role_id,
             ),
             onClick: () => {
               setDrawer((prev) =>
@@ -245,6 +247,7 @@ function columns(
               permissions,
               row.original?.permissions || [],
               "read_documents",
+              user_role_id,
             ),
             onClick: () => {
               setDrawer((prev) => ({
@@ -296,7 +299,8 @@ function columns(
               user_id === row.original.owner_id,
               permissions,
               row.original?.permissions || [],
-              "create_documents",
+              `create_${entityType}`,
+              user_role_id,
             ),
             onClick: () =>
               setDrawer((prev) => ({
@@ -330,7 +334,8 @@ function columns(
             user_id === row.original.owner_id,
             permissions,
             row.original?.permissions || [],
-            "delete_documents",
+            `delete_${entityType}`,
+            user_role_id,
           ),
           onClick: () => {
             setDialog((prev) => ({
@@ -677,6 +682,7 @@ export function FolderView() {
               ]
             : [],
       },
+      permissions: true,
       relations: {
         tags: EntitiesWithTags.includes(type as string),
       },
@@ -1009,72 +1015,7 @@ export function FolderView() {
               type={type as AvailableEntityType}
             />
           ))}
-          {(data?.data?.children?.length && isFolder ? data.data.children : []).map((item) => {
-            return (
-              <EntityItem
-                key={item.id}
-                changeParent={changeParent}
-                icon={item.icon}
-                id={item.id}
-                image_id={item?.image_id}
-                is_folder={item?.is_folder ?? false}
-                show_image={show_image_folder_view}
-                showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
-                  setContextMenuAtom({
-                    event,
-                    items: [
-                      {
-                        id: "1",
-                        title: `Edit ${item.is_folder ? "folder" : entityName}`,
-                        icon: IconEnum.edit,
-                        isDisabled: !permissions?.[`update_${type}` as PermissionCodeType],
 
-                        onClick: () => {
-                          if (item?.is_folder)
-                            setDrawer((prev) => ({
-                              ...prev,
-                              size: "sm",
-                              title: `Edit ${entityName} - ${item.title}`,
-                              type: "folder",
-                              data: { id, type: type as EntitiesWithFolders },
-                            }));
-                          else
-                            setDrawer((prev) => ({
-                              ...prev,
-                              size: "sm",
-                              title: `Edit ${entityName} - ${item.title}`,
-                              type: type as DrawerContentCreateNewType,
-                              data: { id, project_id: project_id as string },
-                            }));
-                        },
-                      },
-                      {
-                        id: "2",
-                        title: `Delete ${entityName}`,
-                        icon: IconEnum.trash,
-                        isDisabled: !permissions?.[`delete_${type}` as PermissionCodeType],
-
-                        onClick: () =>
-                          setDialog((prev) => ({
-                            ...prev,
-                            data: {
-                              ...item,
-                              parent_id: item_id,
-                              entity_title: type,
-                            },
-                            title: `Delete ${item.is_folder ? "folder" : entityName}`,
-                            size: "sm",
-                            type: "delete_entity",
-                          })),
-                      },
-                    ],
-                  })
-                }
-                title={item.title}
-                type={type as AvailableEntityType}
-              />
-            );
-          })}
           {!base?.data?.length && !data?.data?.children?.length && !isInitialLoadingFolder ? (
             <div className="col-span-10 mt-2">
               <Alert label="There is no content." variant="info" />
@@ -1098,6 +1039,7 @@ export function FolderView() {
               permissions,
               isProjectOwner,
               user?.id as string,
+              user?.role?.id,
               show_image_table_view,
             )}
             config={{

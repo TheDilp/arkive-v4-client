@@ -51,7 +51,7 @@ export function ProjectLayout() {
   const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id, project_id },
+      data: { auth_id: user?.id as string, project_id },
       relations: {
         webhooks: true,
         roles: true,

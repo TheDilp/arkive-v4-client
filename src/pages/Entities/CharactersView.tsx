@@ -67,6 +67,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
+  user_role_id: string | undefined,
 ) {
   return [
     columnHelper.display({
@@ -179,6 +180,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "update_characters",
+                  user_role_id,
                 ),
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -200,6 +202,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "read_characters",
+                  user_role_id,
                 ),
                 onClick: () => {
                   setDialog({
@@ -249,6 +252,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "delete_characters",
+                  user_role_id,
                 ),
                 onClick: () => {
                   setDialog((prev) => ({
@@ -636,6 +640,7 @@ export function CharactersView() {
               permissions,
               isProjectOwner,
               user?.id as string,
+              user?.role?.id,
             )}
             config={{
               hasSelect: true,

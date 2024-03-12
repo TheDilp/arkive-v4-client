@@ -38,12 +38,14 @@ export function hasActionPermission(
   isProjectOwner: boolean,
   isEntityOwner: boolean,
   userPermissions: UserHasPermissionsType,
-  entityPermissions: EntityPermissionType[],
+  entityPermissions: Pick<EntityPermissionType, "code" | "role_id">[],
   required_permission: PermissionCodeType,
+  user_role_id: string | undefined,
 ) {
   if (isProjectOwner) return true;
-  return (
-    userPermissions?.[required_permission] &&
-    (isEntityOwner || entityPermissions?.some((perm) => perm?.code === required_permission))
+  if (!userPermissions?.[required_permission]) return false;
+  if (isEntityOwner) return true;
+  return entityPermissions?.some(
+    (perm) => (user_role_id && user_role_id === perm?.role_id) || perm?.code === required_permission,
   );
 }

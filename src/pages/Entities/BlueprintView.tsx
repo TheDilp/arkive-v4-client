@@ -34,6 +34,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
+  user_role_id: string | undefined,
 ) {
   return [
     columnHelper.display({
@@ -76,6 +77,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "update_blueprints",
+                  user_role_id,
                 ),
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -113,6 +115,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "delete_blueprints",
+                  user_role_id,
                 ),
                 onClick: () => {
                   setDialog((prev) => ({
@@ -232,7 +235,7 @@ export function BlueprintView() {
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string);
+  const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
