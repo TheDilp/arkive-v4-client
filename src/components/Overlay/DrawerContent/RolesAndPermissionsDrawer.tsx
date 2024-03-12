@@ -64,7 +64,7 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
     <DrawerLayout>
       <Input label="Role title" name="title" onChange={handleChange} placeholder="New project" value={role?.title || ""} />
       <Alert
-        label="The role will grant a user permission for a group of entities in general. They will be able to view, update and delete only entities they've created - otherwise, they must be granted explcit permissions by the project's or entity's owner."
+        label="The role will grant a user permission for a group of entities in general. They will be able to view, update and delete only entities they've created - otherwise, they must be granted explicit permissions by the project's or entity's owner."
         variant="info-bordered"
       />
       {formattedPermissions.map((permission) => (
