@@ -192,6 +192,12 @@ function createColumns(
                 id: "2",
                 title: "View relationship tree",
                 icon: IconEnum.family_tree,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  permissions,
+                  row.original?.permissions || [],
+                  "read_characters",
+                ),
                 onClick: () => {
                   setDialog({
                     type: "family_tree",
