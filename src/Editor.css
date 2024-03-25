@@ -46,9 +46,6 @@
   h6 {
     @apply text-xs;
   }
-  :is(ol, ul) {
-    @apply pl-3;
-  }
 
   hr {
     @apply border-zinc-700 !important;
@@ -58,6 +55,14 @@
   }
   ul:not(.tableOfContentsList) {
     @apply ml-1 list-disc;
+  }
+  ol,
+  ul {
+    list-style-position: inside !important;
+
+    p {
+      display: inline !important;
+    }
   }
   ul[data-task-list] {
     li {
