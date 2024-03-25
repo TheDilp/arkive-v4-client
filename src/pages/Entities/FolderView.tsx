@@ -717,6 +717,7 @@ export function FolderView() {
         project_id,
       },
       pagination,
+      permissions: true,
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
@@ -861,7 +862,16 @@ export function FolderView() {
                 <div className="w-fit max-w-[208px] lg:w-52">
                   <Button
                     icon={IconEnum.edit}
-                    isDisabled={!permissions?.[`read_${type}` as PermissionCodeType]}
+                    isDisabled={
+                      !hasActionPermission(
+                        isProjectOwner,
+                        user?.id === data?.data?.id,
+                        permissions,
+                        data?.data?.permissions || [],
+                        `update_${type}` as PermissionCodeType,
+                        user?.role?.id,
+                      )
+                    }
                     label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
                     onClick={() => {
                       setDrawer((prev) => ({

@@ -20,6 +20,7 @@ import {
   useGetEntities,
   useGetEntity,
   useHandleChange,
+  useHasPermissions,
   useUpdateEntity,
 } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
@@ -30,6 +31,7 @@ import {
   DefaultTagColor,
   drawerAtom,
   FetchFunction,
+  hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
   mentionPositionAtom,
@@ -64,10 +66,11 @@ export default function DocumentView({ editable }: { editable: boolean }) {
     item_id as string,
     "documents",
     {
-      fields: ["id", "title", "icon", "content", "is_folder", "dice_color"],
+      fields: ["id", "title", "icon", "content", "is_folder", "dice_color", "owner_id"],
       relations: {
         parents: true,
       },
+      permissions: true,
     },
 
     {
@@ -76,6 +79,17 @@ export default function DocumentView({ editable }: { editable: boolean }) {
       queryKeyConcat: ["content"],
     },
   );
+
+  const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id);
+  const canUpdate = hasActionPermission(
+    isProjectOwner,
+    user?.id === currentDocument?.data?.owner_id,
+    permissions,
+    currentDocument?.data?.permissions || [],
+    "update_documents",
+    user?.role?.id,
+  );
+
   const { mutateAsync: createDocument } = useCreateEntity<InsertDocumentType>("documents");
   const { mutate: updateDocument, isLoading: isUpdating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
@@ -216,7 +230,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
 
       {/* @ts-ignore */}
       <Remirror
-        editable
+        editable={canUpdate}
         hooks={documentEditorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
         initialContent={state}
         manager={manager}
@@ -232,108 +246,125 @@ export default function DocumentView({ editable }: { editable: boolean }) {
         <div
           className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
-          <Menubar
-            icon={currentDocument?.data?.icon ?? undefined}
-            id={currentDocument?.data?.id || ""}
-            size="md"
-            title={currentDocument?.data?.title || ""}
-          />
+          {canUpdate ? (
+            <Menubar
+              icon={currentDocument?.data?.icon ?? undefined}
+              id={currentDocument?.data?.id || ""}
+              size="md"
+              title={currentDocument?.data?.title || ""}
+            />
+          ) : null}
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
-            onContextMenu={(e) => {
-              e.preventDefault();
-              setContextMenu({
-                // @ts-ignore
-                event: e,
-                items: [
-                  {
-                    id: "1",
-                    title: "Create document with title",
-                    icon: IconEnum.add,
-                    onClick: async () => {
-                      const slice = getContext()?.getState().selection.content();
-                      if (slice) {
-                        const id = crypto.randomUUID();
+            onContextMenu={
+              canUpdate
+                ? (e) => {
+                    e.preventDefault();
+                    setContextMenu({
+                      // @ts-ignore
+                      event: e,
+                      items: [
+                        {
+                          id: "1",
+                          title: "Create document with title",
+                          icon: IconEnum.add,
+                          onClick: async () => {
+                            const slice = getContext()?.getState().selection.content();
+                            if (slice) {
+                              const id = crypto.randomUUID();
 
-                        if (slice) {
-                          let title = "";
-                          slice.content.descendants((node) => {
-                            if (node.type.name === "mentionAtom") {
-                              title += node.attrs.label;
-                            } else if (node.type.name === "text") {
-                              title += node.textContent;
+                              if (slice) {
+                                let title = "";
+                                slice.content.descendants((node) => {
+                                  if (node.type.name === "mentionAtom") {
+                                    title += node.attrs.label;
+                                  } else if (node.type.name === "text") {
+                                    title += node.textContent;
+                                  }
+                                });
+                                if (title.length > 250) {
+                                  return;
+                                }
+                                await createDocument({ data: { id, project_id: project_id as string, title } });
+                                getContext()?.commands?.replaceText({
+                                  attrs: {
+                                    id,
+                                    label: title,
+                                    name: "documents",
+                                  },
+                                  type: "mentionAtom",
+                                  content: title,
+                                  selection: getContext()?.getState()?.selection,
+                                });
+                              } else {
+                                createNotification({
+                                  title: "No text selected.",
+                                  variant: "error",
+                                  icon: IconEnum.error,
+                                  timer: 3,
+                                });
+                              }
                             }
-                          });
-                          if (title.length > 250) {
-                            return;
-                          }
-                          await createDocument({ data: { id, project_id: project_id as string, title } });
-                          getContext()?.commands?.replaceText({
-                            attrs: {
-                              id,
-                              label: title,
-                              name: "documents",
+                          },
+                        },
+                        {
+                          id: "2",
+                          title: "Send text to Discord",
+                          icon: IconEnum.discord,
+                          subItems: (webhooks?.data || []).map((webhook) => ({
+                            id: webhook.id,
+                            title: webhook.title,
+                            onClick: () => {
+                              const slice = getContext()?.getState().selection.content();
+                              if (slice) {
+                                let text = "";
+                                slice.content.descendants((node) => {
+                                  if (node.type.name === "mentionAtom") {
+                                    text += node.attrs.label;
+                                  } else if (node.type.name === "text") {
+                                    text += node.textContent;
+                                  }
+                                });
+                                if (text.length > 2500) {
+                                  createNotification({
+                                    title: "Text sent to Discord cannot have more than 2500 characters.",
+                                    variant: "warning",
+                                    icon: IconEnum.warning,
+                                    timer: 5,
+                                  });
+                                } else {
+                                  FetchFunction({
+                                    url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                                    body: JSON.stringify({
+                                      data: { title: currentDocument?.data?.title, description: text, type: "document_text" },
+                                    }),
+                                    method: "POST",
+                                  });
+                                }
+                              }
                             },
-                            type: "mentionAtom",
-                            content: title,
-                            selection: getContext()?.getState()?.selection,
-                          });
-                        } else {
-                          createNotification({ title: "No text selected.", variant: "error", icon: IconEnum.error, timer: 3 });
-                        }
-                      }
-                    },
-                  },
-                  {
-                    id: "2",
-                    title: "Send text to Discord",
-                    icon: IconEnum.discord,
-                    subItems: (webhooks?.data || []).map((webhook) => ({
-                      id: webhook.id,
-                      title: webhook.title,
-                      onClick: () => {
-                        const slice = getContext()?.getState().selection.content();
-                        if (slice) {
-                          let text = "";
-                          slice.content.descendants((node) => {
-                            if (node.type.name === "mentionAtom") {
-                              text += node.attrs.label;
-                            } else if (node.type.name === "text") {
-                              text += node.textContent;
-                            }
-                          });
-                          if (text.length > 2500) {
-                            createNotification({
-                              title: "Text sent to Discord cannot have more than 2500 characters.",
-                              variant: "warning",
-                              icon: IconEnum.warning,
-                              timer: 5,
-                            });
-                          } else {
-                            FetchFunction({
-                              url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                              body: JSON.stringify({
-                                data: { title: currentDocument?.data?.title, description: text, type: "document_text" },
-                              }),
-                              method: "POST",
-                            });
-                          }
-                        }
-                      },
-                    })),
-                  },
-                ],
-              });
-            }}
-            onDrop={(e) => {
-              const stringData = e.dataTransfer.getData("Text");
-              if (!stringData) return;
-              if (stringData) {
-                const data: { index: number; title: string; description?: string } = JSON.parse(e.dataTransfer.getData("Text"));
-                if (!data) return;
-                getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
-              }
-            }}>
+                          })),
+                        },
+                      ],
+                    });
+                  }
+                : undefined
+            }
+            onDrop={
+              canUpdate
+                ? (e) => {
+                    const stringData = e.dataTransfer.getData("Text");
+                    if (!stringData) return;
+                    if (stringData) {
+                      const data: { index: number; title: string; description?: string } = JSON.parse(
+                        e.dataTransfer.getData("Text"),
+                      );
+                      if (!data) return;
+                      getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
+                    }
+                  }
+                : undefined
+            }>
             <EditorComponent />
             <MentionDropdownComponent />
           </div>
