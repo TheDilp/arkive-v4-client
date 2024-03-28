@@ -8,13 +8,16 @@ import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, TagInput } from "../../Form";
 
 type Props = {
-  data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } };
+  data: {
+    tags: Omit<TagType, "owner_id" | "permissions">[];
+    entity: { type: AvailableEntityType | AvailableSubEntityType; id: string };
+  };
 };
 
 export function EditTags({ data }: Props) {
   const resetDrawer = useResetAtom(drawerAtom);
   const { project_id } = useParams();
-  const [tagsData, setTagsData] = useState<{ tags: TagType[] }>({ tags: data.tags || [] });
+  const [tagsData, setTagsData] = useState<{ tags: Omit<TagType, "owner_id" | "permissions">[] }>({ tags: data.tags || [] });
 
   const { handleChange } = useHandleChange({ data: tagsData, setData: setTagsData });
 
