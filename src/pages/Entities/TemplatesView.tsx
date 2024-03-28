@@ -1,17 +1,21 @@
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useTable } from "../../hooks";
-import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, TextFilters } from "../../utils";
+import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useHasPermissions, useTable } from "../../hooks";
+import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
+import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  isProjectOwner: boolean,
+  permissions: UserHasPermissionsType,
+  user_id: string,
+  user_role_id: string | undefined,
 ) {
   return [
     columnHelper.accessor("title", {
@@ -47,13 +51,21 @@ function createColumns(
             items={[
               {
                 id: "1",
-                title: "Edit field template",
+                title: "Edit template",
                 icon: IconEnum.edit,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_character_fields_templates",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
                     data: row.original,
-                    title: "Edit field template",
+                    title: "Edit template",
                     size: "lg",
                     type: "character_fields_templates",
                   }));
@@ -69,6 +81,14 @@ function createColumns(
                 id: "3",
                 title: "Delete field template",
                 icon: IconEnum.trash,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_character_fields_templates",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -97,7 +117,14 @@ export function TemplatesView() {
   useChangeNavbarTitle(" Field templates");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const columns = createColumns(setDrawer, setDialog);
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(
+    ["create_character_fields_templates", "update_character_fields_templates", "delete_character_fields_templates"],
+    undefined,
+  );
+
+  const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "sort", sort: "desc" }],
@@ -127,6 +154,7 @@ export function TemplatesView() {
         <div className="w-fit lg:w-52">
           <Button
             icon={IconEnum.add}
+            isDisabled={!permissions?.create_character_fields_templates}
             label="Create new field template"
             onClick={() =>
               setDrawer((prev) => ({

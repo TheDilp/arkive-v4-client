@@ -1,3 +1,4 @@
+import { EntityPermissionType } from "./baseEntityTypes";
 import { BlueprintType } from "./blueprintTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
 import { TagType } from "./tagTypes";
@@ -65,6 +66,8 @@ export interface CharacterFieldTemplateType {
   title: string;
   project_id: string;
   character_fields: CharacterFieldType[];
+  permissions: EntityPermissionType[];
+  owner_id: string;
   sort: number;
   tags: TagType[];
 }
