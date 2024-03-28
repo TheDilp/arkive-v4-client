@@ -108,8 +108,9 @@ export function RandomTableView() {
   const setDialog = useSetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
   const createNotification = useNotifications();
-  const [{ selection }, dispatch] = useTable({
+  const [{ selection, orderBy }, dispatch] = useTable({
     selection: {},
+    orderBy: [{ field: "title", sort: "asc" }],
   });
   const { project_id, item_id } = useParams();
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
@@ -117,6 +118,7 @@ export function RandomTableView() {
       data: { parent_id: item_id as string, project_id },
       fields: ["id", "title", "description", "icon", "icon_color"],
       relations: { random_table_suboptions: true },
+      orderBy,
     },
     "random_table_options",
     {
