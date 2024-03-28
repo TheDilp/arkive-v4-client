@@ -14,7 +14,7 @@ type Props = { data: { ids: string[]; selectablePermissions: PermissionCodeType[
 
 export function BulkAccessDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const [permissions, setPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
+  const [permissions, setPermissions] = useState<{ permissions: Omit<EntityPermissionType, "code">[] }>({ permissions: [] });
   const { handleChange } = useHandleChange({ data, setData: setPermissions });
   const { mutate } = useBulkUpdateAccess(project_id, "characters");
   const resetDrawer = useResetAtom(drawerAtom);
@@ -33,7 +33,7 @@ export function BulkAccessDrawer({ data }: Props) {
         label="Change access"
         onClick={() => {
           const formattedPermissions: (
-            | EntityPermissionType
+            | Omit<EntityPermissionType, "code">
             | { related_id: string; permission_id: null; user_id: null; role_id: null }
           )[] = [];
           if (permissions.permissions.length === 0) {

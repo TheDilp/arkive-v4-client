@@ -123,7 +123,7 @@ export interface CharacterType {
   character_relationship_types?: CharacterRelationshipDataType[];
   locations?: CharacterLocationType[];
   documents?: Pick<DocumentType, "id" | "title" | "icon">[];
-  tags?: TagType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
   events?: EventType[];
 
   related_to?: CharacterRelatedType[];

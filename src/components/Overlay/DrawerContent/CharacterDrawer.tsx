@@ -350,7 +350,7 @@ export function AdditionalFieldsTab({
   character_fields?: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
-  tags?: TagType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
   canCreateOrEdit: boolean;
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;

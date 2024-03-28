@@ -66,7 +66,7 @@ export interface BlueprintInstanceType {
   owner_id: string;
   is_public?: boolean;
   blueprint?: BlueprintType;
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
   blueprint_fields: BlueprintInstanceBlueprintFieldType[];
   permissions: EntityPermissionType[];
 }

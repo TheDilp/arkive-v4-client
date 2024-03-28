@@ -21,7 +21,7 @@ type ExistingFolderType = {
   parent_id: string | undefined;
   is_folder: boolean;
   title: string;
-  tags?: TagType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
 };
 
 export function FolderDrawer({ data }: Props) {

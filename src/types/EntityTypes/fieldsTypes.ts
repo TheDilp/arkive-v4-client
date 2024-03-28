@@ -69,7 +69,7 @@ export interface CharacterFieldTemplateType {
   permissions: EntityPermissionType[];
   owner_id: string;
   sort: number;
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
 }
 
 export type TemplateStateType = Partial<

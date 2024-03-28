@@ -22,7 +22,7 @@ export interface MapType {
   map_layers?: MapLayerType[];
   characters: CharacterType[];
   permissions: EntityPermissionType[];
-  tags?: TagType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
 }
 
 export interface MapLayerType {

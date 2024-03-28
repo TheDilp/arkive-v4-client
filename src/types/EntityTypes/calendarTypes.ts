@@ -18,7 +18,7 @@ export interface CalendarType extends BaseEntityType {
   months: MonthType[];
   leap_days: LeapDayType[];
   days: string[];
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
 }
 
 export type CalendarFilters = {
@@ -91,7 +91,7 @@ export interface EventType {
   start_year: number;
   document?: DocumentType;
   image?: ImageType;
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
   characters: Pick<CharacterType, "id" | "full_name" | "portrait_id">[];
   map_pins: Pick<MapPinType, "id" | "title" | "parent_id" | "icon" | "color" | "border_color" | "image_id">[];
 }

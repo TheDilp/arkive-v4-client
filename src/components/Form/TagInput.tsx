@@ -7,8 +7,8 @@ import { Search } from "./Search";
 type Props = {
   label?: string;
   isAutofocused?: boolean;
-  tags: TagType[];
-  handleChange: (newData: { name: string; value: TagType[] }) => void;
+  tags: Omit<TagType, "owner_id" | "permissions">[];
+  handleChange: (newData: { name: string; value: Omit<TagType, "owner_id" | "permissions">[] }) => void;
   isMultiple?: boolean;
   isDisabled?: boolean;
 };

@@ -75,7 +75,7 @@ export type NodeType = {
   map_pin?: MapPinType;
   image?: ImageType;
 
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
 };
 export type EdgeType = {
   id: string;
@@ -110,7 +110,7 @@ export type EdgeType = {
   source_id: string;
   target_id: string;
   parent_id?: string;
-  tags?: TagType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
 };
 export interface GraphType extends BaseEntityType {
   default_node_shape: string;
@@ -118,7 +118,7 @@ export interface GraphType extends BaseEntityType {
   default_edge_color: string;
   nodes: NodeType[];
   edges: EdgeType[];
-  tags: TagType[];
+  tags: Omit<TagType, "owner_id" | "permissions">[];
 }
 
 export type CytoscapeNodeType = cytoscape.NodeDefinition;

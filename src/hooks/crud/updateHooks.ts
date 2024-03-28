@@ -774,7 +774,10 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
   return useMutation(
     async (updateItemValues: {
       data: {
-        permissions: (EntityPermissionType | { related_id: string; permission_id: null; user_id: null; role_id: null })[];
+        permissions: (
+          | Omit<EntityPermissionType, "code">
+          | { related_id: string; permission_id: null; user_id: null; role_id: null }
+        )[];
       };
     }) => {
       if (updateItemValues.data.permissions.length) {
