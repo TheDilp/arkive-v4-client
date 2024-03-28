@@ -1,18 +1,22 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, TagType } from "../../types";
-import { dialogAtom, drawerAtom, IconEnum, TextFilters } from "../../utils";
+import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
+import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
+import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  isProjectOwner: boolean,
+  permissions: UserHasPermissionsType,
+  user_id: string,
+  user_role_id: string | undefined,
 ) {
   return [
     columnHelper.accessor("title", {
@@ -56,6 +60,14 @@ function createColumns(
                 id: "1",
                 title: "Edit tag",
                 icon: IconEnum.edit,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_tags",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -76,6 +88,14 @@ function createColumns(
                 id: "3",
                 title: "Delete tag",
                 icon: IconEnum.trash,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_tags",
+                  user_role_id,
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -107,7 +127,10 @@ export function TagView() {
   const { mutateAsync: deleteMany } = useDeleteMany("tags", project_id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const [filter, setFilter] = useState("");
-  const columns = createColumns(setDrawer, setDialog);
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(["create_tags", "update_tags"], undefined);
+  const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
@@ -161,6 +184,7 @@ export function TagView() {
         <div className="w-fit lg:w-52">
           <Button
             icon={IconEnum.add}
+            isDisabled={!permissions.create_tags}
             label="Create new tags"
             onClick={() =>
               setDrawer((prev) => ({
