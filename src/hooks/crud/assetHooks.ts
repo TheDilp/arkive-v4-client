@@ -13,7 +13,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
       const formData = new FormData();
 
       for (let index = 0; index < images.length; index += 1) {
-        formData.append(images[index].name, images[index]);
+        formData.append(images[index].name, images[index], images[index].name);
       }
 
       return FetchFunction({
