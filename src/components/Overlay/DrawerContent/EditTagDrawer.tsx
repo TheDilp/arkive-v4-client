@@ -5,8 +5,9 @@ import { useParams } from "react-router-dom";
 import { useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { TagType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
-import { DrawerLayout } from "../../Layout";
+import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 import { ColorPicker } from "..";
 
@@ -16,13 +17,20 @@ type Props = {
   };
 };
 
+const tabs = [
+  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+  { id: "2", label: "Access", icon: IconEnum.permissions },
+];
+
 export function EditTagDrawer({ data }: Props) {
   const { project_id } = useParams();
   const { data: tagData, isInitialLoading } = useGetEntity<TagType>(data?.id, "tags", {
-    fields: ["id", "title", "color", "owner_id", "permissions"],
+    fields: ["id", "title", "color", "owner_id"],
+    permissions: true,
   });
   const resetDrawer = useResetAtom(drawerAtom);
   const [tag, setTag] = useState<TagType | null>(null);
+  const [selectedTab, setSelectedTab] = useState(0);
   const { mutate: update, isLoading } = useUpdateEntity<{ data: Pick<TagType, "id" | "title" | "color"> }>(
     "tags",
     project_id as string,
@@ -45,12 +53,26 @@ export function EditTagDrawer({ data }: Props) {
 
   return (
     <DrawerLayout>
-      <div className="flex items-center justify-between gap-x-2">
-        <Input label="Title" name="title" onChange={handleChange} value={tag?.title} />
-        <div className="mb-2 self-end">
-          <ColorPicker name="color" onChange={handleChange} value={tag?.color || DefaultTagColor} />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+
+      {tabs[selectedTab].id === "1" ? (
+        <div className="flex items-center justify-between gap-x-2">
+          <Input label="Title" name="title" onChange={handleChange} value={tag?.title} />
+          <div className="mb-2 self-end">
+            <ColorPicker name="color" onChange={handleChange} value={tag?.color || DefaultTagColor} />
+          </div>
         </div>
-      </div>
+      ) : null}
+
+      {tabs[selectedTab].id === "2" ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={tag?.permissions || []}
+          related_id={tag?.id || null}
+          selectablePermissions={["read_tags", "update_tags", "delete_tags"]}
+          type="tags"
+        />
+      ) : null}
       <Button
         icon={IconEnum.save}
         isDisabled={!tag?.title || isLoading}
