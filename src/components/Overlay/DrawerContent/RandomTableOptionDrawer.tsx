@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -19,6 +20,7 @@ const tabs = [
   { id: "2", label: "Suboptions", icon: IconEnum.random_table },
 ];
 export function RandomTableOptionDrawer({ data }: Props) {
+  const queryClient = useQueryClient();
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -154,6 +156,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
               });
               await update(parsedData, {
                 onSuccess: (d) => {
+                  queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
                   if (d.ok) resetDrawer();
                 },
               });
