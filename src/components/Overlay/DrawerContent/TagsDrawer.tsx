@@ -1,14 +1,15 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
-import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntities, useCreateEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { TagType } from "../../../types";
-import { drawerAtom, EntitiesWithTags, IconEnum } from "../../../utils";
+import { useCreateEntities, useHandleChange, useHasPermissions } from "../../../hooks";
+import { EntityPermissionType, TagType } from "../../../types";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { DefaultTagColor } from "../../../utils/enums/ColorEnums";
+import { InsertTagSchema, InsertTagType } from "../../../validation";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
+import { Tabs } from "../../Layout";
 import { ColorPicker } from "../ColorPicker";
 
 function isDisabled(tags: TagType | TagType[]) {
@@ -25,113 +26,115 @@ function isDisabled(tags: TagType | TagType[]) {
   return false;
 }
 
-export function TagsDrawer({ data }: { data: TagType | { project_id: string } }) {
-  const queryClient = useQueryClient();
+export function TagsDrawer() {
   const { project_id } = useParams();
-  const [tags, setTags] = useState<TagType | TagType[]>("id" in data ? data : []);
+
+  const permissions = useHasPermissions(["create_tags"], undefined);
+  const tabs = [
+    { id: "1", label: "Tags", icon: IconEnum.tags },
+    { id: "2", label: "Access", icon: IconEnum.permissions },
+  ];
+
+  const [tags, setTags] = useState<TagType[]>([]);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedPermissions, setSelectedPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
+
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const { mutateAsync: createMany, isLoading: isCreatingMany } = useCreateEntities<{ data: Omit<TagType, "id">[] }>(
-    "tags",
-    project_id as string,
-  );
-  const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{ data: Omit<TagType, "id"> }>("tags");
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{ data: Omit<TagType, "project_id"> }>(
-    "tags",
-    project_id as string,
-  );
+  const { mutateAsync: createMany, isLoading: isCreatingMany } = useCreateEntities<InsertTagType>("tags", project_id as string);
+
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });
-  const isMutating = isCreating || isCreatingMany || isUpdating;
+  const { handleChange: handleChangePermissions } = useHandleChange({
+    data: selectedPermissions,
+    setData: setSelectedPermissions,
+  });
   return (
     <div className="flex flex-col gap-y-2">
-      {"id" in data ? null : (
-        <div className="flex h-8 w-full justify-between">
-          <span>Insert new tag:</span>
-          <div className="h-8 w-8">
-            <Button
-              icon={IconEnum.add}
-              onClick={() => {
-                setTags((prev) => {
-                  if (Array.isArray(prev))
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {tabs[selectedTab].id === "1" ? (
+        <>
+          <div className="flex h-8 w-full justify-between">
+            <span>Insert new tag:</span>
+            <div className="h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                onClick={() => {
+                  setTags((prev) => {
                     return [
                       ...(prev || []),
-                      { id: crypto.randomUUID(), title: "", color: "", project_id: project_id as string },
+                      {
+                        id: crypto.randomUUID(),
+                        title: "",
+                        color: "",
+                        permissions: [],
+                        owner_id: "",
+                        project_id: project_id as string,
+                      },
                     ];
-                  return prev;
-                });
-              }}
-              tooltip="Add new tag"
-              variant="info"
-            />
-          </div>
-        </div>
-      )}
-      {Array.isArray(tags) ? (
-        tags.map((tag, index) => (
-          <div key={tag.id} className="flex items-end gap-x-2">
-            <Input
-              label="Tag name (required, must be unique)"
-              name={`[${index}].title`}
-              onChange={handleChange}
-              value={tag.title}
-            />
-            <div className="self-end pb-2">
-              <ColorPicker name={`[${index}].color`} onChange={handleChange} value={tag.color} />
-            </div>
-            <div className="self-end pb-2">
-              <Button
-                hasNoBackground
-                icon={IconEnum.trash}
-                isIconOnly
-                onClick={() =>
-                  setTags((prev) => {
-                    if (Array.isArray(prev)) {
-                      return prev.filter((t) => t.id !== tag.id);
-                    }
-                    return prev;
-                  })
-                }
-                variant="error"
+                  });
+                }}
+                tooltip="Add new tag"
+                variant="info"
               />
             </div>
           </div>
-        ))
-      ) : (
-        <div className="flex gap-x-2">
-          <Input label="Tag name (required, must be unique)" name="title" onChange={handleChange} value={tags?.title} />
-          <div className="self-end pb-2">
-            <ColorPicker name="color" onChange={handleChange} value={tags?.color || DefaultTagColor} />
-          </div>
-        </div>
-      )}
+          {tags.map((tag, index) => (
+            <div key={tag.id} className="flex items-end gap-x-2">
+              <Input
+                label="Tag name (required, must be unique)"
+                name={`[${index}].title`}
+                onChange={handleChange}
+                value={tag.title}
+              />
+              <div className="self-end pb-2">
+                <ColorPicker name={`[${index}].color`} onChange={handleChange} value={tag.color} />
+              </div>
+              <div className="self-end pb-2">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.trash}
+                  isIconOnly
+                  onClick={() =>
+                    setTags((prev) => {
+                      if (Array.isArray(prev)) {
+                        return prev.filter((t) => t.id !== tag.id);
+                      }
+                      return prev;
+                    })
+                  }
+                  variant="error"
+                />
+              </div>
+            </div>
+          ))}
+        </>
+      ) : null}
+      {tabs[selectedTab].id === "2" ? (
+        <EntityPermission
+          handleChange={handleChangePermissions}
+          permissions={selectedPermissions.permissions || []}
+          related_id={null}
+          selectablePermissions={["read_tags", "update_tags", "delete_tags"]}
+          type="tags"
+        />
+      ) : null}
+
       <Button
-        icon={"id" in data ? IconEnum.save : IconEnum.add}
-        isDisabled={isDisabled(tags) || isMutating}
-        isLoading={isMutating}
-        label={"id" in data ? "Save" : "Create"}
+        icon={IconEnum.add}
+        isDisabled={isDisabled(tags) || isCreatingMany || !permissions.create_tags}
+        isLoading={isCreatingMany}
+        label="Create"
         onClick={async () => {
-          if (!("id" in data)) {
-            if (Array.isArray(tags)) {
-              await createMany({ data: tags.map((tag) => ({ ...omit(tag, ["id"]), color: tag?.color || DefaultTagColor })) });
-            } else {
-              await create(
-                { data: tags },
-                {
-                  onSuccess: resetDrawerAtom,
-                },
-              );
-            }
-          } else if (!Array.isArray(tags)) {
-            await update(
-              { data: omit(tags, ["project_id"]) },
-              {
-                onSuccess: resetDrawerAtom,
-              },
-            );
-            queryClient.invalidateQueries({
-              predicate: (query) =>
-                EntitiesWithTags.includes(query.queryKey[2] as string) ||
-                EntitiesWithTags.includes(query.queryKey[3] as string),
+          if (Array.isArray(tags)) {
+            const parsed = InsertTagSchema.parse({
+              data: tags.map((tag) => ({
+                title: tag.title,
+                project_id: tag.project_id,
+                color: tag?.color || DefaultTagColor,
+              })),
+              permissions: selectedPermissions.permissions,
             });
+
+            await createMany({ data: parsed.data, permissions: parsed.permissions });
           }
 
           resetDrawerAtom();

@@ -1,0 +1,17 @@
+import { z } from "zod";
+
+import { InsertEntityPermissionSchema } from "./permissions";
+
+export const InsertTagSchema = z.object({
+  data: z
+    .object({
+      project_id: z.string(),
+      title: z.string(),
+      color: z.string(),
+    })
+    .array(),
+  permissions: InsertEntityPermissionSchema,
+});
+
+export type InsertTagType = z.infer<typeof InsertTagSchema>;
+// export type UpdateTagType = z.infer<typeof UpdateTagSchema>;

@@ -19,5 +19,6 @@ export * from "./permissions";
 export * from "./project";
 export * from "./random_tables";
 export * from "./roles";
+export * from "./tags";
 export * from "./timelines";
 export * from "./webhooks";
