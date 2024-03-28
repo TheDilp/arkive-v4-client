@@ -116,7 +116,13 @@ export type DrawerAtomType = {
   | { type: "event_management"; data: { date: { month: number; year: number }; event_ids: string[] } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "search"; data?: null }
-  | { type: "edit_tags"; data: { tags: TagType[]; entity: { type: AvailableEntityType | AvailableSubEntityType; id: string } } }
+  | {
+      type: "edit_tags";
+      data: {
+        tags: Omit<TagType, "owner_id" | "permissions">[];
+        entity: { type: AvailableEntityType | AvailableSubEntityType; id: string };
+      };
+    }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } }
   | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
   | { type: "document_outline"; data: { headings: { id: string; title: string; level: number }[] } }
