@@ -168,6 +168,7 @@ export type DrawerAtomType = {
         >;
       };
     }
+  | { type: "edit_tag"; data: { id: string } }
   | { type: "nodes_from_characters" | "nodes_from_images"; data: null }
 );
 

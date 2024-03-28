@@ -74,7 +74,7 @@ function createColumns(
                     data: row.original,
                     title: "Edit tag",
                     size: "lg",
-                    type: "tags",
+                    type: "edit_tag",
                   }));
                 },
               },

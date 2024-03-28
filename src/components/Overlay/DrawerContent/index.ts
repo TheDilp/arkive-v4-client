@@ -17,6 +17,7 @@ export * from "./DocumentFromTemplate";
 export * from "./DocumentOutlineDrawer";
 export * from "./EdgeDrawer";
 export * from "./EditMessageDrawer";
+export * from "./EditTagDrawer";
 export * from "./EditTags";
 export * from "./EntityPreviewDrawer";
 export * from "./EventDrawer";
