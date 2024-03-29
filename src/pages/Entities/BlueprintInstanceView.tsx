@@ -27,9 +27,14 @@ import {
 import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
+  DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
   NotificationType,
+  TableDispatch,
+  TableSelectedAction,
+  TableSelectionType,
+  UpdatePublicManyType,
   UserHasPermissionsType,
   WebhookType,
 } from "../../types";
@@ -522,6 +527,148 @@ function createColumns(
   return fieldColumns;
 }
 
+function getSelectedActions(
+  permissions: UserHasPermissionsType,
+  {
+    selection,
+    updatePublicMany,
+    resetDialog,
+    deleteMany,
+    dispatch,
+    data,
+    setDrawer,
+    setDialog,
+  }: {
+    updatePublicMany: UpdatePublicManyType;
+    deleteMany: DeleteManyType;
+    selection: TableSelectionType | undefined;
+    setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+    setDialog: Dispatch<SetStateAction<DialogAtomType>>;
+    resetDialog: () => unknown;
+    data: BlueprintInstanceType[];
+    dispatch: TableDispatch;
+  },
+) {
+  const selectedActions: TableSelectedAction[] = [];
+  if (permissions?.update_blueprint_instances) {
+    selectedActions.push(
+      {
+        icon: IconEnum.eye,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set public",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            await updatePublicMany({ data: { ids, is_public: true } });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+      {
+        icon: IconEnum.eye_slash,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set private",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            await updatePublicMany({ data: { ids, is_public: false } });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+      {
+        icon: IconEnum.tags,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Add/remove tags",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const bpiWithTags = (data || [])
+            ?.filter((e) => ids.includes(e.id))
+            .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
+
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Bulk edit tags",
+            type: "bulk_tags",
+            data: { items: bpiWithTags, dispatch, type: "blueprint_instances" },
+          }));
+        },
+      },
+    );
+  }
+  if (permissions?.is_owner) {
+    selectedActions.push({
+      icon: IconEnum.permissions,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Change access",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+
+        setDrawer((prev) => ({
+          ...prev,
+          size: "lg",
+          title: "Edit access",
+          type: "bulk_access",
+          data: {
+            ids,
+            selectablePermissions: ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
+            type: "blueprint_instances",
+          },
+        }));
+      },
+    });
+  }
+  if (permissions?.delete_blueprint_instances) {
+    selectedActions.push({
+      icon: IconEnum.trash,
+      variant: "error",
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Delete selected rows",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Delete many",
+            description: `Are you sure you want to delete ${ids.length} ${
+              ids.length === 1 ? "blueprint instance" : "blueprint_instances"
+            }?`,
+            warning: "This action cannot be undone.",
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialog,
+            },
+            confirm: {
+              label: "Delete",
+              icon: IconEnum.trash,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    });
+  }
+
+  return selectedActions;
+}
+
 export function BlueprintInstanceView() {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
@@ -603,94 +750,16 @@ export function BlueprintInstanceView() {
               selection,
               filters,
               relationFilters,
-              selectedActions: [
-                {
-                  icon: IconEnum.eye,
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Set public",
-                  onClick: async () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    const entitesNotFolders = (instances?.data || [])?.filter((e) => ids.includes(e.id));
-                    if (entitesNotFolders.length) {
-                      await updatePublicMany({ data: { ids, is_public: true } });
-                      dispatch({ type: "clearSelection" });
-                    }
-                  },
-                },
-                {
-                  icon: IconEnum.eye_slash,
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Set private",
-                  onClick: async () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    const entitesNotFolders = (instances?.data || [])?.filter((e) => ids.includes(e.id));
-                    if (entitesNotFolders.length) {
-                      await updatePublicMany({ data: { ids, is_public: false } });
-                      dispatch({ type: "clearSelection" });
-                    }
-                  },
-                },
-                {
-                  icon: IconEnum.tags,
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Add/remove tags",
-                  onClick: async () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    const instancesWithTags = (instances?.data || [])
-                      ?.filter((e) => ids.includes(e.id))
-                      .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
-
-                    setDrawer((prev) => ({
-                      ...prev,
-                      size: "lg",
-                      title: "Bulk edit tags",
-                      type: "bulk_tags",
-                      data: { items: instancesWithTags, dispatch, type: "blueprint_instances" },
-                    }));
-                  },
-                },
-                {
-                  icon: IconEnum.trash,
-                  variant: "error",
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Delete selected rows.",
-                  onClick: () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    if (ids.length) {
-                      setDialog((prev) => ({
-                        ...prev,
-                        title: "Delete many",
-                        description: `Are you sure you want to delete ${ids.length} ${
-                          ids.length > 1 ? "blueprint instances" : "blueprint instance"
-                        }?`,
-                        warning: "This action cannot be undone.",
-                        isOverlay: true,
-                        cancel: {
-                          label: "Cancel",
-                          variant: "primary",
-                          action: resetDialog,
-                        },
-                        confirm: {
-                          label: "Delete",
-                          icon: IconEnum.trash,
-                          action: async () =>
-                            deleteMany(
-                              { data: { ids } },
-                              {
-                                onSuccess: () => dispatch({ type: "clearSelection" }),
-                              },
-                            ),
-                          variant: "error",
-                        },
-                      }));
-                    }
-                  },
-                },
-              ],
+              selectedActions: getSelectedActions(permissions, {
+                data: instances?.data || [],
+                selection,
+                updatePublicMany,
+                resetDialog,
+                deleteMany,
+                dispatch,
+                setDialog,
+                setDrawer,
+              }),
               getLink: (rowData: BlueprintInstanceType) =>
                 `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`,
             }}
@@ -698,7 +767,7 @@ export function BlueprintInstanceView() {
             dispatch={dispatch}
             isLoading={isLoading}
             pagination={pagination}
-            type="characters"
+            type="blueprint_instances"
           />
         ) : null}
       </div>
