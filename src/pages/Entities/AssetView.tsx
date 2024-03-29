@@ -12,10 +12,11 @@ import {
   useDownloadImage,
   useGetImages,
   useGetInfiniteAssets,
+  useHasPermissions,
   useTable,
   useUpdateManyPublic,
 } from "../../hooks";
-import { AssetType, DialogAtomType, DrawerAtomType, ImageType, WebhookType } from "../../types";
+import { AssetType, DialogAtomType, DrawerAtomType, ImageType, UserHasPermissionsType, UserType } from "../../types";
 import {
   baseURLS,
   BooleanFilters,
@@ -24,7 +25,9 @@ import {
   FetchFunction,
   getAvatarInitials,
   getImageURL,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   TextFilters,
   userAtom,
 } from "../../utils";
@@ -45,7 +48,8 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   downloadImage: downloadImageMutationType,
-  webhooks: WebhookType[],
+  user: UserType | null,
+  isProjectOwner: boolean,
   type: AssetType,
   project_id: string,
   updatePublic: UseMutateAsyncFunction<
@@ -59,6 +63,7 @@ function createColumns(
     },
     unknown
   >,
+  permissions: UserHasPermissionsType,
 ) {
   return [
     columnHelper.display({
@@ -128,6 +133,14 @@ function createColumns(
                 id: "1",
                 title: "Edit image",
                 icon: IconEnum.edit,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user?.id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "update_assets",
+                  user?.role?.id,
+                ),
                 onClick: () => {
                   setDrawer((prev) => ({
                     ...prev,
@@ -142,7 +155,7 @@ function createColumns(
                 id: "send_to_discord",
                 title: "Send to Discord",
                 icon: IconEnum.discord,
-                subItems: webhooks.map((webhook) => ({
+                subItems: (user?.webhooks || []).map((webhook) => ({
                   id: webhook.id,
                   title: webhook.title,
                   onClick: () =>
@@ -165,6 +178,14 @@ function createColumns(
                 id: "delete_image",
                 title: "Delete image",
                 icon: IconEnum.trash,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user?.id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  "delete_assets",
+                  user?.role?.id,
+                ),
                 onClick: () => {
                   setDialog((prev) => ({
                     ...prev,
@@ -205,6 +226,8 @@ export function AssetView() {
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
 
   const user = useAtomValue(userAtom);
 
@@ -319,6 +342,7 @@ export function AssetView() {
         <div className="lg:w-52">
           <Button
             icon={IconEnum.add}
+            isDisabled={!permissions?.create_assets}
             label="Upload image"
             onClick={() =>
               setDialog((prev: DialogAtomType) => ({
@@ -366,10 +390,12 @@ export function AssetView() {
               setDrawer,
               setDialog,
               downloadImage,
-              user?.webhooks || [],
+              user,
+              isProjectOwner,
               type,
               project_id as string,
               updateImagesPublic,
+              permissions,
             )}
             config={{
               hasSelect: true,
