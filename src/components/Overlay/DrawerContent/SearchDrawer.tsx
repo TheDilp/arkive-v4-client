@@ -10,6 +10,7 @@ import {
   SearchableEntities,
   SearchAllEntitiesType,
   SearchResultType,
+  TabType,
   TagType,
 } from "../../../types";
 import {
@@ -29,7 +30,7 @@ import { Search, Select, Title } from "../../Form";
 import { Tabs } from "../../Layout";
 import { Alert, Badge } from "../../Misc";
 
-const tabs = [
+const tabs: TabType[] = [
   { id: "1", label: "Title" },
   { id: "2", label: "Category" },
   { id: "3", label: "Tag" },
@@ -95,7 +96,11 @@ export function SearchDrawer() {
 
   return (
     <div className="flex flex-col gap-y-2 overflow-hidden">
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <Tabs
+        onChange={(_, index) => setSelectedTab(index)}
+        selectedTab={selectedTab}
+        tabs={userPermissions.includes("read_tags") || isProjectOwner ? tabs : tabs.slice(0, 2)}
+      />
       <div className="flex w-full items-center gap-x-2">
         {selectedTab <= 1 ? (
           <>
