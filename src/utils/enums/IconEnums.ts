@@ -106,6 +106,7 @@ export const IconEnum = {
   table: "ph:table" as const,
   table_add: "ph:grid-nine" as const,
   tags: "ph:tag" as const,
+  task_list: "ph:list-checks" as const,
   taxi_edges: "icon-park-outline:chart-graph" as const,
   text_align_center: "ph:text-align-center" as const,
   text_align_justify: "ph:text-align-justify" as const,

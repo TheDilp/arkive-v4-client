@@ -158,6 +158,13 @@ function menuBarItems({
       tooltip: "Insert numbered list",
     },
     {
+      id: "task_list",
+      icon: IconEnum.task_list,
+      onClick: () => chain?.toggleTaskList()?.run(),
+      variant: active.taskList() ? ("info" as Variant) : ("primary" as Variant),
+      tooltip: "Insert task list",
+    },
+    {
       id: "callout",
       icon: IconEnum.callout,
       onClick: undefined,

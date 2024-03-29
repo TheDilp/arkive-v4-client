@@ -72,9 +72,11 @@
         @apply outline-none;
       }
     }
-
+    label {
+      @apply w-fit;
+    }
     label input {
-      @apply mt-1 h-4 w-4 appearance-none rounded border bg-zinc-700 text-white outline-none;
+      @apply relative m-0 -ml-1 mr-1 h-4 w-4 appearance-none rounded border bg-zinc-700 text-white outline-none;
       &:checked {
         @apply bg-zinc-400;
 
@@ -91,6 +93,9 @@
           transform: translate(-50%, -50%);
         }
       }
+    }
+    div {
+      @apply inline;
     }
   }
   blockquote {
