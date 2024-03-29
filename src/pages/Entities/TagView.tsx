@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
+import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType, Variant } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
@@ -140,6 +140,69 @@ export function TagView() {
     { data: { project_id }, fields: ["id", "color", "title", "project_id"], filters, pagination, orderBy },
     "tags",
   );
+  const selectedActions = [
+    {
+      icon: IconEnum.trash,
+      variant: "error" as Variant,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Delete selected rows",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Delete many",
+            description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "tag" : "tags"}?`,
+            warning: "This action cannot be undone.",
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: "Delete",
+              icon: IconEnum.trash,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    },
+    ...(isProjectOwner
+      ? [
+          {
+            icon: IconEnum.permissions,
+            hasNoBackground: true,
+            isIconOnly: true,
+            tooltip: "Change access",
+            onClick: () => {
+              const ids = Object.values(selection || {}).flatMap((id) => id);
+
+              setDrawer((prev) => ({
+                ...prev,
+                size: "lg",
+                title: "Edit access",
+                type: "bulk_access",
+                data: {
+                  ids,
+                  selectablePermissions: ["read_tags", "update_tags", "delete_tags"],
+                  type: "tags",
+                },
+              }));
+            },
+          },
+        ]
+      : []),
+  ];
 
   useLayoutEffect(() => {
     if (!filter) {
@@ -208,44 +271,7 @@ export function TagView() {
             orderBy,
             filters,
             selection,
-            selectedActions: [
-              {
-                icon: IconEnum.trash,
-                variant: "error",
-                hasNoBackground: true,
-                isIconOnly: true,
-                tooltip: "Delete selected rows",
-                onClick: () => {
-                  const ids = Object.values(selection || {}).flatMap((id) => id);
-                  if (ids.length) {
-                    setDialog((prev) => ({
-                      ...prev,
-                      title: "Delete many",
-                      description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "tag" : "tags"}?`,
-                      warning: "This action cannot be undone.",
-                      isOverlay: true,
-                      cancel: {
-                        label: "Cancel",
-                        variant: "primary",
-                        action: resetDialogAtom,
-                      },
-                      confirm: {
-                        label: "Delete",
-                        icon: IconEnum.trash,
-                        action: async () =>
-                          deleteMany(
-                            { data: { ids } },
-                            {
-                              onSuccess: () => dispatch({ type: "clearSelection" }),
-                            },
-                          ),
-                        variant: "error",
-                      },
-                    }));
-                  }
-                },
-              },
-            ],
+            selectedActions,
           }}
           data={data?.data || []}
           dispatch={dispatch}
