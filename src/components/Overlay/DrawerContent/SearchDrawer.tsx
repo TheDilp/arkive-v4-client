@@ -12,7 +12,16 @@ import {
   SearchResultType,
   TagType,
 } from "../../../types";
-import { drawerAtom, getDefaultEntityIcon, getSentenceCase, IconEnum, useNotifications } from "../../../utils";
+import {
+  currentUserPermissions,
+  drawerAtom,
+  getDefaultEntityIcon,
+  getSearchCategoryPermission,
+  getSentenceCase,
+  IconEnum,
+  isProjectOwnerAtom,
+  useNotifications,
+} from "../../../utils";
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getEntityLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
@@ -42,6 +51,9 @@ export function SearchDrawer() {
   const [results, setResults] = useState<SearchAllEntitiesType | SearchResultType | null>();
   const [match, setMatch] = useState<"all" | "any">("all");
   const createNotification = useNotifications();
+
+  const userPermissions = useAtomValue(currentUserPermissions);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const {
     data: searchByTagsData,
@@ -107,7 +119,10 @@ export function SearchDrawer() {
                   label="Entity"
                   name="searchCategory"
                   onChange={({ value }) => setSearchCategory(value as SearchableEntities)}
-                  options={SearchCategories}
+                  options={SearchCategories.map((item) => ({
+                    ...item,
+                    isDisabled: !isProjectOwner && !getSearchCategoryPermission(userPermissions, item.value),
+                  }))}
                   value={searchCategory}
                 />
               </div>
