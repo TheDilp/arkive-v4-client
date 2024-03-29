@@ -1,6 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query";
-import { saveAs } from "file-saver";
 import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -207,11 +206,10 @@ export function documentEditorHooks(
       unknown
     >
   >,
-  title: string,
 ) {
   return [
     () => {
-      const { getJSON, getText, getHTML } = useHelpers();
+      const { getJSON } = useHelpers();
       const { project_id, item_id } = useParams();
       const { mutate } = useUpdateEntity<{ data: Partial<DocumentType> }>("documents", project_id as string);
 
@@ -239,22 +237,22 @@ export function documentEditorHooks(
         }
         return true;
       }, [changedData]);
-      const handleExportShortcut = useCallback(() => {
-        const htmlString = getHTML();
-        saveAs(
-          new Blob([htmlString], {
-            type: "text/html;charset=utf-8",
-          }),
-          `${title || `Arkive Document - ${item_id}`}.html`,
-        );
-        return true; // Prevents any further key handlers from being run.
-      }, [getText, item_id]);
+      // const handleExportShortcut = useCallback(() => {
+      //   const htmlString = getHTML();
+      //   saveAs(
+      //     new Blob([htmlString], {
+      //       type: "text/html;charset=utf-8",
+      //     }),
+      //     `${title || `Arkive Document - ${item_id}`}.html`,
+      //   );
+      //   return true; // Prevents any further key handlers from being run.
+      // }, [getText, item_id]);
 
       // "Mod" means platform agnostic modifier key - i.e. Ctrl on Windows, or Cmd on MacOS
 
       useKeymap("Mod-s", handleSaveShortcut);
       useKeymap("Mod-k", handleCancelSaveShortcut);
-      useKeymap("Mod-e", handleExportShortcut);
+      // useKeymap("Mod-e", handleExportShortcut);
     },
   ];
 }

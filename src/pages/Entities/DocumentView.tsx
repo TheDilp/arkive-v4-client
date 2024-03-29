@@ -231,7 +231,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
       {/* @ts-ignore */}
       <Remirror
         editable={canUpdate}
-        hooks={documentEditorHooks(changedData, resetChanges, refetch, currentDocument?.data?.title || "")}
+        hooks={documentEditorHooks(changedData, resetChanges, refetch)}
         initialContent={state}
         manager={manager}
         onChange={(params) => {
