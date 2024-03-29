@@ -1,20 +1,28 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
+
 export const InsertDictionarySchema = z.object({
-  title: z.string(),
-  project_id: z.string(),
-  icon: z.string().nullable().optional(),
-  is_folder: z.boolean().nullable().optional(),
-  is_public: z.boolean().nullable().optional(),
-  parent_id: z.string().nullable().optional(),
+  data: z.object({
+    title: z.string(),
+    project_id: z.string(),
+    icon: z.string().nullable().optional(),
+    is_folder: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
+    parent_id: z.string().nullable().optional(),
+  }),
+  permissions: InsertEntityPermissionSchema,
 });
 export const UpdateDictionarySchema = z.object({
-  id: z.string(),
-  title: z.string().optional(),
-  icon: z.string().nullable().optional(),
-  is_folder: z.boolean().nullable().optional(),
-  is_public: z.boolean().nullable().optional(),
-  parent_id: z.string().nullable().optional(),
+  data: z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    icon: z.string().nullable().optional(),
+    is_folder: z.boolean().nullable().optional(),
+    is_public: z.boolean().nullable().optional(),
+    parent_id: z.string().nullable().optional(),
+  }),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export type InsertDictionaryType = z.infer<typeof InsertDictionarySchema>;
