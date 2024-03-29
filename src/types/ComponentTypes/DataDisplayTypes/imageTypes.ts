@@ -2,7 +2,7 @@ import { AssetType } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
 export interface ImageComponentType {
-  image: ImageType;
+  image: Omit<ImageType, "owner_id" | "permissions">;
   isOpenable?: boolean;
   hasTitle?: boolean;
   isLazyLoading?: boolean;
