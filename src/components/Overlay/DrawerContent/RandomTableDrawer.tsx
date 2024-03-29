@@ -2,8 +2,8 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { HandleChangePropsType } from "../../../types";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import { HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
 import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
 import {
@@ -13,6 +13,7 @@ import {
   UpdateRandomTableType,
 } from "../../../validation/random_tables";
 import { FolderSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Checkbox, Input, Textarea } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
@@ -29,18 +30,20 @@ function isSaveDisabled(random_table: Partial<RandomTableType>) {
   return random_table?.random_table_options?.some((opt) => !opt.title);
 }
 
-const tabs = [
-  {
-    id: "1",
-    label: "Basic info",
-    icon: IconEnum.info_circle,
-  },
-  {
-    id: "2",
-    label: "Options",
-    icon: IconEnum.random_table,
-  },
-];
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    {
+      id: "2",
+      label: "Options",
+      icon: IconEnum.random_table,
+    },
+  ];
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 function OptionInput({
   name,
@@ -81,7 +84,7 @@ function OptionInput({
 
 export function RandomTableDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
-  const [selectTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const { data: existingRandomTable, isInitialLoading } = useGetEntity<RandomTableType>(
@@ -92,6 +95,7 @@ export function RandomTableDrawer({ data }: Props) {
       relations: {
         random_table_options: true,
       },
+      permissions: true,
       fields: ["id", "title", "description", "icon", "is_public"],
     },
     { enabled: !!data?.id },
@@ -108,6 +112,12 @@ export function RandomTableDrawer({ data }: Props) {
 
   const { changedData, handleChange } = useHandleChange({ data: randomTable, setData: setRandomTable });
 
+  const permissions = useHasPermissions(
+    ["read_random_tables", "create_random_tables", "update_random_tables"],
+    randomTable?.owner_id,
+  );
+  const tabs = getTabs(permissions, data?.id);
+
   useLayoutEffect(() => {
     if (existingRandomTable?.data && !randomTable?.title) {
       setRandomTable(existingRandomTable?.data);
@@ -118,8 +128,8 @@ export function RandomTableDrawer({ data }: Props) {
 
   return (
     <div className="flex flex-col gap-y-2">
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectTab} tabs={tabs} />
-      {selectTab === 0 ? (
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {tabs[selectedTab].id === "1" ? (
         <>
           <div className="w-full">
             <Input
@@ -146,7 +156,7 @@ export function RandomTableDrawer({ data }: Props) {
         </>
       ) : null}
 
-      {selectTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <>
           <div className="flex w-full items-center justify-between">
             <span>Insert new option:</span>
@@ -202,6 +212,15 @@ export function RandomTableDrawer({ data }: Props) {
         </>
       ) : null}
 
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={randomTable?.permissions || []}
+          related_id={randomTable?.id || null}
+          selectablePermissions={["read_random_tables", "update_random_tables", "delete_random_tables"]}
+        />
+      ) : null}
+
       <Button
         icon={randomTable?.id ? IconEnum.save : IconEnum.add}
         isDisabled={isSaveDisabled(randomTable) || isCreating || isUpdating}
@@ -213,6 +232,7 @@ export function RandomTableDrawer({ data }: Props) {
               const parsed = UpdateRandomTableSchema.parse({
                 data: randomTable,
                 relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
+                permissions: randomTable.permissions,
               });
               await update(parsed, {
                 onSuccess: (res) => {
@@ -223,6 +243,7 @@ export function RandomTableDrawer({ data }: Props) {
               const parsed = InsertRandomTableSchema.parse({
                 data: randomTable,
                 relations: { random_table_options: (randomTable?.random_table_options || [])?.map((opt) => ({ data: opt })) },
+                permissions: randomTable.permissions,
               });
               await create(parsed, {
                 onSuccess: (res) => {

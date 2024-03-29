@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
+
 export const UpdateRandomTableSchema = z.object({
   data: z.object({
     id: z.string(),
@@ -26,6 +28,8 @@ export const UpdateRandomTableSchema = z.object({
         .optional(),
     })
     .optional(),
+
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export const RandomTableSubOptionSchema = z.object({
@@ -92,6 +96,8 @@ export const InsertRandomTableSchema = z.object({
         .optional(),
     })
     .optional(),
+
+  permissions: InsertEntityPermissionSchema,
 });
 
 export type InsertRandomTableType = z.infer<typeof InsertRandomTableSchema>;
