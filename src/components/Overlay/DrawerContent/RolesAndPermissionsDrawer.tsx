@@ -69,21 +69,25 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
           variant="info-bordered"
         />
       </div>
-      {formattedPermissions.map((permission) => (
-        <Collapsible key={permission.title} label={capitalizeFirstLetter(getSentenceCase(permission.title))}>
-          <div className="grid grid-cols-2 gap-2 p-2 text-center">
-            {permission.permissions.map((p) => (
-              <Checkbox
-                key={p.title}
-                label={p.title}
-                name={`permissions[${p.id}]`}
-                onChange={handleChange}
-                value={role?.permissions?.[p.id]}
-              />
-            ))}
-          </div>
-        </Collapsible>
-      ))}
+      {formattedPermissions.map((permission) => {
+        const hasReadPermission = permission.permissions.some((p) => p.code.startsWith("read_") && role?.permissions?.[p.id]);
+        return (
+          <Collapsible key={permission.title} label={capitalizeFirstLetter(getSentenceCase(permission.title))}>
+            <div className="grid grid-cols-2 gap-2 p-2 text-center">
+              {permission.permissions.map((p) => (
+                <Checkbox
+                  key={p.title}
+                  isDisabled={!hasReadPermission && !p.code.startsWith("read_")}
+                  label={p.title}
+                  name={`permissions[${p.id}]`}
+                  onChange={handleChange}
+                  value={role?.permissions?.[p.id]}
+                />
+              ))}
+            </div>
+          </Collapsible>
+        );
+      })}
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
