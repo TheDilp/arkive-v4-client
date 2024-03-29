@@ -3,12 +3,21 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { CalendarType, DayStateType, LeapDayConditionType, LeapDayStateType, MonthStateType } from "../../../types";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  CalendarType,
+  DayStateType,
+  LeapDayConditionType,
+  LeapDayStateType,
+  MonthStateType,
+  TabType,
+  UserHasPermissionsType,
+} from "../../../types";
 import { capitalizeFirstLetter, DefaultTagColor, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { FolderSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Checkbox, Input, Select, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Icon, Skeleton } from "../../Misc";
@@ -395,11 +404,19 @@ function LeapDaysSection({
   );
 }
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Eras", icon: IconEnum.era },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Eras", icon: IconEnum.era },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function CalendarDrawer({ data }: Props) {
   const { project_id } = useParams();
@@ -416,6 +433,7 @@ export function CalendarDrawer({ data }: Props) {
     {
       fields: ["id", "title", "icon", "hours", "minutes", "days", "starts_on_day", "is_folder", "is_public", "parent_id"],
       relations: { eras: true, months: true, leap_days: true, tags: true },
+      permissions: true,
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
@@ -427,6 +445,11 @@ export function CalendarDrawer({ data }: Props) {
     "calendars",
     project_id as string,
   );
+  const permissions = useHasPermissions(
+    ["read_calendars", "create_calendars", "update_calendars", "read_tags", "read_character_fields_templates"],
+    calendar?.owner_id,
+  );
+  const tabs = getTabs(permissions, data?.id);
 
   useLayoutEffect(() => {
     if (existingCalendar?.data) {
@@ -450,6 +473,7 @@ export function CalendarDrawer({ data }: Props) {
           leap_days: leapDays.map((ld) => ({ data: ld })),
           tags: calendar.tags,
         },
+        permissions: calendar?.permissions,
       });
       await createCalendar(parsedData, { onSuccess: resetDrawer });
     } else {
@@ -463,6 +487,7 @@ export function CalendarDrawer({ data }: Props) {
           leap_days: leapDays.map((ld) => ({ data: ld })),
           tags: calendar.tags,
         },
+        permissions: calendar?.permissions,
       });
       await updateCalendar(parsedData, { onSuccess: resetDrawer });
     }
@@ -473,7 +498,7 @@ export function CalendarDrawer({ data }: Props) {
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <div className="max-h-[90%] overflow-y-auto">
           <div className="flex flex-nowrap gap-x-2">
             <Input label="Title (required)" name="title" onChange={handleChange} value={calendar?.title || ""} />
@@ -532,7 +557,7 @@ export function CalendarDrawer({ data }: Props) {
           </Collapsible>
         </div>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <div>
           <div className="flex items-center justify-between">
             <span>Add era:</span>
@@ -642,7 +667,18 @@ export function CalendarDrawer({ data }: Props) {
           ))}
         </div>
       ) : null}
-      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={calendar?.tags || []} /> : null}
+      {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
+        <TagInput handleChange={handleChange} tags={calendar?.tags || []} />
+      ) : null}
+
+      {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          permissions={calendar?.permissions || []}
+          related_id={calendar?.id || null}
+          selectablePermissions={["read_calendars", "update_calendars", "delete_calendars"]}
+        />
+      ) : null}
 
       <div>
         <Button

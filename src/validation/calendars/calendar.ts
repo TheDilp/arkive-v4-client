@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
 import { InsertEraSchema, UpdateEraSchema } from "./eras";
 import { InsertMonthSchema, UpdateMonthSchema } from "./month";
 
@@ -44,6 +45,7 @@ export const InsertCalendarSchema = z.object({
       .optional()
       .nullable(),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateCalendarSchema = z.object({
@@ -86,6 +88,7 @@ export const UpdateCalendarSchema = z.object({
       .optional()
       .nullable(),
   }),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export type InsertCalendarType = z.infer<typeof InsertCalendarSchema>;
