@@ -472,7 +472,7 @@ export function AssetView() {
         </div>
         <div className="lg:w-52">
           <Button
-            icon={IconEnum.add}
+            icon={IconEnum.upload}
             isDisabled={!permissions?.create_assets}
             label="Upload image"
             onClick={() =>
