@@ -522,6 +522,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       {tabs[selectedTab].id === "3" && (permissions.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
+          owner_id={blueprint?.owner_id}
           permissions={blueprint?.permissions || []}
           related_id={blueprint?.id || ""}
           selectablePermissions={["read_blueprints", "update_blueprints", "delete_blueprints"]}

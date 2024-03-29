@@ -245,6 +245,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       ) : null}
       {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
+          owner_id={document?.owner_id}
           handleChange={handleChange}
           permissions={document?.permissions || []}
           related_id={document?.id || null}

@@ -473,6 +473,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
           handleChange={handleChange}
+          owner_id={instance?.owner_id}
           permissions={instance?.permissions || []}
           related_id={instance?.id || null}
           selectablePermissions={["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"]}

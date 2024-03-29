@@ -1,25 +1,51 @@
 import { useAtomValue } from "jotai";
 
-import { EntityPermissionType, HandleChangePropsType } from "../../types";
+import { EntityPermissionType, HandleChangePropsType, UserType } from "../../types";
 import { IconEnum, membersAtom, permissionsAtom, userAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
+
+function OwnerDisplay({
+  owner_id,
+  members,
+  user,
+}: {
+  owner_id: string | undefined;
+  members: UserType[] | undefined;
+  user: UserType | null;
+}) {
+  let ownerEmail = "";
+  if (owner_id && user && members) {
+    if (user?.id === owner_id && user?.email) {
+      ownerEmail = user?.email;
+    } else {
+      const member = (members || []).find((m) => m.id === owner_id);
+      if (member) {
+        ownerEmail = member.email;
+      }
+    }
+  }
+  if (ownerEmail) return <Title isDrawerTitle label={`Owner: ${ownerEmail}`} size="lg" variant="primary" />;
+  return null;
+}
 
 type Props = {
   related_id: string | null;
   permissions: (Pick<EntityPermissionType, "permission_id" | "role_id" | "user_id"> & { related_id: string | null })[];
   handleChange: (newData: HandleChangePropsType) => void;
   selectablePermissions: string[];
+  owner_id?: string;
   // type?: AvailableEntityType | AvailableSubEntityType;
 };
 
-export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions }: Props) {
+export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, owner_id }: Props) {
   const user = useAtomValue(userAtom);
-
   const members = useAtomValue(membersAtom);
+
   const availablePermissions = useAtomValue(permissionsAtom).filter((p) => selectablePermissions.includes(p.code as string));
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-4">
+      <OwnerDisplay members={members} owner_id={owner_id} user={user} />
       {/* {isProjectOwner ? (
         <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
           <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">

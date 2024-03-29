@@ -56,7 +56,7 @@ export function ProjectLayout() {
         webhooks: true,
         roles: true,
       },
-      fields: ["id", "feature_flags"],
+      fields: ["id", "feature_flags", "email"],
     },
     { enabled: !!user?.id && !!project_id },
   );

@@ -57,6 +57,7 @@ export function ImageDrawer({ data }: Props) {
           permissions={image?.permissions || []}
           related_id={image?.id || null}
           selectablePermissions={["read_assets", "update_assets", "delete_assets"]}
+          owner_id={image?.owner_id}
         />
       ) : null}
       <Button

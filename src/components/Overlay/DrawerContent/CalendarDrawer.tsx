@@ -673,6 +673,7 @@ export function CalendarDrawer({ data }: Props) {
 
       {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
+          owner_id={calendar?.owner_id}
           handleChange={handleChange}
           permissions={calendar?.permissions || []}
           related_id={calendar?.id || null}
