@@ -211,7 +211,7 @@ export function AssetView() {
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
     type,
-    { orderBy, fields: ["id", "title", "type", "is_public"], filters, pagination },
+    { orderBy, fields: ["id", "title", "type", "is_public"], filters, pagination, permissions: true },
     { enabled: view === "table", prefetch: false },
   );
 
@@ -222,6 +222,7 @@ export function AssetView() {
   } = useGetInfiniteAssets<ImageType>(
     {
       filters,
+      permissions: true,
       fields: ["id", "title", "type"],
       pagination: {
         limit: isLg ? 24 : 12,

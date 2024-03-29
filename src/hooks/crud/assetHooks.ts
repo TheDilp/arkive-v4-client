@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { saveAs } from "file-saver";
 
-import { AssetType, RequestBodyType } from "../../types";
+import { AssetType, EntityPermissionType, RequestBodyType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
 import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
 
@@ -126,11 +126,11 @@ export function useGetImages<InsertType>(
 
   return res;
 }
-export function useGetImage<InsertType>(
+export function useGetImage(
   id: string,
   project_id: string,
   type: AssetType,
-  request: RequestBodyType<InsertType>,
+  request: RequestBodyType<ImageType>,
   options?: UseQueryOptions<{ data: ImageType }, any, { data: ImageType }> & {
     isPublic?: boolean;
     queryKeyConcat?: string[];
@@ -150,7 +150,7 @@ export function useGetImage<InsertType>(
     },
   );
 }
-export function useUpdateImage<InsertType extends { data: { title: string } }>(
+export function useUpdateImage<InsertType extends { data: { title: string }; permissions?: EntityPermissionType[] }>(
   id: string,
   project_id: string | undefined,
   type: AssetType,
