@@ -214,7 +214,7 @@ export function TagView() {
                 variant: "error",
                 hasNoBackground: true,
                 isIconOnly: true,
-                tooltip: "Delete selected rows.",
+                tooltip: "Delete selected rows",
                 onClick: () => {
                   const ids = Object.values(selection || {}).flatMap((id) => id);
                   if (ids.length) {

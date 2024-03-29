@@ -293,7 +293,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
                 variant: "error",
                 hasNoBackground: true,
                 isIconOnly: true,
-                tooltip: "Delete selected rows.",
+                tooltip: "Delete selected rows",
                 onClick: () => {
                   const ids = Object.values(selection || {}).flatMap((i) => i);
                   if (ids.length) {

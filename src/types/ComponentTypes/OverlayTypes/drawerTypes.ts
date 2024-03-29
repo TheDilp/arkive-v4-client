@@ -101,7 +101,7 @@ export type DrawerAtomType = {
     }
   | {
       type: "bulk_access";
-      data: { ids: string[]; selectablePermissions: PermissionCodeType[]; type: AvailableEntityType };
+      data: { ids: string[]; selectablePermissions: PermissionCodeType[]; type: AvailableEntityType | AvailableSubEntityType };
     }
   | {
       type: "mentioned_in_document";
