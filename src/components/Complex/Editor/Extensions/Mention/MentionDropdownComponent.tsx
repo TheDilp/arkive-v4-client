@@ -34,16 +34,18 @@ export function MentionDropdownComponent() {
         icon?: string;
         parent_id?: string;
       }[];
-    } = await FetchFunction({
-      url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
-      method: "POST",
-      body: JSON.stringify({
-        data: {
-          search_term: state?.query?.full,
-        },
-        limit: 5,
-      }),
-    });
+    } = state?.query?.full?.length
+      ? await FetchFunction({
+          url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
+          method: "POST",
+          body: JSON.stringify({
+            data: {
+              search_term: state?.query?.full,
+            },
+            limit: 5,
+          }),
+        })
+      : [];
     setIsFetching(false);
     setOptions(
       items.data
