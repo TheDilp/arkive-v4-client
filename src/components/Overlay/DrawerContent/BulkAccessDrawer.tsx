@@ -16,7 +16,7 @@ export function BulkAccessDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [permissions, setPermissions] = useState<{ permissions: Omit<EntityPermissionType, "code">[] }>({ permissions: [] });
   const { handleChange } = useHandleChange({ data, setData: setPermissions });
-  const { mutate } = useBulkUpdateAccess(project_id, "characters");
+  const { mutate } = useBulkUpdateAccess(project_id, data?.type);
   const resetDrawer = useResetAtom(drawerAtom);
   return (
     <DrawerLayout>
