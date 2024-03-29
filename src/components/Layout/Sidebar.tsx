@@ -4,7 +4,8 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useBreakpoint } from "../../hooks";
-import { IconEnum, isProjectOwnerAtom, navItems, userAtom } from "../../utils";
+import { PermissionCodeType } from "../../types";
+import { currentUserPermissions, getSidebarLink, IconEnum, isProjectOwnerAtom, navItems, userAtom } from "../../utils";
 import { Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 
@@ -18,14 +19,26 @@ const SidebarClasses = tv({
     list: "flex w-screen overflow-x-auto lg:w-full lg:flex-1 lg:flex-col lg:items-center lg:justify-start lg:overflow-x-hidden lg:overflow-y-auto overflow-y-hidden",
     sidebarLogo:
       "flex h-16 items-center justify-center w-16 min-w-[4rem] min-h-[4rem] sticky top-0 left-0 bg-zinc-900 select-none",
-    listItemLink: "w-full cursor-pointer transition-all lg:mx-0 flex justify-center w-16 hover:fill-blue-300",
-    listItem:
-      "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors hover:text-blue-400 justify-center",
-    selectedListItem: "text-white bg-blue-400 [&>li]:hover:text-white",
-    listSettingsItem: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mt-auto",
-    selectedSettingsListItem: "text-white bg-blue-400 [&>li]:hover:text-white",
-    navIcon: "cursor-pointer",
+    listItem: "flex h-16 max-w-[4rem] min-w-[4rem] min-h-[4rem] items-center justify-center transition-colors  justify-center",
   },
+});
+const { base, nav, list, sidebarLogo, listItem } = SidebarClasses();
+
+const SidebarItemClasses = tv({
+  base: "w-full transition-all lg:mx-0 flex justify-center w-16 ",
+  variants: {
+    isSelected: {
+      true: "text-white bg-blue-400 [&>li]:hover:text-white",
+    },
+    isSettings: {
+      true: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mt-auto",
+    },
+    isDisabled: {
+      true: "cursor-not-allowed bg-zinc-300 ",
+      false: "hover:text-blue-400",
+    },
+  },
+  compoundVariants: [{ isSelected: true, isSettings: true, class: "text-white bg-blue-400 [&>li]:hover:text-white" }],
 });
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 export function Sidebar({ isLoading }: { isLoading: boolean }) {
@@ -33,25 +46,13 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
   const user = useAtomValue(userAtom);
+  const userPermissions = useAtomValue(currentUserPermissions);
   const enabledEntities = Object.entries(user?.feature_flags || [])
     .filter(([key, value]) => {
       return key.includes("_enabled") && value;
     })
     .map(([key]) => key);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-
-  const {
-    base,
-    nav,
-    list,
-    sidebarLogo,
-    listItemLink,
-    listItem,
-    listSettingsItem,
-    selectedListItem,
-    selectedSettingsListItem,
-    navIcon,
-  } = SidebarClasses();
 
   const finalSidebarItems = useMemo(() => {
     return sidebarItems
@@ -60,8 +61,15 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
         user?.feature_flags
           ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
           : alwaysEnabledItems.includes(item.navigate),
-      );
-  }, [isProjectOwner, user?.feature_flags]);
+      )
+      .map((item) => ({
+        ...item,
+        isDisabled:
+          !isProjectOwner &&
+          item.navigate !== "settings" &&
+          !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
+      }));
+  }, [isProjectOwner, user?.feature_flags, userPermissions]);
 
   return (
     <div className={base()}>
@@ -78,23 +86,21 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
                 return (
                   <Link
                     key={item.icon}
-                    className={`${listItemLink()} ${
-                      item.navigate === "characters" && pathname.includes("characters") ? selectedListItem() : ""
-                    }
-                ${item.navigate === "blueprints" && pathname.includes("blueprints") ? selectedListItem() : ""}
-                ${item.navigate === type && type !== "settings" ? selectedListItem() : ""}
-                 ${item.navigate === "settings" && type === "settings" ? selectedSettingsListItem() : ""}
-                
-                ${item.navigate === "settings" ? listSettingsItem() : ""}
-                
-                `}
-                    to={item.navigate === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${item.navigate}`}>
+                    className={SidebarItemClasses({
+                      isSelected:
+                        (item.navigate === "characters" && pathname.includes("characters")) ||
+                        (item.navigate === "blueprints" && pathname.includes("blueprints")) ||
+                        (item.navigate === type && type !== "settings"),
+                      isSettings: item.navigate === "settings",
+                      isDisabled: item?.isDisabled,
+                    })}
+                    to={getSidebarLink(item.navigate, project_id as string, item?.isDisabled)}>
                     <Tooltip
                       allowedPlacements={[isLg ? "right" : "top"]}
                       content={item.tooltip}
                       isDisabled={item.navigate === type}>
                       <li className={listItem()}>
-                        <Icon className={navIcon()} fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
+                        <Icon fontSize={32} hFlip={item.navigate === "generators"} icon={item.icon} />
                       </li>
                     </Tooltip>
                   </Link>

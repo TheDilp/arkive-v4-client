@@ -45,3 +45,8 @@ export function getMentionLink(
   if (isPublic && !is_public) return "#";
   return getEntityLink(project_id, type, id, parent_id, isPublic);
 }
+
+export function getSidebarLink(link: string, project_id: string, isDisabled?: boolean): string {
+  if (isDisabled) return "#";
+  return link === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${link}`;
+}
