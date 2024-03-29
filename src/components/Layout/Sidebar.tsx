@@ -91,7 +91,7 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
                       isSelected:
                         (item.navigate === "characters" && pathname.includes("characters")) ||
                         (item.navigate === "blueprints" && pathname.includes("blueprints")) ||
-                        (item.navigate === type && type !== "settings"),
+                        item.navigate === type,
                       isSettings: item.navigate === "settings",
                       isDisabled: item?.isDisabled,
                     })}
