@@ -57,7 +57,6 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
 
   const finalSidebarItems = useMemo(() => {
     return sidebarItems
-      .toSpliced(0, isProjectOwner ? 0 : 1)
       .filter((item) =>
         user?.feature_flags
           ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
@@ -68,6 +67,7 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
         isDisabled:
           !isProjectOwner &&
           item.navigate !== "settings" &&
+          item.navigate !== "/" &&
           !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
       }));
   }, [isProjectOwner, user?.feature_flags, userPermissions]);
