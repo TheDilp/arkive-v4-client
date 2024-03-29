@@ -1,8 +1,9 @@
+import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateFromTemplate, useHandleChange } from "../../../hooks";
-import { IconEnum } from "../../../utils";
+import { drawerAtom, IconEnum } from "../../../utils";
 import { Button, Input, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
@@ -16,8 +17,9 @@ type Props = {
 export function DocumentFromTemplate({ data }: Props) {
   const { project_id } = useParams();
   const [template, setTemplate] = useState<{ titles: string[]; count: number }>({ titles: [], count: 1 });
+  const resetDrawer = useResetAtom(drawerAtom);
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
-  const { mutateAsync: createDocumentFromTemplate } = useCreateFromTemplate(project_id as string);
+  const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
 
   return (
     <DrawerLayout>
@@ -42,13 +44,18 @@ export function DocumentFromTemplate({ data }: Props) {
       ))}
       <Button
         icon={IconEnum.add}
+        isDisabled={isLoading}
+        isLoading={isLoading}
         label="Create"
         onClick={async () => {
-          createDocumentFromTemplate({
-            id: data.id,
-            titles: template.titles.slice(0, template.count),
-            count: template.count,
-          });
+          createDocumentFromTemplate(
+            {
+              id: data.id,
+              titles: template.titles.slice(0, template.count),
+              count: template.count,
+            },
+            { onSuccess: resetDrawer },
+          );
         }}
         variant="success"
       />
