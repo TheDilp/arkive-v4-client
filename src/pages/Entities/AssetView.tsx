@@ -16,7 +16,19 @@ import {
   useTable,
   useUpdateManyPublic,
 } from "../../hooks";
-import { AssetType, DialogAtomType, DrawerAtomType, ImageType, UserHasPermissionsType, UserType } from "../../types";
+import {
+  AssetType,
+  DeleteManyType,
+  DialogAtomType,
+  DrawerAtomType,
+  ImageType,
+  TableDispatch,
+  TableSelectedAction,
+  TableSelectionType,
+  UpdatePublicManyType,
+  UserHasPermissionsType,
+  UserType,
+} from "../../types";
 import {
   baseURLS,
   BooleanFilters,
@@ -208,6 +220,125 @@ function createColumns(
     }),
   ];
 }
+function getSelectedActions(
+  permissions: UserHasPermissionsType,
+  {
+    selection,
+    updatePublicMany,
+    resetDialog,
+    deleteMany,
+    dispatch,
+    data,
+    setDrawer,
+    setDialog,
+  }: {
+    updatePublicMany: UpdatePublicManyType;
+    deleteMany: DeleteManyType;
+    selection: TableSelectionType | undefined;
+    setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+    setDialog: Dispatch<SetStateAction<DialogAtomType>>;
+    resetDialog: () => unknown;
+    data: ImageType[];
+    dispatch: TableDispatch;
+  },
+) {
+  const selectedActions: TableSelectedAction[] = [];
+  if (permissions?.update_assets) {
+    selectedActions.push(
+      {
+        icon: IconEnum.eye,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set public",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            await updatePublicMany({ data: { ids, is_public: true } });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+      {
+        icon: IconEnum.eye_slash,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Set private",
+        onClick: async () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          if (entitesNotFolders.length) {
+            await updatePublicMany({ data: { ids, is_public: false } });
+            dispatch({ type: "clearSelection" });
+          }
+        },
+      },
+    );
+  }
+  if (permissions?.is_owner) {
+    selectedActions.push({
+      icon: IconEnum.permissions,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Change access",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+
+        setDrawer((prev) => ({
+          ...prev,
+          size: "lg",
+          title: "Edit access",
+          type: "bulk_access",
+          data: {
+            ids,
+            selectablePermissions: ["read_assets", "update_assets", "delete_assets"],
+            type: "images",
+          },
+        }));
+      },
+    });
+  }
+  if (permissions?.delete_assets) {
+    selectedActions.push({
+      icon: IconEnum.trash,
+      variant: "error",
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Delete selected rows",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Delete many",
+            description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "image" : "images"}?`,
+            warning: "This action cannot be undone.",
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialog,
+            },
+            confirm: {
+              label: "Delete",
+              icon: IconEnum.trash,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    });
+  }
+
+  return selectedActions;
+}
 
 export function AssetView() {
   const { project_id } = useParams();
@@ -216,8 +347,8 @@ export function AssetView() {
   const resetDialog = useResetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
-  const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
-  const { mutate: deleteManyImages } = useDeleteMany("images", project_id);
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("images", project_id as string);
+  const { mutateAsync: deleteMany } = useDeleteMany("images", project_id);
 
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
@@ -394,7 +525,7 @@ export function AssetView() {
               isProjectOwner,
               type,
               project_id as string,
-              updateImagesPublic,
+              updatePublicMany,
               permissions,
             )}
             config={{
@@ -402,44 +533,16 @@ export function AssetView() {
               orderBy,
               filters,
               selection,
-              selectedActions: [
-                {
-                  icon: IconEnum.trash,
-                  variant: "error",
-                  hasNoBackground: true,
-                  isIconOnly: true,
-                  tooltip: "Delete selected rows",
-                  onClick: () => {
-                    const ids = Object.values(selection || {}).flatMap((id) => id);
-                    if (ids.length) {
-                      setDialog((prev) => ({
-                        ...prev,
-                        title: "Delete many",
-                        description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "image" : "images"}?`,
-                        warning: "This action cannot be undone.",
-                        isOverlay: true,
-                        cancel: {
-                          label: "Cancel",
-                          variant: "primary",
-                          action: resetDialog,
-                        },
-                        confirm: {
-                          label: "Delete",
-                          icon: IconEnum.trash,
-                          action: async () =>
-                            deleteManyImages(
-                              { data: { ids } },
-                              {
-                                onSuccess: () => dispatch({ type: "clearSelection" }),
-                              },
-                            ),
-                          variant: "error",
-                        },
-                      }));
-                    }
-                  },
-                },
-              ],
+              selectedActions: getSelectedActions(permissions, {
+                selection,
+                setDialog,
+                setDrawer,
+                resetDialog,
+                updatePublicMany,
+                dispatch,
+                deleteMany,
+                data: assets?.data || [],
+              }),
             }}
             data={assets?.data || []}
             dispatch={dispatch}
