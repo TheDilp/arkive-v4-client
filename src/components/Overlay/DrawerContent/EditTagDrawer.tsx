@@ -67,10 +67,10 @@ export function EditTagDrawer({ data }: Props) {
       {tabs[selectedTab].id === "2" ? (
         <EntityPermission
           handleChange={handleChange}
+          owner_id={tag?.owner_id}
           permissions={tag?.permissions || []}
           related_id={tag?.id || null}
           selectablePermissions={["read_tags", "update_tags", "delete_tags"]}
-          owner_id={tag?.owner_id}
         />
       ) : null}
       <Button

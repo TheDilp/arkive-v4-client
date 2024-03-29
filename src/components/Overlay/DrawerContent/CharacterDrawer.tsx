@@ -851,8 +851,8 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {tabs[selectedTab].id === "6" && (permissions?.is_owner || !data?.id) ? (
         <EntityPermission
-          owner_id={character?.owner_id}
           handleChange={handleChange}
+          owner_id={character?.owner_id}
           permissions={character?.permissions || []}
           related_id={character?.id || null}
           selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
