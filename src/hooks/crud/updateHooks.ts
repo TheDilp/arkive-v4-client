@@ -768,7 +768,7 @@ export function useBulkUpdate(project_id: string, type: AvailableEntityType) {
     },
   );
 }
-export function useBulkUpdateAccess(project_id: string | undefined, type: AvailableEntityType) {
+export function useBulkUpdateAccess(project_id: string | undefined, type: AvailableEntityType | AvailableSubEntityType) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(

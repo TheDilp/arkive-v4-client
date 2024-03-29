@@ -3,14 +3,16 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateAccess, useHandleChange } from "../../../hooks";
-import { AvailableEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
-type Props = { data: { ids: string[]; selectablePermissions: PermissionCodeType[]; type: AvailableEntityType } };
+type Props = {
+  data: { ids: string[]; selectablePermissions: PermissionCodeType[]; type: AvailableEntityType | AvailableSubEntityType };
+};
 
 export function BulkAccessDrawer({ data }: Props) {
   const { project_id } = useParams();

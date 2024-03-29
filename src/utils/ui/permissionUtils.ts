@@ -3,6 +3,7 @@ import {
   AvailableSubEntityType,
   EntityPermissionType,
   PermissionCodeType,
+  SearchableEntities,
   UserHasPermissionsType,
 } from "../../types";
 
@@ -48,4 +49,15 @@ export function hasActionPermission(
   return entityPermissions?.some(
     (perm) => (user_role_id && user_role_id === perm?.role_id) || perm?.code === required_permission,
   );
+}
+
+export function getSearchCategoryPermission(permissions: PermissionCodeType[], type: SearchableEntities): boolean | undefined {
+  if (type === "characters") return permissions.includes("read_characters");
+  if (type === "documents" || type === "documents_content" || type === "alter_names")
+    return permissions.includes("read_documents");
+  if (type === "maps" || type === "map_pins") return permissions.includes("read_maps");
+  if (type === "graphs" || type === "nodes" || type === "edges") return permissions.includes("read_graphs");
+  if (type === "events") return permissions.includes("read_calendars");
+  if (type === "words") return permissions.includes("read_dictionaries");
+  return false;
 }

@@ -47,6 +47,7 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
   const { isLg } = useBreakpoint();
   const user = useAtomValue(userAtom);
   const userPermissions = useAtomValue(currentUserPermissions);
+
   const enabledEntities = Object.entries(user?.feature_flags || [])
     .filter(([key, value]) => {
       return key.includes("_enabled") && value;
