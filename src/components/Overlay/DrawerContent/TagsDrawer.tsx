@@ -114,7 +114,6 @@ export function TagsDrawer() {
           permissions={selectedPermissions.permissions || []}
           related_id={null}
           selectablePermissions={["read_tags", "update_tags", "delete_tags"]}
-          type="tags"
         />
       ) : null}
 

@@ -249,7 +249,6 @@ export function DocumentDrawer({ data, exceptions }: Props) {
           permissions={document?.permissions || []}
           related_id={document?.id || null}
           selectablePermissions={["read_documents", "update_documents", "delete_documents"]}
-          type="documents"
         />
       ) : null}
       <Button

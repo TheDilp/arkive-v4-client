@@ -476,7 +476,6 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           permissions={instance?.permissions || []}
           related_id={instance?.id || null}
           selectablePermissions={["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"]}
-          type="blueprint_instances"
         />
       ) : null}
 

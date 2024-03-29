@@ -70,7 +70,6 @@ export function EditTagDrawer({ data }: Props) {
           permissions={tag?.permissions || []}
           related_id={tag?.id || null}
           selectablePermissions={["read_tags", "update_tags", "delete_tags"]}
-          type="tags"
         />
       ) : null}
       <Button

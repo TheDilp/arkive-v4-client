@@ -25,7 +25,6 @@ export function BulkAccessDrawer({ data }: Props) {
         permissions={permissions?.permissions || []}
         related_id=""
         selectablePermissions={data?.selectablePermissions || []}
-        type={data?.type}
       />
 
       <Button

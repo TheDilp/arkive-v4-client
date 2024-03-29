@@ -855,7 +855,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           permissions={character?.permissions || []}
           related_id={character?.id || null}
           selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
-          type="characters"
         />
       ) : null}
       <div>

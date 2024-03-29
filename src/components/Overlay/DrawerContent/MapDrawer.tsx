@@ -250,7 +250,6 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
           permissions={map?.permissions || []}
           related_id={data?.id || null}
           selectablePermissions={["read_maps", "update_maps", "delete_maps"]}
-          type="maps"
         />
       ) : null}
       <Button

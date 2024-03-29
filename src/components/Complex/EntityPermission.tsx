@@ -1,45 +1,26 @@
 import { useAtomValue } from "jotai";
-import { useParams } from "react-router-dom";
 
-import { useGetEntities } from "../../hooks";
-import {
-  AvailableEntityType,
-  AvailableSubEntityType,
-  EntityPermissionType,
-  HandleChangePropsType,
-  RoleType,
-} from "../../types";
-import { getSingularEntityType, IconEnum, isProjectOwnerAtom, membersAtom, permissionsAtom, userAtom } from "../../utils";
+import { EntityPermissionType, HandleChangePropsType } from "../../types";
+import { IconEnum, membersAtom, permissionsAtom, userAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
-import { Icon } from "../Misc";
-import { Tooltip } from "../Overlay";
 
 type Props = {
   related_id: string | null;
   permissions: (Pick<EntityPermissionType, "permission_id" | "role_id" | "user_id"> & { related_id: string | null })[];
   handleChange: (newData: HandleChangePropsType) => void;
   selectablePermissions: string[];
-  type: AvailableEntityType | AvailableSubEntityType;
+  // type?: AvailableEntityType | AvailableSubEntityType;
 };
 
-export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, type }: Props) {
-  const { project_id } = useParams();
-  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions }: Props) {
   const user = useAtomValue(userAtom);
-  const { data: roles } = useGetEntities<RoleType>(
-    { data: { project_id }, fields: ["id"], relations: { permissions: true } },
-    "roles",
-    {
-      enabled: isProjectOwner,
-      staleTime: 5 * 60 * 1000,
-    },
-  );
+
   const members = useAtomValue(membersAtom);
   const availablePermissions = useAtomValue(permissionsAtom).filter((p) => selectablePermissions.includes(p.code as string));
   return (
     <div className="flex flex-col gap-y-2">
-      {isProjectOwner ? (
+      {/* {isProjectOwner ? (
         <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
           <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
             {(roles?.data || [])?.map((role) => {
@@ -84,7 +65,7 @@ export function EntityPermission({ related_id, permissions, handleChange, select
             })}
           </ul>
         </Collapsible>
-      ) : null}
+      ) : null} */}
 
       <Collapsible icon={IconEnum.user} initialOpen label="Member access">
         <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto px-2">
