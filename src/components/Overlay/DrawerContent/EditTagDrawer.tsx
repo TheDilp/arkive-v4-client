@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { TagType } from "../../../types";
+import { EntityPermissionType, TagType } from "../../../types";
 import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
@@ -31,14 +31,14 @@ export function EditTagDrawer({ data }: Props) {
   const resetDrawer = useResetAtom(drawerAtom);
   const [tag, setTag] = useState<TagType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
-  const { mutate: update, isLoading } = useUpdateEntity<{ data: Pick<TagType, "id" | "title" | "color"> }>(
-    "tags",
-    project_id as string,
-  );
+  const { mutate: update, isLoading } = useUpdateEntity<{
+    data: Pick<TagType, "id" | "title" | "color">;
+    permissions: EntityPermissionType[];
+  }>("tags", project_id as string);
 
   function handleSave() {
     if (tag) {
-      update({ data: { id: data.id, title: tag?.title, color: tag?.color } });
+      update({ data: { id: data.id, title: tag?.title, color: tag?.color }, permissions: tag.permissions });
       resetDrawer();
     }
   }
