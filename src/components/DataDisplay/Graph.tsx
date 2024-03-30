@@ -154,13 +154,14 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   // Board Events
   useEffect(() => {
     if (cyRef?.current?._cy && !isReadOnly && !isViewOnly) {
-      cyRef?.current?._cy.on("grabon", function (evt: any) {
-        const selected = cyRef?.current?._cy.elements(":selected");
-        if (selected?.length === 1) {
-          cyRef?.current?._cy.elements(":selected").unselect();
-          evt.target.select();
-        }
-      });
+      cyRef?.current?._cy.removeListener("grabon tapstart tapdrag tapend tapdragover tapdragout grab");
+      // cyRef?.current?._cy.on("grabon", function (evt: any) {
+      //   const selected = cyRef?.current?._cy.elements(":selected");
+      //   if (selected?.length === 1) {
+      //     cyRef?.current?._cy.elements(":selected").unselect();
+      //     evt.target.select();
+      //   }
+      // });
       // Right click
       cyRef?.current?._cy.on("cxttap", function (evt: any) {
         // If the target is the background of the canvas
@@ -435,17 +436,24 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         }
       });
       // Moving nodes
-      cyRef?.current?._cy.on("dragfreeon", "node", function (evt: EventObject) {
+      cyRef?.current?._cy.on(boardState.grid ? "free" : "dragfreeon", "node", function (evt: EventObject) {
         evt.preventDefault();
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        cyRef?.current?._cy.elements(":selected").select();
-        evt.target.select();
+        const selectedNodes: Collection<NodeSingular> = cyRef?.current?._cy.nodes(":selected");
 
-        cyRef?.current?._cy.elements(":selected").forEach((el: NodeSingular) => {
+        if (selectedNodes.length === 0) {
+          evt.target.select();
+        } else {
+          selectedNodes.select();
+        }
+
+        cyRef?.current?._cy.nodes(":selected").forEach((el: NodeSingular) => {
           addOrUpdateNode({ id: el.id(), ...el.position() });
         });
+        selectedNodes.select();
       });
+
       // Double Click
       cyRef?.current?._cy.on("dbltap", "node", function (evt: any) {
         const target = evt.target._private;
@@ -495,9 +503,9 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       });
     }
     return () => {
-      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap dragfreeon");
+      cyRef?.current?._cy.removeListener(`mousedown cxttap dbltap ${boardState.grid ? "free" : "dragfreeon"}`);
     };
-  }, [cyRef?.current?._cy, nodes, edges, item_id]);
+  }, [cyRef?.current?._cy, boardState.grid, nodes, edges, item_id]);
   useEffect(() => {
     // Creating edges
     // @ts-ignore
@@ -650,6 +658,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     }
     return () => {};
   }, [drawer]);
+  cyRef?.current?._cy.removeListener("grabon tapstart tapdrag tapend tapdragover tapdragout grab");
 
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">
