@@ -120,8 +120,12 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   });
 
   useLayoutEffect(() => {
-    if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
+    if (
+      (currentDocument?.data?.content || currentDocument?.data?.content === null) &&
+      manager.view.state.doc.textContent === ""
+    ) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
+      // Timeout is necessary for mentions to load and render correctly
       setTimeout(() => {
         manager.view.updateState(
           manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
