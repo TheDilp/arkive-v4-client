@@ -11,7 +11,7 @@ import { Tooltip } from "../Overlay";
 import { CarouselEntityPreview } from "./CarouselEntityPreview";
 import { Gallery } from "./Gallery";
 
-const tooltipFields = ["text", "number"];
+const tooltipFields = ["text", "number", "select_multiple"];
 
 function RandomTableField({
   random_table_id,
@@ -109,11 +109,21 @@ export function AdditionalBlueprintFieldDisplay({
   const value = blueprint_field_data?.value;
   const { project_id } = useParams();
   const fieldClasses = FieldClasses({ type: blueprint_field.field_type || "text", isPreview });
+  const selectMultipleFormatted =
+    blueprint_field.field_type === "select_multiple"
+      ? blueprint_field?.options
+          ?.filter((opt) => (value as string[]).includes(opt.id))
+          .map((opt) => opt.value)
+          ?.join(", ") || ""
+      : "";
   return (
     <Tooltip
       allowedPlacements={["top", "bottom"]}
-      content={blueprint_field_data.value as string}
-      isDisabled={!tooltipFields.includes(blueprint_field.field_type)}>
+      content={
+        blueprint_field_data.field_type === "select_multiple" ? selectMultipleFormatted : (blueprint_field_data.value as string)
+      }
+      isDisabled={!tooltipFields.includes(blueprint_field.field_type)}
+      variant="secondary">
       <div className={fieldClasses}>
         {blueprint_field.field_type === "text" ||
         blueprint_field.field_type === "number" ||
@@ -126,13 +136,22 @@ export function AdditionalBlueprintFieldDisplay({
             value={(value as string | number | null) || ""}
           />
         ) : null}
-        {blueprint_field.field_type === "select" || blueprint_field.field_type === "select_multiple" ? (
+        {blueprint_field.field_type === "select" ? (
           <Input
             isReadOnly
             label={blueprint_field.title}
             name={blueprint_field.title}
             onChange={() => {}}
-            value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data?.value)?.value || ""}
+            value={blueprint_field?.options?.find((opt) => opt.id === value)?.value || ""}
+          />
+        ) : null}
+        {blueprint_field.field_type === "select_multiple" ? (
+          <Input
+            isReadOnly
+            label={blueprint_field.title}
+            name={blueprint_field.title}
+            onChange={() => {}}
+            value={selectMultipleFormatted}
           />
         ) : null}
         {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
