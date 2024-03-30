@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import { Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
@@ -54,6 +55,25 @@ function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }
 function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boolean) {
   return {
     bulletList: "ul",
+    taskList: (args: any) => <ul data-task-list>{args?.children}</ul>,
+    taskListItem: (args: any) => {
+      return (
+        <li
+          className="remirror-list-item-with-custom-mark list-none"
+          data-checked={args?.node?.attrs?.checked}
+          data-task-list-item>
+          <label className="remirror-list-item-marker-container" contentEditable="false">
+            <input
+              checked={args?.node?.attrs?.checked}
+              className="remirror-list-item-checkbox"
+              contentEditable="false"
+              type="checkbox"
+            />
+          </label>
+          {args?.children}
+        </li>
+      );
+    },
     doc: Doc,
     hardBreak: "br",
     heading: (args: any) => {
