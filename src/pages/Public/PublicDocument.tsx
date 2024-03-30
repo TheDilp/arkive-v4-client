@@ -34,7 +34,7 @@ export function PublicDocument() {
   }
   return (
     <PublicEntityLayout title={subitem_id ? "" : document?.data?.title}>
-      <div className="max-h-[calc(100%-6.5rem)] overflow-y-auto">
+      <div className="max-h-[calc(100%-6.5rem)] overflow-y-auto px-4">
         <StaticRender content={document?.data?.content as RemirrorJSON} isPublicView />
       </div>
     </PublicEntityLayout>
