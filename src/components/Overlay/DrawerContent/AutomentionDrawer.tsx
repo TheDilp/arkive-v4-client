@@ -192,7 +192,7 @@ export function AutomentionDrawer({ data }: Props) {
             type: selectedEntity,
           },
         }),
-        url: `${baseURLS.baseServer}/documents/autolink`,
+        url: `${baseURLS.baseServer}/documents/automention`,
       });
     },
     {

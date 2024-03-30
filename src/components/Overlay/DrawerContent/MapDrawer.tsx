@@ -38,7 +38,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function MapDrawer({ data }: { data: { id?: string } }) {
+export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
   const { project_id, item_id } = useParams();
 
   const { data: existingMap, isFetching } = useGetEntity<MapType>(
@@ -64,7 +64,7 @@ export function MapDrawer({ data }: { data: { id?: string } }) {
   const tabs = getTabs(permissions, data?.id);
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
-    existingMap?.data || { project_id: project_id as string },
+    existingMap?.data || { title: data?.title, project_id: project_id as string },
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);

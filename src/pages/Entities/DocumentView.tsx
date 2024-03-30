@@ -5,7 +5,7 @@ import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorContentType } from "remirror";
 
@@ -16,7 +16,6 @@ import { Icon, Skeleton } from "../../components/Misc";
 import { Notification } from "../../components/Overlay";
 import {
   useChangeNavbarTitle,
-  useCreateEntity,
   useGetEntities,
   useGetEntity,
   useHandleChange,
@@ -40,7 +39,6 @@ import {
 } from "../../utils";
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
-import { InsertDocumentType } from "../../validation";
 
 export default function DocumentView({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
@@ -51,7 +49,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const mentionPosition = useAtomValue(mentionPositionAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
-
+  const setDrawer = useSetAtom(drawerAtom);
   const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
     enabled: !!user?.id && isProjectOwner,
     staleTime: Infinity,
@@ -90,7 +88,6 @@ export default function DocumentView({ editable }: { editable: boolean }) {
     user?.role?.id,
   );
 
-  const { mutateAsync: createDocument } = useCreateEntity<InsertDocumentType>("documents");
   const { mutate: updateDocument, isLoading: isUpdating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
   }>("documents", project_id as string);
@@ -106,6 +103,138 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   });
 
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
+
+  const getContextActions = useCallback((e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+    e.preventDefault();
+
+    const slice = getContext()?.getState().selection.content();
+    let title = "";
+    if (slice) {
+      slice.content.descendants((node) => {
+        if (node.type.name === "mentionAtom") {
+          title += node.attrs.label;
+        } else if (node.type.name === "text") {
+          title += node.textContent;
+        }
+      });
+      if (title.length > 250) {
+        return;
+      }
+    }
+    setContextMenu({
+      // @ts-ignore
+      event: e,
+      items: [
+        {
+          id: "1",
+          title: "Create entity from text",
+          icon: IconEnum.add,
+          subItems: [
+            {
+              id: "3a",
+              title: "Character",
+              icon: IconEnum.character,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create character",
+                  data: { preselectedTab: 0, id: undefined, title },
+                  type: "characters",
+                  size: "xl",
+                })),
+            },
+            {
+              id: "3b",
+              title: "Blueprint instance",
+              icon: IconEnum.blueprint,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create blueprint instance",
+                  data: { title },
+                  type: "blueprint_instances",
+                })),
+            },
+            {
+              id: "3c",
+              title: "Document",
+              icon: IconEnum.document,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create document",
+                  data: { preselectedTab: 0, id: undefined, title },
+                  type: "documents",
+                })),
+            },
+            {
+              id: "3d",
+              title: "Map",
+              icon: IconEnum.map,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create map",
+                  data: { preselectedTab: 0, id: undefined, title },
+                  type: "maps",
+                })),
+            },
+            {
+              id: "3e",
+              title: "Graph",
+              icon: IconEnum.graph,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create graph",
+                  data: { preselectedTab: 0, id: undefined, title },
+                  type: "graphs",
+                })),
+            },
+            {
+              id: "3f",
+              title: "Word",
+              icon: IconEnum.word,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Create word",
+                  data: { title },
+                  type: "words",
+                })),
+            },
+          ],
+        },
+        {
+          id: "2",
+          title: "Send text to Discord",
+          icon: IconEnum.discord,
+          subItems: (webhooks?.data || []).map((webhook) => ({
+            id: webhook.id,
+            title: webhook.title,
+            onClick: () => {
+              if (title.length > 2500) {
+                createNotification({
+                  title: "Text sent to Discord cannot have more than 2500 characters.",
+                  variant: "warning",
+                  icon: IconEnum.warning,
+                  timer: 5,
+                });
+              } else {
+                FetchFunction({
+                  url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                  body: JSON.stringify({
+                    data: { title: currentDocument?.data?.title, description: title, type: "document_text" },
+                  }),
+                  method: "POST",
+                });
+              }
+            },
+          })),
+        },
+      ],
+    });
+  }, []);
 
   useBlocker(() => {
     if (changedData) {
@@ -260,100 +389,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
           ) : null}
           <div
             className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
-            onContextMenu={
-              canUpdate
-                ? (e) => {
-                    e.preventDefault();
-                    setContextMenu({
-                      // @ts-ignore
-                      event: e,
-                      items: [
-                        {
-                          id: "1",
-                          title: "Create document with title",
-                          icon: IconEnum.add,
-                          onClick: async () => {
-                            const slice = getContext()?.getState().selection.content();
-                            if (slice) {
-                              const id = crypto.randomUUID();
-
-                              if (slice) {
-                                let title = "";
-                                slice.content.descendants((node) => {
-                                  if (node.type.name === "mentionAtom") {
-                                    title += node.attrs.label;
-                                  } else if (node.type.name === "text") {
-                                    title += node.textContent;
-                                  }
-                                });
-                                if (title.length > 250) {
-                                  return;
-                                }
-                                await createDocument({ data: { id, project_id: project_id as string, title } });
-                                getContext()?.commands?.replaceText({
-                                  attrs: {
-                                    id,
-                                    label: title,
-                                    name: "documents",
-                                  },
-                                  type: "mentionAtom",
-                                  content: title,
-                                  selection: getContext()?.getState()?.selection,
-                                });
-                              } else {
-                                createNotification({
-                                  title: "No text selected.",
-                                  variant: "error",
-                                  icon: IconEnum.error,
-                                  timer: 3,
-                                });
-                              }
-                            }
-                          },
-                        },
-                        {
-                          id: "2",
-                          title: "Send text to Discord",
-                          icon: IconEnum.discord,
-                          subItems: (webhooks?.data || []).map((webhook) => ({
-                            id: webhook.id,
-                            title: webhook.title,
-                            onClick: () => {
-                              const slice = getContext()?.getState().selection.content();
-                              if (slice) {
-                                let text = "";
-                                slice.content.descendants((node) => {
-                                  if (node.type.name === "mentionAtom") {
-                                    text += node.attrs.label;
-                                  } else if (node.type.name === "text") {
-                                    text += node.textContent;
-                                  }
-                                });
-                                if (text.length > 2500) {
-                                  createNotification({
-                                    title: "Text sent to Discord cannot have more than 2500 characters.",
-                                    variant: "warning",
-                                    icon: IconEnum.warning,
-                                    timer: 5,
-                                  });
-                                } else {
-                                  FetchFunction({
-                                    url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                                    body: JSON.stringify({
-                                      data: { title: currentDocument?.data?.title, description: text, type: "document_text" },
-                                    }),
-                                    method: "POST",
-                                  });
-                                }
-                              }
-                            },
-                          })),
-                        },
-                      ],
-                    });
-                  }
-                : undefined
-            }
+            onContextMenu={canUpdate ? (e) => getContextActions(e) : undefined}
             onDrop={
               canUpdate
                 ? (e) => {

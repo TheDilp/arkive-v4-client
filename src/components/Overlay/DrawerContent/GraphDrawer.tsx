@@ -26,11 +26,10 @@ const tabs = [
   { id: "2", label: "Tags", icon: IconEnum.tags },
 ];
 
-export function GraphDrawer({ data }: { data: { id?: string } }) {
+export function GraphDrawer({ data }: { data: { id?: string; title?: string } }) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
-
   const { data: existingGraph, isFetching } = useGetEntity<GraphType>(
     data?.id,
     "graphs",
@@ -55,7 +54,12 @@ export function GraphDrawer({ data }: { data: { id?: string } }) {
   );
 
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>(
-    existingGraph?.data || { project_id: project_id as string, parent_id: item_id, default_node_shape: "rectangle" },
+    existingGraph?.data || {
+      title: data?.title,
+      project_id: project_id as string,
+      parent_id: data?.title ? null : item_id,
+      default_node_shape: "rectangle",
+    },
   );
   const { handleChange } = useHandleChange({ data: graph, setData: setGraph });
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{

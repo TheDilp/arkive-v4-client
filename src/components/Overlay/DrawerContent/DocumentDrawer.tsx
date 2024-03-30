@@ -41,6 +41,8 @@ function isSaveDisabled(document: Partial<DocumentType>) {
 type Props = {
   data: {
     id?: string;
+    title?: string;
+    preselectedTab?: number;
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -64,7 +66,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
 export function DocumentDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
   const user = useAtomValue(userAtom);
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
@@ -92,7 +94,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     data?.id,
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
-    existingDocument?.data || { parent_id: item_id, project_id: project_id as string },
+    existingDocument?.data || { title: data.title, parent_id: item_id, project_id: project_id as string },
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{

@@ -62,10 +62,10 @@ export type DrawerAtomType = {
   exceptions?: DrawerExceptions;
 } & (
   | { type: "project"; data: { owner_id: string } | { id: string } | null }
-  | { type: "characters"; data: { id?: string; project_id?: string; preselectedTab?: number } }
   | { type: "images"; data: ImageType }
   | {
       type:
+        | "characters"
         | "character_fields_templates"
         | "blueprints"
         | "documents"
@@ -77,7 +77,7 @@ export type DrawerAtomType = {
         | "random_table_option"
         | "character_relationship_types"
         | "map_pin_types";
-      data: { id?: string; project_id?: string };
+      data: { id?: string; project_id?: string; preselectedTab?: number; title?: string };
     }
   | { type: "from_template"; data: { id: string; title: string } }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
@@ -124,7 +124,7 @@ export type DrawerAtomType = {
       };
     }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } }
-  | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string } }
+  | { type: "words" | "blueprint_instances"; data: { id?: string; parent_id?: string; title?: string } }
   | { type: "document_outline"; data: { headings: { id: string; title: string; level: number }[] } }
   | {
       type: "edit_message";

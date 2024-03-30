@@ -247,8 +247,8 @@ export function getDifferenceForBlueprintInstance(
 }
 
 export function getDifferenceForCharacterFields(
-  originalCharacter: CharacterType,
-  updatedCharacter: CharacterType,
+  originalCharacter: Partial<CharacterType>,
+  updatedCharacter: Partial<CharacterType>,
 ): CharacterCharacterFieldType[] {
   const fields = [...(updatedCharacter.character_fields || [])];
   const originalFields = originalCharacter.character_fields || [];

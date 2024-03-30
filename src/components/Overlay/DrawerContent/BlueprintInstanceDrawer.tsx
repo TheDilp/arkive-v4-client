@@ -1,9 +1,10 @@
 import { useResetAtom } from "jotai/utils";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
   useCreateSubEntity,
+  useGetEntities,
   useGetEntity,
   useGetSubEntity,
   useHandleChange,
@@ -48,12 +49,12 @@ import {
   TemplateTextareaField,
 } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
-import { Button, Checkbox, Input, TagInput } from "../../Form";
+import { Button, Checkbox, Input, Select, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
-  data: { id?: string; parent_id?: string };
+  data: { id?: string; parent_id?: string; title?: string };
 };
 
 function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_fields"], blueprint?: BlueprintType) {
@@ -367,11 +368,11 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
-    data?.parent_id ?? item_id,
+    data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
     "blueprints",
     {
       data: {
-        id: data?.parent_id ?? item_id,
+        id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
       },
       fields: ["id", "title", "title_name", "icon"],
       relations: {
@@ -380,8 +381,19 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       },
     },
     {
+      enabled: data?.title ? !!instance?.parent_id : true,
       queryKeyConcat: ["instance_drawer"],
     },
+  );
+  const { data: blueprints, isFetching: isFetchingBlueprints } = useGetEntities(
+    {
+      data: {
+        project_id,
+      },
+      fields: ["id", "title", "title_name", "icon"],
+    },
+    "blueprints",
+    { enabled: !!data?.title, queryKeyConcat: ["blueprint_instance_drawer"] },
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
@@ -406,15 +418,20 @@ export function BlueprintInstanceDrawer({ data }: Props) {
     } else if (!data?.id && !instance) {
       setInstance({
         id: "",
-        title: "",
+        title: data?.title || "",
         owner_id: "",
         blueprint_fields: [],
         permissions: [],
-        parent_id: item_id as string,
+        parent_id: data?.title ? "" : (item_id as string),
         tags: [],
       });
     }
   }, [existingInstance?.data]);
+
+  useEffect(() => {
+    if (instance) setInstance({ ...instance, blueprint_fields: [] });
+  }, [instance?.parent_id]);
+
   const permissions = useHasPermissions(
     ["create_blueprint_instances", "update_blueprint_instances", "read_tags"],
     existingInstance?.data?.owner_id,
@@ -427,34 +444,53 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   );
   const tabs = getTabs(permissions, data?.id);
 
-  if (isFetchingInstance || isFetchingBlueprint || !instance) return <Skeleton type="drawer_form" />;
+  if (isFetchingInstance || (!data?.title && isFetchingBlueprint) || isFetchingBlueprints || !instance)
+    return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
-        <ul className="flex max-h-[90%] flex-col overflow-y-auto">
-          {!blueprint?.data?.blueprint_fields?.length ? <Alert label="This blueprint has no fields." variant="info" /> : null}
-          <div>
-            <Input
-              isDisabled={!canCreateOrEdit}
-              label={`${blueprint?.data?.title_name} (required)`}
-              name="title"
+        <div className="flex max-h-[90%] flex-col overflow-y-auto">
+          {data?.title ? (
+            <Select
+              label="Blueprint (required)"
+              name="parent_id"
               onChange={handleChange}
-              value={instance?.title}
+              options={(blueprints?.data || [])?.map((bp) => ({
+                label: bp.title,
+                value: bp.id,
+                icon: bp.icon || IconEnum.blueprint,
+              }))}
+              value={instance?.parent_id}
             />
-          </div>
-
-          <div className="mt-2 flex w-full items-center justify-between">
-            <span>Is public:</span>
-            <Checkbox
-              isDisabled={!canCreateOrEdit}
-              name="is_public"
-              onChange={handleChange}
-              value={instance?.is_public ?? false}
-            />
-          </div>
-        </ul>
+          ) : null}
+          {!!blueprint?.data && !blueprint?.data?.blueprint_fields?.length && instance?.parent_id ? (
+            <Alert label="This blueprint has no fields." variant="info" />
+          ) : null}
+          {instance?.parent_id ? (
+            <>
+              <div>
+                <Input
+                  isDisabled={!canCreateOrEdit}
+                  label={`${blueprint?.data?.title_name} (required)`}
+                  name="title"
+                  onChange={handleChange}
+                  value={instance?.title}
+                />
+              </div>
+              <div className="mt-2 flex w-full items-center justify-between">
+                <span>Is public:</span>
+                <Checkbox
+                  isDisabled={!canCreateOrEdit}
+                  name="is_public"
+                  onChange={handleChange}
+                  value={instance?.is_public ?? false}
+                />
+              </div>
+            </>
+          ) : null}
+        </div>
       ) : null}
       {tabs[selectedTab].id === "2" && blueprint?.data?.blueprint_fields?.length ? (
         <FieldTemplateRows
@@ -485,6 +521,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           icon={instance?.id ? IconEnum.save : IconEnum.add}
           isDisabled={
             !instance?.title ||
+            !instance?.parent_id ||
             isSaveDisabled(instance?.blueprint_fields || [], blueprint?.data) ||
             isCreating ||
             isUpdating ||
@@ -500,7 +537,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                     id: instance.id,
                     title: instance.title,
                     is_public: instance?.is_public,
-                    parent_id: data?.parent_id ?? item_id,
+                    parent_id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),
@@ -520,7 +557,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   data: {
                     title: instance.title,
                     is_public: instance?.is_public,
-                    parent_id: data?.parent_id ?? item_id,
+                    parent_id: data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
                   },
                   relations: {
                     tags: instance?.tags?.map((t) => ({ id: t.id })),

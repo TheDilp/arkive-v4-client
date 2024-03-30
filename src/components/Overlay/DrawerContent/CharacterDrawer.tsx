@@ -60,7 +60,7 @@ import { Collapsible } from "../../Layout/Collapsible";
 import { Tabs } from "../../Layout/Tabs";
 import { Alert } from "../../Misc";
 
-function isSaveDisabled(character: CharacterType | null) {
+function isSaveDisabled(character: Partial<CharacterType> | null) {
   if (!character) return true;
   if (!character?.first_name) return true;
   if (character?.related_from?.length) {
@@ -396,7 +396,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number } }) {
+export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?: number; title?: string } }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab ?? 0);
 
@@ -433,7 +433,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     existingCharacter?.data?.owner_id,
   );
   const tabs = getTabs(permissions, data?.id);
-  const [character, setCharacter] = useState<CharacterType | null>(null);
+  const [character, setCharacter] = useState<Partial<CharacterType> | null>(
+    data.title ? { first_name: data.title.split(" ")[0], last_name: data.title.split(" ")[1] } : null,
+  );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
