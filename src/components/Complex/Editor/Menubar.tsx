@@ -293,14 +293,14 @@ function menuBarItems({
         tooltip: "Outline",
       },
       {
-        id: "autolinker",
+        id: "automention",
         // @ts-ignore
         icon: IconEnum.mention,
         onClick: () =>
           setDrawer((prev) => ({
             ...prev,
             title: "Automention",
-            size: "lg",
+            size: "xs",
             type: "autolinker",
             data: { getContext, title: title || "", id: id || "" },
           })),

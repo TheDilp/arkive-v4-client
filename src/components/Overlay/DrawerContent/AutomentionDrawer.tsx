@@ -224,7 +224,7 @@ export function AutomentionDrawer({ data }: Props) {
       }
       data.getContext.commands.setAnnotations(selectedItemsAnnotations);
     }
-  }, [selectedLinks]);
+  }, [selectedLinks, selectedEntity, ranges]);
 
   useEffect(() => {
     if (links?.data && selectedEntity) {
@@ -252,8 +252,10 @@ export function AutomentionDrawer({ data }: Props) {
                   className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
                   onMouseOut={() => {
                     const highlighted = data.getContext.helpers.getAnnotations();
-                    const notSelected = highlighted.filter((highlight) => !selectedLinks.includes(highlight.id));
-                    const notSelectedIds = notSelected.map((s) => s.id);
+                    const notSelected = highlighted.filter(
+                      (highlight: { id: string }) => !selectedLinks.includes(highlight.id),
+                    );
+                    const notSelectedIds = notSelected.map((s: { id: string }) => s.id);
                     if (!selectedLinks.includes(idWithRange))
                       data.getContext.commands.removeAnnotations([...notSelectedIds, idWithRange]);
 
@@ -322,7 +324,8 @@ export function AutomentionDrawer({ data }: Props) {
           label="Close"
           onClick={() => {
             const activeAnnotations = data.getContext.helpers.getAnnotations();
-            if (activeAnnotations.length) data.getContext.commands.removeAnnotations(activeAnnotations.map((a) => a.id));
+            if (activeAnnotations.length)
+              data.getContext.commands.removeAnnotations(activeAnnotations.map((a: { id: string }) => a.id));
             resetAtomDrawer();
           }}
         />
@@ -344,7 +347,8 @@ export function AutomentionDrawer({ data }: Props) {
             }
 
             const activeAnnotations = data.getContext.helpers.getAnnotations();
-            if (activeAnnotations.length) data.getContext.commands.removeAnnotations(activeAnnotations.map((a) => a.id));
+            if (activeAnnotations.length)
+              data.getContext.commands.removeAnnotations(activeAnnotations.map((a: { id: string }) => a.id));
           }}
           variant="info"
         />
