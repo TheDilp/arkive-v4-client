@@ -274,7 +274,7 @@ export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
 export const cytoscapeGridOptions = {
   // On/Off Modules
   /* From the following four snap options, at most one should be true at a given time */
-  snapToGridDuringDrag: true,
+  snapToGridDuringDrag: false,
   snapToGridOnRelease: true, // Snap to grid on release
   snapToAlignmentLocationOnRelease: false, // Snap to alignment location on release
   snapToAlignmentLocationDuringDrag: false, // Snap to alignment location during drag
@@ -290,6 +290,7 @@ export const cytoscapeGridOptions = {
   snapToGridCenter: true, // Snaps nodes to center of gridlines. When false, snaps to gridlines themselves. Note that either snapToGridOnRelease or snapToGridDuringDrag must be true.
 
   // Draw Grid
+  drawGrid: true,
   zoomDash: false, // Determines whether the size of the dashes should change when the drawing is zoomed in and out if grid is drawn.
   panGrid: true, // Determines whether the grid should move then the user moves the graph if grid is drawn.
   gridStackOrder: -1, // Namely z-index

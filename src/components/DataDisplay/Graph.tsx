@@ -605,11 +605,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }, [boardState.draw_mode, cyRef?.current?._cy, ehRef?.current]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
-      cyRef?.current?._cy?.gridGuide?.({
-        ...cytoscapeGridOptions,
-        snapToGridDuringDrag: boardState.grid,
-        drawGrid: boardState.grid,
-      });
+      cyRef?.current?._cy?.gridGuide?.(cytoscapeGridOptions);
     }
   }, [boardState.grid, cyRef?.current?._cy]);
   useEffect(() => {

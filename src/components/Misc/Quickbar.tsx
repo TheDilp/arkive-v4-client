@@ -77,13 +77,13 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
         variant={boardState.add_nodes ? "info" : "primary"}
       />
 
-      <Button
+      {/* <Button
         hasNoBackground
         icon={IconEnum.grid}
         onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })}
         tooltip="Toggle grid"
         variant={boardState.grid ? "info" : "primary"}
-      />
+      /> */}
       <Button
         hasNoBackground
         icon={IconEnum.lock}
