@@ -132,7 +132,7 @@ export function AdditionalBlueprintFieldDisplay({
             label={blueprint_field.title}
             name={blueprint_field.title}
             onChange={() => {}}
-            value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data.id)?.value || ""}
+            value={blueprint_field?.options?.find((opt) => opt.id === blueprint_field_data?.value)?.value || ""}
           />
         ) : null}
         {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
