@@ -1,9 +1,8 @@
 /* eslint-disable func-names */
-import { useQueryClient } from "@tanstack/react-query";
 import { Collection, Core, EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import uniqBy from "lodash.uniqby";
-import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
@@ -46,7 +45,6 @@ type Props = {
 
 export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFamilyTreeView, layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
-  const queryClient = useQueryClient();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const dialogValue = useAtomValue(dialogAtom);
   const { data: existingGraphData, isFetching } = useGetEntity<GraphType>(
@@ -78,7 +76,6 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }>();
   const cyRef = useRef() as any;
   const ehRef = useRef(undefined) as any;
-  const firstRender = useRef(true) as MutableRefObject<boolean>;
   const [drawer, setDrawer] = useAtom(drawerAtom);
   const createNotification = useNotifications();
   const [boardState, setBoardState] = useAtom(BoardStateAtom);
@@ -132,13 +129,9 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }, [graph?.nodes, graph?.edges]);
   useEffect(() => {
     if (!cyRef || !ehRef) return () => {};
-    if (firstRender && firstRender.current) {
-      firstRender.current = false;
-    }
 
     return () => {
       const refVariable = cyRef?.current;
-      firstRender.current = true;
       if (ehRef?.current) {
         ehRef.current.destroy();
         ehRef.current = undefined;
@@ -148,7 +141,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       }
       setNodes([]);
       setEdges([]);
-      queryClient.removeQueries(["graphs", item_id]);
+      // queryClient.removeQueries(["graph_view", item_id]);
     };
   }, [item_id]);
   // Board Events
