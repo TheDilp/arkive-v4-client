@@ -32,6 +32,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "conversations") return IconEnum.conversation;
   if (type === "tags") return IconEnum.tags;
   if (type === "images") return IconEnum.image;
+  if (type === "roles") return IconEnum.permissions;
 
   return IconEnum.error;
 }

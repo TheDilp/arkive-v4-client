@@ -21,6 +21,7 @@ import {
   Table,
   Tabs,
   Title,
+  Tooltip,
 } from "../../components";
 import {
   useAssignRole,
@@ -51,6 +52,7 @@ import {
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
+  getDefaultEntityIcon,
   getFirstLetters,
   getImageURL,
   getPluralEntityType,
@@ -267,8 +269,24 @@ function membersColumns(
     membersColumnHelper.display({
       id: "role",
       header: "Role",
-      cell: ({ row }) => row.original.role.title,
-      maxSize: 15,
+      cell: ({ row }) => (
+        <Tooltip content={row.original.role.title}>
+          <div>
+            <Button
+              hasNoBackground
+              icon={row.original.role.icon || IconEnum.permissions}
+              isDisabled
+              isIconOnly
+              onClick={undefined}
+            />
+          </div>
+        </Tooltip>
+      ),
+      maxSize: 2,
+      size: 2,
+      meta: {
+        centered: true,
+      },
     }),
     membersColumnHelper.display({
       id: "action",
@@ -321,6 +339,15 @@ function membersColumns(
 }
 function rolesColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
   return [
+    rolesColumnHelper.display({
+      id: "icon",
+      cell: ({ row }) => <Icon fontSize={24} icon={row.original?.icon || getDefaultEntityIcon("roles")} />,
+      maxSize: 3.25,
+      minSize: 3.25,
+      meta: {
+        centered: true,
+      },
+    }),
     rolesColumnHelper.display({
       id: "title",
       header: "Title",
@@ -424,7 +451,7 @@ export function ProjectSettingsView() {
     { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].label === "6" },
   );
   const { data: roles } = useGetEntities<RoleType>(
-    { data: { project_id }, fields: ["id", "title"], relations: { permissions: true } },
+    { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
     "roles",
     { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") },
   );

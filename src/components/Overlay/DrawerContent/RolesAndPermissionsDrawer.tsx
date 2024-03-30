@@ -17,14 +17,16 @@ import { InsertRoleSchema, UpdateRoleSchema } from "../../../validation";
 import { Button, Checkbox, Input } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
+import { IconPicker } from "../IconPicker";
 
 export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
   const { project_id } = useParams();
   const [role, setRole] = useState<
-    Partial<Pick<RoleType, "id" | "title" | "project_id"> & { permissions: Record<string, boolean> }>
+    Partial<Pick<RoleType, "id" | "title" | "project_id" | "icon"> & { permissions: Record<string, boolean> }>
   >({
     id: "",
     title: "",
+    icon: null,
     permissions: {},
     project_id: project_id as string,
   });
@@ -54,7 +56,12 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
       for (let index = 0; index < existingRole?.data?.permissions?.length; index += 1) {
         existingPermissions[existingRole?.data?.permissions[index].id] = true;
       }
-      setRole({ title: existingRole?.data?.title, id: existingRole?.data?.id, permissions: existingPermissions });
+      setRole({
+        title: existingRole?.data?.title,
+        icon: existingRole?.data?.icon,
+        id: existingRole?.data?.id,
+        permissions: existingPermissions,
+      });
     }
   }, [existingRole]);
 
@@ -62,7 +69,12 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
 
   return (
     <DrawerLayout>
-      <Input label="Role title" name="title" onChange={handleChange} placeholder="New project" value={role?.title || ""} />
+      <div className="flex items-center gap-x-2">
+        <Input label="Role title" name="title" onChange={handleChange} placeholder="New project" value={role?.title || ""} />
+        <div className="mb-1 self-end">
+          <IconPicker icon={role?.icon || IconEnum.permissions} name="icon" onChange={handleChange} />
+        </div>
+      </div>
       <div>
         <Alert
           label="The role will grant a user permission for a group of entities in general. They will be able to view, update and delete only entities they've created - otherwise, they must be granted explicit permissions by the project's or entity's owner."
@@ -99,6 +111,7 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
               const formattedRole = {
                 title: role.title,
                 project_id: role.project_id,
+                icon: role.icon,
                 permissions: Object.entries(role.permissions ?? {})
                   .map(([key, value]) => {
                     if (value) return key;
