@@ -65,15 +65,15 @@
     }
   }
   ul[data-task-list] {
+    .remirror-list-item-marker-container {
+      @apply relative left-0 w-fit !important;
+    }
     li {
       @apply outline-none;
 
       > * {
         @apply outline-none;
       }
-    }
-    label {
-      @apply w-fit;
     }
     label input {
       @apply relative m-0 -ml-1 mr-1 h-4 w-4 appearance-none rounded border bg-zinc-700 text-white outline-none;
@@ -83,7 +83,6 @@
         &:after {
           content: "\2713";
           color: #fff;
-
           position: absolute;
           left: 50%;
           top: 50%;
