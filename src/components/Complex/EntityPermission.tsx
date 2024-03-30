@@ -4,6 +4,7 @@ import { EntityPermissionType, HandleChangePropsType, UserType } from "../../typ
 import { IconEnum, membersAtom, permissionsAtom, userAtom } from "../../utils";
 import { Checkbox, Title } from "../Form";
 import { Collapsible } from "../Layout";
+import { Badge } from "../Misc";
 
 function OwnerDisplay({
   owner_id,
@@ -25,7 +26,12 @@ function OwnerDisplay({
       }
     }
   }
-  if (ownerEmail) return <Title isDrawerTitle label={`Owner: ${ownerEmail}`} size="lg" variant="primary" />;
+  if (ownerEmail)
+    return (
+      <div>
+        <Badge label={`Owner: ${ownerEmail}`} variant="info" />
+      </div>
+    );
   return null;
 }
 
