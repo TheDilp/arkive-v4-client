@@ -301,7 +301,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
   return (
-    <div className="h-[calc(100%-3rem)] max-h-full w-full">
+    <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:w-[60%]">
       {changedData ? (
         <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
           <Notification
