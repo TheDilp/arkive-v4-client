@@ -23,7 +23,7 @@ function useBatchUpdateNodePositions(parent_id: string) {
     timer.current = setTimeout(() => {
       updateManyNodePositions.mutate({ data: batchedData.current.map((node) => ({ data: node })) });
       batchedData.current = [];
-    }, 350);
+    }, 450);
   }
 
   return { addOrUpdateNode, isMutating: updateManyNodePositions.isLoading };

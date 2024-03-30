@@ -1,8 +1,7 @@
 /* eslint-disable func-names */
 import { useQueryClient } from "@tanstack/react-query";
-import { Collection, Core, EventObject, LayoutOptions } from "cytoscape";
+import { Collection, Core, EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import set from "lodash.set";
 import uniqBy from "lodash.uniqby";
 import { MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -57,7 +56,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       fields: ["title", "is_public", "default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
     },
-    { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view"], isPublic },
+    { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view", item_id as string], isPublic },
   );
 
   useLayoutEffect(() => {
@@ -124,10 +123,10 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }
 
   useEffect(() => {
-    if (graph?.nodes) {
+    if (graph?.nodes && nodes.length === 0) {
       setNodes(graph?.nodes);
     }
-    if (graph?.edges) {
+    if (graph?.edges && edges.length === 0) {
       setEdges(graph?.edges);
     }
   }, [graph?.nodes, graph?.edges]);
@@ -436,36 +435,16 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         }
       });
       // Moving nodes
-      cyRef?.current?._cy.on("freeon", "node", function (evt: EventObject) {
+      cyRef?.current?._cy.on("dragfreeon", "node", function (evt: EventObject) {
         evt.preventDefault();
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        const target = evt.target._private;
         cyRef?.current?._cy.elements(":selected").select();
         evt.target.select();
-        // Grid extenstion messes with the "grab events"
-        // "Freeon" event triggers on double clicking
-        // This is a safeguard to prevent the node position from being changed on anything EXCEPT dragging
-        if (target.position.x !== target?.data.x || target.position.y !== target.data?.y) {
-          setNodes((prev) => {
-            const idx = prev.findIndex((n) => n.id === target.data.id);
 
-            if (idx !== -1) {
-              const newNodes = [...prev];
-              const foundNode = newNodes[idx];
-              if (foundNode.x !== target.position.x) {
-                set(foundNode, "x", target.position.x);
-              }
-              if (foundNode.y !== target.position.y) {
-                set(foundNode, "y", target.position.y);
-              }
-              addOrUpdateNode({ id: target.data.id, ...target.position });
-              newNodes[idx] = foundNode;
-              return newNodes;
-            }
-            return prev;
-          });
-        }
+        cyRef?.current?._cy.elements(":selected").forEach((el: NodeSingular) => {
+          addOrUpdateNode({ id: el.id(), ...el.position() });
+        });
       });
       // Double Click
       cyRef?.current?._cy.on("dbltap", "node", function (evt: any) {
@@ -516,7 +495,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       });
     }
     return () => {
-      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap freeon");
+      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap dragfreeon");
     };
   }, [cyRef?.current?._cy, nodes, edges, item_id]);
   useEffect(() => {
