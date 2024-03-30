@@ -63,7 +63,6 @@ import { Alert } from "../../Misc";
 function isSaveDisabled(character: Partial<CharacterType> | null) {
   if (!character) return true;
   if (!character?.first_name) return true;
-  if (!character?.project_id) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
   }
@@ -874,6 +873,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
+            if (!data?.title && !changedData) {
+              createNotification({ title: "No data was changed.", timer: 3, variant: "info", icon: IconEnum.info_circle });
+              return;
+            }
             if (changedData || data?.title) {
               if (character?.id && existingCharacter?.data) {
                 const dataToParse = {
