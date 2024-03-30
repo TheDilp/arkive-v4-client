@@ -126,6 +126,7 @@ function FieldTemplateRows({
                 title={template_field.title}
               />
             );
+
           if (template_field.field_type === "select" || template_field.field_type === "select_multiple")
             return (
               <TemplateSelectField
@@ -429,7 +430,10 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   }, [existingInstance?.data]);
 
   useEffect(() => {
-    if (instance) setInstance({ ...instance, blueprint_fields: [] });
+    // Only reset fields if this is for adding from a document (data?.title)
+    // when the selected blueprint (parent_id) changes
+    if (instance && instance?.blueprint_fields?.length && instance?.parent_id && data?.title)
+      setInstance({ ...instance, blueprint_fields: [] });
   }, [instance?.parent_id]);
 
   const permissions = useHasPermissions(
@@ -545,7 +549,6 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   },
                   permissions: instance?.permissions,
                 };
-
                 const parsedData = UpdateBlueprintInstanceSchema.parse(dataToParse);
                 await update(parsedData, {
                   onSuccess: (res) => {
