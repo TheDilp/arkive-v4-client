@@ -80,15 +80,18 @@ const TableClasses = tv({
     hasNoHeaderGap: {
       true: {
         head: "mb-0 border-b-0",
-        body: "mt-0",
-      },
-    },
-    hasNoData: {
-      true: {
-        head: "mb-0",
       },
     },
   },
+  compoundVariants: [
+    {
+      hasNoData: true,
+      hasNoHeaderGap: true,
+      class: {
+        head: "mb-0",
+      },
+    },
+  ],
 });
 
 const TableFilterClasses = tv({
@@ -553,7 +556,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     showPageCount,
     showPageCountSelectContainer,
     paginationButtonsContainer,
-  } = TableClasses({ isSubheaderEnabled, hasNoHeaderGap, hasNoData: data?.length === 0 && !isSubheaderEnabled });
+  } = TableClasses({ isSubheaderEnabled, isLoading, hasNoHeaderGap, hasNoData: data?.length === 0 && !isSubheaderEnabled });
 
   const bodyRef = useRef() as MutableRefObject<HTMLDivElement>;
   const headerRef = useRef() as MutableRefObject<HTMLDivElement>;
