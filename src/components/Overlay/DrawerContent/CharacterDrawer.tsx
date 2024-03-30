@@ -63,6 +63,7 @@ import { Alert } from "../../Misc";
 function isSaveDisabled(character: Partial<CharacterType> | null) {
   if (!character) return true;
   if (!character?.first_name) return true;
+  if (!character?.project_id) return true;
   if (character?.related_from?.length) {
     if (character?.related_from?.some((rel) => !rel?.relation_type_id)) return true;
   }
@@ -434,7 +435,13 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   );
   const tabs = getTabs(permissions, data?.id);
   const [character, setCharacter] = useState<Partial<CharacterType> | null>(
-    data.title ? { first_name: data.title.split(" ")[0], last_name: data.title.split(" ")[1] } : null,
+    data.title
+      ? {
+          project_id,
+          first_name: data.title.split(" ")[0],
+          last_name: data.title.split(" ")[1],
+        }
+      : null,
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
@@ -867,7 +874,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
-            if (changedData) {
+            if (changedData || data?.title) {
               if (character?.id && existingCharacter?.data) {
                 const dataToParse = {
                   data: character,
@@ -904,6 +911,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 if (dataToParse?.data?.portrait?.id) {
                   dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                 }
+
                 const parsedData = InsertCharacterSchema.parse(dataToParse);
                 await create(parsedData, {
                   onSuccess: (res) => {
