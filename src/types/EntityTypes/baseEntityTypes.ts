@@ -20,6 +20,7 @@ export interface BaseEntityType {
   id: string;
   title: string;
   project_id: string;
+  deleted_at?: string | null;
   parent_id?: string | null;
   parents?: { id: string; title: string; is_folder: boolean; parent_id: string | null }[];
   children?: (BaseEntityType & { image_id?: string })[];

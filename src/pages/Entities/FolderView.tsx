@@ -203,41 +203,64 @@ function columns(
             title: string;
             onClick: () => Promise<any>;
           }[];
-        }[] = [
-          {
-            id: "1",
-            title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
-            icon: IconEnum.edit,
-            isDisabled: !hasActionPermission(
-              isProjectOwner,
-              user_id === row.original.owner_id,
-              permissions,
-              row.original?.permissions || [],
-              `update_${entityType}` as PermissionCodeType,
-              user_role_id,
-            ),
-            onClick: () => {
-              setDrawer((prev) =>
-                row.original.is_folder
-                  ? {
+        }[] =
+          active === "arkive"
+            ? [
+                {
+                  id: "1",
+                  title: "Restore",
+                  icon: IconEnum.restore,
+                  onClick: () => {
+                    setDialog((prev) => ({
                       ...prev,
-                      data: { id: row.original.id, type: entityType as EntitiesWithFolders },
-                      title: `Edit folder - ${row.original.title}`,
+                      data: {
+                        ...row.original,
+                        entity_title: entityType,
+                      },
+
+                      title: `Restore ${getSingularEntityType(entityType)}`,
                       size: "sm",
-                      type: "folder",
-                    }
-                  : {
-                      ...prev,
-                      data: row.original,
-                      title: `Edit ${entityName} - ${row.original.title}`,
-                      size: "lg",
-                      type: entityType,
-                    },
-              );
-            },
-          },
-        ];
-        if (entityType === "documents" && !is_document_template) {
+                      type: "restore_entity",
+                      isOverlay: true,
+                    }));
+                  },
+                },
+              ]
+            : [
+                {
+                  id: "1",
+                  title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
+                  icon: IconEnum.edit,
+                  isDisabled: !hasActionPermission(
+                    isProjectOwner,
+                    user_id === row.original.owner_id,
+                    permissions,
+                    row.original?.permissions || [],
+                    `update_${entityType}` as PermissionCodeType,
+                    user_role_id,
+                  ),
+                  onClick: () => {
+                    setDrawer((prev) =>
+                      row.original.is_folder
+                        ? {
+                            ...prev,
+                            data: { id: row.original.id, type: entityType as EntitiesWithFolders },
+                            title: `Edit folder - ${row.original.title}`,
+                            size: "sm",
+                            type: "folder",
+                          }
+                        : {
+                            ...prev,
+                            data: row.original,
+                            title: `Edit ${entityName} - ${row.original.title}`,
+                            size: "lg",
+                            type: entityType,
+                          },
+                    );
+                  },
+                },
+              ];
+        if (entityType === "documents" && !is_document_template && active === "active") {
           actions.push({
             id: "mentioned_in",
             title: "Mentioned in",
@@ -261,7 +284,7 @@ function columns(
             },
           });
         }
-        if (PublicEntities.includes(entityType) && !is_document_template) {
+        if (PublicEntities.includes(entityType) && !is_document_template && active === "active") {
           actions.push(
             {
               id: "view_public",
@@ -290,7 +313,7 @@ function columns(
             },
           );
         }
-        if (is_document_template) {
+        if (is_document_template && active === "active") {
           actions.push({
             id: "create_from_template",
             title: "Create document from template",
@@ -325,7 +348,7 @@ function columns(
         //   });
         // }
 
-        // ALWAYS GOES LAST
+        //! ALWAYS GOES LAST
         actions.push({
           id: "delete_entity",
           title: row.original.is_folder

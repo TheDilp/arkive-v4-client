@@ -15,6 +15,7 @@ import {
   ImageUploadDialog,
   ImageViewDialog,
   InsertEditorImageDialog,
+  RestoreEntityDialog,
 } from "./DialogContent";
 
 const DialogClasses = tv({
@@ -94,7 +95,11 @@ export function Dialog() {
       dialog?.isOverlay,
     size: dialog?.size || "md",
     isImageView: dialog?.type === "image_view",
-    hasNoContent: !dialog?.type || dialog?.type === "delete_entity" || dialog?.type === "arkive_entity",
+    hasNoContent:
+      !dialog?.type ||
+      dialog?.type === "delete_entity" ||
+      dialog?.type === "arkive_entity" ||
+      dialog?.type === "restore_entity",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
 
@@ -125,6 +130,7 @@ export function Dialog() {
           </div>
         </div>
         {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} /> : null}
+        {dialog.type === "restore_entity" ? <RestoreEntityDialog data={dialog.data} /> : null}
         {dialog.type === "arkive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
         ) : null}

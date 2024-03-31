@@ -19,6 +19,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
   const action = type?.replace("_entity", "");
   const { project_id } = useParams();
   const resetDialogAtom = useResetAtom(dialogAtom);
+  const createNotification = useNotifications();
   const { mutate: deleteEntity } = useDeleteEntity(
     data?.entity_title as AvailableEntityType,
     project_id as string,
@@ -26,7 +27,6 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
   );
   const { mutate: deleteSubEntity } = useDeleteSubEntity(data?.entity_title as AvailableSubEntityType, project_id as string);
   const { mutate: deleteAsset } = useDeleteAsset(project_id as string, data.asset_type);
-  const createNotification = useNotifications();
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="text-center text-lg">
