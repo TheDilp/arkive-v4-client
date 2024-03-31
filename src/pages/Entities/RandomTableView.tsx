@@ -265,6 +265,7 @@ export function RandomTableView() {
             hasSelect: true,
             expandable: true,
             selection,
+            orderBy,
           }}
           data={data?.data || []}
           dispatch={dispatch}
