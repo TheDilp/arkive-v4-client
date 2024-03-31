@@ -3,10 +3,10 @@ import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 
-import { useCreateWebhook, useGetEntity, useHandleChange } from "../../../hooks";
+import { useGetEntity, useHandleChange, useMutateWebhook } from "../../../hooks";
 import { WebhookType } from "../../../types";
 import { drawerAtom, IconEnum, userAtom } from "../../../utils";
-import { InsertWebhookSchema } from "../../../validation/webhooks";
+import { InsertWebhookSchema, UpdateWebhookSchema } from "../../../validation/webhooks";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { Skeleton } from "../../Misc";
@@ -29,7 +29,7 @@ export function WebhookDrawer({ data }: Props) {
     },
     { enabled: !!data?.id },
   );
-  const { mutateAsync: create, isLoading: isCreating } = useCreateWebhook();
+  const { mutateAsync, isLoading: isCreating } = useMutateWebhook(data?.id ? "update" : "create", data?.id);
   const [webhook, setWebhook] = useState<WebhookType | null>();
   const { handleChange } = useHandleChange({ data: webhook, setData: setWebhook });
   const resetDrawer = useResetAtom(drawerAtom);
@@ -62,7 +62,10 @@ export function WebhookDrawer({ data }: Props) {
           onClick={async () => {
             if (!data?.id) {
               const parsedData = InsertWebhookSchema.parse({ data: webhook });
-              await create(parsedData);
+              await mutateAsync(parsedData);
+            } else {
+              const parsedData = UpdateWebhookSchema.parse({ data: webhook });
+              await mutateAsync(parsedData);
             }
             resetDrawer();
             queryClient.invalidateQueries(["projects"]);

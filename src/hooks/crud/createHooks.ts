@@ -392,14 +392,14 @@ export function useInviteUserToProject() {
     },
   );
 }
-export function useCreateWebhook() {
+export function useMutateWebhook(action: "create" | "update", id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
   return useMutation(
-    async (newItemValues: { data: { title: string; url: string; user_id: string } }) =>
+    async (newItemValues: { data: { title: string; url?: string; user_id?: string } }) =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/webhooks/create`,
+        url: `${baseURLS.baseServer}/webhooks/${action}${action === "update" ? `/${id}` : ""}`,
         body: JSON.stringify(newItemValues),
         method: "POST",
       }),
@@ -411,7 +411,7 @@ export function useCreateWebhook() {
           queryClient.invalidateQueries(["user"]);
 
           createNotification({
-            title: data?.message || getEntityCRUDNotification("webhooks", "create"),
+            title: data?.message || getEntityCRUDNotification("webhooks", action),
             variant: "success",
             icon: IconEnum.check,
             timer: 2,

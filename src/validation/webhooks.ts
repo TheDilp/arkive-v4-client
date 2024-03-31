@@ -7,3 +7,9 @@ export const InsertWebhookSchema = z.object({
     user_id: z.string(),
   }),
 });
+
+export const UpdateWebhookSchema = z.object({
+  data: z.object({
+    title: z.string(),
+  }),
+});
