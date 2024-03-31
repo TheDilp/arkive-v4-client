@@ -122,6 +122,7 @@ function columns(
   isProjectOwner: boolean,
   user_id: string,
   user_role_id: string | undefined,
+  active: "active" | "arkive",
   show_image?: boolean,
 ) {
   return [
@@ -327,8 +328,10 @@ function columns(
         // ALWAYS GOES LAST
         actions.push({
           id: "delete_entity",
-          title: row.original.is_folder ? "Delete folder" : `Delete ${entityName}`,
-          icon: IconEnum.trash,
+          title: row.original.is_folder
+            ? `${active === "arkive" ? "Delete" : "Arkive"} folder`
+            : `${active === "arkive" ? "Delete" : "Arkive"} ${entityName}`,
+          icon: active === "arkive" ? IconEnum.trash : IconEnum.archive,
           isDisabled: !hasActionPermission(
             isProjectOwner,
             user_id === row.original.owner_id,
@@ -346,7 +349,7 @@ function columns(
               },
               title: `Delete ${getSingularEntityType(entityType)}`,
               size: "sm",
-              type: "delete_entity",
+              type: `${active === "active" ? "arkive_" : "delete_"}entity`,
               isOverlay: true,
             }));
           },
@@ -633,6 +636,7 @@ export function FolderView() {
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection, pagination }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get(`${entityName}-table-active`) || "active");
   const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
   const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
@@ -683,6 +687,7 @@ export function FolderView() {
             : [],
       },
       permissions: true,
+      arkived: arkived === "arkive",
       relations: {
         tags: EntitiesWithTags.includes(type as string),
       },
@@ -737,8 +742,9 @@ export function FolderView() {
     },
   );
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
-
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
+  const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
+
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -756,8 +762,6 @@ export function FolderView() {
     dispatch,
     data: base?.data || [],
   });
-
-  const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
 
@@ -782,7 +786,8 @@ export function FolderView() {
     if (
       EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&
       Object.keys(permissions).length > 1 &&
-      !permissions?.[`read_${type}` as PermissionCodeType]
+      !permissions?.[`read_${type}` as PermissionCodeType] &&
+      user
     ) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(
@@ -842,6 +847,22 @@ export function FolderView() {
                   </div>
                 </>
               ) : null}
+
+              <div className="w-32">
+                <Select
+                  name="active"
+                  onChange={({ value }) => {
+                    setArkived(value as "active" | "arkive");
+                    ls.set(`${entityName}-table-active`, value);
+                  }}
+                  options={[
+                    { label: "Active", value: "active", icon: IconEnum.folder },
+                    { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+                  ]}
+                  placeholder="Active"
+                  value={arkived}
+                />
+              </div>
 
               <div className="w-32">
                 <Select
@@ -1050,6 +1071,7 @@ export function FolderView() {
               isProjectOwner,
               user?.id as string,
               user?.role?.id,
+              arkived,
               show_image_table_view,
             )}
             config={{
