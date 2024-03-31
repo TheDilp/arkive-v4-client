@@ -27,6 +27,8 @@ import { Sidebar } from "./Sidebar";
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
+  const { user } = useUser();
+
   const { data, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
@@ -38,17 +40,6 @@ export function ProjectLayout() {
     },
     { staleTime: 60 * 60 * 1 },
   );
-  const { user } = useUser();
-  const setProjectAtom = useSetAtom(projectAtom);
-  const setDialog = useSetAtom(dialogAtom);
-  const setPermissions = useSetAtom(permissionsAtom);
-  const setUserPermissions = useSetAtom(currentUserPermissions);
-  const hasChangedData = useAtomValue(hasChangedDataAtom);
-  const drawer = useAtomValue(drawerAtom);
-  const contextMenu = useAtomValue(contextMenuAtom);
-  const createNotification = useNotifications();
-  const resetDrawer = useResetAtom(drawerAtom);
-  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id as string, project_id },
@@ -64,6 +55,16 @@ export function ProjectLayout() {
   const { data: permissions } = useGetEntities<PermissionType>({ fields: ["id", "title", "code"] }, "permissions", {
     staleTime: Infinity,
   });
+  const setProjectAtom = useSetAtom(projectAtom);
+  const setDialog = useSetAtom(dialogAtom);
+  const setPermissions = useSetAtom(permissionsAtom);
+  const setUserPermissions = useSetAtom(currentUserPermissions);
+  const hasChangedData = useAtomValue(hasChangedDataAtom);
+  const drawer = useAtomValue(drawerAtom);
+  const contextMenu = useAtomValue(contextMenuAtom);
+  const createNotification = useNotifications();
+  const resetDrawer = useResetAtom(drawerAtom);
+  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
 
   const setUserAtom = useSetAtom(userAtom);
 
@@ -139,7 +140,7 @@ export function ProjectLayout() {
     return <Navigate to="/" />;
   }
 
-  if (!user?.unsafeMetadata?.project_id) return null;
+  if (!user?.unsafeMetadata?.project_id || isInitialLoading) return null;
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
