@@ -89,12 +89,12 @@ export function Dialog() {
     position: dialog?.position || "center",
     isOverlay:
       dialog?.type === "image_view" ||
-      dialog?.type === "archive_entity" ||
+      dialog?.type === "arkive_entity" ||
       dialog?.type === "delete_entity" ||
       dialog?.isOverlay,
     size: dialog?.size || "md",
     isImageView: dialog?.type === "image_view",
-    hasNoContent: !dialog?.type || dialog?.type === "delete_entity" || dialog?.type === "archive_entity",
+    hasNoContent: !dialog?.type || dialog?.type === "delete_entity" || dialog?.type === "arkive_entity",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
 
@@ -125,7 +125,7 @@ export function Dialog() {
           </div>
         </div>
         {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} /> : null}
-        {dialog.type === "archive_entity" || dialog.type === "delete_entity" ? (
+        {dialog.type === "arkive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
         ) : null}
         {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} /> : null}

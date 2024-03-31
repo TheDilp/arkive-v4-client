@@ -18,7 +18,7 @@ export function removeNotification(setNotificationAtom: any, id: string) {
 
 export function getEntityCRUDNotification(
   type: AllAvailableEntities | AssetType,
-  action_type: "create" | "update" | "archive" | "delete",
+  action_type: "create" | "update" | "arkive" | "delete",
   bulk?: boolean,
 ) {
   let action = "";
@@ -27,8 +27,8 @@ export function getEntityCRUDNotification(
   } else if (action_type === "update") {
     action = "updated";
   }
-  if (action_type === "archive") {
-    action = "archived";
+  if (action_type === "arkive") {
+    action = "arkived";
   }
   if (action_type === "delete") {
     action = "deleted";

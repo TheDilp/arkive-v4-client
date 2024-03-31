@@ -152,6 +152,7 @@ export function useGetEntities<ReturnType>(
     request?.filters,
     request?.relationFilters,
     request?.orderBy,
+    request?.arkived,
   ];
   let mainRequestQueryKey = [...baseQueryKey];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {

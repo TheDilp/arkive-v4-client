@@ -23,6 +23,6 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
       }
       setPermissions(finalPermissions);
     }
-  }, [owner_id, user, type]);
+  }, [owner_id, user, type, userPermissions, isProjectOwner]);
   return permissions;
 }

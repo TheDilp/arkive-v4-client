@@ -55,6 +55,7 @@ export interface RequestBodyType<InsertType> {
   pagination?: RequestPaginationType;
   relations?: RequestRelationsType;
   permissions?: boolean;
+  arkived?: boolean;
   columns?: RequestColumnsType;
 }
 

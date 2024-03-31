@@ -28,7 +28,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
   return useMutation(
     async (vars: { data: { id: string; parent_id?: string } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/archive" : ""}/${vars.data.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/arkive" : ""}/${vars.data.id}`,
         method: "DELETE",
       });
     },
@@ -42,7 +42,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
           }
 
           createNotification({
-            title: getEntityCRUDNotification(type, archive ? "archive" : "delete"),
+            title: getEntityCRUDNotification(type, archive ? "arkive" : "delete"),
             variant: "success",
             icon: IconEnum.check,
             timer: 5,

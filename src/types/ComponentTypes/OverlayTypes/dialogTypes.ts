@@ -7,7 +7,7 @@ export type DialogContentType =
   | "image_upload"
   | "family_tree"
   | "export_graph"
-  | "archive_entity"
+  | "arkive_entity"
   | "delete_entity"
   | "image_view"
   | "insert_image";

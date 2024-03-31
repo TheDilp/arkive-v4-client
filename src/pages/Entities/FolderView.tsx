@@ -833,7 +833,7 @@ export function FolderView() {
                       tooltip="View all document connections"
                     />
                   </div>
-                  <div className="w-32">
+                  <div className="w-fit max-w-32">
                     <Select
                       isDisabled={!permissions?.read_documents}
                       name="documentType"
@@ -848,7 +848,7 @@ export function FolderView() {
                 </>
               ) : null}
 
-              <div className="w-32">
+              <div className="w-fit max-w-32">
                 <Select
                   name="active"
                   onChange={({ value }) => {
@@ -856,7 +856,7 @@ export function FolderView() {
                     ls.set(`${entityName}-table-active`, value);
                   }}
                   options={[
-                    { label: "Active", value: "active", icon: IconEnum.folder },
+                    { label: "Active", value: "active", icon: IconEnum.eye },
                     { label: "Arkived", value: "arkive", icon: IconEnum.archive },
                   ]}
                   placeholder="Active"
@@ -864,7 +864,7 @@ export function FolderView() {
                 />
               </div>
 
-              <div className="w-32">
+              <div className="w-fit max-w-32">
                 <Select
                   name="view"
                   onChange={({ value }) => {
