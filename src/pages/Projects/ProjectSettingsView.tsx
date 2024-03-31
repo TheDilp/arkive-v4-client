@@ -448,7 +448,7 @@ export function ProjectSettingsView() {
   const { data: webhooks } = useGetEntities<WebhookType>(
     { data: { user_id: user?.id }, fields: ["id", "title", "user_id"] },
     "webhooks",
-    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].label === "6" },
+    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].id === "6" },
   );
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },

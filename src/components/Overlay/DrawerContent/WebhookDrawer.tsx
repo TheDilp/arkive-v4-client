@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function WebhookDrawer({ data }: Props) {
+  const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);
   const { data: existingWebhook, isInitialLoading } = useGetEntity<WebhookType>(
     data?.id,
@@ -54,7 +56,7 @@ export function WebhookDrawer({ data }: Props) {
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isCreating}
+          isDisabled={isCreating || !webhook?.title || !webhook?.url}
           isLoading={isCreating}
           label={data?.id ? "Update" : "Create"}
           onClick={async () => {
@@ -63,6 +65,7 @@ export function WebhookDrawer({ data }: Props) {
               await create(parsedData);
             }
             resetDrawer();
+            queryClient.invalidateQueries(["projects"]);
           }}
           variant="success"
         />
