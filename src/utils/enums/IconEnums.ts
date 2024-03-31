@@ -93,6 +93,7 @@ export const IconEnum = {
   range: "ph:rows" as const,
   reload: "ph:arrow-clockwise" as const,
   remove: "ph:minus" as const,
+  restore: "ph:box-arrow-up" as const,
   save: "ph:floppy-disk" as const,
   screen: "fluent:board-24-regular" as const,
   search: "ph:magnifying-glass-light" as const,
