@@ -21,6 +21,9 @@ function createColumns(
       id: "title",
       header: "Title",
       cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+      },
     }),
 
     columnHelper.display({
