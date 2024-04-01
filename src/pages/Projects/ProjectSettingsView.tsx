@@ -1,12 +1,9 @@
-import { useUser } from "@clerk/clerk-react";
 import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deepMerge } from "remirror";
 
 import {
-  Alert,
   Avatar,
   Button,
   Checkbox,
@@ -20,24 +17,20 @@ import {
   Skeleton,
   Table,
   Tabs,
-  Title,
   Tooltip,
 } from "../../components";
 import {
   useAssignRole,
   useBreakpoint,
   useDeleteEntity,
-  useDeleteWebhook,
   useGetEntities,
   useGetEntity,
   useHandleChange,
   useKickMember,
   useTable,
   useUpdateEntity,
-  useUpdateUser,
 } from "../../hooks";
 import {
-  AllAvailableEntities,
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
@@ -45,24 +38,17 @@ import {
   ProjectType,
   RoleType,
   UserType,
-  WebhookType,
 } from "../../types";
 import {
-  capitalizeFirstLetter,
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
   getFirstLetters,
   getImageURL,
-  getPluralEntityType,
-  getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
-  MiscellaneousSettings,
   userAtom,
-  UserNotificationEntities,
-  UserSidebarEntitiesEnabled,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
@@ -95,7 +81,6 @@ const tabs = [
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
-  { id: "6", label: "User settings", icon: IconEnum.user_settings, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -403,7 +388,6 @@ export function ProjectSettingsView() {
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
 
   const [project, setProject] = useState<ProjectType | null>();
-  const { user: authUser } = useUser();
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -434,28 +418,13 @@ export function ProjectSettingsView() {
     "projects",
     project_id as string,
   );
-  const { mutate: updateUser } = useUpdateUser(user?.id || "", authUser?.id || "");
   const { mutate: assignRole } = useAssignRole();
-  function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
-    const newFeatureFlags = deepMerge(user?.feature_flags || {}, { [newValue.name]: newValue.value });
-    updateUser({
-      data: {
-        feature_flags: newFeatureFlags,
-      },
-    });
-  }
 
-  const { data: webhooks } = useGetEntities<WebhookType>(
-    { data: { user_id: user?.id }, fields: ["id", "title", "user_id"] },
-    "webhooks",
-    { enabled: !!user?.id && isProjectOwner && finalTabs[selectedTab].id === "6" },
-  );
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
     "roles",
     { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") },
   );
-  const { mutateAsync: deleteWebhook } = useDeleteWebhook();
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
   useLayoutEffect(() => {
@@ -717,129 +686,6 @@ export function ProjectSettingsView() {
                   type="roles"
                 />
               </div>
-            </div>
-          ) : null}
-          {finalTabs[selectedTab].id === "6" ? (
-            <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
-              <Collapsible label="Notifications from other project members">
-                <div className="bg-zinc-900">
-                  {UserNotificationEntities.map((entity) => (
-                    <div
-                      key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
-                      <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
-                      <div className="flex w-52 items-center justify-between gap-x-2 text-center">
-                        <Checkbox
-                          label="Create"
-                          name={`${entity}_create_notification`}
-                          onChange={handleFeatureFlagChange}
-                          value={user?.feature_flags?.[`${entity}_create_notification`]}
-                        />
-                        <Checkbox
-                          label="Update"
-                          name={`${entity}_update_notification`}
-                          onChange={handleFeatureFlagChange}
-                          value={user?.feature_flags?.[`${entity}_update_notification`]}
-                        />
-                        <Checkbox
-                          label="Delete"
-                          name={`${entity}_delete_notification`}
-                          onChange={handleFeatureFlagChange}
-                          value={user?.feature_flags?.[`${entity}_delete_notification`]}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Collapsible>
-              <Collapsible label="Sidebar settings">
-                <div className="bg-zinc-900">
-                  {UserSidebarEntitiesEnabled.map((entity) => (
-                    <div
-                      key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
-                      <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
-                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
-                        <Checkbox
-                          label="Enabled"
-                          name={`${entity}_enabled`}
-                          onChange={handleFeatureFlagChange}
-                          value={user?.feature_flags?.[`${entity}_enabled`]}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Collapsible>
-              <Collapsible label="Miscellaneous settings">
-                <div className="bg-zinc-900">
-                  {MiscellaneousSettings.map((setting) => (
-                    <div
-                      key={setting}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
-                      <span>{getSentenceCase(setting)}:</span>
-                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
-                        <Checkbox
-                          label="Enabled"
-                          name={setting}
-                          onChange={handleFeatureFlagChange}
-                          value={user?.feature_flags?.[setting]}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Collapsible>
-              {isProjectOwner ? (
-                <Collapsible
-                  actions={[
-                    {
-                      icon: IconEnum.add,
-                      tooltip: "Add webhook",
-                      onClick: () =>
-                        setDrawer((prev) => ({ ...prev, type: "webhooks", data: {}, title: "Create webhook", size: "md" })),
-                    },
-                  ]}
-                  label="Webhooks">
-                  <div className="flex flex-col gap-y-2">
-                    {webhooks?.data?.length ? (
-                      (webhooks?.data || [])?.map((webhook) => (
-                        <div key={webhook.id} className="flex items-center justify-between py-2">
-                          <Title label={webhook.title} size="md" />
-                          <div className="flex items-center">
-                            <div className="h-8 w-8">
-                              <Button
-                                hasNoBackground
-                                icon={IconEnum.edit}
-                                onClick={() =>
-                                  setDrawer((prev) => ({
-                                    ...prev,
-                                    type: "webhooks",
-                                    data: { id: webhook.id },
-                                    title: "Create webhook",
-                                    size: "md",
-                                  }))
-                                }
-                                variant="primary"
-                              />
-                            </div>
-                            <div className="h-8 w-8">
-                              <Button
-                                hasNoBackground
-                                icon={IconEnum.trash}
-                                onClick={async () => deleteWebhook({ data: { id: webhook.id } })}
-                                variant="error"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <Alert label="There are no available webhooks for this user." variant="info" />
-                    )}
-                  </div>
-                </Collapsible>
-              ) : null}
             </div>
           ) : null}
         </div>

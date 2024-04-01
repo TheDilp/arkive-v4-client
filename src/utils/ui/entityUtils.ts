@@ -33,6 +33,7 @@ export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEnt
   if (type === "tags") return IconEnum.tags;
   if (type === "images") return IconEnum.image;
   if (type === "roles") return IconEnum.permissions;
+  if (type === "webhooks") return IconEnum.webhooks;
 
   return IconEnum.error;
 }

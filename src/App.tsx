@@ -11,7 +11,7 @@ import { ProjectsView } from "./pages/Projects";
 import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView, PublicListView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
-import { UserSettings } from "./pages/User/UserSettings";
+import { UserSettings, UserSettingsWebhooks } from "./pages/User";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,7 +52,9 @@ export default function App() {
                 </>
               }
               path="/">
-              <Route element={<UserSettings />} path="user_settings" />
+              <Route element={<UserSettings />} path="user_settings/*">
+                <Route element={<UserSettingsWebhooks />} path="webhooks" />
+              </Route>
               <Route element={<Outlet />} path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
                 <Route element={<ProjectLayout />} path=":project_id/*">
