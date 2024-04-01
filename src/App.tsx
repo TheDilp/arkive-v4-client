@@ -2,7 +2,7 @@ import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/cle
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
@@ -22,6 +22,7 @@ const queryClient = new QueryClient({
 });
 export default function App() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   return (
     <main
       className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden"
@@ -48,6 +49,7 @@ export default function App() {
                   </SignedOut>
                   <SignedIn>
                     <Outlet />
+                    {pathname === "/" ? <Navigate to="/projects" /> : null}
                   </SignedIn>
                 </>
               }
