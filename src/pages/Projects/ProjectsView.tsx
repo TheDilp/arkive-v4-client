@@ -122,7 +122,6 @@ export function ProjectsView() {
   const setUserAtom = useSetAtom(userAtom);
   const resetProjectAtom = useResetAtom(projectAtom);
   const [, dispatch] = useTable({});
-
   useEffect(() => {
     if (userData) {
       if (user)
@@ -177,6 +176,7 @@ export function ProjectsView() {
             {(data?.data || []).map((project) => (
               <ProjectCard
                 key={project.id}
+                feature_flags={project.feature_flags}
                 id={project.id}
                 image={getImageURL(project.id, "images", project.image_id)}
                 title={project.title}

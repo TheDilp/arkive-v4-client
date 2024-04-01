@@ -5,7 +5,9 @@ import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
-export function ProjectCard({ id, title, image }: ProjectCardType) {
+const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
+
+export function ProjectCard({ id, title, image, feature_flags }: ProjectCardType) {
   const navigate = useNavigate();
 
   return (
@@ -16,26 +18,28 @@ export function ProjectCard({ id, title, image }: ProjectCardType) {
         {title}
       </h2>
       <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
-        {projectCardNavItems.map((item, index) => (
-          <div
-            key={item.tooltip}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigate(`/projects/${id}/${item.navigate}`);
-            }}
-            onKeyDown={() => {}}
-            role="link"
-            tabIndex={0}>
-            <span className="col-span-1 flex items-center justify-center text-5xl">
-              <Tooltip allowedPlacements={index <= 3 ? ["top"] : ["bottom"]} content={item.tooltip}>
-                <div className="w-fit transition-colors hover:text-blue-400">
-                  <Icon icon={item.icon} />
-                </div>
-              </Tooltip>
-            </span>
-          </div>
-        ))}
+        {projectCardNavItems
+          .filter((item) => feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate))
+          .map((item, index) => (
+            <div
+              key={item.tooltip}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/projects/${id}/${item.navigate}`);
+              }}
+              onKeyDown={() => {}}
+              role="link"
+              tabIndex={0}>
+              <span className="col-span-1 flex items-center justify-center text-5xl">
+                <Tooltip allowedPlacements={index <= 3 ? ["top"] : ["bottom"]} content={item.tooltip}>
+                  <div className="w-fit transition-colors hover:text-blue-400">
+                    <Icon icon={item.icon} />
+                  </div>
+                </Tooltip>
+              </span>
+            </div>
+          ))}
       </div>
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
