@@ -61,7 +61,6 @@ export type DrawerAtomType = {
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
 } & (
-  | { type: "project" }
   | { type: "images"; data: ImageType }
   | {
       type:
@@ -154,7 +153,7 @@ export type DrawerAtomType = {
             image_type: AssetType;
           };
     }
-  | { type: "invite_to_project" | null; data: null }
+  | { type: "project" | "invite_to_project" | "nodes_from_characters" | "nodes_from_images" | null; data: null }
   | { type: "webhooks" | "roles"; data: { id?: string } }
   | { type: "character_filter"; data: { dispatch: TableDispatch } }
   | {
@@ -175,7 +174,6 @@ export type DrawerAtomType = {
       };
     }
   | { type: "edit_tag"; data: { id: string } }
-  | { type: "nodes_from_characters" | "nodes_from_images"; data: null }
 );
 
 export interface ContextMenuAtomType {
