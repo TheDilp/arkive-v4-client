@@ -72,7 +72,7 @@ function createColumns(
                 ? [
                     {
                       id: "1",
-                      title: "Restore",
+                      title: "Restore blueprint",
                       icon: IconEnum.restore,
                       onClick: () => {
                         setDialog((prev) => ({

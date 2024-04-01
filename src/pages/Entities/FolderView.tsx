@@ -208,7 +208,7 @@ function columns(
             ? [
                 {
                   id: "1",
-                  title: "Restore",
+                  title: `Restore ${getSingularEntityType(entityType)}`,
                   icon: IconEnum.restore,
                   onClick: () => {
                     setDialog((prev) => ({

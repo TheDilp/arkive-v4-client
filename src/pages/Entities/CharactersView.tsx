@@ -174,7 +174,7 @@ function createColumns(
                 ? [
                     {
                       id: "1",
-                      title: "Restore",
+                      title: "Restore character",
                       icon: IconEnum.restore,
                       onClick: () => {
                         setDialog((prev) => ({
