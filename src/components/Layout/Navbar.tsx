@@ -17,6 +17,7 @@ import {
   getEntityTypeFromNotificationType,
   IconEnum,
   navbarTitleAtom,
+  projectFeatureFlagsAtom,
   useNotifications,
   userAtom,
 } from "../../utils";
@@ -80,6 +81,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { user: authUser } = useUser();
   const permissions = useHasPermissions(["create_assets"], undefined);
   const user = useAtomValue(userAtom);
+  const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -127,7 +129,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         if (lastJsonMessage?.notification_type) {
           const entityType = getEntityTypeFromNotificationType(lastJsonMessage?.notification_type);
           queryClient.invalidateQueries(["allEntities", project_id, entityType]);
-          if (user?.feature_flags?.[lastJsonMessage?.notification_type]) {
+          if (featureFlags?.[lastJsonMessage?.notification_type]) {
             createNotification({
               icon: getDefaultEntityIcon(lastJsonMessage.entity),
               title: lastJsonMessage.message,

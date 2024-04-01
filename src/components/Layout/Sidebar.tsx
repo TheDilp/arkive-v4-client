@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 
 import { useBreakpoint } from "../../hooks";
 import { PermissionCodeType, SidebarType } from "../../types";
-import { currentUserPermissions, getSidebarLink, isProjectOwnerAtom, userAtom } from "../../utils";
+import { currentUserPermissions, getSidebarLink, isProjectOwnerAtom, projectFeatureFlagsAtom } from "../../utils";
 import { Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 
@@ -43,10 +43,10 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
-  const user = useAtomValue(userAtom);
+  const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const userPermissions = useAtomValue(currentUserPermissions);
 
-  const enabledEntities = Object.entries(user?.feature_flags || [])
+  const enabledEntities = Object.entries(featureFlags || [])
     .filter(([key, value]) => {
       return key.includes("_enabled") && value;
     })
@@ -57,7 +57,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
     return isUsingPermissions
       ? items
           .filter((item) =>
-            user?.feature_flags
+            featureFlags
               ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
               : alwaysEnabledItems.includes(item.navigate),
           )
@@ -70,7 +70,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
               !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
           }))
       : items;
-  }, [isProjectOwner, user?.feature_flags, userPermissions, items]);
+  }, [isProjectOwner, featureFlags, userPermissions, items]);
 
   return (
     <div className={base()}>

@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue } from "jotai";
 
 import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
-import { FavoritesFilters, IconEnum, sortTags, TagFilters, userAtom } from "../../../utils";
+import { FavoritesFilters, IconEnum, projectFeatureFlagsAtom, sortTags, TagFilters } from "../../../utils";
 import { Alert, Badge, Button, Checkbox, Tooltip } from "../..";
 
 export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType): ColumnDef<any> {
@@ -60,7 +60,7 @@ export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => Promise<v
 }
 
 export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: TagType[] }> {
-  const user = useAtomValue(userAtom);
+  const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
   return {
     id: "tags",
@@ -73,9 +73,7 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
     minSize: 12,
     maxSize: 12,
     cell: ({ row }) => {
-      const sortedTags = user?.feature_flags?.sort_tags_alphabetically
-        ? row.original?.tags?.sort(sortTags)
-        : row.original?.tags;
+      const sortedTags = featureFlags?.sort_tags_alphabetically ? row.original?.tags?.sort(sortTags) : row.original?.tags;
 
       return (
         <div className="flex w-full max-w-full items-center justify-center gap-x-2">

@@ -39,6 +39,7 @@ import {
   getLeapDays,
   getStartingDayForMonth,
   IconEnum,
+  projectFeatureFlagsAtom,
   userAtom,
 } from "../../utils";
 import { TimelineView } from "./TimelineView";
@@ -304,6 +305,7 @@ export function CalendarView({
   isCharacterCalendar?: boolean;
 }) {
   const user = useAtomValue(userAtom);
+  const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
@@ -341,7 +343,7 @@ export function CalendarView({
       data: { project_id },
       fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
       relations: {
-        eras: user?.feature_flags?.show_eras_in_calendars || user?.feature_flags?.show_eras_in_timelines || false,
+        eras: featureFlags?.show_eras_in_calendars || featureFlags?.show_eras_in_timelines || false,
         months: true,
         leap_days: true,
       },
@@ -692,7 +694,7 @@ export function CalendarView({
                 style={{
                   backgroundColor:
                     matchingEra &&
-                    user?.feature_flags?.show_eras_in_calendars &&
+                    featureFlags?.show_eras_in_calendars &&
                     (matchingEra.start_day <= day || matchingEra.end_day >= day)
                       ? `${matchingEra?.color || DefaultTagColor}aa`
                       : "transparent",

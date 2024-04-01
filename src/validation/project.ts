@@ -15,6 +15,11 @@ export const UpdateProjectSchema = z.object({
     image_id: z.string().optional().nullable(),
     default_dice_color: z.string().optional().nullable(),
   }),
+  relations: z
+    .object({
+      feature_flags: z.any().nullable().optional(),
+    })
+    .optional(),
 });
 
 export type InsertProjectType = z.infer<typeof InsertProjectSchema>;

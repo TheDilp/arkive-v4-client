@@ -24,6 +24,7 @@ export interface ProjectType {
   map_pin_types?: MapPinTypesType[];
   members: UserType[];
   roles: RoleType[];
+  feature_flags?: Record<string, boolean> | null;
 }
 
 export type ProjectDashboardType = [

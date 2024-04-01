@@ -49,6 +49,7 @@ export const IconEnum = {
   eye: "ph:eye" as const,
   eye_slash: "ph:eye-slash" as const,
   family_tree: "ph:tree-structure" as const,
+  feature_flag: "fluent:wrench-settings-24-regular" as const,
   filter: "iconoir:filter" as const,
   fit: "icon-park-outline:off-screen-one" as const,
   flow_arrow: "ph:flow-arrow" as const,

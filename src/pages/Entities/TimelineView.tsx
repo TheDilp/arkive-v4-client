@@ -14,8 +14,8 @@ import {
   drawerAtom,
   getDayOrdinal,
   IconEnum,
+  projectFeatureFlagsAtom,
   timelineZoomOptions,
-  userAtom,
 } from "../../utils";
 
 const CIRCLE_RADIUS = 6;
@@ -70,8 +70,7 @@ export function TimelineView({
 }) {
   const { project_id, item_id } = useParams();
   const { isLg } = useBreakpoint();
-
-  const user = useAtomValue(userAtom);
+  const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
   const [numberOfTicks, setNumberOfTicks] = useState(0);
   const [goToYear, setGoToYear] = useState(1);
@@ -241,7 +240,7 @@ export function TimelineView({
           .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
           .attr("id", "groupForCircles");
 
-        (user?.feature_flags?.show_eras_in_timelines ? eraBars : []).forEach((e) => {
+        (featureFlags?.show_eras_in_timelines ? eraBars : []).forEach((e) => {
           const bar = groupForEras.append("g");
 
           bar

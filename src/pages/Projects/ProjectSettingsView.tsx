@@ -2,6 +2,7 @@ import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { deepMerge } from "remirror";
 
 import {
   Avatar,
@@ -31,6 +32,7 @@ import {
   useUpdateEntity,
 } from "../../hooks";
 import {
+  AllAvailableEntities,
   CharacterRelationshipType,
   DialogAtomType,
   DrawerAtomType,
@@ -40,15 +42,21 @@ import {
   UserType,
 } from "../../types";
 import {
+  capitalizeFirstLetter,
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
   getFirstLetters,
   getImageURL,
+  getPluralEntityType,
+  getSentenceCase,
   IconEnum,
   isProjectOwnerAtom,
+  MiscellaneousSettings,
   userAtom,
+  UserNotificationEntities,
+  UserSidebarEntitiesEnabled,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
@@ -81,6 +89,7 @@ const tabs = [
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
+  { id: "6", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -408,6 +417,7 @@ export function ProjectSettingsView() {
         map_pin_types: true,
         character_relationship_types: true,
         members: true,
+        feature_flags: true,
       },
     },
     {
@@ -419,6 +429,17 @@ export function ProjectSettingsView() {
     project_id as string,
   );
   const { mutate: assignRole } = useAssignRole();
+  function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
+    const newFeatureFlags = deepMerge(project?.feature_flags || {}, { [newValue.name]: newValue.value });
+    updateProject({
+      data: {
+        id: project_id as string,
+      },
+      relations: {
+        feature_flags: newFeatureFlags,
+      },
+    });
+  }
 
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
@@ -686,6 +707,79 @@ export function ProjectSettingsView() {
                   type="roles"
                 />
               </div>
+            </div>
+          ) : null}
+          {finalTabs[selectedTab].id === "6" ? (
+            <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
+              <Collapsible label="Notifications from other project members">
+                <div className="bg-zinc-900">
+                  {UserNotificationEntities.map((entity) => (
+                    <div
+                      key={entity}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
+                      <div className="flex w-52 items-center justify-between gap-x-2 text-center">
+                        <Checkbox
+                          label="Create"
+                          name={`${entity}_create_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={project?.feature_flags?.[`${entity}_create_notification`]}
+                        />
+                        <Checkbox
+                          label="Update"
+                          name={`${entity}_update_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={project?.feature_flags?.[`${entity}_update_notification`]}
+                        />
+                        <Checkbox
+                          label="Delete"
+                          name={`${entity}_delete_notification`}
+                          onChange={handleFeatureFlagChange}
+                          value={project?.feature_flags?.[`${entity}_delete_notification`]}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Collapsible>
+              <Collapsible label="Sidebar settings">
+                <div className="bg-zinc-900">
+                  {UserSidebarEntitiesEnabled.map((entity) => (
+                    <div
+                      key={entity}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
+                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
+                        <Checkbox
+                          label="Enabled"
+                          name={`${entity}_enabled`}
+                          onChange={handleFeatureFlagChange}
+                          value={project?.feature_flags?.[`${entity}_enabled`]}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Collapsible>
+              <Collapsible label="Miscellaneous settings">
+                <div className="bg-zinc-900">
+                  {MiscellaneousSettings.map((setting) => (
+                    <div
+                      key={setting}
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      <span>{getSentenceCase(setting)}:</span>
+                      <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
+                        <Checkbox
+                          label="Enabled"
+                          name={setting}
+                          onChange={handleFeatureFlagChange}
+                          value={project?.feature_flags?.[setting]}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Collapsible>
             </div>
           ) : null}
         </div>
