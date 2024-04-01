@@ -1,9 +1,10 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch } from "react";
+import ls from "localstorage-slim";
+import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import {
   DeleteManyType,
@@ -66,71 +67,121 @@ function createColumns(
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: "Edit blueprint",
-                icon: IconEnum.edit,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "update_blueprints",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: "Edit blueprint",
-                    size: "lg",
-                    type: "blueprints",
-                  }));
-                },
-              },
-              {
-                id: "2",
-                title: "Create instance",
-                isDisabled: !permissions?.create_blueprint_instances,
-                icon: IconEnum.add,
-                onClick: () =>
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: {
-                      parent_id: row.original.id,
+            items={
+              row.original.deleted_at
+                ? [
+                    {
+                      id: "1",
+                      title: "Restore",
+                      icon: IconEnum.restore,
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprints",
+                          },
+
+                          title: "Restore blueprint",
+                          size: "sm",
+                          type: "restore_entity",
+                          isOverlay: true,
+                        }));
+                      },
                     },
-                    title: "Create new instance",
-                    type: "blueprint_instances",
-                    size: "lg",
-                  })),
-              },
-              {
-                id: "3",
-                title: "Delete blueprint",
-                icon: IconEnum.trash,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "delete_blueprints",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "blueprints",
+                    {
+                      id: "delete_blueprint",
+                      title: row.original.deleted_at ? "Delete blueprint" : "Arkive blueprint",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprints",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprints",
+                          },
+                          title: row.original.deleted_at ? "Delete blueprint" : "Arkive blueprint",
+                          size: "sm",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          isOverlay: true,
+                        }));
+                      },
                     },
-                    title: "Delete blueprint",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
+                  ]
+                : [
+                    {
+                      id: "1",
+                      title: "Edit blueprint",
+                      icon: IconEnum.edit,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_blueprints",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: row.original,
+                          title: "Edit blueprint",
+                          size: "lg",
+                          type: "blueprints",
+                        }));
+                      },
+                    },
+                    {
+                      id: "2",
+                      title: "Create instance",
+                      isDisabled: !permissions?.create_blueprint_instances,
+                      icon: IconEnum.add,
+                      onClick: () =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: {
+                            parent_id: row.original.id,
+                          },
+                          title: "Create new instance",
+                          type: "blueprint_instances",
+                          size: "lg",
+                        })),
+                    },
+                    {
+                      id: "3",
+                      title: "Arkive blueprint",
+                      icon: IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprints",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprints",
+                          },
+                          title: "Arkive blueprint",
+                          size: "sm",
+                          type: "arkive_entity",
+                        }));
+                      },
+                    },
+                  ]
+            }>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
         </div>
@@ -233,6 +284,7 @@ export function BlueprintView() {
   );
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
+  const [arkived, setArkived] = useState<"active" | "arkive">("active");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
@@ -250,11 +302,12 @@ export function BlueprintView() {
       filters,
       orderBy,
       pagination,
-      fields: ["id", "title", "title_name", "icon", "owner_id"],
+      fields: ["id", "deleted_at", "title", "title_name", "icon", "owner_id"],
       data: {
         project_id,
       },
       permissions: true,
+      arkived: arkived === "arkive",
     },
     "blueprints",
   );
@@ -272,6 +325,21 @@ export function BlueprintView() {
     <TablePageLayout>
       <div className="flex h-full w-full flex-col">
         <div className="flex h-12 w-full items-center justify-end gap-x-2">
+          <div className="w-32">
+            <Select
+              name="view"
+              onChange={({ value }) => {
+                setArkived(value as "active" | "arkive");
+                ls.set("blueprints-table-active", value);
+              }}
+              options={[
+                { label: "Active", value: "active", icon: IconEnum.eye },
+                { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+              ]}
+              placeholder="Active or arkived"
+              value={arkived}
+            />
+          </div>
           <div className="w-fit">
             <Button
               icon={IconEnum.add}
