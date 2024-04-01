@@ -30,6 +30,7 @@ import {
 } from "../../utils";
 
 const columnHelper = createColumnHelper<ProjectType>();
+const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
 function createColumns(navigate: NavigateFunction) {
   return [
@@ -71,17 +72,22 @@ function createColumns(navigate: NavigateFunction) {
       cell: ({ row }) => {
         return (
           <div className="flex w-full flex-1 items-center justify-between gap-x-4 overflow-auto">
-            {projectCardNavItems.map((item) => (
-              <div key={item.icon}>
-                <Button
-                  hasNoBackground
-                  icon={item.icon}
-                  iconSize={32}
-                  isIconOnly
-                  onClick={() => navigate(`/projects/${row.original.id}/${item.navigate}`)}
-                />
-              </div>
-            ))}
+            {projectCardNavItems
+              .filter(
+                (item) =>
+                  row.original?.feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate),
+              )
+              .map((item) => (
+                <div key={item.icon}>
+                  <Button
+                    hasNoBackground
+                    icon={item.icon}
+                    iconSize={32}
+                    isIconOnly
+                    onClick={() => navigate(`/projects/${row.original.id}/${item.navigate}`)}
+                  />
+                </div>
+              ))}
           </div>
         );
       },
