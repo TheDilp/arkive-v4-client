@@ -638,7 +638,7 @@ export function ProjectSettingsView() {
                               cancel: {
                                 action: () => {},
                                 variant: "info",
-                                label: "Delete (permanent)",
+                                label: "Cancel",
                                 icon: IconEnum.close,
                               },
                               confirm: {
