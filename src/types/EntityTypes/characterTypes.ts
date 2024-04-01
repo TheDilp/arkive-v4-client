@@ -101,6 +101,7 @@ export interface CharacterCharacterFieldType {
 }
 export interface CharacterType {
   id: string;
+  deleted_at: string;
   project_id: string;
   is_favorite?: boolean | null;
   is_public?: boolean | null;

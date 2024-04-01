@@ -63,6 +63,7 @@ export interface CharacterFieldType {
 }
 export interface CharacterFieldTemplateType {
   id: string;
+  deleted_at: string;
   title: string;
   project_id: string;
   character_fields: CharacterFieldType[];

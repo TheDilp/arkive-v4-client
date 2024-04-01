@@ -21,6 +21,7 @@ export interface BlueprintFieldType {
 }
 export interface BlueprintType {
   id: string;
+  deleted_at: string;
   title: string;
   title_name: string;
   icon?: AvailableIcons;

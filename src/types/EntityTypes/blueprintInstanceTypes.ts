@@ -61,6 +61,7 @@ export interface BlueprintInstanceBlueprintFieldType {
 }
 export interface BlueprintInstanceType {
   id: string;
+  deleted_at: string;
   title: string;
   parent_id: string;
   owner_id: string;
