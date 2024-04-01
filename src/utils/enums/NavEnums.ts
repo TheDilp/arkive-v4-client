@@ -21,6 +21,7 @@ export function getProjectsViewNavItems(
           ...prev,
           type: "project",
           title: "Create new project",
+          data: null,
         })),
     },
     {
