@@ -40,6 +40,7 @@ export function ProjectLayout() {
       fields: ["id", "title", "owner_id"],
       relations: {
         members: true,
+        feature_flags: true,
       },
     },
     { staleTime: 60 * 60 * 1 },
