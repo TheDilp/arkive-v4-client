@@ -1,8 +1,9 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
-import { Dispatch } from "react";
+import ls from "localstorage-slim";
+import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
@@ -48,61 +49,119 @@ function createColumns(
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: "Edit template",
-                icon: IconEnum.edit,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "update_character_fields_templates",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: "Edit template",
-                    size: "lg",
-                    type: "character_fields_templates",
-                  }));
-                },
-              },
-              {
-                id: "expand",
-                title: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
-                icon: IconEnum.additional_fields,
-                onClick: row.getToggleExpandedHandler(),
-              },
-              {
-                id: "3",
-                title: "Delete field template",
-                icon: IconEnum.trash,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "delete_character_fields_templates",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "character_fields_templates",
+            items={
+              row.original.deleted_at
+                ? [
+                    {
+                      id: "1",
+                      title: "Restore character template",
+                      icon: IconEnum.restore,
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "character_fields_templates",
+                          },
+
+                          title: "Restore character template",
+                          size: "sm",
+                          type: "restore_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_character_fields_templates",
+                        user_role_id,
+                      ),
                     },
-                    title: "Delete field template",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
+                    {
+                      id: "delete_template",
+                      title: "Delete character template",
+                      icon: IconEnum.trash,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_character_fields_templates",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "character_fields_templates",
+                          },
+                          title: "Delete character template",
+                          size: "sm",
+                          type: "delete_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      id: "1",
+                      title: "Edit template",
+                      icon: IconEnum.edit,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_character_fields_templates",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: row.original,
+                          title: "Edit template",
+                          size: "lg",
+                          type: "character_fields_templates",
+                        }));
+                      },
+                    },
+                    {
+                      id: "expand",
+                      title: `${!row.getIsExpanded() ? "Show" : "Hide"} template fields`,
+                      icon: IconEnum.additional_fields,
+                      onClick: row.getToggleExpandedHandler(),
+                    },
+                    {
+                      id: "3",
+                      title: "Arkive template",
+                      icon: IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_character_fields_templates",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "character_fields_templates",
+                          },
+                          title: "Arkive template",
+                          size: "sm",
+                          type: "arkive_entity",
+                        }));
+                      },
+                    },
+                  ]
+            }>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
         </div>
@@ -115,6 +174,8 @@ export function TemplatesView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
   useChangeNavbarTitle(" Field templates");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("character-template-table-active") || "active");
+
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
@@ -141,16 +202,32 @@ export function TemplatesView() {
       data: {
         project_id,
       },
-      fields: ["id", "title", "sort"],
+      fields: ["id", "deleted_at", "title", "sort"],
       relations: {
         tags: true,
       },
+      arkived: arkived === "arkive",
     },
     "character_fields_templates",
   );
   return (
     <TablePageLayout>
       <div className="flex w-full items-center justify-end gap-x-2">
+        <div className="w-32">
+          <Select
+            name="view"
+            onChange={({ value }) => {
+              setArkived(value as "active" | "arkive");
+              ls.set("character-template-table-active", value);
+            }}
+            options={[
+              { label: "Active", value: "active", icon: IconEnum.eye },
+              { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+            ]}
+            placeholder="Active or arkived"
+            value={arkived}
+          />
+        </div>
         <div className="w-fit lg:w-52">
           <Button
             icon={IconEnum.add}
