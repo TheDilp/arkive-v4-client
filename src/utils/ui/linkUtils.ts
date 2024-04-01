@@ -48,6 +48,6 @@ export function getMentionLink(
 
 export function getSidebarLink(link: string, project_id: string, isDisabled?: boolean): string {
   if (isDisabled) return "#";
-  if (link === "/user_settings") return link;
+  if (link === "/user_settings/webhooks") return link;
   return link === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${link}`;
 }
