@@ -88,6 +88,14 @@ function createColumns(
                           isOverlay: true,
                         }));
                       },
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprints",
+                        user_role_id,
+                      ),
                     },
                     {
                       id: "delete_blueprint",

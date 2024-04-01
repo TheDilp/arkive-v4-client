@@ -210,6 +210,14 @@ function columns(
                   id: "1",
                   title: `Restore ${getSingularEntityType(entityType)}`,
                   icon: IconEnum.restore,
+                  isDisabled: !hasActionPermission(
+                    isProjectOwner,
+                    user_id === row.original.owner_id,
+                    permissions,
+                    row.original?.permissions || [],
+                    `delete_${entityType}` as PermissionCodeType,
+                    user_role_id,
+                  ),
                   onClick: () => {
                     setDialog((prev) => ({
                       ...prev,

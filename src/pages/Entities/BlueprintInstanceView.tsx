@@ -450,6 +450,14 @@ function createColumns(
                       id: "1",
                       title: "Restore blueprint instance",
                       icon: IconEnum.restore,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprint_instances",
+                        user_role_id,
+                      ),
                       onClick: () => {
                         setDialog((prev) => ({
                           ...prev,
