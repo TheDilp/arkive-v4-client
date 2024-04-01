@@ -443,80 +443,130 @@ function createColumns(
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: "Edit instance",
-                icon: IconEnum.edit,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "update_blueprint_instances",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: "Edit instance",
-                    size: "lg",
-                    type: "blueprint_instances",
-                  }));
-                },
-              },
-              {
-                id: "2",
-                title: "View public page",
-                icon: IconEnum.public,
-                onClick: () => window.open(`/public/${project_id}/blueprints/${row.original.id}`, "_blank"),
-                isDisabled: !row.original.is_public,
-              },
-              {
-                id: "send_to_discord",
-                title: "Send to Discord",
-                icon: IconEnum.discord,
-                isDisabled: !row.original.is_public,
-                subItems: webhooks.map((webhook) => ({
-                  id: webhook.id,
-                  title: webhook.title,
-                  onClick: () =>
-                    FetchFunction({
-                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                      body: JSON.stringify({
-                        data: { id: row.original.id, type: "blueprint_instances" },
-                      }),
-                      method: "POST",
-                    }),
-                })),
-              },
-              {
-                id: "delete_instance",
-                title: "Delete instance",
-                icon: IconEnum.trash,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "delete_blueprint_instances",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "blueprint_instances",
+            items={
+              row.original.deleted_at
+                ? [
+                    {
+                      id: "1",
+                      title: "Restore blueprint instance",
+                      icon: IconEnum.restore,
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprint_instances",
+                          },
+
+                          title: "Restore blueprint instance",
+                          size: "sm",
+                          type: "restore_entity",
+                          isOverlay: true,
+                        }));
+                      },
                     },
-                    title: "Delete instance",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
+                    {
+                      id: "delete_blueprint",
+                      title: row.original.deleted_at ? "Delete blueprint instance" : "Arkive blueprint instance",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprint_instances",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprint_instances",
+                          },
+                          title: row.original.deleted_at ? "Delete blueprint instance" : "Arkive blueprint instance",
+                          size: "sm",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      id: "1",
+                      title: "Edit instance",
+                      icon: IconEnum.edit,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_blueprint_instances",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: row.original,
+                          title: "Edit instance",
+                          size: "lg",
+                          type: "blueprint_instances",
+                        }));
+                      },
+                    },
+                    {
+                      id: "2",
+                      title: "View public page",
+                      icon: IconEnum.public,
+                      onClick: () => window.open(`/public/${project_id}/blueprints/${row.original.id}`, "_blank"),
+                      isDisabled: !row.original.is_public,
+                    },
+                    {
+                      id: "send_to_discord",
+                      title: "Send to Discord",
+                      icon: IconEnum.discord,
+                      isDisabled: !row.original.is_public,
+                      subItems: webhooks.map((webhook) => ({
+                        id: webhook.id,
+                        title: webhook.title,
+                        onClick: () =>
+                          FetchFunction({
+                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                            body: JSON.stringify({
+                              data: { id: row.original.id, type: "blueprint_instances" },
+                            }),
+                            method: "POST",
+                          }),
+                      })),
+                    },
+                    {
+                      id: "delete_instance",
+                      title: "Arkive instance",
+                      icon: IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_blueprint_instances",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "blueprint_instances",
+                          },
+                          title: "Arkive instance",
+                          size: "sm",
+                          type: "arkive_entity",
+                        }));
+                      },
+                    },
+                  ]
+            }>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
         </div>
@@ -669,11 +719,12 @@ function getSelectedActions(
   return selectedActions;
 }
 
-export function BlueprintInstanceView() {
+export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive" }) {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
+
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
@@ -713,10 +764,11 @@ export function BlueprintInstanceView() {
         tags: true,
       },
       filters,
-      fields: ["id", "is_public", "title"],
+      fields: ["id", "deleted_at", "is_public", "title"],
       relationFilters,
       orderBy,
       pagination,
+      arkived: arkived === "arkive",
     },
     "blueprint_instances",
     {

@@ -284,7 +284,7 @@ export function BlueprintView() {
   );
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
-  const [arkived, setArkived] = useState<"active" | "arkive">("active");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);

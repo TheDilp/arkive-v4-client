@@ -1,7 +1,9 @@
 import { useAtomValue, useSetAtom } from "jotai";
+import ls from "localstorage-slim";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph } from "../../components";
+import { Breadcrumbs, Button, Graph, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
 import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
 import { drawerAtom, getPermissionsForTypeView, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
@@ -17,6 +19,7 @@ export function EntitiesView() {
   const setDrawer = useSetAtom(drawerAtom);
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const permissions = useHasPermissions(getPermissionsForTypeView("blueprint_instances"), undefined);
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
 
   return (
     <div className="flex h-full flex-col gap-y-2">
@@ -25,6 +28,23 @@ export function EntitiesView() {
           <Breadcrumbs />
           {item_id ? (
             <div className="flex justify-end gap-x-2">
+              {type === "blueprints" ? (
+                <div className="ml-auto w-32">
+                  <Select
+                    name="view"
+                    onChange={({ value }) => {
+                      setArkived(value as "active" | "arkive");
+                      ls.set("blueprint_instance-table-active", value);
+                    }}
+                    options={[
+                      { label: "Active", value: "active", icon: IconEnum.eye },
+                      { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+                    ]}
+                    placeholder="Active or arkived"
+                    value={arkived}
+                  />
+                </div>
+              ) : null}
               <div className="w-52">
                 <Button
                   icon={IconEnum.edit}
@@ -41,7 +61,7 @@ export function EntitiesView() {
                   }}
                 />
               </div>
-              {type === "blueprints" && item_id ? (
+              {type === "blueprints" ? (
                 <div className="w-52">
                   <Button
                     icon={IconEnum.add}
@@ -67,7 +87,7 @@ export function EntitiesView() {
       {!!item_id && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}
-      {!!item_id && type === "blueprints" ? <BlueprintInstanceView /> : null}
+      {!!item_id && type === "blueprints" ? <BlueprintInstanceView arkived={arkived} /> : null}
       {!!item_id && type === "calendars" ? <CalendarView /> : null}
       {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
