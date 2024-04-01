@@ -1,9 +1,10 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
+import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType, Variant } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
@@ -55,61 +56,111 @@ function createColumns(
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: "Edit tag",
-                icon: IconEnum.edit,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "update_tags",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: "Edit tag",
-                    size: "lg",
-                    type: "edit_tag",
-                  }));
-                },
-              },
-              {
-                id: "expand",
-                icon: IconEnum.tags,
-                title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this tag`,
-                onClick: row.getToggleExpandedHandler(),
-              },
-              {
-                id: "3",
-                title: "Delete tag",
-                icon: IconEnum.trash,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "delete_tags",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "tags",
+            items={
+              row.original.deleted_at
+                ? [
+                    {
+                      id: "1",
+                      title: "Restore tag",
+                      icon: IconEnum.restore,
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "tags",
+                          },
+
+                          title: "Restore tag",
+                          size: "sm",
+                          type: "restore_entity",
+                          isOverlay: true,
+                        }));
+                      },
                     },
-                    title: "Delete tag",
-                    size: "sm",
-                    type: "delete_entity",
-                  }));
-                },
-              },
-            ]}>
+                    {
+                      id: "delete_tag",
+                      title: "Delete tag",
+                      icon: IconEnum.trash,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_tags",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "tags",
+                          },
+                          title: "Delete tag",
+                          size: "sm",
+                          type: "delete_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      id: "1",
+                      title: "Edit tag",
+                      icon: IconEnum.edit,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_tags",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: row.original,
+                          title: "Edit tag",
+                          size: "lg",
+                          type: "edit_tag",
+                        }));
+                      },
+                    },
+                    {
+                      id: "expand",
+                      icon: IconEnum.tags,
+                      title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this tag`,
+                      onClick: row.getToggleExpandedHandler(),
+                    },
+                    {
+                      id: "3",
+                      title: "Arkive tag",
+                      icon: IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_tags",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "tags",
+                          },
+                          title: "Arkive tag",
+                          size: "sm",
+                          type: "arkive_entity",
+                        }));
+                      },
+                    },
+                  ]
+            }>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
         </div>
@@ -121,6 +172,7 @@ function createColumns(
 export function TagView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("tag-table-active") || "active");
   useChangeNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -137,7 +189,14 @@ export function TagView() {
     pagination: { limit: 10, page: 0 },
   });
   const { data, isLoading } = useGetEntities<TagType>(
-    { data: { project_id }, fields: ["id", "color", "title", "project_id"], filters, pagination, orderBy },
+    {
+      data: { project_id },
+      fields: ["id", "deleted_at", "color", "title", "project_id"],
+      filters,
+      pagination,
+      orderBy,
+      arkived: arkived === "arkive",
+    },
     "tags",
   );
   const selectedActions = [
@@ -242,6 +301,21 @@ export function TagView() {
             onChange={({ value }) => setFilter(value as string)}
             placeholder="Quick search by title"
             value={filter}
+          />
+        </div>
+        <div className="w-32">
+          <Select
+            name="view"
+            onChange={({ value }) => {
+              setArkived(value as "active" | "arkive");
+              ls.set("tag-table-active", value);
+            }}
+            options={[
+              { label: "Active", value: "active", icon: IconEnum.eye },
+              { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+            ]}
+            placeholder="Active or arkived"
+            value={arkived}
           />
         </div>
         <div className="w-fit lg:w-52">
