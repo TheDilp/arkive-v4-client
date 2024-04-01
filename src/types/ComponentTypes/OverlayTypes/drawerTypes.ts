@@ -61,7 +61,7 @@ export type DrawerAtomType = {
   position?: DrawerPosition;
   exceptions?: DrawerExceptions;
 } & (
-  | { type: "project"; data: { owner_id: string } | { id: string } | null }
+  | { type: "project" }
   | { type: "images"; data: ImageType }
   | {
       type:
