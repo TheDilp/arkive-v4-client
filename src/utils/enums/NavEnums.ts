@@ -28,8 +28,10 @@ export function getProjectsViewNavItems(
       tooltip: "Change view",
       navigate: "#",
       onClick: () => {
-        ls.set("projects_view", !view);
-        setView(!view);
+        setView((prev) => {
+          ls.set("projects_view", !prev);
+          return !prev;
+        });
       },
     },
     {

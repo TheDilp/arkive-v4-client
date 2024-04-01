@@ -70,7 +70,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
               !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
           }))
       : items;
-  }, [isProjectOwner, user?.feature_flags, userPermissions]);
+  }, [isProjectOwner, user?.feature_flags, userPermissions, items]);
 
   return (
     <div className={base()}>
