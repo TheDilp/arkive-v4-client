@@ -1,6 +1,46 @@
-import { AvailableIcons, IconEnum } from "./IconEnums";
+import { SetStateAction } from "jotai";
+import ls from "localstorage-slim";
+import { Dispatch } from "react";
 
-export const navItems: { icon: AvailableIcons; navigate: string; tooltip: string; isDisabled?: boolean }[] = [
+import { DrawerAtomType, SidebarItemType } from "../../types";
+import { IconEnum } from "./IconEnums";
+
+export function getProjectsViewNavItems(
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setView: Dispatch<SetStateAction<boolean | null>>,
+  view: boolean | null,
+): SidebarItemType[] {
+  return [
+    {
+      icon: IconEnum.add,
+      tooltip: "Create project",
+      navigate: "#",
+
+      onClick: () =>
+        setDrawer((prev: DrawerAtomType) => ({
+          ...prev,
+          type: "project",
+          title: "Create new project",
+        })),
+    },
+    {
+      icon: view ? IconEnum.table : IconEnum.card,
+      tooltip: "Change view",
+      navigate: "#",
+      onClick: () => {
+        ls.set("projects_view", !view);
+        setView(!view);
+      },
+    },
+    {
+      icon: IconEnum.user_settings,
+      tooltip: "User settings",
+      navigate: "/user_settings",
+    },
+  ];
+}
+
+export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
   { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
   { icon: IconEnum.document, navigate: "documents", tooltip: "Documents" },
@@ -17,7 +57,7 @@ export const navItems: { icon: AvailableIcons; navigate: string; tooltip: string
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];
 
-export const projectCardNavItems = navItems.slice(0, -1);
+export const projectCardNavItems = projectNavItems.slice(0, -1);
 
 export const settingsSubnavItems = [
   { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },

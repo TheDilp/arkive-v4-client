@@ -633,7 +633,7 @@ export function ProjectSettingsView() {
                               ...prev,
                               title: `Delete project - ${project?.title || ""}`,
                               description:
-                                "Are you sure you wish to delete this project? All data aassociated with this project will be PERMANENTLY deleted.",
+                                "Are you sure you wish to delete this project? All data associated with this project will be PERMANENTLY deleted.",
                               warning: "THIS ACTION IS IRREVERSABLE! ONCE DELETED DATA CANNOT BE RECOVERED!",
                               cancel: {
                                 action: () => {},

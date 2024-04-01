@@ -9,10 +9,10 @@ import { InsertProjectSchema, InsertProjectType } from "../../../validation/proj
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
-export function ProjectDrawer({ data }: { data: { owner_id: string } | { id: string } | null }) {
+export function ProjectDrawer() {
   const user = useAtomValue(userAtom);
   const [project, setProject] = useState<Partial<ProjectType>>({
-    ...(data || { title: "" }),
+    title: "",
     owner_id: user?.id as string,
   });
   const { handleChange } = useHandleChange({ data: project, setData: setProject });

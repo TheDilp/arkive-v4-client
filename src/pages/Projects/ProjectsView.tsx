@@ -3,7 +3,7 @@ import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 import {
   Avatar,
@@ -12,72 +12,94 @@ import {
   Drawer,
   Navbar,
   ProjectCard,
+  Sidebar,
   Skeleton,
   Table,
   TablePageLayout,
 } from "../../components";
-import { useChangeNavbarTitle, useGetAllProjects, useGetUser, useTable } from "../../hooks";
-import { DrawerAtomType, ProjectType } from "../../types";
-import { drawerAtom, getAvatarInitials, getImageURL, IconEnum, projectAtom, projectCardNavItems, userAtom } from "../../utils";
+import { useBreakpoint, useChangeNavbarTitle, useGetAllProjects, useGetUser, useTable } from "../../hooks";
+import { ProjectType } from "../../types";
+import {
+  drawerAtom,
+  getAvatarInitials,
+  getImageURL,
+  getProjectsViewNavItems,
+  projectAtom,
+  projectCardNavItems,
+  userAtom,
+} from "../../utils";
 
 const columnHelper = createColumnHelper<ProjectType>();
 
-const createColumns = [
-  columnHelper.display({
-    id: "image_id",
-    header: "Image",
-    cell: ({ row }) => (
-      <div className="flex w-full items-center justify-center">
-        <Avatar
-          hasShowImage
-          image={getImageURL(row.original.id, "images", row.original.image_id)}
-          initials={getAvatarInitials(row.original.title)}
-          isBordered
-          isTooltipDisabled
-          size="sm"
-        />
-      </div>
-    ),
-    meta: {
-      pinned: true,
-      noLink: true,
-      centered: true,
-    },
-    minSize: 4.5,
-    maxSize: 4.5,
-  }),
+function createColumns(navigate: NavigateFunction) {
+  return [
+    columnHelper.display({
+      id: "image_id",
+      header: "Image",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar
+            hasShowImage
+            image={getImageURL(row.original.id, "images", row.original.image_id)}
+            initials={getAvatarInitials(row.original.title)}
+            isBordered
+            isTooltipDisabled
+            size="sm"
+          />
+        </div>
+      ),
+      meta: {
+        pinned: true,
+        noLink: true,
+        centered: true,
+      },
+      minSize: 4.5,
+      maxSize: 4.5,
+    }),
 
-  columnHelper.accessor("title", {
-    id: "title",
-    header: "Title",
-    cell: (info) => info.getValue(),
-    meta: {
-      sortable: true,
-    },
-  }),
-  columnHelper.display({
-    id: "links",
-    header: "Shortcuts",
-    cell: ({ row }) => (
-      <div className="flex w-full flex-1 items-center justify-between gap-x-4">
-        {projectCardNavItems.map((item) => (
-          <Link key={item.icon} to={`/projects/${row.original.id}/${item.navigate}`}>
-            <Button hasNoBackground icon={item.icon} iconSize={32} isIconOnly onClick={() => {}} />
-          </Link>
-        ))}
-      </div>
-    ),
-    meta: {
-      pinned: true,
-      noLink: true,
-      centered: true,
-    },
-    minSize: 12,
-  }),
-];
+    columnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        sortable: true,
+      },
+    }),
+    columnHelper.display({
+      id: "links",
+      header: "Shortcuts",
+      cell: ({ row }) => {
+        return (
+          <div className="flex w-full flex-1 items-center justify-between gap-x-4 overflow-auto">
+            {projectCardNavItems.map((item) => (
+              <div key={item.icon}>
+                <Button
+                  hasNoBackground
+                  icon={item.icon}
+                  iconSize={32}
+                  isIconOnly
+                  onClick={() => navigate(`/projects/${row.original.id}/${item.navigate}`)}
+                />
+              </div>
+            ))}
+          </div>
+        );
+      },
+      meta: {
+        pinned: true,
+        noLink: true,
+        centered: true,
+      },
+      minSize: 12,
+    }),
+  ];
+}
 
 export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
+  const navigate = useNavigate();
+  const { isLg } = useBreakpoint();
+
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useChangeNavbarTitle("The Arkive");
 
@@ -119,42 +141,18 @@ export function ProjectsView() {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Drawer />
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      <div className="h-full w-16 min-w-[4rem] max-w-[4rem] border-r border-zinc-800 bg-zinc-900">
-        <div className="sticky left-0 top-0 flex h-16 min-h-[4rem] w-16 min-w-[4rem] select-none items-center justify-center border-r border-zinc-800 bg-zinc-900">
-          <img alt="Arkive Logo" className="h-12 min-w-[4rem]" height={48} src="/Logo.webp" width={64} />
-        </div>
-        <div className="h-16 w-full">
-          <Button
-            hasNoBackground
-            icon={IconEnum.add}
-            iconSize={28}
-            onClick={() =>
-              setDrawer((prev: DrawerAtomType) => ({
-                ...prev,
-                type: "project",
-                title: "Create new project",
-                data: { owner_id: userData?.data?.id as string },
-              }))
-            }
-            tooltip="Create new project"
-          />
-          <Button
-            hasNoBackground
-            icon={view ? IconEnum.table : IconEnum.card}
-            iconSize={28}
-            onClick={() => {
-              ls.set("projects_view", !view);
-              setView(!view);
-            }}
-            tooltip="Change view"
-          />
-        </div>
-      </div>
+      {isLg ? (
+        <Sidebar
+          isLoading={isInitialLoadingUser}
+          isUsingPermissions={false}
+          items={getProjectsViewNavItems(setDrawer, setView, view)}
+        />
+      ) : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isLoading || isInitialLoadingUser} />
@@ -164,7 +162,7 @@ export function ProjectsView() {
           <div className="flex-1 p-4">
             <TablePageLayout>
               <Table
-                columns={createColumns}
+                columns={createColumns(navigate)}
                 config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
                 data={data?.data || []}
                 dispatch={dispatch}
@@ -187,6 +185,13 @@ export function ProjectsView() {
           </div>
         ) : null}
       </div>
+      {isLg ? null : (
+        <Sidebar
+          isLoading={isInitialLoadingUser}
+          isUsingPermissions={false}
+          items={getProjectsViewNavItems(setDrawer, setView, view)}
+        />
+      )}
     </div>
   );
 }

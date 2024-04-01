@@ -17,12 +17,16 @@ import {
   IconEnum,
   permissionsAtom,
   projectAtom,
+  projectNavItems,
   useNotifications,
   userAtom,
 } from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
+
+const sidebarItems = [...projectNavItems];
+sidebarItems.unshift({ icon: IconEnum.dasboard, tooltip: "Dasboard", navigate: "/" });
 
 export function ProjectLayout() {
   const { project_id } = useParams();
@@ -150,7 +154,7 @@ export function ProjectLayout() {
       </SignedOut>
 
       <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
-      {isLg ? <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} /> : null}
+      {isLg ? <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={sidebarItems} /> : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
@@ -158,7 +162,9 @@ export function ProjectLayout() {
           <Drawer />
           {isInitialLoading || isInitialLoadingUser ? null : <Outlet />}
         </div>
-        {!isLg ? <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} /> : null}
+        {!isLg ? (
+          <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={sidebarItems} />
+        ) : null}
       </div>
     </div>
   );

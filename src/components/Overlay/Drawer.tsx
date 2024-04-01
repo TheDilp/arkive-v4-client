@@ -177,7 +177,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
               <span>{drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic /> : null}</span>
             ) : (
               <>
-                {drawer.type === "project" ? <ProjectDrawer data={drawer.data} /> : null}
+                {drawer.type === "project" ? <ProjectDrawer /> : null}
                 {drawer.type === "characters" ? <CharacterDrawer data={drawer.data} /> : null}
                 {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
