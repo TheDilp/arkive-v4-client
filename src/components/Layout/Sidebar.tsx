@@ -1,16 +1,14 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useBreakpoint } from "../../hooks";
-import { PermissionCodeType } from "../../types";
-import { currentUserPermissions, getSidebarLink, IconEnum, isProjectOwnerAtom, navItems, userAtom } from "../../utils";
+import { PermissionCodeType, SidebarType } from "../../types";
+import { currentUserPermissions, getSidebarLink, isProjectOwnerAtom, userAtom } from "../../utils";
 import { Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
-
-const sidebarItems = [...navItems];
-sidebarItems.unshift({ icon: IconEnum.dasboard, tooltip: "Dasboard", navigate: "/" });
 
 const SidebarClasses = tv({
   slots: {
@@ -31,7 +29,7 @@ const SidebarItemClasses = tv({
       true: "text-white bg-blue-400 [&>li]:hover:text-white",
     },
     isSettings: {
-      true: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mt-auto",
+      true: "justify-center flex h-16 min-w-[4rem] min-h-[4rem] items-center lg:mt-auto ml-auto lg:ml-0",
     },
     isDisabled: {
       true: "cursor-not-allowed bg-zinc-300 ",
@@ -41,7 +39,7 @@ const SidebarItemClasses = tv({
   compoundVariants: [{ isSelected: true, isSettings: true, class: "text-white bg-blue-400 [&>li]:hover:text-white" }],
 });
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
-export function Sidebar({ isLoading }: { isLoading: boolean }) {
+export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const { pathname } = useLocation();
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
@@ -56,20 +54,22 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const finalSidebarItems = useMemo(() => {
-    return sidebarItems
-      .filter((item) =>
-        user?.feature_flags
-          ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
-          : alwaysEnabledItems.includes(item.navigate),
-      )
-      .map((item) => ({
-        ...item,
-        isDisabled:
-          !isProjectOwner &&
-          item.navigate !== "settings" &&
-          item.navigate !== "/" &&
-          !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
-      }));
+    return isUsingPermissions
+      ? items
+          .filter((item) =>
+            user?.feature_flags
+              ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
+              : alwaysEnabledItems.includes(item.navigate),
+          )
+          .map((item) => ({
+            ...item,
+            isDisabled:
+              !isProjectOwner &&
+              item.navigate !== "settings" &&
+              item.navigate !== "/" &&
+              !userPermissions.includes(`read_${item.navigate}` as PermissionCodeType),
+          }))
+      : items;
   }, [isProjectOwner, user?.feature_flags, userPermissions]);
 
   return (
@@ -92,10 +92,11 @@ export function Sidebar({ isLoading }: { isLoading: boolean }) {
                         (item.navigate === "characters" && pathname.includes("characters")) ||
                         (item.navigate === "blueprints" && pathname.includes("blueprints")) ||
                         item.navigate === type,
-                      isSettings: item.navigate === "settings",
+                      isSettings: item.navigate.includes("settings"),
                       isDisabled: item?.isDisabled,
                     })}
-                    to={getSidebarLink(item.navigate, project_id as string, item?.isDisabled)}>
+                    onClick={item?.onClick}
+                    to={item.onClick ? "#" : getSidebarLink(item.navigate, project_id as string, item?.isDisabled)}>
                     <Tooltip
                       allowedPlacements={[isLg ? "right" : "top"]}
                       content={item.tooltip}
