@@ -59,9 +59,12 @@
   ol,
   ul {
     list-style-position: inside !important;
-
+    padding-inline-start: 0.75rem;
     p {
       display: inline !important;
+    }
+    li {
+      @apply relative;
     }
   }
   ul[data-task-list] {

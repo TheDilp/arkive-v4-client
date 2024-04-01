@@ -74,6 +74,7 @@ details:not([open]) div {
 }
 
 input[type="color"] {
+  appearance: none;
   -webkit-appearance: none;
   @apply h-6 w-6 appearance-none rounded-full border-none bg-transparent;
 }
