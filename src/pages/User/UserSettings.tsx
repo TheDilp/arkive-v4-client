@@ -32,7 +32,7 @@ export function UserSettings() {
         <Sidebar isLoading={false} isUsingPermissions={false} items={getProjectsViewNavItems(setDrawer, setView, view)} />
       ) : null}
       <Outlet />
-      <div className="flex flex-col">
+      <div className="flex flex-1 flex-col">
         {/* <Collapsible label="Notifications from other project members">
           <div className="bg-zinc-900">
             {UserNotificationEntities.map((entity) => (

@@ -1,10 +1,11 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useUser } from "@clerk/clerk-react";
+import { useSetAtom } from "jotai";
 import { Dispatch, SetStateAction } from "react";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
+import { useGetEntities, useGetUser, useTable } from "../../hooks";
 import { DrawerAtomType, WebhookType } from "../../types";
-import { drawerAtom, getDefaultEntityIcon, IconEnum, userAtom } from "../../utils";
+import { drawerAtom, getDefaultEntityIcon, IconEnum } from "../../utils";
 
 const rolesColumnHelper = createColumnHelper<WebhookType>();
 
@@ -58,7 +59,8 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
   ];
 }
 export function UserSettingsWebhooks() {
-  const user = useAtomValue(userAtom);
+  const { user: authUser } = useUser();
+  const { data: user } = useGetUser({ data: { auth_id: authUser?.id as string }, fields: ["id"] });
   const setDrawer = useSetAtom(drawerAtom);
   const [, dispatch] = useTable({});
 
@@ -67,9 +69,9 @@ export function UserSettingsWebhooks() {
   }
 
   const { data: webhooks } = useGetEntities<WebhookType>(
-    { data: { user_id: user?.id }, fields: ["id", "title", "user_id"] },
+    { data: { user_id: user?.data?.id }, fields: ["id", "title", "user_id"] },
     "webhooks",
-    { enabled: !!user?.id },
+    { enabled: !!user?.data?.id },
   );
   return (
     <div className="flex w-full flex-col gap-y-2 p-4">
