@@ -169,106 +169,160 @@ function createColumns(
         <div className="flex items-center justify-center">
           <Dropdown
             allowedPlacements={["left", "left-start", "left-end"]}
-            items={[
-              {
-                id: "1",
-                title: "Edit character",
-                icon: IconEnum.edit,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "update_characters",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDrawer((prev) => ({
-                    ...prev,
-                    data: row.original,
-                    title: `Edit character - ${getCharacterFullName(row.original.first_name, "", row.original?.last_name)}`,
-                    size: "2xl",
-                    type: "characters",
-                  }));
-                },
-              },
-              {
-                id: "2",
-                title: "View relationship tree",
-                icon: IconEnum.family_tree,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "read_characters",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog({
-                    type: "family_tree",
-                    title: `Relationship tree of ${getCharacterFullName(
-                      row.original.first_name,
-                      "",
-                      row.original?.last_name || "",
-                    )}`,
-                    data: { id: row.original.id },
-                    size: "lg",
-                  });
-                },
-              },
-              {
-                id: "send_to_discord",
-                title: "Send to Discord",
-                icon: IconEnum.discord,
-                isDisabled: !row.original.is_public,
-                subItems: webhooks.map((webhook) => ({
-                  id: webhook.id,
-                  title: webhook.title,
-                  onClick: () =>
-                    FetchFunction({
-                      url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
-                      body: JSON.stringify({
-                        data: { id: row.original.id, type: "characters" },
-                      }),
-                      method: "POST",
-                    }),
-                })),
-              },
-              {
-                id: "view_public",
-                title: "View public page",
-                icon: IconEnum.public,
-                onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
-                isDisabled: !row.original.is_public,
-              },
-              {
-                id: "delete_character",
-                title: "Delete character",
-                icon: IconEnum.trash,
-                isDisabled: !hasActionPermission(
-                  isProjectOwner,
-                  user_id === row.original.owner_id,
-                  permissions,
-                  row.original?.permissions || [],
-                  "delete_characters",
-                  user_role_id,
-                ),
-                onClick: () => {
-                  setDialog((prev) => ({
-                    ...prev,
-                    data: {
-                      ...row.original,
-                      entity_title: "characters",
+            items={
+              row.original.deleted_at
+                ? [
+                    {
+                      id: "1",
+                      title: "Restore",
+                      icon: IconEnum.restore,
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "characters",
+                          },
+
+                          title: "Restore character",
+                          size: "sm",
+                          type: "restore_entity",
+                          isOverlay: true,
+                        }));
+                      },
                     },
-                    title: "Delete character",
-                    size: "sm",
-                    type: "delete_entity",
-                    isOverlay: true,
-                  }));
-                },
-              },
-            ]}>
+                    {
+                      id: "delete_character",
+                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_characters",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "characters",
+                          },
+                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                          size: "sm",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      id: "1",
+                      title: "Edit character",
+                      icon: IconEnum.edit,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_characters",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDrawer((prev) => ({
+                          ...prev,
+                          data: row.original,
+                          title: `Edit character - ${getCharacterFullName(
+                            row.original.first_name,
+                            "",
+                            row.original?.last_name,
+                          )}`,
+                          size: "2xl",
+                          type: "characters",
+                        }));
+                      },
+                    },
+                    {
+                      id: "2",
+                      title: "View relationship tree",
+                      icon: IconEnum.family_tree,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "read_characters",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog({
+                          type: "family_tree",
+                          title: `Relationship tree of ${getCharacterFullName(
+                            row.original.first_name,
+                            "",
+                            row.original?.last_name || "",
+                          )}`,
+                          data: { id: row.original.id },
+                          size: "lg",
+                        });
+                      },
+                    },
+                    {
+                      id: "send_to_discord",
+                      title: "Send to Discord",
+                      icon: IconEnum.discord,
+                      isDisabled: !row.original.is_public,
+                      subItems: webhooks.map((webhook) => ({
+                        id: webhook.id,
+                        title: webhook.title,
+                        onClick: () =>
+                          FetchFunction({
+                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                            body: JSON.stringify({
+                              data: { id: row.original.id, type: "characters" },
+                            }),
+                            method: "POST",
+                          }),
+                      })),
+                    },
+                    {
+                      id: "view_public",
+                      title: "View public page",
+                      icon: IconEnum.public,
+                      onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
+                      isDisabled: !row.original.is_public,
+                    },
+                    {
+                      id: "delete_character",
+                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "delete_characters",
+                        user_role_id,
+                      ),
+                      onClick: () => {
+                        setDialog((prev) => ({
+                          ...prev,
+                          data: {
+                            ...row.original,
+                            entity_title: "characters",
+                          },
+                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                          size: "sm",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          isOverlay: true,
+                        }));
+                      },
+                    },
+                  ]
+            }>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
           </Dropdown>
         </div>
@@ -421,6 +475,7 @@ export function CharactersView() {
   useChangeNavbarTitle("Characters");
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") ?? "table");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
@@ -445,8 +500,20 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
-      fields: ["id", "first_name", "nickname", "last_name", "portrait_id", "is_favorite", "is_public", "age", "owner_id"],
+      fields: [
+        "id",
+        "deleted_at",
+        "first_name",
+        "nickname",
+        "last_name",
+        "portrait_id",
+        "is_favorite",
+        "is_public",
+        "age",
+        "owner_id",
+      ],
       permissions: true,
+      arkived: arkived === "arkive",
     },
     "characters",
     {
@@ -470,7 +537,7 @@ export function CharactersView() {
       relations: {
         portrait: true,
       },
-      fields: ["id", "full_name", "portrait_id", "is_favorite", "age", "owner_id"],
+      fields: ["id", "deleted_at", "full_name", "portrait_id", "is_favorite", "age", "owner_id"],
       filters,
       pagination: {
         limit: 12,
@@ -482,6 +549,7 @@ export function CharactersView() {
         },
       ],
       permissions: true,
+      arkived: arkived === "arkive",
     },
     "characters",
     {
@@ -567,6 +635,21 @@ export function CharactersView() {
             placeholder="Quick search by first name"
             type="search"
             value={filter}
+          />
+        </div>
+        <div className="w-32">
+          <Select
+            name="view"
+            onChange={({ value }) => {
+              setArkived(value as "active" | "arkive");
+              ls.set("characters-table-active", value);
+            }}
+            options={[
+              { label: "Active", value: "active", icon: IconEnum.eye },
+              { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+            ]}
+            placeholder="Active or arkived"
+            value={arkived}
           />
         </div>
         <div className="w-32">
