@@ -4,8 +4,23 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntity, useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
-import { AvailableEntityType, CalendarType, EventStateType, EventType, onChangeValue } from "../../../types";
+import {
+  useCreateSubEntity,
+  useGetEntity,
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useUpdateSubEntity,
+} from "../../../hooks";
+import {
+  AvailableEntityType,
+  CalendarType,
+  EventStateType,
+  EventType,
+  onChangeValue,
+  TabType,
+  UserHasPermissionsType,
+} from "../../../types";
 import {
   checkIfDayCorrect,
   checkIfMonthCorrect,
@@ -18,6 +33,7 @@ import {
 } from "../../../utils";
 import { InsertEventSchema, UpdateEventSchema } from "../../../validation/calendars/event";
 import { ImageSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select, TagInput, Textarea } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
@@ -45,11 +61,22 @@ type Props = {
     isPublic?: boolean;
   };
 };
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Details", icon: IconEnum.edit },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-];
+
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Details", icon: IconEnum.edit },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
+
 export function EventDrawer({ data }: Props) {
   const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
@@ -97,6 +124,7 @@ export function EventDrawer({ data }: Props) {
         "is_public",
         "description",
       ],
+      permissions: true,
     },
     {
       isPublic: data?.isPublic,
@@ -104,6 +132,21 @@ export function EventDrawer({ data }: Props) {
       enabled: !!data?.id,
     },
   );
+
+  const permissions = useHasPermissions(
+    [
+      "read_events",
+      "create_events",
+      "update_events",
+      "read_tags",
+      "read_characters",
+      "read_map_pins",
+      "read_assets",
+      "read_documents",
+    ],
+    existingEvent?.data?.owner_id,
+  );
+  const tabs = getTabs(permissions, existingEvent?.data?.id);
 
   const existingMonths = calendar?.data?.months || [];
 
@@ -167,6 +210,7 @@ export function EventDrawer({ data }: Props) {
           characters: event?.characters?.map((char) => ({ id: char.id })),
           map_pins: event?.map_pins?.map((pin) => ({ id: pin.id })),
         },
+        permissions: event.permissions,
       });
 
       await createEvent(parsedData, {
@@ -187,6 +231,7 @@ export function EventDrawer({ data }: Props) {
           characters: event?.characters?.map((char) => ({ id: char.id })),
           map_pins: event?.map_pins?.map((pin) => ({ id: pin.id })),
         },
+        permissions: event.permissions,
       });
       await updateEvent(parsedData, {
         onSuccess: () => {
@@ -213,7 +258,7 @@ export function EventDrawer({ data }: Props) {
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <div className="flex flex-col gap-y-2">
           <div className="flex flex-nowrap gap-x-2">
             <Input
@@ -375,7 +420,7 @@ export function EventDrawer({ data }: Props) {
         </div>
       ) : null}
 
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <>
           <div className="h-fit py-2">
             <Textarea
@@ -388,34 +433,36 @@ export function EventDrawer({ data }: Props) {
               value={event?.description || ""}
             />
           </div>
+          {permissions?.read_assets ? (
+            <div>
+              {event?.image?.id ? (
+                <ImagePreview
+                  clearAction={
+                    data?.isReadOnly || !permissions?.read_assets
+                      ? undefined
+                      : () => {
+                          handleChange({ name: "image", value: null });
+                        }
+                  }
+                  id={event.image.id}
+                  label="Event image (optional)"
+                  title={event.image.title}
+                  url={getImageURL(project_id as string, "images", event.image.id)}
+                />
+              ) : (
+                <ImageSelect
+                  isDisabled={data?.isReadOnly}
+                  label="Event image (optional)"
+                  name="image"
+                  onChange={handleImageChange}
+                  type="images"
+                  value={event.image_id}
+                />
+              )}
+            </div>
+          ) : null}
           <div>
-            {event?.image?.id ? (
-              <ImagePreview
-                clearAction={
-                  data?.isReadOnly
-                    ? undefined
-                    : () => {
-                        handleChange({ name: "image", value: null });
-                      }
-                }
-                id={event.image.id}
-                label="Event image (optional)"
-                title={event.image.title}
-                url={getImageURL(project_id as string, "images", event.image.id)}
-              />
-            ) : (
-              <ImageSelect
-                isDisabled={data?.isReadOnly}
-                label="Event image (optional)"
-                name="image"
-                onChange={handleImageChange}
-                type="images"
-                value={event.image_id}
-              />
-            )}
-          </div>
-          <div>
-            {event?.document ? (
+            {event?.document && permissions?.read_documents ? (
               <EntityPreview
                 clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "document", value: null })}
                 icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
@@ -445,95 +492,108 @@ export function EventDrawer({ data }: Props) {
               />
             )}
           </div>
-          <Collapsible icon={IconEnum.character} initialOpen={false} label="Characters">
-            <div className="flex flex-col gap-y-1 p-2">
-              <Search
-                isMultiple
-                label="Characters (optional)"
-                limit={10}
-                name="characters"
-                onChange={({ name, value, label, image }) => {
-                  if ((event.characters || [])?.some((char) => char.id === value)) {
+          {permissions?.read_characters ? (
+            <Collapsible icon={IconEnum.character} initialOpen={false} label="Characters">
+              <div className="flex flex-col gap-y-1 p-2">
+                <Search
+                  isMultiple
+                  label="Characters (optional)"
+                  limit={10}
+                  name="characters"
+                  onChange={({ name, value, label, image }) => {
+                    if ((event.characters || [])?.some((char) => char.id === value)) {
+                      handleChange({
+                        name,
+                        value: (event.characters || []).filter((t) => t.id !== value),
+                      });
+                      return;
+                    }
+
                     handleChange({
                       name,
-                      value: (event.characters || []).filter((t) => t.id !== value),
+                      value: (event.characters || []).concat({
+                        full_name: label || "",
+                        id: value,
+                        portrait_id: image,
+                      }),
                     });
-                    return;
-                  }
-
-                  handleChange({
-                    name,
-                    value: (event.characters || []).concat({
-                      full_name: label || "",
-                      id: value,
-                      portrait_id: image,
-                    }),
-                  });
-                }}
-                searchEntity="characters"
-                value={event.characters?.map((char) => char.id)}
-              />
-              {event.characters?.map((char) => (
-                <EntityPreview
-                  clearAction={(id) =>
-                    handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
-                  }
-                  id={char.id}
-                  image_id={char.portrait_id}
-                  title={char.full_name}
-                  type="characters"
+                  }}
+                  searchEntity="characters"
+                  value={event.characters?.map((char) => char.id)}
                 />
-              ))}
-            </div>
-          </Collapsible>
-          <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-            <div className="flex flex-col gap-y-1 p-2">
-              <Search
-                isMultiple
-                label="Locations (optional)"
-                limit={10}
-                name="map_pins"
-                onChange={({ name, value, label, image, icon, parent_id }) => {
-                  if ((event.map_pins || [])?.some((char) => char.id === value)) {
+                {event.characters?.map((char) => (
+                  <EntityPreview
+                    clearAction={(id) =>
+                      handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
+                    }
+                    id={char.id}
+                    image_id={char.portrait_id}
+                    title={char.full_name}
+                    type="characters"
+                  />
+                ))}
+              </div>
+            </Collapsible>
+          ) : null}
+          {permissions?.read_map_pins ? (
+            <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+              <div className="flex flex-col gap-y-1 p-2">
+                <Search
+                  isMultiple
+                  label="Locations (optional)"
+                  limit={10}
+                  name="map_pins"
+                  onChange={({ name, value, label, image, icon, parent_id }) => {
+                    if ((event.map_pins || [])?.some((char) => char.id === value)) {
+                      handleChange({
+                        name,
+                        value: (event.map_pins || []).filter((t) => t.id !== value),
+                      });
+                      return;
+                    }
+
                     handleChange({
                       name,
-                      value: (event.map_pins || []).filter((t) => t.id !== value),
+                      value: (event.map_pins || []).concat({
+                        id: value,
+                        title: label || "",
+                        image_id: image,
+                        icon: icon || getDefaultEntityIcon("map_pins"),
+                        parent_id: parent_id || "",
+                        color: "#ffffff",
+                        border_color: "#ffffff",
+                      }),
                     });
-                    return;
-                  }
-
-                  handleChange({
-                    name,
-                    value: (event.map_pins || []).concat({
-                      id: value,
-                      title: label || "",
-                      image_id: image,
-                      icon: icon || getDefaultEntityIcon("map_pins"),
-                      parent_id: parent_id || "",
-                      color: "#ffffff",
-                      border_color: "#ffffff",
-                    }),
-                  });
-                }}
-                searchEntity="map_pins"
-                value={event.map_pins?.map((pin) => pin.id)}
-              />
-              {event.map_pins?.map((pin) => (
-                <EntityPreview
-                  clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
-                  icon={pin.icon}
-                  id={pin.id}
-                  image_id={pin.image_id}
-                  title={pin.title || ""}
-                  type="map_pins"
+                  }}
+                  searchEntity="map_pins"
+                  value={event.map_pins?.map((pin) => pin.id)}
                 />
-              ))}
-            </div>
-          </Collapsible>
+                {event.map_pins?.map((pin) => (
+                  <EntityPreview
+                    clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
+                    icon={pin.icon}
+                    id={pin.id}
+                    image_id={pin.image_id}
+                    title={pin.title || ""}
+                    type="map_pins"
+                  />
+                ))}
+              </div>
+            </Collapsible>
+          ) : null}
         </>
       ) : null}
-      {selectedTab === 2 ? (
+      {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
         <TagInput handleChange={handleChange} isDisabled={data?.isReadOnly} isMultiple tags={event?.tags || []} />
+      ) : null}
+      {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={event?.owner_id}
+          permissions={event?.permissions || []}
+          related_id={event?.id || null}
+          selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
+        />
       ) : null}
 
       {data?.isReadOnly ? null : (

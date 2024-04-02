@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
+
 export const InsertEventSchema = z.object({
   data: z.object({
     title: z.string(),
@@ -31,6 +33,7 @@ export const InsertEventSchema = z.object({
       map_pins: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateEventSchema = z.object({
@@ -64,4 +67,5 @@ export const UpdateEventSchema = z.object({
       map_pins: z.object({ id: z.string() }).array().optional(),
     })
     .optional(),
+  permissions: UpdateEntityPermissionSchema,
 });

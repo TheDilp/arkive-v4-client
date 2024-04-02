@@ -1,6 +1,6 @@
 import { AvailableIcons } from "../../utils";
 import { RequestFilterType } from "../CRUD";
-import { BaseEntityType } from "./baseEntityTypes";
+import { BaseEntityType, EntityPermissionType } from "./baseEntityTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
 import { ImageType } from "./imageTypes";
@@ -69,6 +69,7 @@ export interface EraType {
 
 export interface EventType {
   id: string;
+  owner_id: string;
   title: string;
   description: string | null;
   is_public: boolean | null;
@@ -89,6 +90,7 @@ export interface EventType {
   end_year?: number | null;
   start_month: number;
   start_year: number;
+  permissions: EntityPermissionType[];
   document?: DocumentType;
   image?: ImageType;
   tags: Omit<TagType, "owner_id" | "permissions">[];
