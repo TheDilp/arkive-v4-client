@@ -462,28 +462,31 @@ export function EventDrawer({ data }: Props) {
             </div>
           ) : null}
           <div>
-            {event?.document && permissions?.read_documents ? (
+            {event?.document ? (
               <EntityPreview
                 clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "document", value: null })}
                 icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
                 id={event.document.id}
                 label="Document"
                 link={getEntityLink(project_id as string, "documents", event.document.id, null, data?.isReadOnly)}
-                previewAction={() =>
-                  setDrawer((prev) => ({
-                    ...prev,
-                    title: "Preview",
-                    data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
-                    type: "entity_preview",
-                    size: "half",
-                  }))
+                previewAction={
+                  !permissions?.read_documents
+                    ? undefined
+                    : () =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          title: "Preview",
+                          data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
+                          type: "entity_preview",
+                          size: "half",
+                        }))
                 }
                 title={event.document.title}
                 type="documents"
               />
             ) : (
               <Search
-                isDisabled={data?.isReadOnly}
+                isDisabled={data?.isReadOnly || !permissions?.read_documents}
                 label="Event document (optional)"
                 name="document"
                 onChange={handleImageChange}
@@ -492,95 +495,97 @@ export function EventDrawer({ data }: Props) {
               />
             )}
           </div>
-          {permissions?.read_characters ? (
-            <Collapsible icon={IconEnum.character} initialOpen={false} label="Characters">
-              <div className="flex flex-col gap-y-1 p-2">
-                <Search
-                  isMultiple
-                  label="Characters (optional)"
-                  limit={10}
-                  name="characters"
-                  onChange={({ name, value, label, image }) => {
-                    if ((event.characters || [])?.some((char) => char.id === value)) {
-                      handleChange({
-                        name,
-                        value: (event.characters || []).filter((t) => t.id !== value),
-                      });
-                      return;
-                    }
 
+          <Collapsible
+            icon={IconEnum.character}
+            initialOpen={false}
+            isDisabled={!permissions?.read_characters}
+            label="Characters">
+            <div className="flex flex-col gap-y-1 p-2">
+              <Search
+                isMultiple
+                label="Characters (optional)"
+                limit={10}
+                name="characters"
+                onChange={({ name, value, label, image }) => {
+                  if ((event.characters || [])?.some((char) => char.id === value)) {
                     handleChange({
                       name,
-                      value: (event.characters || []).concat({
-                        full_name: label || "",
-                        id: value,
-                        portrait_id: image,
-                      }),
+                      value: (event.characters || []).filter((t) => t.id !== value),
                     });
-                  }}
-                  searchEntity="characters"
-                  value={event.characters?.map((char) => char.id)}
-                />
-                {event.characters?.map((char) => (
-                  <EntityPreview
-                    clearAction={(id) =>
-                      handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
-                    }
-                    id={char.id}
-                    image_id={char.portrait_id}
-                    title={char.full_name}
-                    type="characters"
-                  />
-                ))}
-              </div>
-            </Collapsible>
-          ) : null}
-          {permissions?.read_map_pins ? (
-            <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-              <div className="flex flex-col gap-y-1 p-2">
-                <Search
-                  isMultiple
-                  label="Locations (optional)"
-                  limit={10}
-                  name="map_pins"
-                  onChange={({ name, value, label, image, icon, parent_id }) => {
-                    if ((event.map_pins || [])?.some((char) => char.id === value)) {
-                      handleChange({
-                        name,
-                        value: (event.map_pins || []).filter((t) => t.id !== value),
-                      });
-                      return;
-                    }
+                    return;
+                  }
 
+                  handleChange({
+                    name,
+                    value: (event.characters || []).concat({
+                      full_name: label || "",
+                      id: value,
+                      portrait_id: image,
+                    }),
+                  });
+                }}
+                searchEntity="characters"
+                value={event.characters?.map((char) => char.id)}
+              />
+              {event.characters?.map((char) => (
+                <EntityPreview
+                  clearAction={(id) =>
+                    handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
+                  }
+                  id={char.id}
+                  image_id={char.portrait_id}
+                  title={char.full_name}
+                  type="characters"
+                />
+              ))}
+            </div>
+          </Collapsible>
+
+          <Collapsible icon={IconEnum.map_pin} initialOpen={false} isDisabled={!permissions?.read_map_pins} label="Locations">
+            <div className="flex flex-col gap-y-1 p-2">
+              <Search
+                isMultiple
+                label="Locations (optional)"
+                limit={10}
+                name="map_pins"
+                onChange={({ name, value, label, image, icon, parent_id }) => {
+                  if ((event.map_pins || [])?.some((char) => char.id === value)) {
                     handleChange({
                       name,
-                      value: (event.map_pins || []).concat({
-                        id: value,
-                        title: label || "",
-                        image_id: image,
-                        icon: icon || getDefaultEntityIcon("map_pins"),
-                        parent_id: parent_id || "",
-                        color: "#ffffff",
-                        border_color: "#ffffff",
-                      }),
+                      value: (event.map_pins || []).filter((t) => t.id !== value),
                     });
-                  }}
-                  searchEntity="map_pins"
-                  value={event.map_pins?.map((pin) => pin.id)}
+                    return;
+                  }
+
+                  handleChange({
+                    name,
+                    value: (event.map_pins || []).concat({
+                      id: value,
+                      title: label || "",
+                      image_id: image,
+                      icon: icon || getDefaultEntityIcon("map_pins"),
+                      parent_id: parent_id || "",
+                      color: "#ffffff",
+                      border_color: "#ffffff",
+                    }),
+                  });
+                }}
+                searchEntity="map_pins"
+                value={event.map_pins?.map((pin) => pin.id)}
+              />
+              {event.map_pins?.map((pin) => (
+                <EntityPreview
+                  clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
+                  icon={pin.icon}
+                  id={pin.id}
+                  image_id={pin.image_id}
+                  title={pin.title || ""}
+                  type="map_pins"
                 />
-                {event.map_pins?.map((pin) => (
-                  <EntityPreview
-                    clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
-                    icon={pin.icon}
-                    id={pin.id}
-                    image_id={pin.image_id}
-                    title={pin.title || ""}
-                    type="map_pins"
-                  />
-                ))}
-              </div>
-            </Collapsible>
-          ) : null}
+              ))}
+            </div>
+          </Collapsible>
         </>
       ) : null}
       {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
