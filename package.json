@@ -94,7 +94,7 @@
     "start": "vite",
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "precommit": "bun run lint --fix"
+    "precommit": "tsc --noEmit && bun run lint --fix"
   },
   "type": "module",
   "version": "0.0.0"
