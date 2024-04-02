@@ -98,7 +98,7 @@
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{ts,tsx}": "tsc --noEmit",
+    "*.{ts,tsx}": "bash -c tsc -p ./tsconfig.json --noEmit",
     "*.{ts,tsx,css,html}": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",
