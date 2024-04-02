@@ -67,7 +67,7 @@ export function getEntityLinkType(type: AvailableEntityType | AvailableSubEntity
 }
 
 export function getEntityFields(type: AvailableEntityType): string[] {
-  const fields: string[] = ["id", "title", "icon", "is_folder", "parent_id", "owner_id"];
+  const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
   if (
     type === "documents" ||
@@ -434,7 +434,7 @@ const realWorldMonths = [
   "November",
   "December",
 ];
-export function getDeletedAtDisplay(deleted_at: BaseEntityType["deleted_at"]): string | null {
+export function getDeletedAtDisplay(deleted_at: BaseEntityType["deleted_at"]): string {
   if (deleted_at) {
     const date = new Date(deleted_at);
     const deleteAtDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() + 14, 0, 0, 0, 0);
@@ -444,5 +444,5 @@ export function getDeletedAtDisplay(deleted_at: BaseEntityType["deleted_at"]): s
       realWorldMonths[deleteAtDate.getMonth()]
     } ${deleteAtDate.getFullYear()}`;
   }
-  return null;
+  return "";
 }
