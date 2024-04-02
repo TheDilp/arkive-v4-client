@@ -55,7 +55,8 @@ export function getTableColumns(
     if (finalColumns.some((c) => c.id === "is_public")) {
       finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning));
     } else if (finalColumns.some((c) => c.id === "action")) {
-      finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
+      const hasDeletedAt = finalColumns.some((c) => c.id === "deleted_at");
+      finalColumns.splice(finalColumns.length - (hasDeletedAt ? 2 : 1), 0, TagColumn(config?.hasTagsWarning));
     } else {
       finalColumns.splice(finalColumns.length, 0, TagColumn(config?.hasTagsWarning));
     }
