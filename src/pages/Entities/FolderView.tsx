@@ -17,6 +17,7 @@ import {
   Skeleton,
   Table,
   TablePageLayout,
+  Tooltip,
 } from "../../components";
 import {
   useBreakpoint,
@@ -59,6 +60,7 @@ import {
   EntitiesWithTags,
   FetchFunction,
   getDefaultEntityIcon,
+  getDeletedAtDisplay,
   getEntityFields,
   getImageURL,
   getNavbarEntityType,
@@ -109,7 +111,7 @@ type EntityItemType = {
 };
 const columnHelper = createColumnHelper<BaseEntityType>();
 
-function columns(
+function getColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   entityName: string,
@@ -125,7 +127,7 @@ function columns(
   active: "active" | "arkive",
   show_image?: boolean,
 ) {
-  return [
+  const columns = [
     columnHelper.display({
       id: "is_folder",
       header: "",
@@ -176,6 +178,7 @@ function columns(
           <Button
             hasNoBackground
             icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+            isDisabled={!!row.original.deleted_at}
             isIconOnly
             onClick={async () => {
               await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
@@ -185,6 +188,31 @@ function columns(
       minSize: 3.25,
       maxSize: 3.25,
     }),
+  ];
+
+  if (active === "arkive") {
+    columns.push(
+      columnHelper.display({
+        id: "deleted_at",
+        header: "",
+        meta: {
+          centered: true,
+          noLink: true,
+        },
+        cell: ({ row }) => (
+          <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
+            <div>
+              <Button hasNoBackground icon={IconEnum.archive} isIconOnly onClick={undefined} />
+            </div>
+          </Tooltip>
+        ),
+        minSize: 3.25,
+        maxSize: 3.25,
+      }),
+    );
+  }
+
+  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -395,7 +423,9 @@ function columns(
         );
       },
     }),
-  ];
+  );
+
+  return columns;
 }
 
 function EntityItem({
@@ -1089,7 +1119,7 @@ export function FolderView() {
         <div className="w-full flex-1 overflow-hidden">
           <Table
             key={type}
-            columns={columns(
+            columns={getColumns(
               setDrawer,
               setDialog,
               entityName,
