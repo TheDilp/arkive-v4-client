@@ -441,9 +441,7 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
     return {
       tooltip: `Arkived on: ${date.getDate()}${getDayOrdinal(date.getDate())} ${
         realWorldMonths[date.getMonth()]
-      } ${date.getFullYear()} | Will be deleted on ${deleteAtDate.getDate()}${getDayOrdinal(deleteAtDate.getDate())} ${
-        realWorldMonths[deleteAtDate.getMonth()]
-      } ${deleteAtDate.getFullYear()}`,
+      } ${date.getFullYear()}`,
       isSoonToBeDeleted: (deleteAtDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) <= 7,
     };
   }
