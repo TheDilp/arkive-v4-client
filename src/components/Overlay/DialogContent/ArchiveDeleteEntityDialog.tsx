@@ -72,7 +72,7 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
       <div className="mt-auto flex gap-x-2">
         <Button icon={IconEnum.close} label="Cancel" onClick={resetDialogAtom} />
         <Button
-          icon={action === "archive" ? IconEnum.archive : IconEnum.trash}
+          icon={action === "arkive" ? IconEnum.archive : IconEnum.trash}
           label={capitalizeFirstLetter(action || "")}
           onClick={() => {
             if (data?.id && project_id && data?.entity_title) {
