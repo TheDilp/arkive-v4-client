@@ -805,6 +805,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
             )}
             config={{
               hasSelect: true,
+              hasArkived: arkived === "arkive",
               hasTags: true,
               orderBy,
               selection,

@@ -17,7 +17,6 @@ import {
   Skeleton,
   Table,
   TablePageLayout,
-  Tooltip,
 } from "../../components";
 import {
   useBreakpoint,
@@ -60,7 +59,6 @@ import {
   EntitiesWithTags,
   FetchFunction,
   getDefaultEntityIcon,
-  getDeletedAtDisplay,
   getEntityFields,
   getImageURL,
   getNavbarEntityType,
@@ -124,10 +122,9 @@ function getColumns(
   isProjectOwner: boolean,
   user_id: string,
   user_role_id: string | undefined,
-  active: "active" | "arkive",
   show_image?: boolean,
 ) {
-  const columns = [
+  return [
     columnHelper.display({
       id: "is_folder",
       header: "",
@@ -188,31 +185,6 @@ function getColumns(
       minSize: 3.25,
       maxSize: 3.25,
     }),
-  ];
-
-  if (active === "arkive") {
-    columns.push(
-      columnHelper.display({
-        id: "deleted_at",
-        header: "",
-        meta: {
-          centered: true,
-          noLink: true,
-        },
-        cell: ({ row }) => (
-          <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
-            <div>
-              <Button hasNoBackground icon={IconEnum.archive} isIconOnly onClick={undefined} />
-            </div>
-          </Tooltip>
-        ),
-        minSize: 3.25,
-        maxSize: 3.25,
-      }),
-    );
-  }
-
-  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -231,72 +203,71 @@ function getColumns(
             title: string;
             onClick: () => Promise<any>;
           }[];
-        }[] =
-          active === "arkive"
-            ? [
-                {
-                  id: "1",
-                  title: `Restore ${getSingularEntityType(entityType)}`,
-                  icon: IconEnum.restore,
-                  isDisabled: !hasActionPermission(
-                    isProjectOwner,
-                    user_id === row.original.owner_id,
-                    permissions,
-                    row.original?.permissions || [],
-                    `delete_${entityType}` as PermissionCodeType,
-                    user_role_id,
-                  ),
-                  onClick: () => {
-                    setDialog((prev) => ({
-                      ...prev,
-                      data: {
-                        ...row.original,
-                        entity_title: entityType,
-                      },
+        }[] = row.original.deleted_at
+          ? [
+              {
+                id: "1",
+                title: `Restore ${getSingularEntityType(entityType)}`,
+                icon: IconEnum.restore,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  `delete_${entityType}` as PermissionCodeType,
+                  user_role_id,
+                ),
+                onClick: () => {
+                  setDialog((prev) => ({
+                    ...prev,
+                    data: {
+                      ...row.original,
+                      entity_title: entityType,
+                    },
 
-                      title: `Restore ${getSingularEntityType(entityType)}`,
-                      size: "sm",
-                      type: "restore_entity",
-                      isOverlay: true,
-                    }));
-                  },
+                    title: `Restore ${getSingularEntityType(entityType)}`,
+                    size: "sm",
+                    type: "restore_entity",
+                    isOverlay: true,
+                  }));
                 },
-              ]
-            : [
-                {
-                  id: "1",
-                  title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
-                  icon: IconEnum.edit,
-                  isDisabled: !hasActionPermission(
-                    isProjectOwner,
-                    user_id === row.original.owner_id,
-                    permissions,
-                    row.original?.permissions || [],
-                    `update_${entityType}` as PermissionCodeType,
-                    user_role_id,
-                  ),
-                  onClick: () => {
-                    setDrawer((prev) =>
-                      row.original.is_folder
-                        ? {
-                            ...prev,
-                            data: { id: row.original.id, type: entityType as EntitiesWithFolders },
-                            title: `Edit folder - ${row.original.title}`,
-                            size: "sm",
-                            type: "folder",
-                          }
-                        : {
-                            ...prev,
-                            data: row.original,
-                            title: `Edit ${entityName} - ${row.original.title}`,
-                            size: "lg",
-                            type: entityType,
-                          },
-                    );
-                  },
+              },
+            ]
+          : [
+              {
+                id: "1",
+                title: getEditActionTitle(is_document_template, !!row.original.is_folder, entityName),
+                icon: IconEnum.edit,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  `update_${entityType}` as PermissionCodeType,
+                  user_role_id,
+                ),
+                onClick: () => {
+                  setDrawer((prev) =>
+                    row.original.is_folder
+                      ? {
+                          ...prev,
+                          data: { id: row.original.id, type: entityType as EntitiesWithFolders },
+                          title: `Edit folder - ${row.original.title}`,
+                          size: "sm",
+                          type: "folder",
+                        }
+                      : {
+                          ...prev,
+                          data: row.original,
+                          title: `Edit ${entityName} - ${row.original.title}`,
+                          size: "lg",
+                          type: entityType,
+                        },
+                  );
                 },
-              ];
-        if (entityType === "documents" && !is_document_template && active === "active") {
+              },
+            ];
+        if (entityType === "documents" && !is_document_template && row.original.deleted_at) {
           actions.push({
             id: "mentioned_in",
             title: "Mentioned in",
@@ -320,7 +291,7 @@ function getColumns(
             },
           });
         }
-        if (PublicEntities.includes(entityType) && !is_document_template && active === "active") {
+        if (PublicEntities.includes(entityType) && !is_document_template && row.original.deleted_at) {
           actions.push(
             {
               id: "view_public",
@@ -349,7 +320,7 @@ function getColumns(
             },
           );
         }
-        if (is_document_template && active === "active") {
+        if (is_document_template && row.original.deleted_at) {
           actions.push({
             id: "create_from_template",
             title: "Create document from template",
@@ -388,9 +359,9 @@ function getColumns(
         actions.push({
           id: "delete_entity",
           title: row.original.is_folder
-            ? `${active === "arkive" ? "Delete" : "Arkive"} folder`
-            : `${active === "arkive" ? "Delete" : "Arkive"} ${entityName}`,
-          icon: active === "arkive" ? IconEnum.trash : IconEnum.archive,
+            ? `${row.original.deleted_at ? "Delete" : "Arkive"} folder`
+            : `${row.original.deleted_at ? "Delete" : "Arkive"} ${entityName}`,
+          icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
           isDisabled: !hasActionPermission(
             isProjectOwner,
             user_id === row.original.owner_id,
@@ -408,7 +379,7 @@ function getColumns(
               },
               title: `Delete ${getSingularEntityType(entityType)}`,
               size: "sm",
-              type: `${active === "active" ? "arkive_" : "delete_"}entity`,
+              type: `${row.original.deleted_at ? "arkive_" : "delete_"}entity`,
               isOverlay: true,
             }));
           },
@@ -423,9 +394,7 @@ function getColumns(
         );
       },
     }),
-  );
-
-  return columns;
+  ];
 }
 
 function EntityItem({
@@ -1132,12 +1101,12 @@ export function FolderView() {
               isProjectOwner,
               user?.id as string,
               user?.role?.id,
-              arkived,
               show_image_table_view,
             )}
             config={{
               selectedActions,
               hasSelect: true,
+              hasArkived: arkived === "arkive",
               hasTags: EntitiesWithTags.includes(type as string),
               selection,
               getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,

@@ -578,6 +578,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
       hasSelect: config?.hasSelect,
       hasFavorite: config?.hasFavorite,
       hasTags: config?.hasTags,
+      hasArkived: config?.hasArkived,
       setFavorite: config?.setFavorite,
       dispatch,
       pagination,

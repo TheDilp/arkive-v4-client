@@ -3,19 +3,10 @@ import ls from "localstorage-slim";
 import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout, Tooltip } from "../../components";
+import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
-import {
-  dialogAtom,
-  drawerAtom,
-  getDeletedAtDisplay,
-  hasActionPermission,
-  IconEnum,
-  isProjectOwnerAtom,
-  TextFilters,
-  userAtom,
-} from "../../utils";
+import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
 
@@ -26,9 +17,8 @@ function createColumns(
   permissions: UserHasPermissionsType,
   user_id: string,
   user_role_id: string | undefined,
-  arkive: boolean,
 ) {
-  const columns = [
+  return [
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -49,31 +39,6 @@ function createColumns(
       maxSize: 10,
       minSize: 5,
     }),
-  ];
-
-  if (arkive) {
-    columns.push(
-      columnHelper.display({
-        id: "deleted_at",
-        header: "",
-        meta: {
-          centered: true,
-          noLink: true,
-        },
-        cell: ({ row }) => (
-          <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
-            <div>
-              <Button hasNoBackground icon={IconEnum.archive} isIconOnly onClick={undefined} />
-            </div>
-          </Tooltip>
-        ),
-        minSize: 3.25,
-        maxSize: 3.25,
-      }),
-    );
-  }
-
-  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -202,9 +167,7 @@ function createColumns(
         </div>
       ),
     }),
-  );
-
-  return columns;
+  ];
 }
 
 export function TemplatesView() {
@@ -222,15 +185,7 @@ export function TemplatesView() {
     undefined,
   );
 
-  const columns = createColumns(
-    setDrawer,
-    setDialog,
-    isProjectOwner,
-    permissions,
-    user?.id as string,
-    user?.role?.id,
-    arkived === "arkive",
-  );
+  const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "sort", sort: "desc" }],
@@ -257,7 +212,7 @@ export function TemplatesView() {
   );
   return (
     <TablePageLayout>
-      <div className="flex w-full items-center justify-end gap-x-2">
+      <div className="flex h-12 w-full items-center justify-end gap-x-2">
         <div className="w-32">
           <Select
             name="view"
@@ -296,6 +251,7 @@ export function TemplatesView() {
           columns={columns}
           config={{
             hasSelect: true,
+            hasArkived: arkived === "arkive",
             expandable: true,
             hasTags: true,
             hasTagsWarning: true,

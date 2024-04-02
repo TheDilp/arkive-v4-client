@@ -4,19 +4,10 @@ import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout, Tooltip } from "../../components";
+import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType, Variant } from "../../types";
-import {
-  dialogAtom,
-  drawerAtom,
-  getDeletedAtDisplay,
-  hasActionPermission,
-  IconEnum,
-  isProjectOwnerAtom,
-  TextFilters,
-  userAtom,
-} from "../../utils";
+import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
 
@@ -27,9 +18,8 @@ function createColumns(
   permissions: UserHasPermissionsType,
   user_id: string,
   user_role_id: string | undefined,
-  arkived: boolean,
 ) {
-  const columns = [
+  return [
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -55,31 +45,6 @@ function createColumns(
       maxSize: 6,
       minSize: 6,
     }),
-  ];
-
-  if (arkived) {
-    columns.push(
-      columnHelper.display({
-        id: "deleted_at",
-        header: "",
-        meta: {
-          centered: true,
-          noLink: true,
-        },
-        cell: ({ row }) => (
-          <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
-            <div>
-              <Button hasNoBackground icon={IconEnum.archive} isIconOnly onClick={undefined} />
-            </div>
-          </Tooltip>
-        ),
-        minSize: 3.25,
-        maxSize: 3.25,
-      }),
-    );
-  }
-
-  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -208,9 +173,7 @@ function createColumns(
         </div>
       ),
     }),
-  );
-
-  return columns;
+  ];
 }
 
 export function TagView() {
@@ -226,15 +189,7 @@ export function TagView() {
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["create_tags", "update_tags", "delete_tags"], undefined);
-  const columns = createColumns(
-    setDrawer,
-    setDialog,
-    isProjectOwner,
-    permissions,
-    user?.id as string,
-    user?.role?.id,
-    arkived === "arkive",
-  );
+  const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
@@ -393,6 +348,7 @@ export function TagView() {
           columns={columns}
           config={{
             hasSelect: true,
+            hasArkived: arkived === "arkive",
             expandable: true,
             orderBy,
             filters,

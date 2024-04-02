@@ -76,6 +76,7 @@ export interface TableType {
     hasTags?: boolean;
     hasTagsWarning?: boolean;
     hasNoHeaderGap?: boolean;
+    hasArkived?: boolean;
     orderBy?: RequestOrderByType<any>[];
     selection?: TableSelectionType;
     expandable?: boolean;

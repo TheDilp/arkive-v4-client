@@ -292,7 +292,7 @@ export function BlueprintView() {
   );
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
-  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint-table-active") || "active");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
@@ -338,7 +338,7 @@ export function BlueprintView() {
               name="view"
               onChange={({ value }) => {
                 setArkived(value as "active" | "arkive");
-                ls.set("blueprints-table-active", value);
+                ls.set("blueprint-table-active", value);
               }}
               options={[
                 { label: "Active", value: "active", icon: IconEnum.eye },
@@ -371,6 +371,7 @@ export function BlueprintView() {
           columns={columns}
           config={{
             hasSelect: true,
+            hasArkived: arkived === "arkive",
             filters,
             selection,
             orderBy,

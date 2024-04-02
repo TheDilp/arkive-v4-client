@@ -434,15 +434,18 @@ const realWorldMonths = [
   "November",
   "December",
 ];
-export function getDeletedAtDisplay(deleted_at: BaseEntityType["deleted_at"]): string {
+export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { tooltip: string; isSoonToBeDeleted: boolean } {
   if (deleted_at) {
     const date = new Date(deleted_at);
     const deleteAtDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() + 14, 0, 0, 0, 0);
-    return `Arkived on: ${date.getDate()}${getDayOrdinal(date.getDate())} ${
-      realWorldMonths[date.getMonth()]
-    } ${date.getFullYear()} | Will be deleted on ${deleteAtDate.getDate()}${getDayOrdinal(deleteAtDate.getDate())} ${
-      realWorldMonths[deleteAtDate.getMonth()]
-    } ${deleteAtDate.getFullYear()}`;
+    return {
+      tooltip: `Arkived on: ${date.getDate()}${getDayOrdinal(date.getDate())} ${
+        realWorldMonths[date.getMonth()]
+      } ${date.getFullYear()} | Will be deleted on ${deleteAtDate.getDate()}${getDayOrdinal(deleteAtDate.getDate())} ${
+        realWorldMonths[deleteAtDate.getMonth()]
+      } ${deleteAtDate.getFullYear()}`,
+      isSoonToBeDeleted: (deleteAtDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) <= 7,
+    };
   }
-  return "";
+  return { tooltip: "", isSoonToBeDeleted: false };
 }

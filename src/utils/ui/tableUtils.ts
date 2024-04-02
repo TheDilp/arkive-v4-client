@@ -2,7 +2,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction } from "jotai";
 import { Dispatch } from "react";
 
-import { FavoriteColumn, SelectColumn, TagColumn } from "../../components/DataDisplay/TableComponents/TableColumns";
+import {
+  ArkivedAtColumn,
+  FavoriteColumn,
+  SelectColumn,
+  TagColumn,
+} from "../../components/DataDisplay/TableComponents/TableColumns";
 import { RequestPaginationType, SetFavoriteType, TableColumnFilterType, TableDispatch } from "../../types";
 import { FilterNamesEnum } from "../enums";
 
@@ -27,6 +32,7 @@ export function getTableColumns(
     hasSelect,
     hasFavorite,
     hasTags,
+    hasArkived,
     setFavorite,
     dispatch,
     pagination,
@@ -35,6 +41,7 @@ export function getTableColumns(
     hasSelect?: boolean;
     hasFavorite?: boolean;
     hasTags?: boolean;
+    hasArkived?: boolean;
     setFavorite?: (data: SetFavoriteType) => Promise<void>;
     dispatch?: TableDispatch;
     pagination?: RequestPaginationType;
@@ -55,11 +62,13 @@ export function getTableColumns(
     if (finalColumns.some((c) => c.id === "is_public")) {
       finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning));
     } else if (finalColumns.some((c) => c.id === "action")) {
-      const hasDeletedAt = finalColumns.some((c) => c.id === "deleted_at");
-      finalColumns.splice(finalColumns.length - (hasDeletedAt ? 2 : 1), 0, TagColumn(config?.hasTagsWarning));
+      finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
     } else {
       finalColumns.splice(finalColumns.length, 0, TagColumn(config?.hasTagsWarning));
     }
+  }
+  if (hasArkived) {
+    finalColumns.splice(finalColumns.length - 1, 0, ArkivedAtColumn());
   }
 
   return finalColumns;

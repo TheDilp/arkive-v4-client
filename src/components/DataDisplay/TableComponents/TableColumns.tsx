@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue } from "jotai";
 
 import { MetaType, RequestPaginationType, SetFavoriteType, TableDispatch, TagType } from "../../../types";
-import { FavoritesFilters, IconEnum, projectFeatureFlagsAtom, sortTags, TagFilters } from "../../../utils";
+import { FavoritesFilters, getDeletedAtParams, IconEnum, projectFeatureFlagsAtom, sortTags, TagFilters } from "../../../utils";
 import { Alert, Badge, Button, Checkbox, Tooltip } from "../..";
 
 export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType): ColumnDef<any> {
@@ -98,5 +98,33 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
         </div>
       );
     },
+  };
+}
+export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }> {
+  return {
+    id: "deleted_at",
+    header: "",
+    meta: {
+      centered: true,
+      noLink: true,
+    },
+    cell: ({ row }) => {
+      const params = getDeletedAtParams(row.original.deleted_at);
+      return (
+        <Tooltip content={params.tooltip} isDisabled={!params.tooltip}>
+          <div>
+            <Button
+              hasNoBackground
+              icon={IconEnum.archive}
+              isIconOnly
+              onClick={undefined}
+              variant={params.isSoonToBeDeleted ? "error" : "primary"}
+            />
+          </div>
+        </Tooltip>
+      );
+    },
+    minSize: 3.25,
+    maxSize: 3.25,
   };
 }
