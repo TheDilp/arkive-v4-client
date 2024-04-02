@@ -517,7 +517,7 @@ function createColumns(
                       onClick: () => {
                         setDrawer((prev) => ({
                           ...prev,
-                          data: row.original,
+                          data: { id: row.original.id },
                           title: "Edit instance",
                           size: "lg",
                           type: "blueprint_instances",
