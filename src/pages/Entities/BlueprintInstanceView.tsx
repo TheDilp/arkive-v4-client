@@ -420,6 +420,7 @@ function createColumns(
         <Button
           hasNoBackground
           icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isDisabled={!!row.original.deleted_at}
           isIconOnly
           onClick={async () => {
             await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
