@@ -101,6 +101,19 @@ function FieldTemplateRows({
   isDisabled?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
+  const permissions = useHasPermissions(
+    [
+      "read_characters",
+      "read_blueprints",
+      "read_blueprint_instances",
+      "read_documents",
+      "read_map_pins",
+      "read_calendars",
+      "read_assets",
+      "read_random_tables",
+    ],
+    undefined,
+  );
   return (
     <li className="flex flex-col first:mt-0">
       <div className="flex select-none flex-col gap-y-2 pt-2">
@@ -194,7 +207,7 @@ function FieldTemplateRows({
                 title={template_field.title}
               />
             );
-          if (template_field.field_type === "date") {
+          if (template_field.field_type === "date" && permissions?.read_calendars) {
             return (
               <TemplateDateField
                 key={template_field.id}
@@ -212,7 +225,7 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "random_table")
+          if (template_field.field_type === "random_table" && permissions?.read_random_tables)
             return (
               <TemplateRandomTableField
                 key={template_field.id}
@@ -230,7 +243,10 @@ function FieldTemplateRows({
               />
             );
 
-          if (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") {
+          if (
+            (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") &&
+            permissions?.read_characters
+          ) {
             return (
               <TemplateCharacterField
                 key={template_field.id}
@@ -248,7 +264,11 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") {
+          if (
+            (template_field.field_type === "blueprints_single" || template_field.field_type === "blueprints_multiple") &&
+            permissions?.read_blueprint_instances &&
+            permissions?.read_blueprints
+          ) {
             return (
               <TemplateBlueprintField
                 key={template_field.id}
@@ -267,7 +287,10 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") {
+          if (
+            (template_field.field_type === "documents_single" || template_field.field_type === "documents_multiple") &&
+            permissions?.read_documents
+          ) {
             return (
               <TemplateDocumentField
                 key={template_field.id}
@@ -285,7 +308,10 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") {
+          if (
+            (template_field.field_type === "locations_single" || template_field.field_type === "locations_multiple") &&
+            permissions?.read_map_pins
+          ) {
             return (
               <TemplateLocationsField
                 key={template_field.id}
@@ -303,7 +329,10 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") {
+          if (
+            (template_field.field_type === "events_single" || template_field.field_type === "events_multiple") &&
+            permissions?.read_events
+          ) {
             return (
               <TemplateEventField
                 key={template_field.id}
@@ -321,7 +350,10 @@ function FieldTemplateRows({
               />
             );
           }
-          if (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") {
+          if (
+            (template_field.field_type === "images_single" || template_field.field_type === "images_multiple") &&
+            permissions?.read_assets
+          ) {
             return (
               <TemplateImageField
                 key={template_field.id}
