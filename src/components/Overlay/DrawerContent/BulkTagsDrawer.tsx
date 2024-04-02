@@ -20,9 +20,9 @@ export function BulkTagsDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
-  const [tagsToAdd, setTagsToAdd] = useState<Omit<TagType, "owner_id" | "permissions">[]>([]);
+  const [tagsToAdd, setTagsToAdd] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);
   const addedTagIds = tagsToAdd.map((t) => t.id);
-  const [tagsToRemove, setTagsToRemove] = useState<Omit<TagType, "owner_id" | "permissions">[]>([]);
+  const [tagsToRemove, setTagsToRemove] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);
   const removedTagIds = tagsToRemove.map((t) => t.id);
 
   const { mutate } = useBulkUpdateTags(data.type, project_id as string, item_id as string);

@@ -12,7 +12,7 @@ import { Button, Input } from "../../Form";
 import { Tabs } from "../../Layout";
 import { ColorPicker } from "../ColorPicker";
 
-function isDisabled(tags: TagType | TagType[]) {
+function isDisabled(tags: Omit<TagType, "deleted_at"> | Omit<TagType, "deleted_at">[]) {
   if (Array.isArray(tags)) {
     if (!tags.length) return true;
     if (tags.some((tag) => !tag.title)) return true;
@@ -35,7 +35,7 @@ export function TagsDrawer() {
     { id: "2", label: "Access", icon: IconEnum.permissions },
   ];
 
-  const [tags, setTags] = useState<TagType[]>([]);
+  const [tags, setTags] = useState<Omit<TagType, "deleted_at">[]>([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedPermissions, setSelectedPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
 

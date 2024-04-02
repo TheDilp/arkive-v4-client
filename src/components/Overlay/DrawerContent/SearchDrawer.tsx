@@ -48,7 +48,7 @@ export function SearchDrawer() {
   const drawer = useAtomValue(drawerAtom);
   const [selectedTab, setSelectedTab] = useState(0);
   const [searchCategory, setSearchCategory] = useState<SearchableEntities | null>(null);
-  const [selectedTags, setSelectedTags] = useState<Omit<TagType, "owner_id" | "permissions">[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);
   const [results, setResults] = useState<SearchAllEntitiesType | SearchResultType | null>();
   const [match, setMatch] = useState<"all" | "any">("all");
   const createNotification = useNotifications();

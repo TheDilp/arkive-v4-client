@@ -118,7 +118,7 @@ export interface GraphType extends BaseEntityType {
   default_edge_color: string;
   nodes: NodeType[];
   edges: EdgeType[];
-  tags: Omit<TagType, "owner_id" | "permissions">[];
+  tags: Omit<TagType, "owner_id" | "permissions" | "deleted_at">[];
 }
 
 export type CytoscapeNodeType = cytoscape.NodeDefinition;

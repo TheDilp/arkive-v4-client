@@ -2,7 +2,6 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
 import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
@@ -23,7 +22,7 @@ import {
   useNotifications,
 } from "../../../utils";
 import { UpdateEdgeSchema } from "../../../validation";
-import { Alert, Badge, Button, Collapsible, Input, Range, Search, Select, Skeleton, Tabs, Title } from "../..";
+import { Alert, Button, Collapsible, Input, Range, Select, Skeleton, Tabs, TagInput, Title } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
 type Props = { data: { id: string; parent_id: string } };
@@ -95,7 +94,6 @@ function ArrowForm({
 }
 
 export function EdgeDrawer({ data }: Props) {
-  const { project_id } = useParams();
   const [edge, setEdge] = useState<Partial<EdgeType>>({});
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -356,52 +354,7 @@ export function EdgeDrawer({ data }: Props) {
           ))}
         </div>
       ) : null}
-      {selectedTab === 2 ? (
-        <div className="flex flex-col gap-y-2">
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((edge?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-              handleChange({
-                name,
-                value: (edge?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags"
-            searchEntity="tags"
-          />
-
-          <div className="flex flex-wrap gap-2">
-            {edge?.tags?.length
-              ? edge.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (edge?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        </div>
-      ) : null}
+      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={edge.tags || []} /> : null}
       <div className="flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}

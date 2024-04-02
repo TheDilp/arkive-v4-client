@@ -7,8 +7,8 @@ import { Search } from "./Search";
 type Props = {
   label?: string;
   isAutofocused?: boolean;
-  tags: Omit<TagType, "owner_id" | "permissions">[];
-  handleChange: (newData: { name: string; value: Omit<TagType, "owner_id" | "permissions">[] }) => void;
+  tags: Omit<TagType, "owner_id" | "permissions" | "deleted_at">[];
+  handleChange: (newData: { name: string; value: Omit<TagType, "owner_id" | "permissions" | "deleted_at">[] }) => void;
   isMultiple?: boolean;
   isDisabled?: boolean;
 };

@@ -155,8 +155,8 @@ export function getFieldValueFromType(
 }
 
 export function getDifferenceForBlueprintInstance(
-  originalInstance: BlueprintInstanceType,
-  updatedInstance: BlueprintInstanceType,
+  originalInstance: Omit<BlueprintInstanceType, "deleted_at">,
+  updatedInstance: Omit<BlueprintInstanceType, "deleted_at">,
 ): BlueprintInstanceBlueprintFieldType[] {
   const fields = [...updatedInstance.blueprint_fields];
   const originalFields = originalInstance.blueprint_fields;

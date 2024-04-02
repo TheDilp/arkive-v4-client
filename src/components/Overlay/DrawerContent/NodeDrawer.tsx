@@ -19,7 +19,6 @@ import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
 import { UpdateNodeSchema } from "../../../validation";
 import {
   Alert,
-  Badge,
   Button,
   EntityPreview,
   ImagePreview,
@@ -29,6 +28,7 @@ import {
   Select,
   Skeleton,
   Tabs,
+  TagInput,
   Title,
 } from "../..";
 import { ColorPicker } from "../ColorPicker";
@@ -396,52 +396,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           )}
         </div>
       ) : null}
-      {selectedTab === 2 ? (
-        <div className="flex flex-col gap-y-2">
-          <Search
-            name="tags"
-            onChange={({ name, label, value, color }) => {
-              if ((node?.tags || [])?.some((tag) => tag.id === value)) {
-                createNotification({
-                  title: "Cannot add the same tag twice.",
-                  variant: "warning",
-                  icon: IconEnum.info_circle,
-                  timer: 3,
-                });
-                return;
-              }
-              handleChange({
-                name,
-                value: (node?.tags || []).concat({
-                  title: label as string,
-                  id: value,
-                  project_id: project_id as string,
-                  color: color as string,
-                }),
-              });
-            }}
-            placeholder="Press enter to search tags"
-            searchEntity="tags"
-          />
-
-          <div className="flex flex-wrap gap-2">
-            {node?.tags?.length
-              ? node.tags.map((tag) => (
-                  <div key={tag.id} className="w-fit">
-                    <Badge
-                      clearAction={() => {
-                        handleChange({ name: "tags", value: (node?.tags || []).filter((t) => t.id !== tag.id) });
-                      }}
-                      customColor={tag.color}
-                      label={tag.title}
-                      size="lg"
-                    />
-                  </div>
-                ))
-              : null}
-          </div>
-        </div>
-      ) : null}
+      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={node.tags || []} /> : null}
       <div className="sticky bottom-0 flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}

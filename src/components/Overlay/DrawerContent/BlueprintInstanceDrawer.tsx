@@ -365,7 +365,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawerAtom = useResetAtom(drawerAtom);
-  const [instance, setInstance] = useState<BlueprintInstanceType | null>(null);
+  const [instance, setInstance] = useState<Omit<BlueprintInstanceType, "deleted_at"> | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
