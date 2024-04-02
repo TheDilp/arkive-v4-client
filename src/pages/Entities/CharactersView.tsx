@@ -14,6 +14,7 @@ import {
   Select,
   Table,
   TablePageLayout,
+  Tooltip,
 } from "../../components";
 import {
   useBreakpoint,
@@ -46,6 +47,7 @@ import {
   FetchFunction,
   getAvatarInitials,
   getCharacterFullName,
+  getDeletedAtDisplay,
   getImageURL,
   hasActionPermission,
   IconEnum,
@@ -68,8 +70,9 @@ function createColumns(
   isProjectOwner: boolean,
   user_id: string,
   user_role_id: string | undefined,
+  arkived: boolean,
 ) {
-  return [
+  const columns = [
     columnHelper.display({
       id: "portrait_id",
       header: "Portrait",
@@ -150,6 +153,7 @@ function createColumns(
         <Button
           hasNoBackground
           icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isDisabled={!!row.original.deleted_at}
           isIconOnly
           onClick={async () => {
             await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
@@ -159,6 +163,39 @@ function createColumns(
       minSize: 3.25,
       maxSize: 3.25,
     }),
+  ];
+
+  if (arkived) {
+    columns.push(
+      columnHelper.display({
+        id: "deleted_at",
+        header: "",
+        meta: {
+          centered: true,
+          noLink: true,
+          filterOptions: BooleanFilters,
+        },
+        cell: ({ row }) => (
+          <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
+            <div>
+              <Button
+                hasNoBackground
+                icon={IconEnum.archive}
+                isIconOnly
+                onClick={async () => {
+                  await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+                }}
+              />
+            </div>
+          </Tooltip>
+        ),
+        minSize: 3.25,
+        maxSize: 3.25,
+      }),
+    );
+  }
+
+  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -336,7 +373,9 @@ function createColumns(
         </div>
       ),
     }),
-  ];
+  );
+
+  return columns;
 }
 
 function getSelectedActions(
@@ -732,6 +771,7 @@ export function CharactersView() {
               isProjectOwner,
               user?.id as string,
               user?.role?.id,
+              arkived === "arkive",
             )}
             config={{
               hasSelect: true,

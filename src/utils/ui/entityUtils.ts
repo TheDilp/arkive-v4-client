@@ -4,6 +4,7 @@ import { tv } from "tailwind-variants";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
+  BaseEntityType,
   BlueprintFieldTypes,
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
@@ -12,7 +13,7 @@ import {
   FieldTypes,
   RandomTableOptionType,
 } from "../../types";
-import { AvailableIcons, IconEnum } from "..";
+import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType): AvailableIcons {
   if (type === "characters") return IconEnum.character;
@@ -419,3 +420,29 @@ export const FieldClasses = tv({
     },
   ],
 });
+const realWorldMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+export function getDeletedAtDisplay(deleted_at: BaseEntityType["deleted_at"]): string | null {
+  if (deleted_at) {
+    const date = new Date(deleted_at);
+    const deleteAtDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getDate() + 14, 0, 0, 0, 0);
+    return `Arkived on: ${date.getDate()}${getDayOrdinal(date.getDate())} ${
+      realWorldMonths[date.getMonth()]
+    } ${date.getFullYear()} | Will be deleted on ${deleteAtDate.getDate()}${getDayOrdinal(deleteAtDate.getDate())} ${
+      realWorldMonths[deleteAtDate.getMonth()]
+    } ${deleteAtDate.getFullYear()}`;
+  }
+  return null;
+}
