@@ -94,7 +94,12 @@
     "start": "vite",
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "precommit": "bun run lint --fix"
+    "prepare": "husky install",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "tsc --noEmit",
+    "*.{ts,tsx,css,html}": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",
   "version": "0.0.0"
