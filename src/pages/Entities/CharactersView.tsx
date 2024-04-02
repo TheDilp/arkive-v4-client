@@ -178,14 +178,7 @@ function createColumns(
         cell: ({ row }) => (
           <Tooltip content={getDeletedAtDisplay(row.original.deleted_at)}>
             <div>
-              <Button
-                hasNoBackground
-                icon={IconEnum.archive}
-                isIconOnly
-                onClick={async () => {
-                  await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
-                }}
-              />
+              <Button hasNoBackground icon={IconEnum.archive} isIconOnly onClick={undefined} />
             </div>
           </Tooltip>
         ),
