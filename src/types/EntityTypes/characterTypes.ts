@@ -15,14 +15,6 @@ import {
 } from ".";
 import { ImageType } from "./imageTypes";
 
-export interface RelationType {
-  character_relationship_id: string;
-  character_a_id: string;
-  character_b_id: string;
-  relation_type_id: string;
-  relation_type: CharacterRelationshipType;
-}
-
 export interface CharacterRelationshipDataType {
   id: string;
   related_to_title?: string;

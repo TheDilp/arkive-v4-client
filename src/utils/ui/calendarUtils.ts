@@ -1,32 +1,12 @@
-import { EventType, RequestFilterType } from "../../types";
+import { RequestFilterType } from "../../types";
 import {
   CalendarFilters,
-  CalendarType,
   EventStateType,
   LeapDayConditionType,
   LeapDayType,
   MonthType,
 } from "../../types/EntityTypes/calendarTypes";
 import { groupFiltersByHeader } from "./tableUtils";
-
-export function sortEvents(a: EventType, b: EventType) {
-  if (a?.start_hours && b?.start_hours) {
-    if (a.start_hours > b.start_hours) return 1;
-    if (a.start_hours < b.start_hours) return -1;
-    if (a.start_hours === b.start_hours) {
-      if (a?.start_minutes && b?.start_minutes) {
-        if (a.start_minutes > b.start_minutes) return 1;
-        if (a.start_minutes < b.start_minutes) return -1;
-        return 0;
-      }
-    }
-  } else if (a.start_hours && !b.start_hours) return -1;
-  else if (!a.start_hours && b.start_hours) return 1;
-  else {
-    return 0;
-  }
-  return 0;
-}
 
 export function checkIfDayCorrect(e: EventStateType, isYearCorrect: boolean, isMonthCorrect: boolean): boolean {
   if (isYearCorrect && isMonthCorrect) {
@@ -71,32 +51,7 @@ export function checkIfYearCorrect(start_year: number | undefined, end_year: num
   return true;
 }
 
-export function getNextDate(date: { month: number; year: number }, calendar: CalendarType, type: "next" | "previous") {
-  const { month, year } = date;
-  const numberOfMonths = calendar?.months?.length;
-  // const monthDays = calendar?.months?.[month]?.days;
-  if (numberOfMonths) {
-    if (type === "next") {
-      if (month === numberOfMonths - 1) {
-        return { month: 0, year: year + 1 };
-      }
-      return { month: month + 1, year };
-    }
-    if (type === "previous") {
-      if (month === 0) {
-        return {
-          month: numberOfMonths - 1,
-          year: year - 1 === 0 ? -1 : year - 1,
-        };
-      }
-      return { month: month - 1, year };
-    }
-    return date;
-  }
-  return date;
-}
-
-export function checkLeapDayCondition(
+function checkLeapDayCondition(
   cond: { type: LeapDayConditionType; value: number | string },
   date: { year: number; month: number },
 ) {

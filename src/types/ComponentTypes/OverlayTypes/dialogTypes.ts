@@ -1,7 +1,7 @@
 import { AvailableIcons } from "../../../utils";
 import { Size, Variant } from "../../baseTypes";
 
-export type DialogPosition = "center" | "top" | "right" | "left" | "bottom" | "top-right" | "top-left";
+type DialogPosition = "center" | "top" | "right" | "left" | "bottom" | "top-right" | "top-left";
 export type DialogContentType =
   | null
   | "image_upload"

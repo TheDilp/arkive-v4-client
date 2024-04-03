@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { CustomMentionExtension } from "../../components";
 
-export interface MentionAtomState<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
+interface MentionAtomState<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
   extends Pick<SuggestChangeHandlerProps, "name" | "query" | "text" | "range"> {
   /**
    * The reason for the change.
@@ -20,12 +20,12 @@ export interface MentionAtomState<Data extends MentionAtomNodeAttributes = Menti
   command: (attrs: Data) => void;
 }
 
-export interface UseMentionAtomReturn<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
+interface UseMentionAtomReturn<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
   extends UseMenuNavigationReturn<Data> {
   state: MentionAtomState<Data> | null;
 }
 
-export interface UseMentionAtomProps<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
+interface UseMentionAtomProps<Data extends MentionAtomNodeAttributes = MentionAtomNodeAttributes>
   extends MenuNavigationOptions,
     Pick<MentionAtomNodeAttributes, "replacementType"> {
   /**
@@ -165,5 +165,3 @@ export function useMentionAtom<Data extends MentionAtomNodeAttributes = MentionA
 
   return useMemo(() => ({ ...menu, state }), [menu, state]);
 }
-
-export type { MentionAtomNodeAttributes };

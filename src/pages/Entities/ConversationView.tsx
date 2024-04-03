@@ -44,7 +44,7 @@ function getCharacterSide(
   return false;
 }
 
-export function NarrationMessage({
+function NarrationMessage({
   id,
   content,
   parent_id,
@@ -85,7 +85,7 @@ text-xl italic text-zinc-300
   );
 }
 
-export function PlaceMessage({
+function PlaceMessage({
   id,
   content,
   project_id,

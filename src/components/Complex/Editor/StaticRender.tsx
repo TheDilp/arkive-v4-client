@@ -15,7 +15,7 @@ import { CharacterMention } from "./Extensions/Mention/CharacterMention";
 import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExtension";
 // import WordMention from "../Mention/WordMention";
 
-export type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
+type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
 
 function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }) {
   const setDialog = useSetAtom(dialogAtom);

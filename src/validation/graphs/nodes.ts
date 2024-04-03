@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const InsertNodeSchema = z.object({
+const InsertNodeSchema = z.object({
   data: z.object({
     id: z.string(),
     parent_id: z.string(),
@@ -92,4 +92,3 @@ export const UpdateNodeSchema = z.object({
 });
 
 export type InsertNodeType = z.infer<typeof InsertNodeSchema>;
-export type UpdateNodeType = z.infer<typeof UpdateNodeSchema>;

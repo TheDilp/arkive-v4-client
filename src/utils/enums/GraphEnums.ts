@@ -902,12 +902,6 @@ export const NodeShapesEnum = [
     value: "round-octagon",
   },
 ];
-export const NodeRelationLabelEnum = [
-  { label: "Character", value: "character" },
-  // { label: "Document", value: "document" },
-  // { label: "Location", value: "location" },
-  // { label: "Event", value: "event" },
-];
 export const EdgeCurveStylesEnum = [
   {
     label: "Straight",
@@ -1015,11 +1009,6 @@ export const EdgeArrowShapesEnum = [
 export const EdgeArrowFillEnum = [
   { label: "Filled", value: "filled" },
   { label: "Hollow", value: "hollow" },
-];
-export const EdgeCapsEnum = [
-  { label: "Round", value: "round" },
-  { label: "Butt", value: "butt" },
-  { label: "Square", value: "square" },
 ];
 
 // Defaults

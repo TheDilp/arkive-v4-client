@@ -10,7 +10,7 @@ type Props = {
   isPublic?: boolean;
 };
 
-export function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
+function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
   const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
     id as string,
     "words",

@@ -55,14 +55,7 @@ const DropdownItemClasses = tv({
   },
 });
 
-export function DropdownComponent({
-  allowedPlacements = [],
-  children,
-  items,
-  isReferenceMaxSize,
-  event,
-  isDisabled,
-}: DropdownType) {
+function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize, event, isDisabled }: DropdownType) {
   const { base, floatingBase } = DropdownClasses({ isEvent: !!event });
 
   const [isOpen, setIsOpen] = useState(false);

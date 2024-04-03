@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { BaseCardType, CharacterType, ProjectCardType, ProjectDashboardInfoCardType } from "../../types";
+import { BaseCardType, CharacterType, ProjectCardType } from "../../types";
 import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
@@ -48,39 +48,6 @@ export function ProjectCard({ id, title, image, feature_flags }: ProjectCardType
         }}
       />
     </Link>
-  );
-}
-
-export function ProjectDashboardInfoCard({ title, count, icon, latestItems }: ProjectDashboardInfoCardType) {
-  return (
-    <div className="col-span-4 h-56 w-full bg-zinc-800 p-4 shadow md:col-span-2 lg:col-span-1">
-      <h2 className="flex justify-between text-3xl font-bold text-white">
-        <span>{count}</span>
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-x-2 text-2xl font-semibold text-zinc-300">
-            <Link className="transition-colors hover:text-blue-400" to={`/projects/${title}/${title}`}>
-              {title}
-            </Link>
-            <Icon fontSize={32} icon={icon} />
-          </span>
-        </div>
-      </h2>
-      <div className="mt-8 flex flex-col">
-        <h4 className="text-lg font-light text-zinc-600">Latest</h4>
-        <ul className="flex flex-col">
-          {latestItems.map((item) => (
-            <li key={item.id} className="truncate text-white">
-              <Link
-                key={item.id}
-                className="truncate text-xl font-bold transition-colors hover:text-blue-400"
-                to={`${item.id}/${item.id}`}>
-                {item.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
   );
 }
 

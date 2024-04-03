@@ -111,12 +111,12 @@ export function removeColumnFilter(
   }));
 }
 
-export function getFilterBadgeLabelOperator(operator: TableColumnFilterType["operator"], isRelationFilter: boolean): string {
+function getFilterBadgeLabelOperator(operator: TableColumnFilterType["operator"], isRelationFilter: boolean): string {
   if (isRelationFilter) return "";
   return `${FilterNamesEnum[operator]}:`;
 }
 
-export function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "value" | "relationalData">) {
+function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "value" | "relationalData">) {
   return `${getFilterBadgeLabelOperator(filter.operator, !!filter?.relationalData)} "${
     filter?.relationalData?.label || filter.value
   }"`;

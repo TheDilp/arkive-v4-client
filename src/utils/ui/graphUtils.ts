@@ -241,7 +241,6 @@ export function mapEdges(edges: EdgeType[], isReadOnly?: boolean) {
     },
   }));
 }
-export const edgeArrowTypes = ["source", "target", "midsource", "mid_target"];
 export const curveStyles: CurveStyleType[] = ["straight", "taxi", "unbundled-bezier"];
 export function getCurveStyleIcon(curve_style: CurveStyleType): AvailableIcons {
   if (curve_style === "straight") return IconEnum.straight_edges;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ArrowShapeEnum = z.enum([
+const ArrowShapeEnum = z.enum([
   "none",
   "triangle",
   "triangle-tee",
@@ -13,9 +13,9 @@ export const ArrowShapeEnum = z.enum([
   "chevron",
 ]);
 
-export const ArrowFillEnum = z.enum(["filled", "hollow"]);
+const ArrowFillEnum = z.enum(["filled", "hollow"]);
 
-export const InsertEdgeSchema = z.object({
+const InsertEdgeSchema = z.object({
   data: z.object({
     id: z.string(),
     parent_id: z.string(),
@@ -99,4 +99,3 @@ export const UpdateEdgeSchema = z.object({
 });
 
 export type InsertEdgeType = z.infer<typeof InsertEdgeSchema>;
-export type UpdateEdgeType = z.infer<typeof UpdateEdgeSchema>;

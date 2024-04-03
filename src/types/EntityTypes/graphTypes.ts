@@ -1,5 +1,3 @@
-import cytoscape from "cytoscape";
-
 import { BaseEntityType, CharacterType, EventType, ImageType, MapPinType, MapType, TagType } from ".";
 import { DocumentType } from "./documentTypes";
 
@@ -120,11 +118,6 @@ export interface GraphType extends BaseEntityType {
   edges: EdgeType[];
   tags: Omit<TagType, "owner_id" | "permissions" | "deleted_at">[];
 }
-
-export type CytoscapeNodeType = cytoscape.NodeDefinition;
-export type CytoscapeEdgeType = cytoscape.EdgeDefinition;
-
-export type BoardContextType = null | "board" | "nodes" | "edges";
 
 export type BoardExportType = {
   view: "entire_graph" | "current_view";

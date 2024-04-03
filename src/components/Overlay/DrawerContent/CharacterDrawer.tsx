@@ -334,7 +334,7 @@ function FieldTemplateRows({
 }
 
 // #region tabs
-export function AdditionalFieldsTab({
+function AdditionalFieldsTab({
   templates,
   handleChange,
   character_fields,

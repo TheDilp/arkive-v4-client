@@ -5,7 +5,6 @@ import { AvailableIcons } from "../../../utils";
 import { AssetType, Size } from "../../baseTypes";
 import { RequestFilterType } from "../../CRUD";
 import {
-  AllAvailableEntities,
   AvailableEntityType,
   AvailableSubEntityType,
   EntitiesWithFolders,
@@ -18,24 +17,6 @@ import {
 import { TableDispatch } from "../DataDisplayTypes";
 import { DropdownItemType } from "./dropdownTypes";
 
-export type DrawerContentType =
-  | null
-  | AllAvailableEntities
-  | "folder"
-  | "full_search"
-  | "many_nodes"
-  | "many_edges"
-  | "random_table_option"
-  | "random_table_options"
-  | "mention"
-  | "insert_word"
-  | "insert_image"
-  | "swatches"
-  | "content_preview"
-  | "map_pin_management"
-  | "search"
-  | "autolinker";
-
 export type DrawerContentCreateNewType =
   | "characters"
   | "character_fields_templates"
@@ -45,9 +26,9 @@ export type DrawerContentCreateNewType =
   | "random_tables"
   | "random_table_option";
 
-export type DrawerSize = Size | "half" | "full";
-export type DrawerPosition = "left" | "right";
-export type DrawerExceptions = {
+type DrawerSize = Size | "half" | "full";
+type DrawerPosition = "left" | "right";
+type DrawerExceptions = {
   fromTemplate?: boolean;
   createTemplate?: boolean;
   eventDescription?: boolean;

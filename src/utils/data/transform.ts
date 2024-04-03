@@ -1,15 +1,5 @@
 import { PermissionType } from "../../types";
 
-export function removeFalsy(object: { [key: string]: any }) {
-  return Object.keys(object).reduce((accumulator: { [key: string]: any }, key) => {
-    if (object[key]) {
-      accumulator[key] = object[key];
-    }
-
-    return accumulator;
-  }, {});
-}
-
 export function deleteObjectProps(obj: { [key: string]: any }, keys: string[]) {
   return Object.fromEntries(Object.entries(obj).filter(([k]) => !keys.includes(k)));
 }
@@ -32,10 +22,6 @@ export function closestDivisibleBy50(x: number, y: number): [number, number] {
   const closestY = Math.round(y / 50) * 50;
 
   return [closestX, closestY];
-}
-
-export function closestDivisibleBy(number: number, divisible: number): number {
-  return Math.round(number / divisible) * divisible;
 }
 
 export function permissionsByEntity(permissions: PermissionType[]) {

@@ -3,14 +3,6 @@ import { createHmac } from "crypto";
 import { AssetType, SearchableEntities } from "../../types";
 import { baseURLS } from "../enums/ServerEnum";
 
-export function createURL(type: string): string {
-  if (type === "dictionaries") return `${baseURLS.baseServer}api/v1/${type}/create`;
-  if (type === "entities") return `${baseURLS.baseServer}createentity`;
-  if (type === "entityinstances") return `${baseURLS.baseServer}createentityinstance`;
-
-  return `${baseURLS.baseServer}create${type.slice(0, -1).replace("_", "")}`; // Replace is for random_tables
-}
-
 export function getPreviewImageURLs(files: File[] | undefined): { name: string; url: string }[] {
   if (files) {
     const urls = [];

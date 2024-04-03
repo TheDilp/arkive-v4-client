@@ -51,21 +51,6 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
   return null;
 }
 
-export function getEntityLinkType(type: AvailableEntityType | AvailableSubEntityType) {
-  if (
-    type === "nodes" ||
-    type === "edges" ||
-    type === "random_table_options" ||
-    type === "map_pins" ||
-    type === "map_layers" ||
-    type === "events" ||
-    type === "words"
-  )
-    return getParentEntityType(type);
-
-  return type;
-}
-
 export function getEntityFields(type: AvailableEntityType): string[] {
   const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
   if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
@@ -85,38 +70,6 @@ export function getEntityFields(type: AvailableEntityType): string[] {
     fields.pop();
 
   return fields;
-}
-
-export function getSearchFieldTypeLabel(type: string) {
-  if (type === "images_single") return "Image";
-  if (type === "images_multiple") return "Images";
-  if (type === "documents_single") return "Document";
-  if (type === "documents_multiple") return "Documents";
-  if (type === "locations_single") return "Location";
-  if (type === "locations_multiple") return "Locations";
-  if (type === "blueprints_single") return "Locations";
-  if (type === "blueprints_multiple") return "Locations";
-  return "";
-}
-export function getSearchFieldTypeSearchType(type: string) {
-  if (type === "images_single") return "images";
-  if (type === "images_multiple") return "images";
-  if (type === "documents_single") return "documents";
-  if (type === "documents_multiple") return "documents";
-  if (type === "locations_single") return "map_pins";
-  if (type === "locations_multiple") return "map_pins";
-  if (type === "blueprints_single") return "blueprint_instances";
-  if (type === "blueprints_multiple") return "blueprint_instances";
-  return "";
-}
-export function getSearchFieldTypeLinkType(type: string) {
-  if (type === "images_single") return "images";
-  if (type === "images_multiple") return "images";
-  if (type === "documents_single") return "documents";
-  if (type === "documents_multiple") return "documents";
-  if (type === "locations_single") return "maps";
-  if (type === "locations_multiple") return "maps";
-  return "";
 }
 
 export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize?: number } {

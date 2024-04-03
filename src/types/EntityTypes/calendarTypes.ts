@@ -46,12 +46,6 @@ export interface LeapDayType {
   };
 }
 
-export interface EraBackgroundGradientType {
-  id: string;
-  start_stop: number;
-  end_stop: number;
-  color: string;
-}
 export interface EraType {
   id: string;
   title: string;

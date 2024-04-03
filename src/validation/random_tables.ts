@@ -32,13 +32,6 @@ export const UpdateRandomTableSchema = z.object({
   permissions: UpdateEntityPermissionSchema,
 });
 
-export const RandomTableSubOptionSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1),
-  description: z.string().optional().nullable(),
-  parent_id: z.string(),
-});
-
 export const InsertRandomTableOptionSchema = z.object({
   data: z.object({
     title: z.string(),
@@ -104,4 +97,3 @@ export type InsertRandomTableType = z.infer<typeof InsertRandomTableSchema>;
 export type UpdateRandomTableType = z.infer<typeof UpdateRandomTableSchema>;
 
 export type InsertRandomTableOptionType = z.infer<typeof InsertRandomTableOptionSchema>;
-export type UpdateRandomTableOptionType = z.infer<typeof UpdateRandomTableOptionSchema>;

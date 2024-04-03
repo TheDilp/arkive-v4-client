@@ -17,7 +17,7 @@ import {
 } from "@remirror/core";
 import { TextSelection } from "@remirror/pm/state";
 
-export type CalloutType = "info" | "success" | "warning" | "error" | "custom";
+type CalloutType = "info" | "success" | "warning" | "error" | "custom";
 
 function getCalloutColor(type: CalloutType, customColor?: string | null): string {
   if (type === "custom") {
@@ -43,7 +43,7 @@ function getCalloutBorderColor(type: CalloutType, customColor?: string | null): 
   return "#3298dc";
 }
 
-export interface CustomCalloutOptions {
+interface CustomCalloutOptions {
   type: CalloutType;
   customColor?: string | null;
 }

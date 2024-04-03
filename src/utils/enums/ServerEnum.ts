@@ -17,9 +17,3 @@ export const baseURLS = {
       : "wss://arkive-v4-server-production.up.railway.app"
   }`,
 };
-
-export const ResponseMessageEnum = {
-  entity_create: "Entity successfully created",
-  entity_update: "Entity successfully updated.",
-  no_entity: "This entity does not exist.",
-};

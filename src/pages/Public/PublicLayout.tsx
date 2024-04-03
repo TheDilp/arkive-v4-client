@@ -42,19 +42,3 @@ export function PublicEntityLayout({
     </div>
   );
 }
-
-export function PublicCharacterResourceLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="relative flex h-full max-h-full flex-col overflow-y-auto overflow-x-hidden bg-zinc-900 lg:flex-row lg:flex-nowrap ">
-      {children}
-    </div>
-  );
-}
-
-export function PublicCharacterResourceLinksLayout({ children }: { children: ReactNode | ReactNode[] }) {
-  return (
-    <div className="sticky top-8 hidden h-full max-h-full w-full max-w-full flex-col gap-y-1 overflow-y-auto border-y border-r border-zinc-800 bg-zinc-900 lg:flex lg:min-w-[20%] lg:max-w-[20%]">
-      {children}
-    </div>
-  );
-}

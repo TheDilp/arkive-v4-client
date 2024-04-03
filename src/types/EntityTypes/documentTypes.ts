@@ -2,7 +2,7 @@ import { RemirrorJSON } from "remirror";
 
 import { BaseEntityType, ImageType, TagType } from ".";
 
-export interface AlterNameType {
+interface AlterNameType {
   id: string;
   title: string;
   parent_id: string;
@@ -24,4 +24,3 @@ export interface InsertDocumentType extends Omit<DocumentType, "alter_names"> {
 }
 
 export type UpdateDocumentType = Partial<DocumentType>;
-export type StaticRendererType = { content: RemirrorJSON };

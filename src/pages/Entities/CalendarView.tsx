@@ -44,7 +44,7 @@ import {
 } from "../../utils";
 import { TimelineView } from "./TimelineView";
 
-export function DayNumber({
+function DayNumber({
   dayNumber,
   monthNumber,
   year,
@@ -101,7 +101,7 @@ export function DayNumber({
     </span>
   );
 }
-export function CalendarRangeEvents({
+function CalendarRangeEvents({
   events,
   setDrawer,
   isPublic,

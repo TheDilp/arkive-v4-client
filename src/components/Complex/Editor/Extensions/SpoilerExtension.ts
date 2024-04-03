@@ -80,6 +80,6 @@ class SpoilerExtension extends MarkExtension<SpoilerOptions> {
     return this.toggleSpoiler()(props);
   }
 }
-export interface SpoilerOptions {}
+interface SpoilerOptions {}
 
 export default SpoilerExtension;

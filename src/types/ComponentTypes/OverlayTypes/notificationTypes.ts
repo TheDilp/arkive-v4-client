@@ -2,7 +2,7 @@ import { AvailableIcons } from "../../../utils";
 import { Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
-export type NotificationPositionsType =
+type NotificationPositionsType =
   | "top"
   | "right"
   | "bottom"
@@ -12,7 +12,7 @@ export type NotificationPositionsType =
   | "bottom-right"
   | "bottom-left";
 
-export type NotificationContentType = "dice_roll" | null;
+type NotificationContentType = "dice_roll" | null;
 export interface NotificationType {
   id: string;
   title: string;

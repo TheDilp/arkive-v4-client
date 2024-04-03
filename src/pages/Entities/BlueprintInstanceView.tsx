@@ -758,7 +758,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
     },
     fields: ["id", "title", "title_name"],
   });
-  useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title}`, !!blueprint?.data?.title);
+  useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("blueprint_instances", project_id as string);
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", project_id);
 

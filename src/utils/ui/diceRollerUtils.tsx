@@ -23,9 +23,6 @@ Dice.init().then(() => {
   });
 });
 
-export function getRandomHexColor() {
-  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-}
 export function getCritColor(critical: "success" | "failure" | null | undefined) {
   if (!critical) return "";
   if (critical === "success") return "text-green-400 font-bold";
@@ -49,13 +46,6 @@ export async function getRollValue(notation: string, hasNoSimulation?: boolean) 
   const rollData = await Dice.roll(parsedNotation);
   const { value } = DiceRollParser.parseFinalResults(rollData);
   return value;
-}
-
-export function parseDiceResults(r: any) {
-  const parsedNotation = DiceRollParser.parseNotation(r);
-
-  const rollData = DiceRollParser.parseFinalResults(parsedNotation);
-  return rollData;
 }
 
 export async function rollDiceWithNotification(

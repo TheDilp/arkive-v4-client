@@ -1,8 +1,5 @@
 import { BlueprintFieldTypes, FilterEnumType, RequestFilterTypes, SearchableEntities } from "../../types";
 
-export const inputFilters = ["eq", "gt", "gte", "lt", "lte"];
-export const rangeFilters = ["between", "notBetween"];
-
 export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   eq: "Equals",
   ne: "Doesn't equal",

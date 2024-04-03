@@ -45,5 +45,3 @@ export const UpdateDocumentSchema = z.object({
     .optional(),
   permissions: UpdateEntityPermissionSchema,
 });
-
-export type InsertDocumentType = z.infer<typeof InsertDocumentSchema>;

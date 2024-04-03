@@ -61,7 +61,3 @@ export const projectNavItems: SidebarItemType[] = [
 ];
 
 export const projectCardNavItems = projectNavItems.slice(0, -1);
-
-export const settingsSubnavItems = [
-  { icon: IconEnum.family_tree, navigate: "relationship-types", tooltip: "Character relationship types" },
-];

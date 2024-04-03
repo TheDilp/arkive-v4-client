@@ -19,11 +19,11 @@ export interface RequestPaginationType {
   page?: number;
 }
 
-export type RequestColumnsType = {
+type RequestColumnsType = {
   [key: string]: boolean;
 };
 
-export type RequestRelationsType = {
+type RequestRelationsType = {
   [key: string]:
     | boolean
     | {
@@ -31,12 +31,6 @@ export type RequestRelationsType = {
         or?: RequestFilterType[];
       };
 };
-
-export interface ResponseType<DataType = []> {
-  data?: DataType;
-  messsage: string;
-  ok: boolean;
-}
 
 export interface RequestBodyType<InsertType> {
   data?: {
@@ -57,11 +51,4 @@ export interface RequestBodyType<InsertType> {
   permissions?: boolean;
   arkived?: boolean;
   columns?: RequestColumnsType;
-}
-
-export interface ResponseErrorType {
-  statusCode: number;
-  code: string;
-  error: string;
-  message: string;
 }
