@@ -135,40 +135,45 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
             <div className="w-min">
               <Button hasNoBackground icon={IconEnum.expand} iconSize={22} onClick={() => setIsExpanded((prev) => !prev)} />
             </div>
-            <div className="w-min">
-              <Button
-                hasNoBackground
-                icon={IconEnum.close}
-                iconSize={22}
-                onClick={() => {
-                  if (!hasChangedData) {
-                    resetDrawer();
-                    setIsExpanded(false);
-                  } else {
-                    setDialog((prev) => ({
-                      ...prev,
-                      title: "You have unsaved changes - are you sure you want to proceed?",
-                      confirm: {
-                        label: "Proceed",
-                        variant: "primary",
-                        icon: IconEnum.chevron_right,
-                        action: () => {
-                          resetDrawer();
-                          setHasChangedData(false);
-                          setIsExpanded(false);
+            {drawer.type === "nodes" ||
+            drawer.type === "many_nodes" ||
+            drawer.type === "edges" ||
+            drawer.type === "many_edges" ? null : (
+              <div className="w-min">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.close}
+                  iconSize={22}
+                  onClick={() => {
+                    if (!hasChangedData) {
+                      resetDrawer();
+                      setIsExpanded(false);
+                    } else {
+                      setDialog((prev) => ({
+                        ...prev,
+                        title: "You have unsaved changes - are you sure you want to proceed?",
+                        confirm: {
+                          label: "Proceed",
+                          variant: "primary",
+                          icon: IconEnum.chevron_right,
+                          action: () => {
+                            resetDrawer();
+                            setHasChangedData(false);
+                            setIsExpanded(false);
+                          },
                         },
-                      },
-                      cancel: {
-                        label: "Cancel",
-                        variant: "info",
-                        action: () => {},
-                      },
-                      isOverlay: true,
-                    }));
-                  }
-                }}
-              />
-            </div>
+                        cancel: {
+                          label: "Cancel",
+                          variant: "info",
+                          action: () => {},
+                        },
+                        isOverlay: true,
+                      }));
+                    }
+                  }}
+                />
+              </div>
+            )}
           </div>
         </h3>
         {renderContent ? (
