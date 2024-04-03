@@ -32,7 +32,7 @@ import {
 } from "../../components/Complex/Editor/Extensions";
 import CustomCalloutExtension from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
 import SecretExtension from "../../components/Complex/Editor/Extensions/SecretExtension";
-import SpoilerExtension from "../../components/Complex/Editor/Extensions/SpoilerExtension";
+import { SpoilerExtension } from "../../components/Complex/Editor/Extensions/SpoilerExtension";
 import TableOfContentsExtension from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
 import { useUpdateEntity } from "../../hooks";
 import { ConversationType, DocumentType, MessageKindType, NotificationType, slashMenuItem } from "../../types";

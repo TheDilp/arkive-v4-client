@@ -431,11 +431,13 @@ function EntityItem({
       draggable
       onDragLeave={(e) => {
         e.preventDefault();
+
         // eslint-disable-next-line no-param-reassign
         e.currentTarget.className = "";
       }}
       onDragOver={(e) => {
         e.preventDefault();
+
         // eslint-disable-next-line no-param-reassign
         if (is_folder) e.currentTarget.className = "text-blue-400";
       }}
@@ -817,7 +819,9 @@ export function FolderView() {
       EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&
       Object.keys(permissions).length > 1 &&
       !permissions?.[`read_${type}` as PermissionCodeType] &&
-      user
+      user &&
+      typeof isProjectOwner !== "undefined" &&
+      isProjectOwner !== null
     ) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(

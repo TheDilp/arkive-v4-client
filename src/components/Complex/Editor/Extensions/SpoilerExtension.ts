@@ -21,7 +21,7 @@ import {
   handlerKeys: [],
 })
 // eslint-disable-next-line no-use-before-define
-class SpoilerExtension extends MarkExtension<SpoilerOptions> {
+export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
   get name() {
     return "spoiler" as const;
   }

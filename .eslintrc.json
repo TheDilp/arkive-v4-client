@@ -67,7 +67,6 @@
     "react/jsx-filename-extension": ["error", { "extensions": [".ts", ".tsx"] }],
     "react/jsx-sort-props": "error",
     "react/jsx-no-bind": "off",
-    "react/boolean-prop-naming": ["error", { "validateNested": true }],
     "react/jsx-props-no-spreading": ["off"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "off",

@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
+import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -68,9 +69,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
           label="Add"
           onClick={async () => {
             const optionsToCreate = options.map((opt) => {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const { id, ...rest } = opt;
-              return { data: rest };
+              return { data: omit(opt, "id") };
             });
             const parsedData = InsertRandomTableOptionSchema.array().parse(optionsToCreate);
             await create(

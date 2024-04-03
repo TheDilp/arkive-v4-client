@@ -486,6 +486,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       cyRef?.current?._cy.on("dbltap", "node", function (evt: any) {
         if (!updateGraphActionPermission) return;
         const target = evt.target._private;
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
         setDrawer((prev) => {
