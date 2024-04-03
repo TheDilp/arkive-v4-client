@@ -176,7 +176,6 @@ export function ProjectsView() {
             </TablePageLayout>
           </div>
         ) : null}
-
         {!view && !isLoading && !isInitialLoadingUser ? (
           <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
             {(data?.data || []).map((project) => (

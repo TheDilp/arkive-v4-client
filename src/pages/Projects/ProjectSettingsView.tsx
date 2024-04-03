@@ -1,4 +1,5 @@
-import { UseMutateFunction } from "@tanstack/react-query";
+import { useUser } from "@clerk/clerk-react";
+import { UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,6 +31,7 @@ import {
   useKickMember,
   useTable,
   useUpdateEntity,
+  useUpdateUser,
 } from "../../hooks";
 import {
   AllAvailableEntities,
@@ -264,11 +266,11 @@ function membersColumns(
       id: "role",
       header: "Role",
       cell: ({ row }) => (
-        <Tooltip content={row.original.role.title}>
+        <Tooltip content={row?.original?.role?.title || ""}>
           <div>
             <Button
               hasNoBackground
-              icon={row.original.role.icon || IconEnum.permissions}
+              icon={row?.original?.role?.icon || IconEnum.permissions}
               isDisabled
               isIconOnly
               onClick={undefined}
@@ -388,6 +390,7 @@ function rolesColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
 }
 export function ProjectSettingsView() {
   const { project_id } = useParams();
+  const queryClient = useQueryClient();
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const navigate = useNavigate();
@@ -397,6 +400,7 @@ export function ProjectSettingsView() {
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
 
   const [project, setProject] = useState<ProjectType | null>();
+  const { user: authUser } = useUser();
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -429,16 +433,17 @@ export function ProjectSettingsView() {
     project_id as string,
   );
   const { mutate: assignRole } = useAssignRole();
+  const { mutate: updateUser } = useUpdateUser(user?.id as string, authUser?.id as string);
   function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
     const newFeatureFlags = deepMerge(project?.feature_flags || {}, { [newValue.name]: newValue.value });
-    updateProject({
-      data: {
-        id: project_id as string,
+    updateUser(
+      {
+        relations: {
+          feature_flags: { project_id: project_id as string, feature_flags: newFeatureFlags },
+        },
       },
-      relations: {
-        feature_flags: newFeatureFlags,
-      },
-    });
+      { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+    );
   }
 
   const { data: roles } = useGetEntities<RoleType>(
