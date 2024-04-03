@@ -63,6 +63,7 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
   );
   const permissions = useHasPermissions(
     ["read_graphs", "update_graphs", "delete_graphs", "read_tags"],
+
     existingGraph?.data?.owner_id,
   );
   const tabs = getTabs(permissions, existingGraph?.data?.id);

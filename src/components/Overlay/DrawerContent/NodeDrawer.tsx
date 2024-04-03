@@ -4,8 +4,8 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
-import { NodeType } from "../../../types";
+import { useGetSubEntity, useHandleChange, useHasPermissions, useUpdateGraphSubEntity } from "../../../hooks";
+import { NodeType, TabType, UserHasPermissionsType } from "../../../types";
 import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
@@ -33,11 +33,16 @@ import {
 } from "../..";
 import { ColorPicker } from "../ColorPicker";
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Realations", icon: IconEnum.link },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Realations", icon: IconEnum.link },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+  return tabs;
+}
 
 type UpdateNodeType = { data: Partial<NodeType> };
 
@@ -59,16 +64,22 @@ function UpdateGraphNodes({
       const newNodes = [...oldNodes];
       const idx = newNodes.findIndex((n) => n.id === node.id);
       if (idx > -1) {
-        const alteredNodeData = { ...newNodes[idx], ...rest, ...changedData };
-
-        set(newNodes, `[${idx}]`, {
+        const alteredNodeData = { ...newNodes[idx], ...(Object.keys(changedData).length ? changedData : rest) };
+        newNodes[idx] = {
           ...alteredNodeData,
           label: getNodeLabel(alteredNodeData as NodeType),
-          background_image: getNodeImage(alteredNodeData as NodeType, project_id as string, {
-            width: alteredNodeData.width || 50,
-            height: alteredNodeData.height || 50,
-          }),
-        });
+          character: changedData?.character || rest?.character || undefined,
+          event: changedData?.event || rest?.event || undefined,
+          map_pin: changedData?.map_pin || rest?.map_pin || undefined,
+          document: changedData?.document || rest?.document || undefined,
+          // @ts-ignore
+          background_image: alteredNodeData
+            ? getNodeImage(alteredNodeData as NodeType, project_id as string, {
+                width: alteredNodeData.width || 50,
+                height: alteredNodeData.height || 50,
+              })
+            : null,
+        };
         return newNodes;
       }
       return newNodes;
@@ -125,6 +136,12 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   >("nodes", data.parent_id);
 
   const originalNode = existingNode?.data;
+  const permissions = useHasPermissions(
+    ["update_graphs", "read_characters", "read_assets", "read_events", "read_documents", "read_tags"],
+    undefined,
+  );
+  const tabs = getTabs(permissions);
+
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>(existingNode?.data || data);
 
   const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
@@ -152,7 +169,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   return (
     <div className="flex flex-col gap-y-2 overflow-auto font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <Title isDrawerTitle label="Label" size="xl" />
           <div className="flex w-full items-center gap-x-2">
@@ -293,11 +310,12 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           </div>
         </>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <div className="flex flex-col gap-y-2">
           {!node?.character ? (
             <Search
               isAutocomplete
+              isDisabled={!permissions?.read_characters}
               label="Represents character (optional)"
               name="character.id"
               onChange={({ value, label, image }) => {
@@ -310,9 +328,13 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             />
           ) : (
             <EntityPreview
-              clearAction={() => {
-                handleChange({ name: "character", value: "" });
-              }}
+              clearAction={
+                permissions?.read_characters && permissions?.update_graphs
+                  ? () => {
+                      handleChange({ name: "character", value: "" });
+                    }
+                  : undefined
+              }
               id={node?.character?.id}
               image_id={node?.character?.portrait_id ?? undefined}
               label="Represents character (optional)"
@@ -324,6 +346,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           {!node?.document ? (
             <Search
               isAutocomplete
+              isDisabled={!permissions?.read_documents}
               label="Related document (optional)"
               name="document.id"
               onChange={({ value, label }) => {
@@ -335,9 +358,13 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             />
           ) : (
             <EntityPreview
-              clearAction={() => {
-                handleChange({ name: "document", value: "" });
-              }}
+              clearAction={
+                permissions?.read_documents && permissions?.update_graphs
+                  ? () => {
+                      handleChange({ name: "document", value: "" });
+                    }
+                  : undefined
+              }
               icon={IconEnum.document}
               id={node?.document?.id}
               link={`/projects/${project_id}/documents/${node.document.id}`}
@@ -373,6 +400,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           {!node?.event ? (
             <Search
               isAutocomplete
+              isDisabled={permissions?.read_events}
               label="Related event (optional)"
               name="event.id"
               onChange={({ value, label }) => {
@@ -384,9 +412,13 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
             />
           ) : (
             <EntityPreview
-              clearAction={() => {
-                handleChange({ name: "event", value: "" });
-              }}
+              clearAction={
+                permissions?.read_events && permissions?.update_graphs
+                  ? () => {
+                      handleChange({ name: "event", value: "" });
+                    }
+                  : undefined
+              }
               icon={IconEnum.event}
               id={node?.event?.id}
               link={`/projects/${project_id}/calendars/${node.event.parent_id}/${node.event.id}`}
@@ -396,7 +428,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           )}
         </div>
       ) : null}
-      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={node.tags || []} /> : null}
+      {tabs[selectedTab].id === "3" ? <TagInput handleChange={handleChange} tags={node.tags || []} /> : null}
       <div className="sticky bottom-0 flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}
@@ -427,6 +459,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                   },
                 },
                 cancel: {
+                  variant: "info",
                   action: () => resetDialogAtom(),
                 },
               });
@@ -438,7 +471,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
         />
         <Button
           icon={IconEnum.save}
-          isDisabled={isUpdating}
+          isDisabled={isUpdating || !permissions?.update_graphs}
           isLoading={isUpdating}
           label="Save"
           onClick={async () => {
