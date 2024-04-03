@@ -28,7 +28,7 @@ import {
   useGetSubEntity,
   useHasPermissions,
 } from "../../hooks";
-import { DrawerAtomType } from "../../types";
+import { DrawerAtomType, UserHasPermissionsType, UserType } from "../../types";
 import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
@@ -118,184 +118,210 @@ function CalendarRangeEvents({
   deleteEvent,
   months,
   calendar_id,
+  permissions,
+  user,
+  isProjectOwner,
 }: {
   events: EventType[];
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
   isPublic: boolean;
   deleteEvent: any;
   calendar_id: string;
-
   months: MonthType[];
+  permissions: UserHasPermissionsType;
+  user: UserType | null;
+  isProjectOwner: boolean;
 }) {
   const { project_id } = useParams();
   const grouped = groupBy(events, "start_year");
-
   return Object.entries(grouped).map(([year, groupedEvents]) => {
     return (
       <div key={year} className="my-2">
         <h3 className="font-merriweather text-xl">Year {year}</h3>
-        {groupedEvents.map((e) => (
-          <div
-            key={e.id}
-            className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2">
-            <div className="flex items-center gap-x-2">
-              <span>{e.title}</span>
-              <Tooltip
-                content={`${formatDateToString(e.start_day, e.start_year, e.start_month_id, months)} ${
-                  e?.end_year ? `- ${formatDateToString(e.end_day || 0, e.end_year, e.end_month_id || "", months)}` : ""
-                }`}
-                customOffset={{
-                  mainAxis: 10,
-                }}>
-                <div>
-                  <Icon icon={IconEnum.calendar} />
-                </div>
-              </Tooltip>
-            </div>
+        {groupedEvents.map((event) => {
+          const updatePermissions = hasActionPermission(
+            isProjectOwner,
+            user?.id === event?.owner_id,
+            permissions,
+            event?.permissions || [],
+            "update_events",
+            user?.role?.id,
+          );
+          const deletePermissions = hasActionPermission(
+            isProjectOwner,
+            user?.id === event?.owner_id,
+            permissions,
+            event?.permissions || [],
+            "delete_events",
+            user?.role?.id,
+          );
+          return (
+            <div
+              key={event.id}
+              className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2">
+              <div className="flex items-center gap-x-2">
+                <span>{event.title}</span>
+                <Tooltip
+                  content={`${formatDateToString(event.start_day, event.start_year, event.start_month_id, months)} ${
+                    event?.end_year
+                      ? `- ${formatDateToString(event.end_day || 0, event.end_year, event.end_month_id || "", months)}`
+                      : ""
+                  }`}
+                  customOffset={{
+                    mainAxis: 10,
+                  }}>
+                  <div>
+                    <Icon icon={IconEnum.calendar} />
+                  </div>
+                </Tooltip>
+              </div>
 
-            <div className="ml-auto flex items-center gap-x-10">
-              {e.document ? (
-                <div className="flex items-center">
-                  <EntityPreview
-                    hasNoBackground
-                    icon={e.document.icon || getDefaultEntityIcon("documents")}
-                    id={e.document.id}
-                    link={getEntityLink(project_id as string, "documents", e.document.id)}
-                    size="sm"
-                    title={e.document.title}
-                    type="documents"
-                  />
+              <div className="ml-auto flex items-center gap-x-10">
+                {event.document ? (
+                  <div className="flex items-center">
+                    <EntityPreview
+                      hasNoBackground
+                      icon={event.document.icon || getDefaultEntityIcon("documents")}
+                      id={event.document.id}
+                      link={getEntityLink(project_id as string, "documents", event.document.id)}
+                      size="sm"
+                      title={event.document.title}
+                      type="documents"
+                    />
+                  </div>
+                ) : null}
+                <div className="flex items-center -space-x-4">
+                  {event?.map_pins?.slice(0, 5)?.map((pin) => (
+                    <Avatar
+                      key={pin.id}
+                      image={
+                        pin.image_id
+                          ? getImageURL(project_id as string, "images", pin.image_id)
+                          : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
+                      }
+                      initials={getAvatarInitials(pin.title || "")}
+                      isPreview
+                      label={pin.title || ""}
+                      size="xs"
+                      tooltipAllowedPlacements={["top"]}
+                    />
+                  ))}
+                  {event.characters && event.characters?.length && event.characters?.length > 5 ? (
+                    <Tooltip
+                      content={event.characters
+                        ?.slice(5)
+                        .map((char) => char.full_name || "")
+                        .join(", ")}>
+                      <div className="w-min max-w-min">
+                        <Badge label={`+${event.characters.length - 5}`} size="sm" variant="secondary" />
+                      </div>
+                    </Tooltip>
+                  ) : null}
                 </div>
-              ) : null}
-              <div className="flex items-center -space-x-4">
-                {e?.map_pins?.slice(0, 5)?.map((pin) => (
-                  <Avatar
-                    key={pin.id}
-                    image={
-                      pin.image_id
-                        ? getImageURL(project_id as string, "images", pin.image_id)
-                        : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
-                    }
-                    initials={getAvatarInitials(pin.title || "")}
-                    isPreview
-                    label={pin.title || ""}
-                    size="xs"
-                    tooltipAllowedPlacements={["top"]}
-                  />
-                ))}
-                {e.characters && e.characters?.length && e.characters?.length > 5 ? (
-                  <Tooltip
-                    content={e.characters
-                      ?.slice(5)
-                      .map((char) => char.full_name || "")
-                      .join(", ")}>
-                    <div className="w-min max-w-min">
-                      <Badge label={`+${e.characters.length - 5}`} size="sm" variant="secondary" />
-                    </div>
-                  </Tooltip>
-                ) : null}
-              </div>
-              <div className="flex items-center -space-x-4">
-                {e?.characters?.slice(0, 5)?.map((char) => (
-                  <Avatar
-                    key={char.id}
-                    image={getImageURL(project_id as string, "images", char.portrait_id)}
-                    initials={getAvatarInitials(char.full_name)}
-                    label={char.full_name}
-                    size="xs"
-                    tooltipAllowedPlacements={["top"]}
-                  />
-                ))}
-                {e.characters && e.characters?.length && e.characters?.length > 5 ? (
-                  <Tooltip
-                    content={e.characters
-                      ?.slice(5)
-                      .map((char) => char.full_name || "")
-                      .join(", ")}>
-                    <div className="w-min max-w-min">
-                      <Badge label={`+${e.characters.length - 5}`} size="sm" variant="secondary" />
-                    </div>
-                  </Tooltip>
-                ) : null}
-              </div>
-              <div className="">
-                <Dropdown
-                  allowedPlacements={["left", "left-end", "left-start"]}
-                  items={
-                    isPublic
-                      ? [
-                          {
-                            id: "1",
-                            title: "Preview event",
-                            icon: IconEnum.eye,
-                            onClick: () =>
-                              setDrawer((prev) => ({
-                                ...prev,
-                                title: "Preview event",
-                                type: "entity_preview",
-                                data: { id: e.id, parent_id: calendar_id, entity_type: "events" },
-                                size: "lg",
-                              })),
-                          },
-                          {
-                            id: "2",
-                            title: "Preview document",
-                            icon: IconEnum.text_align_justify,
-                            isDisabled: !e.document_id,
-                            onClick: () =>
-                              setDrawer((prev) => ({
-                                ...prev,
-                                title: "Preview document",
-                                type: "entity_preview",
-                                size: "lg",
-                                data: { id: e.document_id as string, entity_type: "documents" },
-                              })),
-                          },
-                        ]
-                      : [
-                          {
-                            id: "1",
-                            title: "Edit event",
-                            icon: IconEnum.edit,
-                            onClick: () =>
-                              setDrawer((prev) => ({
-                                ...prev,
-                                title: "Edit event",
-                                type: "events",
-                                data: { id: e.id, parent_id: calendar_id },
-                                size: "lg",
-                              })),
-                          },
-                          {
-                            id: "2",
-                            title: "Preview document",
-                            icon: IconEnum.text_align_justify,
-                            isDisabled: !e.document_id,
-                            onClick: () =>
-                              setDrawer((prev) => ({
-                                ...prev,
-                                title: "Preview document",
-                                type: "entity_preview",
-                                size: "lg",
-                                data: { id: e.document_id as string, entity_type: "documents" },
-                              })),
-                          },
-                          {
-                            id: "3",
-                            title: "Delete event",
-                            icon: IconEnum.trash,
-                            onClick: () => {
-                              deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                <div className="flex items-center -space-x-4">
+                  {event?.characters?.slice(0, 5)?.map((char) => (
+                    <Avatar
+                      key={char.id}
+                      image={getImageURL(project_id as string, "images", char.portrait_id)}
+                      initials={getAvatarInitials(char.full_name)}
+                      label={char.full_name}
+                      size="xs"
+                      tooltipAllowedPlacements={["top"]}
+                    />
+                  ))}
+                  {event.characters && event.characters?.length && event.characters?.length > 5 ? (
+                    <Tooltip
+                      content={event.characters
+                        ?.slice(5)
+                        .map((char) => char.full_name || "")
+                        .join(", ")}>
+                      <div className="w-min max-w-min">
+                        <Badge label={`+${event.characters.length - 5}`} size="sm" variant="secondary" />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+                </div>
+                <div className="">
+                  <Dropdown
+                    allowedPlacements={["left", "left-end", "left-start"]}
+                    items={
+                      isPublic
+                        ? [
+                            {
+                              id: "1",
+                              title: "Preview event",
+                              icon: IconEnum.eye,
+                              onClick: () =>
+                                setDrawer((prev) => ({
+                                  ...prev,
+                                  title: "Preview event",
+                                  type: "entity_preview",
+                                  data: { id: event.id, parent_id: calendar_id, entity_type: "events" },
+                                  size: "lg",
+                                })),
                             },
-                          },
-                        ]
-                  }>
-                  <Button hasNoBackground icon={IconEnum.actions} iconSize={24} isIconOnly onClick={undefined} />
-                </Dropdown>
+                            {
+                              id: "2",
+                              title: "Preview document",
+                              icon: IconEnum.text_align_justify,
+                              isDisabled: !event.document_id,
+                              onClick: () =>
+                                setDrawer((prev) => ({
+                                  ...prev,
+                                  title: "Preview document",
+                                  type: "entity_preview",
+                                  size: "lg",
+                                  data: { id: event.document_id as string, entity_type: "documents" },
+                                })),
+                            },
+                          ]
+                        : [
+                            {
+                              id: "1",
+                              title: "Edit event",
+                              icon: IconEnum.edit,
+                              isDisabled: !updatePermissions,
+                              onClick: () =>
+                                setDrawer((prev) => ({
+                                  ...prev,
+                                  title: "Edit event",
+                                  type: "events",
+                                  data: { id: event.id, parent_id: calendar_id },
+                                  size: "lg",
+                                })),
+                            },
+                            {
+                              id: "2",
+                              title: "Preview document",
+                              icon: IconEnum.text_align_justify,
+                              isDisabled: !event.document_id,
+                              onClick: () =>
+                                setDrawer((prev) => ({
+                                  ...prev,
+                                  title: "Preview document",
+                                  type: "entity_preview",
+                                  size: "lg",
+                                  data: { id: event.document_id as string, entity_type: "documents" },
+                                })),
+                            },
+                            {
+                              id: "3",
+                              title: "Delete event",
+                              isDisabled: !deletePermissions,
+                              icon: IconEnum.trash,
+                              onClick: () => {
+                                deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
+                              },
+                            },
+                          ]
+                    }>
+                    <Button hasNoBackground icon={IconEnum.actions} iconSize={24} isIconOnly onClick={undefined} />
+                  </Dropdown>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   });
@@ -1029,9 +1055,12 @@ export function CalendarView({
             calendar_id={calendar.id}
             deleteEvent={deleteEvent}
             events={events?.data || []}
+            isProjectOwner={isProjectOwner}
             isPublic={!!isPublic}
             months={calendar?.months || []}
+            permissions={permissions}
             setDrawer={setDrawer}
+            user={user}
           />
         </div>
       ) : null}
@@ -1041,8 +1070,11 @@ export function CalendarView({
           eras={calendar?.eras || []}
           events={events?.data || []}
           id={id}
+          isProjectOwner={isProjectOwner}
           isPublic={isPublic}
           months={calendar?.months || []}
+          permissions={permissions}
+          user={user}
         />
       ) : null}
     </div>

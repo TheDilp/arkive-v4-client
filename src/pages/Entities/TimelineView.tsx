@@ -7,12 +7,13 @@ import { clamp } from "remirror";
 
 import { Button, Input, Select } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
-import { EraType, EventType, MonthType } from "../../types";
+import { EraType, EventType, MonthType, UserHasPermissionsType, UserType } from "../../types";
 import {
   contextMenuAtom,
   DefaultTagColor,
   drawerAtom,
   getDayOrdinal,
+  hasActionPermission,
   IconEnum,
   projectFeatureFlagsAtom,
   timelineZoomOptions,
@@ -61,12 +62,18 @@ export function TimelineView({
   events,
   months,
   eras,
+  user,
+  isProjectOwner,
+  permissions,
 }: {
   id?: string;
   isPublic?: boolean;
   events: EventType[];
   months: MonthType[];
   eras: EraType[];
+  user: UserType | null;
+  isProjectOwner: boolean;
+  permissions: UserHasPermissionsType;
 }) {
   const { project_id, item_id } = useParams();
   const { isLg } = useBreakpoint();
@@ -178,6 +185,8 @@ export function TimelineView({
           return {
             id: e.id,
             parent_id: e.parent_id,
+            owner_id: e.owner_id,
+            permissions: e.permissions,
             x: isYearsOnly
               ? e.start_year - 1 + e.start_day * 0.01
               : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
@@ -197,6 +206,8 @@ export function TimelineView({
               id: e.id,
               start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
               start_year: e.start_year,
+              owner_id: e.owner_id,
+              permissions: e.permissions,
               image_id: e.image_id,
               index,
               end_x: isYearsOnly
@@ -269,22 +280,33 @@ export function TimelineView({
             .attr("x", x(e.x) + 20)
             .attr("y", 30);
         });
-        event_bars.forEach((e, j) => {
+        event_bars.forEach((event, j) => {
           const event_bar = groupForBars.append("g");
-          const bar_width = x(e.end_x) - x(e.start_x);
+          const bar_width = x(event.end_x) - x(event.start_x);
           event_bar
             .append("rect")
-            .on("click", () =>
-              setDrawer((prev) => ({
-                ...prev,
-                size: "lg",
-                title: `Edit event - ${e.title}`,
-                type: "events",
-                data: {
-                  id: e.id,
-                },
-              })),
-            )
+            .on("click", () => {
+              if (
+                hasActionPermission(
+                  isProjectOwner,
+                  user?.id === event?.owner_id,
+                  permissions,
+                  event?.permissions || [],
+                  "update_events",
+                  user?.role?.id,
+                )
+              ) {
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: `Edit event - ${event.title}`,
+                  type: "events",
+                  data: {
+                    id: event.id,
+                  },
+                }));
+              }
+            })
             .on("contextmenu", (evt: MouseEvent) => {
               evt.preventDefault();
               setContextMenu({
@@ -301,7 +323,7 @@ export function TimelineView({
                               ...prev,
                               title: "Preview event",
                               type: "entity_preview",
-                              data: { id: e.id, parent_id: e.parent_id, entity_type: "events" },
+                              data: { id: event.id, parent_id: event.parent_id, entity_type: "events" },
                               size: "lg",
                             })),
                         },
@@ -311,21 +333,37 @@ export function TimelineView({
                           id: "1",
                           title: "Edit event",
                           icon: IconEnum.add,
+                          isDisabled: !hasActionPermission(
+                            isProjectOwner,
+                            user?.id === event?.owner_id,
+                            permissions,
+                            event?.permissions || [],
+                            "update_events",
+                            user?.role?.id,
+                          ),
                           onClick: () =>
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Edit event",
                               type: "events",
-                              data: { id: e.id, parent_id: e.parent_id },
+                              data: { id: event.id, parent_id: event.parent_id },
                               size: "lg",
                             })),
                         },
                         {
                           id: "2",
                           title: "Delete event",
+                          isDisabled: !hasActionPermission(
+                            isProjectOwner,
+                            user?.id === event?.owner_id,
+                            permissions,
+                            event?.permissions || [],
+                            "delete_events",
+                            user?.role?.id,
+                          ),
                           icon: IconEnum.trash,
                           onClick: () => {
-                            deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                            deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
                           },
                         },
                       ],
@@ -346,7 +384,7 @@ export function TimelineView({
                       Number(evt.currentTarget.getAttribute("y")) - 25 ?? 0
                     }px)`,
                   )
-                  .html(`${e.title} ${e.date_string}`);
+                  .html(`${event.title} ${event.date_string}`);
             })
             .on("mouseout", () => {
               tooltip.style("display", "none");
@@ -354,10 +392,10 @@ export function TimelineView({
             .attr("width", bar_width)
             .attr("height", 30)
             .attr("class", "event-bar")
-            .attr("x", x(e.start_x))
+            .attr("x", x(event.start_x))
             .attr("y", j * 30 + 80)
             .attr("cursor", "pointer")
-            .style("fill", e.background_color);
+            .style("fill", event.background_color);
 
           event_bar
             .append("text")
@@ -365,26 +403,26 @@ export function TimelineView({
             .attr("class", "event-text")
             .attr("width", bar_width - 10)
             .text(() => {
-              const title = `${e.title} ${e.date_string}`;
+              const title = `${event.title} ${event.date_string}`;
               if (title.length > bar_width - 10) {
                 return `${title.slice(0, title.length / 2)}...`;
               }
               return title;
             })
             .attr("fill", "white")
-            .attr("x", x(e.start_x) + 10)
+            .attr("x", x(event.start_x) + 10)
             .attr("y", j * 30 + 100);
         });
 
-        points.forEach((e) => {
+        points.forEach((event) => {
           groupForCircles
             .append("g")
             .append("circle")
             .attr("class", "cursor-pointer")
-            .attr("cx", x(e.x))
-            .attr("cy", y(e.y))
+            .attr("cx", x(event.x))
+            .attr("cy", y(event.y))
             .attr("r", CIRCLE_RADIUS)
-            .style("fill", e.background_color)
+            .style("fill", event.background_color)
             .style("stroke", "white")
             .style("stroke-opacity", "20%")
             .on("mouseover", (evt: MouseEvent) => {
@@ -396,22 +434,33 @@ export function TimelineView({
                     Number(evt.currentTarget.getAttribute("cy")) ?? 0
                   }px)`,
                 )
-                .html(e.title);
+                .html(event.title);
             })
             .on("mouseout", () => {
               tooltip.style("display", "none");
             })
-            .on("click", () =>
-              setDrawer((prev) => ({
-                ...prev,
-                size: "lg",
-                title: `Edit event - ${e.title}`,
-                type: "events",
-                data: {
-                  id: e.id,
-                },
-              })),
-            )
+            .on("click", () => {
+              if (
+                hasActionPermission(
+                  isProjectOwner,
+                  user?.id === event?.owner_id,
+                  permissions,
+                  event?.permissions || [],
+                  "update_events",
+                  user?.role?.id,
+                )
+              ) {
+                setDrawer((prev) => ({
+                  ...prev,
+                  size: "lg",
+                  title: `Edit event - ${event.title}`,
+                  type: "events",
+                  data: {
+                    id: event.id,
+                  },
+                }));
+              }
+            })
             .on("contextmenu", (evt: MouseEvent) => {
               evt.preventDefault();
               setContextMenu({
@@ -428,7 +477,7 @@ export function TimelineView({
                               ...prev,
                               title: "Preview event",
                               type: "entity_preview",
-                              data: { id: e.id, parent_id: e.parent_id, entity_type: "events" },
+                              data: { id: event.id, parent_id: event.parent_id, entity_type: "events" },
                               size: "lg",
                             })),
                         },
@@ -438,21 +487,37 @@ export function TimelineView({
                           id: "1",
                           title: "Edit event",
                           icon: IconEnum.add,
+                          isDisabled: !hasActionPermission(
+                            isProjectOwner,
+                            user?.id === event?.owner_id,
+                            permissions,
+                            event?.permissions || [],
+                            "update_events",
+                            user?.role?.id,
+                          ),
                           onClick: () =>
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Edit event",
                               type: "events",
-                              data: { id: e.id, parent_id: e.parent_id },
+                              data: { id: event.id, parent_id: event.parent_id },
                               size: "lg",
                             })),
                         },
                         {
                           id: "2",
                           title: "Delete event",
+                          isDisabled: !hasActionPermission(
+                            isProjectOwner,
+                            user?.id === event?.owner_id,
+                            permissions,
+                            event?.permissions || [],
+                            "delete_events",
+                            user?.role?.id,
+                          ),
                           icon: IconEnum.trash,
                           onClick: () => {
-                            deleteEvent({ data: { id: e.id, parent_id: e.parent_id } });
+                            deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
                           },
                         },
                       ],
