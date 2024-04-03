@@ -67,7 +67,7 @@ export function Gallery({ images, isOpenable, columns = 4, size = "md", type }: 
       <div
         className={base()}
         style={{
-          height: `${rowSize - 6}rem`,
+          height: `${rowSize}rem`,
           gridAutoRows: `${rowSize}rem`,
         }}>
         {images.map((image) => (
