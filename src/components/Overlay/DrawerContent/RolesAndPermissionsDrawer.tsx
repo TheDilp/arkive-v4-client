@@ -111,7 +111,7 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
               const formattedRole = {
                 title: role.title,
                 project_id: role.project_id,
-                icon: role.icon,
+                icon: role.icon || IconEnum.permissions,
                 permissions: Object.entries(role.permissions ?? {})
                   .map(([key, value]) => {
                     if (value) return key;
