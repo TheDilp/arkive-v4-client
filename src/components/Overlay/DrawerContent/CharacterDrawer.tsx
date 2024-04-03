@@ -109,12 +109,12 @@ function FieldTemplateRows({
   character_fields = [],
   character_fields_data = [],
   handleChange,
-  canCreateOrEdit,
+  hasCreateOrEdit,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
-  canCreateOrEdit: boolean;
+  hasCreateOrEdit: boolean;
 }) {
   return (
     <li className="flex flex-col first:mt-0">
@@ -136,7 +136,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -154,7 +154,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 options={template_field.options || []}
                 title={template_field.title}
@@ -170,7 +170,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -185,7 +185,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -201,7 +201,7 @@ function FieldTemplateRows({
                 formula={template_field.formula as string}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -217,7 +217,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -233,7 +233,7 @@ function FieldTemplateRows({
                 }
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 random_table={template_field.random_table}
                 title={template_field.title}
@@ -253,7 +253,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -270,7 +270,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -287,7 +287,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -303,7 +303,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -319,7 +319,7 @@ function FieldTemplateRows({
                 fieldType={template_field.field_type}
                 handleChange={handleChange}
                 id={template_field.id}
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 title={template_field.title}
               />
@@ -340,7 +340,7 @@ function AdditionalFieldsTab({
   character_fields,
   isLoading,
   tags,
-  canCreateOrEdit,
+  hasCreateOrEdit,
 }: {
   templates:
     | {
@@ -351,7 +351,7 @@ function AdditionalFieldsTab({
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   tags?: Omit<TagType, "owner_id" | "permissions">[];
-  canCreateOrEdit: boolean;
+  hasCreateOrEdit: boolean;
 }) {
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
@@ -364,10 +364,10 @@ function AdditionalFieldsTab({
           <Collapsible key={t.id} label={t.title}>
             <div className="p-2">
               <FieldTemplateRows
-                canCreateOrEdit={canCreateOrEdit}
                 character_fields={t.character_fields}
                 character_fields_data={character_fields || []}
                 handleChange={handleChange}
+                hasCreateOrEdit={hasCreateOrEdit}
               />
             </div>
           </Collapsible>
@@ -447,7 +447,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "characters",
     project_id as string,
   );
-  const canCreateOrEdit = createOrEditPermission(
+  const hasCreateOrEdit = createOrEditPermission(
     permissions?.create_characters,
     permissions?.update_characters,
     permissions?.is_owner,
@@ -534,7 +534,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="w-full lg:w-1/2">
               <Input
                 isAutofocused
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 label="First name"
                 name="first_name"
                 onChange={handleChange}
@@ -543,7 +543,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 label="Nickname (optional)"
                 name="nickname"
                 onChange={handleChange}
@@ -552,7 +552,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             </div>
             <div className="w-full lg:w-1/2">
               <Input
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 label="Last name (optional)"
                 name="last_name"
                 onChange={handleChange}
@@ -564,7 +564,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <span className="text-sm text-zinc-300">Character image (optional)</span>
             {!character?.portrait?.id ? (
               <ImageSelect
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 isIconOnly
                 name="portrait"
                 onChange={({ name, label, value }) => {
@@ -582,7 +582,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             )}
           </div>
           <Input
-            isDisabled={!canCreateOrEdit}
+            isDisabled={!hasCreateOrEdit}
             label="Age (optional)"
             name="age"
             onChange={handleChange}
@@ -594,7 +594,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <li className="flex items-center justify-between">
               <span>Favorite:</span>
               <Checkbox
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name="is_favorite"
                 onChange={handleChange}
                 value={character?.is_favorite ?? false}
@@ -603,7 +603,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
             <div className="flex w-full items-center justify-between">
               <span>Is public:</span>
               <Checkbox
-                isDisabled={!canCreateOrEdit}
+                isDisabled={!hasCreateOrEdit}
                 name="is_public"
                 onChange={handleChange}
                 value={character?.is_public ?? false}
@@ -615,14 +615,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       {tabs[selectedTab].id === "2" ? (
         <Editor
           initialContent={character?.biography || undefined}
-          isDisabled={!canCreateOrEdit}
+          isDisabled={!hasCreateOrEdit}
           name="biography"
           onChange={handleChange}
         />
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div className="flex flex-col gap-y-2 p-2">
-          {canCreateOrEdit ? (
+          {hasCreateOrEdit ? (
             <div className="flex flex-nowrap items-center justify-between">
               <span>Insert new type:</span>
               <Dropdown
@@ -655,7 +655,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     {isOther ? (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          isDisabled={!canCreateOrEdit}
+                          isDisabled={!hasCreateOrEdit}
                           name="related_other"
                           onChange={({ label, value, image }) => {
                             if (character?.id && character.id === value) {
@@ -698,7 +698,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             <RelationshipRow
                               character_name={char.full_name}
                               handleRemove={
-                                canCreateOrEdit
+                                hasCreateOrEdit
                                   ? (character_b_id: string) =>
                                       handleChange({
                                         name: "related_other",
@@ -715,7 +715,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     ) : (
                       <div className="flex flex-col gap-y-2 p-2">
                         <Search
-                          isDisabled={!canCreateOrEdit}
+                          isDisabled={!hasCreateOrEdit}
                           label="Ascendants"
                           name="related_to"
                           onChange={({ value, image, label }) => {
@@ -761,7 +761,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               <RelationshipRow
                                 character_name={char.full_name}
                                 handleRemove={
-                                  canCreateOrEdit
+                                  hasCreateOrEdit
                                     ? (character_b_id: string) =>
                                         handleChange({
                                           name: "related_to",
@@ -775,7 +775,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                             ))}
                         </div>
                         <Search
-                          isDisabled={!canCreateOrEdit}
+                          isDisabled={!hasCreateOrEdit}
                           label="Descendants"
                           name="related_from"
                           onChange={({ label, value, image }) => {
@@ -820,7 +820,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                               <RelationshipRow
                                 character_name={char.full_name}
                                 handleRemove={
-                                  canCreateOrEdit
+                                  hasCreateOrEdit
                                     ? (character_b_id: string) =>
                                         handleChange({
                                           name: "related_from",
@@ -844,14 +844,14 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {tabs[selectedTab].id === "4" && permissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} isDisabled={!canCreateOrEdit} tags={character?.tags || []} />
+          <TagInput handleChange={handleChange} isDisabled={!hasCreateOrEdit} tags={character?.tags || []} />
         </div>
       ) : null}
       {tabs[selectedTab].id === "5" && permissions?.read_character_fields_templates ? (
         <AdditionalFieldsTab
-          canCreateOrEdit={canCreateOrEdit && permissions?.read_character_fields_templates}
           character_fields={character?.character_fields || []}
           handleChange={handleChange}
+          hasCreateOrEdit={hasCreateOrEdit && permissions?.read_character_fields_templates}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
           templates={{ data: uniqueBy(templates?.data || [], "id") }}
@@ -869,7 +869,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character) || !canCreateOrEdit || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character) || !hasCreateOrEdit || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {
