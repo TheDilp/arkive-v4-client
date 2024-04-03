@@ -122,8 +122,8 @@ function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprin
         <Tooltip
           content={characters
             ?.slice(5)
-            .map((char) => char.character.full_name || "")
-            .join(", ")}>
+            ?.map((char) => char?.character?.full_name || "")
+            ?.join(", ")}>
           <div className="w-min max-w-min">
             <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />
           </div>
