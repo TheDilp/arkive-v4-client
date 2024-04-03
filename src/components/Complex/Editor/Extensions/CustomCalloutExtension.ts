@@ -49,6 +49,9 @@ interface CustomCalloutOptions {
 }
 
 @extension<CustomCalloutOptions>({
+  staticKeys: [],
+  handlerKeys: [],
+  customHandlerKeys: [],
   defaultOptions: {
     type: "info",
     customColor: null,

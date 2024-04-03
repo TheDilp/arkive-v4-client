@@ -1,4 +1,5 @@
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch } from "react";
@@ -240,7 +241,7 @@ function createColumns(
   user_id: string,
   user_role_id: string | undefined,
 ) {
-  const fieldColumns = [
+  const fieldColumns: ColumnDef<BlueprintInstanceType, any>[] = [
     columnHelper.accessor("title", {
       id: "title",
       header: title_name,

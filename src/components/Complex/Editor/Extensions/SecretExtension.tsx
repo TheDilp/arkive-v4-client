@@ -25,6 +25,9 @@ interface SecretOptions {
 }
 
 @extension<SecretOptions>({
+  staticKeys: [],
+  handlerKeys: [],
+  customHandlerKeys: [],
   defaultOptions: {
     secret: true,
     classNames: "secretBlock",

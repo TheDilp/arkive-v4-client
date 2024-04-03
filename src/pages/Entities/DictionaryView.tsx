@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, useLayoutEffect, useState } from "react";
@@ -27,7 +28,7 @@ function createColumns(
   webhooks: WebhookType[],
   is_public?: boolean,
 ) {
-  const actions = [
+  const columns: ColumnDef<any, any>[] = [
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -48,7 +49,7 @@ function createColumns(
     }),
   ];
   if (!is_public)
-    actions.push(
+    columns.push(
       columnHelper.display({
         id: "action",
         header: "Actions",
@@ -128,7 +129,7 @@ function createColumns(
     );
 
   if (is_public)
-    actions.push(
+    columns.push(
       columnHelper.display({
         id: "action",
         header: "Actions",
@@ -154,7 +155,7 @@ function createColumns(
       }),
     );
 
-  return actions;
+  return columns;
 }
 
 export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boolean }) {

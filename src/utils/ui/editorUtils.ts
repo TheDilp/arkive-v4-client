@@ -131,7 +131,7 @@ export function DefaultEditorExtensions(
   });
   return [
     new MarkdownExtension({}),
-    new AnnotationExtension(),
+    new AnnotationExtension({}),
     new SecretExtension({
       secret: true,
     }),

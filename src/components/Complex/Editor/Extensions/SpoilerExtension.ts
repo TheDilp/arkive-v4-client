@@ -15,7 +15,11 @@ import {
   toggleMark,
 } from "remirror";
 
-@extension({})
+@extension({
+  staticKeys: [],
+  defaultOptions: {},
+  handlerKeys: [],
+})
 // eslint-disable-next-line no-use-before-define
 class SpoilerExtension extends MarkExtension<SpoilerOptions> {
   get name() {
