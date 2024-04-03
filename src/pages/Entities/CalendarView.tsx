@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
@@ -19,7 +20,14 @@ import {
   Skeleton,
   Tooltip,
 } from "../../components";
-import { useChangeNavbarTitle, useDeleteSubEntity, useGetEntities, useGetEntity, useGetSubEntity } from "../../hooks";
+import {
+  useChangeNavbarTitle,
+  useDeleteSubEntity,
+  useGetEntities,
+  useGetEntity,
+  useGetSubEntity,
+  useHasPermissions,
+} from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
 import {
@@ -38,7 +46,9 @@ import {
   getImageURL,
   getLeapDays,
   getStartingDayForMonth,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   projectFeatureFlagsAtom,
   userAtom,
 } from "../../utils";
@@ -308,6 +318,7 @@ export function CalendarView({
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setContextMenu = useSetAtom(contextMenuAtom);
 
@@ -341,7 +352,7 @@ export function CalendarView({
     "calendars",
     {
       data: { project_id },
-      fields: ["id", "title", "icon", "days", "hours", "minutes", "is_public"],
+      fields: ["id", "owner_id", "title", "icon", "days", "hours", "minutes", "is_public"],
       relations: {
         eras: featureFlags?.show_eras_in_calendars || featureFlags?.show_eras_in_timelines || false,
         months: true,
@@ -356,6 +367,21 @@ export function CalendarView({
 
   const calendar = data ?? existingCalendar?.data;
 
+  const permissions = useHasPermissions(
+    [
+      "read_calendars",
+      "read_events",
+      "create_events",
+      "update_events",
+      "read_tags",
+      "read_characters",
+      "read_map_pins",
+      "read_assets",
+      "read_documents",
+    ],
+    calendar?.owner_id,
+  );
+
   const { data: events, isLoading } = useGetEntities<EventType>(
     {
       data: { project_id, parent_id: item_id || id },
@@ -364,6 +390,7 @@ export function CalendarView({
       },
       fields: [
         "id",
+        "owner_id",
         "title",
         "image_id",
         "background_color",
@@ -394,6 +421,7 @@ export function CalendarView({
               document: true,
             }
           : {},
+      permissions: true,
       orderBy: [
         { field: "start_hours", sort: "asc" },
         { field: "start_minutes", sort: "asc" },
@@ -623,6 +651,7 @@ export function CalendarView({
           <div className="w-fit self-end">
             <Button
               icon={IconEnum.add}
+              isDisabled={!permissions?.create_events}
               label="Create new event"
               onClick={() => {
                 setDrawer((prev) => ({
@@ -650,7 +679,6 @@ export function CalendarView({
               key={day}
               className="group sticky top-0 col-span-1 h-min border-b border-r border-zinc-700 bg-black px-2 text-white"
               onKeyDown={() => {}}
-              role="button"
               tabIndex={-1}>
               {day}
             </div>
@@ -662,7 +690,6 @@ export function CalendarView({
                 key={day}
                 className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white"
                 onKeyDown={() => {}}
-                role="button"
                 tabIndex={-1}>
                 <DayNumber
                   key={day}
@@ -709,33 +736,51 @@ export function CalendarView({
                 />
                 <div className="flex flex-col gap-y-0.5 overflow-auto px-1">
                   {(isLoading ? [] : filteredEvents || []).slice(0, 7).map((event) => {
+                    const readPermission = hasActionPermission(
+                      isProjectOwner,
+                      user?.id === event?.owner_id,
+                      permissions,
+                      event?.permissions || [],
+                      "read_events",
+                      user?.role?.id,
+                    );
+                    const updatePermission = hasActionPermission(
+                      isProjectOwner,
+                      user?.id === event?.owner_id,
+                      permissions,
+                      event?.permissions || [],
+                      "update_events",
+                      user?.role?.id,
+                    );
                     return (
                       <div
                         key={event.id}
-                        className="cursor-pointer"
-                        onClick={() =>
-                          id || isPublic
-                            ? setDrawer((prev) => ({
-                                ...prev,
-                                title: "Preview event",
-                                type: "entity_preview",
-                                data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
-                                size: "lg",
-                              }))
-                            : setDrawer((prev) => ({
-                                ...prev,
-                                title: "Edit event",
-                                type: "events",
-                                data: { id: event.id, parent_id: calendar.id, month: date.month, year: date.year },
-                                size: "lg",
-                              }))
-                        }
+                        className={updatePermission ? "cursor-pointer" : "cursor-not-allowed"}
+                        onClick={() => {
+                          if ((id && readPermission) || isPublic) {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: "Preview event",
+                              type: "entity_preview",
+                              data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
+                              size: "lg",
+                            }));
+                          } else if (!isPublic && updatePermission) {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: "Edit event",
+                              type: "events",
+                              data: { id: event.id, parent_id: calendar.id, month: date.month, year: date.year },
+                              size: "lg",
+                            }));
+                          }
+                        }}
                         onContextMenu={(e: any) => {
                           e.preventDefault();
                           setContextMenu({
                             event: e,
                             items:
-                              id || isPublic
+                              (id && readPermission) || isPublic
                                 ? [
                                     {
                                       id: "1",
@@ -756,6 +801,7 @@ export function CalendarView({
                                       id: "1",
                                       title: "Edit event",
                                       icon: IconEnum.edit,
+                                      isDisabled: !updatePermission,
                                       onClick: () =>
                                         setDrawer((prev) => ({
                                           ...prev,
@@ -768,6 +814,14 @@ export function CalendarView({
                                     {
                                       id: "2",
                                       title: "Delete event",
+                                      isDisabled: !hasActionPermission(
+                                        isProjectOwner,
+                                        user?.id === event?.owner_id,
+                                        permissions,
+                                        event?.permissions || [],
+                                        "delete_events",
+                                        user?.role?.id,
+                                      ),
                                       icon: IconEnum.trash,
                                       onClick: () => {
                                         deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
@@ -777,7 +831,6 @@ export function CalendarView({
                           });
                         }}
                         onKeyDown={() => {}}
-                        role="button"
                         tabIndex={-1}>
                         {event.image_id ? (
                           <div className="relative h-24 w-full overflow-hidden rounded-md">
@@ -814,85 +867,122 @@ export function CalendarView({
                             )}`}
                           </h4>
                           <ul className="flex flex-col gap-y-0.5">
-                            {filteredEvents.slice(7).map((e) => (
-                              <li
-                                key={e.id}
-                                onClick={() =>
-                                  id || isPublic
-                                    ? setDrawer((prev) => ({
+                            {filteredEvents.slice(7).map((event) => {
+                              const readPermission = hasActionPermission(
+                                isProjectOwner,
+                                user?.id === event?.owner_id,
+                                permissions,
+                                event?.permissions || [],
+                                "read_events",
+                                user?.role?.id,
+                              );
+                              const updatePermission = hasActionPermission(
+                                isProjectOwner,
+                                user?.id === event?.owner_id,
+                                permissions,
+                                event?.permissions || [],
+                                "update_events",
+                                user?.role?.id,
+                              );
+                              return (
+                                <li
+                                  key={event.id}
+                                  className={updatePermission ? "" : "cursor-not-allowed"}
+                                  onClick={() => {
+                                    if ((id && readPermission) || isPublic) {
+                                      setDrawer((prev) => ({
                                         ...prev,
                                         title: "Preview event",
                                         type: "entity_preview",
-                                        data: { id: e.id, parent_id: calendar.id, entity_type: "events" },
+                                        data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
                                         size: "lg",
-                                      }))
-                                    : setDrawer((prev) => ({
+                                      }));
+                                    } else if (!isPublic && updatePermission) {
+                                      setDrawer((prev) => ({
                                         ...prev,
                                         title: "Edit event",
                                         type: "events",
-                                        data: { id: e.id, parent_id: calendar.id, month: date.month, year: date.year },
+                                        data: { id: event.id, parent_id: calendar.id, month: date.month, year: date.year },
                                         size: "lg",
-                                      }))
-                                }
-                                onContextMenu={(evt: any) => {
-                                  evt.preventDefault();
-                                  setContextMenu({
-                                    event: evt,
-                                    items:
-                                      id || isPublic
-                                        ? [
-                                            {
-                                              id: "1",
-                                              title: "Preview event",
-                                              icon: IconEnum.eye,
-                                              onClick: () =>
-                                                setDrawer((prev) => ({
-                                                  ...prev,
-                                                  title: "Preview event",
-                                                  type: "entity_preview",
-                                                  data: { id: evt.id, parent_id: calendar.id, entity_type: "events" },
-                                                  size: "lg",
-                                                })),
-                                            },
-                                          ]
-                                        : [
-                                            {
-                                              id: "1",
-                                              title: "Edit event",
-                                              icon: IconEnum.edit,
-                                              onClick: () =>
-                                                setDrawer((prev) => ({
-                                                  ...prev,
-                                                  title: "Edit event",
-                                                  type: "events",
-                                                  data: {
-                                                    id: evt.id,
-                                                    parent_id: calendar.id,
-                                                    month: date.month,
-                                                    year: date.year,
-                                                  },
-                                                  size: "lg",
-                                                })),
-                                            },
-                                            {
-                                              id: "2",
-                                              title: "Delete event",
-                                              icon: IconEnum.trash,
-                                              onClick: () => {
-                                                deleteEvent({ data: { id: evt.id, parent_id: evt.parent_id } });
+                                      }));
+                                    }
+                                  }}
+                                  onContextMenu={(evt: any) => {
+                                    evt.preventDefault();
+                                    setContextMenu({
+                                      event: evt,
+                                      items:
+                                        id || isPublic
+                                          ? [
+                                              {
+                                                id: "1",
+                                                title: "Preview event",
+                                                icon: IconEnum.eye,
+                                                onClick: () =>
+                                                  setDrawer((prev) => ({
+                                                    ...prev,
+                                                    title: "Preview event",
+                                                    type: "entity_preview",
+                                                    data: { id: evt.id, parent_id: calendar.id, entity_type: "events" },
+                                                    size: "lg",
+                                                  })),
                                               },
-                                            },
-                                          ],
-                                  });
-                                }}>
-                                <Badge
-                                  customColor={e.background_color || DefaultTagColor}
-                                  label={`${e.title} ${e.start_day === day + 1 && !!e.end_day ? "(start)" : ""} ${
-                                    e.end_day === day + 1 ? "(end)" : ""
-                                  }`}
-                                />
-                              </li>
-                            ))}
+                                            ]
+                                          : [
+                                              {
+                                                id: "1",
+                                                title: "Edit event",
+                                                icon: IconEnum.edit,
+                                                isDisabled: !hasActionPermission(
+                                                  isProjectOwner,
+                                                  user?.id === event?.owner_id,
+                                                  permissions,
+                                                  event?.permissions || [],
+                                                  "update_events",
+                                                  user?.role?.id,
+                                                ),
+                                                onClick: () =>
+                                                  setDrawer((prev) => ({
+                                                    ...prev,
+                                                    title: "Edit event",
+                                                    type: "events",
+                                                    isDisabled: !hasActionPermission(
+                                                      isProjectOwner,
+                                                      user?.id === event?.owner_id,
+                                                      permissions,
+                                                      event?.permissions || [],
+                                                      "delete_events",
+                                                      user?.role?.id,
+                                                    ),
+                                                    data: {
+                                                      id: evt.id,
+                                                      parent_id: calendar.id,
+                                                      month: date.month,
+                                                      year: date.year,
+                                                    },
+                                                    size: "lg",
+                                                  })),
+                                              },
+                                              {
+                                                id: "2",
+                                                title: "Delete event",
+                                                icon: IconEnum.trash,
+                                                onClick: () => {
+                                                  deleteEvent({ data: { id: evt.id, parent_id: evt.parent_id } });
+                                                },
+                                              },
+                                            ],
+                                    });
+                                  }}>
+                                  <Badge
+                                    customColor={event.background_color || DefaultTagColor}
+                                    label={`${event.title} ${event.start_day === day + 1 && !!event.end_day ? "(start)" : ""} ${
+                                      event.end_day === day + 1 ? "(end)" : ""
+                                    }`}
+                                  />
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       }>
@@ -918,7 +1008,6 @@ export function CalendarView({
                 key={day}
                 className="group col-span-1 h-56 cursor-default border-b border-r border-zinc-700 hover:text-white"
                 onKeyDown={() => {}}
-                role="button"
                 tabIndex={-1}>
                 <DayNumber
                   key={day}

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { tv } from "tailwind-variants";
 
 import { BadgeType } from "../../types";
@@ -34,7 +35,6 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
     <span
       className={BadgeClasses({ variant, hasClearAction: !!clearAction, size, isColorWhite: customColor === "#ffffff" })}
       onKeyDown={() => {}}
-      role="button"
       style={{
         backgroundColor: customColor,
       }}
