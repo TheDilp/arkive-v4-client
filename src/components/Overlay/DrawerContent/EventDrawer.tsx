@@ -106,6 +106,7 @@ export function EventDrawer({ data }: Props) {
       relations: { tags: true, image: true, document: true, characters: true, map_pins: true },
       fields: [
         "id",
+        "owner_id",
         "title",
         "background_color",
         "parent_id",
@@ -597,7 +598,7 @@ export function EventDrawer({ data }: Props) {
           owner_id={event?.owner_id}
           permissions={event?.permissions || []}
           related_id={event?.id || null}
-          selectablePermissions={["read_characters", "update_characters", "delete_characters"]}
+          selectablePermissions={["read_events", "update_events", "delete_events"]}
         />
       ) : null}
 
