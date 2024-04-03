@@ -13,11 +13,12 @@ import {
   useDeleteSubEntity,
   useGenerateGraph,
   useGetEntity,
+  useHasPermissions,
   useUpdateManySubEntities,
 } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
 import { GraphType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { hasActionPermission, IconEnum, useNotifications } from "../../utils";
 import {
   BoardReferenceAtom,
   BoardStateAtom,
@@ -26,7 +27,9 @@ import {
   dialogAtom,
   drawerAtom,
   edgesAtom,
+  isProjectOwnerAtom,
   nodesAtom,
+  userAtom,
 } from "../../utils/atoms";
 import { cytoscapeGridOptions, dagreLayoutOptions, DefaultNode, getCytoscapeStylesheet } from "../../utils/enums/GraphEnums";
 import { changeLockState, edgehandlesSettings, mapEdges, mapNodes } from "../../utils/ui/graphUtils";
@@ -47,12 +50,14 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   const { project_id, item_id, subitem_id } = useParams();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const dialogValue = useAtomValue(dialogAtom);
+
   const { data: existingGraphData, isFetching } = useGetEntity<GraphType>(
     item_id,
     "graphs",
     {
-      fields: ["title", "is_public", "default_node_shape", "default_node_color", "default_edge_color"],
+      fields: ["owner_id", "title", "is_public", "default_node_shape", "default_node_color", "default_edge_color"],
       relations: { nodes: true, edges: true, parents: true },
+      permissions: true,
     },
     { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view", item_id as string], isPublic },
   );
@@ -66,6 +71,17 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }, [existingGraphData, setBreadcrumbs, item_id]);
 
   const graph = existingGraphData?.data || data;
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(["read_graphs", "update_graphs", "delete_graphs", "read_tags"], graph?.owner_id);
+  const updateGraphActionPermission = hasActionPermission(
+    isProjectOwner,
+    user?.id === graph?.owner_id,
+    permissions,
+    graph?.permissions || [],
+    "update_graphs",
+    user?.role?.id,
+  );
 
   useChangeNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
@@ -99,6 +115,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
   function makeEdgeCallback(source: string, target: string, color?: string) {
     cyRef?.current?._cy?.remove(".eh-ghost-edge");
+    if (!updateGraphActionPermission) return;
     const newEdge = {
       id: crypto.randomUUID(),
       source_id: source,
@@ -166,6 +183,14 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                 id: "1",
                 title: "New node",
                 icon: IconEnum.add,
+                isDisabled: !hasActionPermission(
+                  isProjectOwner,
+                  user?.id === graph?.owner_id,
+                  permissions,
+                  graph?.permissions || [],
+                  "update_graphs",
+                  user?.role?.id,
+                ),
                 onClick: () => {
                   createNode({
                     data: {
@@ -232,6 +257,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         id: "1",
                         title: "Edit node",
                         icon: IconEnum.edit,
+                        isDisabled: !updateGraphActionPermission,
                         onClick: () =>
                           setDrawer((prev) => ({
                             ...prev,
@@ -262,6 +288,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         title: locked ? "Unlock node" : "Lock node",
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
+                        isDisabled: !updateGraphActionPermission,
                       },
                       {
                         id: "4",
@@ -275,6 +302,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         id: "5",
                         title: "Delete node",
                         icon: IconEnum.trash,
+                        isDisabled: !updateGraphActionPermission,
                         onClick: () =>
                           deleteNode(
                             { data: { id, parent_id: item_id as string } },
@@ -292,6 +320,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                       {
                         id: "6",
                         title: "Edit multiple nodes",
+                        isDisabled: !updateGraphActionPermission,
                         icon: IconEnum.edit,
                         onClick: () => {
                           setDrawer((prev) => ({
@@ -308,6 +337,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                       {
                         id: "7",
                         title: locked ? "Unlock nodes" : "Lock nodes",
+                        isDisabled: !updateGraphActionPermission,
                         icon: locked ? IconEnum.unlock : IconEnum.lock,
                         onClick: () => changeLockState(cyRef?.current?._cy, !locked, updateManyNodes, item_id as string),
                       },
@@ -320,6 +350,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                       {
                         id: "9",
                         title: "Delete multiple nodes",
+                        isDisabled: !updateGraphActionPermission,
                         icon: IconEnum.trash,
                         onClick: () => {
                           // @ts-ignore
@@ -353,6 +384,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         id: "1",
                         title: "Edit edge",
                         icon: IconEnum.edit,
+                        isDisabled: !updateGraphActionPermission,
                         onClick: () => {
                           if (edges) {
                             setDrawer((prev) => ({
@@ -383,6 +415,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         id: "3",
                         title: "Delete selected edge",
                         icon: IconEnum.trash,
+                        isDisabled: !updateGraphActionPermission,
                         onClick: () => {
                           if (edges) {
                             const ids: string[] = cyRef?.current?._cy?.edges(":selected").map((edge: any) => edge.id());
@@ -397,6 +430,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                         id: "4",
                         title: "Edit many edges",
                         icon: IconEnum.edit,
+                        isDisabled: !updateGraphActionPermission,
                         onClick: () => {
                           if (edges) {
                             setDrawer((prev) => ({
@@ -414,6 +448,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
                       {
                         id: "5",
                         title: "Delete selected edges",
+                        isDisabled: !updateGraphActionPermission,
                         icon: IconEnum.trash,
                         onClick: () => {
                           if (edges) {
@@ -449,6 +484,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
       // Double Click
       cyRef?.current?._cy.on("dbltap", "node", function (evt: any) {
+        if (!updateGraphActionPermission) return;
         const target = evt.target._private;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { backgroundImage, classes, document, locked, parent, zIndexCompare, ...rest } = target.data;
@@ -473,6 +509,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         });
       });
       cyRef?.current?._cy.on("dbltap", "edge", function (evt: any) {
+        if (!updateGraphActionPermission) return;
         const targetEdge = evt.target._private;
         setDrawer((prev) => {
           if (prev?.data && "id" in prev.data) {
@@ -527,6 +564,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     // Creating edges
     // @ts-ignore
     cyRef?.current?._cy.on("click", function (evt: any) {
+      if (!updateGraphActionPermission) return;
       // If the target is the background of the canvas
       if (evt.target === cyRef?.current?._cy && boardState.add_nodes) {
         createNode({
@@ -722,7 +760,11 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       />
       {isViewOnly || isReadOnly ? null : (
         <div className="relative flex w-full justify-center">
-          <Quickbar graphTitle={existingGraphData?.data?.title || ""} isViewOnly={isViewOnly ?? false} />
+          <Quickbar
+            graphTitle={existingGraphData?.data?.title || ""}
+            hasPermission={updateGraphActionPermission}
+            isViewOnly={isViewOnly ?? false}
+          />
         </div>
       )}
     </div>

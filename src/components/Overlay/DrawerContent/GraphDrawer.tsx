@@ -3,10 +3,11 @@ import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { GraphType } from "../../../types";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import { EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
 import { Button, Checkbox, DrawerLayout, FolderSelect, IconPicker, Input, Select, Skeleton, Tabs, TagInput } from "../..";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { ColorPicker } from "../ColorPicker";
 
 type insertGraphType = Partial<GraphType> & { parent_id?: string | null; project_id: string };
@@ -21,10 +22,16 @@ function isSaveDisabled(graph: Partial<GraphType>) {
   return false;
 }
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function GraphDrawer({ data }: { data: { id?: string; title?: string } }) {
   const { project_id, item_id } = useParams();
@@ -38,8 +45,10 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
       relations: {
         tags: true,
       },
+      permissions: true,
       fields: [
         "id",
+        "owner_id",
         "title",
         "icon",
         "parent_id",
@@ -52,6 +61,11 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
     },
     { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
+  const permissions = useHasPermissions(
+    ["read_graphs", "update_graphs", "delete_graphs", "read_tags"],
+    existingGraph?.data?.owner_id,
+  );
+  const tabs = getTabs(permissions, existingGraph?.data?.id);
 
   const [graph, setGraph] = useState<Partial<GraphType> & { project_id: string }>(
     existingGraph?.data || {
@@ -65,10 +79,12 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
     data: insertGraphType;
     relations?: graphRelationsType;
+    permissions: EntityPermissionType[];
   }>("graphs");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
     data: updateGraphType;
     relations?: graphRelationsType;
+    permissions: EntityPermissionType[];
   }>("graphs", project_id as string);
 
   useEffect(() => {
@@ -82,7 +98,7 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
   return (
     <DrawerLayout>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <div className="flex w-full flex-nowrap gap-x-2">
             <Input
@@ -135,12 +151,22 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
         </>
       ) : null}
 
-      {selectedTab === 1 ? <TagInput handleChange={handleChange} isMultiple tags={graph?.tags || []} /> : null}
+      {tabs[selectedTab].id === "2" ? <TagInput handleChange={handleChange} isMultiple tags={graph?.tags || []} /> : null}
+
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={graph?.owner_id}
+          permissions={graph?.permissions || []}
+          related_id={graph?.id || null}
+          selectablePermissions={["read_graphs", "update_graphs", "delete_graphs"]}
+        />
+      ) : null}
 
       <div>
         <Button
           icon={graph?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(graph) || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(graph) || isCreating || isUpdating || !permissions?.update_graphs}
           isLoading={isCreating || isUpdating}
           label={graph?.id ? "Save" : "Create"}
           onClick={async () => {
@@ -148,10 +174,11 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
               if (graph?.id) {
                 await update(
                   {
-                    data: omit(graph, ["tags"]),
+                    data: omit(graph, ["tags", "permissions"]),
                     relations: {
                       tags: graph?.tags,
                     },
+                    permissions: graph?.permissions || [],
                   },
                   {
                     onSettled: (res) => {
@@ -162,10 +189,11 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
               } else
                 await create(
                   {
-                    data: omit(graph, ["tags"]),
+                    data: omit(graph, ["tags", "permissions"]),
                     relations: {
                       tags: graph?.tags,
                     },
+                    permissions: graph?.permissions || [],
                   },
                   {
                     onSettled: (res) => {

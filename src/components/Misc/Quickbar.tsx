@@ -46,7 +46,15 @@ function changeCurveStyle(
   setBoardState((prev) => ({ ...prev, curve_style }));
 }
 
-export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; graphTitle: string }) {
+export function Quickbar({
+  isViewOnly,
+  graphTitle,
+  hasPermission,
+}: {
+  isViewOnly: boolean;
+  graphTitle: string;
+  hasPermission: boolean;
+}) {
   const { item_id } = useParams();
   const createNotification = useNotifications();
 
@@ -70,41 +78,39 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
       <Button
         hasNoBackground
         icon={IconEnum.add}
+        isDisabled={!hasPermission}
         onClick={() => {
-          if (!isViewOnly) setBoardState({ ...boardState, draw_mode: false, add_nodes: !boardState.add_nodes });
+          if (!isViewOnly && hasPermission)
+            setBoardState({ ...boardState, draw_mode: false, add_nodes: !boardState.add_nodes });
         }}
         tooltip="Create nodes"
         variant={boardState.add_nodes ? "info" : "primary"}
       />
 
-      {/* <Button
-        hasNoBackground
-        icon={IconEnum.grid}
-        onClick={() => setBoardState({ ...boardState, grid: !boardState.grid })}
-        tooltip="Toggle grid"
-        variant={boardState.grid ? "info" : "primary"}
-      /> */}
       <Button
         hasNoBackground
         icon={IconEnum.lock}
+        isDisabled={!hasPermission}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, true, updateManyNodes, item_id as string);
+          if (boardRef && !isViewOnly && hasPermission) changeLockState(boardRef, true, updateManyNodes, item_id as string);
         }}
         tooltip="Lock selected"
       />
       <Button
         hasNoBackground
         icon={IconEnum.unlock}
+        isDisabled={!hasPermission}
         onClick={() => {
-          if (boardRef && !isViewOnly) changeLockState(boardRef, false, updateManyNodes, item_id as string);
+          if (boardRef && !isViewOnly && hasPermission) changeLockState(boardRef, false, updateManyNodes, item_id as string);
         }}
         tooltip="Unlock selected"
       />
       <Button
         hasNoBackground
         icon={IconEnum.trash}
+        isDisabled={!hasPermission}
         onClick={() => {
-          if (!boardRef || isViewOnly) return;
+          if (!boardRef || isViewOnly || !hasPermission) return;
           const selected = boardRef.elements(":selected");
           if (selected.length === 0) {
             createNotification({ timer: 3, title: "No elements are selected.", variant: "info", icon: IconEnum.info_circle });
@@ -159,12 +165,14 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
             ))}
           </div>
         }
-        isDisabled={isViewOnly}>
+        isDisabled={isViewOnly || !hasPermission}>
         <span className="cursor-pointer">
           <Button
             hasNoBackground
             icon={getCurveStyleIcon(boardState.curve_style)}
+            isDisabled={!hasPermission || isViewOnly}
             onClick={() => {
+              if (!hasPermission) return;
               if (boardState.draw_mode) changeDrawMode(false, setBoardState);
               else {
                 changeDrawMode(false, setBoardState);
@@ -196,36 +204,41 @@ export function Quickbar({ isViewOnly, graphTitle }: { isViewOnly: boolean; grap
       <Button
         hasNoBackground
         icon={IconEnum.character}
+        isDisabled={!hasPermission || isViewOnly}
         isIconOnly
-        onClick={() =>
-          setDrawer((prev) => ({
-            ...prev,
-            title: "Nodes from characters",
-            type: "nodes_from_characters",
-            data: null,
-            size: "lg",
-          }))
-        }
+        onClick={() => {
+          if (hasPermission)
+            setDrawer((prev) => ({
+              ...prev,
+              title: "Nodes from characters",
+              type: "nodes_from_characters",
+              data: null,
+              size: "lg",
+            }));
+        }}
         tooltip="Create node from characters"
       />
       <Button
         hasNoBackground
         icon={IconEnum.image}
+        isDisabled={!hasPermission || isViewOnly}
         isIconOnly
-        onClick={() =>
-          setDrawer((prev) => ({
-            ...prev,
-            title: "Nodes from images",
-            type: "nodes_from_images",
-            data: null,
-            size: "lg",
-          }))
-        }
+        onClick={() => {
+          if (hasPermission)
+            setDrawer((prev) => ({
+              ...prev,
+              title: "Nodes from images",
+              type: "nodes_from_images",
+              data: null,
+              size: "lg",
+            }));
+        }}
         tooltip="Create node from images"
       />
 
       <div className="">
         <ColorPicker
+          isDisabled={!hasPermission || isViewOnly}
           name="pickerColor"
           onChange={({ value }) => {
             if (boardRef) {
