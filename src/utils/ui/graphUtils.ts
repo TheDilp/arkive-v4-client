@@ -129,8 +129,8 @@ export function getNodeLabel(node: NodeType): string {
 }
 
 export function getNodeImage(node: NodeType, project_id: string, { width, height }: { width: number; height: number }) {
-  if (node?.image_id) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image_id, true), { width, height });
+  if (node?.image) {
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image?.id, true), { width, height });
   }
   if (node?.document?.image) {
     return getThumbnailUrl(getImageURL(project_id as string, "images", node.document.image_id, true), { width, height });
