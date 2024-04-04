@@ -3,8 +3,8 @@ import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { useEffect, useState } from "react";
 
-import { useGetSubEntity, useHandleChange, useUpdateGraphSubEntity } from "../../../hooks";
-import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
+import { useGetSubEntity, useHandleChange, useHasPermissions, useUpdateGraphSubEntity } from "../../../hooks";
+import { ArrowFill, ArrowShape, EdgeType, SelectType, TabType, UserHasPermissionsType } from "../../../types";
 import {
   capitalizeFirstLetter,
   DefaultBoardColor,
@@ -28,11 +28,16 @@ import { ColorPicker } from "../ColorPicker";
 type Props = { data: { id: string; parent_id: string } };
 type UpdateEdgeType = { data: Partial<EdgeType> };
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Arrows", icon: IconEnum.flow_arrow },
-  { id: "3", label: "Tags", icon: IconEnum.tags },
-];
+function getTabs(permissions: UserHasPermissionsType): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Arrows", icon: IconEnum.flow_arrow },
+  ];
+  if (permissions?.read_tags) {
+    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+  }
+  return tabs;
+}
 const edgeArrows = ["target", "source", "mid_target", "mid_source"] as const;
 
 function UpdateGraphEdges({
@@ -76,7 +81,7 @@ function ArrowForm({
 } & Pick<SelectType, "onChange">) {
   return (
     <Collapsible initialOpen={false} label={capitalizeFirstLetter(label).replace("_", "-")}>
-      <div className="mt-2 flex flex-nowrap items-center gap-2">
+      <div className="mt-2 flex flex-nowrap items-center gap-2 p-2">
         <Select
           label="Arrow shape"
           name={`${label}_arrow_shape`}
@@ -103,7 +108,11 @@ export function EdgeDrawer({ data }: Props) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
-
+  const permissions = useHasPermissions(
+    ["update_graphs", "read_characters", "read_assets", "read_events", "read_documents", "read_tags"],
+    undefined,
+  );
+  const tabs = getTabs(permissions);
   const { data: existingEdge, isFetching } = useGetSubEntity<EdgeType>(
     data?.id,
     "edges",
@@ -192,7 +201,7 @@ export function EdgeDrawer({ data }: Props) {
   return (
     <div className="flex flex-col gap-y-2 font-lato">
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <Title isDrawerTitle label="Label" size="xl" />
           <div className="flex w-full items-center gap-2">
@@ -341,7 +350,7 @@ export function EdgeDrawer({ data }: Props) {
           </div>
         </>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <div className="flex flex-col gap-y-2">
           {edgeArrows.map((a) => (
             <ArrowForm
@@ -354,7 +363,7 @@ export function EdgeDrawer({ data }: Props) {
           ))}
         </div>
       ) : null}
-      {selectedTab === 2 ? <TagInput handleChange={handleChange} tags={edge.tags || []} /> : null}
+      {tabs[selectedTab].id === "3" ? <TagInput handleChange={handleChange} tags={edge.tags || []} /> : null}
       <div className="flex flex-nowrap items-center gap-x-2">
         <Button
           icon={IconEnum.close}
@@ -392,7 +401,7 @@ export function EdgeDrawer({ data }: Props) {
         />
         <Button
           icon={IconEnum.save}
-          isDisabled={isFetching || isMutating}
+          isDisabled={isFetching || isMutating || !permissions?.update_graphs}
           isLoading={isFetching || isMutating}
           label="Save"
           onClick={handleSave}

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
-import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
+import { AvailableEntityType, DrawerContentCreateNewType, PermissionCodeType } from "../../types";
 import { drawerAtom, getPermissionsForTypeView, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
 import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
@@ -18,7 +18,10 @@ export function EntitiesView() {
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const setDrawer = useSetAtom(drawerAtom);
   const navbarTitle = useAtomValue(navbarTitleAtom);
-  const permissions = useHasPermissions(getPermissionsForTypeView("blueprint_instances"), undefined);
+  const permissions = useHasPermissions(
+    getPermissionsForTypeView(type === "blueprints" ? "blueprint_instances" : (type as AvailableEntityType)),
+    undefined,
+  );
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
 
   return (
@@ -48,7 +51,7 @@ export function EntitiesView() {
               <div className="w-52">
                 <Button
                   icon={IconEnum.edit}
-                  isDisabled={!permissions?.update_blueprints}
+                  isDisabled={!permissions?.[`update_${type}` as PermissionCodeType]}
                   label={`Edit current ${entityName}`}
                   onClick={() => {
                     setDrawer((prev) => ({
