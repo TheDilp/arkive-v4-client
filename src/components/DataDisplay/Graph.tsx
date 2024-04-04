@@ -478,8 +478,12 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
         cyRef?.current?._cy.nodes(":grabbed").forEach((el: NodeSingular) => {
           if (el.grabbed()) {
-            addOrUpdateNode({ id: el.id(), ...el.position() });
-            el.select();
+            const oldPosition = { x: el.data().x, y: el.data().y };
+            const newPosition = el.position();
+            if (oldPosition.x !== newPosition.x || oldPosition.y !== newPosition.y) {
+              addOrUpdateNode({ id: el.id(), ...el.position() });
+              el.select();
+            }
           }
         });
         grabbedNodes.select();
@@ -487,6 +491,8 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
       // Double Click
       cyRef?.current?._cy.on("dbltap", "node", function (evt: any) {
+        evt.preventDefault();
+        evt.stopPropagation();
         if (!updateGraphActionPermission) return;
         const target = evt.target._private;
 
