@@ -773,6 +773,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
         blueprint_fields: true,
         tags: true,
       },
+      permissions: true,
       filters,
       fields: ["id", "deleted_at", "is_public", "title"],
       relationFilters,
