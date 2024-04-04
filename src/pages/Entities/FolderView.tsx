@@ -38,6 +38,7 @@ import {
   DrawerAtomType,
   DrawerContentCreateNewType,
   EntitiesWithFolders,
+  ImageType,
   PermissionCodeType,
   TableDispatch,
   TableSelectedAction,
@@ -129,12 +130,12 @@ function getColumns(
       id: "is_folder",
       header: "",
       cell: ({ row }) =>
-        "image_id" in row.original && row.original?.image_id && show_image ? (
+        "image" in row.original && (row.original.image as ImageType) && show_image ? (
           <Avatar
             image={getImageURL(
               project_id,
               entityType === "maps" ? "map_images" : "images",
-              (row.original?.image_id as string) || "",
+              (row.original.image as ImageType)?.id || "",
             )}
             isBordered
             isTooltipDisabled
@@ -722,6 +723,7 @@ export function FolderView() {
       arkived: arkived === "arkive",
       relations: {
         tags: EntitiesWithTags.includes(type as string),
+        image: type === "documents" || type === "maps",
       },
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),

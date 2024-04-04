@@ -53,7 +53,7 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
 
 export function getEntityFields(type: AvailableEntityType): string[] {
   const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
-  if ((type === "documents" || type === "maps") && !fields.includes("image_id")) fields.push("image_id");
+
   if (
     type === "documents" ||
     type === "maps" ||

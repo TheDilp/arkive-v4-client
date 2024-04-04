@@ -75,9 +75,9 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     "documents",
     {
       data: {},
-      relations: { alter_names: true, tags: true },
+      relations: { alter_names: true, tags: true, image: true },
       permissions: true,
-      fields: ["id", "title", "icon", "parent_id", "image_id", "dice_color", "is_public", "owner_id"],
+      fields: ["id", "title", "icon", "parent_id", "dice_color", "is_public", "owner_id"],
     },
     {
       enabled: !!data?.id,
