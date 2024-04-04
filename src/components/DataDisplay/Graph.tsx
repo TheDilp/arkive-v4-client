@@ -164,7 +164,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   // Board Events
   useEffect(() => {
     if (cyRef?.current?._cy && !isReadOnly && !isViewOnly) {
-      cyRef?.current?._cy.removeListener("grabon tapstart tapdrag tapend tapdragover tapdragout grab");
+      cyRef?.current?._cy.removeListener("grabon grab");
       // cyRef?.current?._cy.on("grabon", function (evt: any) {
       //   const selected = cyRef?.current?._cy.elements(":selected");
       //   if (selected?.length === 1) {
@@ -464,22 +464,25 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         }
       });
       // Moving nodes
-      cyRef?.current?._cy.on(boardState.grid ? "free" : "dragfreeon", "node", function (evt: EventObject) {
+      cyRef?.current?._cy.on("mouseup", "node", function (evt: EventObject) {
         evt.preventDefault();
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        const selectedNodes: Collection<NodeSingular> = cyRef?.current?._cy.nodes(":selected");
+        const grabbedNodes: Collection<NodeSingular> = cyRef?.current?._cy.nodes(":grabbed");
 
-        if (selectedNodes.length === 0) {
+        if (grabbedNodes.length === 0) {
           evt.target.select();
         } else {
-          selectedNodes.select();
+          grabbedNodes.select();
         }
 
-        cyRef?.current?._cy.nodes(":selected").forEach((el: NodeSingular) => {
-          addOrUpdateNode({ id: el.id(), ...el.position() });
+        cyRef?.current?._cy.nodes(":grabbed").forEach((el: NodeSingular) => {
+          if (el.grabbed()) {
+            addOrUpdateNode({ id: el.id(), ...el.position() });
+            el.select();
+          }
         });
-        selectedNodes.select();
+        grabbedNodes.select();
       });
 
       // Double Click
@@ -534,7 +537,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       });
     }
     return () => {
-      cyRef?.current?._cy.removeListener(`mousedown cxttap dbltap ${boardState.grid ? "free" : "dragfreeon"}`);
+      cyRef?.current?._cy.removeListener("mousedown cxttap dbltap mouseup");
     };
   }, [cyRef?.current?._cy, boardState.grid, nodes, edges, item_id]);
   useEffect(() => {
@@ -686,7 +689,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     }
     return () => {};
   }, [drawer]);
-  cyRef?.current?._cy.removeListener("grabon tapstart tapdrag tapend tapdragover tapdragout grab");
+  cyRef?.current?._cy.removeListener("grabon grab");
 
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">

@@ -274,8 +274,8 @@ export function getCytoscapeStylesheet(curve_style: CurveStyleType) {
 export const cytoscapeGridOptions = {
   // On/Off Modules
   /* From the following four snap options, at most one should be true at a given time */
-  snapToGridDuringDrag: false,
-  snapToGridOnRelease: true, // Snap to grid on release
+  snapToGridDuringDrag: true, //! intereferes with events
+  snapToGridOnRelease: false, // Snap to grid on release
   snapToAlignmentLocationOnRelease: false, // Snap to alignment location on release
   snapToAlignmentLocationDuringDrag: false, // Snap to alignment location during drag
   distributionGuidelines: false, // Distribution guidelines
