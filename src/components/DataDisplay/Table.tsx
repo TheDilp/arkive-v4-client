@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -597,37 +596,12 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     }
   }, [pagination?.page]);
 
-  const rowVirtualizer = useVirtualizer({
-    count: data.length,
-    getScrollElement: () => bodyRef.current,
-    estimateSize: () => 48,
-    overscan: 15,
-  });
   const { rows } = table.getRowModel();
 
   const pinned = columns.filter((col) => col?.meta?.pinned);
   return (
     <>
-      <div
-        ref={bodyRef}
-        className="scrollbar-hidden max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800"
-        style={{
-          height:
-            expandable || isLoading
-              ? ""
-              : `${
-                  // 20px added to account for the pagination
-                  // 40px added to account for the subheader when it is enabled
-                  rowVirtualizer.getTotalSize() +
-                  Number(headerRef?.current?.clientHeight) +
-                  (pagination ? 20 : 0) +
-                  (!hasNoHeaderGap && !pagination ? 28 : 0) +
-                  (hasNoHeaderGap && !pagination ? 28 : 0) +
-                  (!hasNoHeaderGap && pagination ? 10 : 0) +
-                  (isSubheaderEnabled && !pagination ? 40 : 0) +
-                  (isSubheaderEnabled && pagination ? 40 : 0)
-                }px`,
-        }}>
+      <div ref={bodyRef} className="scrollbar-hidden max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800">
         <div ref={headerRef} className={head()}>
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
@@ -805,8 +779,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
         {isLoading ? (
           <Skeleton limit={pagination?.limit || skeletonLimit || 10} type="table" />
         ) : (
-          rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
-            const row = rows[virtualRow.index];
+          rows.map((row) => {
             return (
               <div
                 key={row.id}
@@ -814,11 +787,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                     ? "group hover:text-white"
                     : "hover:bg-zinc-800"
-                }`}
-                style={{
-                  height: expandable ? "" : `${virtualRow.size}px`,
-                  transform: expandable ? "" : `translateY(${virtualRow.start - index * virtualRow.size}px)`,
-                }}>
+                }`}>
                 <Link
                   onClick={(e) => {
                     if (onRowClick) {
