@@ -480,6 +480,121 @@ function getSelectedActions(
   return selectedActions;
 }
 
+function CharacterViewHeader({
+  setArkived,
+  setDrawer,
+  setFilter,
+  setView,
+  dispatch,
+  arkived,
+  view,
+  permissions,
+  isMd,
+}: {
+  isMd: boolean;
+  setView: any;
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
+  setFilter: Dispatch<SetStateAction<string>>;
+  setArkived: Dispatch<SetStateAction<"active" | "arkive">>;
+  arkived: "active" | "arkive";
+  dispatch: TableDispatch;
+  view: "card" | "table";
+  permissions: UserHasPermissionsType;
+}) {
+  const { project_id } = useParams();
+  const [localFilter, setLocalFilter] = useState("");
+
+  useLayoutEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilter(localFilter);
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [localFilter]);
+
+  return (
+    <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
+      <div className="mr-auto">
+        <div className="h-11 w-11">
+          <Button
+            icon={IconEnum.filter}
+            isIconOnly
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                type: "character_filter",
+                data: { dispatch },
+                size: "xl",
+                title: "Character filter",
+              }))
+            }
+            tooltip="Filter characters"
+          />
+        </div>
+      </div>
+      <div className="w-52">
+        <Input
+          isClearable
+          name="quick_filter"
+          onChange={({ value }) => setLocalFilter(value as string)}
+          placeholder="Quick search by first name"
+          type="search"
+          value={localFilter}
+        />
+      </div>
+      <div className="w-32">
+        <Select
+          name="view"
+          onChange={({ value }) => {
+            setArkived(value as "active" | "arkive");
+            ls.set("characters-table-active", value);
+          }}
+          options={[
+            { label: "Active", value: "active", icon: IconEnum.eye },
+            { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+          ]}
+          placeholder="Active or arkived"
+          value={arkived}
+        />
+      </div>
+      <div className="w-32">
+        <Select
+          name="view"
+          onChange={({ value }) => {
+            setView(value as "card" | "table");
+            ls.set("characters_view", value);
+          }}
+          options={[
+            { label: "Card", value: "card", icon: IconEnum.card },
+            { label: "Table", value: "table", icon: IconEnum.table },
+          ]}
+          placeholder="View"
+          value={view}
+        />
+      </div>
+      <div className="lg:w-52">
+        <Button
+          icon={IconEnum.add}
+          isDisabled={!permissions?.create_characters}
+          label="Create new character"
+          onClick={() =>
+            setDrawer((prev) => ({
+              ...prev,
+              data: { project_id },
+              title: "Create new character",
+              type: "characters",
+              size: "2xl",
+            }))
+          }
+          tooltip={isMd ? undefined : "Create new character"}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function CharactersView() {
   useChangeNavbarTitle("Characters");
   const { isMd } = useBreakpoint();
@@ -617,83 +732,17 @@ export function CharactersView() {
   }, [filter, dispatch, view]);
   return (
     <TablePageLayout>
-      <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
-        <div className="mr-auto">
-          <div className="h-11 w-11">
-            <Button
-              icon={IconEnum.filter}
-              isIconOnly
-              onClick={() =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  type: "character_filter",
-                  data: { dispatch },
-                  size: "xl",
-                  title: "Character filter",
-                }))
-              }
-              tooltip="Filter characters"
-            />
-          </div>
-        </div>
-        <div className="w-52">
-          <Input
-            isClearable
-            name="quick_filter"
-            onChange={({ value }) => setFilter(value as string)}
-            placeholder="Quick search by first name"
-            type="search"
-            value={filter}
-          />
-        </div>
-        <div className="w-32">
-          <Select
-            name="view"
-            onChange={({ value }) => {
-              setArkived(value as "active" | "arkive");
-              ls.set("characters-table-active", value);
-            }}
-            options={[
-              { label: "Active", value: "active", icon: IconEnum.eye },
-              { label: "Arkived", value: "arkive", icon: IconEnum.archive },
-            ]}
-            placeholder="Active or arkived"
-            value={arkived}
-          />
-        </div>
-        <div className="w-32">
-          <Select
-            name="view"
-            onChange={({ value }) => {
-              setView(value as "card" | "table");
-              ls.set("characters_view", value);
-            }}
-            options={[
-              { label: "Card", value: "card", icon: IconEnum.card },
-              { label: "Table", value: "table", icon: IconEnum.table },
-            ]}
-            placeholder="View"
-            value={view}
-          />
-        </div>
-        <div className="lg:w-52">
-          <Button
-            icon={IconEnum.add}
-            isDisabled={!permissions?.create_characters}
-            label="Create new character"
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: { project_id },
-                title: "Create new character",
-                type: "characters",
-                size: "2xl",
-              }))
-            }
-            tooltip={isMd ? undefined : "Create new character"}
-          />
-        </div>
-      </div>
+      <CharacterViewHeader
+        arkived={arkived}
+        dispatch={dispatch}
+        isMd={isMd}
+        permissions={permissions}
+        setArkived={setArkived}
+        setDrawer={setDrawer}
+        setFilter={setFilter}
+        setView={setView}
+        view={view}
+      />
       {view === "card" ? (
         <div
           className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
