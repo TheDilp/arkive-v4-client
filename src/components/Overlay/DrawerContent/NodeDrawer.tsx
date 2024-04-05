@@ -65,6 +65,7 @@ function UpdateGraphNodes({
       const idx = newNodes.findIndex((n) => n.id === node.id);
       if (idx > -1) {
         const alteredNodeData = { ...newNodes[idx], ...(Object.keys(changedData).length ? changedData : rest) };
+
         newNodes[idx] = {
           ...alteredNodeData,
           label: getNodeLabel(alteredNodeData as NodeType),
@@ -74,7 +75,7 @@ function UpdateGraphNodes({
           document: changedData?.document || rest?.document || undefined,
           // @ts-ignore
           background_image: alteredNodeData
-            ? getNodeImage(alteredNodeData as NodeType, project_id as string, {
+            ? getNodeImage((alteredNodeData || rest) as NodeType, project_id as string, {
                 width: alteredNodeData.width || 50,
                 height: alteredNodeData.height || 50,
               })
