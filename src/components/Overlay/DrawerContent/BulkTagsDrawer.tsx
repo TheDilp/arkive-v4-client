@@ -25,7 +25,7 @@ export function BulkTagsDrawer({ data }: Props) {
   const [tagsToRemove, setTagsToRemove] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);
   const removedTagIds = tagsToRemove.map((t) => t.id);
 
-  const { mutate } = useBulkUpdateTags(data.type, project_id as string, item_id as string);
+  const { mutate, isLoading: isMutating } = useBulkUpdateTags(data.type, project_id as string, item_id as string);
 
   function handleSave() {
     const finalToAdd: { A: string; B: string }[] = [];
@@ -93,6 +93,7 @@ export function BulkTagsDrawer({ data }: Props) {
         <Button
           icon={IconEnum.tags}
           isDisabled={!tagsToAdd.length && !tagsToRemove.length}
+          isLoading={isMutating}
           label="Update"
           onClick={handleSave}
           variant="success"
