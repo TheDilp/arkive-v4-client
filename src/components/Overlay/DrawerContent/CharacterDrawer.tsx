@@ -844,7 +844,13 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       ) : null}
       {tabs[selectedTab].id === "4" && permissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
-          <TagInput handleChange={handleChange} isDisabled={!hasCreateOrEdit} tags={character?.tags || []} />
+          <TagInput
+            handleChange={handleChange}
+            isAutofocused
+            isDisabled={!hasCreateOrEdit}
+            isMultiple
+            tags={character?.tags || []}
+          />
         </div>
       ) : null}
       {tabs[selectedTab].id === "5" && permissions?.read_character_fields_templates ? (
