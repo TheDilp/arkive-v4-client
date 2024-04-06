@@ -3,10 +3,11 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
-import { EntitiesWithFolders, TagType } from "../../../types";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import { EntitiesWithFolders, EntityPermissionType, TagType } from "../../../types";
 import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
 import { FolderSelect } from "../../Complex";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
 
 type Props = {
@@ -17,36 +18,51 @@ type Props = {
 };
 type ExistingFolderType = {
   id?: string;
+  owner_id: string;
   project_id: string;
   parent_id: string | undefined;
   is_folder: boolean;
   title: string;
   tags?: Omit<TagType, "owner_id" | "permissions">[];
+  permissions: EntityPermissionType[];
 };
 
 export function FolderDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const [folder, setFolder] = useState<ExistingFolderType>({
     title: "",
+    owner_id: "",
     project_id: project_id as string,
     is_folder: true,
     parent_id: item_id,
+    permissions: [],
     tags: [],
   });
   const createNotification = useNotifications();
 
-  const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity(data.type);
+  const permissions = useHasPermissions(
+    [`read_${data?.type}`, `create_${data?.type}`, `update_${data?.type}`],
+    folder?.owner_id,
+  );
+
+  const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity<{
+    data: Omit<ExistingFolderType, "owner_id" | "permissions">;
+    relations?: { tags: { id: string }[] };
+    permissions: EntityPermissionType[];
+  }>(data.type);
   const { mutateAsync: updateFolder, isLoading: isUpdating } = useUpdateEntity<{
     data: { id: string; title: string; parent_id: string | null };
     relations?: { tags: { id: string }[] };
+    permissions: EntityPermissionType[];
   }>(data.type, project_id as string);
   const { data: existingFolder } = useGetEntity<ExistingFolderType>(
     data?.id,
     data.type,
     {
       data: {},
-      fields: ["id", "is_folder", "title", "parent_id"],
+      fields: ["id", "owner_id", "is_folder", "title", "parent_id"],
       relations: data.type === "random_tables" ? {} : { tags: true },
+      permissions: true,
     },
     {
       enabled: !!data?.id,
@@ -67,20 +83,33 @@ export function FolderDrawer({ data }: Props) {
       if (data?.id) {
         await updateFolder(
           data.type === "random_tables"
-            ? { data: { id: data.id, title: folder.title, parent_id: folder?.parent_id || null } }
+            ? {
+                data: { id: data.id, title: folder.title, parent_id: folder?.parent_id || null },
+                permissions: folder.permissions,
+              }
             : {
                 data: { id: data.id, title: folder.title, parent_id: folder?.parent_id || null },
                 relations: { tags: folder.tags || [] },
+                permissions: folder.permissions,
               },
           {
             onSuccess: resetDrawerAtom,
           },
         );
       } else {
-        const { tags, ...rest } = folder;
-        await createFolder(data.type === "random_tables" ? { data: rest } : { data: rest, relations: { tags } }, {
-          onSuccess: resetDrawerAtom,
-        });
+        const { tags, title, parent_id } = folder;
+        await createFolder(
+          data.type === "random_tables"
+            ? { data: { title, parent_id, is_folder: true, project_id: project_id as string }, permissions: folder.permissions }
+            : {
+                data: { title, parent_id, is_folder: true, project_id: project_id as string },
+                relations: { tags: tags || [] },
+                permissions: folder.permissions,
+              },
+          {
+            onSuccess: resetDrawerAtom,
+          },
+        );
       }
     }
   }
@@ -115,6 +144,16 @@ export function FolderDrawer({ data }: Props) {
         parent_id={folder?.parent_id ?? null}
         type={data.type}
       />
+
+      {permissions?.is_owner || !data?.id ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={folder?.owner_id}
+          permissions={folder?.permissions || []}
+          related_id={folder?.id || null}
+          selectablePermissions={[`read_${data.type}`, `update_${data.type}`, `delete_${data.type}`]}
+        />
+      ) : null}
 
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
