@@ -36,7 +36,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     "maps",
     {
       data: {},
-      fields: ["id", "image_id", "icon", "cluster_pins", "owner_id"],
+      fields: ["id", "title", "owner_id", "image_id", "icon", "cluster_pins", "owner_id"],
       relations: { map_pins: true, map_layers: true },
     },
     {
