@@ -438,7 +438,13 @@ export function MapPinDrawer({ data, exceptions }: Props) {
 
       <Button
         icon={IconEnum.save}
-        isDisabled={isSaveDisabled(mapPin, { exceptions }) || isCreating || isUpdating || !permissions?.update_map_pins}
+        isDisabled={
+          isSaveDisabled(mapPin, { exceptions }) ||
+          isCreating ||
+          isUpdating ||
+          (!!data?.id && !permissions?.update_map_pins) ||
+          (!data?.id && !permissions?.create_map_pins)
+        }
         isLoading={isCreating || isUpdating}
         label="Save"
         onClick={async () => {
