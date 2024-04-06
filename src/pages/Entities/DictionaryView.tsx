@@ -5,7 +5,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
 import {
   baseURLS,
@@ -179,7 +179,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     item_id || id,
     "dictionaries",
     {
-      fields: ["id", "title", "is_public"],
+      fields: ["id", "owner_id", "title", "is_public"],
     },
     {
       staleTime: 5 * 60 * 1000,
@@ -200,6 +200,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     "words",
     { queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || ""], isPublic },
   );
+  useChangeNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
 
   useLayoutEffect(() => {
     if (!filter) {
