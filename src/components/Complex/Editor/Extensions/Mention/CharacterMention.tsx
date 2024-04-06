@@ -47,7 +47,7 @@ function CharacterMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "ti
 
 export function CharacterMention({ id, project_id, title, label, isPublic }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const { data, refetch } = useGetEntity<CharacterType>(
+  const { data, isPaused, isFetched, refetch } = useGetEntity<CharacterType>(
     id,
     "characters",
     {
@@ -79,31 +79,31 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     };
   }, []);
 
-  if (isPublic && !data?.data?.is_public) return <span className="font-lato">{label}</span>;
-
-  return id ? (
-    <Tooltip
-      arrowColor="#3f3f46"
-      content={<CharacterMentionTooltip id={id} isPublic={isPublic} title={data?.data?.full_name || title || label} />}
-      delay={{ openDelay: 500, closeDelay: 200 }}
-      isDisabled={(isPublic && !data?.data?.is_public) ?? false}
-      isPortal={false}>
-      <Link
-        className="inline-flex items-center font-lato text-sm font-bold transition-colors"
-        to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
-        <div ref={mentionRef} className="flex items-start">
-          {data?.data?.portrait_id ? (
-            <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-              <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
-            </span>
-          ) : (
-            <Icon fontSize={14} icon={IconEnum.character} />
-          )}
-          <span className="underline hover:text-sky-400">{data?.data?.full_name || title || label}</span>
-        </div>
-      </Link>
-    </Tooltip>
-  ) : (
-    <span className="font-lato underline decoration-wavy">{label}</span>
-  );
+  if (id) {
+    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    return (
+      <Tooltip
+        arrowColor="#3f3f46"
+        content={<CharacterMentionTooltip id={id} isPublic={isPublic} title={data?.data?.full_name || title || label} />}
+        delay={{ openDelay: 500, closeDelay: 200 }}
+        isDisabled={(isPublic && !data?.data?.is_public) ?? false}
+        isPortal={false}>
+        <Link
+          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
+          to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
+          <div ref={mentionRef} className="flex items-start">
+            {data?.data?.portrait_id ? (
+              <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
+                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
+              </span>
+            ) : (
+              <Icon fontSize={14} icon={IconEnum.character} />
+            )}
+            <span className="underline hover:text-sky-400">{data?.data?.full_name || title || label}</span>
+          </div>
+        </Link>
+      </Tooltip>
+    );
+  }
 }

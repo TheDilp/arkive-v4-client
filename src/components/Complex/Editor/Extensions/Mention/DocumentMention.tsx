@@ -41,7 +41,7 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
 }
 export function DocumentMention({ alterId, title, id, label, project_id, isPublic }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const { data, refetch } = useGetEntity<DocumentType>(
+  const { data, isFetched, isPaused, refetch } = useGetEntity<DocumentType>(
     id as string,
     "documents",
     {
@@ -77,7 +77,10 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
     };
   }, []);
 
-  if (data?.data && (data?.data?.is_public || !isPublic))
+  if (id) {
+    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+
     return (
       <Tooltip
         arrowColor="#3f3f46"
@@ -97,6 +100,5 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
         </Link>
       </Tooltip>
     );
-
-  return <span className="font-lato underline decoration-wavy">{label}</span>;
+  }
 }

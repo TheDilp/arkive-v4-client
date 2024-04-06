@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Icon } from "@iconify/react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import { useGetEntity, useGetSubEntity } from "../../../../../hooks";
@@ -37,7 +38,8 @@ function MapPinMentionTooltip({ id, parent_id, project_id }: Pick<Props, "id" | 
 }
 
 export function MapPinMention({ title, id, label, project_id, isPublic, parent_id }: Props) {
-  const { data } = useGetSubEntity<MapPinType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, isFetched, isPaused, refetch } = useGetSubEntity<MapPinType>(
     id as string,
     "map_pins",
     {
@@ -45,7 +47,33 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
     },
     { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
-  return id ? (
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
+
+  if (id) {
+    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
     <Tooltip content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
       <Link
         className="inline-flex items-center font-lato text-sm font-bold transition-colors"
@@ -57,7 +85,7 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
           isPublic,
           parent_id,
         )}>
-        <div className="flex items-start">
+        <div ref={mentionRef} className="flex items-start">
           {data?.data?.image_id ? (
             <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
               <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.image_id)} size="3xs" />
@@ -68,8 +96,6 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
           <span className="underline hover:text-sky-400">{data?.data?.title || title || label || ""}</span>
         </div>
       </Link>
-    </Tooltip>
-  ) : (
-    <span className="font-lato">{label || ""}</span>
-  );
+    </Tooltip>;
+  }
 }

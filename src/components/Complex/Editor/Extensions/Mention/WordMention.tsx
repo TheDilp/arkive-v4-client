@@ -42,7 +42,7 @@ function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
 }
 export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const { data, refetch } = useGetSubEntity<WordType>(
+  const { data, isFetched, isPaused, refetch } = useGetSubEntity<WordType>(
     id as string,
     "words",
     {
@@ -77,7 +77,10 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
     };
   }, []);
 
-  return id ? (
+  if (id) {
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    if (isPublic) return <span>{label}</span>;
+
     <Tooltip
       arrowColor="#3f3f46"
       content={<WordMentionTooltip id={id} isPublic={isPublic} />}
@@ -86,8 +89,6 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
         {data?.data?.title || title || label}
         <sup>*</sup>
       </span>
-    </Tooltip>
-  ) : (
-    <span className="font-lato underline decoration-wavy">{label}</span>
-  );
+    </Tooltip>;
+  }
 }

@@ -33,7 +33,7 @@ function GraphMentionTooltip({ id, project_id, isPublic }: Pick<Props, "id" | "p
 
 export function GraphMention({ title, id, label, project_id, isPublic }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const { data, refetch } = useGetEntity<GraphType>(
+  const { data, isFetched, isPaused, refetch } = useGetEntity<GraphType>(
     id as string,
     "graphs",
     { data: { project_id }, fields: ["is_public"] },
@@ -63,7 +63,9 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
     };
   }, []);
 
-  return data?.data && (data?.data?.is_public || !isPublic) ? (
+  if (id) {
+    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
     <Tooltip
       arrowColor="#3f3f46"
       content={<GraphMentionTooltip id={id} isPublic={!!isPublic} project_id={project_id} />}
@@ -80,8 +82,6 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
           <span className="text-sm underline">{title || label}</span>
         </div>
       </Link>
-    </Tooltip>
-  ) : (
-    <span className="font-lato underline decoration-wavy">{label}</span>
-  );
+    </Tooltip>;
+  }
 }

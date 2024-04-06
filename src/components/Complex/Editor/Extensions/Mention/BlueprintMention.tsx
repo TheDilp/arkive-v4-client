@@ -17,7 +17,7 @@ type Props = {
 };
 export function BlueprintMention({ id, project_id, title, label, icon, parent_id, isPublic }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const { data, refetch } = useGetSubEntity<BlueprintInstanceType>(
+  const { data, isFetched, isPaused, refetch } = useGetSubEntity<BlueprintInstanceType>(
     id as string,
     "blueprint_instances",
     {
@@ -52,7 +52,9 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
     };
   }, []);
 
-  if (data?.data && (data?.data?.is_public || !isPublic))
+  if (id) {
+    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
     return (
       <Link
         className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
@@ -74,5 +76,5 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
         </div>
       </Link>
     );
-  return <span className="font-lato underline decoration-wavy">{label}</span>;
+  }
 }
