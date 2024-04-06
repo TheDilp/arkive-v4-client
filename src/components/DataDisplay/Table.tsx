@@ -888,13 +888,6 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                           { label: "80", value: "80" },
                           { label: "90", value: "90" },
                           { label: "100", value: "100" },
-                          { label: "200", value: "200" },
-                          { label: "250", value: "250" },
-                          { label: "300", value: "300" },
-                          { label: "350", value: "350" },
-                          { label: "400", value: "400" },
-                          { label: "450", value: "450" },
-                          { label: "500", value: "500" },
                         ]
                   }
                   size="sm"
