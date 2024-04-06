@@ -28,12 +28,17 @@ export function permissionsByEntity(permissions: PermissionType[]) {
   const formatted = permissions.reduce(
     (accumulator: Record<string, { title: string; permissions: PermissionType[] }>, permission) => {
       let entity = permission.title.split(" ")[1].toLowerCase(); // Extracting the entity from the title
+
+      // Actual main entities will be in plural
+      // If they are in singular then they must be one of the following
       if (entity === "blueprint") {
         entity = "blueprint_instances";
       } else if (entity === "random") {
         entity = "random_tables";
       } else if (entity === "character") {
         entity = "character_fields_templates";
+      } else if (entity === "map") {
+        entity = "map_pins";
       }
       if (!accumulator[entity]) {
         accumulator[entity] = { title: entity, permissions: [] };
