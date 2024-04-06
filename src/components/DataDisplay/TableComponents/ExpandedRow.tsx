@@ -256,7 +256,7 @@ function ExpandedWord({ id }: { id: string }) {
     },
   );
   if (isFetching) return <Spinner />;
-  return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description} />;
+  return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description || ""} />;
 }
 function ExpandedRole({ permissions }: { permissions: PermissionType[] }) {
   const formatted = permissionsByEntity(permissions || []);

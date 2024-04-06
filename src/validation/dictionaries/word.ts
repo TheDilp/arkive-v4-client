@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
+
 export const InsertWordSchema = z.object({
   data: z.object({
     title: z.string(),
@@ -7,6 +9,7 @@ export const InsertWordSchema = z.object({
     description: z.string().nullable().optional(),
     parent_id: z.string(),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 export const UpdateWordSchema = z.object({
   data: z.object({
@@ -15,5 +18,6 @@ export const UpdateWordSchema = z.object({
     translation: z.string().optional(),
     description: z.string().nullable().optional(),
   }),
+  permissions: UpdateEntityPermissionSchema,
 });
 export type InsertWordType = z.infer<typeof InsertWordSchema>;
