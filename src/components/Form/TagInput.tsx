@@ -13,12 +13,11 @@ type Props = {
   isDisabled?: boolean;
 };
 
-export function TagInput({ tags, label: componentLabel, handleChange, isMultiple, isDisabled, isAutofocused }: Props) {
+export function TagInput({ tags, label: componentLabel, handleChange, isMultiple = true, isDisabled, isAutofocused }: Props) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">
       <Search
-        isAutocomplete
         isAutofocused={isAutofocused ?? true}
         isDisabled={isDisabled}
         isMultiple={isMultiple}
