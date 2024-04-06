@@ -6,7 +6,19 @@ import { useParams } from "react-router-dom";
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
 import { EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
-import { Button, Checkbox, DrawerLayout, FolderSelect, IconPicker, Input, Select, Skeleton, Tabs, TagInput } from "../..";
+import {
+  Alert,
+  Button,
+  Checkbox,
+  DrawerLayout,
+  FolderSelect,
+  IconPicker,
+  Input,
+  Select,
+  Skeleton,
+  Tabs,
+  TagInput,
+} from "../..";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ColorPicker } from "../ColorPicker";
 
@@ -155,13 +167,16 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
       {tabs[selectedTab].id === "2" ? <TagInput handleChange={handleChange} isMultiple tags={graph?.tags || []} /> : null}
 
       {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
-        <EntityPermission
-          handleChange={handleChange}
-          owner_id={graph?.owner_id}
-          permissions={graph?.permissions || []}
-          related_id={graph?.id || null}
-          selectablePermissions={["read_graphs", "update_graphs", "delete_graphs"]}
-        />
+        <div className="flex flex-col gap-y-2">
+          <Alert label="Note: Granting update permissions for a graph allows the user to create, update and delete nodes and edges." />
+          <EntityPermission
+            handleChange={handleChange}
+            owner_id={graph?.owner_id}
+            permissions={graph?.permissions || []}
+            related_id={graph?.id || null}
+            selectablePermissions={["read_graphs", "update_graphs", "delete_graphs"]}
+          />
+        </div>
       ) : null}
 
       <div>
