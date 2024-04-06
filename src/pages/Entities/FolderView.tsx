@@ -268,7 +268,7 @@ function getColumns(
                 },
               },
             ];
-        if (entityType === "documents" && !is_document_template && row.original.deleted_at) {
+        if (entityType === "documents" && !is_document_template && !row.original.deleted_at) {
           actions.push({
             id: "mentioned_in",
             title: "Mentioned in",
@@ -292,7 +292,7 @@ function getColumns(
             },
           });
         }
-        if (PublicEntities.includes(entityType) && !is_document_template && row.original.deleted_at) {
+        if (PublicEntities.includes(entityType) && !is_document_template && !row.original.deleted_at) {
           actions.push(
             {
               id: "view_public",
@@ -321,7 +321,7 @@ function getColumns(
             },
           );
         }
-        if (is_document_template && row.original.deleted_at) {
+        if (is_document_template && !row.original.deleted_at) {
           actions.push({
             id: "create_from_template",
             title: "Create document from template",
