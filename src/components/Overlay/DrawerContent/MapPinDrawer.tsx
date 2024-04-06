@@ -3,10 +3,18 @@ import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntity, useGetEntities, useGetSubEntity, useHandleChange, useUpdateMapSubEntity } from "../../../hooks";
-import { MapPinType, MapPinTypesType, MapType } from "../../../types";
+import {
+  useCreateSubEntity,
+  useGetEntities,
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useUpdateMapSubEntity,
+} from "../../../hooks";
+import { MapPinType, MapPinTypesType, MapType, TabType, UserHasPermissionsType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
@@ -29,18 +37,25 @@ function isSaveDisabled(mapPin: Partial<MapPinType>, { exceptions }: Pick<Props,
   return false;
 }
 
-const tabs = [
-  {
-    id: "1",
-    label: "Basic info",
-    icon: IconEnum.info_circle,
-  },
-  {
-    id: "2",
-    label: "Links",
-    icon: IconEnum.link,
-  },
-];
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [
+    {
+      id: "1",
+      label: "Basic info",
+      icon: IconEnum.info_circle,
+    },
+    {
+      id: "2",
+      label: "Links",
+      icon: IconEnum.link,
+    },
+  ];
+
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function MapPinDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
@@ -62,6 +77,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       data: {},
       fields: [
         "id",
+        "owner_id",
         "title",
         "map_pin_type_id",
         "background_color",
@@ -79,6 +95,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       relations: {
         events: true,
       },
+      permissions: true,
     },
     { enabled: !!data?.id },
   );
@@ -88,6 +105,19 @@ export function MapPinDrawer({ data, exceptions }: Props) {
   const { mutateAsync: updateMapPin, isLoading: isUpdating } = useUpdateMapSubEntity<UpdateMapPinType>(
     "map_pins",
     item_id as string,
+  );
+  const permissions = useHasPermissions(
+    [
+      "read_map_pins",
+      "create_map_pins",
+      "update_map_pins",
+      "read_map_pins",
+      "read_characters",
+      "read_documents",
+      "read_events",
+      "read_assets",
+    ],
+    existingMapPin?.data?.owner_id,
   );
   const [character, setCharacter] = useState<MapPinType["character"] | null>(null);
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
@@ -116,24 +146,26 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       setMapPin((prev) => ({ ...prev, character_id: character.id }));
     }
   }, [character]);
-
+  const tabs = getTabs(permissions, data?.id).toSpliced(exceptions?.characterPin ? 1 : 0, exceptions?.characterPin ? 1 : 0);
   if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
-      <Tabs
-        onChange={(_, index) => setSelectedTab(index)}
-        selectedTab={selectedTab}
-        tabs={tabs.slice(0, exceptions?.characterPin ? 1 : 2)}
-      />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
 
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <div>
-          {exceptions?.characterPin ? (
+          {exceptions?.characterPin && permissions?.read_characters ? (
             <div className="flex flex-col gap-y-2">
               {character && mapPin.character_id ? (
                 <EntityPreview
-                  clearAction={() => setCharacter(null)}
+                  clearAction={
+                    permissions?.update_map_pins
+                      ? () => {
+                          if (permissions?.update_map_pins) setCharacter(null);
+                        }
+                      : undefined
+                  }
                   id={character.id}
                   image_id={character.portrait_id}
                   label="Character"
@@ -143,7 +175,9 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               ) : (
                 <Search
                   isAutofocused
-                  isDisabled={!!character && !!mapPin.character_id}
+                  isDisabled={
+                    (!!character && !!mapPin.character_id) || !permissions?.update_map_pins || !permissions?.read_characters
+                  }
                   name="character_id"
                   onChange={({ value: id, label, image: portrait_id }) => {
                     setCharacter({ id, full_name: label || "", portrait_id });
@@ -246,6 +280,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 {!mapPin?.image_id ? (
                   <Search
                     imageType="images"
+                    isDisabled={!permissions?.read_assets}
                     label="Image (replaces icon if selected)"
                     name="image_id"
                     onChange={handleChange}
@@ -254,7 +289,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   />
                 ) : (
                   <ImagePreview
-                    clearAction={() => handleChange({ name: "image_id", value: null })}
+                    clearAction={permissions?.read_assets ? () => handleChange({ name: "image_id", value: null }) : undefined}
                     id={mapPin?.image_id}
                     title={mapPin?.image?.title || ""}
                   />
@@ -264,19 +299,22 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           )}
         </div>
       ) : null}
-      {selectedTab === 1 && !exceptions?.characterPin ? (
+      {tabs[selectedTab].id === "2" && !exceptions?.characterPin ? (
         <div className="flex flex-wrap gap-2">
           {mapPin?.document ? (
             <div className="w-full">
               <EntityPreview
-                clearAction={() =>
-                  handleChange([
-                    {
-                      name: "doc_id",
-                      value: null,
-                    },
-                    { name: "document", value: null },
-                  ])
+                clearAction={
+                  permissions?.read_documents
+                    ? () =>
+                        handleChange([
+                          {
+                            name: "doc_id",
+                            value: null,
+                          },
+                          { name: "document", value: null },
+                        ])
+                    : undefined
                 }
                 id={mapPin.document.id}
                 label="Document"
@@ -286,6 +324,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             </div>
           ) : (
             <Search
+              isDisabled={!permissions?.read_documents}
               label="Document"
               name="doc_id"
               onChange={({ name, label, value }) => {
@@ -301,14 +340,17 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           {!exceptions?.characterPin && mapPin?.linked_map ? (
             <div className="w-full">
               <EntityPreview
-                clearAction={() =>
-                  handleChange([
-                    {
-                      name: "map_link",
-                      value: null,
-                    },
-                    { name: "linked_map", value: null },
-                  ])
+                clearAction={
+                  permissions?.read_maps
+                    ? () =>
+                        handleChange([
+                          {
+                            name: "map_link",
+                            value: null,
+                          },
+                          { name: "linked_map", value: null },
+                        ])
+                    : undefined
                 }
                 id={mapPin.linked_map.id}
                 image_id={mapPin?.linked_map?.image_id}
@@ -321,6 +363,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           {!exceptions?.characterPin && !mapPin?.linked_map ? (
             <Search
               imageType="map_images"
+              isDisabled={!permissions?.read_maps}
               label="Linked map"
               name="map_link"
               onChange={({ name, label, value, image }) => {
@@ -338,6 +381,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
                 <div className="flex flex-col gap-y-1 p-2">
                   <Search
+                    isDisabled={permissions?.read_events}
                     isMultiple
                     label="Events (optional)"
                     limit={10}
@@ -365,7 +409,11 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   />
                   {mapPin.events?.map((event) => (
                     <EntityPreview
-                      clearAction={(id) => handleChange({ name: "events", value: mapPin.events?.filter((c) => c.id !== id) })}
+                      clearAction={
+                        permissions?.read_events
+                          ? (id) => handleChange({ name: "events", value: mapPin.events?.filter((c) => c.id !== id) })
+                          : undefined
+                      }
                       id={event.id}
                       image_id={event.image_id}
                       title={event.title || ""}
@@ -378,15 +426,24 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           ) : null}
         </div>
       ) : null}
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={mapPin?.owner_id}
+          permissions={mapPin?.permissions || []}
+          related_id={mapPin?.id || null}
+          selectablePermissions={["read_map_pins", "update_map_pins", "delete_map_pins"]}
+        />
+      ) : null}
 
       <Button
         icon={IconEnum.save}
-        isDisabled={isSaveDisabled(mapPin, { exceptions }) || isCreating || isUpdating}
+        isDisabled={isSaveDisabled(mapPin, { exceptions }) || isCreating || isUpdating || !permissions?.update_map_pins}
         isLoading={isCreating || isUpdating}
         label="Save"
         onClick={async () => {
           if (!("id" in data) || !data?.id) {
-            const parsed = InsertMapPinSchema.parse({ data: mapPin });
+            const parsed = InsertMapPinSchema.parse({ data: mapPin, permissions: mapPin.permissions });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
 
             // Must insert character into query data here as the character prop/data itself
@@ -410,7 +467,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               },
             });
           } else {
-            const parsed = UpdateMapPinSchema.parse({ data: mapPin });
+            const parsed = UpdateMapPinSchema.parse({ data: mapPin, permissions: mapPin.permissions });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
             // if (character) final.character = character;
             await updateMapPin(final, {

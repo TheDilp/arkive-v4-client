@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../permissions";
+
 export const InsertMapPinSchema = z.object({
   data: z.object({
     id: z.string(),
@@ -20,6 +22,7 @@ export const InsertMapPinSchema = z.object({
     character_id: z.string().nullable().optional(),
     map_pin_type_id: z.string().nullable().optional(),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 export const UpdateMapPinSchema = z.object({
   data: z.object({
@@ -40,6 +43,7 @@ export const UpdateMapPinSchema = z.object({
     character_id: z.string().nullable().optional(),
     map_pin_type_id: z.string().nullable().optional(),
   }),
+  permissions: UpdateEntityPermissionSchema,
 });
 
 export type InsertMapPinType = z.infer<typeof InsertMapPinSchema>;

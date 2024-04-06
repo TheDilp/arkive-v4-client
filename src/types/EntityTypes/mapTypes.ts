@@ -36,6 +36,7 @@ export interface MapLayerType {
 
 export interface MapPinType {
   id: string;
+  owner_id: string;
   title: string | null;
   parent_id: string;
   lat: number;
@@ -58,6 +59,7 @@ export interface MapPinType {
   character?: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
   events: Pick<EventType, "id" | "title" | "image_id" | "parent_id">[];
   map_pin_type?: MapPinType | null;
+  permissions: EntityPermissionType[];
 }
 
 export interface MapPinTypesType {
