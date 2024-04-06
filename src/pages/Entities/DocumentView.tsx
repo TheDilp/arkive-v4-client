@@ -300,6 +300,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   if (currentDocument?.data?.is_folder) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
+
   return (
     <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:w-[60%]">
       {changedData ? (

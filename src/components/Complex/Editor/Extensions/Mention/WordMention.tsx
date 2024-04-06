@@ -1,3 +1,5 @@
+import { MutableRefObject, useEffect, useRef } from "react";
+
 import { useGetSubEntity } from "../../../../../hooks";
 import { WordType } from "../../../../../types";
 import { Spinner, Tooltip } from "../../../..";
@@ -39,7 +41,8 @@ function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
   );
 }
 export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: Props) {
-  const { data } = useGetSubEntity<WordType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, refetch } = useGetSubEntity<WordType>(
     id as string,
     "words",
     {
@@ -48,8 +51,32 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
       },
       fields: ["id", "title"],
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
+
   return (
     <Tooltip
       arrowColor="#3f3f46"

@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import { useGetSubEntity } from "../../../../../hooks";
@@ -14,14 +15,38 @@ type Props = {
   isPublic?: boolean;
 };
 export function EventMention({ id, project_id, title, label, isPublic, parent_id }: Props) {
-  const { data } = useGetSubEntity<EventType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, refetch } = useGetSubEntity<EventType>(
     id,
     "events",
     {
       fields: ["id", "title", "parent_id", "is_public"],
     },
-    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
 
   return data?.data && (data?.data?.is_public || !isPublic) ? (
     <Link

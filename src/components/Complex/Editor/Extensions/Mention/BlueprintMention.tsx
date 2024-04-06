@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import { useGetSubEntity } from "../../../../../hooks";
@@ -15,7 +16,8 @@ type Props = {
   isPublic?: boolean;
 };
 export function BlueprintMention({ id, project_id, title, label, icon, parent_id, isPublic }: Props) {
-  const { data } = useGetSubEntity<BlueprintInstanceType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, refetch } = useGetSubEntity<BlueprintInstanceType>(
     id as string,
     "blueprint_instances",
     {
@@ -24,8 +26,32 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
       },
       fields: ["id", "title", "is_public", "parent_id"],
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
+
   if (data?.data && (data?.data?.is_public || !isPublic))
     return (
       <Link

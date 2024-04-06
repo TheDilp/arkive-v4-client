@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Icon } from "@iconify/react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -45,14 +46,38 @@ function CharacterMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "ti
 }
 
 export function CharacterMention({ id, project_id, title, label, isPublic }: Props) {
-  const { data } = useGetEntity<CharacterType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, refetch } = useGetEntity<CharacterType>(
     id,
     "characters",
     {
       fields: ["id", "full_name", "is_public", "portrait_id"],
     },
-    { enabled: !!id, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
 
   if (isPublic && !data?.data?.is_public) return <span className="font-lato">{label}</span>;
 
@@ -66,7 +91,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
       <Link
         className="inline-flex items-center font-lato text-sm font-bold transition-colors"
         to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
-        <div className="flex items-start">
+        <div ref={mentionRef} className="flex items-start">
           {data?.data?.portrait_id ? (
             <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
               <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />

@@ -1,3 +1,4 @@
+import { MutableRefObject, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
@@ -39,7 +40,8 @@ function DocumentMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "tit
   );
 }
 export function DocumentMention({ alterId, title, id, label, project_id, isPublic }: Props) {
-  const { data } = useGetEntity<DocumentType>(
+  const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const { data, refetch } = useGetEntity<DocumentType>(
     id as string,
     "documents",
     {
@@ -48,9 +50,33 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
         alter_names: !!alterId,
       },
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
   );
   const alter_name = data?.data?.alter_names?.find((an) => an.id === alterId);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!!id && !data && entry.isIntersecting) refetch();
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1, // 100% of target visible
+      },
+    );
+
+    if (mentionRef.current) {
+      observer.observe(mentionRef.current);
+    }
+
+    return () => {
+      if (mentionRef.current) {
+        observer.unobserve(mentionRef.current);
+      }
+    };
+  }, []);
+
   if (data?.data && (data?.data?.is_public || !isPublic))
     return (
       <Tooltip
