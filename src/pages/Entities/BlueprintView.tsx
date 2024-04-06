@@ -1,7 +1,7 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Select, Table, TablePageLayout } from "../../components";
@@ -328,6 +328,11 @@ export function BlueprintView() {
     setDrawer,
     dispatch,
   });
+
+  useEffect(() => {
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+  }, [arkived]);
 
   return (
     <TablePageLayout>

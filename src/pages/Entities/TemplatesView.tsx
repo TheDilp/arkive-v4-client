@@ -1,6 +1,6 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
@@ -210,6 +210,11 @@ export function TemplatesView() {
     },
     "character_fields_templates",
   );
+
+  useEffect(() => {
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+  }, [arkived]);
   return (
     <TablePageLayout>
       <div className="flex h-12 w-full items-center justify-end gap-x-2">

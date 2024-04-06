@@ -815,7 +815,8 @@ export function FolderView() {
 
   useEffect(() => {
     dispatch({ type: "clearSelection" });
-  }, [item_id]);
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+  }, [item_id, arkived]);
   useEffect(() => {
     if (
       EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&

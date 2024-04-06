@@ -2,7 +2,7 @@ import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch } from "react";
+import { Dispatch, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -786,6 +786,11 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
       enabled: !!blueprint?.data,
     },
   );
+
+  useEffect(() => {
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+  }, [arkived]);
 
   return (
     <TablePageLayout>

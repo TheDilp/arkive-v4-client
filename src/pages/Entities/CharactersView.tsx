@@ -708,6 +708,8 @@ export function CharactersView() {
         type: "clearAllFilters",
       });
     }
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
@@ -729,7 +731,8 @@ export function CharactersView() {
       };
     }
     return () => {};
-  }, [filter, dispatch, view]);
+  }, [filter, dispatch, view, arkived]);
+
   return (
     <TablePageLayout>
       <CharacterViewHeader

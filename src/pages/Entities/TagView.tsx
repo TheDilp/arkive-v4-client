@@ -276,6 +276,8 @@ export function TagView() {
         type: "clearAllFilters",
       });
     }
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
         if (filter) {
