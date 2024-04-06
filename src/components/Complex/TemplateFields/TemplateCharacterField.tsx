@@ -33,7 +33,6 @@ export function TemplateCharacterField({
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex h-56 max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
-          isAutocomplete
           isDisabled={isDisabled}
           isMultiple
           name={name}

@@ -315,7 +315,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
         <div className="flex flex-col gap-y-2">
           {!node?.character ? (
             <Search
-              isAutocomplete
               isDisabled={!permissions?.read_characters}
               label="Represents character (optional)"
               name="character.id"
@@ -346,7 +345,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           )}
           {!node?.document ? (
             <Search
-              isAutocomplete
               isDisabled={!permissions?.read_documents}
               label="Related document (optional)"
               name="document.id"
@@ -375,7 +373,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           )}
           {!node?.map_pin ? (
             <Search
-              isAutocomplete
               label="Related location (optional)"
               name="map_pin.id"
               onChange={({ value, label }) => {
@@ -400,7 +397,6 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
           )}
           {!node?.event ? (
             <Search
-              isAutocomplete
               isDisabled={permissions?.read_events}
               label="Related event (optional)"
               name="event.id"

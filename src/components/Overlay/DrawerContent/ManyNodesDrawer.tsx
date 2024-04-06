@@ -357,7 +357,6 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
         <div className="flex flex-col gap-y-2">
           {!node?.character ? (
             <Search
-              isAutocomplete
               label="Represents character (optional)"
               name="character.id"
               onChange={({ value, label, image }) => {
@@ -383,7 +382,6 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
           )}
           {!node?.document ? (
             <Search
-              isAutocomplete
               label="Related document (optional)"
               name="document.id"
               onChange={({ value, label }) => {
@@ -407,7 +405,6 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
           )}
           {!node?.map_pin ? (
             <Search
-              isAutocomplete
               label="Related location (optional)"
               name="map_pin.id"
               onChange={({ value, label }) => {
@@ -432,7 +429,6 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
           )}
           {!node?.event ? (
             <Search
-              isAutocomplete
               label="Related event (optional)"
               name="event.id"
               onChange={({ value, label }) => {

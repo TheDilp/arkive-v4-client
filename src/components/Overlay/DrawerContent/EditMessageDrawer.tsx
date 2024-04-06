@@ -100,7 +100,6 @@ export function EditMessageDrawer({ data }: Props) {
         <>
           <Search
             imageType="map_images"
-            isAutocomplete
             name="place"
             onChange={({ value, label, image, parent_id, icon }) => {
               setContent({

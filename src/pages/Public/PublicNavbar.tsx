@@ -60,7 +60,6 @@ export function PublicNavbar() {
           <Search
             hasNoBackground
             imageType="images"
-            isAutocomplete
             isPublic
             manualResults={(results || []).flatMap((result) =>
               result.result.map((r) => {

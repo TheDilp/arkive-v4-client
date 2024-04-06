@@ -92,11 +92,7 @@ const SearchClasses = tv({
         input: "bg-zinc-700 text-zinc-400 cursor-not-allowed pointer-events-none select-none",
       },
     },
-    isAutocomplete: {
-      true: {
-        base: "rounded-r-md",
-      },
-    },
+
     hasValueWithImage: {
       true: {
         input: "pl-2",
@@ -166,7 +162,6 @@ export function Search({
   initialDisplayValue,
   placeholder,
   label,
-  isAutocomplete = true,
   isAutofocused,
   variant = "primary",
   searchEntity,
@@ -199,7 +194,6 @@ export function Search({
     optionsContainer,
   } = SearchClasses({
     variant,
-    isAutocomplete,
     hasValueWithImage: !isMultiple && !!value && searchEntity === "images",
     isDisabled,
     size,
@@ -276,7 +270,7 @@ export function Search({
   }, [data?.data]);
 
   useEffect(() => {
-    if (isAutocomplete && inputValue.length >= 2 && document.activeElement === inputRef.current) {
+    if (inputValue.length >= 2 && document.activeElement === inputRef.current) {
       setSearchTerm(inputValue);
       const timeout = setTimeout(() => {
         refetch();
@@ -291,7 +285,7 @@ export function Search({
       setOpen(false);
     }
     return () => {};
-  }, [isAutocomplete, inputValue, refetch]);
+  }, [inputValue, refetch]);
 
   useEffect(() => {
     if (document.activeElement !== inputRef.current) setOpen(false);
@@ -396,7 +390,7 @@ export function Search({
         />
 
         <div className={buttonContainer()}>
-          {isAutocomplete ? (
+          {!inputValue && !displayValue ? (
             <div className="flex h-full items-center justify-center">
               <Icon
                 className={isFetching ? "animate-spin" : ""}
@@ -407,101 +401,102 @@ export function Search({
             </div>
           ) : (
             <Button
-              hasNoBackground={hasNoBackground}
-              icon={isFetching ? IconEnum.loading : IconEnum.search}
+              hasNoBackground
+              icon={IconEnum.close}
               isDisabled={!inputValue}
               isLoading={isFetching}
-              onClick={() => refetch()}
-              variant={hasNoBackground ? "primary" : "info"}
+              onClick={() => {
+                setDisplayValue("");
+                setInputValue("");
+              }}
+              variant="primary"
             />
           )}
         </div>
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || (!isAutocomplete && (searchTerm || displayValue))) &&
-          !isOptionsHidden &&
-          (data?.data?.length || manualResults?.length) && (
-            <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
-              <div
-                {...getFloatingProps({
-                  ref: refs.setFloating,
-                  style: floatingStyles,
-                })}
-                className={optionsContainer()}>
-                {(manualResults || data?.data)?.map((item, index) => (
-                  <Item
-                    {...getItemProps({
-                      key: item.value,
-                      ref(node) {
-                        listRef.current[index] = node;
-                      },
-                      onClick(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onChange({
-                          name,
-                          value: item.value,
-                          label: item.label,
-                          color: item?.color,
-                          image: item?.image,
-                          parent_id: item?.parent_id,
-                          type: item?.type,
-                          icon: item?.icon,
-                        });
+        {(open || searchTerm || displayValue) && !isOptionsHidden && (data?.data?.length || manualResults?.length) && (
+          <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
+            <div
+              {...getFloatingProps({
+                ref: refs.setFloating,
+                style: floatingStyles,
+              })}
+              className={optionsContainer()}>
+              {(manualResults || data?.data)?.map((item, index) => (
+                <Item
+                  {...getItemProps({
+                    key: item.value,
+                    ref(node) {
+                      listRef.current[index] = node;
+                    },
+                    onClick(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onChange({
+                        name,
+                        value: item.value,
+                        label: item.label,
+                        color: item?.color,
+                        image: item?.image,
+                        parent_id: item?.parent_id,
+                        type: item?.type,
+                        icon: item?.icon,
+                      });
 
-                        if (hasShownOption) setDisplayValue(item.label);
-                        if (!isMultiple) {
-                          remove();
-                          setOpen(false);
-                        }
+                      if (hasShownOption) setDisplayValue(item.label);
+                      if (!isMultiple) {
+                        remove();
+                        setOpen(false);
+                      }
 
-                        inputRef.current?.focus();
-                      },
-                    })}
-                    isActive={activeIndex === index}
-                    isSelected={(value || [])?.includes(item.value)}>
-                    {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                    ((searchEntity === "places" ||
-                      searchEntity === "maps" ||
-                      searchEntity === "characters" ||
-                      searchEntity === "all") &&
-                      item?.image) ? (
-                      <Avatar
-                        image={getImageURL(
-                          project_id as string,
-                          imageType || "images",
-                          searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
-                        )}
-                        imageLoading="lazy"
-                        isTooltipDisabled
-                        label={label || ""}
-                        size="xs"
-                      />
-                    ) : null}
-                    {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
-                    <span className="truncate">{item.label}</span>
-                  </Item>
-                ))}
+                      inputRef.current?.focus();
+                    },
+                  })}
+                  isActive={activeIndex === index}
+                  isSelected={(value || [])?.includes(item.value)}>
+                  {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
+                  ((searchEntity === "places" ||
+                    searchEntity === "maps" ||
+                    searchEntity === "characters" ||
+                    searchEntity === "all") &&
+                    item?.image) ? (
+                    <Avatar
+                      image={getImageURL(
+                        project_id as string,
+                        imageType || "images",
+                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
+                      )}
+                      imageLoading="lazy"
+                      isTooltipDisabled
+                      label={label || ""}
+                      size="xs"
+                    />
+                  ) : null}
+                  {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
+                  <span className="truncate">{item.label}</span>
+                </Item>
+              ))}
 
-                {/* If no results for public search display NO RESULTS */}
-                {isPublic && data?.data?.length && !manualResults?.length ? (
-                  <Item
-                    {...getItemProps({
-                      key: "no_results",
-                      onClick(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      },
-                    })}
-                    isActive={false}
-                    isSelected={false}>
-                    <span className="truncate">No results</span>
-                  </Item>
-                ) : null}
-              </div>
-            </FloatingFocusManager>
-          )}
+              {/* If no results for public search display NO RESULTS */}
+              {isPublic && data?.data?.length && !manualResults?.length ? (
+                <Item
+                  {...getItemProps({
+                    key: "no_results",
+                    onClick(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    },
+                  })}
+                  isActive={false}
+                  isSelected={false}>
+                  <span className="truncate">No results</span>
+                </Item>
+              ) : null}
+            </div>
+          </FloatingFocusManager>
+        )}
       </FloatingPortal>
     </div>
   );

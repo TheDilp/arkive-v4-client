@@ -34,7 +34,6 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
             <Search
               helperText={helperText}
               imageType={type}
-              isAutocomplete
               isDisabled={isDisabled || !permissions?.read_assets}
               limit={100}
               name={name}

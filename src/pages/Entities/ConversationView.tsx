@@ -379,7 +379,6 @@ export function ConversationView({ id }: { id: string }) {
           <Search
             allowedPlacements={["top"]}
             imageType="map_images"
-            isAutocomplete
             name="place"
             onChange={({ value, label, image, parent_id, icon }) => {
               const content = {
