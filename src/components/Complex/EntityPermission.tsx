@@ -48,7 +48,9 @@ export function EntityPermission({ related_id, permissions, handleChange, select
   const user = useAtomValue(userAtom);
   const members = useAtomValue(membersAtom);
 
-  const availablePermissions = useAtomValue(permissionsAtom).filter((p) => selectablePermissions.includes(p.code as string));
+  const availablePermissions = useAtomValue(permissionsAtom)
+    .filter((p) => selectablePermissions.includes(p.code as string))
+    .toReversed();
   return (
     <div className="flex flex-col gap-y-4">
       <OwnerDisplay members={members} owner_id={owner_id} user={user} />

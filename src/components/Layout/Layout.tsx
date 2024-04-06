@@ -57,9 +57,19 @@ export function ProjectLayout() {
     { enabled: !!user?.id && !!project_id },
   );
 
-  const { data: permissions } = useGetEntities<PermissionType>({ fields: ["id", "title", "code"] }, "permissions", {
-    staleTime: Infinity,
-  });
+  const { data: permissions } = useGetEntities<PermissionType>(
+    {
+      fields: ["id", "title", "code"],
+      orderBy: [
+        { field: "parent_category", sort: "asc" },
+        { field: "title", sort: "asc" },
+      ],
+    },
+    "permissions",
+    {
+      staleTime: Infinity,
+    },
+  );
   const setProjectAtom = useSetAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
