@@ -77,7 +77,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
     };
   }, []);
 
-  return (
+  return id ? (
     <Tooltip
       arrowColor="#3f3f46"
       content={<WordMentionTooltip id={id} isPublic={isPublic} />}
@@ -87,5 +87,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
         <sup>*</sup>
       </span>
     </Tooltip>
+  ) : (
+    <span className="font-lato underline decoration-wavy">{label}</span>
   );
 }

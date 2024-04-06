@@ -86,6 +86,6 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
       </Link>
     </Tooltip>
   ) : (
-    <span className="font-lato">{label}</span>
+    <span className="font-lato underline decoration-wavy">{label}</span>
   );
 }

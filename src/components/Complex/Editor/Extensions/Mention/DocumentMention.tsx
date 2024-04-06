@@ -98,5 +98,5 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
       </Tooltip>
     );
 
-  return <span className="font-lato">{label}</span>;
+  return <span className="font-lato underline decoration-wavy">{label}</span>;
 }

@@ -104,6 +104,6 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
       </Link>
     </Tooltip>
   ) : (
-    <span className="font-lato">{label}</span>
+    <span className="font-lato underline decoration-wavy">{label}</span>
   );
 }
