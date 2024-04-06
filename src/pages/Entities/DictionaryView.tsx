@@ -68,7 +68,7 @@ function createColumns(
                   onClick: () => {
                     setDrawer((prev) => ({
                       ...prev,
-                      data: row.original,
+                      data: { id: row.original.id },
                       title: `Edit word - ${row.original.title}`,
                       size: "lg",
                       type: "words",
