@@ -73,7 +73,10 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   const graph = existingGraphData?.data || data;
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-  const permissions = useHasPermissions(["read_graphs", "update_graphs", "delete_graphs", "read_tags"], graph?.owner_id);
+  const permissions = useHasPermissions(
+    ["create_graphs", "read_graphs", "update_graphs", "delete_graphs", "read_tags"],
+    graph?.owner_id,
+  );
   const updateGraphActionPermission = hasActionPermission(
     isProjectOwner,
     user?.id === graph?.owner_id,
@@ -706,7 +709,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         <div className="ml-auto w-min">
           <Button
             icon={IconEnum.add}
-            isDisabled={isMutating}
+            isDisabled={isMutating || !permissions?.create_graphs}
             isLoading={isMutating}
             label="Create graph from tree"
             onClick={async () => {
