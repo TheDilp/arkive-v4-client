@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
+
 const FieldTypeSchema = z.union([
   z.literal("text"),
   z.literal("textarea"),
@@ -43,6 +45,7 @@ export const InsertTemplateSchema = z.object({
       .array(),
     tags: z.object({ id: z.string() }).array().min(1),
   }),
+  permissions: InsertEntityPermissionSchema,
 });
 
 export const UpdateTemplateSchema = z
@@ -74,6 +77,7 @@ export const UpdateTemplateSchema = z
         .array()
         .optional(),
     }),
+    permissions: UpdateEntityPermissionSchema,
   })
   .strict();
 

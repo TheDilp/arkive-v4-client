@@ -5,17 +5,20 @@ import { useResetAtom } from "jotai/utils";
 import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
 import {
   CharacterFieldTemplateType,
   CharacterFieldType,
   InputOnChangeValue,
   onChangeValue,
+  TabType,
   TemplateStateType,
+  UserHasPermissionsType,
 } from "../../../types";
 import { CharacterFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
+import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input, Search, Select, TagInput } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
@@ -236,10 +239,16 @@ function FieldRow({
   );
 }
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "2", label: "Fields", icon: IconEnum.additional_fields },
-];
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
+  const tabs: TabType[] = [
+    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
+    { id: "2", label: "Fields", icon: IconEnum.additional_fields },
+  ];
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
 
 export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
@@ -253,7 +262,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     "character_fields_templates",
     project_id as string,
   );
-
   const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType>(
     data?.id,
     "character_fields_templates",
@@ -271,6 +279,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       enabled: !!data?.id,
     },
   );
+
+  const permissions = useHasPermissions(
+    ["read_character_fields_templates", "update_character_fields_templates"],
+    existingTemplate?.data?.owner_id,
+  );
+  const tabs = getTabs(permissions, existingTemplate?.data?.id);
 
   const [template, setTemplate] = useState<TemplateStateType>({
     title: "",
@@ -294,7 +308,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <div className="flex flex-nowrap items-center gap-x-2">
             <div className="flex-1">
@@ -326,7 +340,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           </div>
         </>
       ) : null}
-      {selectedTab === 1 ? (
+      {tabs[selectedTab].id === "2" ? (
         <div className="flex max-h-[90%] flex-col content-start gap-y-2 overflow-hidden">
           <h5 className="border-b border-zinc-600 text-lg">Fields</h5>
           <div className="flex items-center justify-between">
@@ -478,10 +492,29 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
           </div>
         </div>
       ) : null}
+
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={template?.owner_id}
+          permissions={template?.permissions || []}
+          related_id={template?.id || null}
+          selectablePermissions={[
+            "read_character_fields_templates",
+            "update_character_fields_templates",
+            "delete_character_fields_templates",
+          ]}
+        />
+      ) : null}
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(template) || isLoading}
+          isDisabled={
+            isSaveDisabled(template) ||
+            isLoading ||
+            (data?.id && !permissions?.update_character_fields_templates) ||
+            (!data?.id && !permissions?.create_character_fields_templates)
+          }
           isLoading={isLoading}
           label={data?.id ? "Update" : "Create"}
           onClick={async () => {
@@ -493,6 +526,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                   tags,
                   character_fields,
                 },
+                permissions: template.permissions,
               });
               await create(parsedData, {
                 onSuccess: () => {
@@ -510,6 +544,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                   tags,
                   character_fields,
                 },
+                permissions: template.permissions,
               });
               await update(parsedData, {
                 onSuccess: () => {
