@@ -28,18 +28,22 @@ const ExpandedTableRowClasses = tv({
 function expandedTagRowTabs(counts: number[]) {
   return [
     { id: "1", label: `Characters (${counts[0]})`, icon: IconEnum.character },
-    { id: "2", label: `Documents (${counts[1]})`, icon: IconEnum.document },
-    { id: "3", label: `Maps (${counts[2]})`, icon: IconEnum.map },
-    { id: "4", label: `Graphs (${counts[3]})`, icon: IconEnum.graph },
-    { id: "5", label: `Nodes (${counts[4]})`, icon: IconEnum.node },
-    { id: "6", label: `Edges (${counts[5]})`, icon: IconEnum.edge },
-    { id: "8", label: `Calendars (${counts[6]})`, icon: IconEnum.calendar },
-    { id: "9", label: `Dictionaries (${counts[7]})`, icon: IconEnum.dictionary },
+    { id: "2", label: `Blueprint instances (${counts[1]})`, icon: IconEnum.blueprint },
+    { id: "3", label: `Documents (${counts[2]})`, icon: IconEnum.document },
+    { id: "4", label: `Maps (${counts[3]})`, icon: IconEnum.map },
+    { id: "5", label: `Graphs (${counts[4]})`, icon: IconEnum.graph },
+    { id: "6", label: `Nodes (${counts[5]})`, icon: IconEnum.node },
+    { id: "7", label: `Edges (${counts[6]})`, icon: IconEnum.edge },
+    { id: "8", label: `Calendars (${counts[7]})`, icon: IconEnum.calendar },
+    { id: "9", label: `Dictionaries (${counts[8]})`, icon: IconEnum.dictionary },
   ];
 }
 
 type FormattedTagEntitiesSearch = Record<"characters", Pick<CharacterType, "id" | "full_name" | "portrait_id">[]> &
-  Record<"documents" | "maps" | "graphs" | "calendars" | "dictionaries", { id: string; title: string; icon?: string }[]> &
+  Record<
+    "blueprint_instances" | "documents" | "maps" | "graphs" | "calendars" | "dictionaries",
+    { id: string; title: string; icon?: string }[]
+  > &
   Record<"nodes" | "edges", { id: string; label: string; parent_id: string }[]>;
 
 function ExpandedRowTagListWrapper({
@@ -200,7 +204,7 @@ function ExpandedTag({ id }: { id: string }) {
     { data: { tag_ids: [id], match: "all" }, limit: 100 },
     "by_tags",
     project_id as string,
-    { queryKeyConcat: [id] },
+    { queryKeyConcat: [id], enabled: true },
   );
 
   const formatted: FormattedTagEntitiesSearch = (searchByTagsData?.data || []).reduce(
@@ -208,7 +212,17 @@ function ExpandedTag({ id }: { id: string }) {
       set(accumulator, curr.name, curr.result);
       return accumulator;
     },
-    { characters: [], documents: [], maps: [], graphs: [], nodes: [], edges: [], calendars: [], dictionaries: [] },
+    {
+      characters: [],
+      blueprint_instances: [],
+      documents: [],
+      maps: [],
+      graphs: [],
+      nodes: [],
+      edges: [],
+      calendars: [],
+      dictionaries: [],
+    },
   );
 
   if (isFetching) return <Skeleton type="expanded_tag" />;
@@ -224,18 +238,21 @@ function ExpandedTag({ id }: { id: string }) {
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="characters" />
       ) : null}
       {selectedTab === 1 ? (
+        <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="blueprint_instances" />
+      ) : null}
+      {selectedTab === 2 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="documents" />
       ) : null}
-      {selectedTab === 2 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="maps" /> : null}
-      {selectedTab === 3 ? (
+      {selectedTab === 3 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="maps" /> : null}
+      {selectedTab === 4 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="graphs" />
       ) : null}
-      {selectedTab === 4 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="nodes" /> : null}
-      {selectedTab === 5 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="edges" /> : null}
-      {selectedTab === 6 ? (
+      {selectedTab === 5 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="nodes" /> : null}
+      {selectedTab === 6 ? <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="edges" /> : null}
+      {selectedTab === 7 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="calendars" />
       ) : null}
-      {selectedTab === 7 ? (
+      {selectedTab === 8 ? (
         <ExpandedRowTagListWrapper data={formatted} project_id={project_id as string} type="dictionaries" />
       ) : null}
     </div>
