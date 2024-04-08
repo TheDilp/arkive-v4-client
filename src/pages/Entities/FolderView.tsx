@@ -20,6 +20,7 @@ import {
 } from "../../components";
 import {
   useBreakpoint,
+  useBulkUpdate,
   useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
@@ -27,12 +28,12 @@ import {
   useHasPermissions,
   useTable,
   useUpdateEntity,
-  useUpdateManyPublic,
 } from "../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
   BaseEntityType,
+  BulkUpdateType,
   DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
@@ -44,7 +45,6 @@ import {
   TableSelectedAction,
   TableSelectionType,
   TagType,
-  UpdatePublicManyType,
   UserHasPermissionsType,
   WebhookType,
 } from "../../types";
@@ -118,7 +118,7 @@ function getColumns(
   project_id: string,
   is_document_template: boolean,
   webhooks: WebhookType[],
-  updatePublicMany: UpdatePublicManyType,
+  updateMany: BulkUpdateType,
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
@@ -178,8 +178,8 @@ function getColumns(
             icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
             isDisabled={!!row.original.deleted_at}
             isIconOnly
-            onClick={async () => {
-              await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            onClick={() => {
+              updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });
             }}
           />
         ),
@@ -483,7 +483,7 @@ function getSelectedActions(
   permissions: UserHasPermissionsType,
   {
     selection,
-    updatePublicMany,
+    updateMany,
     resetDialogAtom,
     deleteMany,
     dispatch,
@@ -493,7 +493,7 @@ function getSelectedActions(
     setDialog,
     type,
   }: {
-    updatePublicMany: UpdatePublicManyType;
+    updateMany: BulkUpdateType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
     setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
@@ -515,11 +515,11 @@ function getSelectedActions(
               hasNoBackground: true,
               isIconOnly: true,
               tooltip: "Set public",
-              onClick: async () => {
+              onClick: () => {
                 const ids = Object.values(selection || {}).flatMap((id) => id);
                 const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
                 if (entitesNotFolders.length) {
-                  await updatePublicMany({ data: { ids, is_public: true } });
+                  updateMany({ data: ids.map((id) => ({ data: { id, is_public: true } })) });
                   dispatch({ type: "clearSelection" });
                 }
               },
@@ -529,11 +529,11 @@ function getSelectedActions(
               hasNoBackground: true,
               isIconOnly: true,
               tooltip: "Set private",
-              onClick: async () => {
+              onClick: () => {
                 const ids = Object.values(selection || {}).flatMap((id) => id);
                 const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id) && !e.is_folder);
                 if (entitesNotFolders.length) {
-                  await updatePublicMany({ data: { ids, is_public: false } });
+                  updateMany({ data: ids.map((id) => ({ data: { id, is_public: false } })) });
                   dispatch({ type: "clearSelection" });
                 }
               },
@@ -613,6 +613,48 @@ function getSelectedActions(
     });
   }
   if (permissions?.[`delete_${type}` as PermissionCodeType]) {
+    if (arkived === "arkive") {
+      selectedActions.push({
+        icon: IconEnum.restore,
+        variant: "primary",
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Restore selected rows",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          if (ids.length) {
+            setDialog((prev) => ({
+              ...prev,
+              title: "Restore many",
+              description: `Are you sure you want to restore ${ids.length} ${
+                ids.length === 1 ? getSingularEntityType(type) : getPluralEntityType(type)
+              }?`,
+              isOverlay: true,
+              cancel: {
+                label: "Cancel",
+                variant: "primary",
+                action: resetDialogAtom,
+              },
+              confirm: {
+                label: "Restore",
+                icon: IconEnum.restore,
+                action: () => {
+                  updateMany(
+                    { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                    {
+                      onSuccess: () => dispatch({ type: "clearSelection" }),
+                    },
+                  );
+                  dispatch({ type: "clearSelection" });
+                },
+                variant: "success",
+              },
+            }));
+          }
+        },
+      });
+    }
+
     selectedActions.push({
       icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
       variant: arkived === "arkive" ? "error" : "primary",
@@ -779,7 +821,7 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     },
   );
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
+  const { mutateAsync: updateMany } = useBulkUpdate(project_id as string, type as AvailableEntityType);
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, arkived === "active", project_id);
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
@@ -796,7 +838,7 @@ export function FolderView() {
     setDrawer,
     deleteMany,
     resetDialogAtom,
-    updatePublicMany,
+    updateMany,
     type: type as AvailableEntityType | AvailableSubEntityType,
     dispatch,
     data: base?.data || [],
@@ -1108,7 +1150,7 @@ export function FolderView() {
               project_id as string,
               documentType === "templates" && type === "documents",
               user?.webhooks || [],
-              updatePublicMany,
+              updateMany,
               permissions,
               isProjectOwner,
               user?.id as string,

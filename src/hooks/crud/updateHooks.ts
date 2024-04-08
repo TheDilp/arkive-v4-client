@@ -653,7 +653,7 @@ export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntity
   );
 }
 
-export function useBulkUpdate(project_id: string, type: AvailableEntityType) {
+export function useBulkUpdate(project_id: string, type: AvailableEntityType | "blueprint_instances") {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(

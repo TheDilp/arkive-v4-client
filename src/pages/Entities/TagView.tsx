@@ -5,7 +5,15 @@ import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
+import {
+  useBreakpoint,
+  useBulkUpdate,
+  useChangeNavbarTitle,
+  useDeleteMany,
+  useGetEntities,
+  useHasPermissions,
+  useTable,
+} from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
@@ -183,6 +191,7 @@ export function TagView() {
   useChangeNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const { mutate: updateMany } = useBulkUpdate(project_id as string, "tags");
   const { mutateAsync: deleteMany } = useDeleteMany("tags", arkived === "active", project_id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const [filter, setFilter] = useState("");
@@ -228,6 +237,48 @@ export function TagView() {
                   type: "tags",
                 },
               }));
+            },
+          },
+        ]
+      : []),
+
+    ...(arkived === "arkive"
+      ? [
+          {
+            icon: IconEnum.restore,
+            variant: "primary" as const,
+            hasNoBackground: true,
+            isIconOnly: true,
+            tooltip: "Restore selected rows",
+            onClick: () => {
+              const ids = Object.values(selection || {}).flatMap((id) => id);
+              if (ids.length) {
+                setDialog((prev) => ({
+                  ...prev,
+                  title: "Restore many",
+                  description: `Are you sure you want to restore ${ids.length} ${ids.length === 1 ? "tag" : "tags"}?`,
+                  isOverlay: true,
+                  cancel: {
+                    label: "Cancel",
+                    variant: "primary",
+                    action: resetDialogAtom,
+                  },
+                  confirm: {
+                    label: "Restore",
+                    icon: IconEnum.restore,
+                    action: () => {
+                      updateMany(
+                        { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                        {
+                          onSuccess: () => dispatch({ type: "clearSelection" }),
+                        },
+                      );
+                      dispatch({ type: "clearSelection" });
+                    },
+                    variant: "success",
+                  },
+                }));
+              }
             },
           },
         ]

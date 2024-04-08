@@ -5,8 +5,17 @@ import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Select, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import {
+  useBreakpoint,
+  useBulkUpdate,
+  useChangeNavbarTitle,
+  useDeleteMany,
+  useGetEntities,
+  useHasPermissions,
+  useTable,
+} from "../../hooks";
+import {
+  BulkUpdateType,
   DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
@@ -203,6 +212,7 @@ function getSelectedActions(
   {
     selection,
     arkived,
+    updateMany,
     resetDialogAtom,
     deleteMany,
     dispatch,
@@ -210,6 +220,7 @@ function getSelectedActions(
     setDialog,
   }: {
     arkived: "arkive" | "active";
+    updateMany: BulkUpdateType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
     setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
@@ -243,6 +254,46 @@ function getSelectedActions(
     });
   }
   if (permissions?.delete_blueprints) {
+    if (arkived === "arkive") {
+      selectedActions.push({
+        icon: IconEnum.restore,
+        variant: "primary",
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Restore selected rows",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          if (ids.length) {
+            setDialog((prev) => ({
+              ...prev,
+              title: "Restore many",
+              description: `Are you sure you want to restore ${ids.length} ${ids.length === 1 ? "blueprint" : "blueprints"}?`,
+              isOverlay: true,
+              cancel: {
+                label: "Cancel",
+                variant: "primary",
+                action: resetDialogAtom,
+              },
+              confirm: {
+                label: "Restore",
+                icon: IconEnum.restore,
+                action: () => {
+                  updateMany(
+                    { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                    {
+                      onSuccess: () => dispatch({ type: "clearSelection" }),
+                    },
+                  );
+                  dispatch({ type: "clearSelection" });
+                },
+                variant: "success",
+              },
+            }));
+          }
+        },
+      });
+    }
+
     selectedActions.push({
       icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
       variant: arkived === "arkive" ? "error" : "primary",
@@ -301,6 +352,7 @@ export function BlueprintView() {
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
   const resetDialogAtom = useResetAtom(dialogAtom);
+  const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprints");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", arkived === "active", project_id);
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
@@ -326,6 +378,7 @@ export function BlueprintView() {
 
   const selectedActions = getSelectedActions(permissions, {
     arkived,
+    updateMany,
     deleteMany,
     selection,
     resetDialogAtom,

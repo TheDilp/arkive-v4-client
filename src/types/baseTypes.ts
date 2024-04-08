@@ -1,4 +1,4 @@
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
 
 export type Size = "4xl" | "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type Variant =
@@ -97,6 +97,21 @@ export type DeleteManyType = UseMutateAsyncFunction<
     data: {
       ids: string[];
     };
+  },
+  unknown
+>;
+
+export type BulkUpdateType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      data: {
+        [key: string]: any;
+        id: string;
+        parent_id?: string | null | undefined;
+      };
+    }[];
   },
   unknown
 >;

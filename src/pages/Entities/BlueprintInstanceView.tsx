@@ -1,4 +1,3 @@
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
@@ -17,17 +16,18 @@ import {
   Tooltip,
 } from "../../components";
 import {
+  useBulkUpdate,
   useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useGetEntity,
   useHasPermissions,
   useTable,
-  useUpdateManyPublic,
 } from "../../hooks";
 import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
+  BulkUpdateType,
   DeleteManyType,
   DialogAtomType,
   DrawerAtomType,
@@ -35,7 +35,6 @@ import {
   TableDispatch,
   TableSelectedAction,
   TableSelectionType,
-  UpdatePublicManyType,
   UserHasPermissionsType,
   WebhookType,
 } from "../../types";
@@ -224,17 +223,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   createNotification: (notification: Omit<NotificationType, "id">) => void,
-  updatePublicMany: UseMutateAsyncFunction<
-    any,
-    unknown,
-    {
-      data: {
-        ids: string[];
-        is_public: boolean;
-      };
-    },
-    unknown
-  >,
+  updateMany: BulkUpdateType,
   webhooks: WebhookType[],
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
@@ -423,8 +412,8 @@ function createColumns(
           icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
           isDisabled={!!row.original.deleted_at}
           isIconOnly
-          onClick={async () => {
-            await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+          onClick={() => {
+            updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });
           }}
         />
       ),
@@ -591,7 +580,7 @@ function getSelectedActions(
   permissions: UserHasPermissionsType,
   {
     selection,
-    updatePublicMany,
+    updateMany,
     resetDialog,
     deleteMany,
     dispatch,
@@ -601,7 +590,7 @@ function getSelectedActions(
     arkived,
   }: {
     arkived: "arkive" | "active";
-    updatePublicMany: UpdatePublicManyType;
+    updateMany: BulkUpdateType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
     setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
@@ -619,11 +608,11 @@ function getSelectedActions(
         hasNoBackground: true,
         isIconOnly: true,
         tooltip: "Set public",
-        onClick: async () => {
+        onClick: () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
           const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
-            await updatePublicMany({ data: { ids, is_public: true } });
+            updateMany({ data: ids.map((id) => ({ data: { id, is_public: true } })) });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -633,11 +622,11 @@ function getSelectedActions(
         hasNoBackground: true,
         isIconOnly: true,
         tooltip: "Set private",
-        onClick: async () => {
+        onClick: () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
           const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
-            await updatePublicMany({ data: { ids, is_public: false } });
+            updateMany({ data: ids.map((id) => ({ data: { id, is_public: false } })) });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -688,6 +677,47 @@ function getSelectedActions(
     });
   }
   if (permissions?.delete_blueprint_instances) {
+    if (arkived === "arkive") {
+      selectedActions.push({
+        icon: IconEnum.restore,
+        variant: "primary",
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Restore selected rows",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          if (ids.length) {
+            setDialog((prev) => ({
+              ...prev,
+              title: "Restore many",
+              description: `Are you sure you want to restore ${ids.length} ${
+                ids.length === 1 ? "blueprint instance" : "blueprint_instances"
+              }?`,
+              isOverlay: true,
+              cancel: {
+                label: "Cancel",
+                variant: "primary",
+                action: resetDialog,
+              },
+              confirm: {
+                label: "Restore",
+                icon: IconEnum.restore,
+                action: () => {
+                  updateMany(
+                    { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                    {
+                      onSuccess: () => dispatch({ type: "clearSelection" }),
+                    },
+                  );
+                  dispatch({ type: "clearSelection" });
+                },
+                variant: "success",
+              },
+            }));
+          }
+        },
+      });
+    }
     selectedActions.push({
       icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
       variant: arkived === "arkive" ? "error" : "primary",
@@ -713,13 +743,15 @@ function getSelectedActions(
             confirm: {
               label: arkived === "arkive" ? "Delete" : "Arkive",
               icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
-              action: async () =>
+              action: () => {
                 deleteMany(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
                   },
-                ),
+                );
+                dispatch({ type: "clearSelection" });
+              },
               variant: "error",
             },
           }));
@@ -762,7 +794,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
     fields: ["id", "title", "title_name"],
   });
   useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("blueprint_instances", project_id as string);
+  const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprint_instances");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
 
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
@@ -806,7 +838,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
               setDrawer,
               setDialog,
               createNotification,
-              updatePublicMany,
+              updateMany,
               user?.webhooks || [],
               permissions,
               isProjectOwner,
@@ -825,7 +857,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
                 data: instances?.data || [],
                 selection,
                 arkived,
-                updatePublicMany,
+                updateMany,
                 resetDialog,
                 deleteMany,
                 dispatch,

@@ -17,6 +17,7 @@ import {
 } from "../../components";
 import {
   useBreakpoint,
+  useBulkUpdate,
   useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
@@ -27,6 +28,7 @@ import {
   useUpdateManyPublic,
 } from "../../hooks";
 import {
+  BulkUpdateType,
   CharacterType,
   DeleteManyType,
   DialogAtomType,
@@ -345,7 +347,7 @@ function getSelectedActions(
   {
     selection,
     arkived,
-    updatePublicMany,
+    updateMany,
     resetDialogAtom,
     deleteMany,
     dispatch,
@@ -354,7 +356,7 @@ function getSelectedActions(
     setDialog,
   }: {
     arkived: "active" | "arkive";
-    updatePublicMany: UpdatePublicManyType;
+    updateMany: BulkUpdateType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
     setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
@@ -376,7 +378,7 @@ function getSelectedActions(
           const ids = Object.values(selection || {}).flatMap((id) => id);
           const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
-            await updatePublicMany({ data: { ids, is_public: true } });
+            updateMany({ data: ids.map((id) => ({ data: { id, is_public: true } })) });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -390,7 +392,7 @@ function getSelectedActions(
           const ids = Object.values(selection || {}).flatMap((id) => id);
           const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
-            await updatePublicMany({ data: { ids, is_public: false } });
+            updateMany({ data: ids.map((id) => ({ data: { id, is_public: false } })) });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -441,6 +443,45 @@ function getSelectedActions(
     });
   }
   if (permissions?.delete_characters) {
+    if (arkived === "arkive") {
+      selectedActions.push({
+        icon: IconEnum.restore,
+        variant: "primary",
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Restore selected rows",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          if (ids.length) {
+            setDialog((prev) => ({
+              ...prev,
+              title: "Restore many",
+              description: `Are you sure you want to restore ${ids.length} ${ids.length === 1 ? "character" : "characters"}?`,
+              isOverlay: true,
+              cancel: {
+                label: "Cancel",
+                variant: "primary",
+                action: resetDialogAtom,
+              },
+              confirm: {
+                label: "Restore",
+                icon: IconEnum.restore,
+                action: () => {
+                  updateMany(
+                    { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                    {
+                      onSuccess: () => dispatch({ type: "clearSelection" }),
+                    },
+                  );
+                  dispatch({ type: "clearSelection" });
+                },
+                variant: "success",
+              },
+            }));
+          }
+        },
+      });
+    }
     selectedActions.push({
       icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
       variant: arkived === "arkive" ? "error" : "primary",
@@ -466,13 +507,15 @@ function getSelectedActions(
             confirm: {
               label: arkived === "arkive" ? "Delete" : "Arkive",
               icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
-              action: async () =>
+              action: () => {
                 deleteMany(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
                   },
-                ),
+                );
+                dispatch({ type: "clearSelection" });
+              },
               variant: "error",
             },
           }));
@@ -651,6 +694,7 @@ export function CharactersView() {
     },
   );
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
+  const { mutate: updateMany } = useBulkUpdate(project_id as string, "characters");
 
   const { mutateAsync: deleteMany } = useDeleteMany("characters", arkived === "active", project_id);
   const {
@@ -697,7 +741,7 @@ export function CharactersView() {
 
   const selectedActions = getSelectedActions(permissions, {
     deleteMany,
-    updatePublicMany,
+    updateMany,
     selection,
     resetDialogAtom,
     setDialog,
