@@ -312,7 +312,7 @@ function menuBarItems({
               onClick: () => chain?.deleteTableRow()?.focus()?.run(),
             },
             {
-              id: "delete_row",
+              id: "delete_column",
               title: "Delete current column",
               icon: IconEnum.delete_column,
               onClick: () => chain?.deleteTableColumn()?.focus()?.run(),
