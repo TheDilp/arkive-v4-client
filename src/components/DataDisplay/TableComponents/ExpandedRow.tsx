@@ -58,7 +58,7 @@ function ExpandedRowTagListWrapper({
   if (!data[type]?.length)
     return (
       <div className="mt-2">
-        <Alert label="There is no content." variant="info" />
+        <Alert label="There is no content." variant="info-bordered" />
       </div>
     );
   return (
