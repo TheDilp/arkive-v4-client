@@ -246,10 +246,84 @@ function menuBarItems({
 
       subItems: [
         {
-          id: "create_basic_table",
-          icon: IconEnum.table_add,
-          title: "Create table",
-          onClick: () => chain?.createTable({ rowsCount: 3, columnsCount: 3, withHeaderRow: true })?.run(),
+          id: "create",
+          title: "Create",
+          icon: IconEnum.create_table,
+          onClick: undefined,
+          allowedPlacements: ["right-start"],
+          subItems: [
+            {
+              id: "create_basic_table",
+              icon: IconEnum.create_table,
+              title: "Create table (with headers)",
+              onClick: () => chain?.createTable({ rowsCount: 4, columnsCount: 4, withHeaderRow: true })?.run(),
+            },
+            {
+              id: "create_basic_table_no_headers",
+              icon: IconEnum.create_table,
+              title: "Create table (without headers)",
+              onClick: () => chain?.createTable({ rowsCount: 3, columnsCount: 3, withHeaderRow: false })?.run(),
+            },
+          ],
+        },
+        {
+          id: "add_to_table",
+          icon: IconEnum.add,
+          title: "Add",
+          onClick: undefined,
+          allowedPlacements: ["right-start"],
+          subItems: [
+            {
+              id: "add_row_above",
+              icon: IconEnum.create_row_before,
+              title: "Add row (above)",
+              onClick: () => chain?.addTableRowBefore()?.run(),
+            },
+            {
+              id: "add_row_below",
+              icon: IconEnum.create_row_after,
+              title: "Add row (below)",
+              onClick: () => chain?.addTableRowAfter()?.run(),
+            },
+            {
+              id: "add_col_left",
+              icon: IconEnum.create_column_before,
+              title: "Add column (left)",
+              onClick: () => chain?.addTableColumnBefore()?.run(),
+            },
+            {
+              id: "add_col_right",
+              icon: IconEnum.create_column_after,
+              title: "Add column (right)",
+              onClick: () => chain?.addTableColumnAfter()?.run(),
+            },
+          ],
+        },
+        {
+          id: "delete",
+          icon: IconEnum.trash,
+          title: "Delete",
+          allowedPlacements: ["right-start"],
+          subItems: [
+            {
+              id: "delete_row",
+              title: "Delete current row",
+              icon: IconEnum.delete_row,
+              onClick: () => chain?.deleteTableRow()?.focus()?.run(),
+            },
+            {
+              id: "delete_row",
+              title: "Delete current column",
+              icon: IconEnum.delete_column,
+              onClick: () => chain?.deleteTableColumn()?.focus()?.run(),
+            },
+            {
+              id: "delete_table",
+              title: "Delete table",
+              icon: IconEnum.delete_table,
+              onClick: () => chain?.deleteTable()?.focus()?.run(),
+            },
+          ],
         },
       ],
     },
