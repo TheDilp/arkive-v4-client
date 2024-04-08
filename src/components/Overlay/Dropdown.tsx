@@ -189,10 +189,11 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                       dropdownItem.subItems?.length ? (
                         <Dropdown
                           key={dropdownItem.id}
-                          allowedPlacements={allowedPlacements}
+                          allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                           isDisabled={dropdownItem?.isDisabled}
                           items={dropdownItem.subItems}>
                           <DropdownItem
+                            allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                             child={dropdownItem?.child}
                             icon={dropdownItem.icon}
                             iconColor={dropdownItem?.iconColor}
@@ -215,6 +216,7 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                       ) : (
                         <DropdownItem
                           key={dropdownItem.id}
+                          allowedPlacements={dropdownItem?.allowedPlacements || allowedPlacements}
                           child={dropdownItem?.child}
                           icon={dropdownItem.icon}
                           iconColor={dropdownItem?.iconColor}
