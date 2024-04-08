@@ -194,7 +194,7 @@ export function TemplatesView() {
     selection: {},
   });
 
-  const { data, isFetching } = useGetEntities<CharacterFieldTemplateType>(
+  const { data, isLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       filters,
       orderBy,
@@ -266,7 +266,7 @@ export function TemplatesView() {
           }}
           data={data?.data || []}
           dispatch={dispatch}
-          isLoading={isFetching}
+          isLoading={isLoading}
           pagination={pagination}
           type="character_fields_templates"
         />
