@@ -242,7 +242,7 @@ export function TagView() {
         ]
       : []),
 
-    ...(arkived === "arkive"
+    ...(arkived === "arkive" && permissions?.delete_tags
       ? [
           {
             icon: IconEnum.restore,
