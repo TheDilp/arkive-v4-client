@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { uniqueBy } from "remirror";
 
 import {
   useCreateEntity,
@@ -477,7 +476,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_fields_templates",
     {
-      enabled: tabs[selectedTab].id === "5" && !!character?.tags?.length,
+      enabled:
+        tabs[selectedTab].id === "5" &&
+        !!character?.tags?.length &&
+        permissions?.read_character_fields_templates &&
+        permissions?.read_tags,
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -523,7 +526,6 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       });
     }
   }, [existingCharacter?.data]);
-
   if (isFetching) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
@@ -860,7 +862,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           hasCreateOrEdit={hasCreateOrEdit && permissions?.read_character_fields_templates}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
-          templates={{ data: uniqueBy(templates?.data || [], "id") }}
+          templates={{ data: templates?.data || [] }}
         />
       ) : null}
       {tabs[selectedTab].id === "6" && (permissions?.is_owner || !data?.id) ? (
