@@ -26,7 +26,7 @@ import {
 } from "../../../utils";
 import { Button, Checkbox, Select } from "../../Form";
 import { DrawerLayout } from "../../Layout";
-import { Alert, Avatar } from "../../Misc";
+import { Alert, Avatar, Icon } from "../../Misc";
 
 type Props = {
   data: {
@@ -35,7 +35,7 @@ type Props = {
     getContext: ReactFrameworkOutput<Remirror.Extensions>;
   };
 };
-type matchItem = { id: string; title: string; image_id?: string; icon?: string; parent_id?: string };
+type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
 
 function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: SearchableMentionEntities | null): matchResult[] {
@@ -83,6 +83,7 @@ function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: Sea
           id: matchedItem.id,
           title: matchedItem.title,
           icon: matchedItem.icon,
+          blueprint_title: matchedItem?.blueprint_title,
           image_id: matchedItem?.image_id,
         });
     }
@@ -90,7 +91,16 @@ function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: Sea
     return false;
   });
 
-  return ranges;
+  return selectedEntity === "blueprint_instances"
+    ? ranges.sort((a, b) => {
+        if (a.blueprint_title && b.blueprint_title) {
+          if (a.blueprint_title < b.blueprint_title) return -1;
+          if (a.blueprint_title > b.blueprint_title) return 1;
+          return 0;
+        }
+        return 0;
+      })
+    : ranges;
 }
 
 function createMentions(
@@ -289,12 +299,19 @@ export function AutomentionDrawer({ data }: Props) {
                     <Avatar image={getImageURL(project_id as string, "images", potentialMatch.image_id)} size="xs" />
                   ) : null}
                   <span
+                    className="flex items-center justify-between gap-x-2 truncate"
                     onClick={() =>
                       setSelectedLinks((prev) =>
                         prev.includes(idWithRange) ? prev.filter((id) => id !== idWithRange) : prev.concat(idWithRange),
                       )
                     }>
-                    {potentialMatch.title}
+                    <span className="flex items-center gap-x-2">
+                      {potentialMatch?.icon ? <Icon icon={potentialMatch?.icon as AvailableIcons} /> : null}
+                      {potentialMatch.title}
+                    </span>
+                    <span className="text-sm text-zinc-500">
+                      {potentialMatch?.blueprint_title ? `(${potentialMatch?.blueprint_title})` : ""}
+                    </span>
                   </span>
                   <div className="ml-auto">
                     <Button
