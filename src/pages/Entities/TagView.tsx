@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
 import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType, Variant } from "../../types";
+import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
@@ -183,7 +183,7 @@ export function TagView() {
   useChangeNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const { mutateAsync: deleteMany } = useDeleteMany("tags", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany("tags", arkived === "active", project_id);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const [filter, setFilter] = useState("");
   const user = useAtomValue(userAtom);
@@ -207,42 +207,6 @@ export function TagView() {
     "tags",
   );
   const selectedActions = [
-    {
-      icon: IconEnum.trash,
-      variant: "error" as Variant,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Delete selected rows",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
-        if (ids.length) {
-          setDialog((prev) => ({
-            ...prev,
-            title: "Delete many",
-            description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "tag" : "tags"}?`,
-            warning: "This action cannot be undone.",
-            isOverlay: true,
-            cancel: {
-              label: "Cancel",
-              variant: "primary",
-              action: resetDialogAtom,
-            },
-            confirm: {
-              label: "Delete",
-              icon: IconEnum.trash,
-              action: async () =>
-                deleteMany(
-                  { data: { ids } },
-                  {
-                    onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
-                ),
-              variant: "error",
-            },
-          }));
-        }
-      },
-    },
     ...(isProjectOwner
       ? [
           {
@@ -268,6 +232,44 @@ export function TagView() {
           },
         ]
       : []),
+    {
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? ("error" as const) : ("primary" as const),
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? "tag" : "tags"
+            }?`,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    },
   ];
 
   useLayoutEffect(() => {

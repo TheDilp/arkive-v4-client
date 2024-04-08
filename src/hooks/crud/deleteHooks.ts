@@ -21,14 +21,14 @@ import {
   useNotifications,
 } from "../../utils";
 
-export function useDeleteEntity(type: AvailableEntityType, project_id: string, archive: boolean) {
+export function useDeleteEntity(type: AvailableEntityType, project_id: string, arkive: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
   return useMutation(
     async (vars: { data: { id: string; parent_id?: string } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}${archive ? "/arkive" : ""}/${vars.data.id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}${arkive ? "/arkive" : ""}/${vars.data.id}`,
         method: "DELETE",
       });
     },
@@ -42,7 +42,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
           }
 
           createNotification({
-            title: getEntityCRUDNotification(type, archive ? "arkive" : "delete"),
+            title: getEntityCRUDNotification(type, arkive ? "arkive" : "delete"),
             variant: "success",
             icon: IconEnum.check,
             timer: 5,
@@ -134,13 +134,18 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
     },
   );
 }
-export function useDeleteMany(type: AllAvailableEntities, project_id?: string | undefined, parent_id?: string | undefined) {
+export function useDeleteMany(
+  type: AllAvailableEntities,
+  arkive: boolean,
+  project_id?: string | undefined,
+  parent_id?: string | undefined,
+) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
     async (vars: { data: { ids: string[] } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/bulk/delete/${type.toLowerCase()}`,
+        url: `${baseURLS.baseServer}/bulk/${arkive ? "arkive" : "delete"}/${type.toLowerCase()}`,
         body: JSON.stringify(type === "images" ? { data: { ids: vars.data.ids, project_id } } : vars),
         method: "DELETE",
       });
@@ -156,7 +161,7 @@ export function useDeleteMany(type: AllAvailableEntities, project_id?: string | 
           }
 
           createNotification({
-            title: getEntityCRUDNotification(type, "delete", true),
+            title: getEntityCRUDNotification(type, arkive ? "arkive" : "delete", true),
             variant: "success",
             icon: IconEnum.check,
             timer: 5,

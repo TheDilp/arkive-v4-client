@@ -344,6 +344,7 @@ function getSelectedActions(
   permissions: UserHasPermissionsType,
   {
     selection,
+    arkived,
     updatePublicMany,
     resetDialogAtom,
     deleteMany,
@@ -352,6 +353,7 @@ function getSelectedActions(
     setDrawer,
     setDialog,
   }: {
+    arkived: "active" | "arkive";
     updatePublicMany: UpdatePublicManyType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
@@ -440,19 +442,21 @@ function getSelectedActions(
   }
   if (permissions?.delete_characters) {
     selectedActions.push({
-      icon: IconEnum.trash,
-      variant: "error",
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? "error" : "primary",
       hasNoBackground: true,
       isIconOnly: true,
-      tooltip: "Delete selected rows",
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
       onClick: () => {
         const ids = Object.values(selection || {}).flatMap((id) => id);
         if (ids.length) {
           setDialog((prev) => ({
             ...prev,
-            title: "Delete many",
-            description: `Are you sure you want to delete ${ids.length} ${ids.length === 1 ? "character" : "characters"}?`,
-            warning: "This action cannot be undone.",
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? "character" : "characters"
+            }?`,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
             isOverlay: true,
             cancel: {
               label: "Cancel",
@@ -460,8 +464,8 @@ function getSelectedActions(
               action: resetDialogAtom,
             },
             confirm: {
-              label: "Delete",
-              icon: IconEnum.trash,
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
               action: async () =>
                 deleteMany(
                   { data: { ids } },
@@ -648,7 +652,7 @@ export function CharactersView() {
   );
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
 
-  const { mutateAsync: deleteMany } = useDeleteMany("characters", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany("characters", arkived === "active", project_id);
   const {
     data: cardData,
     isFetching,
@@ -700,6 +704,7 @@ export function CharactersView() {
     setDrawer,
     data: data?.data || [],
     dispatch,
+    arkived,
   });
 
   useLayoutEffect(() => {

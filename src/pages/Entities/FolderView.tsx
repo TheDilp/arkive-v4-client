@@ -378,9 +378,9 @@ function getColumns(
                 ...row.original,
                 entity_title: entityType,
               },
-              title: `Delete ${getSingularEntityType(entityType)}`,
+              title: `${row.original.deleted_at ? "Delete" : "Arkive"} ${getSingularEntityType(entityType)}`,
               size: "sm",
-              type: `${row.original.deleted_at ? "arkive_" : "delete_"}entity`,
+              type: `${row.original.deleted_at ? "delete_" : "arkive_"}entity`,
               isOverlay: true,
             }));
           },
@@ -488,6 +488,7 @@ function getSelectedActions(
     deleteMany,
     dispatch,
     data,
+    arkived,
     setDrawer,
     setDialog,
     type,
@@ -499,6 +500,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialogAtom: () => unknown;
     data: any[];
+    arkived: "active" | "arkive";
     dispatch: TableDispatch;
     type: AvailableEntityType | AvailableSubEntityType;
   },
@@ -612,19 +614,21 @@ function getSelectedActions(
   }
   if (permissions?.[`delete_${type}` as PermissionCodeType]) {
     selectedActions.push({
-      icon: IconEnum.trash,
-      variant: "error",
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? "error" : "primary",
       hasNoBackground: true,
       isIconOnly: true,
-      tooltip: "Delete selected rows",
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
       onClick: () => {
         const ids = Object.values(selection || {}).flatMap((id) => id);
         if (ids.length) {
           setDialog((prev) => ({
             ...prev,
-            title: "Delete many",
-            description: `Are you sure you want to delete ${ids.length} ${getPluralEntityType(type as AvailableEntityType)}?`,
-            warning: "This action cannot be undone.",
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? getSingularEntityType(type) : getPluralEntityType(type)
+            }?`,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
             isOverlay: true,
             cancel: {
               label: "Cancel",
@@ -632,8 +636,8 @@ function getSelectedActions(
               action: resetDialogAtom,
             },
             confirm: {
-              label: "Delete",
-              icon: IconEnum.trash,
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
               action: async () =>
                 deleteMany(
                   { data: { ids } },
@@ -776,7 +780,7 @@ export function FolderView() {
     },
   );
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic(type as AvailableEntityType, project_id as string);
-  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, arkived === "active", project_id);
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
@@ -786,6 +790,7 @@ export function FolderView() {
   const resetDialogAtom = useResetAtom(dialogAtom);
 
   const selectedActions = getSelectedActions(permissions, {
+    arkived,
     selection,
     setDialog,
     setDrawer,

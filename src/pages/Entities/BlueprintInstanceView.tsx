@@ -598,7 +598,9 @@ function getSelectedActions(
     data,
     setDrawer,
     setDialog,
+    arkived,
   }: {
+    arkived: "arkive" | "active";
     updatePublicMany: UpdatePublicManyType;
     deleteMany: DeleteManyType;
     selection: TableSelectionType | undefined;
@@ -687,21 +689,21 @@ function getSelectedActions(
   }
   if (permissions?.delete_blueprint_instances) {
     selectedActions.push({
-      icon: IconEnum.trash,
-      variant: "error",
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? "error" : "primary",
       hasNoBackground: true,
       isIconOnly: true,
-      tooltip: "Delete selected rows",
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
       onClick: () => {
         const ids = Object.values(selection || {}).flatMap((id) => id);
         if (ids.length) {
           setDialog((prev) => ({
             ...prev,
-            title: "Delete many",
-            description: `Are you sure you want to delete ${ids.length} ${
-              ids.length === 1 ? "blueprint instance" : "blueprint_instances"
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? "blueprint instance" : "blueprint instances"
             }?`,
-            warning: "This action cannot be undone.",
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
             isOverlay: true,
             cancel: {
               label: "Cancel",
@@ -709,8 +711,8 @@ function getSelectedActions(
               action: resetDialog,
             },
             confirm: {
-              label: "Delete",
-              icon: IconEnum.trash,
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
               action: async () =>
                 deleteMany(
                   { data: { ids } },
@@ -761,7 +763,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
   });
   useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("blueprint_instances", project_id as string);
-  const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
 
   const { data: instances, isLoading } = useGetEntities<BlueprintInstanceType>(
     {
@@ -822,6 +824,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
               selectedActions: getSelectedActions(permissions, {
                 data: instances?.data || [],
                 selection,
+                arkived,
                 updatePublicMany,
                 resetDialog,
                 deleteMany,

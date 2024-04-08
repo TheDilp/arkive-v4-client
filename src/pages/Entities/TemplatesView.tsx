@@ -1,10 +1,11 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetEntities, useHasPermissions, useTable } from "../../hooks";
+import { useBreakpoint, useChangeNavbarTitle, useDeleteMany, useGetEntities, useHasPermissions, useTable } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
@@ -178,6 +179,7 @@ export function TemplatesView() {
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const resetDialogAtom = useResetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
@@ -186,6 +188,7 @@ export function TemplatesView() {
   );
 
   const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
+  const { mutateAsync: deleteMany } = useDeleteMany("character_fields_templates", arkived === "active", project_id);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "sort", sort: "desc" }],
@@ -210,6 +213,47 @@ export function TemplatesView() {
     },
     "character_fields_templates",
   );
+
+  const selectedActions = [
+    {
+      icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+      variant: arkived === "arkive" ? ("error" as const) : ("primary" as const),
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: `${arkived === "arkive" ? "Delete" : "Arkive"} selected rows`,
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
+        if (ids.length) {
+          setDialog((prev) => ({
+            ...prev,
+            title: `${arkived === "arkive" ? "Delete" : "Arkive"} many`,
+            description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
+              ids.length === 1 ? "character template" : "character templates"
+            }?`,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
+            isOverlay: true,
+            cancel: {
+              label: "Cancel",
+              variant: "primary",
+              action: resetDialogAtom,
+            },
+            confirm: {
+              label: arkived === "arkive" ? "Delete" : "Arkive",
+              icon: arkived === "arkive" ? IconEnum.trash : IconEnum.archive,
+              action: async () =>
+                deleteMany(
+                  { data: { ids } },
+                  {
+                    onSuccess: () => dispatch({ type: "clearSelection" }),
+                  },
+                ),
+              variant: "error",
+            },
+          }));
+        }
+      },
+    },
+  ];
 
   useEffect(() => {
     dispatch({ type: "clearSelection" });
@@ -263,6 +307,7 @@ export function TemplatesView() {
             filters,
             selection,
             orderBy,
+            selectedActions,
           }}
           data={data?.data || []}
           dispatch={dispatch}
