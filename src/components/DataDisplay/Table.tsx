@@ -591,6 +591,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   });
 
   useEffect(() => {
+    setExpanded({});
     if (bodyRef.current) {
       bodyRef.current.scrollTop = 0;
     }
