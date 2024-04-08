@@ -348,7 +348,7 @@ export function AssetView() {
   const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("images", project_id as string);
-  const { mutateAsync: deleteMany } = useDeleteMany("images", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany("images", false, project_id);
 
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");

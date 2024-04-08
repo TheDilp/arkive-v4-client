@@ -70,8 +70,8 @@ export function Quickbar({
 
   const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
   const { mutate: updateManyEdges } = useUpdateManySubEntities("edges", item_id as string);
-  const { mutate: deleteManyNodes } = useDeleteMany("nodes");
-  const { mutate: deleteManyEdges } = useDeleteMany("edges");
+  const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
+  const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 
   return (
     <div className="absolute bottom-0 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md ">

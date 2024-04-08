@@ -102,8 +102,8 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   const setContextMenu = useSetAtom(contextMenuAtom);
 
   const { mutate: deleteNode } = useDeleteSubEntity("nodes", project_id as string);
-  const { mutate: deleteManyNodes } = useDeleteMany("nodes");
-  const { mutate: deleteManyEdges } = useDeleteMany("edges");
+  const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
+  const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);

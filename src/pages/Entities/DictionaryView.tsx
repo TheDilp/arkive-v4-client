@@ -167,7 +167,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const { mutateAsync: deleteMany } = useDeleteMany("words", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany("words", false, project_id);
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
