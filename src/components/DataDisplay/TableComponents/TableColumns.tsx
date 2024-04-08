@@ -10,6 +10,7 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
     id: "select",
     header: ({ table }) => (
       <Checkbox
+        isDisabled={table.getRowCount() === 0}
         name="selectAll"
         onChange={({ value }) => {
           if (value) {
@@ -27,6 +28,7 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
         }
       />
     ),
+
     cell: ({ table, row }) => (
       <Checkbox
         name={row.id}
