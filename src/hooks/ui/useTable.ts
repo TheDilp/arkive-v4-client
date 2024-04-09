@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { deepMerge } from "remirror";
+import { deepMerge, uniqueBy } from "remirror";
 
 import { TableActionType, TableDispatch, TableParams } from "../../types";
 import { deleteObjectProps } from "../../utils";
@@ -52,7 +52,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
 
           tempFilters = {
             ...tempFilters,
-            and: newFilters.concat(action.payload.and),
+            and: uniqueBy(newFilters.concat(action.payload.and), "id"),
           };
         } else {
           tempFilters = {
@@ -68,7 +68,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       if (action?.payload?.or?.length) {
         if (tempFilters?.or) {
           const newFilters = tempFilters.or.filter((filt) => filt.field !== field);
-          tempFilters = { ...tempFilters, or: newFilters.concat(action.payload.or) };
+          tempFilters = { ...tempFilters, or: uniqueBy(newFilters.concat(action.payload.or), "id") };
         } else {
           tempFilters = { ...tempFilters, or: action.payload.or };
         }
