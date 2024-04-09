@@ -48,11 +48,13 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       const { field } = action.payload;
       if (action?.payload?.and?.length) {
         if (tempFilters?.and) {
-          const newFilters = tempFilters.and.filter((filt) => filt.field !== field);
-
+          const newFilters = tempFilters.and.filter(
+            (filt) =>
+              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+          );
           tempFilters = {
             ...tempFilters,
-            and: uniqueBy(newFilters.concat(action.payload.and), "id"),
+            and: newFilters.concat(action.payload.and),
           };
         } else {
           tempFilters = {
@@ -62,19 +64,34 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
         }
       } else {
         tempFilters = tempFilters?.and
-          ? { ...tempFilters, and: tempFilters.and.filter((filt) => filt.field !== field) }
+          ? {
+              ...tempFilters,
+              and: tempFilters.and.filter(
+                (filt) =>
+                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+              ),
+            }
           : tempFilters;
       }
       if (action?.payload?.or?.length) {
         if (tempFilters?.or) {
-          const newFilters = tempFilters.or.filter((filt) => filt.field !== field);
+          const newFilters = tempFilters.or.filter(
+            (filt) =>
+              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+          );
           tempFilters = { ...tempFilters, or: uniqueBy(newFilters.concat(action.payload.or), "id") };
         } else {
           tempFilters = { ...tempFilters, or: action.payload.or };
         }
       } else {
         tempFilters = tempFilters?.or
-          ? { ...tempFilters, or: tempFilters.or.filter((filt) => filt.field !== field) }
+          ? {
+              ...tempFilters,
+              or: tempFilters.or.filter(
+                (filt) =>
+                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+              ),
+            }
           : tempFilters;
       }
 
