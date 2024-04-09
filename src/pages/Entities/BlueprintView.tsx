@@ -394,60 +394,58 @@ export function BlueprintView() {
 
   return (
     <TablePageLayout>
-      <div className="flex h-full w-full flex-col">
-        <div className="flex h-12 w-full items-center justify-end gap-x-2">
-          <div className="w-32">
-            <Select
-              name="view"
-              onChange={({ value }) => {
-                setArkived(value as "active" | "arkive");
-                ls.set("blueprint-table-active", value);
-              }}
-              options={[
-                { label: "Active", value: "active", icon: IconEnum.eye },
-                { label: "Arkived", value: "arkive", icon: IconEnum.archive },
-              ]}
-              placeholder="Active or arkived"
-              value={arkived}
-            />
-          </div>
-          <div className="w-fit">
-            <Button
-              icon={IconEnum.add}
-              isDisabled={!permissions?.create_blueprints}
-              label="Create new blueprint"
-              onClick={() =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  data: { project_id },
-                  title: "Create new blueprint",
-                  type: "blueprints",
-                  size: "lg",
-                }))
-              }
-              tooltip={isMd ? undefined : "Create new blueprint"}
-            />
-          </div>
+      <div className="flex h-12 w-full items-center justify-end gap-x-2">
+        <div className="w-32">
+          <Select
+            name="view"
+            onChange={({ value }) => {
+              setArkived(value as "active" | "arkive");
+              ls.set("blueprint-table-active", value);
+            }}
+            options={[
+              { label: "Active", value: "active", icon: IconEnum.eye },
+              { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+            ]}
+            placeholder="Active or arkived"
+            value={arkived}
+          />
         </div>
-
-        <Table
-          columns={columns}
-          config={{
-            hasSelect: true,
-            hasArkived: arkived === "arkive",
-            filters,
-            selection,
-            orderBy,
-            getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
-            selectedActions,
-          }}
-          data={data?.data || []}
-          dispatch={dispatch}
-          isLoading={isLoading}
-          pagination={pagination}
-          type="blueprints"
-        />
+        <div className="w-fit">
+          <Button
+            icon={IconEnum.add}
+            isDisabled={!permissions?.create_blueprints}
+            label="Create new blueprint"
+            onClick={() =>
+              setDrawer((prev) => ({
+                ...prev,
+                data: { project_id },
+                title: "Create new blueprint",
+                type: "blueprints",
+                size: "lg",
+              }))
+            }
+            tooltip={isMd ? undefined : "Create new blueprint"}
+          />
+        </div>
       </div>
+
+      <Table
+        columns={columns}
+        config={{
+          hasSelect: true,
+          hasArkived: arkived === "arkive",
+          filters,
+          selection,
+          orderBy,
+          getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
+          selectedActions,
+        }}
+        data={data?.data || []}
+        dispatch={dispatch}
+        isLoading={isLoading}
+        pagination={pagination}
+        type="blueprints"
+      />
     </TablePageLayout>
   );
 }
