@@ -777,7 +777,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         images: true,
         events: true,
       },
-      fields: ["id", "full_name", "portrait_id", "age", "biography", "is_public"],
+      fields: ["id", "full_name", "nickname", "portrait_id", "age", "biography", "is_public"],
     },
     {
       staleTime: 60 * 1000,

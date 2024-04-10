@@ -7,7 +7,6 @@ import { Navigate, Outlet, useBlocker, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntities, useGetEntity, useGetUser } from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
-import { QuestionnaireType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   contextMenuAtom,
   currentUserPermissionsAtom,
@@ -190,18 +189,6 @@ export function QuestionnaireLayout({ children }: { children: ReactNode }) {
   const { isLg } = useBreakpoint();
   const { user } = useUser();
 
-  const { data, isInitialLoading } = useGetEntity<QuestionnaireType>(
-    questionnaire_id,
-    "questionnaires",
-    {
-      fields: ["id", "title", "icon", "owner_id"],
-      relations: {
-        members: true,
-        feature_flags: true,
-      },
-    },
-    { staleTime: 60 * 60 * 1 },
-  );
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id as string },
@@ -214,7 +201,6 @@ export function QuestionnaireLayout({ children }: { children: ReactNode }) {
   const hasChangedData = useAtomValue(hasChangedDataAtom);
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
-  const createNotification = useNotifications();
   const resetDrawer = useResetAtom(drawerAtom);
   const resetHasChangedData = useResetAtom(hasChangedDataAtom);
 
@@ -262,17 +248,6 @@ export function QuestionnaireLayout({ children }: { children: ReactNode }) {
 
     return false;
   });
-  if (data?.data?.owner_id !== userData?.data?.id && !isInitialLoading && !isInitialLoadingUser) {
-    createNotification({
-      title: "You do not have access to this questionnaire.",
-      variant: "error",
-      icon: IconEnum.forbidden,
-      timer: 5,
-    });
-    return <Navigate to="/" />;
-  }
-
-  if (isInitialLoading) return null;
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
@@ -285,10 +260,10 @@ export function QuestionnaireLayout({ children }: { children: ReactNode }) {
       {isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
 
       <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
-        <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
+        <Navbar isDisabled={isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser ? null : children}
+          {isInitialLoadingUser ? null : children}
         </div>
         {!isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
       </div>

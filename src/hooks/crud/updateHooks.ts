@@ -100,7 +100,8 @@ export function useUpdateEntity<
           }
 
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
-          if (vars.data.id && type !== "documents" && type !== "maps") queryClient.invalidateQueries([type, vars.data.id]);
+          if (vars.data.id && type !== "documents" && type !== "maps" && type !== "questionnaires")
+            queryClient.invalidateQueries([type, vars.data.id]);
 
           // Invalidate mentions queries if this is a mentionable entity being updated
           if (MentionableEntites.includes(type)) {

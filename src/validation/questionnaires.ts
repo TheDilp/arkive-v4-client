@@ -45,6 +45,23 @@ export const UpdateQuestionnaireSchema = z
       title: z.string().optional(),
       icon: z.string().optional().nullable(),
     }),
-    relations: z.object({}),
+    relations: z
+      .object({
+        questions: z
+          .object({
+            data: z.object({
+              id: z.string(),
+              title: z.string(),
+              sort: z.number().optional(),
+              type: QuestionTypeSchema,
+              options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+              blueprint_id: z.string().optional().nullable(),
+            }),
+          })
+          .array()
+          .min(1)
+          .optional(),
+      })
+      .optional(),
   })
   .strict();

@@ -176,7 +176,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   //     ls.set("version_timestamp", versionMessage.timestamp);
   //   }
   // }, [versionMessage]);
-
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
       {isMutating ? <IndeterminateProgressBar /> : null}

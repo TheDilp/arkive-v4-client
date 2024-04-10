@@ -95,7 +95,9 @@ function QuestionRow({
               onClick={() =>
                 changeField({
                   name: `questions[${index}].options`,
-                  value: (options || []).concat({ id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` }),
+                  value: (options || []).concat([
+                    { id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` },
+                  ]),
                 })
               }
               tooltip="Add new option"
@@ -200,18 +202,12 @@ export function QuestionnaireDrawer({ data }: Props) {
   const user = useAtomValue(userAtom);
   const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
 
-  const [questionnaire, setQuestionnaire] = useState<Partial<QuestionnaireType> | null>({
-    id: "",
-    icon: undefined,
-    title: "",
-    owner_id: user?.id,
-    questions: [],
-  });
+  const [questionnaire, setQuestionnaire] = useState<Partial<QuestionnaireType> | null>();
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutate: create, isLoading: isCreating } = useCreateQuestionnaire();
-  const { mutate: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: Partial<Omit<QuestionnaireType, "owner_id" | "questions" | "icon"> & { icon?: string | null }>;
-    relations?: { questions?: QuestionType[] };
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
+    data: Partial<Omit<QuestionnaireType, "owner_id" | "questions" | "icon" | "parent_id"> & { icon?: string | null }>;
+    relations?: { questions?: { data: Partial<QuestionType> }[] };
   }>("questionnaires", "");
   const { handleChange, changedData } = useHandleChange({ data: questionnaire, setData: setQuestionnaire });
   const { data: existingQuestionnaire, isFetching } = useGetEntity<QuestionnaireType>(
@@ -225,11 +221,12 @@ export function QuestionnaireDrawer({ data }: Props) {
     },
     {
       enabled: !!data?.id,
+      queryKeyOverwrite: ["questionnaire", "drawer"],
     },
   );
 
   useLayoutEffect(() => {
-    if (existingQuestionnaire?.data) setQuestionnaire(existingQuestionnaire?.data);
+    if (existingQuestionnaire?.data && !questionnaire) setQuestionnaire(existingQuestionnaire?.data);
   }, [existingQuestionnaire]);
 
   return (
@@ -263,15 +260,17 @@ export function QuestionnaireDrawer({ data }: Props) {
                 onClick={() => {
                   handleChange({
                     name: "questions",
-                    value: (questionnaire?.questions || []).concat({
-                      id: crypto.randomUUID(),
-                      title: "New question",
-                      type: "text",
-                      parent_id: "",
-                      sort: (questionnaire?.questions?.length || 0) + 1,
-                      options: [],
-                      blueprint_id: null,
-                    }),
+                    value: (questionnaire?.questions || []).concat([
+                      {
+                        id: crypto.randomUUID(),
+                        title: "New question",
+                        type: "text",
+                        parent_id: "",
+                        sort: (questionnaire?.questions?.length || 0) + 1,
+                        options: [],
+                        blueprint_id: null,
+                      },
+                    ]),
                   });
                   setTimeout(() => {
                     fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
@@ -377,13 +376,15 @@ export function QuestionnaireDrawer({ data }: Props) {
                 const dataToParse = {
                   data: questionnaire,
                   relations: {
-                    questions: [],
+                    questions: (questionnaire?.questions || []).map((q) => ({ data: q })),
                   },
                 };
                 const parsedData = UpdateQuestionnaireSchema.parse(dataToParse);
-                update(parsedData, {
+                await update(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
+                    if (res?.ok) {
+                      resetDrawerAtom();
+                    }
                   },
                 });
               } else {
@@ -397,7 +398,9 @@ export function QuestionnaireDrawer({ data }: Props) {
                 const parsedData = InsertQuestionnaireSchema.parse(dataToParse);
                 create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
+                    if (res?.ok) {
+                      resetDrawerAtom();
+                    }
                   },
                 });
               }

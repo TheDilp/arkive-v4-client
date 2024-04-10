@@ -1,10 +1,11 @@
 import { useSetAtom } from "jotai";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useGetEntity, useTable } from "../../hooks";
+import { useGetEntity, useTable } from "../../hooks";
 import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
-import { drawerAtom, IconEnum } from "../../utils";
+import { drawerAtom, IconEnum, navbarTitleAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<QuestionType>();
 
@@ -19,21 +20,20 @@ function getQuestionnaireColumns(questions: QuestionType[]) {
 
 export function AnswersView() {
   const { questionnaire_id } = useParams();
-
+  const setNavbarTitle = useSetAtom(navbarTitleAtom);
   const setDrawer = useSetAtom(drawerAtom);
-  const { data: questionnaireData, isLoading } = useGetEntity<QuestionnaireType>(
-    questionnaire_id,
-    "questionnaires",
-    {
-      fields: ["title", "owner_id"],
-      relations: { questions: true },
-    },
-    {
-      queryKeyOverwrite: [questionnaire_id as string, "questionnaires"],
-    },
-  );
+  const { data: questionnaireData, isLoading } = useGetEntity<QuestionnaireType>(questionnaire_id, "questionnaires", {
+    fields: ["title", "owner_id"],
+    relations: { questions: true },
+  });
 
-  useChangeNavbarTitle(`Questionnaires | ${questionnaireData?.data?.title}`, !!questionnaireData?.data?.title);
+  useEffect(() => {
+    if (questionnaireData?.data?.title) {
+      document.title = `The Arkive | Questionnaires | ${questionnaireData?.data?.title}`;
+      setNavbarTitle(`The Arkive | Questionnaires | ${questionnaireData?.data?.title}`);
+    }
+  }, [questionnaireData?.data?.title]);
+
   const [{ selection }, dispatch] = useTable({ selection: {} });
   return (
     <div className="flex flex-col gap-y-2">
