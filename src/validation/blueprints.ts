@@ -39,7 +39,6 @@ export const InsertBlueprintSchema = z.object({
         title: z.string(),
         field_type: BlueprintFieldTypeSchema,
         sort: z.number().optional(),
-        // width: z.literal("half").or(z.literal("full")),
         formula: z.string().optional().nullable(),
         options: z.object({ id: z.string(), value: z.string() }).array().optional(),
         random_table_id: z.string().optional().nullable(),
@@ -47,7 +46,6 @@ export const InsertBlueprintSchema = z.object({
         blueprint_id: z.string().optional().nullable(),
       })
       .array(),
-    // tags: z.object({ id: z.string() }).array().min(1),
   }),
   permissions: InsertEntityPermissionSchema,
 });
@@ -59,7 +57,6 @@ export const UpdateBlueprintSchema = z
       title: z.string().optional(),
       title_name: z.string().optional(),
       icon: z.string().optional().nullable(),
-      // title_width: z.literal("half").or(z.literal("full")).optional(),
     }),
     relations: z.object({
       blueprint_fields: z
@@ -67,7 +64,6 @@ export const UpdateBlueprintSchema = z
           id: z.string(),
           title: z.string().optional(),
           field_type: BlueprintFieldTypeSchema.optional(),
-          // width: z.literal("half").or(z.literal("full")),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),
           options: z.object({ id: z.string(), value: z.string() }).array().optional(),
