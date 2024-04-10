@@ -14,7 +14,7 @@ import {
   TagType,
 } from "../../../types";
 import {
-  currentUserPermissions,
+  currentUserPermissionsAtom,
   drawerAtom,
   getDefaultEntityIcon,
   getSearchCategoryPermission,
@@ -53,7 +53,7 @@ export function SearchDrawer() {
   const [match, setMatch] = useState<"all" | "any">("all");
   const createNotification = useNotifications();
 
-  const userPermissions = useAtomValue(currentUserPermissions);
+  const userPermissions = useAtomValue(currentUserPermissionsAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const {
