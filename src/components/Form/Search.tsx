@@ -418,110 +418,112 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || searchTerm || displayValue) && !isOptionsHidden && (data?.data?.length || manualResults?.length) && (
-          <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
-            <div
-              {...getFloatingProps({
-                ref: refs.setFloating,
-                style: floatingStyles,
-              })}
-              className={optionsContainer()}>
-              {(manualResults || data?.data)?.map((item, index) => (
-                <Item
-                  {...getItemProps({
-                    key: item.value,
-                    ref(node) {
-                      listRef.current[index] = node;
-                    },
-                    onClick(e) {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
-                        const ittem = (manualResults || data?.data)?.[activeIndex || 0];
-                        if (ittem) {
-                          onChange({
-                            name,
-                            value: ittem.value,
-                            label: ittem.label,
-                            color: ittem?.color,
-                            image: ittem?.image,
-                            type: ittem?.type,
-                            parent_id: ittem?.parent_id,
-                            icon: ittem?.icon,
-                          });
-                          if (hasShownOption) setDisplayValue(ittem.label);
-                          if (!isMultiple) {
-                            setInputValue("");
-                            setOpen(false);
+        {(open || ((searchTerm || displayValue) && !isMultiple)) &&
+          !isOptionsHidden &&
+          (data?.data?.length || manualResults?.length) && (
+            <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
+              <div
+                {...getFloatingProps({
+                  ref: refs.setFloating,
+                  style: floatingStyles,
+                })}
+                className={optionsContainer()}>
+                {(manualResults || data?.data)?.map((item, index) => (
+                  <Item
+                    {...getItemProps({
+                      key: item.value,
+                      ref(node) {
+                        listRef.current[index] = node;
+                      },
+                      onClick(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
+                          const ittem = (manualResults || data?.data)?.[activeIndex || 0];
+                          if (ittem) {
+                            onChange({
+                              name,
+                              value: ittem.value,
+                              label: ittem.label,
+                              color: ittem?.color,
+                              image: ittem?.image,
+                              type: ittem?.type,
+                              parent_id: ittem?.parent_id,
+                              icon: ittem?.icon,
+                            });
+                            if (hasShownOption) setDisplayValue(ittem.label);
+                            if (!isMultiple) {
+                              setInputValue("");
+                              setOpen(false);
+                            }
+
+                            inputRef.current?.focus();
                           }
-
-                          inputRef.current?.focus();
                         }
-                      }
 
-                      // onChange({
-                      //   name,
-                      //   value: item.value,
-                      //   label: item.label,
-                      //   color: item?.color,
-                      //   image: item?.image,
-                      //   parent_id: item?.parent_id,
-                      //   type: item?.type,
-                      //   icon: item?.icon,
-                      // });
+                        // onChange({
+                        //   name,
+                        //   value: item.value,
+                        //   label: item.label,
+                        //   color: item?.color,
+                        //   image: item?.image,
+                        //   parent_id: item?.parent_id,
+                        //   type: item?.type,
+                        //   icon: item?.icon,
+                        // });
 
-                      if (hasShownOption) setDisplayValue(item.label);
-                      if (!isMultiple) {
-                        remove();
-                        setOpen(false);
-                      }
+                        if (hasShownOption) setDisplayValue(item.label);
+                        if (!isMultiple) {
+                          remove();
+                          setOpen(false);
+                        }
 
-                      inputRef.current?.focus();
-                    },
-                  })}
-                  isActive={activeIndex === index}
-                  isSelected={(value || [])?.includes(item.value)}>
-                  {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                  ((searchEntity === "places" ||
-                    searchEntity === "maps" ||
-                    searchEntity === "characters" ||
-                    searchEntity === "all") &&
-                    item?.image) ? (
-                    <Avatar
-                      image={getImageURL(
-                        project_id as string,
-                        imageType || "images",
-                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
-                      )}
-                      imageLoading="lazy"
-                      isTooltipDisabled
-                      label={label || ""}
-                      size="xs"
-                    />
-                  ) : null}
-                  {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
-                  <span className="truncate">{item.label}</span>
-                </Item>
-              ))}
+                        inputRef.current?.focus();
+                      },
+                    })}
+                    isActive={activeIndex === index}
+                    isSelected={(value || [])?.includes(item.value)}>
+                    {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
+                    ((searchEntity === "places" ||
+                      searchEntity === "maps" ||
+                      searchEntity === "characters" ||
+                      searchEntity === "all") &&
+                      item?.image) ? (
+                      <Avatar
+                        image={getImageURL(
+                          project_id as string,
+                          imageType || "images",
+                          searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
+                        )}
+                        imageLoading="lazy"
+                        isTooltipDisabled
+                        label={label || ""}
+                        size="xs"
+                      />
+                    ) : null}
+                    {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
+                    <span className="truncate">{item.label}</span>
+                  </Item>
+                ))}
 
-              {/* If no results for public search display NO RESULTS */}
-              {isPublic && data?.data?.length && !manualResults?.length ? (
-                <Item
-                  {...getItemProps({
-                    key: "no_results",
-                    onClick(e) {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    },
-                  })}
-                  isActive={false}
-                  isSelected={false}>
-                  <span className="truncate">No results</span>
-                </Item>
-              ) : null}
-            </div>
-          </FloatingFocusManager>
-        )}
+                {/* If no results for public search display NO RESULTS */}
+                {isPublic && data?.data?.length && !manualResults?.length ? (
+                  <Item
+                    {...getItemProps({
+                      key: "no_results",
+                      onClick(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      },
+                    })}
+                    isActive={false}
+                    isSelected={false}>
+                    <span className="truncate">No results</span>
+                  </Item>
+                ) : null}
+              </div>
+            </FloatingFocusManager>
+          )}
       </FloatingPortal>
     </div>
   );
