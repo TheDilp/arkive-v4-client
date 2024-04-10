@@ -37,7 +37,8 @@ function isSaveDisabled(blueprint: BlueprintStateType) {
         ((field.field_type === "select_multiple" || field.field_type === "select") && !field?.options?.length) ||
         (field.field_type === "dice_roll" && !field?.formula) ||
         (field.field_type === "random_table" && !field.random_table_id) ||
-        (field.field_type === "date" && !field?.calendar_id),
+        (field.field_type === "date" && !field?.calendar_id) ||
+        ((field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") && !field.blueprint_id),
     )
   )
     return true;
