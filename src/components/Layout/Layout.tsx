@@ -9,7 +9,7 @@ import { useBreakpoint, useGetEntities, useGetEntity, useGetUser } from "../../h
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
-  currentUserPermissions,
+  currentUserPermissionsAtom,
   DefaultTagColor,
   dialogAtom,
   drawerAtom,
@@ -73,7 +73,7 @@ export function ProjectLayout() {
   const setProjectAtom = useSetAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
-  const setUserPermissions = useSetAtom(currentUserPermissions);
+  const setUserPermissions = useSetAtom(currentUserPermissionsAtom);
   const hasChangedData = useAtomValue(hasChangedDataAtom);
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);

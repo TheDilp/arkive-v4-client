@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 
 import { useBreakpoint } from "../../hooks";
 import { PermissionCodeType, SidebarType } from "../../types";
-import { currentUserPermissions, getSidebarLink, isProjectOwnerAtom, projectFeatureFlagsAtom } from "../../utils";
+import { currentUserPermissionsAtom, getSidebarLink, isProjectOwnerAtom, projectFeatureFlagsAtom } from "../../utils";
 import { Icon, Skeleton } from "../Misc";
 import { Tooltip } from "../Overlay";
 
@@ -44,7 +44,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const { project_id, type } = useParams();
   const { isLg } = useBreakpoint();
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
-  const userPermissions = useAtomValue(currentUserPermissions);
+  const userPermissions = useAtomValue(currentUserPermissionsAtom);
 
   const enabledEntities = Object.entries(featureFlags || [])
     .filter(([key, value]) => {
