@@ -25,6 +25,11 @@ export function getProjectsViewNavItems(
         })),
     },
     {
+      icon: IconEnum.questionnaires,
+      tooltip: "Questionnaires",
+      navigate: "../../questionnaires",
+    },
+    {
       icon: view ? IconEnum.table : IconEnum.card,
       tooltip: "Change view",
       navigate: "#",
@@ -34,6 +39,35 @@ export function getProjectsViewNavItems(
           return !prev;
         });
       },
+    },
+    {
+      icon: IconEnum.user_settings,
+      tooltip: "User settings",
+      navigate: "/user_settings/webhooks",
+    },
+  ];
+}
+
+export function getQuestionnairesViewNavItems(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>): SidebarItemType[] {
+  return [
+    {
+      icon: IconEnum.add,
+      tooltip: "Create questionnaire",
+      navigate: "#",
+
+      onClick: () =>
+        setDrawer((prev: DrawerAtomType) => ({
+          ...prev,
+          type: "questionnaires",
+          title: "Create new questionnaire",
+          data: {},
+          size: "lg",
+        })),
+    },
+    {
+      icon: IconEnum.project,
+      tooltip: "Projects",
+      navigate: "../../projects",
     },
     {
       icon: IconEnum.user_settings,
