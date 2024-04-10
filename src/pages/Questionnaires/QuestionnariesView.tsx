@@ -2,10 +2,20 @@ import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 
-import { createColumnHelper, Dialog, Drawer, Navbar, Sidebar, Skeleton, Table, TablePageLayout } from "../../components";
+import {
+  Button,
+  createColumnHelper,
+  Dialog,
+  Drawer,
+  Navbar,
+  Sidebar,
+  Skeleton,
+  Table,
+  TablePageLayout,
+} from "../../components";
 import { useBreakpoint, useGetEntities, useGetUser, useTable } from "../../hooks";
 import { QuestionnaireType } from "../../types/EntityTypes/questionnaireTypes";
-import { currentUserPermissionsAtom, drawerAtom, getQuestionnairesViewNavItems, userAtom } from "../../utils";
+import { currentUserPermissionsAtom, drawerAtom, IconEnum, questionnaireNavEnum, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -70,16 +80,33 @@ export function QuestionnariesView() {
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      {isLg ? (
-        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={getQuestionnairesViewNavItems(setDrawer)} />
-      ) : null}
+      {isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isInitialLoadingUser} />
         </div>
-        {isInitialLoadingUser ? <Skeleton limit={4} type="project_view" /> : null}
-        {!isInitialLoadingUser ? (
-          <div className="flex-1 p-4">
+
+        <div className="flex flex-1 flex-col items-end gap-y-2 p-4">
+          {isInitialLoadingUser ? null : (
+            <div className="w-fit">
+              <Button
+                icon={IconEnum.add}
+                label="Create new questionnaire"
+                onClick={() =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    type: "questionnaires",
+                    title: "Create new questionnaire",
+                    data: {},
+                    size: "xl",
+                  }))
+                }
+              />
+            </div>
+          )}
+          {isInitialLoadingUser ? (
+            <Skeleton limit={4} type="project_view" />
+          ) : (
             <TablePageLayout>
               <Table
                 columns={createColumns()}
@@ -90,12 +117,10 @@ export function QuestionnariesView() {
                 type="projects"
               />
             </TablePageLayout>
-          </div>
-        ) : null}
+          )}
+        </div>
+        {isLg ? null : <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} />}
       </div>
-      {isLg ? null : (
-        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={getQuestionnairesViewNavItems(setDrawer)} />
-      )}
     </div>
   );
 }

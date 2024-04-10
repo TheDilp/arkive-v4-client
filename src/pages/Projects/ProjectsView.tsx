@@ -25,6 +25,7 @@ import {
   getAvatarInitials,
   getImageURL,
   getProjectsViewNavItems,
+  IconEnum,
   projectAtom,
   projectCardNavItems,
   userAtom,
@@ -154,50 +155,63 @@ export function ProjectsView() {
         <RedirectToSignIn />
       </SignedOut>
       {isLg ? (
-        <Sidebar
-          isLoading={isInitialLoadingUser}
-          isUsingPermissions={false}
-          items={getProjectsViewNavItems(setDrawer, setView, view)}
-        />
+        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={getProjectsViewNavItems(setView, view)} />
       ) : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isLoading || isInitialLoadingUser} />
         </div>
-        {isLoading ? <Skeleton limit={4} type="project_view" /> : null}
-        {view && !isLoading && !isInitialLoadingUser ? (
-          <div className="flex-1 p-4">
-            <TablePageLayout>
-              <Table
-                columns={createColumns(navigate)}
-                config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
-                data={data?.data || []}
-                dispatch={dispatch}
-                type="projects"
-              />
-            </TablePageLayout>
-          </div>
-        ) : null}
-        {!view && !isLoading && !isInitialLoadingUser ? (
-          <div className="grid grid-cols-1 gap-4 overflow-y-auto p-4 xl:grid-cols-2 2xl:grid-cols-4">
-            {(data?.data || []).map((project) => (
-              <ProjectCard
-                key={project.id}
-                feature_flags={project.feature_flags}
-                id={project.id}
-                image={getImageURL(project.id, "images", project.image_id)}
-                title={project.title}
-              />
-            ))}
-          </div>
-        ) : null}
+        <div className="flex flex-1 flex-col gap-y-2 p-4">
+          {isLoading ? (
+            <Skeleton limit={4} type="project_view" />
+          ) : (
+            <div className="flex justify-end">
+              <div className="w-fit">
+                <Button
+                  icon={IconEnum.add}
+                  label="Create new project"
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      type: "project",
+                      title: "Create new project",
+                      data: null,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          )}
+          {view && !isLoading && !isInitialLoadingUser ? (
+            <div className="flex-1">
+              <TablePageLayout>
+                <Table
+                  columns={createColumns(navigate)}
+                  config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
+                  data={data?.data || []}
+                  dispatch={dispatch}
+                  type="projects"
+                />
+              </TablePageLayout>
+            </div>
+          ) : null}
+          {!view && !isLoading && !isInitialLoadingUser ? (
+            <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto xl:grid-cols-2 2xl:grid-cols-4">
+              {(data?.data || []).map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  feature_flags={project.feature_flags}
+                  id={project.id}
+                  image={getImageURL(project.id, "images", project.image_id)}
+                  title={project.title}
+                />
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
       {isLg ? null : (
-        <Sidebar
-          isLoading={isInitialLoadingUser}
-          isUsingPermissions={false}
-          items={getProjectsViewNavItems(setDrawer, setView, view)}
-        />
+        <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={getProjectsViewNavItems(setView, view)} />
       )}
     </div>
   );

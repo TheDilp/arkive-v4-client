@@ -2,28 +2,14 @@ import { SetStateAction } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch } from "react";
 
-import { DrawerAtomType, SidebarItemType } from "../../types";
+import { SidebarItemType } from "../../types";
 import { IconEnum } from "./IconEnums";
 
 export function getProjectsViewNavItems(
-  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setView: Dispatch<SetStateAction<boolean | null>>,
   view: boolean | null,
 ): SidebarItemType[] {
   return [
-    {
-      icon: IconEnum.add,
-      tooltip: "Create project",
-      navigate: "#",
-
-      onClick: () =>
-        setDrawer((prev: DrawerAtomType) => ({
-          ...prev,
-          type: "project",
-          title: "Create new project",
-          data: null,
-        })),
-    },
     {
       icon: IconEnum.questionnaires,
       tooltip: "Questionnaires",
@@ -48,34 +34,18 @@ export function getProjectsViewNavItems(
   ];
 }
 
-export function getQuestionnairesViewNavItems(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>): SidebarItemType[] {
-  return [
-    {
-      icon: IconEnum.add,
-      tooltip: "Create questionnaire",
-      navigate: "#",
-
-      onClick: () =>
-        setDrawer((prev: DrawerAtomType) => ({
-          ...prev,
-          type: "questionnaires",
-          title: "Create new questionnaire",
-          data: {},
-          size: "xl",
-        })),
-    },
-    {
-      icon: IconEnum.project,
-      tooltip: "Projects",
-      navigate: "../../projects",
-    },
-    {
-      icon: IconEnum.user_settings,
-      tooltip: "User settings",
-      navigate: "/user_settings/webhooks",
-    },
-  ];
-}
+export const questionnaireNavEnum = [
+  {
+    icon: IconEnum.project,
+    tooltip: "Projects",
+    navigate: "../../projects",
+  },
+  {
+    icon: IconEnum.user_settings,
+    tooltip: "User settings",
+    navigate: "/user_settings/webhooks",
+  },
+];
 
 export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
