@@ -12,6 +12,7 @@ import {
   MapType,
   NodeType,
 } from "../../types";
+import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -448,6 +449,49 @@ export function useCreateFromTemplate(project_id: string) {
           queryClient.invalidateQueries(["allEntities", project_id, "documents"]);
           createNotification({
             title: data?.message || getEntityCRUDNotification("documents", "create"),
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+            position: "top-right",
+          });
+        }
+      },
+      onError: (error: { message?: string }) => {
+        createNotification({
+          title: error?.message || "There was an error creating this entity.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+          position: "top-right",
+        });
+      },
+    },
+  );
+}
+export function useCreateQuestionnaire() {
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+
+  return useMutation(
+    async (newItemValues: {
+      data: Omit<QuestionnaireType, "id" | "questions" | "icon"> & { icon?: string };
+      relations: { questions: { data: Omit<QuestionType, "parent_id"> }[] };
+    }) => {
+      const data = await FetchFunction({
+        url: `${baseURLS.baseServer}/questionnaires/create`,
+        body: JSON.stringify(newItemValues),
+        method: "POST",
+      });
+
+      return data;
+    },
+
+    {
+      onSuccess: (data) => {
+        if (data?.ok) {
+          queryClient.invalidateQueries(["questionnaires"]);
+          createNotification({
+            title: data?.message || getEntityCRUDNotification("questionnaires", "create"),
             variant: "success",
             icon: IconEnum.check,
             timer: 2,

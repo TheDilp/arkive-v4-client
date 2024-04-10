@@ -52,7 +52,8 @@ export type AvailableEntityType =
   | "webhooks"
   | "images"
   | "roles"
-  | "permissions";
+  | "permissions"
+  | "questionnaires";
 
 export type AvailableSubEntityType =
   | "alter_names"
@@ -69,7 +70,9 @@ export type AvailableSubEntityType =
   | "random_table_options"
   | "character_fields"
   | "blueprint_instances"
-  | "messages";
+  | "messages"
+  | "questions"
+  | "answers";
 
 export type SearchableEntities =
   | "all"

@@ -27,6 +27,17 @@ const tabs: TabType[] = [
 function isSaveDisabled(questionnaire: Partial<QuestionnaireType> | null | undefined) {
   if (!questionnaire?.title) return true;
   if (!questionnaire?.questions?.length) return true;
+  if (
+    questionnaire?.questions?.length &&
+    questionnaire.questions.some(
+      (question) =>
+        !question.title ||
+        !question.type ||
+        ((question.type === "select_multiple" || question.type === "select_single") && !question?.options?.length) ||
+        ((question.type === "blueprints_single" || question.type === "blueprints_multiple") && !question.blueprint_id),
+    )
+  )
+    return true;
   return false;
 }
 
