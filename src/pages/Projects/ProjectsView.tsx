@@ -9,6 +9,7 @@ import {
   Avatar,
   Button,
   createColumnHelper,
+  Dialog,
   Drawer,
   Navbar,
   ProjectCard,
@@ -148,6 +149,7 @@ export function ProjectsView() {
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Drawer />
+      <Dialog />
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
