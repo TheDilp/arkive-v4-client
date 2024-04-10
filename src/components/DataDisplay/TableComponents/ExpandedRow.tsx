@@ -204,6 +204,7 @@ function ExpandedTag({ id }: { id: string }) {
     { data: { tag_ids: [id], match: "all" }, limit: 100 },
     "by_tags",
     project_id as string,
+    false,
     { queryKeyConcat: [id], enabled: true },
   );
 

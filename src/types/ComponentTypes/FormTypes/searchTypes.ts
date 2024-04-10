@@ -66,6 +66,7 @@ export interface SearchType extends BaseFormComponentType {
   placeholder?: string;
   buttonIcon?: string;
   isAutofocused?: boolean;
+  isGlobal?: boolean;
   hasShownOption?: boolean;
   isOptionsHidden?: boolean;
   isMultiple?: boolean;

@@ -64,6 +64,7 @@ export function SearchDrawer() {
     { data: { tag_ids: selectedTags.map((tag) => tag.id), match }, limit: 100 },
     "by_tags",
     project_id as string,
+    false,
     {
       enabled: false,
     },

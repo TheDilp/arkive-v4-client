@@ -173,6 +173,7 @@ export function Search({
   imageType,
   isOptionsHidden,
   isMultiple,
+  isGlobal,
   isFolders,
   limit,
   offset: offsetProp,
@@ -222,6 +223,7 @@ export function Search({
     { data: { search_term: inputValue, project_id: project_id as string, parent_id }, limit: limit ?? 0 },
     searchEntity,
     project_id as string,
+    isGlobal,
     {
       enabled: false,
       queryKeyConcat: [searchTerm, name],
@@ -390,7 +392,7 @@ export function Search({
         />
 
         <div className={buttonContainer()}>
-          {!inputValue && !displayValue ? (
+          {!inputValue ? (
             <div className="flex h-full items-center justify-center">
               <Icon
                 className={isFetching ? "animate-spin" : ""}
