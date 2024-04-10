@@ -72,6 +72,7 @@
     "react-hooks/exhaustive-deps": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
+    "react/prop-types": "off",
     "quotes": ["error", "double"],
     "semi": ["error", "always"],
     "simple-import-sort/exports": "error",
