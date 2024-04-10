@@ -2,7 +2,7 @@ import { autoUpdate, useFloating, useTransitionStyles } from "@floating-ui/react
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
@@ -47,6 +47,7 @@ import {
   NodeDrawer,
   NodeFromDrawer,
   ProjectDrawer,
+  QuestionnaireDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
   RandomTableOptionsDrawer,
@@ -84,8 +85,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
   const [hasChangedData, setHasChangedData] = useAtom(hasChangedDataAtom);
   const resetDrawer = useResetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-  const { type, item_id } = useParams();
-
+  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(!!drawer.type);
   const [isExpanded, setIsExpanded] = useState(false);
   const [renderContent, setRenderContent] = useState(false);
@@ -114,10 +114,8 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
 
   // Close drawer if the location changes
   useEffect(() => {
-    if (!hasChangedData) {
-      resetDrawer();
-    }
-  }, [type, item_id, hasChangedData]);
+    resetDrawer();
+  }, [pathname]);
 
   useEffect(() => {
     setIsOpen(!!drawer.type);
@@ -229,6 +227,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
+                {drawer.type === "questionnaires" ? <QuestionnaireDrawer data={drawer?.data} /> : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}
