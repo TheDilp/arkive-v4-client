@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
-import { NotificationContainer, ProjectLayout } from "./components";
+import { NotificationContainer, ProjectLayout, QuestionnaireLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
 import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
 import { ProjectsView } from "./pages/Projects";
@@ -60,6 +60,7 @@ export default function App() {
               </Route>
               <Route element={<Outlet />} path="questionnaires/*">
                 <Route element={<QuestionnariesView />} path="*" />
+                <Route element={<QuestionnaireLayout />} path=":questionnaire_id/*" />
               </Route>
               <Route element={<Outlet />} path="projects/*">
                 <Route element={<ProjectsView />} path="*" />

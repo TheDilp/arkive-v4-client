@@ -110,11 +110,11 @@ export function QuestionnariesView() {
             <TablePageLayout>
               <Table
                 columns={createColumns()}
-                config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
+                config={{ getLink: (rowData) => `/questionnaires/${rowData.id}` }}
                 data={questionnaires?.data || []}
                 dispatch={dispatch}
                 isLoading={isLoading}
-                type="projects"
+                type="questionnaires"
               />
             </TablePageLayout>
           )}
