@@ -185,7 +185,7 @@ export function ProjectLayout() {
   );
 }
 
-export function QuestionnaireLayout() {
+export function QuestionnaireLayout({ children }: { children: ReactNode }) {
   const { questionnaire_id } = useParams();
   const { isLg } = useBreakpoint();
   const { user } = useUser();
@@ -288,7 +288,7 @@ export function QuestionnaireLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser ? null : <Outlet />}
+          {isInitialLoading || isInitialLoadingUser ? null : children}
         </div>
         {!isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
       </div>

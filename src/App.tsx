@@ -11,6 +11,7 @@ import { ProjectsView } from "./pages/Projects";
 import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView, PublicListView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
+import { AnswersView } from "./pages/Questionnaires/AnswersView";
 import { QuestionnariesView } from "./pages/Questionnaires/QuestionnariesView";
 import { UserSettings, UserSettingsWebhooks } from "./pages/User";
 
@@ -60,7 +61,14 @@ export default function App() {
               </Route>
               <Route element={<Outlet />} path="questionnaires/*">
                 <Route element={<QuestionnariesView />} path="*" />
-                <Route element={<QuestionnaireLayout />} path=":questionnaire_id/*" />
+                <Route
+                  element={
+                    <QuestionnaireLayout>
+                      <AnswersView />
+                    </QuestionnaireLayout>
+                  }
+                  path=":questionnaire_id/*"
+                />
               </Route>
               <Route element={<Outlet />} path="projects/*">
                 <Route element={<ProjectsView />} path="*" />
