@@ -289,15 +289,16 @@ export function useSearch<ReturnType>(
   },
   type: SearchableEntities,
   project_id: string,
+  isGlobal?: boolean,
   options?: UseQueryOptions<any> & { queryKeyConcat?: string[]; isPublic?: boolean; isFolders?: boolean },
 ) {
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () =>
       FetchFunction({
-        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${project_id}${getSearchURL(type)}${
-          options?.isFolders ? "/folder" : ""
-        }`,
+        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
+          isGlobal ? "global" : project_id
+        }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}`,
         method: "POST",
         body: JSON.stringify(request),
         isPublic: options?.isPublic,
