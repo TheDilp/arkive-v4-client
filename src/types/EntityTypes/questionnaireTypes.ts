@@ -42,7 +42,7 @@ export type QuestionType = {
 export type QuestionnaireType = {
   id: string;
   title: string;
-  user_id: string;
+  owner_id: string;
   icon?: AvailableIcons;
   questions: QuestionType[];
 };

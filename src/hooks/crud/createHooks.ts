@@ -474,8 +474,19 @@ export function useCreateQuestionnaire() {
 
   return useMutation(
     async (newItemValues: {
-      data: Omit<QuestionnaireType, "id" | "questions" | "icon"> & { icon?: string };
-      relations: { questions: { data: Omit<QuestionType, "parent_id"> }[] };
+      data: Omit<QuestionnaireType, "id" | "owner_id" | "questions" | "icon"> & { icon?: string };
+      relations: {
+        questions: {
+          data: {
+            id: string;
+            title: string;
+            sort?: number;
+            options?: QuestionType["options"];
+            type: QuestionType["type"];
+            blueprint_id?: string | null;
+          };
+        }[];
+      };
     }) => {
       const data = await FetchFunction({
         url: `${baseURLS.baseServer}/questionnaires/create`,
@@ -489,7 +500,7 @@ export function useCreateQuestionnaire() {
     {
       onSuccess: (data) => {
         if (data?.ok) {
-          queryClient.invalidateQueries(["questionnaires"]);
+          queryClient.invalidateQueries(["allEntities", undefined, "questionnaires"]);
           createNotification({
             title: data?.message || getEntityCRUDNotification("questionnaires", "create"),
             variant: "success",

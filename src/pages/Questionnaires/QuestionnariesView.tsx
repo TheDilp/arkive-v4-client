@@ -1,9 +1,11 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
+import { useEffect } from "react";
 
 import { createColumnHelper, Dialog, Drawer, Navbar, Sidebar, Skeleton, Table, TablePageLayout } from "../../components";
-import { useBreakpoint, useGetUser, useTable } from "../../hooks";
-import { drawerAtom, getQuestionnairesViewNavItems } from "../../utils";
+import { useBreakpoint, useGetEntities, useGetUser, useTable } from "../../hooks";
+import { QuestionnaireType } from "../../types/EntityTypes/questionnaireTypes";
+import { currentUserPermissionsAtom, drawerAtom, getQuestionnairesViewNavItems, userAtom } from "../../utils";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -25,7 +27,7 @@ export function QuestionnariesView() {
   const { isLg } = useBreakpoint();
   const { user } = useUser();
 
-  const { isInitialLoading: isInitialLoadingUser } = useGetUser(
+  const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
       data: { auth_id: user?.id as string },
       relations: {
@@ -35,7 +37,30 @@ export function QuestionnariesView() {
     },
     { enabled: !!user?.id },
   );
+
+  const { data: questionnaires, isLoading } = useGetEntities<QuestionnaireType>(
+    { fields: ["id", "icon", "owner_id", "title"] },
+    "questionnaires",
+    { enabled: !!userData },
+  );
+
   const [, dispatch] = useTable({});
+
+  const setUserAtom = useSetAtom(userAtom);
+  const setUserPermissions = useSetAtom(currentUserPermissionsAtom);
+
+  useEffect(() => {
+    if (userData?.data) {
+      if (user)
+        user?.update({
+          unsafeMetadata: {
+            user_id: userData?.data?.id,
+          },
+        });
+      setUserAtom(userData.data);
+      setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
+    }
+  }, [userData?.data]);
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
@@ -53,14 +78,15 @@ export function QuestionnariesView() {
           <Navbar isDisabled={isInitialLoadingUser} />
         </div>
         {isInitialLoadingUser ? <Skeleton limit={4} type="project_view" /> : null}
-        {!isInitialLoadingUser && !isInitialLoadingUser ? (
+        {!isInitialLoadingUser ? (
           <div className="flex-1 p-4">
             <TablePageLayout>
               <Table
                 columns={createColumns()}
                 config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
-                data={[]}
+                data={questionnaires?.data || []}
                 dispatch={dispatch}
+                isLoading={isLoading}
                 type="projects"
               />
             </TablePageLayout>

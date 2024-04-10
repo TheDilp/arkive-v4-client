@@ -92,11 +92,11 @@ function QuestionRow({
               hasNoBackground
               icon={IconEnum.add}
               isDisabled={isLoading || isDisabled}
-              onClick={
-                () => {} // changeField({
-                //   name: `questions[${index}].options`,
-                //   value: (options || []).concat({ id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` }),
-                // })
+              onClick={() =>
+                changeField({
+                  name: `questions[${index}].options`,
+                  value: (options || []).concat({ id: crypto.randomUUID(), value: `New option ${(options?.length || 0) + 1}` }),
+                })
               }
               tooltip="Add new option"
               variant="info"
@@ -204,7 +204,7 @@ export function QuestionnaireDrawer({ data }: Props) {
     id: "",
     icon: undefined,
     title: "",
-    user_id: user?.id || "",
+    owner_id: user?.id,
     questions: [],
   });
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -215,7 +215,7 @@ export function QuestionnaireDrawer({ data }: Props) {
     data?.id,
     "questionnaires",
     {
-      fields: ["id", "title", "user_id", "icon"],
+      fields: ["id", "title", "owner_id", "icon"],
       relations: {
         questions: true,
       },
@@ -236,7 +236,7 @@ export function QuestionnaireDrawer({ data }: Props) {
         <div className="flex-1">
           <div className="flex items-center gap-x-2">
             <Input
-              label="Title (required)"
+              label="Title (required, must be unique)"
               name="title"
               onChange={handleChange}
               placeholder="E.g. Personal questions"
@@ -386,14 +386,13 @@ export function QuestionnaireDrawer({ data }: Props) {
                 });
               } else {
                 const dataToParse = {
-                  data: questionnaire,
+                  data: { ...questionnaire, user_id: user?.id },
                   relations: {
-                    questions: (questionnaire?.questions || []).map((q) => ({ data: { title: q.title, type: q.type } })),
+                    questions: (questionnaire?.questions || []).map((q) => ({ data: q })),
                   },
                 };
 
                 const parsedData = InsertQuestionnaireSchema.parse(dataToParse);
-                // @ts-ignore
                 create(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) resetDrawerAtom();

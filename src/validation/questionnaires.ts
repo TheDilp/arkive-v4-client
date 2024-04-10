@@ -19,12 +19,20 @@ const QuestionTypeSchema = z.union([
 export const InsertQuestionnaireSchema = z.object({
   data: z.object({
     title: z.string(),
-    user_id: z.string(),
     icon: z.string().optional(),
   }),
   relations: z.object({
     questions: z
-      .object({ data: z.object({ title: z.string(), sort: z.number(), type: QuestionTypeSchema }) })
+      .object({
+        data: z.object({
+          id: z.string(),
+          title: z.string(),
+          sort: z.number().optional(),
+          type: QuestionTypeSchema,
+          options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+          blueprint_id: z.string().optional().nullable(),
+        }),
+      })
       .array()
       .min(1),
   }),
