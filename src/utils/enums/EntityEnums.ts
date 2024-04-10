@@ -44,6 +44,26 @@ export const BlueprintFieldTypesEnum = [
   { value: "events_multiple", label: "Events (multiple)" },
 ];
 
+export const QuestionnaireQuestionTypesEnum = [
+  { value: "text", label: "Text" },
+  { value: "number", label: "Number" },
+  { value: "select_single", label: "Select (single)" },
+  { value: "select_multiple", label: "Select (multiple)" },
+  { value: "boolean", label: "Boolean" },
+  { value: "documents_single", label: "Document (single)" },
+  { value: "documents_multiple", label: "Documents (multiple)" },
+  { value: "images_single", label: "Image (single)" },
+  { value: "images_multiple", label: "Images (multiple)" },
+  { value: "locations_single", label: "Location (single)" },
+  { value: "locations_multiple", label: "Locations (multiple)" },
+  { value: "characters_single", label: "Character (single)" },
+  { value: "characters_multiple", label: "Characters (multiple)" },
+  { value: "blueprints_single", label: "Blueprint instances (single)" },
+  { value: "blueprints_multiple", label: "Blueprint instances (multiple)" },
+  { value: "events_single", label: "Events (single)" },
+  { value: "events_multiple", label: "Events (multiple)" },
+];
+
 export const EntitiesWithTags = [
   "characters",
   "blueprint_instances",
