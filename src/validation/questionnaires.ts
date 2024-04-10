@@ -43,7 +43,7 @@ export const UpdateQuestionnaireSchema = z
     data: z.object({
       id: z.string(),
       title: z.string().optional(),
-      icon: z.string().optional(),
+      icon: z.string().optional().nullable(),
     }),
     relations: z.object({}),
   })

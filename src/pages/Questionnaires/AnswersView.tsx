@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
-import { useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useGetEntity, useTable } from "../../hooks";
 import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import { drawerAtom, IconEnum } from "../../utils";
 
@@ -19,6 +19,7 @@ function getQuestionnaireColumns(questions: QuestionType[]) {
 
 export function AnswersView() {
   const { questionnaire_id } = useParams();
+
   const setDrawer = useSetAtom(drawerAtom);
   const { data: questionnaireData, isLoading } = useGetEntity<QuestionnaireType>(
     questionnaire_id,
@@ -32,10 +33,11 @@ export function AnswersView() {
     },
   );
 
+  useChangeNavbarTitle(`Questionnaires | ${questionnaireData?.data?.title}`, !!questionnaireData?.data?.title);
   const [{ selection }, dispatch] = useTable({ selection: {} });
   return (
     <div className="flex flex-col gap-y-2">
-      <div className="ml-auto w-fit max-w-[208px] lg:w-52">
+      <div className="ml-auto w-fit max-w-64 lg:w-64">
         <Button
           icon={IconEnum.edit}
           label="Edit current questionnaire"

@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 
-import { useCreateQuestionnaire, useGetEntity, useHandleChange } from "../../../hooks";
+import { useCreateQuestionnaire, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { InputOnChangeValue, onChangeValue, TabType } from "../../../types";
 import { QuestionnaireType, QuestionType } from "../../../types/EntityTypes/questionnaireTypes";
 import { drawerAtom, IconEnum, QuestionnaireQuestionTypesEnum, reorder, userAtom } from "../../../utils";
@@ -209,7 +209,10 @@ export function QuestionnaireDrawer({ data }: Props) {
   });
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutate: create, isLoading: isCreating } = useCreateQuestionnaire();
-  const { mutate: update, isLoading: isUpdating } = useCreateQuestionnaire();
+  const { mutate: update, isLoading: isUpdating } = useUpdateEntity<{
+    data: Partial<Omit<QuestionnaireType, "owner_id" | "questions" | "icon"> & { icon?: string | null }>;
+    relations?: { questions?: QuestionType[] };
+  }>("questionnaires", "");
   const { handleChange, changedData } = useHandleChange({ data: questionnaire, setData: setQuestionnaire });
   const { data: existingQuestionnaire, isFetching } = useGetEntity<QuestionnaireType>(
     data?.id,
@@ -378,7 +381,6 @@ export function QuestionnaireDrawer({ data }: Props) {
                   },
                 };
                 const parsedData = UpdateQuestionnaireSchema.parse(dataToParse);
-                // @ts-ignore
                 update(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) resetDrawerAtom();
