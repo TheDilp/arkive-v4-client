@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PermissionCodeType, UserHasPermissionsType } from "../../types";
-import { currentUserPermissions, isProjectOwnerAtom, userAtom } from "../../utils";
+import { currentUserPermissionsAtom, isProjectOwnerAtom, userAtom } from "../../utils";
 
 export function useHasPermissions(requiredPermissions: PermissionCodeType[], owner_id: string | undefined) {
   const { type } = useParams();
@@ -11,7 +11,7 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
 
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
-  const userPermissions = useAtomValue(currentUserPermissions);
+  const userPermissions = useAtomValue(currentUserPermissionsAtom);
 
   useEffect(() => {
     setPermissions({});

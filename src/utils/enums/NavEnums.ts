@@ -61,7 +61,7 @@ export function getQuestionnairesViewNavItems(setDrawer: Dispatch<SetStateAction
           type: "questionnaires",
           title: "Create new questionnaire",
           data: {},
-          size: "lg",
+          size: "xl",
         })),
     },
     {

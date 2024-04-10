@@ -18,4 +18,4 @@ export const isProjectOwnerAtom = atom((get) => {
   if (owner_id && user_id) return owner_id === user_id;
   return false;
 });
-export const currentUserPermissions = atom<PermissionCodeType[]>([]);
+export const currentUserPermissionsAtom = atom<PermissionCodeType[]>([]);
