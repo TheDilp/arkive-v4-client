@@ -32,7 +32,7 @@ export function AnswersView() {
       document.title = `The Arkive | Questionnaires | ${questionnaireData?.data?.title}`;
       setNavbarTitle(`The Arkive | Questionnaires | ${questionnaireData?.data?.title}`);
     }
-  }, [questionnaireData?.data?.title]);
+  }, [questionnaireData]);
 
   const [{ selection }, dispatch] = useTable({ selection: {} });
   return (

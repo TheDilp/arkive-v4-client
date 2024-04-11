@@ -10,7 +10,7 @@ import { drawerAtom, IconEnum, QuestionnaireQuestionTypesEnum, reorder, userAtom
 import { InsertQuestionnaireSchema, UpdateQuestionnaireSchema } from "../../../validation/questionnaires";
 import { Button, Input, Search, Select } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Icon } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -226,9 +226,11 @@ export function QuestionnaireDrawer({ data }: Props) {
   );
 
   useLayoutEffect(() => {
-    if (existingQuestionnaire?.data && !questionnaire) setQuestionnaire(existingQuestionnaire?.data);
+    if (existingQuestionnaire?.data && !questionnaire) {
+      setQuestionnaire(existingQuestionnaire?.data);
+    }
   }, [existingQuestionnaire]);
-
+  if (isFetching) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -240,7 +242,7 @@ export function QuestionnaireDrawer({ data }: Props) {
               name="title"
               onChange={handleChange}
               placeholder="E.g. Personal questions"
-              value={questionnaire?.title}
+              value={questionnaire?.title || ""}
             />
             <span className="mb-1 self-end">
               <IconPicker icon={questionnaire?.icon || IconEnum.questionnaires} name="icon" onChange={handleChange} />
