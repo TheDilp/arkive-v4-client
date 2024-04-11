@@ -228,9 +228,12 @@ export function QuestionnaireDrawer({ data }: Props) {
   useLayoutEffect(() => {
     if (existingQuestionnaire?.data) {
       setQuestionnaire(existingQuestionnaire?.data);
+    } else {
+      setQuestionnaire({});
     }
   }, [existingQuestionnaire]);
   if (isFetching) return <Skeleton type="drawer_form" />;
+
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
