@@ -26,11 +26,7 @@ export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   return (
-    <main
-      className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden"
-      style={{
-        overflow: "hidden",
-      }}>
+    <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
         <ClerkProvider
           // afterSignInUrl="/projects"

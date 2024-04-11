@@ -385,6 +385,7 @@ export function QuestionnaireDrawer({ data }: Props) {
                 await update(parsedData, {
                   onSuccess: (res) => {
                     if (res?.ok) {
+                      // queryClient.invalidateQueries(["questionnaires", existingQuestionnaire?.data?.id]);
                       resetDrawerAtom();
                     }
                   },

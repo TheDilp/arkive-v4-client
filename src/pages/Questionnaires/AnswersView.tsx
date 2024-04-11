@@ -22,7 +22,11 @@ export function AnswersView() {
   const { questionnaire_id } = useParams();
   const setNavbarTitle = useSetAtom(navbarTitleAtom);
   const setDrawer = useSetAtom(drawerAtom);
-  const { data: questionnaireData, isLoading } = useGetEntity<QuestionnaireType>(questionnaire_id, "questionnaires", {
+  const {
+    data: questionnaireData,
+    isLoading,
+    isFetching,
+  } = useGetEntity<QuestionnaireType>(questionnaire_id, "questionnaires", {
     fields: ["title", "owner_id"],
     relations: { questions: true },
   });
@@ -32,8 +36,7 @@ export function AnswersView() {
       document.title = `The Arkive | Questionnaires | ${questionnaireData?.data?.title}`;
       setNavbarTitle(`The Arkive | Questionnaires | ${questionnaireData?.data?.title}`);
     }
-  }, [questionnaireData]);
-
+  }, [questionnaireData, isFetching]);
   const [{ selection }, dispatch] = useTable({ selection: {} });
   return (
     <div className="flex flex-col gap-y-2">

@@ -42,22 +42,22 @@ export function useUpdateEntity<
     },
     {
       onMutate: (vars) => {
-        if (type !== "projects") {
+        if (type !== "projects" && type !== "questionnaires" && type !== "documents") {
           const old = queryClient.getQueryData([type, vars.data.id]);
-          if (type !== "documents") {
-            queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
-              if (oldData?.data)
-                return {
-                  ...oldData,
-                  data: {
-                    ...oldData.data,
-                    ...vars.data,
-                    ...Object.values(vars.relations || {}).map((rel) => rel?.data),
-                  },
-                };
-              return oldData;
-            });
-          }
+
+          queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
+            if (oldData?.data)
+              return {
+                ...oldData,
+                data: {
+                  ...oldData.data,
+                  ...vars.data,
+                  ...Object.values(vars.relations || {}).map((rel) => rel?.data),
+                },
+              };
+            return oldData;
+          });
+
           return { old };
         }
         return {};
@@ -100,11 +100,7 @@ export function useUpdateEntity<
           }
 
           if (vars.data.parent_id) queryClient.invalidateQueries([type, vars.data.parent_id]);
-          if (vars.data.id && type !== "documents" && type !== "maps" && type !== "questionnaires")
-            queryClient.invalidateQueries([type, vars.data.id]);
-          else if (type === "questionnaires") {
-            queryClient.removeQueries(["questionnaire", "drawer"]);
-          }
+          if (vars.data.id && type !== "documents" && type !== "maps") queryClient.invalidateQueries([type, vars.data.id]);
 
           // Invalidate mentions queries if this is a mentionable entity being updated
           if (MentionableEntites.includes(type)) {
