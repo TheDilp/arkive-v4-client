@@ -39,7 +39,7 @@ type matchItem = { id: string; title: string; blueprint_title?: string; image_id
 type matchResult = FromToProps & matchItem;
 
 function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: SearchableMentionEntities | null): matchResult[] {
-  const matchWords = potentialMatches.flatMap((res) => res.title).join("|");
+  const matchWords = potentialMatches.flatMap((res) => res.title.trim()).join("|");
   if (!matchWords || !selectedEntity) {
     return [];
   }
@@ -241,7 +241,6 @@ export function AutomentionDrawer({ data }: Props) {
       setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity));
     }
   }, [links?.data, selectedEntity]);
-
   return (
     <DrawerLayout>
       <Select
