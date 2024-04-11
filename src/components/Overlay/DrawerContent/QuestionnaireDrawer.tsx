@@ -226,7 +226,7 @@ export function QuestionnaireDrawer({ data }: Props) {
   );
 
   useLayoutEffect(() => {
-    if (existingQuestionnaire?.data && !questionnaire) {
+    if (existingQuestionnaire?.data) {
       setQuestionnaire(existingQuestionnaire?.data);
     }
   }, [existingQuestionnaire]);
