@@ -405,18 +405,16 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
   );
 }
 
-export function useAddToEntity<InsertType extends { relations: { [key: string]: { id: string }[] } }>(
-  id: string,
-  type: AvailableEntityType,
-  project_id: string,
-) {
+export function useAddToEntity<
+  InsertType extends { relations: { [key: string]: { id: string }[] } } | { data: { [key: string]: string[] } },
+>(id: string, type: AvailableEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/resource/add/${id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/add/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });

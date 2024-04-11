@@ -2,19 +2,21 @@ import { AvailableIcons } from "../../utils";
 import { BlueprintType } from "./blueprintTypes";
 
 export type AnswerType =
-  | ({
+  | {
       id: string;
       parent_id: string;
       value: string | null;
       icon: string | null;
-    } & {
-      character_id: string;
-      blueprint_instance_id: null;
-    })
-  | {
-      character_id: null;
-      blueprint_instance_id: string;
-    };
+    } & (
+      | {
+          character_id: string;
+          blueprint_instance_id: null;
+        }
+      | {
+          character_id: null;
+          blueprint_instance_id: string;
+        }
+    );
 export type QuestionType = {
   id: string;
   parent_id: string;
@@ -45,4 +47,18 @@ export type QuestionnaireType = {
   owner_id: string;
   icon?: AvailableIcons;
   questions: QuestionType[];
+  characters: {
+    id: string;
+    full_name: string;
+    project_id: string;
+    portrait_id?: string;
+    answers: Pick<AnswerType, "id" | "value" | "parent_id">[];
+  }[];
+  blueprint_instances: {
+    id: string;
+    title: string;
+    project_id: string;
+    icon?: string;
+    answers: Pick<AnswerType, "id" | "value" | "parent_id">[];
+  }[];
 };

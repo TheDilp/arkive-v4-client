@@ -10,6 +10,7 @@ import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Input, Search, Title } from "../../Form";
+import { DrawerLayout } from "../../Layout";
 import { Badge } from "../../Misc";
 
 type Props = {
@@ -35,7 +36,7 @@ export function CharacterAddDrawer({ data }: Props) {
   }>("documents");
   const { mutate: deleteDocument } = useDeleteEntity("documents", project_id as string, false);
   return (
-    <div className="flex flex-col gap-y-2">
+    <DrawerLayout>
       <Search
         isMultiple
         name="items"
@@ -116,6 +117,6 @@ export function CharacterAddDrawer({ data }: Props) {
         }}
         variant="success"
       />
-    </div>
+    </DrawerLayout>
   );
 }

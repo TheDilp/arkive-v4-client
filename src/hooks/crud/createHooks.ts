@@ -474,7 +474,9 @@ export function useCreateQuestionnaire() {
 
   return useMutation(
     async (newItemValues: {
-      data: Omit<QuestionnaireType, "id" | "owner_id" | "questions" | "icon"> & { icon?: string };
+      data: Omit<QuestionnaireType, "id" | "owner_id" | "questions" | "icon" | "characters" | "blueprint_instances"> & {
+        icon?: string;
+      };
       relations: {
         questions: {
           data: {

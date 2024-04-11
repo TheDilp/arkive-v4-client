@@ -96,6 +96,7 @@ export type DrawerAtomType = {
   | { type: "map_pin_management"; data: { map_id: string } }
   | { type: "event_management"; data: { date: { month: number; year: number }; event_ids: string[] } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
+  | { type: "questionnaire_add"; data: { id: string } }
   | { type: "search"; data?: null }
   | {
       type: "edit_tags";
