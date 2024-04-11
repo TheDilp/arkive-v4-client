@@ -86,6 +86,7 @@ export interface SearchType extends BaseFormComponentType {
     icon?: AvailableIcons;
     parent_id?: string;
     type?: AllAvailableEntities;
+    project_id?: string;
   }[];
   onSearch?: (result: any) => void;
   onChange: ({
@@ -105,5 +106,6 @@ export interface SearchType extends BaseFormComponentType {
     parent_id?: string;
     icon?: AvailableIcons;
     type?: AllAvailableEntities;
+    project_id?: string;
   }) => void;
 }

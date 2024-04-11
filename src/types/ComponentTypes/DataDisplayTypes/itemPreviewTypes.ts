@@ -5,6 +5,7 @@ export interface ItemPreviewType {
   id: string;
   title: string;
   parent_id?: string;
+  entity_project_id?: string;
   icon?: string;
   link?: string;
   label?: string;

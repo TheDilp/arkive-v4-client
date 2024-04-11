@@ -217,6 +217,7 @@ export function Search({
       full_name?: string;
       icon?: AvailableIcons;
       parent_id?: string;
+      project_id?: string;
       type?: AllAvailableEntities;
     }[]
   >(
@@ -345,6 +346,7 @@ export function Search({
                     type: item?.type,
                     parent_id: item?.parent_id,
                     icon: item?.icon,
+                    project_id: item?.project_id,
                   });
                   if (hasShownOption) setDisplayValue(item.label);
                   if (!isMultiple) {
@@ -449,6 +451,7 @@ export function Search({
                               image: ittem?.image,
                               type: ittem?.type,
                               parent_id: ittem?.parent_id,
+                              project_id: ittem?.project_id,
                               icon: ittem?.icon,
                             });
                             if (hasShownOption) setDisplayValue(ittem.label);
@@ -491,7 +494,7 @@ export function Search({
                       item?.image) ? (
                       <Avatar
                         image={getImageURL(
-                          project_id as string,
+                          item?.project_id || (project_id as string),
                           imageType || "images",
                           searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
                         )}
