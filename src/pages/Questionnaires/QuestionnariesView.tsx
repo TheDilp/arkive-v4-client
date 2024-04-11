@@ -7,6 +7,7 @@ import {
   createColumnHelper,
   Dialog,
   Drawer,
+  Icon,
   Navbar,
   Sidebar,
   Skeleton,
@@ -21,13 +22,22 @@ const columnHelper = createColumnHelper<any>();
 
 function createColumns() {
   return [
+    columnHelper.accessor("icon", {
+      id: "icon",
+      header: "",
+      cell: (info) => <Icon fontSize={28} icon={info.getValue() || IconEnum.questionnaires} />,
+      meta: {
+        sortable: true,
+        centered: true,
+      },
+      minSize: 3.75,
+      size: 3.75,
+      maxSize: 3.75,
+    }),
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
       cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-      },
     }),
   ];
 }
