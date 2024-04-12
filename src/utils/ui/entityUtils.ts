@@ -13,6 +13,7 @@ import {
   FieldTypes,
   RandomTableOptionType,
 } from "../../types";
+import { QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType): AvailableIcons {
@@ -399,4 +400,15 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
     };
   }
   return { tooltip: "", isSoonToBeDeleted: false };
+}
+
+export function getQuestionColumnWidth(type: QuestionType["type"]): { minSize: number; maxSize?: number } {
+  if (type === "text") return { minSize: 15 };
+  if (type === "images_single" || type === "characters_single" || type === "number" || type === "boolean")
+    return { minSize: 7.5, maxSize: 7.5 };
+  if (type === "characters_multiple" || type === "images_multiple" || type === "select_single")
+    return { minSize: 12, maxSize: 12 };
+  if (type === "select_multiple") return { minSize: 18, maxSize: 18 };
+  if (type === "locations_multiple" || type === "blueprints_multiple") return { minSize: 15, maxSize: 15 };
+  return { minSize: 10, maxSize: 10 };
 }

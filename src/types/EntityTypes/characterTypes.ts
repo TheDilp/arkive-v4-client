@@ -52,23 +52,23 @@ export interface CharacterCharacterFieldType {
   field_type: FieldTypes;
 
   blueprint_instances: {
-    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string };
+    blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string; project_id: string };
     related_id: string;
   }[];
   documents: {
-    document: Pick<DocumentType, "id" | "title" | "icon">;
+    document: Pick<DocumentType, "id" | "title" | "icon" | "project_id">;
     related_id: string;
   }[];
   map_pins: {
-    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id">;
+    map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id"> & { project_id: string };
     related_id: string;
   }[];
   images: {
-    image: Pick<ImageType, "id" | "title">;
+    image: Pick<ImageType, "id" | "title" | "project_id">;
     related_id: string;
   }[];
   events: {
-    event: Pick<EventType, "id" | "title" | "parent_id">;
+    event: Pick<EventType, "id" | "title" | "parent_id"> & { project_id: string };
     related_id: string;
   }[];
 

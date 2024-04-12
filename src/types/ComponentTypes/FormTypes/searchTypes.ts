@@ -97,6 +97,7 @@ export interface SearchType extends BaseFormComponentType {
     parent_id,
     icon,
     type,
+    project_id,
   }: {
     name: string;
     value: string;

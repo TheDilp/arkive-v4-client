@@ -16,6 +16,7 @@ type Props = {
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
   blueprint_id: string | null | undefined;
   isDisabled?: boolean;
+  isGlobal?: boolean;
 };
 
 export function TemplateBlueprintField({
@@ -27,6 +28,7 @@ export function TemplateBlueprintField({
   fieldType,
   currentValue,
   isDisabled,
+  isGlobal,
   isCollapsible,
 }: Props) {
   const createNotification = useNotifications();
@@ -37,9 +39,10 @@ export function TemplateBlueprintField({
         {isDisabled ? null : (
           <Search
             isDisabled={isDisabled}
+            isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon }) => {
+            onChange={({ value, label, icon, project_id: entity_project_id }) => {
               if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
                 createNotification({
                   timer: 3,
@@ -59,6 +62,7 @@ export function TemplateBlueprintField({
                       id: value,
                       title: label,
                       icon,
+                      project_id: entity_project_id || project_id,
                     },
                   },
                 },
@@ -84,9 +88,16 @@ export function TemplateBlueprintField({
                     ]);
                   }
             }
+            entity_project_id={val?.blueprint_instance?.project_id}
             icon={val?.blueprint_instance?.icon}
             id={val?.related_id}
-            link={getEntityLink(project_id as string, "blueprint_instances", id, val?.blueprint_instance?.parent_id, false)}
+            link={getEntityLink(
+              val?.blueprint_instance?.project_id || project_id || "",
+              "blueprint_instances",
+              id,
+              val?.blueprint_instance?.parent_id,
+              false,
+            )}
             title={val?.blueprint_instance?.title}
             type="blueprint_instances"
           />

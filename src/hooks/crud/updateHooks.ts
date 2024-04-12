@@ -13,6 +13,7 @@ import {
   MessagePlaceContentType,
   UserType,
 } from "../../types";
+import { AnswerValueType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -836,7 +837,7 @@ export function useFillQuestionnaire() {
       data: {
         character_id: string | undefined;
         blueprint_instance_id: string | undefined;
-        answers: { parent_id: string; value: string | number | boolean | null }[];
+        answers: { parent_id: string; value: AnswerValueType }[];
       };
     }) => {
       return FetchFunction({

@@ -1,11 +1,44 @@
 import { AvailableIcons } from "../../utils";
+import { BlueprintInstanceType } from "./blueprintInstanceTypes";
 import { BlueprintType } from "./blueprintTypes";
+import { EventType } from "./calendarTypes";
+import { CharacterType } from "./characterTypes";
+import { DocumentType } from "./documentTypes";
+import { ImageType } from "./imageTypes";
+import { MapPinType } from "./mapTypes";
+
+export type AnswerValueType = string | number | boolean | (string | number | boolean)[] | null;
 
 export type AnswerType =
   | {
       id: string;
       parent_id: string;
-      value: string | null;
+      value: AnswerValueType;
+
+      characters: {
+        related_id: string;
+        character: Pick<CharacterType, "id" | "full_name" | "portrait_id" | "project_id">;
+      }[];
+      blueprint_instances: {
+        blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string; project_id: string };
+        related_id: string;
+      }[];
+      documents: {
+        document: Pick<DocumentType, "id" | "title" | "icon" | "project_id">;
+        related_id: string;
+      }[];
+      map_pins: {
+        map_pin: Pick<MapPinType, "id" | "title" | "icon" | "parent_id"> & { project_id: string };
+        related_id: string;
+      }[];
+      images: {
+        image: Pick<ImageType, "id" | "title" | "project_id">;
+        related_id: string;
+      }[];
+      events: {
+        event: Pick<EventType, "id" | "title" | "parent_id"> & { project_id: string };
+        related_id: string;
+      }[];
       icon: string | null;
     } & (
       | {
@@ -33,12 +66,16 @@ export type QuestionType = {
     | "select_multiple"
     | "characters_single"
     | "characters_multiple"
+    | "documents_single"
+    | "documents_multiple"
     | "blueprints_single"
     | "blueprints_multiple"
     | "events_single"
     | "events_multiple"
     | "locations_single"
-    | "locations_multiple";
+    | "locations_multiple"
+    | "images_single"
+    | "images_multiple";
 };
 
 export type QuestionnaireType = {

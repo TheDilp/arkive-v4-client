@@ -14,6 +14,7 @@ type Props = {
   fieldType: "characters_single" | "characters_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["characters"];
 };
 
@@ -26,17 +27,19 @@ export function TemplateCharacterField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isGlobal,
 }: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
-      <div className="flex h-56 max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         <Search
           isDisabled={isDisabled}
+          isGlobal={isGlobal}
           isMultiple
           name={name}
-          onChange={({ value, label, image }) => {
+          onChange={({ value, label, image, project_id: character_project_id }) => {
             if (currentValue?.some((cVal) => cVal.related_id === value)) {
               createNotification({
                 timer: 3,
@@ -56,6 +59,7 @@ export function TemplateCharacterField({
                     id: value,
                     full_name: label,
                     portrait_id: image,
+                    project_id: character_project_id || project_id,
                   },
                 },
               },
@@ -65,6 +69,7 @@ export function TemplateCharacterField({
           searchEntity="characters"
           value={currentValue?.map((c) => c.related_id)}
         />
+
         {(currentValue || [])?.map((val) => (
           <EntityPreview
             key={val.related_id}
@@ -76,9 +81,10 @@ export function TemplateCharacterField({
                 },
               ]);
             }}
+            entity_project_id={val?.character?.project_id}
             id={val?.related_id}
             image_id={val?.character?.portrait_id}
-            link={getEntityLink(project_id as string, "characters", id, undefined, false)}
+            link={getEntityLink(val?.character?.project_id || project_id || "", "characters", id, undefined, false)}
             title={val?.character?.full_name || ""}
             type="characters"
           />

@@ -291,10 +291,7 @@ export function QuestionnaireDrawer({ data }: Props) {
                 return;
               }
               const newData = reorder(questionnaire?.questions || [], result.source.index, result.destination.index);
-              setQuestionnaire((prev) => ({
-                ...prev,
-                questions: newData,
-              }));
+              handleChange({ name: "questions", value: newData });
             }}>
             <Droppable droppableId="droppable">
               {(providedDroppable) => (

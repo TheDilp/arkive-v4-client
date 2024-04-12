@@ -14,7 +14,8 @@ type Props = {
   fieldType: "documents_single" | "documents_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
-  currentValue: { related_id: string; document: Pick<DocumentType, "id" | "title" | "icon"> }[];
+  isGlobal?: boolean;
+  currentValue: { related_id: string; document: Pick<DocumentType, "id" | "title" | "icon"> & { project_id: string } }[];
 };
 
 export function TemplateDocumentField({
@@ -26,18 +27,20 @@ export function TemplateDocumentField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isGlobal,
 }: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
-      <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
+      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled ? null : (
           <Search
             isDisabled={isDisabled}
+            isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon }) => {
+            onChange={({ value, label, icon, project_id: entity_project_id }) => {
               if (currentValue?.some((cVal) => cVal.related_id === value)) {
                 createNotification({
                   timer: 3,
@@ -57,6 +60,7 @@ export function TemplateDocumentField({
                       id: value,
                       title: label,
                       icon,
+                      project_id: entity_project_id,
                     },
                   },
                 },
@@ -81,9 +85,10 @@ export function TemplateDocumentField({
                     ]);
                   }
             }
+            entity_project_id={val?.document?.project_id}
             icon={val?.document?.icon || ""}
             id={val?.related_id}
-            link={getEntityLink(project_id as string, "documents", val?.related_id, undefined, false)}
+            link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val?.related_id, undefined, false)}
             title={val?.document?.title}
             type="documents"
           />

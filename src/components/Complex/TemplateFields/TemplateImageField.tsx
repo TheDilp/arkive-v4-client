@@ -12,6 +12,7 @@ type Props = {
   fieldType: "images_single" | "images_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
 };
 
@@ -23,6 +24,7 @@ export function TemplateImageField({
   fieldType,
   isCollapsible,
   isDisabled,
+  isGlobal,
   currentValue,
 }: Props) {
   const createNotification = useNotifications();
@@ -32,9 +34,10 @@ export function TemplateImageField({
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled ? null : (
           <Search
+            isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label }) => {
+            onChange={({ value, label, project_id: entity_project_id }) => {
               if (currentValue?.some((cVal) => cVal.related_id === value)) {
                 createNotification({
                   timer: 3,
@@ -53,6 +56,7 @@ export function TemplateImageField({
                     image: {
                       id: value,
                       title: label,
+                      project_id: entity_project_id,
                     },
                   },
                 },
@@ -77,6 +81,7 @@ export function TemplateImageField({
                     ]);
                   }
             }
+            entity_project_id={val?.image?.project_id}
             id={val?.related_id}
             image_id={val?.image?.id}
             title={val?.image?.title}

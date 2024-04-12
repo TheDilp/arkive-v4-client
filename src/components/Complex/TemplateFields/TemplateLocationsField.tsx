@@ -13,8 +13,9 @@ type Props = {
   id: string;
   fieldType: "locations_single" | "locations_multiple";
   isCollapsible?: boolean;
+  isGlobal?: boolean;
   isDisabled?: boolean;
-  currentValue: { related_id: string; map_pin: Pick<MapPinType, "id" | "title" | "icon"> }[];
+  currentValue: { related_id: string; map_pin: Pick<MapPinType, "id" | "title" | "icon"> & { project_id: string } }[];
 };
 
 export function TemplateLocationsField({
@@ -26,6 +27,7 @@ export function TemplateLocationsField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isGlobal,
 }: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
@@ -34,9 +36,10 @@ export function TemplateLocationsField({
       <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
         {isDisabled ? null : (
           <Search
+            isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon, parent_id }) => {
+            onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
               if (currentValue?.some((cVal) => cVal.related_id === value)) {
                 createNotification({
                   timer: 3,
@@ -57,6 +60,7 @@ export function TemplateLocationsField({
                       parent_id,
                       title: label,
                       icon,
+                      project_id: entity_project_id || project_id,
                     },
                   },
                 },
@@ -81,6 +85,7 @@ export function TemplateLocationsField({
                     ]);
                   }
             }
+            entity_project_id={val?.map_pin?.project_id}
             icon={val?.map_pin?.icon || ""}
             id={val?.related_id}
             link={getEntityLink(project_id as string, "map_pins", id, undefined, false)}

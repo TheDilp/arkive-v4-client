@@ -6,9 +6,15 @@ import { useParams } from "react-router-dom";
 import { Avatar, Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useGetEntity, useTable } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
-import { drawerAtom, getImageURL, IconEnum, navbarTitleAtom } from "../../utils";
+import { AnswerValueType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
+import { drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
 
+function getAnswerValue(type: QuestionType["type"], options: { id: string; value: string }[], value: AnswerValueType) {
+  if (type === "select_single" || type === "select_multiple") return options.find((opt) => opt.id === value)?.value || "";
+  if (type === "boolean") return value ? "Yes" : "No";
+
+  return value;
+}
 const columnHelper = createColumnHelper<QuestionType & { project_id: string; portrait_id?: string }>();
 
 function getQuestionnaireColumns(
@@ -19,24 +25,44 @@ function getQuestionnaireColumns(
   const columns: ColumnDef<any, any>[] = [
     columnHelper.display({
       id: "portrait_id",
-      header: "Image",
-      minSize: 3.75,
-      maxSize: 3.75,
+      header: "Portrait",
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
+        </div>
+      ),
       meta: {
+        pinned: true,
+        noLink: true,
         centered: true,
       },
-      cell: ({ row }) => (
-        <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
-      ),
+      minSize: 4.5,
+      maxSize: 4.5,
     }),
-    columnHelper.accessor("title", { header: "Title", maxSize: 15 }),
+    columnHelper.accessor("title", {
+      id: "title",
+      header: "Title",
+      cell: (info) => info.getValue(),
+      meta: {
+        pinned: true,
+        sortable: true,
+      },
+      minSize: 12,
+      size: 12,
+    }),
   ];
 
   for (let index = 0; index < questions.length; index += 1) {
+    const { minSize, maxSize } = getQuestionColumnWidth(questions[index]?.type || "text");
+
     columns.push(
       columnHelper.accessor(questions[index].id as any, {
         header: questions[index].title,
-        cell: (info) => info.getValue(),
+        cell: (info) => {
+          return info.getValue();
+        },
+        minSize,
+        maxSize,
       }),
     );
   }
@@ -44,8 +70,9 @@ function getQuestionnaireColumns(
     columnHelper.display({
       id: "actions",
       header: "Actions",
-      maxSize: 3.75,
-      minSize: 3.75,
+      size: 5,
+      maxSize: 5,
+      minSize: 5,
       meta: { centered: true, noLink: true },
       cell: ({ row }) => (
         <Dropdown
@@ -99,7 +126,12 @@ export function AnswersView() {
     const answers: Record<string, any> = {};
 
     for (let index = 0; index < char.answers.length; index += 1) {
-      answers[char.answers[index].parent_id] = char.answers[index].value;
+      const question = questionnaireData?.data?.questions?.find((q) => q.id === char.answers[index].parent_id);
+      answers[char.answers[index].parent_id] = getAnswerValue(
+        question?.type || "text",
+        question?.options || [],
+        char.answers[index].value || "",
+      );
     }
 
     return {

@@ -14,6 +14,7 @@ type Props = {
   fieldType: "events_single" | "events_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["events"];
 };
 
@@ -26,6 +27,7 @@ export function TemplateEventField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isGlobal,
 }: Props) {
   const createNotification = useNotifications();
   const { project_id } = useParams();
@@ -35,9 +37,10 @@ export function TemplateEventField({
         {isDisabled ? null : (
           <Search
             isDisabled={isDisabled}
+            isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon, parent_id }) => {
+            onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
               if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
                 createNotification({
                   timer: 3,
@@ -58,6 +61,7 @@ export function TemplateEventField({
                       title: label,
                       parent_id,
                       icon,
+                      project_id: entity_project_id || project_id,
                     },
                   },
                 },
@@ -82,6 +86,7 @@ export function TemplateEventField({
                     ]);
                   }
             }
+            entity_project_id={val?.event?.project_id}
             id={val?.related_id}
             link={getEntityLink(project_id as string, "events", id, val?.event?.parent_id, false)}
             title={val?.event?.title}
