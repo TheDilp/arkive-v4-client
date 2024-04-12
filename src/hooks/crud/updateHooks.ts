@@ -741,7 +741,6 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
     },
   );
 }
-
 export function useUpdateUser<
   InsertType extends {
     data?: Partial<Pick<UserType, "feature_flags">>;
@@ -788,7 +787,6 @@ export function useUpdateUser<
     },
   );
 }
-
 export function useAssignRole<InsertType extends { data: { user_id: string; role_id: string } }>() {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -826,6 +824,47 @@ export function useAssignRole<InsertType extends { data: { user_id: string; role
             icon: IconEnum.error,
             timer: 5,
           });
+      },
+    },
+  );
+}
+export function useFillQuestionnaire() {
+  const createNotification = useNotifications();
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (updateValues: {
+      data: {
+        character_id: string | undefined;
+        blueprint_instance_id: string | undefined;
+        answers: { parent_id: string; value: string | number | boolean | null }[];
+      };
+    }) => {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/answers/fill`,
+        body: JSON.stringify(updateValues),
+        method: "POST",
+      });
+    },
+    {
+      onError: () => {
+        createNotification({
+          title: "There was an error filling this questionnaire.",
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
+      },
+      onSuccess: (data) => {
+        if (data.ok) {
+          queryClient.invalidateQueries(["questionnaires"]);
+
+          createNotification({
+            title: "Questionnaire successfully filled.",
+            variant: "success",
+            icon: IconEnum.check,
+            timer: 2,
+          });
+        }
       },
     },
   );

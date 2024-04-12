@@ -62,3 +62,5 @@ export type QuestionnaireType = {
     answers: Pick<AnswerType, "id" | "value" | "parent_id">[];
   }[];
 };
+
+export type EntityQuestionnaireType = { questions: (QuestionType & { answer: AnswerType })[] };

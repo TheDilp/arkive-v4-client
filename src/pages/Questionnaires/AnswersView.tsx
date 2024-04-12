@@ -1,17 +1,36 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { useSetAtom } from "jotai";
-import { useEffect } from "react";
+import { SetStateAction, useSetAtom } from "jotai";
+import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import { useGetEntity, useTable } from "../../hooks";
+import { DrawerAtomType } from "../../types";
 import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
-import { drawerAtom, IconEnum, navbarTitleAtom } from "../../utils";
+import { drawerAtom, getImageURL, IconEnum, navbarTitleAtom } from "../../utils";
 
-const columnHelper = createColumnHelper<QuestionType>();
+const columnHelper = createColumnHelper<QuestionType & { project_id: string; portrait_id?: string }>();
 
-function getQuestionnaireColumns(questions: QuestionType[]) {
-  const columns: ColumnDef<any, any>[] = [columnHelper.accessor("title", { header: "Title", maxSize: 15 })];
+function getQuestionnaireColumns(
+  questionnaire_id: string,
+  questions: QuestionType[],
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+) {
+  const columns: ColumnDef<any, any>[] = [
+    columnHelper.display({
+      id: "portrait_id",
+      header: "Image",
+      minSize: 3.75,
+      maxSize: 3.75,
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
+      ),
+    }),
+    columnHelper.accessor("title", { header: "Title", maxSize: 15 }),
+  ];
 
   for (let index = 0; index < questions.length; index += 1) {
     columns.push(
@@ -21,6 +40,37 @@ function getQuestionnaireColumns(questions: QuestionType[]) {
       }),
     );
   }
+  columns.push(
+    columnHelper.display({
+      id: "actions",
+      header: "Actions",
+      maxSize: 3.75,
+      minSize: 3.75,
+      meta: { centered: true, noLink: true },
+      cell: ({ row }) => (
+        <Dropdown
+          allowedPlacements={["left", "left-end", "left-start"]}
+          items={[
+            {
+              id: "1",
+              title: "Fill out questionnaire",
+              icon: IconEnum.check_circle,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  title: "Fill out questionnaire",
+                  type: "questionnaire_answer",
+                  data: { id: questionnaire_id, character_id: row.original.id, blueprint_instance_id: undefined },
+                })),
+            },
+          ]}>
+          <div>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
+          </div>
+        </Dropdown>
+      ),
+    }),
+  );
   return columns;
 }
 
@@ -98,11 +148,13 @@ export function AnswersView() {
       <TablePageLayout>
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            columns={isLoading ? [] : getQuestionnaireColumns(questionnaireData?.data?.questions || [])}
+            columns={
+              isLoading
+                ? []
+                : getQuestionnaireColumns(questionnaire_id as string, questionnaireData?.data?.questions || [], setDrawer)
+            }
             config={{
               hasSelect: true,
-              // orderBy,
-              // filters,
               selection,
             }}
             data={formatted}

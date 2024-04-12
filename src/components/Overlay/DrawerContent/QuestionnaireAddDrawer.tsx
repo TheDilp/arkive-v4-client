@@ -93,27 +93,28 @@ export default function QuestionnaireAddDrawer({ data }: { data: { id: string } 
           type="blueprint_instances"
         />
       ))}
-
-      <Button
-        icon={IconEnum.add}
-        isDisabled={isMutating || (items.characters.length === 0 && items.blueprint_instances.length === 0)}
-        isLoading={isMutating}
-        label="Save"
-        onClick={async () => {
-          if (items.characters.length || items.blueprint_instances.length) {
-            const parsedPayload = {
-              data: {
-                characters: items.characters.map((c) => c.value),
-                blueprint_instances: items.blueprint_instances.map((b) => b.value),
-              },
-            };
-            await addToCharacter(parsedPayload, {
-              onSuccess: resetDrawer,
-            });
-          }
-        }}
-        variant="success"
-      />
+      <div className="mt-auto">
+        <Button
+          icon={IconEnum.add}
+          isDisabled={isMutating || (items.characters.length === 0 && items.blueprint_instances.length === 0)}
+          isLoading={isMutating}
+          label="Save"
+          onClick={async () => {
+            if (items.characters.length || items.blueprint_instances.length) {
+              const parsedPayload = {
+                data: {
+                  characters: items.characters.map((c) => c.value),
+                  blueprint_instances: items.blueprint_instances.map((b) => b.value),
+                },
+              };
+              await addToCharacter(parsedPayload, {
+                onSuccess: resetDrawer,
+              });
+            }
+          }}
+          variant="success"
+        />
+      </div>
     </DrawerLayout>
   );
 }

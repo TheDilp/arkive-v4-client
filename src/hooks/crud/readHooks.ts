@@ -9,6 +9,7 @@ import {
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
+import { EntityQuestionnaireType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
   FetchFunction,
@@ -352,6 +353,35 @@ export function useGetIcons(type: IconCategories | null) {
       select: (data: { total: number; uncategorized: string[] }) => {
         return data;
       },
+    },
+  );
+}
+export function useGetEntityQuestionnaire(id: string, entity_id: string, type: "characters" | "blueprint_instances") {
+  const createNotification = useNotifications();
+
+  return useQuery<{ data: EntityQuestionnaireType }>(
+    [id, entity_id, type],
+    async () => {
+      const data = await FetchFunction({
+        method: "GET",
+        url: `${baseURLS.baseServer}/questionnaires/${type.toLowerCase()}/${entity_id}/${id}`,
+      });
+      if (!data?.role_access) {
+        createNotification({
+          title: "Could not get answers for this entity.",
+          timer: 5,
+          hasNoTruncate: true,
+          variant: "error",
+          icon: IconEnum.forbidden,
+        });
+        return { data: [], message: "NO_ROLE_ACCESS", ok: false };
+      }
+      return data;
+    },
+    {
+      // retry: options?.retry,
+      // enabled: options?.enabled,
+      // staleTime: options?.staleTime,
     },
   );
 }

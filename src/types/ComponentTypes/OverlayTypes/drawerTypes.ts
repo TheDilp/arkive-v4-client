@@ -97,6 +97,10 @@ export type DrawerAtomType = {
   | { type: "event_management"; data: { date: { month: number; year: number }; event_ids: string[] } }
   | { type: "character_add"; data: { id: string; type: "documents" | "images" | "tags" } }
   | { type: "questionnaire_add"; data: { id: string } }
+  | {
+      type: "questionnaire_answer";
+      data: { id: string; character_id: string | undefined; blueprint_instance_id: string | undefined };
+    }
   | { type: "search"; data?: null }
   | {
       type: "edit_tags";
