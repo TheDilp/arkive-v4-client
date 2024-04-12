@@ -80,8 +80,6 @@ export default function App() {
                   <Route element={<Dashboard />} path="*" />
                 </Route>
               </Route>
-
-              <Route element={<Navigate to="/projects" />} path="*" />
             </Route>
           </Routes>
           <Routes>
