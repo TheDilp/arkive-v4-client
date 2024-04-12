@@ -161,7 +161,7 @@ export function ProjectsView() {
         <div className="w-full">
           <Navbar isDisabled={isLoading || isInitialLoadingUser} />
         </div>
-        <div className="flex flex-1 flex-col gap-y-2 p-4">
+        <div className="flex h-full flex-1 flex-col gap-y-2 p-4">
           {isLoading ? (
             <Skeleton limit={4} type="project_view" />
           ) : (
@@ -196,7 +196,7 @@ export function ProjectsView() {
             </div>
           ) : null}
           {!view && !isLoading && !isInitialLoadingUser ? (
-            <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto xl:grid-cols-2 2xl:grid-cols-4">
+            <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
               {(data?.data || []).map((project) => (
                 <ProjectCard
                   key={project.id}
