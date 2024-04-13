@@ -198,7 +198,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
                       q?.answer?.events || [],
                       q?.answer?.images || [],
                     )?.map((item: { related_id: string }) => ({
-                      answer_id: q.answer.id,
+                      answer_id: crypto.randomUUID(),
                       related_id: item.related_id,
                     })),
                   })),
