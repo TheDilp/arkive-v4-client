@@ -217,7 +217,12 @@ function disableShowRelationshipTree(character: CharacterType | undefined) {
   return false;
 }
 function documentsTableColumns(
-  removeItem: UseMutateAsyncFunction<any, unknown, { relations: { [key: string]: { id: string }[] } }, unknown>,
+  removeItem: UseMutateAsyncFunction<
+    any,
+    unknown,
+    { relations: { [key: string]: { id: string }[] } } | { data: { [key: string]: string[] } },
+    unknown
+  >,
   updatePublic: UseMutateAsyncFunction<
     any,
     unknown,
@@ -497,13 +502,14 @@ function assetTableColumns(
   removeItem: UseMutateAsyncFunction<
     any,
     unknown,
-    {
-      relations: {
-        [key: string]: {
-          id: string;
-        }[];
-      };
-    },
+    | {
+        relations: {
+          [key: string]: {
+            id: string;
+          }[];
+        };
+      }
+    | { data: { [key: string]: string[] } },
     unknown
   >,
   webhooks: WebhookType[],

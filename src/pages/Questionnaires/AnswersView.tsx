@@ -1,3 +1,4 @@
+import { UseMutateFunction } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect } from "react";
@@ -11,10 +12,28 @@ import {
   LocationColumn,
   ShowMultipleWithBadge,
 } from "../../components/DataDisplay/TableComponents/TableColumns";
-import { useGetEntity, useTable } from "../../hooks";
+import { useGetEntity, useRemoveFromEntity, useTable } from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { AnswerType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import { AvailableIcons, drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
+
+type RemoveFromQuestionnaireType = UseMutateFunction<
+  any,
+  unknown,
+  | {
+      relations: {
+        [key: string]: {
+          id: string;
+        }[];
+      };
+    }
+  | {
+      data: {
+        [key: string]: string[];
+      };
+    },
+  unknown
+>;
 
 const centeredColumns = [
   "images_single",
@@ -38,6 +57,7 @@ function getQuestionnaireColumns(
   questionnaire_id: string,
   questions: QuestionType[],
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  removeFromQuestionnaire: RemoveFromQuestionnaireType,
 ) {
   const columns: ColumnDef<any, any>[] = [
     columnHelper.display({
@@ -168,8 +188,24 @@ function getQuestionnaireColumns(
                   ...prev,
                   title: "Fill out questionnaire",
                   type: "questionnaire_answer",
-                  data: { id: questionnaire_id, character_id: row.original.id, blueprint_instance_id: undefined },
+                  data: {
+                    id: questionnaire_id,
+                    character_id: "full_name" in row.original ? row.original.id : undefined,
+                    blueprint_instance_id: "icon" in row.original ? row.original.id : undefined,
+                  },
                 })),
+            },
+            {
+              id: "2",
+              title: "Delete",
+              icon: IconEnum.trash,
+              onClick: () =>
+                removeFromQuestionnaire({
+                  data: {
+                    characters: "full_name" in row.original ? [row.original.id] : [],
+                    blueprint_instances: "icon" in row.original ? [row.original.id] : [],
+                  },
+                }),
             },
           ]}>
           <div>
@@ -194,6 +230,8 @@ export function AnswersView() {
     fields: ["title", "owner_id"],
     relations: { questions: true, characters: true, blueprint_instances: true },
   });
+
+  const { mutate: removeFromQuestionnaire } = useRemoveFromEntity("questionnaires", questionnaire_id as string, "");
 
   useEffect(() => {
     if (questionnaireData?.data?.title) {
@@ -267,7 +305,12 @@ export function AnswersView() {
             columns={
               isLoading
                 ? []
-                : getQuestionnaireColumns(questionnaire_id as string, questionnaireData?.data?.questions || [], setDrawer)
+                : getQuestionnaireColumns(
+                    questionnaire_id as string,
+                    questionnaireData?.data?.questions || [],
+                    setDrawer,
+                    removeFromQuestionnaire,
+                  )
             }
             config={{
               hasSelect: true,

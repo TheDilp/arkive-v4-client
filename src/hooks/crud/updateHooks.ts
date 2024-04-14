@@ -444,11 +444,9 @@ export function useAddToEntity<
   );
 }
 
-export function useRemoveFromEntity<InsertType extends { relations: { [key: string]: { id: string }[] } }>(
-  type: AvailableEntityType,
-  id: string,
-  project_id: string,
-) {
+export function useRemoveFromEntity<
+  InsertType extends { relations: { [key: string]: { id: string }[] } } | { data: { [key: string]: string[] } },
+>(type: AvailableEntityType, id: string, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
