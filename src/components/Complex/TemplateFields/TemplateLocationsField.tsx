@@ -46,13 +46,15 @@ export function TemplateLocationsField({
                 isQuestionnaire
                   ? {
                       name,
-                      value: {
-                        id: value,
-                        parent_id,
-                        title: label,
-                        icon,
-                        project_id: entity_project_id || project_id,
-                      },
+                      value: [
+                        {
+                          id: value,
+                          parent_id,
+                          title: label,
+                          icon,
+                          project_id: entity_project_id || project_id,
+                        },
+                      ],
                     }
                   : [
                       { name: `${name}.id`, value: id },

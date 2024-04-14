@@ -46,12 +46,14 @@ export function TemplateCharacterField({
               isQuestionnaire
                 ? {
                     name,
-                    value: {
-                      id: value,
-                      full_name: label,
-                      portrait_id: image,
-                      project_id: character_project_id || project_id,
-                    },
+                    value: [
+                      {
+                        id: value,
+                        full_name: label,
+                        portrait_id: image,
+                        project_id: character_project_id || project_id,
+                      },
+                    ],
                   }
                 : [
                     { name: `${name}.id`, value: id },

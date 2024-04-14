@@ -42,11 +42,13 @@ export function TemplateImageField({
                 isQuestionnaire
                   ? {
                       name,
-                      value: {
-                        id: value,
-                        title: label,
-                        project_id: entity_project_id,
-                      },
+                      value: [
+                        {
+                          id: value,
+                          title: label,
+                          project_id: entity_project_id,
+                        },
+                      ],
                     }
                   : [
                       { name: `${name}.id`, value: id },

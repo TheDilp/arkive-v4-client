@@ -49,12 +49,14 @@ export function TemplateBlueprintField({
                 isQuestionnaire
                   ? {
                       name,
-                      value: {
-                        id: value,
-                        title: label,
-                        icon,
-                        project_id: entity_project_id || project_id,
-                      },
+                      value: [
+                        {
+                          id: value,
+                          title: label,
+                          icon,
+                          project_id: entity_project_id || project_id,
+                        },
+                      ],
                     }
                   : [
                       { name: `${name}.id`, value: id },

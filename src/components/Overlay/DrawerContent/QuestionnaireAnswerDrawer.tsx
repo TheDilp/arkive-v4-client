@@ -92,7 +92,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               isCollapsible
               isGlobal
               isQuestionnaire
-              name={`questions[${index}].answer`}
+              name={`questions[${index}].answer.characters`}
               title={q.title}
             />
           );
@@ -109,7 +109,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               isCollapsible
               isGlobal
               isQuestionnaire
-              name={`questions[${index}].answer`}
+              name={`questions[${index}].blueprint_instances`}
               title={q.title}
             />
           );
@@ -125,7 +125,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               isCollapsible
               isGlobal
               isQuestionnaire
-              name={`questions[${index}].answer`}
+              name={`questions[${index}].answer.documents`}
               title={q.title}
             />
           );
@@ -157,7 +157,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               isCollapsible
               isGlobal
               isQuestionnaire
-              name={`questions[${index}].answer`}
+              name={`questions[${index}].answer.events`}
               title={q.title}
             />
           );
@@ -173,7 +173,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               isCollapsible
               isGlobal
               isQuestionnaire
-              name={`questions[${index}].answer`}
+              name={`questions[${index}].answer.images`}
               title={q.title}
             />
           );
