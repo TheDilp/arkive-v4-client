@@ -50,6 +50,7 @@ const columnHelper = createColumnHelper<
     project_id: string;
     portrait_id?: string | null;
     icon?: AvailableIcons | null;
+    isBlueprintInstance: boolean;
   }
 >();
 
@@ -183,17 +184,18 @@ function getQuestionnaireColumns(
               id: "1",
               title: "Fill out questionnaire",
               icon: IconEnum.check_circle,
-              onClick: () =>
+              onClick: () => {
                 setDrawer((prev) => ({
                   ...prev,
                   title: "Fill out questionnaire",
                   type: "questionnaire_answer",
                   data: {
                     id: questionnaire_id,
-                    character_id: "full_name" in row.original ? row.original.id : undefined,
-                    blueprint_instance_id: "icon" in row.original ? row.original.id : undefined,
+                    character_id: !row.original.isBlueprintInstance ? row.original.id : undefined,
+                    blueprint_instance_id: row.original.isBlueprintInstance ? row.original.id : undefined,
                   },
-                })),
+                }));
+              },
             },
             {
               id: "2",
@@ -261,6 +263,7 @@ export function AnswersView() {
       project_id: item.project_id,
       portrait_id: "portrait_id" in item ? item.portrait_id : null,
       icon: "icon" in item ? item.icon : null,
+      isBlueprintInstance: "icon" in item,
       ...answers,
     };
   });
