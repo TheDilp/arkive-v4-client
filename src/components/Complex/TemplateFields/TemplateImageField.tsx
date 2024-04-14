@@ -1,5 +1,5 @@
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { IconEnum, useNotifications } from "../../../utils";
+import { AnswerType } from "../../../types/EntityTypes/questionnaireTypes";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -13,7 +13,8 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
-  currentValue: BlueprintInstanceBlueprintFieldType["images"];
+  isQuestionnaire?: boolean;
+  currentValue: BlueprintInstanceBlueprintFieldType["images"] | AnswerType["images"];
 };
 
 export function TemplateImageField({
@@ -25,10 +26,9 @@ export function TemplateImageField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  isQuestionnaire,
   currentValue,
 }: Props) {
-  const createNotification = useNotifications();
-
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
@@ -38,56 +38,62 @@ export function TemplateImageField({
             label={isCollapsible ? "" : title}
             name={name}
             onChange={({ value, label, project_id: entity_project_id }) => {
-              if (currentValue?.some((cVal) => cVal.related_id === value)) {
-                createNotification({
-                  timer: 3,
-                  title: "Cannot add the same image more than once.",
-                  variant: "warning",
-                  icon: IconEnum.warning,
-                });
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.images[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    image: {
-                      id: value,
-                      title: label,
-                      project_id: entity_project_id,
-                    },
-                  },
-                },
-              ]);
+              handleChange(
+                isQuestionnaire
+                  ? {
+                      name,
+                      value: {
+                        id: value,
+                        title: label,
+                        project_id: entity_project_id,
+                      },
+                    }
+                  : [
+                      { name: `${name}.id`, value: id },
+                      {
+                        name: `${name}.images[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                        value: {
+                          related_id: value,
+                          image: {
+                            id: value,
+                            title: label,
+                            project_id: entity_project_id,
+                          },
+                        },
+                      },
+                    ],
+              );
             }}
             placeholder="Press enter to search."
             searchEntity="images"
           />
         )}
-        {(currentValue || [])?.map((val) => (
-          <EntityPreview
-            key={val.related_id}
-            clearAction={
-              isDisabled
-                ? undefined
-                : (char_id) => {
-                    handleChange([
-                      {
-                        name: `${name}.images`,
-                        value: currentValue.filter((c) => c.related_id !== char_id),
-                      },
-                    ]);
-                  }
-            }
-            entity_project_id={val?.image?.project_id}
-            id={val?.related_id}
-            image_id={val?.image?.id}
-            title={val?.image?.title}
-            type="images"
-          />
-        ))}
+        {(currentValue || [])?.map((val) => {
+          const image = "related_id" in val ? val.image : val;
+
+          return (
+            <EntityPreview
+              key={image.id}
+              clearAction={
+                isDisabled
+                  ? undefined
+                  : (char_id) => {
+                      handleChange([
+                        {
+                          name: `${name}.images`,
+                          value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== char_id),
+                        },
+                      ]);
+                    }
+              }
+              entity_project_id={image?.project_id}
+              id={image?.id}
+              image_id={image?.id}
+              title={image?.title}
+              type="images"
+            />
+          );
+        })}
       </div>
     </TemplateFieldContainer>
   );

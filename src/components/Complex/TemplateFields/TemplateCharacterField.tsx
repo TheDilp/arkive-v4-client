@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
+import { AnswerType } from "../../../types/EntityTypes/questionnaireTypes";
+import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -15,7 +16,8 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
-  currentValue: BlueprintInstanceBlueprintFieldType["characters"];
+  isQuestionnaire?: boolean;
+  currentValue: BlueprintInstanceBlueprintFieldType["characters"] | AnswerType["characters"];
 };
 
 export function TemplateCharacterField({
@@ -28,8 +30,8 @@ export function TemplateCharacterField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  isQuestionnaire,
 }: Props) {
-  const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
@@ -40,55 +42,61 @@ export function TemplateCharacterField({
           isMultiple
           name={name}
           onChange={({ value, label, image, project_id: character_project_id }) => {
-            if (currentValue?.some((cVal) => cVal.related_id === value)) {
-              createNotification({
-                timer: 3,
-                title: "Cannot add the same character more than once.",
-                variant: "warning",
-                icon: IconEnum.warning,
-              });
-              return;
-            }
-            handleChange([
-              { name: `${name}.id`, value: id },
-              {
-                name: `${name}.characters[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                value: {
-                  related_id: value,
-                  character: {
-                    id: value,
-                    full_name: label,
-                    portrait_id: image,
-                    project_id: character_project_id || project_id,
-                  },
-                },
-              },
-            ]);
+            handleChange(
+              isQuestionnaire
+                ? {
+                    name,
+                    value: {
+                      id: value,
+                      full_name: label,
+                      portrait_id: image,
+                      project_id: character_project_id || project_id,
+                    },
+                  }
+                : [
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.characters[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                      value: {
+                        related_id: value,
+                        character: {
+                          id: value,
+                          full_name: label,
+                          portrait_id: image,
+                          project_id: character_project_id || project_id,
+                        },
+                      },
+                    },
+                  ],
+            );
           }}
           placeholder="Press enter to search."
           searchEntity="characters"
-          value={currentValue?.map((c) => c.related_id)}
+          value={currentValue?.map((c) => ("related_id" in c ? c.related_id : c.id))}
         />
 
-        {(currentValue || [])?.map((val) => (
-          <EntityPreview
-            key={val.related_id}
-            clearAction={(char_id) => {
-              handleChange([
-                {
-                  name: `${name}.characters`,
-                  value: currentValue.filter((c) => c.related_id !== char_id),
-                },
-              ]);
-            }}
-            entity_project_id={val?.character?.project_id}
-            id={val?.related_id}
-            image_id={val?.character?.portrait_id}
-            link={getEntityLink(val?.character?.project_id || project_id || "", "characters", id, undefined, false)}
-            title={val?.character?.full_name || ""}
-            type="characters"
-          />
-        ))}
+        {(currentValue || [])?.map((val) => {
+          const character = "related_id" in val ? val.character : val;
+          return (
+            <EntityPreview
+              key={character.id}
+              clearAction={(char_id) => {
+                handleChange([
+                  {
+                    name: `${name}.characters`,
+                    value: currentValue.filter((c) => ("related_id" in c ? c.related_id !== char_id : c.id !== char_id)),
+                  },
+                ]);
+              }}
+              entity_project_id={character?.project_id}
+              id={character?.id}
+              image_id={character?.portrait_id}
+              link={getEntityLink(character?.project_id || project_id || "", "characters", id, undefined, false)}
+              title={character?.full_name || ""}
+              type="characters"
+            />
+          );
+        })}
       </div>
     </TemplateFieldContainer>
   );

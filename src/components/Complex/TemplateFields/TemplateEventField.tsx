@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
+import { AnswerType } from "../../../types/EntityTypes/questionnaireTypes";
+import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -15,7 +16,8 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
-  currentValue: BlueprintInstanceBlueprintFieldType["events"];
+  isQuestionnaire?: boolean;
+  currentValue: BlueprintInstanceBlueprintFieldType["events"] | AnswerType["events"];
 };
 
 export function TemplateEventField({
@@ -27,9 +29,9 @@ export function TemplateEventField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isQuestionnaire,
   isGlobal,
 }: Props) {
-  const createNotification = useNotifications();
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
@@ -41,58 +43,66 @@ export function TemplateEventField({
             label={isCollapsible ? "" : title}
             name={name}
             onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
-              if (currentValue?.some((cVal) => cVal.related_id === value) && fieldType.includes("multiple")) {
-                createNotification({
-                  timer: 3,
-                  title: "Cannot add the same event more than once.",
-                  variant: "warning",
-                  icon: IconEnum.warning,
-                });
-                return;
-              }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.events[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    event: {
-                      id: value,
-                      title: label,
-                      parent_id,
-                      icon,
-                      project_id: entity_project_id || project_id,
-                    },
-                  },
-                },
-              ]);
+              handleChange(
+                isQuestionnaire
+                  ? {
+                      name,
+                      value: {
+                        id: value,
+                        title: label,
+                        parent_id,
+                        icon,
+                        project_id: entity_project_id || project_id,
+                      },
+                    }
+                  : [
+                      { name: `${name}.id`, value: id },
+                      {
+                        name: `${name}.events[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                        value: {
+                          related_id: value,
+                          event: {
+                            id: value,
+                            title: label,
+                            parent_id,
+                            icon,
+                            project_id: entity_project_id || project_id,
+                          },
+                        },
+                      },
+                    ],
+              );
             }}
             placeholder="Press enter to search."
             searchEntity="events"
           />
         )}
-        {(currentValue || [])?.map((val) => (
-          <EntityPreview
-            key={val.related_id}
-            clearAction={
-              isDisabled
-                ? undefined
-                : (instance_id) => {
-                    handleChange([
-                      {
-                        name: `${name}.events`,
-                        value: currentValue.filter((c) => c.related_id !== instance_id),
-                      },
-                    ]);
-                  }
-            }
-            entity_project_id={val?.event?.project_id}
-            id={val?.related_id}
-            link={getEntityLink(project_id as string, "events", id, val?.event?.parent_id, false)}
-            title={val?.event?.title}
-            type="events"
-          />
-        ))}
+        {(currentValue || [])?.map((val) => {
+          const event = "related_id" in val ? val?.event : val;
+
+          return (
+            <EntityPreview
+              key={event.id}
+              clearAction={
+                isDisabled
+                  ? undefined
+                  : (instance_id) => {
+                      handleChange([
+                        {
+                          name: `${name}.events`,
+                          value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== instance_id),
+                        },
+                      ]);
+                    }
+              }
+              entity_project_id={event.project_id}
+              id={event?.id}
+              link={getEntityLink(project_id as string, "events", id, event.parent_id, false)}
+              title={event.title}
+              type="events"
+            />
+          );
+        })}
       </div>
     </TemplateFieldContainer>
   );

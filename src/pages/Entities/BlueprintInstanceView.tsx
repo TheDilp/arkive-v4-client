@@ -2,19 +2,15 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
 import {
-  Avatar,
-  Badge,
-  Button,
-  Checkbox,
-  createColumnHelper,
-  Dropdown,
-  Table,
-  TablePageLayout,
-  Tooltip,
-} from "../../components";
+  CharacterColumn,
+  EventColumn,
+  LocationColumn,
+  ShowMultipleWithBadge,
+} from "../../components/DataDisplay/TableComponents/TableColumns";
 import {
   useBulkUpdate,
   useChangeNavbarTitle,
@@ -25,7 +21,6 @@ import {
   useTable,
 } from "../../hooks";
 import {
-  BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   BulkUpdateType,
   DeleteManyType,
@@ -47,7 +42,6 @@ import {
   DiceRollRegex,
   drawerAtom,
   FetchFunction,
-  getAvatarInitials,
   getBlueprintInstanceColumnWidth,
   getDayOrdinal,
   getImageURL,
@@ -79,142 +73,6 @@ const noLinkColumns = [
   "events_multiple",
   "dice_roll",
 ];
-
-function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
-  return (
-    <div className="flex max-w-full items-center gap-x-2">
-      <div className="max-w-full truncate">{titles?.[0]}</div>
-      {titles?.length > 1 ? (
-        <Tooltip
-          content={titles
-            ?.slice(1)
-            ?.map((title) => title)
-            .join(", ")}
-          isPortal>
-          <div className="w-min max-w-min">
-            <Badge label={`+${titles.length - 1}`} size="sm" variant="secondary" />
-          </div>
-        </Tooltip>
-      ) : null}
-    </div>
-  );
-}
-
-function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
-  const { project_id } = useParams();
-
-  return (
-    <div className="flex w-full items-center gap-x-2">
-      <div className="z-0 flex w-full items-center justify-center -space-x-4">
-        {characters?.slice(0, 5)?.map((char) => (
-          <Avatar
-            key={char.related_id}
-            image={getImageURL(project_id as string, "images", char?.character?.portrait_id || "")}
-            initials={getAvatarInitials(char?.character?.full_name || "")}
-            isBordered
-            label={char?.character?.full_name || ""}
-            size="sm"
-            tooltipAllowedPlacements={["left", "right"]}
-          />
-        ))}
-      </div>
-      {characters && characters?.length && characters?.length > 5 ? (
-        <Tooltip
-          content={characters
-            ?.slice(5)
-            ?.map((char) => char?.character?.full_name || "")
-            ?.join(", ")}>
-          <div className="w-min max-w-min">
-            <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />
-          </div>
-        </Tooltip>
-      ) : null}
-    </div>
-  );
-}
-
-function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
-  const { project_id } = useParams();
-  const navigate = useNavigate();
-  const setDrawer = useSetAtom(drawerAtom);
-
-  return (
-    <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.map_pin?.title || "").filter((l) => !!l)} />
-      <Dropdown
-        allowedPlacements={["left-start"]}
-        items={(locations || []).map(({ map_pin }) => ({
-          id: map_pin?.id,
-          title: map_pin?.title || "",
-          icon: map_pin?.icon,
-          subItems: [
-            {
-              id: `go_to_${map_pin?.id}`,
-              title: `Go to ${map_pin?.title}`,
-              onClick: () => navigate(`/projects/${project_id}/maps/${map_pin?.parent_id}/${map_pin?.id}`),
-            },
-            {
-              id: `preview_${map_pin?.id}`,
-              title: `Preview ${map_pin?.title} map`,
-              onClick: () =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  type: "entity_preview",
-                  size: "half",
-                  title: "Preview map",
-                  data: { parent_id: map_pin?.parent_id, id: map_pin?.id, entity_type: "map_pins" },
-                })),
-            },
-          ],
-        }))}>
-        <div className="pointer-events-none w-min max-w-min opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
-          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="2xs" />
-        </div>
-      </Dropdown>
-    </div>
-  );
-}
-
-function EventColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["events"] }) {
-  const { project_id } = useParams();
-  const navigate = useNavigate();
-  const setDrawer = useSetAtom(drawerAtom);
-
-  return (
-    <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.event?.title || "").filter((l) => !!l)} />
-      <Dropdown
-        allowedPlacements={["left-start"]}
-        items={(locations || []).map(({ event }) => ({
-          id: event?.id,
-          title: event?.title || "",
-          subItems: [
-            {
-              id: `go_to_${event?.id}`,
-              title: `Go to ${event?.title}`,
-              onClick: () => navigate(`/projects/${project_id}/calendars/${event?.parent_id}/${event?.id}`),
-            },
-            {
-              id: `preview_${event?.id}`,
-              title: `Preview event ${event?.title}`,
-              onClick: () =>
-                setDrawer((prev) => ({
-                  ...prev,
-                  type: "entity_preview",
-                  size: "half",
-                  title: `Preview event - ${event?.title}`,
-                  data: { id: event?.id, parent_id: event?.parent_id, entity_type: "events" },
-                })),
-            },
-          ],
-        }))}>
-        <div className="pointer-events-none w-min max-w-min opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100">
-          <Button hasNoBackground icon={IconEnum.chevron_down} iconSize={14} isIconOnly onClick={undefined} size="2xs" />
-        </div>
-      </Dropdown>
-    </div>
-  );
-}
 
 function createColumns(
   blueprint: BlueprintType,

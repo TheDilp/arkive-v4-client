@@ -3,19 +3,34 @@ import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import {
+  CharacterColumn,
+  EventColumn,
+  LocationColumn,
+  ShowMultipleWithBadge,
+} from "../../components/DataDisplay/TableComponents/TableColumns";
 import { useGetEntity, useTable } from "../../hooks";
 import { DrawerAtomType } from "../../types";
-import { AnswerValueType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
+import { AnswerType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import { drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
 
-function getAnswerValue(type: QuestionType["type"], options: { id: string; value: string }[], value: AnswerValueType) {
-  if (type === "select_single" || type === "select_multiple") return options.find((opt) => opt.id === value)?.value || "";
-  if (type === "boolean") return value ? "Yes" : "No";
+const centeredColumns = [
+  "images_single",
+  "characters_single",
+  "locations_single",
+  "documents_single",
+  "blueprints_single",
+  "events_single",
+  "boolean",
+];
 
-  return value;
-}
-const columnHelper = createColumnHelper<QuestionType & { project_id: string; portrait_id?: string }>();
+const columnHelper = createColumnHelper<
+  QuestionType & { [key: string]: AnswerType & { type: QuestionType["type"]; options: QuestionType["options"] } } & {
+    project_id: string;
+    portrait_id?: string;
+  }
+>();
 
 function getQuestionnaireColumns(
   questionnaire_id: string,
@@ -58,8 +73,68 @@ function getQuestionnaireColumns(
     columns.push(
       columnHelper.accessor(questions[index].id as any, {
         header: questions[index].title,
-        cell: (info) => {
-          return info.getValue();
+        cell: ({ row }) => {
+          const questionValue = row?.original[questions[index].id];
+
+          if (questionValue?.type === "text" || questionValue?.type === "number") return questionValue?.value || "";
+          if (questionValue?.type === "boolean")
+            return (
+              <Checkbox
+                isReadOnly
+                name="bool"
+                onChange={() => {}}
+                value={(questionValue?.value as boolean | undefined) ?? false}
+              />
+            );
+          if (questionValue?.type === "select_single" || questionValue?.type === "select_multiple") {
+            return (
+              (Array.isArray(questionValue?.value) ? questionValue?.value : [questionValue?.value])
+                ?.map((id) => {
+                  const opt = questionValue?.options?.find((o) => o.id === id);
+                  return opt?.value || "";
+                })
+                .join(", ") ?? ""
+            );
+          }
+          if (questionValue?.type === "characters_single" || questionValue?.type === "characters_multiple") {
+            return <CharacterColumn characters={questionValue?.characters || []} />;
+          }
+          if (questionValue?.type === "blueprints_single" || questionValue?.type === "blueprints_multiple") {
+            return (
+              <ShowMultipleWithBadge titles={(questionValue?.blueprint_instances || []).map((instance) => instance.title)} />
+            );
+          }
+          if (questionValue?.type === "documents_single" || questionValue?.type === "documents_multiple") {
+            return <ShowMultipleWithBadge titles={(questionValue?.documents || []).map((doc) => doc.title)} />;
+          }
+          if (questionValue?.type === "locations_single" || questionValue?.type === "locations_multiple") {
+            return <LocationColumn locations={questionValue?.map_pins || []} />;
+          }
+          if (questionValue?.type === "events_single" || questionValue?.type === "events_multiple") {
+            return <EventColumn locations={questionValue?.events || []} />;
+          }
+          if (questionValue?.type === "images_single" || questionValue?.type === "images_multiple") {
+            return (
+              <div className="flex w-full">
+                {questionValue?.images?.map((image) => (
+                  <div key={image.id} className="-ml-4 flex items-center first:ml-0 hover:z-10">
+                    <Avatar
+                      hasShowImage
+                      image={getImageURL(image?.project_id as string, "images", image.id)}
+                      label={image.title}
+                      size="sm"
+                      tooltipAllowedPlacements={["left", "right"]}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+
+          return null;
+        },
+        meta: {
+          centered: centeredColumns.includes(questions[index].type),
         },
         minSize,
         maxSize,
@@ -124,14 +199,12 @@ export function AnswersView() {
 
   const formatted = (questionnaireData?.data?.characters || []).map((char) => {
     const answers: Record<string, any> = {};
-
     for (let index = 0; index < char.answers.length; index += 1) {
-      const question = questionnaireData?.data?.questions?.find((q) => q.id === char.answers[index].parent_id);
-      answers[char.answers[index].parent_id] = getAnswerValue(
-        question?.type || "text",
-        question?.options || [],
-        char.answers[index].value || "",
-      );
+      const question = questionnaireData?.data?.questions.find((q) => q.id === char.answers[index].parent_id);
+      if (question) {
+        answers[char.answers[index].parent_id] = char.answers[index];
+        answers[char.answers[index].parent_id].type = question.type;
+      }
     }
 
     return {

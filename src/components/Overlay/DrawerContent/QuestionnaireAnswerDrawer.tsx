@@ -91,6 +91,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -107,6 +108,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -122,6 +124,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -137,6 +140,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -152,6 +156,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -167,6 +172,7 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
               id={q.id}
               isCollapsible
               isGlobal
+              isQuestionnaire
               name={`questions[${index}].answer`}
               title={q.title}
             />
@@ -197,10 +203,12 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
                       q?.answer?.map_pins || [],
                       q?.answer?.events || [],
                       q?.answer?.images || [],
-                    )?.map((item: { related_id: string }) => ({
-                      answer_id: crypto.randomUUID(),
-                      related_id: item.related_id,
-                    })),
+                    )?.map((item: { id: string; related_id: string }) => {
+                      return {
+                        answer_id: q.answer.id || crypto.randomUUID(),
+                        related_id: item.related_id || item.id,
+                      };
+                    }),
                   })),
                 },
               },
