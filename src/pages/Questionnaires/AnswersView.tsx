@@ -2,8 +2,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { deepMerge } from "remirror";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -13,7 +14,7 @@ import {
 import { useGetEntity, useTable } from "../../hooks";
 import { DrawerAtomType } from "../../types";
 import { AnswerType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
-import { drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
+import { AvailableIcons, drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
 
 const centeredColumns = [
   "images_single",
@@ -28,7 +29,8 @@ const centeredColumns = [
 const columnHelper = createColumnHelper<
   QuestionType & { [key: string]: AnswerType & { type: QuestionType["type"]; options: QuestionType["options"] } } & {
     project_id: string;
-    portrait_id?: string;
+    portrait_id?: string | null;
+    icon?: AvailableIcons | null;
   }
 >();
 
@@ -40,10 +42,14 @@ function getQuestionnaireColumns(
   const columns: ColumnDef<any, any>[] = [
     columnHelper.display({
       id: "portrait_id",
-      header: "Portrait",
+      header: "",
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
-          <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
+          {row.original.portrait_id ? (
+            <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
+          ) : (
+            <Icon fontSize={28} icon={row.original.icon || IconEnum.blueprint} />
+          )}
         </div>
       ),
       meta: {
@@ -51,8 +57,8 @@ function getQuestionnaireColumns(
         noLink: true,
         centered: true,
       },
-      minSize: 4.5,
-      maxSize: 4.5,
+      minSize: 4,
+      maxSize: 4,
     }),
     columnHelper.accessor("title", {
       id: "title",
@@ -197,21 +203,26 @@ export function AnswersView() {
   }, [questionnaireData, isFetching]);
   const [{ selection }, dispatch] = useTable({ selection: {} });
 
-  const formatted = (questionnaireData?.data?.characters || []).map((char) => {
+  const formatted = (
+    deepMerge(questionnaireData?.data?.characters || [], questionnaireData?.data?.blueprint_instances || []) as
+      | QuestionnaireType["characters"]
+      | QuestionnaireType["blueprint_instances"]
+  ).map((item) => {
     const answers: Record<string, any> = {};
-    for (let index = 0; index < char.answers.length; index += 1) {
-      const question = questionnaireData?.data?.questions.find((q) => q.id === char.answers[index].parent_id);
+    for (let index = 0; index < item.answers.length; index += 1) {
+      const question = questionnaireData?.data?.questions.find((q) => q.id === item.answers[index].parent_id);
       if (question) {
-        answers[char.answers[index].parent_id] = char.answers[index];
-        answers[char.answers[index].parent_id].type = question.type;
+        answers[item.answers[index].parent_id] = item.answers[index];
+        answers[item.answers[index].parent_id].type = question.type;
       }
     }
 
     return {
-      id: char.id,
-      title: char.full_name,
-      project_id: char.project_id,
-      portrait_id: char.portrait_id,
+      id: item.id,
+      title: "full_name" in item ? item.full_name : item.title,
+      project_id: item.project_id,
+      portrait_id: "portrait_id" in item ? item.portrait_id : null,
+      icon: "icon" in item ? item.icon : null,
       ...answers,
     };
   });
