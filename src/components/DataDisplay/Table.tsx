@@ -630,7 +630,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 <div
                   className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
                     ${(meta as MetaType)?.centered ? centeredContent() : ""}
-                    ${(meta as MetaType)?.pinned ? "sticky" : ""}
+                    ${(meta as MetaType)?.pinned ? "sticky z-10" : ""}
                     ${hdr.column.getCanSort() ? sortableHeader() : ""}
                     ${hdr.id === "select" ? "sticky left-0 " : ""}
                     bg-zinc-950 first:border-l`}
