@@ -89,7 +89,7 @@ function getQuestionnaireColumns(
       columnHelper.accessor(entities[index].id as any, {
         header: () => {
           return (
-            <div className="flex w-full items-center gap-x-2">
+            <div className="flex max-w-full items-center gap-x-1">
               {entities[index].portrait_id ? (
                 <Avatar
                   hasShowImage
@@ -100,54 +100,76 @@ function getQuestionnaireColumns(
               {entities[index].icon ? (
                 <Icon fontSize={28} icon={(entities[index].icon as AvailableIcons | undefined) || IconEnum.blueprint} />
               ) : null}
-              <span>{entities[index].full_name || entities[index].title || ""}</span>
-              <Button
-                hasNoBackground
-                icon={IconEnum.edit}
-                iconSize={16}
-                isIconOnly
-                onClick={() =>
-                  setDrawer((prev) => ({
-                    ...prev,
-                    title: "Fill out questionnaire",
-                    type: "questionnaire_answer",
-                    data: {
-                      id: questionnaire_id,
-                      character_id: "full_name" in entities[index] ? entities[index].id : undefined,
-                      blueprint_instance_id: !("full_name" in entities[index]) ? entities[index].id : undefined,
-                    },
-                  }))
-                }
-              />
-              <Button
-                hasNoBackground
-                icon={IconEnum.trash}
-                iconSize={16}
-                isIconOnly
-                onClick={() =>
-                  setDialog((prev) => ({
-                    ...prev,
-                    title: "Remove entity from questionniare",
-                    isOverlay: true,
-                    confirm: {
-                      icon: IconEnum.trash,
-                      variant: "error",
-                      action: () =>
-                        removeFromQuestionnaire({
-                          data: {
-                            characters: "full_name" in entities[index] ? [entities[index].id] : [],
-                            blueprint_instances: !("full_name" in entities[index]) ? [entities[index].id] : [],
-                          },
-                        }),
-                    },
-                    cancel: {
-                      icon: IconEnum.close,
-                      variant: "primary",
-                      action: () => {},
-                    },
-                  }))
-                }
-              />
+              <div className="max-w-32 flex-1 truncate">{entities[index].full_name || entities[index].title || ""}</div>
+              <div className="flex items-center gap-x-0">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.edit}
+                  iconSize={16}
+                  isIconOnly
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Fill out questionnaire",
+                      type: "questionnaire_answer",
+                      data: {
+                        id: questionnaire_id,
+                        character_id: "full_name" in entities[index] ? entities[index].id : undefined,
+                        blueprint_instance_id: !("full_name" in entities[index]) ? entities[index].id : undefined,
+                      },
+                    }))
+                  }
+                  tooltip="Edit"
+                />
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.edit}
+                  iconSize={16}
+                  isIconOnly
+                  onClick={() =>
+                    setDrawer((prev) => ({
+                      ...prev,
+                      title: "Mark public",
+                      type: "questionnaire_answer",
+                      data: {
+                        id: questionnaire_id,
+                        character_id: "full_name" in entities[index] ? entities[index].id : undefined,
+                        blueprint_instance_id: !("full_name" in entities[index]) ? entities[index].id : undefined,
+                      },
+                    }))
+                  }
+                  tooltip="Change public"
+                />
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.trash}
+                  iconSize={16}
+                  isIconOnly
+                  onClick={() =>
+                    setDialog((prev) => ({
+                      ...prev,
+                      title: "Remove entity from questionniare",
+                      isOverlay: true,
+                      confirm: {
+                        icon: IconEnum.trash,
+                        variant: "error",
+                        action: () =>
+                          removeFromQuestionnaire({
+                            data: {
+                              characters: "full_name" in entities[index] ? [entities[index].id] : [],
+                              blueprint_instances: !("full_name" in entities[index]) ? [entities[index].id] : [],
+                            },
+                          }),
+                      },
+                      cancel: {
+                        icon: IconEnum.close,
+                        variant: "primary",
+                        action: () => {},
+                      },
+                    }))
+                  }
+                />
+              </div>
             </div>
           );
         },
@@ -213,6 +235,7 @@ function getQuestionnaireColumns(
         meta: {
           centered: centeredColumns.includes(entities[index].type),
         },
+        maxSize: 20,
         minSize: 15,
       }),
     );
