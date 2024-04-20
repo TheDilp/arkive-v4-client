@@ -314,6 +314,9 @@ export function AnswersView() {
                     removeFromQuestionnaire,
                   )
             }
+            config={{
+              hasNoCellTextWrap: true,
+            }}
             data={formatted || []}
             dispatch={dispatch}
             isLoading={isLoading}
