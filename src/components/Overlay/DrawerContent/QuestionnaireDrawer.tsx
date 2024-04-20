@@ -255,7 +255,7 @@ export function QuestionnaireDrawer({ data }: Props) {
           </div>
           <div className="flex items-center justify-between">
             <span>Is public:</span>
-            <Checkbox name="is_public" onChange={handleChange} value={existingQuestionnaire?.data?.is_public} />
+            <Checkbox name="is_public" onChange={handleChange} value={questionnaire?.is_public} />
           </div>
         </div>
       ) : null}
