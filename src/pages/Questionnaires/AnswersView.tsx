@@ -100,8 +100,8 @@ function getQuestionnaireColumns(
               {entities[index].icon ? (
                 <Icon fontSize={28} icon={(entities[index].icon as AvailableIcons | undefined) || IconEnum.blueprint} />
               ) : null}
-              <div className="max-w-32 flex-1 truncate">{entities[index].full_name || entities[index].title || ""}</div>
-              <div className="flex items-center gap-x-0">
+              <div className="max-w-36 flex-1 truncate">{entities[index].full_name || entities[index].title || ""}</div>
+              <div className="flex items-center gap-x-0.5">
                 <Button
                   hasNoBackground
                   icon={IconEnum.edit}
@@ -121,25 +121,7 @@ function getQuestionnaireColumns(
                   }
                   tooltip="Edit"
                 />
-                <Button
-                  hasNoBackground
-                  icon={IconEnum.edit}
-                  iconSize={16}
-                  isIconOnly
-                  onClick={() =>
-                    setDrawer((prev) => ({
-                      ...prev,
-                      title: "Mark public",
-                      type: "questionnaire_answer",
-                      data: {
-                        id: questionnaire_id,
-                        character_id: "full_name" in entities[index] ? entities[index].id : undefined,
-                        blueprint_instance_id: !("full_name" in entities[index]) ? entities[index].id : undefined,
-                      },
-                    }))
-                  }
-                  tooltip="Change public"
-                />
+
                 <Button
                   hasNoBackground
                   icon={IconEnum.trash}
@@ -168,6 +150,7 @@ function getQuestionnaireColumns(
                       },
                     }))
                   }
+                  tooltip="Delete"
                 />
               </div>
             </div>
