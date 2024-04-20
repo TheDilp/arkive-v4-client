@@ -78,8 +78,9 @@ function getQuestionnaireColumns(
         pinned: true,
         sortable: true,
       },
-      minSize: 12,
-      size: 12,
+      minSize: 25,
+      maxSize: 25,
+      size: 15,
     }),
   ];
 
@@ -95,13 +96,16 @@ function getQuestionnaireColumns(
                   image={getImageURL(entities[index].project_id, "images", entities[index].portrait_id)}
                   size="sm"
                 />
-              ) : (
+              ) : null}
+              {entities[index].icon ? (
                 <Icon fontSize={28} icon={(entities[index].icon as AvailableIcons | undefined) || IconEnum.blueprint} />
-              )}
+              ) : null}
               <span>{entities[index].full_name || entities[index].title || ""}</span>
               <Button
+                hasNoBackground
                 icon={IconEnum.edit}
                 iconSize={16}
+                isIconOnly
                 onClick={() =>
                   setDrawer((prev) => ({
                     ...prev,
@@ -116,8 +120,10 @@ function getQuestionnaireColumns(
                 }
               />
               <Button
+                hasNoBackground
                 icon={IconEnum.trash}
                 iconSize={16}
+                isIconOnly
                 onClick={() =>
                   setDialog((prev) => ({
                     ...prev,
@@ -133,6 +139,11 @@ function getQuestionnaireColumns(
                             blueprint_instances: !("full_name" in entities[index]) ? [entities[index].id] : [],
                           },
                         }),
+                    },
+                    cancel: {
+                      icon: IconEnum.close,
+                      variant: "primary",
+                      action: () => {},
                     },
                   }))
                 }
@@ -202,7 +213,7 @@ function getQuestionnaireColumns(
         meta: {
           centered: centeredColumns.includes(entities[index].type),
         },
-        size: 10,
+        minSize: 15,
       }),
     );
   }
