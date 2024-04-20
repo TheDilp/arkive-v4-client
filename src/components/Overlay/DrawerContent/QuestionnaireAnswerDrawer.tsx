@@ -193,28 +193,30 @@ export default function QuestionnaireAnswerDrawer({ data }: Props) {
                 data: {
                   character_id: data.character_id,
                   blueprint_instance_id: data.blueprint_instance_id,
-                  answers: answers.questions.map((q) => {
-                    const new_id = crypto.randomUUID();
+                  answers: answers.questions
+                    .map((q) => {
+                      const new_id = q?.answer?.id || crypto.randomUUID();
 
-                    return {
-                      id: q.answer.id || new_id,
-                      parent_id: q.id,
-                      value: q?.answer?.value,
-                      relations: deepMerge(
-                        q?.answer?.characters || [],
-                        q?.answer?.blueprint_instances || [],
-                        q?.answer?.documents || [],
-                        q?.answer?.map_pins || [],
-                        q?.answer?.events || [],
-                        q?.answer?.images || [],
-                      )?.map((item: { id: string; related_id: string }) => {
-                        return {
-                          answer_id: q.answer.id || new_id,
-                          related_id: item.related_id || item.id,
-                        };
-                      }),
-                    };
-                  }),
+                      return {
+                        id: new_id,
+                        parent_id: q.id,
+                        value: q?.answer?.value,
+                        relations: deepMerge(
+                          q?.answer?.characters || [],
+                          q?.answer?.blueprint_instances || [],
+                          q?.answer?.documents || [],
+                          q?.answer?.map_pins || [],
+                          q?.answer?.events || [],
+                          q?.answer?.images || [],
+                        )?.map((item: { id: string; related_id: string }) => {
+                          return {
+                            answer_id: new_id,
+                            related_id: item.related_id || item.id,
+                          };
+                        }),
+                      };
+                    })
+                    .filter((q) => (q.value !== null && (!!q.value || q.value === 0)) || q.relations.length > 0),
                 },
               },
               { onSuccess: resetDrawer },
