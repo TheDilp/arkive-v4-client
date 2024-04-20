@@ -11,6 +11,11 @@ export function getProjectsViewNavItems(
 ): SidebarItemType[] {
   return [
     {
+      icon: IconEnum.project,
+      tooltip: "Projects",
+      navigate: "../../projects",
+    },
+    {
       icon: IconEnum.questionnaires,
       tooltip: "Questionnaires",
       navigate: "../../questionnaires",
@@ -39,6 +44,11 @@ export const questionnaireNavEnum = [
     icon: IconEnum.project,
     tooltip: "Projects",
     navigate: "../../projects",
+  },
+  {
+    icon: IconEnum.questionnaires,
+    tooltip: "Questionnaires",
+    navigate: "../../questionnaires",
   },
   {
     icon: IconEnum.user_settings,
