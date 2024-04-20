@@ -90,7 +90,7 @@ export function TemplateLocationsField({
                   : (doc_id) => {
                       handleChange([
                         {
-                          name: `${name}.map_pins`,
+                          name: isQuestionnaire ? name : `${name}.map_pins`,
                           value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== doc_id),
                         },
                       ]);

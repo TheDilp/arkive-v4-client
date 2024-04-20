@@ -85,7 +85,7 @@ export function TemplateCharacterField({
               clearAction={(char_id) => {
                 handleChange([
                   {
-                    name: `${name}.characters`,
+                    name: isQuestionnaire ? name : `${name}.characters`,
                     value: currentValue.filter((c) => ("related_id" in c ? c.related_id !== char_id : c.id !== char_id)),
                   },
                 ]);

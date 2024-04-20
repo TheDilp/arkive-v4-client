@@ -82,7 +82,7 @@ export function TemplateImageField({
                   : (char_id) => {
                       handleChange([
                         {
-                          name: `${name}.images`,
+                          name: isQuestionnaire ? name : `${name}.images`,
                           value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== char_id),
                         },
                       ]);

@@ -91,7 +91,7 @@ export function TemplateBlueprintField({
                   : (instance_id) => {
                       handleChange([
                         {
-                          name: `${name}.blueprint_instances`,
+                          name: isQuestionnaire ? name : `${name}.blueprint_instances`,
                           value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== instance_id),
                         },
                       ]);

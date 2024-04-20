@@ -89,7 +89,7 @@ export function TemplateDocumentField({
                   : (doc_id) => {
                       handleChange([
                         {
-                          name: `${name}.documents`,
+                          name: isQuestionnaire ? name : `${name}.documents`,
                           value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== doc_id),
                         },
                       ]);

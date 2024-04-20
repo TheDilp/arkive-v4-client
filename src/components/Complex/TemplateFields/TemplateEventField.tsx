@@ -91,7 +91,7 @@ export function TemplateEventField({
                   : (instance_id) => {
                       handleChange([
                         {
-                          name: `${name}.events`,
+                          name: isQuestionnaire ? name : `${name}.events`,
                           value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== instance_id),
                         },
                       ]);
