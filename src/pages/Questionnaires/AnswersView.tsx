@@ -243,7 +243,7 @@ export function AnswersView() {
       setNavbarTitle(`The Arkive | Questionnaires | ${questionnaireData?.data?.title}`);
     }
   }, [questionnaireData, isFetching]);
-  const [{ selection }, dispatch] = useTable({ selection: {} });
+  const [, dispatch] = useTable({});
 
   const formatted = questionnaireData?.data?.questions?.map((question) => {
     const item: Record<string, any> = { title: question.title };
@@ -308,10 +308,6 @@ export function AnswersView() {
                     removeFromQuestionnaire,
                   )
             }
-            config={{
-              hasSelect: true,
-              selection,
-            }}
             data={formatted || []}
             dispatch={dispatch}
             isLoading={isLoading}
