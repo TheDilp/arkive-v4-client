@@ -5,7 +5,7 @@ import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { deepMerge } from "remirror";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Icon, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Icon, Table, TablePageLayout } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -13,9 +13,9 @@ import {
   ShowMultipleWithBadge,
 } from "../../components/DataDisplay/TableComponents/TableColumns";
 import { useGetEntity, useRemoveFromEntity, useTable } from "../../hooks";
-import { DrawerAtomType } from "../../types";
+import { DialogAtomType, DrawerAtomType } from "../../types";
 import { AnswerType, QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
-import { AvailableIcons, drawerAtom, getImageURL, getQuestionColumnWidth, IconEnum, navbarTitleAtom } from "../../utils";
+import { AvailableIcons, dialogAtom, drawerAtom, getImageURL, IconEnum, navbarTitleAtom } from "../../utils";
 
 type RemoveFromQuestionnaireType = UseMutateFunction<
   any,
@@ -56,31 +56,20 @@ const columnHelper = createColumnHelper<
 
 function getQuestionnaireColumns(
   questionnaire_id: string,
-  questions: QuestionType[],
+  entities: {
+    id: string;
+    project_id: string;
+    title?: string;
+    full_name?: string;
+    portrait_id?: string;
+    icon?: string;
+    type: QuestionType["type"];
+  }[],
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   removeFromQuestionnaire: RemoveFromQuestionnaireType,
 ) {
   const columns: ColumnDef<any, any>[] = [
-    columnHelper.display({
-      id: "portrait_id",
-      header: "",
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center">
-          {row.original.portrait_id ? (
-            <Avatar hasShowImage image={getImageURL(row.original.project_id, "images", row.original.portrait_id)} size="sm" />
-          ) : (
-            <Icon fontSize={28} icon={row.original.icon || IconEnum.blueprint} />
-          )}
-        </div>
-      ),
-      meta: {
-        pinned: true,
-        noLink: true,
-        centered: true,
-      },
-      minSize: 4,
-      maxSize: 4,
-    }),
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -94,17 +83,67 @@ function getQuestionnaireColumns(
     }),
   ];
 
-  for (let index = 0; index < questions.length; index += 1) {
-    const { minSize, maxSize } = getQuestionColumnWidth(questions[index]?.type || "text");
-
+  for (let index = 0; index < entities.length; index += 1) {
     columns.push(
-      columnHelper.accessor(questions[index].id as any, {
-        header: questions[index].title,
+      columnHelper.accessor(entities[index].id as any, {
+        header: () => {
+          return (
+            <div className="flex w-full items-center gap-x-2">
+              {entities[index].portrait_id ? (
+                <Avatar
+                  hasShowImage
+                  image={getImageURL(entities[index].project_id, "images", entities[index].portrait_id)}
+                  size="sm"
+                />
+              ) : (
+                <Icon fontSize={28} icon={(entities[index].icon as AvailableIcons | undefined) || IconEnum.blueprint} />
+              )}
+              <span>{entities[index].full_name || entities[index].title || ""}</span>
+              <Button
+                icon={IconEnum.edit}
+                iconSize={16}
+                onClick={() =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    title: "Fill out questionnaire",
+                    type: "questionnaire_answer",
+                    data: {
+                      id: questionnaire_id,
+                      character_id: "full_name" in entities[index] ? entities[index].id : undefined,
+                      blueprint_instance_id: !("full_name" in entities[index]) ? entities[index].id : undefined,
+                    },
+                  }))
+                }
+              />
+              <Button
+                icon={IconEnum.trash}
+                iconSize={16}
+                onClick={() =>
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: "Remove entity from questionniare",
+                    isOverlay: true,
+                    confirm: {
+                      icon: IconEnum.trash,
+                      variant: "error",
+                      action: () =>
+                        removeFromQuestionnaire({
+                          data: {
+                            characters: "full_name" in entities[index] ? [entities[index].id] : [],
+                            blueprint_instances: !("full_name" in entities[index]) ? [entities[index].id] : [],
+                          },
+                        }),
+                    },
+                  }))
+                }
+              />
+            </div>
+          );
+        },
         cell: ({ row }) => {
-          const questionValue = row?.original[questions[index].id];
-
-          if (questionValue?.type === "text" || questionValue?.type === "number") return questionValue?.value || "";
-          if (questionValue?.type === "boolean")
+          const questionValue = row?.original[entities[index].id];
+          if (row.original?.type === "text" || row.original?.type === "number") return questionValue?.value || "";
+          if (row.original?.type === "boolean")
             return (
               <Checkbox
                 isReadOnly
@@ -113,7 +152,7 @@ function getQuestionnaireColumns(
                 value={(questionValue?.value as boolean | undefined) ?? false}
               />
             );
-          if (questionValue?.type === "select_single" || questionValue?.type === "select_multiple") {
+          if (row.original?.type === "select_single" || row.original?.type === "select_multiple") {
             return (
               (Array.isArray(questionValue?.value) ? questionValue?.value : [questionValue?.value])
                 ?.map((id) => {
@@ -123,24 +162,24 @@ function getQuestionnaireColumns(
                 .join(", ") ?? ""
             );
           }
-          if (questionValue?.type === "characters_single" || questionValue?.type === "characters_multiple") {
+          if (row.original?.type === "characters_single" || row.original?.type === "characters_multiple") {
             return <CharacterColumn characters={questionValue?.characters || []} />;
           }
-          if (questionValue?.type === "blueprints_single" || questionValue?.type === "blueprints_multiple") {
+          if (row.original?.type === "blueprints_single" || row.original?.type === "blueprints_multiple") {
             return (
               <ShowMultipleWithBadge titles={(questionValue?.blueprint_instances || []).map((instance) => instance.title)} />
             );
           }
-          if (questionValue?.type === "documents_single" || questionValue?.type === "documents_multiple") {
+          if (row.original?.type === "documents_single" || row.original?.type === "documents_multiple") {
             return <ShowMultipleWithBadge titles={(questionValue?.documents || []).map((doc) => doc.title)} />;
           }
-          if (questionValue?.type === "locations_single" || questionValue?.type === "locations_multiple") {
+          if (row.original?.type === "locations_single" || row.original?.type === "locations_multiple") {
             return <LocationColumn locations={questionValue?.map_pins || []} />;
           }
-          if (questionValue?.type === "events_single" || questionValue?.type === "events_multiple") {
+          if (row.original?.type === "events_single" || row.original?.type === "events_multiple") {
             return <EventColumn locations={questionValue?.events || []} />;
           }
-          if (questionValue?.type === "images_single" || questionValue?.type === "images_multiple") {
+          if (row.original?.type === "images_single" || row.original?.type === "images_multiple") {
             return (
               <div className="flex w-full">
                 {questionValue?.images?.map((image) => (
@@ -161,62 +200,13 @@ function getQuestionnaireColumns(
           return null;
         },
         meta: {
-          centered: centeredColumns.includes(questions[index].type),
+          centered: centeredColumns.includes(entities[index].type),
         },
-        minSize,
-        maxSize,
+        size: 10,
       }),
     );
   }
-  columns.push(
-    columnHelper.display({
-      id: "actions",
-      header: "Actions",
-      size: 5,
-      maxSize: 5,
-      minSize: 5,
-      meta: { centered: true, noLink: true },
-      cell: ({ row }) => (
-        <Dropdown
-          allowedPlacements={["left", "left-end", "left-start"]}
-          items={[
-            {
-              id: "1",
-              title: "Fill out questionnaire",
-              icon: IconEnum.check_circle,
-              onClick: () => {
-                setDrawer((prev) => ({
-                  ...prev,
-                  title: "Fill out questionnaire",
-                  type: "questionnaire_answer",
-                  data: {
-                    id: questionnaire_id,
-                    character_id: !row.original.isBlueprintInstance ? row.original.id : undefined,
-                    blueprint_instance_id: row.original.isBlueprintInstance ? row.original.id : undefined,
-                  },
-                }));
-              },
-            },
-            {
-              id: "2",
-              title: "Delete",
-              icon: IconEnum.trash,
-              onClick: () =>
-                removeFromQuestionnaire({
-                  data: {
-                    characters: "full_name" in row.original ? [row.original.id] : [],
-                    blueprint_instances: "icon" in row.original ? [row.original.id] : [],
-                  },
-                }),
-            },
-          ]}>
-          <div>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
-          </div>
-        </Dropdown>
-      ),
-    }),
-  );
+
   return columns;
 }
 
@@ -224,6 +214,7 @@ export function AnswersView() {
   const { questionnaire_id } = useParams();
   const setNavbarTitle = useSetAtom(navbarTitleAtom);
   const setDrawer = useSetAtom(drawerAtom);
+  const setDialog = useSetAtom(dialogAtom);
   const {
     data: questionnaireData,
     isLoading,
@@ -243,29 +234,19 @@ export function AnswersView() {
   }, [questionnaireData, isFetching]);
   const [{ selection }, dispatch] = useTable({ selection: {} });
 
-  const formatted = (
-    deepMerge(questionnaireData?.data?.characters || [], questionnaireData?.data?.blueprint_instances || []) as
-      | QuestionnaireType["characters"]
-      | QuestionnaireType["blueprint_instances"]
-  ).map((item) => {
-    const answers: Record<string, any> = {};
-    for (let index = 0; index < item.answers.length; index += 1) {
-      const question = questionnaireData?.data?.questions.find((q) => q.id === item.answers[index].parent_id);
-      if (question) {
-        answers[item.answers[index].parent_id] = item.answers[index];
-        answers[item.answers[index].parent_id].type = question.type;
+  const formatted = questionnaireData?.data?.questions?.map((question) => {
+    const item: Record<string, any> = { title: question.title };
+    for (let index = 0; index < (question?.answers?.length || 0); index += 1) {
+      if (question?.answers?.[index]?.blueprint_instance_id) {
+        item.is_blueprint_instance = true;
+      }
+      const entity_id = question?.answers?.[index]?.character_id || question?.answers?.[index]?.blueprint_instance_id;
+      if (entity_id) {
+        item[entity_id] = question?.answers?.[index];
       }
     }
-
-    return {
-      id: item.id,
-      title: "full_name" in item ? item.full_name : item.title,
-      project_id: item.project_id,
-      portrait_id: "portrait_id" in item ? item.portrait_id : null,
-      icon: "icon" in item ? item.icon : null,
-      isBlueprintInstance: "icon" in item,
-      ...answers,
-    };
+    item.type = question.type;
+    return item;
   });
 
   return (
@@ -310,8 +291,9 @@ export function AnswersView() {
                 ? []
                 : getQuestionnaireColumns(
                     questionnaire_id as string,
-                    questionnaireData?.data?.questions || [],
+                    deepMerge(questionnaireData?.data?.characters || [], questionnaireData?.data?.blueprint_instances || []),
                     setDrawer,
+                    setDialog,
                     removeFromQuestionnaire,
                   )
             }
@@ -319,7 +301,7 @@ export function AnswersView() {
               hasSelect: true,
               selection,
             }}
-            data={formatted}
+            data={formatted || []}
             dispatch={dispatch}
             isLoading={isLoading}
             skeletonLimit={10}

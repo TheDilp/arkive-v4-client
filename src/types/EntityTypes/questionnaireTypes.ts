@@ -58,6 +58,7 @@ export type QuestionType = {
     | "locations_multiple"
     | "images_single"
     | "images_multiple";
+  answers?: Pick<AnswerType, "id" | "value" | "parent_id" | "character_id" | "blueprint_instance_id">[];
 };
 
 export type QuestionnaireType = {
@@ -71,14 +72,12 @@ export type QuestionnaireType = {
     full_name: string;
     project_id: string;
     portrait_id?: string;
-    answers: Pick<AnswerType, "id" | "value" | "parent_id">[];
   }[];
   blueprint_instances: {
     id: string;
     title: string;
     project_id: string;
     icon?: string;
-    answers: Pick<AnswerType, "id" | "value" | "parent_id">[];
   }[];
 };
 
