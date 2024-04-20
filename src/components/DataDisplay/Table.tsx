@@ -602,7 +602,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const pinned = columns.filter((col) => col?.meta?.pinned);
   return (
     <>
-      <div ref={bodyRef} className="scrollbar-hidden max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800">
+      <div ref={bodyRef} className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800">
         <div ref={headerRef} className={head()}>
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
