@@ -216,7 +216,7 @@ export function QuestionnaireDrawer({ data }: Props) {
     data?.id,
     "questionnaires",
     {
-      fields: ["id", "title", "owner_id", "icon"],
+      fields: ["id", "title", "owner_id", "icon", "is_public"],
       relations: {
         questions: true,
       },
