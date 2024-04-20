@@ -255,7 +255,7 @@ export function EdgeDrawer({ data }: Props) {
                 <Select
                   label="Line style"
                   name="line_style"
-                  onChange={({ name, value }) => handleChange({ name, value: parseInt(value as string, 10) })}
+                  onChange={({ name, value }) => handleChange({ name, value })}
                   options={EdgeLineStylesEnum}
                   value={edge?.line_style || "solid"}
                 />
