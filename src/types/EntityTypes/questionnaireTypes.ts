@@ -66,6 +66,7 @@ export type QuestionnaireType = {
   title: string;
   owner_id: string;
   icon?: AvailableIcons;
+  is_public?: boolean;
   questions: QuestionType[];
   characters: {
     id: string;

@@ -20,6 +20,7 @@ export const InsertQuestionnaireSchema = z.object({
   data: z.object({
     title: z.string(),
     icon: z.string().optional(),
+    is_public: z.boolean().optional().nullable(),
   }),
   relations: z.object({
     questions: z
@@ -44,6 +45,7 @@ export const UpdateQuestionnaireSchema = z
       id: z.string(),
       title: z.string().optional(),
       icon: z.string().optional().nullable(),
+      is_public: z.boolean().optional().nullable(),
     }),
     relations: z
       .object({

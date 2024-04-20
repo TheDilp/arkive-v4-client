@@ -8,7 +8,7 @@ import { InputOnChangeValue, onChangeValue, TabType } from "../../../types";
 import { QuestionnaireType, QuestionType } from "../../../types/EntityTypes/questionnaireTypes";
 import { drawerAtom, IconEnum, QuestionnaireQuestionTypesEnum, reorder, userAtom } from "../../../utils";
 import { InsertQuestionnaireSchema, UpdateQuestionnaireSchema } from "../../../validation/questionnaires";
-import { Button, Input, Search, Select } from "../../Form";
+import { Button, Checkbox, Input, Search, Select } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
@@ -206,7 +206,9 @@ export function QuestionnaireDrawer({ data }: Props) {
   const resetDrawerAtom = useResetAtom(drawerAtom);
   const { mutate: create, isLoading: isCreating } = useCreateQuestionnaire();
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: Partial<Omit<QuestionnaireType, "owner_id" | "questions" | "icon" | "parent_id"> & { icon?: string | null }>;
+    data: Partial<
+      Omit<QuestionnaireType, "owner_id" | "questions" | "icon" | "parent_id" | "is_public"> & { icon?: string | null }
+    >;
     relations?: { questions?: { data: Partial<QuestionType> }[] };
   }>("questionnaires", "");
   const { handleChange, changedData } = useHandleChange({ data: questionnaire, setData: setQuestionnaire });
@@ -238,7 +240,7 @@ export function QuestionnaireDrawer({ data }: Props) {
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
-        <div className="flex-1">
+        <div className="flex flex-1 flex-col gap-y-2">
           <div className="flex items-center gap-x-2">
             <Input
               label="Title (required, must be unique)"
@@ -250,6 +252,10 @@ export function QuestionnaireDrawer({ data }: Props) {
             <span className="mb-1 self-end">
               <IconPicker icon={questionnaire?.icon || IconEnum.questionnaires} name="icon" onChange={handleChange} />
             </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox name="is_public" onChange={handleChange} value={existingQuestionnaire?.data?.is_public} />
           </div>
         </div>
       ) : null}
