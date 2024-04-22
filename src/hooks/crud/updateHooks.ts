@@ -370,9 +370,7 @@ export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id
         const parentEntityType = getParentEntityType(type);
 
         if (parentEntityType === "graphs" && !isNotOptimisticUpdating) {
-          const old =
-            queryClient.getQueryData<{ data: GraphType }>([parentEntityType, parent_id]) ||
-            queryClient.getQueryData<{ data: GraphType }>(["graph_view", parent_id]);
+          const old = queryClient.getQueryData<{ data: GraphType }>(["graph_view", parent_id]);
           const newData = old
             ? {
                 ...old,

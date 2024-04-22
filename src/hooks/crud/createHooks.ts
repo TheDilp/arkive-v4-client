@@ -159,7 +159,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
           }
         }
         if (parentEntityType === "graphs") {
-          const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
+          const old = queryClient.getQueryData(["graph_view", vars.data.parent_id]);
           queryClient.setQueryData<{ data: GraphType }>([parentEntityType, vars.data.parent_id], (oldData) =>
             oldData
               ? {

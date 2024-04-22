@@ -6,7 +6,7 @@ type NodePositionUpdateType = { id: string; x: number; y: number };
 function useBatchUpdateNodePositions(parent_id: string) {
   const batchedData = useRef() as MutableRefObject<NodePositionUpdateType[]>;
   const timer = useRef([]) as MutableRefObject<any>;
-  const updateManyNodePositions = useUpdateManySubEntities("nodes", parent_id, false);
+  const updateManyNodePositions = useUpdateManySubEntities("nodes", parent_id, true);
 
   function addOrUpdateNode(newNode: NodePositionUpdateType) {
     batchedData.current = [...(batchedData.current || [])];
