@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -16,6 +17,7 @@ import { InsertWordSchema, InsertWordType, UpdateWordSchema } from "../../../val
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input, Select, Textarea } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -40,6 +42,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 }
 
 export function WordDrawer({ data }: Props) {
+  const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
   const [word, setWord] = useState<WordStateType>({
@@ -53,7 +56,7 @@ export function WordDrawer({ data }: Props) {
     enabled: !!data?.title,
     isPublic: false,
   });
-  const { data: existingWord } = useGetSubEntity(
+  const { data: existingWord, isFetching } = useGetSubEntity(
     data?.id,
     "words",
     {
@@ -78,7 +81,10 @@ export function WordDrawer({ data }: Props) {
       const parsedData = UpdateWordSchema.parse({ data: word, permissions: word.permissions });
       await updateWord(parsedData, { onSuccess: resetDrawer });
     }
+    queryClient.invalidateQueries(["allEntities", project_id, "words"]);
   }
+
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
