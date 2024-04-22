@@ -139,9 +139,7 @@ export function TimelineView({
         .domain([0, (events.length * zoom) / 2])
         .rangeRound([50, height * 1.05]);
 
-      const numOfTicks = Math.floor(
-        (maxYearCount - Math.abs(minYearCount)) / (clamp({ min: 2, max: 1000, value: zoom % 2 }) * 2),
-      );
+      const numOfTicks = Math.floor((maxYearCount - Math.abs(minYearCount)) / clamp({ min: 1, max: 1000, value: zoom % 2 }));
       if (numberOfTicks !== numOfTicks) {
         setNumberOfTicks(numOfTicks);
       } else {
