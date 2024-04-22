@@ -2,18 +2,13 @@ import { UseMutateFunction } from "@tanstack/react-query";
 import cytoscape, { Core } from "cytoscape";
 import { saveAs } from "file-saver";
 
-import { CurveStyleType, EdgeType, GraphType, NodeType } from "../../types/EntityTypes/graphTypes";
+import { CurveStyleType, EdgeType, NodeType } from "../../types/EntityTypes/graphTypes";
 import { AvailableIcons, getCharacterFullName, getIconUrlFromIconEnum, getImageURL, getThumbnailUrl, IconEnum } from "..";
 
 export function changeLockState(
   boardContext: cytoscape.Core,
   locked: boolean,
-  updateManyNodesLockState: UseMutateFunction<
-    any,
-    unknown,
-    { data: { data: { [key: string]: any; id: string; parent_id?: string } }[] },
-    { old: { data: GraphType } | undefined } | { old: {} }
-  >,
+  updateManyNodesLockState: UseMutateFunction<any, unknown, { data: { data: { [key: string]: any } }[] }>,
   parent_id: string,
 ) {
   const selected = boardContext.nodes(":selected");

@@ -169,7 +169,7 @@ export function ManyEdgesDrawer({ data }: Props) {
   );
   const originalEdges = existingEdges?.data;
 
-  const { mutateAsync: update, isLoading: isMutating } = useUpdateManySubEntities("edges", data.parent_id, true);
+  const { mutateAsync: update, isLoading: isMutating } = useUpdateManySubEntities("edges");
 
   useEffect(() => {
     if (changedData) {

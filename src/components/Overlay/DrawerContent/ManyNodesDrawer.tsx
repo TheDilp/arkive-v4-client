@@ -157,7 +157,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
   const resetDrawerAtom = useResetAtom(drawerAtom);
 
   const originalNodes = existingNodes?.data;
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateManySubEntities("nodes", data.parent_id, true);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateManySubEntities("nodes");
   const [node, setNode] = useState<Partial<NodeType> & { parent_id: string }>({ ...DefaultNode, parent_id: data.parent_id });
   const { changedData, handleChange, resetChanges } = useHandleChange({ data: node, setData: setNode });
   useEffect(() => {

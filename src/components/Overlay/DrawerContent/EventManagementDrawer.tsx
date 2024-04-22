@@ -42,7 +42,7 @@ export function EventManagementDrawer({ data }: Props) {
   const [updatedEvents, setUpdatedEvents] = useState<EventType[]>([]);
 
   const { mutateAsync: deleteMany, isLoading: isDeletingMany } = useDeleteMany("events", false, project_id as string);
-  const { mutateAsync: updateMany, isLoading: isUpdatingMany } = useUpdateManySubEntities("events", item_id as string);
+  const { mutateAsync: updateMany, isLoading: isUpdatingMany } = useUpdateManySubEntities("events");
 
   async function handleSave() {
     const updatedEventIds = (updatedEvents || []).map((e) => e.id);

@@ -51,7 +51,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const dialogValue = useAtomValue(dialogAtom);
 
-  const { data: existingGraphData, isFetching } = useGetEntity<GraphType>(
+  const { data: existingGraphData, isInitialLoading } = useGetEntity<GraphType>(
     item_id,
     "graphs",
     {
@@ -107,8 +107,8 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
-  const { addOrUpdateNode } = useBatchUpdateNodePositions(item_id as string);
-  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
+  const { addOrUpdateNode } = useBatchUpdateNodePositions();
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
 
   const styleSheet = useMemo(
     () => getCytoscapeStylesheet(boardState.curve_style),
@@ -481,12 +481,8 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
         cyRef?.current?._cy.nodes(":grabbed").forEach((el: NodeSingular) => {
           if (el.grabbed()) {
-            const oldPosition = { x: el.data().x, y: el.data().y };
-            const newPosition = el.position();
-            if (oldPosition.x !== newPosition.x || oldPosition.y !== newPosition.y) {
-              addOrUpdateNode({ id: el.id(), ...el.position() });
-              el.select();
-            }
+            addOrUpdateNode({ id: el.id(), ...el.position() });
+            el.select();
           }
         });
         grabbedNodes.select();
@@ -600,7 +596,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     };
   }, [cyRef?.current?._cy, item_id, boardState.add_nodes]);
   useEffect(() => {
-    if (!isFetching) {
+    if (!isInitialLoading) {
       const timeout = setTimeout(() => {
         // If there is a node id in the URL navigate to that node
         if ((subitem_id || center_on) && cyRef?.current?._cy) {
@@ -625,7 +621,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       };
     }
     return () => {};
-  }, [subitem_id, cyRef?.current?._cy, isFetching]);
+  }, [subitem_id, cyRef?.current?._cy, isInitialLoading]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
       if (ehRef?.current) {
@@ -700,10 +696,20 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }, [drawer]);
   cyRef?.current?._cy.removeListener("grabon grab");
 
+  const elements = useMemo(
+    () =>
+      CytoscapeComponent.normalizeElements({
+        nodes: mapNodes(nodes || [], project_id as string, isReadOnly),
+        edges: mapEdges(edges || []),
+      }),
+    [nodes, edges],
+  );
+
   return (
     <div className="relative flex h-[calc(100%)] w-full flex-1 flex-col justify-center">
-      <div className={`absolute z-10 flex h-full w-full items-center justify-center bg-black ${isFetching ? "" : "hidden"}`}>
-        {isFetching ? <Spinner /> : null}
+      <div
+        className={`absolute z-10 flex h-full w-full items-center justify-center bg-black ${isInitialLoading ? "" : "hidden"}`}>
+        {isInitialLoading ? <Spinner /> : null}
       </div>
       {isFamilyTreeView && !isPublic ? (
         <div className="ml-auto w-min">
@@ -761,10 +767,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
             cy.layout(layoutOptions).run();
           }
         }}
-        elements={CytoscapeComponent.normalizeElements({
-          nodes: mapNodes(nodes || [], project_id as string, isReadOnly),
-          edges: mapEdges(edges || []),
-        })}
+        elements={elements}
         maxZoom={5}
         minZoom={0.1}
         stylesheet={styleSheet}

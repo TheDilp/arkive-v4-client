@@ -3,10 +3,10 @@ import { MutableRefObject, useRef } from "react";
 import { useUpdateManySubEntities } from "..";
 
 type NodePositionUpdateType = { id: string; x: number; y: number };
-function useBatchUpdateNodePositions(parent_id: string) {
+function useBatchUpdateNodePositions() {
   const batchedData = useRef() as MutableRefObject<NodePositionUpdateType[]>;
   const timer = useRef([]) as MutableRefObject<any>;
-  const updateManyNodePositions = useUpdateManySubEntities("nodes", parent_id, true);
+  const updateManyNodePositions = useUpdateManySubEntities("nodes");
 
   function addOrUpdateNode(newNode: NodePositionUpdateType) {
     batchedData.current = [...(batchedData.current || [])];

@@ -68,8 +68,8 @@ export function Quickbar({
   const setDialog = useSetAtom(dialogAtom);
   const setDrawer = useSetAtom(drawerAtom);
 
-  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes", item_id as string);
-  const { mutate: updateManyEdges } = useUpdateManySubEntities("edges", item_id as string);
+  const { mutate: updateManyNodes } = useUpdateManySubEntities("nodes");
+  const { mutate: updateManyEdges } = useUpdateManySubEntities("edges");
   const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
   const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 

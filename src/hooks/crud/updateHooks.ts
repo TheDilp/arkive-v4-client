@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
 import { RemirrorJSON } from "remirror";
 
 import {
@@ -16,14 +15,12 @@ import {
 import { AnswerValueType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
-  edgesAtom,
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
   getSingularEntityType,
   IconEnum,
   MentionableEntites,
-  nodesAtom,
   useNotifications,
 } from "../../utils";
 
@@ -349,59 +346,17 @@ export function useUpdateSubEntity(
     },
   );
 }
-export function useUpdateManySubEntities(type: AvailableSubEntityType, parent_id: string, isNotOptimisticUpdating?: boolean) {
-  const queryClient = useQueryClient();
-  const setNodes = useSetAtom(nodesAtom);
-  const setEdges = useSetAtom(edgesAtom);
-  return useMutation(
-    async (updateItemValues: { data: { data: { id: string; parent_id?: string; [key: string]: any } }[] }) => {
-      if (updateItemValues.data.length) {
-        return FetchFunction({
-          url: `${baseURLS.baseServer}/bulk/update/${type}`,
-          body: JSON.stringify(updateItemValues),
-          method: "POST",
-        });
-      }
-      return null;
-    },
-
-    {
-      onMutate: (vars) => {
-        const parentEntityType = getParentEntityType(type);
-
-        if (parentEntityType === "graphs" && !isNotOptimisticUpdating) {
-          const old = queryClient.getQueryData<{ data: GraphType }>(["graph_view", parent_id]);
-          const newData = old
-            ? {
-                ...old,
-                data: {
-                  ...old?.data,
-                  [type]: (old.data?.[type as "nodes" | "edges"] || []).map((item) => {
-                    const idx = vars.data.findIndex((updatedItem) => updatedItem.data.id === item.id);
-                    if (idx > -1) {
-                      return { ...item, ...vars.data[idx].data };
-                    }
-                    return item;
-                  }),
-                },
-              }
-            : old;
-          queryClient.setQueryData<{ data: GraphType }>([parentEntityType, parent_id], newData);
-          if (type === "nodes") setNodes((prev) => newData?.data?.nodes || prev);
-          if (type === "edges") setEdges((prev) => newData?.data?.edges || prev);
-          return { old };
-        }
-
-        return { old: {} };
-      },
-      onError: (_, __, context) => {
-        const parentEntityType = getParentEntityType(type);
-        if (parentEntityType === "graphs") {
-          queryClient.setQueryData([parentEntityType, parent_id], context?.old);
-        }
-      },
-    },
-  );
+export function useUpdateManySubEntities(type: AvailableSubEntityType) {
+  return useMutation(async (updateItemValues: { data: { data: { [key: string]: any } }[] }) => {
+    if (updateItemValues.data.length) {
+      return FetchFunction({
+        url: `${baseURLS.baseServer}/bulk/update/${type}`,
+        body: JSON.stringify(updateItemValues),
+        method: "POST",
+      });
+    }
+    return null;
+  });
 }
 
 export function useAddToEntity<
