@@ -3,7 +3,6 @@ import { UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deepMerge } from "remirror";
 
 import {
   Avatar,
@@ -434,17 +433,6 @@ export function ProjectSettingsView() {
   );
   const { mutate: assignRole } = useAssignRole();
   const { mutate: updateUser } = useUpdateUser(user?.id as string, authUser?.id as string);
-  function handleFeatureFlagChange(newValue: { name: string; value: boolean }) {
-    const newFeatureFlags = deepMerge(project?.feature_flags || {}, { [newValue.name]: newValue.value });
-    updateUser(
-      {
-        relations: {
-          feature_flags: { project_id: project_id as string, feature_flags: newFeatureFlags },
-        },
-      },
-      { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
-    );
-  }
 
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
@@ -716,7 +704,23 @@ export function ProjectSettingsView() {
           ) : null}
           {finalTabs[selectedTab].id === "6" ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
-              <Collapsible label="Notifications from other project members">
+              <Collapsible
+                actions={[
+                  {
+                    icon: IconEnum.save,
+                    variant: "success",
+                    onClick: () =>
+                      updateUser(
+                        {
+                          relations: {
+                            feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
+                          },
+                        },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                      ),
+                  },
+                ]}
+                label="Notifications from other project members">
                 <div className="bg-zinc-900">
                   {UserNotificationEntities.map((entity) => (
                     <div
@@ -726,20 +730,20 @@ export function ProjectSettingsView() {
                       <div className="flex w-52 items-center justify-between gap-x-2 text-center">
                         <Checkbox
                           label="Create"
-                          name={`${entity}_create_notification`}
-                          onChange={handleFeatureFlagChange}
+                          name={`feature_flags.${entity}_create_notification`}
+                          onChange={handleChange}
                           value={project?.feature_flags?.[`${entity}_create_notification`]}
                         />
                         <Checkbox
                           label="Update"
-                          name={`${entity}_update_notification`}
-                          onChange={handleFeatureFlagChange}
+                          name={`feature_flags.${entity}_update_notification`}
+                          onChange={handleChange}
                           value={project?.feature_flags?.[`${entity}_update_notification`]}
                         />
                         <Checkbox
                           label="Delete"
-                          name={`${entity}_delete_notification`}
-                          onChange={handleFeatureFlagChange}
+                          name={`feature_flags.${entity}_delete_notification`}
+                          onChange={handleChange}
                           value={project?.feature_flags?.[`${entity}_delete_notification`]}
                         />
                       </div>
@@ -747,7 +751,23 @@ export function ProjectSettingsView() {
                   ))}
                 </div>
               </Collapsible>
-              <Collapsible label="Sidebar settings">
+              <Collapsible
+                actions={[
+                  {
+                    icon: IconEnum.save,
+                    variant: "success",
+                    onClick: () =>
+                      updateUser(
+                        {
+                          relations: {
+                            feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
+                          },
+                        },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                      ),
+                  },
+                ]}
+                label="Sidebar settings">
                 <div className="bg-zinc-900">
                   {UserSidebarEntitiesEnabled.map((entity) => (
                     <div
@@ -757,8 +777,8 @@ export function ProjectSettingsView() {
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
                           label="Enabled"
-                          name={`${entity}_enabled`}
-                          onChange={handleFeatureFlagChange}
+                          name={`feature_flags.${entity}_enabled`}
+                          onChange={handleChange}
                           value={project?.feature_flags?.[`${entity}_enabled`]}
                         />
                       </div>
@@ -766,7 +786,23 @@ export function ProjectSettingsView() {
                   ))}
                 </div>
               </Collapsible>
-              <Collapsible label="Miscellaneous settings">
+              <Collapsible
+                actions={[
+                  {
+                    icon: IconEnum.save,
+                    variant: "success",
+                    onClick: () =>
+                      updateUser(
+                        {
+                          relations: {
+                            feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
+                          },
+                        },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                      ),
+                  },
+                ]}
+                label="Miscellaneous settings">
                 <div className="bg-zinc-900">
                   {MiscellaneousSettings.map((setting) => (
                     <div
@@ -776,8 +812,8 @@ export function ProjectSettingsView() {
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
                           label="Enabled"
-                          name={setting}
-                          onChange={handleFeatureFlagChange}
+                          name={`feature_flags.${setting}`}
+                          onChange={handleChange}
                           value={project?.feature_flags?.[setting]}
                         />
                       </div>
