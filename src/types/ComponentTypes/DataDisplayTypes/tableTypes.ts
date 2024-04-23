@@ -86,7 +86,7 @@ export interface TableType {
     selectedActions?: TableSelectedAction[];
     getLink?: (rowData: any) => string;
     onRowClick?: (rowData: any) => void;
-    setFavorite?: (rowData: any) => Promise<void>;
+    setFavorite?: (rowData: any) => void;
   };
   type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships" | "roles";
   skeletonLimit?: number;

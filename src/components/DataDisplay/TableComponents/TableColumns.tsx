@@ -61,7 +61,7 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
   };
 }
 
-export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => Promise<void>): ColumnDef<any> {
+export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => void): ColumnDef<any> {
   return {
     id: "is_favorite",
     header: "",

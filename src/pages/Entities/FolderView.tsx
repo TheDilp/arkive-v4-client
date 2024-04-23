@@ -806,7 +806,7 @@ export function FolderView() {
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
-        parents: true,
+        parents: arkived === "active",
         tags: EntitiesWithTags.includes(type as string),
       },
     },
@@ -1163,7 +1163,10 @@ export function FolderView() {
               hasArkived: arkived === "arkive",
               hasTags: EntitiesWithTags.includes(type as string),
               selection,
-              getLink: (rowData: any) => `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`,
+              getLink: (rowData: any) =>
+                arkived === "active"
+                  ? `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`
+                  : "#",
             }}
             data={base?.data || []}
             dispatch={dispatch}

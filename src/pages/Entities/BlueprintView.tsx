@@ -437,7 +437,8 @@ export function BlueprintView() {
           filters,
           selection,
           orderBy,
-          getLink: (rowData: BlueprintType) => `/projects/${project_id}/blueprints/${rowData.id}`,
+          getLink: (rowData: BlueprintType) =>
+            arkived === "active" ? `/projects/${project_id}/blueprints/${rowData.id}` : "#",
           selectedActions,
         }}
         data={data?.data || []}

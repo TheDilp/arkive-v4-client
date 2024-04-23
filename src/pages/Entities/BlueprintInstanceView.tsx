@@ -723,7 +723,7 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
                 setDrawer,
               }),
               getLink: (rowData: BlueprintInstanceType) =>
-                `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`,
+                arkived === "active" ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources` : "#",
             }}
             data={instances?.data || []}
             dispatch={dispatch}

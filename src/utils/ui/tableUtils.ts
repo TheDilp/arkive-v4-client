@@ -42,7 +42,7 @@ export function getTableColumns(
     hasFavorite?: boolean;
     hasTags?: boolean;
     hasArkived?: boolean;
-    setFavorite?: (data: SetFavoriteType) => Promise<void>;
+    setFavorite?: (data: SetFavoriteType) => void;
     dispatch?: TableDispatch;
     pagination?: RequestPaginationType;
     config?: {

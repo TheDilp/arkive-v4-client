@@ -733,7 +733,7 @@ export function CharactersView() {
       },
     },
   );
-  const { mutateAsync } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string);
+  const { mutate } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -844,9 +844,10 @@ export function CharactersView() {
               filters,
               relationFilters,
               selection,
-              getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/biography`,
-              setFavorite: async (rowData: any) => {
-                await mutateAsync({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
+              getLink: (rowData: any) =>
+                arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
+              setFavorite: (rowData: any) => {
+                mutate({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
               },
               selectedActions,
             }}
