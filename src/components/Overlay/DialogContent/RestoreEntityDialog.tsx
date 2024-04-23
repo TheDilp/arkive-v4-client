@@ -56,13 +56,7 @@ export function RestoreEntityDialog({ data }: { data: { [key: string]: any } }) 
           label="Restore"
           onClick={() => {
             if (data?.id && project_id && data?.entity_title) {
-              if (data?.entity_title === "images") {
-                // deleteAsset({ data: { id: data?.id } });
-              } else if (data?.entity_title && data?.parent_id) {
-                // deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
-              } else {
-                updateEntity({ data: { id: data?.id, deleted_at: null } });
-              }
+              updateEntity({ data: { id: data?.id, deleted_at: null } });
               resetDialogAtom();
             } else {
               createNotification({

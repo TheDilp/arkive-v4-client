@@ -24,7 +24,6 @@ import {
 export function useDeleteEntity(type: AvailableEntityType, project_id: string, arkive: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
-
   return useMutation(
     async (vars: { data: { id: string; parent_id?: string } }) => {
       return FetchFunction({
@@ -35,11 +34,8 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
     {
       onSuccess: (data, vars) => {
         if (data?.ok) {
-          if (vars?.data?.parent_id) {
-            queryClient.invalidateQueries([type, vars.data.parent_id]);
-          } else {
-            queryClient.invalidateQueries(["allEntities", project_id, type]);
-          }
+          queryClient.invalidateQueries([type, vars.data.parent_id]);
+          queryClient.invalidateQueries(["allEntities", project_id, type]);
 
           createNotification({
             title: getEntityCRUDNotification(type, arkive ? "arkive" : "delete"),

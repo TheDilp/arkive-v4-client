@@ -380,7 +380,7 @@ function getColumns(
               },
               title: `${row.original.deleted_at ? "Delete" : "Arkive"} ${getSingularEntityType(entityType)}`,
               size: "sm",
-              type: `${row.original.deleted_at ? "delete_" : "arkive_"}entity`,
+              type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
               isOverlay: true,
             }));
           },
