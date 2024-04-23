@@ -3,7 +3,7 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { Dispatch, MouseEvent, useEffect, useLayoutEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
   Alert,
@@ -41,6 +41,7 @@ import {
   EntitiesWithFolders,
   ImageType,
   PermissionCodeType,
+  RequestFilterTypes,
   TableDispatch,
   TableSelectedAction,
   TableSelectionType,
@@ -726,13 +727,17 @@ export function FolderView() {
       },
       filters: {
         and: [
-          {
-            id: "parent",
-            header_name: "Parent",
-            field: "parent_id",
-            operator: isFolder ? "eq" : "is",
-            value: isFolder ? (item_id as string) : null,
-          },
+          ...(arkived === "active"
+            ? [
+                {
+                  id: "parent",
+                  header_name: "Parent",
+                  field: "parent_id",
+                  operator: (isFolder ? "eq" : "is") as RequestFilterTypes,
+                  value: isFolder ? (item_id as string) : null,
+                },
+              ]
+            : []),
           ...(documentType === "templates" && type === "documents"
             ? [
                 {
@@ -803,6 +808,7 @@ export function FolderView() {
       },
       pagination,
       permissions: true,
+      arkived: arkived === "arkive",
       // @ts-ignore
       fields: getEntityFields(type as AvailableEntityType),
       relations: {
@@ -824,7 +830,7 @@ export function FolderView() {
   const { mutateAsync: updateMany } = useBulkUpdate(project_id as string, type as AvailableEntityType);
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, arkived === "active", project_id);
   const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
-
+  const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
@@ -863,6 +869,7 @@ export function FolderView() {
   useEffect(() => {
     dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
+    if (arkived === "arkive") navigate(`/projects/${project_id}/${type}`);
   }, [item_id, arkived]);
   useEffect(() => {
     if (
