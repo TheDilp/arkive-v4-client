@@ -33,8 +33,9 @@ export default function App() {
           appearance={{
             baseTheme: dark,
           }}
-          navigate={(to) => navigate(to)}
-          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+          routerPush={(to: string) => navigate(to)}
+          routerReplace={(to: string) => navigate(to)}>
           <NotificationContainer />
           <ReactQueryDevtools position="top-left" />
 
