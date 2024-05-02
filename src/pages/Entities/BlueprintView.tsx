@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Icon, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -348,6 +348,7 @@ export function BlueprintView() {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint-table-active") || "active");
+  const [filter, setFilter] = useState("");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const columns = createColumns(setDrawer, setDialog, permissions, isProjectOwner, user?.id as string, user?.role?.id);
@@ -388,13 +389,49 @@ export function BlueprintView() {
   });
 
   useEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
     dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
-  }, [arkived]);
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch, arkived]);
 
   return (
     <TablePageLayout>
       <div className="flex h-12 w-full items-center justify-end gap-x-2">
+        <div className="w-52">
+          <Input
+            isClearable
+            name="quick_filter"
+            onChange={({ value }) => setFilter(value as string)}
+            placeholder="Quick search by title"
+            type="search"
+            value={filter}
+          />
+        </div>
         <div className="w-32">
           <Select
             name="view"
