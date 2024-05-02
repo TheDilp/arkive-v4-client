@@ -621,7 +621,7 @@ function getSelectedActions(
   return selectedActions;
 }
 
-export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive" }) {
+export function BlueprintInstanceView({ filter, arkived }: { filter: string; arkived: "active" | "arkive" }) {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -683,6 +683,37 @@ export function BlueprintInstanceView({ arkived }: { arkived: "active" | "arkive
     dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
   }, [arkived]);
+
+  useEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch, arkived]);
 
   return (
     <TablePageLayout>
