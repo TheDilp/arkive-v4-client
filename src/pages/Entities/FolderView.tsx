@@ -13,6 +13,7 @@ import {
   createColumnHelper,
   Dropdown,
   Icon,
+  Input,
   Select,
   Skeleton,
   Table,
@@ -714,7 +715,8 @@ export function FolderView() {
   );
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
-  const [{ selection, pagination }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
+  const [{ selection, pagination, filters }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
+  const [filter, setFilter] = useState("");
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get(`${entityName}-table-active`) || "active");
   const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
@@ -727,6 +729,7 @@ export function FolderView() {
       },
       filters: {
         and: [
+          ...(filters?.and ? filters.and : []),
           ...(arkived === "active"
             ? [
                 {
@@ -892,6 +895,37 @@ export function FolderView() {
     }
   }, [permissions]);
 
+  useEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    dispatch({ type: "clearSelection" });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch, arkived]);
+
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
   if (type === "tags") return <TagView />;
@@ -905,6 +939,16 @@ export function FolderView() {
           <Breadcrumbs />
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
+              <div className="w-52">
+                <Input
+                  isClearable
+                  name="quick_filter"
+                  onChange={({ value }) => setFilter(value as string)}
+                  placeholder="Quick search by title"
+                  type="search"
+                  value={filter}
+                />
+              </div>
               {type === "documents" ? (
                 <>
                   <div className="w-10">

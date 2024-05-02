@@ -3,7 +3,7 @@ import ls from "localstorage-slim";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph, Select } from "../../components";
+import { Breadcrumbs, Button, Graph, Input, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
 import { AvailableEntityType, DrawerContentCreateNewType, PermissionCodeType } from "../../types";
 import { drawerAtom, getPermissionsForTypeView, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
@@ -23,7 +23,7 @@ export function EntitiesView() {
     undefined,
   );
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
-
+  const [filter, setFilter] = useState("");
   return (
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
@@ -31,6 +31,18 @@ export function EntitiesView() {
           <Breadcrumbs />
           {item_id ? (
             <div className="flex justify-end gap-x-2">
+              {type === "blueprints" && item_id ? (
+                <div>
+                  <Input
+                    isClearable
+                    name="quick_filter"
+                    onChange={({ value }) => setFilter(value as string)}
+                    placeholder="Quick search by title"
+                    type="search"
+                    value={filter}
+                  />
+                </div>
+              ) : null}
               {type === "blueprints" ? (
                 <div className="ml-auto w-32">
                   <Select
@@ -90,7 +102,7 @@ export function EntitiesView() {
       {!!item_id && type === "documents" ? <DocumentView editable /> : null}
       {!!item_id && type === "maps" ? <MapView /> : null}
       {!!item_id && type === "graphs" ? <Graph /> : null}
-      {!!item_id && type === "blueprints" ? <BlueprintInstanceView arkived={arkived} /> : null}
+      {!!item_id && type === "blueprints" ? <BlueprintInstanceView arkived={arkived} filter={filter} /> : null}
       {!!item_id && type === "calendars" ? <CalendarView /> : null}
       {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
