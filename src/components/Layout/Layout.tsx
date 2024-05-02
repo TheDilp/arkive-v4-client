@@ -18,7 +18,6 @@ import {
   permissionsAtom,
   projectAtom,
   projectNavItems,
-  questionnaireNavEnum,
   useNotifications,
   userAtom,
 } from "../../utils";
@@ -179,93 +178,6 @@ export function ProjectLayout() {
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
         ) : null}
-      </div>
-    </div>
-  );
-}
-
-export function QuestionnaireLayout({ children }: { children: ReactNode }) {
-  const { questionnaire_id } = useParams();
-  const { isLg } = useBreakpoint();
-  const { user } = useUser();
-
-  const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
-    {
-      data: { auth_id: user?.id as string },
-      fields: ["id", "email"],
-    },
-    { enabled: !!user?.id && !!questionnaire_id },
-  );
-
-  const setDialog = useSetAtom(dialogAtom);
-  const hasChangedData = useAtomValue(hasChangedDataAtom);
-  const drawer = useAtomValue(drawerAtom);
-  const contextMenu = useAtomValue(contextMenuAtom);
-  const resetDrawer = useResetAtom(drawerAtom);
-  const resetHasChangedData = useResetAtom(hasChangedDataAtom);
-
-  const setUserAtom = useSetAtom(userAtom);
-
-  useEffect(() => {
-    if (userData?.data) {
-      if (user)
-        user?.update({
-          unsafeMetadata: {
-            user_id: userData?.data?.id,
-          },
-        });
-      setUserAtom(userData.data);
-    }
-  }, [userData?.data]);
-
-  const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
-    if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {
-      if (proceed) {
-        setDialog((prev) => ({
-          ...prev,
-          title: "You have unsaved changes - are you sure you want to proceed?",
-          confirm: {
-            label: "Proceed",
-            variant: "primary",
-            icon: IconEnum.chevron_right,
-            action: () => {
-              resetDrawer();
-              resetHasChangedData();
-              proceed();
-            },
-          },
-          cancel: {
-            label: "Cancel",
-            variant: "info",
-            action: reset,
-          },
-          isOverlay: true,
-        }));
-        return true;
-      }
-      return true;
-    }
-
-    return false;
-  });
-
-  return (
-    <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
-      <Dialog />
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-
-      <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
-      {isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
-
-      <div className="flex h-full w-full flex-col lg:w-[calc(100%-4rem)]">
-        <Navbar isDisabled={isInitialLoadingUser} />
-        <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
-          <Drawer />
-          {isInitialLoadingUser ? null : children}
-        </div>
-        {!isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={questionnaireNavEnum} /> : null}
       </div>
     </div>
   );

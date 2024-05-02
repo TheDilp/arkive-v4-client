@@ -47,7 +47,6 @@ import {
   NodeDrawer,
   NodeFromDrawer,
   ProjectDrawer,
-  QuestionnaireDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
   RandomTableOptionsDrawer,
@@ -57,8 +56,6 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
-import QuestionnaireAddDrawer from "./DrawerContent/QuestionnaireAddDrawer";
-import QuestionnaireAnswerDrawer from "./DrawerContent/QuestionnaireAnswerDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -229,9 +226,6 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
-                {drawer.type === "questionnaires" ? <QuestionnaireDrawer data={drawer?.data} /> : null}
-                {drawer.type === "questionnaire_add" ? <QuestionnaireAddDrawer data={drawer?.data} /> : null}
-                {drawer.type === "questionnaire_answer" ? <QuestionnaireAnswerDrawer data={drawer?.data} /> : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}

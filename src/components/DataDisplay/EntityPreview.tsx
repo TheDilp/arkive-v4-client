@@ -48,7 +48,6 @@ const EntityPreviewClasses = tv({
 export function EntityPreview({
   id,
   parent_id,
-  entity_project_id,
   title,
   type,
   link,
@@ -80,11 +79,7 @@ export function EntityPreview({
         {image_id ? (
           <Avatar
             hasShowImage
-            image={getImageURL(
-              entity_project_id || (project_id as string),
-              type === "maps" ? "map_images" : "images",
-              image_id,
-            )}
+            image={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
             isTooltipDisabled
             label={title}
             size={size === "md" ? "sm" : "xs"}

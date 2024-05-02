@@ -38,7 +38,6 @@ export * from "./MentionedInDrawer";
 export * from "./NodeDrawer";
 export * from "./NodeFromDrawer";
 export * from "./ProjectDrawer";
-export * from "./QuestionnaireDrawer";
 export * from "./RandomTableDrawer";
 export * from "./RandomTableOptionDrawer";
 export * from "./RandomTableOptionsDrawer";

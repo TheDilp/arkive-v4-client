@@ -12,7 +12,6 @@ import {
   MapType,
   NodeType,
 } from "../../types";
-import { QuestionnaireType, QuestionType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -468,63 +467,5 @@ export function useCreateFromTemplate(project_id: string) {
     },
   );
 }
-export function useCreateQuestionnaire() {
-  const queryClient = useQueryClient();
-  const createNotification = useNotifications();
 
-  return useMutation(
-    async (newItemValues: {
-      data: Omit<
-        QuestionnaireType,
-        "id" | "owner_id" | "questions" | "icon" | "is_public" | "characters" | "blueprint_instances"
-      > & {
-        icon?: string;
-      };
-      relations: {
-        questions: {
-          data: {
-            id: string;
-            title: string;
-            sort?: number;
-            options?: QuestionType["options"];
-            type: QuestionType["type"];
-            blueprint_id?: string | null;
-          };
-        }[];
-      };
-    }) => {
-      const data = await FetchFunction({
-        url: `${baseURLS.baseServer}/questionnaires/create`,
-        body: JSON.stringify(newItemValues),
-        method: "POST",
-      });
-
-      return data;
-    },
-
-    {
-      onSuccess: (data) => {
-        if (data?.ok) {
-          queryClient.invalidateQueries(["allEntities", undefined, "questionnaires"]);
-          createNotification({
-            title: data?.message || getEntityCRUDNotification("questionnaires", "create"),
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-            position: "top-right",
-          });
-        }
-      },
-      onError: (error: { message?: string }) => {
-        createNotification({
-          title: error?.message || "There was an error creating this entity.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-          position: "top-right",
-        });
-      },
-    },
-  );
-}
 // #endregion misc

@@ -15,11 +15,7 @@ export function getProjectsViewNavItems(
       tooltip: "Projects",
       navigate: "../../projects",
     },
-    {
-      icon: IconEnum.questionnaires,
-      tooltip: "Questionnaires",
-      navigate: "../../questionnaires",
-    },
+
     {
       icon: view ? IconEnum.table : IconEnum.card,
       tooltip: "Change view",
@@ -38,24 +34,6 @@ export function getProjectsViewNavItems(
     },
   ];
 }
-
-export const questionnaireNavEnum = [
-  {
-    icon: IconEnum.project,
-    tooltip: "Projects",
-    navigate: "../../projects",
-  },
-  {
-    icon: IconEnum.questionnaires,
-    tooltip: "Questionnaires",
-    navigate: "../../questionnaires",
-  },
-  {
-    icon: IconEnum.user_settings,
-    tooltip: "User settings",
-    navigate: "/user_settings/webhooks",
-  },
-];
 
 export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },

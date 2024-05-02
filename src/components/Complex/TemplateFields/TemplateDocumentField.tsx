@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { AnswerType } from "../../../types/EntityTypes/questionnaireTypes";
 import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search } from "../../Form";
@@ -16,8 +15,7 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
-  isQuestionnaire?: boolean;
-  currentValue: BlueprintInstanceBlueprintFieldType["documents"] | AnswerType["documents"];
+  currentValue: BlueprintInstanceBlueprintFieldType["documents"];
 };
 
 export function TemplateDocumentField({
@@ -29,7 +27,6 @@ export function TemplateDocumentField({
   currentValue,
   isCollapsible,
   isDisabled,
-  isQuestionnaire,
   isGlobal,
 }: Props) {
   const { project_id } = useParams();
@@ -43,63 +40,52 @@ export function TemplateDocumentField({
             label={isCollapsible ? "" : title}
             name={name}
             onChange={({ value, label, icon, project_id: entity_project_id }) => {
-              handleChange(
-                isQuestionnaire
-                  ? {
-                      name,
-                      value: [
-                        {
-                          id: value,
-                          title: label,
-                          icon,
-                          project_id: entity_project_id,
-                        },
-                      ],
-                    }
-                  : [
-                      { name: `${name}.id`, value: id },
-                      {
-                        name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                        value: {
-                          related_id: value,
-                          document: {
-                            id: value,
-                            title: label,
-                            icon,
-                            project_id: entity_project_id,
-                          },
-                        },
-                      },
-                    ],
-              );
+              handleChange([
+                { name: `${name}.id`, value: id },
+                {
+                  name: `${name}.documents[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                  value: {
+                    related_id: value,
+                    document: {
+                      id: value,
+                      title: label,
+                      icon,
+                      project_id: entity_project_id,
+                    },
+                  },
+                },
+              ]);
             }}
             placeholder="Press enter to search."
             searchEntity="documents"
           />
         )}
         {(currentValue || [])?.map((val) => {
-          const document = "related_id" in val ? val.document : val;
-
           return (
             <EntityPreview
-              key={document.id}
+              key={val.document.id}
               clearAction={
                 isDisabled
                   ? undefined
                   : (doc_id) => {
                       handleChange([
                         {
-                          name: isQuestionnaire ? name : `${name}.documents`,
-                          value: currentValue.filter((c) => ("related_id" in c ? c.related_id : c.id) !== doc_id),
+                          name: `${name}.documents`,
+                          value: currentValue.filter((c) => c.related_id !== doc_id),
                         },
                       ]);
                     }
               }
-              entity_project_id={document?.project_id}
-              icon={document?.icon || ""}
-              id={document?.id}
-              link={getEntityLink(document?.project_id || project_id || "", "documents", document?.id, undefined, false)}
-              title={document?.title}
+              icon={val?.document?.icon || ""}
+              id={val?.document?.id}
+              link={getEntityLink(
+                val?.document?.project_id || project_id || "",
+                "documents",
+                val.document?.id,
+                undefined,
+                false,
+              )}
+              title={val.document?.title}
               type="documents"
             />
           );

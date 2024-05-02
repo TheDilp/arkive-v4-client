@@ -10,7 +10,6 @@ import {
   TableDispatch,
   TagType,
 } from "../../../types";
-import { AnswerType } from "../../../types/EntityTypes/questionnaireTypes";
 import {
   drawerAtom,
   FavoritesFilters,
@@ -170,25 +169,23 @@ export function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
   );
 }
 
-export function CharacterColumn({
-  characters,
-}: {
-  characters: BlueprintInstanceBlueprintFieldType["characters"] | AnswerType["characters"];
-}) {
+export function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
   const { project_id } = useParams();
   return (
     <div className="flex w-full items-center gap-x-2">
       <div className="z-0 flex w-full items-center justify-center -space-x-4">
         {characters?.slice(0, 5)?.map((char) => {
-          const character = "related_id" in char ? char?.character : char;
-          const related_id = "related_id" in char ? char?.related_id : char?.id;
           return (
             <Avatar
-              key={related_id}
-              image={getImageURL(character?.project_id || (project_id as string), "images", character?.portrait_id || "")}
-              initials={getAvatarInitials(character?.full_name || "")}
+              key={char?.related_id}
+              image={getImageURL(
+                char?.character?.project_id || (project_id as string),
+                "images",
+                char?.character?.portrait_id || "",
+              )}
+              initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
-              label={character?.full_name || ""}
+              label={char?.character?.full_name || ""}
               size="sm"
               tooltipAllowedPlacements={["left", "right"]}
             />
@@ -199,7 +196,7 @@ export function CharacterColumn({
         <Tooltip
           content={characters
             ?.slice(5)
-            ?.map((char) => ("related_id" in char ? char?.character?.full_name : char?.full_name) || "")
+            ?.map((char) => char?.character?.full_name || "")
             ?.join(", ")}>
           <div className="w-min max-w-min">
             <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />
@@ -210,18 +207,14 @@ export function CharacterColumn({
   );
 }
 
-export function LocationColumn({
-  locations,
-}: {
-  locations: BlueprintInstanceBlueprintFieldType["map_pins"] | AnswerType["map_pins"];
-}) {
+export function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => ("related_id" in l ? l?.map_pin?.title : l.title) || "")} />
+      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.map_pin?.title || "")} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(locations || []).map((location) => {
@@ -259,20 +252,14 @@ export function LocationColumn({
   );
 }
 
-export function EventColumn({
-  locations: events,
-}: {
-  locations: BlueprintInstanceBlueprintFieldType["events"] | AnswerType["events"];
-}) {
+export function EventColumn({ locations: events }: { locations: BlueprintInstanceBlueprintFieldType["events"] }) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge
-        titles={(events || [])?.map((e) => ("related_id" in e ? e?.event?.title : e?.title) || "").filter((l) => !!l)}
-      />
+      <ShowMultipleWithBadge titles={(events || [])?.map((e) => e?.event?.title).filter((l) => !!l)} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(events || []).map((e) => {

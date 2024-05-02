@@ -12,7 +12,6 @@ import {
   MessagePlaceContentType,
   UserType,
 } from "../../types";
-import { AnswerValueType } from "../../types/EntityTypes/questionnaireTypes";
 import {
   baseURLS,
   FetchFunction,
@@ -780,45 +779,5 @@ export function useAssignRole<InsertType extends { data: { user_id: string; role
     },
   );
 }
-export function useFillQuestionnaire() {
-  const createNotification = useNotifications();
-  const queryClient = useQueryClient();
-  return useMutation(
-    async (updateValues: {
-      data: {
-        character_id: string | undefined;
-        blueprint_instance_id: string | undefined;
-        answers: { parent_id: string; value: AnswerValueType }[];
-      };
-    }) => {
-      return FetchFunction({
-        url: `${baseURLS.baseServer}/answers/fill`,
-        body: JSON.stringify(updateValues),
-        method: "POST",
-      });
-    },
-    {
-      onError: () => {
-        createNotification({
-          title: "There was an error filling this questionnaire.",
-          variant: "error",
-          icon: IconEnum.error,
-          timer: 5,
-        });
-      },
-      onSuccess: (data) => {
-        if (data.ok) {
-          queryClient.invalidateQueries(["questionnaires"]);
 
-          createNotification({
-            title: "Questionnaire successfully filled.",
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-          });
-        }
-      },
-    },
-  );
-}
 // #endregion misc
