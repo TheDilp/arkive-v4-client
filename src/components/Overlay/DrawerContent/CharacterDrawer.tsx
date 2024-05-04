@@ -537,10 +537,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               <Input
                 isAutofocused
                 isDisabled={!hasCreateOrEdit}
-                label="First name"
+                label="First name (required)"
                 name="first_name"
                 onChange={handleChange}
                 value={character?.first_name || ""}
+                variant={character?.first_name ? "primary" : "error"}
               />
             </div>
             <div className="w-full lg:w-1/2">
