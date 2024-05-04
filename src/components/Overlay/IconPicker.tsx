@@ -21,7 +21,16 @@ import { iconCategories } from "../../utils/enums/IconPickerEnums";
 import { Button, Input, Select } from "../Form";
 import { Icon } from "../Misc";
 
-export function IconPicker({ name, onChange, icon, iconColor, customOffset, allowedPlacements, isDisabled }: IconPickerType) {
+export function IconPicker({
+  name,
+  onChange,
+  icon,
+  iconColor,
+  customOffset,
+  allowedPlacements,
+  isDisabled,
+  variant,
+}: IconPickerType) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const [category, setCategory] = useState<IconCategories | null>("game-icons");
@@ -83,7 +92,11 @@ export function IconPicker({ name, onChange, icon, iconColor, customOffset, allo
             <Icon color={iconColor || "#ffffff"} fontSize={32} icon={icon} />
           </div>
         ) : (
-          <div className="h-6 w-6 cursor-pointer rounded-full border border-dashed" />
+          <div
+            className={`h-6 w-6 cursor-pointer rounded-full border border-dashed ${
+              variant === "error" ? "border-red-700" : ""
+            }`}
+          />
         )}
       </div>
       {open && (
