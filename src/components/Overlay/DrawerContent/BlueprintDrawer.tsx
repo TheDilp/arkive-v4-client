@@ -93,6 +93,7 @@ function FieldRow({
             onChange={changeField}
             placeholder="Eg. Location"
             value={title}
+            variant={title ? "primary" : "error"}
           />
         </div>
         <div className="h-full flex-1">
@@ -329,6 +330,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                 onChange={handleChange}
                 placeholder="Eg. Organizations"
                 value={blueprint?.title || ""}
+                variant={blueprint?.title ? "primary" : "error"}
               />
               <div className="self-end pb-1.5">
                 <IconPicker
@@ -345,11 +347,12 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               <div className="h-full flex-1">
                 <Input
                   isDisabled={isLoading || !canCreateOrEdit}
-                  label="Field title"
+                  label="Field title (required)"
                   name="title_name"
                   onChange={handleChange}
                   placeholder="Eg. Name / Title / First name / etc."
                   value={blueprint.title_name || ""}
+                  variant={blueprint?.title_name ? "primary" : "error"}
                 />
               </div>
               <div className="h-full w-1/4">
