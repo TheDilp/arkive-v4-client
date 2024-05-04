@@ -79,6 +79,7 @@ export function DictionaryDrawer({ data }: Props) {
               onChange={handleChange}
               placeholder="Eg. English dictionary"
               value={dictionary?.title || ""}
+              variant={dictionary?.title ? "primary" : "error"}
             />
             <span className="h-8 self-end">
               <IconPicker icon={dictionary?.icon || undefined} name="icon" onChange={handleChange} />
