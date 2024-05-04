@@ -178,12 +178,14 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   isDisabled={
                     (!!character && !!mapPin.character_id) || !permissions?.update_map_pins || !permissions?.read_characters
                   }
+                  label="Character (required)"
                   name="character_id"
                   onChange={({ value: id, label, image: portrait_id }) => {
                     setCharacter({ id, full_name: label || "", portrait_id });
                   }}
                   placeholder="Type at least 2 characters"
                   searchEntity="characters"
+                  variant={character && mapPin?.character_id ? "primary" : "error"}
                 />
               )}
               <div className="flex flex-nowrap justify-between">
@@ -224,7 +226,12 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 />
 
                 <div className="flex w-16 flex-col justify-between">
-                  <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Icon (required)</span>
+                  <span
+                    className={`block min-h-[20px] truncate text-center text-sm ${
+                      mapPin?.icon ? "text-red-300" : "text-red-500"
+                    }`}>
+                    Icon (required)
+                  </span>
                   <div className="flex items-center justify-end pb-2">
                     <div className="w-1/2">
                       <ColorPicker hasCustom name="color" onChange={handleChange} value={mapPin.color as string} />
@@ -235,6 +242,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                         iconColor={mapPin.color || "#ffffff"}
                         name="icon"
                         onChange={handleChange}
+                        variant={mapPin?.icon ? "primary" : "error"}
                       />
                     </div>
                   </div>
