@@ -203,7 +203,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               </div>
             </div>
           ) : (
-            <>
+            <div className="flex flex-col gap-y-2">
               <div className="flex flex-nowrap gap-x-2">
                 <Select
                   label="Map pin type (optional)"
@@ -280,7 +280,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
               </div>
               <div className="flex flex-nowrap justify-between">
                 <span className="block min-h-[20px] truncate">Public:</span>
-                <div className="flex items-center gap-x-2 pb-2">
+                <div className="flex w-[26px] items-center gap-x-2 pb-2">
                   <Checkbox name="is_public" onChange={handleChange} value={!!mapPin?.is_public} />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                   />
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       ) : null}
