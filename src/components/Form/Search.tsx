@@ -464,17 +464,6 @@ export function Search({
                           }
                         }
 
-                        // onChange({
-                        //   name,
-                        //   value: item.value,
-                        //   label: item.label,
-                        //   color: item?.color,
-                        //   image: item?.image,
-                        //   parent_id: item?.parent_id,
-                        //   type: item?.type,
-                        //   icon: item?.icon,
-                        // });
-
                         if (hasShownOption) setDisplayValue(item.label);
                         if (!isMultiple) {
                           remove();

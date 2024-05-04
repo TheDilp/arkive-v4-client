@@ -214,12 +214,7 @@ export function SearchDrawer() {
                                 id={result_item.id}
                                 image_id={result_item?.portrait_id}
                                 link={getEntityLink(project_id as string, name, result_item.id, undefined)}
-                                title={`${result_item.full_name}
-                                ${
-                                  "parent_title" in result_item && result_item?.parent_title
-                                    ? `(${result_item.parent_title})`
-                                    : ""
-                                }`}
+                                title={`${result_item.full_name}`}
                                 type={name}
                               />
                             ) : (
@@ -239,10 +234,6 @@ export function SearchDrawer() {
                                 )}
                                 title={`${"title" in result_item ? result_item.title : ""} ${
                                   "label" in result_item ? result_item?.label || "(No label)" : ""
-                                } ${
-                                  "parent_title" in result_item && result_item?.parent_title
-                                    ? `(${result_item.parent_title})`
-                                    : ""
                                 }`}
                                 type={name}
                               />
@@ -273,6 +264,11 @@ export function SearchDrawer() {
                     />
                   ) : (
                     <EntityPreview
+                      icon={
+                        "icon" in item
+                          ? item.icon || getDefaultEntityIcon(searchCategory)
+                          : getDefaultEntityIcon(searchCategory)
+                      }
                       id={item.value}
                       image_id={item.image}
                       link={getEntityLink(

@@ -12,10 +12,13 @@ import {
   CharacterType,
   FieldTypes,
   RandomTableOptionType,
+  SearchableEntities,
 } from "../../types";
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
-export function getDefaultEntityIcon(type: AvailableEntityType | AvailableSubEntityType): AvailableIcons {
+export function getDefaultEntityIcon(
+  type: AvailableEntityType | AvailableSubEntityType | SearchableEntities | null,
+): AvailableIcons {
   if (type === "characters") return IconEnum.character;
   if (type === "documents") return IconEnum.document;
   if (type === "maps") return IconEnum.map;
