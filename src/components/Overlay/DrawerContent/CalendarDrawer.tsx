@@ -84,7 +84,7 @@ function MonthsSection({
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
-                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
+                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
                         draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
                       {...provided.draggableProps}
@@ -102,14 +102,17 @@ function MonthsSection({
                         onChange={handleChange}
                         placeholder="Eg November"
                         value={item.title}
+                        variant={item?.title ? "primary" : "error"}
                       />
                       <div className="w-1/4">
                         <Input
                           label="Days in month (required)"
+                          min={1}
                           name={`[${index}].days`}
                           onChange={handleChange}
                           type="number"
                           value={item.days ?? 0}
+                          variant={typeof item?.days === "number" ? "primary" : "error"}
                         />
                       </div>
                       <div className="h-10 self-end">
@@ -157,7 +160,7 @@ function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatc
                   {(provided, draggableSnapshot) => (
                     <div
                       ref={provided.innerRef}
-                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded bg-zinc-800 px-1 ${
+                      className={`my-1 flex w-full flex-nowrap items-center gap-x-2 rounded px-1 ${
                         draggableSnapshot.isDragging ? "ml-8 w-full rounded bg-transparent bg-none shadow-sm" : ""
                       }`}
                       {...provided.draggableProps}
@@ -176,6 +179,7 @@ function DaysSection({ days, setDays }: { days: DayStateType[]; setDays: Dispatc
                         onChange={handleChange}
                         placeholder="Eg Saturday"
                         value={item.title}
+                        variant={item?.title ? "primary" : "error"}
                       />
                       <div className="h-10 self-end">
                         <Button
@@ -499,9 +503,15 @@ export function CalendarDrawer({ data }: Props) {
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
-        <div className="max-h-[90%] overflow-y-auto">
+        <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
           <div className="flex flex-nowrap gap-x-2">
-            <Input label="Title (required)" name="title" onChange={handleChange} value={calendar?.title || ""} />
+            <Input
+              label="Title (required)"
+              name="title"
+              onChange={handleChange}
+              value={calendar?.title || ""}
+              variant={calendar?.title ? "primary" : "error"}
+            />
 
             <div className="self-end pb-1.5">
               <IconPicker icon={calendar?.icon || IconEnum.calendar} name="icon" onChange={handleChange} />
@@ -545,11 +555,16 @@ export function CalendarDrawer({ data }: Props) {
             <span>Is public:</span>
             <Checkbox name="is_public" onChange={handleChange} value={calendar?.is_public ?? false} />
           </div>
-
-          <Collapsible icon={IconEnum.moon} label="Months (required)">
+          <Collapsible
+            icon={IconEnum.moon}
+            label="Months (required)"
+            variant={months?.length && !months?.some((m) => !m.title || !m.days) ? "primary" : "error"}>
             <MonthsSection months={months} setMonths={setMonths} />
           </Collapsible>
-          <Collapsible icon={IconEnum.sun} label="Days (required)">
+          <Collapsible
+            icon={IconEnum.sun}
+            label="Days (required)"
+            variant={days?.length && !days?.some((d) => !d.title) ? "primary" : "error"}>
             <DaysSection days={days} setDays={setDays} />
           </Collapsible>
           <Collapsible icon={IconEnum.leap_day} label="Leap days (optional)">
@@ -564,10 +579,11 @@ export function CalendarDrawer({ data }: Props) {
             <div className="h-8 w-8">
               <Button
                 icon={IconEnum.add}
+                isDisabled={!months?.length}
                 onClick={() =>
                   handleChange({
                     name: "eras",
-                    value: (calendar.eras || []).concat({
+                    value: (calendar?.eras || []).concat({
                       id: crypto.randomUUID(),
                       title: "New era",
                       parent_id: calendar.id as string,
@@ -583,6 +599,7 @@ export function CalendarDrawer({ data }: Props) {
                     }),
                   })
                 }
+                tooltip={months?.length ? undefined : "Calendar must have at least one month"}
                 variant="info"
               />
             </div>
