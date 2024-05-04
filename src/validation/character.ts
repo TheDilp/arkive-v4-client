@@ -27,6 +27,7 @@ export const InsertCharacterSchema = z.object({
     character_fields: z
       .object({
         id: z.string(),
+        characters: z.object({ related_id: z.string() }).array().optional().nullable(),
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),
@@ -99,6 +100,7 @@ export const UpdateCharacterSchema = z.object({
     character_fields: z
       .object({
         id: z.string(),
+        characters: z.object({ related_id: z.string() }).array().optional().nullable(),
         documents: z.object({ related_id: z.string() }).array().optional().nullable(),
         map_pins: z.object({ related_id: z.string() }).array().optional().nullable(),
         images: z.object({ related_id: z.string() }).array().optional().nullable(),

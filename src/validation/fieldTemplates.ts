@@ -12,6 +12,8 @@ const FieldTypeSchema = z.union([
   z.literal("dice_roll"),
   z.literal("date"),
   z.literal("random_table"),
+  z.literal("characters_single"),
+  z.literal("characters_multiple"),
   z.literal("documents_single"),
   z.literal("documents_multiple"),
   z.literal("images_single"),
