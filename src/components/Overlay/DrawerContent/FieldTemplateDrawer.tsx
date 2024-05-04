@@ -76,6 +76,7 @@ function FieldRow({
             onChange={changeField}
             placeholder="Eg. Location"
             value={title}
+            variant={title ? "primary" : "error"}
           />
         </div>
         <div className="h-full flex-1">
@@ -318,6 +319,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 name="title"
                 onChange={handleChange}
                 value={template?.title || ""}
+                variant={template?.title ? "primary" : "error"}
               />
             </div>
             <div className="w-20">
@@ -336,6 +338,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               handleChange={handleChange}
               label="Used for entities with these tags (required)"
               tags={template?.tags || []}
+              variant={template?.tags?.length ? "primary" : "error"}
             />
           </div>
         </>
