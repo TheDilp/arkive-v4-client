@@ -189,6 +189,7 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
                               onChange={handleChange}
                               placeholder="Eg New layer"
                               value={item.title}
+                              variant={item.title ? "primary" : "error"}
                             />
                           </div>
                           {item?.image ? (
@@ -215,6 +216,7 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
                                 handleChange({ name, value: { id: value, title: label } });
                               }}
                               type="map_images"
+                              variant={item?.image?.title && item?.image_id ? "primary" : "error"}
                             />
                           )}
                           <div className="h-10 self-end">
