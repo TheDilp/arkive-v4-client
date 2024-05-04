@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { TagType } from "../../types";
+import { TagType, Variant } from "../../types";
 import { Badge } from "../Misc";
 import { Search } from "./Search";
 
@@ -11,9 +11,18 @@ type Props = {
   handleChange: (newData: { name: string; value: Omit<TagType, "owner_id" | "permissions" | "deleted_at">[] }) => void;
   isMultiple?: boolean;
   isDisabled?: boolean;
+  variant?: Variant;
 };
 
-export function TagInput({ tags, label: componentLabel, handleChange, isMultiple = true, isDisabled, isAutofocused }: Props) {
+export function TagInput({
+  tags,
+  label: componentLabel,
+  handleChange,
+  isMultiple = true,
+  isDisabled,
+  isAutofocused,
+  variant,
+}: Props) {
   const { project_id } = useParams();
   return (
     <div className="flex flex-col gap-y-2">
@@ -45,6 +54,7 @@ export function TagInput({ tags, label: componentLabel, handleChange, isMultiple
         placeholder="Type at least 2 characters"
         searchEntity="tags"
         value={isMultiple ? tags.map((t) => t.id) : undefined}
+        variant={variant || "primary"}
       />
 
       <div className="flex flex-wrap gap-2">
