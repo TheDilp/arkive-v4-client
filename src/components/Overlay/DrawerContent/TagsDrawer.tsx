@@ -80,10 +80,11 @@ export function TagsDrawer() {
           {tags.map((tag, index) => (
             <div key={tag.id} className="flex items-end gap-x-2">
               <Input
-                label="Tag name (required, must be unique)"
+                label="Tag name (required, must be unique for entire project)"
                 name={`[${index}].title`}
                 onChange={handleChange}
                 value={tag.title}
+                variant={tag.title ? "primary" : "error"}
               />
               <div className="self-end pb-2">
                 <ColorPicker name={`[${index}].color`} onChange={handleChange} value={tag.color} />
