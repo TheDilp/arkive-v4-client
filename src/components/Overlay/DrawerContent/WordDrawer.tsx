@@ -88,7 +88,7 @@ export function WordDrawer({ data }: Props) {
 
   return (
     <DrawerLayout>
-      <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <div className="flex flex-col gap-y-2">
           {data?.title ? (
@@ -99,8 +99,20 @@ export function WordDrawer({ data }: Props) {
               value={word?.parent_id || ""}
             />
           ) : null}
-          <Input label="Word (required)" name="title" onChange={handleChange} value={word?.title || ""} />
-          <Input label="Translation (required)" name="translation" onChange={handleChange} value={word?.translation || ""} />
+          <Input
+            label="Word (required)"
+            name="title"
+            onChange={handleChange}
+            value={word?.title || ""}
+            variant={word?.title ? "primary" : "error"}
+          />
+          <Input
+            label="Translation (required)"
+            name="translation"
+            onChange={handleChange}
+            value={word?.translation || ""}
+            variant={word?.translation ? "primary" : "error"}
+          />
           <div className="h-96">
             <Textarea label="Context (optional)" name="description" onChange={handleChange} value={word?.description || ""} />
           </div>
