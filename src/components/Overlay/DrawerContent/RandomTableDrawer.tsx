@@ -62,7 +62,13 @@ function OptionInput({
     <>
       <div className="flex flex-col items-center gap-x-2 border-zinc-700">
         <div className="flex w-full items-center gap-x-2">
-          <Input label="Title (required)" name={`${name}.title`} onChange={handleChange} value={title || ""} />
+          <Input
+            label="Title (required)"
+            name={`${name}.title`}
+            onChange={handleChange}
+            value={title || ""}
+            variant={title ? "primary" : "error"}
+          />
           {removeSuboption ? (
             <div className="mb-2 h-6 w-6 self-end">
               <Button hasNoBackground icon={IconEnum.trash} isIconOnly onClick={removeSuboption} variant="error" />
@@ -138,6 +144,7 @@ export function RandomTableDrawer({ data }: Props) {
               onChange={handleChange}
               placeholder="Eg. Character classes"
               value={randomTable?.title || ""}
+              variant={randomTable?.title ? "primary" : "error"}
             />
           </div>
           <div className="w-full">
@@ -197,7 +204,8 @@ export function RandomTableDrawer({ data }: Props) {
                   },
                 ]}
                 initialOpen={option.title === "New option"}
-                label={option.title}>
+                label={option.title}
+                variant={option?.title ? "primary" : "error"}>
                 <div className="flex flex-col gap-y-2 p-2">
                   <OptionInput
                     description={option?.description || ""}
