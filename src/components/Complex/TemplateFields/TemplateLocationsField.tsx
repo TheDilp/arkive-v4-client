@@ -38,7 +38,17 @@ export function TemplateLocationsField({
             isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
+            onChange={({ value, label, icon, parent_id }) => {
+              if ((currentValue || [])?.some((doc) => doc.related_id === value)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.map_pins`,
+                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                  },
+                ]);
+                return;
+              }
               handleChange([
                 { name: `${name}.id`, value: id },
                 {
@@ -50,7 +60,6 @@ export function TemplateLocationsField({
                       parent_id,
                       title: label,
                       icon,
-                      project_id: entity_project_id || project_id,
                     },
                   },
                 },

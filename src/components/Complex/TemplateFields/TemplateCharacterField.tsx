@@ -36,9 +36,20 @@ export function TemplateCharacterField({
         <Search
           isDisabled={isDisabled}
           isGlobal={isGlobal}
-          isMultiple
+          isMultiple={fieldType === "characters_multiple"}
           name={name}
-          onChange={({ value, label, image, project_id: character_project_id }) => {
+          onChange={({ value, label, image }) => {
+            if ((currentValue || [])?.some((character) => character.related_id === value)) {
+              handleChange([
+                { name: `${name}.id`, value: id },
+                {
+                  name: `${name}.characters`,
+                  value: (currentValue || []).filter((t) => t.related_id !== value),
+                },
+              ]);
+              return;
+            }
+
             handleChange([
               { name: `${name}.id`, value: id },
               {
@@ -49,7 +60,6 @@ export function TemplateCharacterField({
                     id: value,
                     full_name: label,
                     portrait_id: image,
-                    project_id: character_project_id || project_id,
                   },
                 },
               },

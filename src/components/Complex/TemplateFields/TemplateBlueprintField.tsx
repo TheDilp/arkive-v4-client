@@ -41,7 +41,17 @@ export function TemplateBlueprintField({
             isGlobal={isGlobal}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, icon, project_id: entity_project_id }) => {
+            onChange={({ value, label, icon }) => {
+              if ((currentValue || [])?.some((bpi) => bpi.related_id === value)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.blueprint_instances`,
+                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                  },
+                ]);
+                return;
+              }
               handleChange([
                 { name: `${name}.id`, value: id },
                 {
@@ -52,7 +62,6 @@ export function TemplateBlueprintField({
                       id: value,
                       title: label,
                       icon,
-                      project_id: entity_project_id || project_id,
                     },
                   },
                 },

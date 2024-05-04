@@ -40,6 +40,16 @@ export function TemplateEventField({
             label={isCollapsible ? "" : title}
             name={name}
             onChange={({ value, label, icon, parent_id, project_id: entity_project_id }) => {
+              if ((currentValue || [])?.some((event) => event.related_id === value)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.events`,
+                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                  },
+                ]);
+                return;
+              }
               handleChange([
                 { name: `${name}.id`, value: id },
                 {

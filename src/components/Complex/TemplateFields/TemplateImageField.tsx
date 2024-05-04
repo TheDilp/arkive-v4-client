@@ -32,9 +32,20 @@ export function TemplateImageField({
         {isDisabled ? null : (
           <Search
             isGlobal={isGlobal}
+            isMultiple={fieldType === "images_multiple"}
             label={isCollapsible ? "" : title}
             name={name}
-            onChange={({ value, label, project_id: entity_project_id }) => {
+            onChange={({ value, label }) => {
+              if ((currentValue || [])?.some((image) => image.related_id === value)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.images`,
+                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                  },
+                ]);
+                return;
+              }
               handleChange([
                 { name: `${name}.id`, value: id },
                 {
@@ -44,7 +55,6 @@ export function TemplateImageField({
                     image: {
                       id: value,
                       title: label,
-                      project_id: entity_project_id,
                     },
                   },
                 },
@@ -52,6 +62,7 @@ export function TemplateImageField({
             }}
             placeholder="Press enter to search."
             searchEntity="images"
+            value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
           />
         )}
         {(currentValue || [])?.map((val) => {
