@@ -98,8 +98,7 @@ function handleNumberChange({
     onChange({ name, value: 1 });
     return;
   }
-
-  onChange({ name, value: parsed });
+  onChange({ name, value: Math.abs(parsed) });
 }
 
 export function Input({
@@ -173,7 +172,7 @@ export function Input({
           placeholder={placeholder}
           step={step}
           type={type}
-          value={value}
+          value={type === "number" ? value?.toString() : value}
         />
         {suffix ? <span className="pl-1">{suffix}</span> : null}
 
