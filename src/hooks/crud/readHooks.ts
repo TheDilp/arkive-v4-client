@@ -92,7 +92,7 @@ export function useGetEntity<EntityType>(
         url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
         isPublic: options?.isPublic,
       });
-      if (!data?.role_access) {
+      if (!data?.role_access && !options?.isPublic) {
         createNotification({
           title: `Your current role in this project does not have permission to view this ${getSingularEntityType(type)}.`,
           timer: 5,
