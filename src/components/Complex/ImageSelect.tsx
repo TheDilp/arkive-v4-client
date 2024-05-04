@@ -6,14 +6,23 @@ import { dialogAtom, IconEnum } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Search } from "../Form";
 
-export function ImageSelect({ name, onChange, label, value, type, isIconOnly, helperText, isDisabled }: ImageSelectType) {
+export function ImageSelect({
+  name,
+  onChange,
+  label,
+  value,
+  type,
+  isIconOnly,
+  helperText,
+  isDisabled,
+  variant,
+}: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
 
   const permissions = useHasPermissions(["read_assets", "create_assets"], undefined);
 
   return (
     <div className="flex w-full flex-col">
-      <div className="truncate text-sm text-zinc-300">{label}</div>
       <div className="grid grid-cols-6 gap-x-2">
         <div className={isIconOnly ? "col-span-5" : "col-span-4"}>
           {value ? (
@@ -35,17 +44,19 @@ export function ImageSelect({ name, onChange, label, value, type, isIconOnly, he
               helperText={helperText}
               imageType={type}
               isDisabled={isDisabled || !permissions?.read_assets}
+              label={label}
               limit={100}
               name={name}
               onChange={onChange}
               placeholder="Search images"
               searchEntity={type === "map_images" ? "map_images" : "images"}
               value={value}
+              variant={variant || "primary"}
             />
           )}
         </div>
 
-        <div className={isIconOnly ? "col-span-1" : "col-span-2"}>
+        <div className={`self-end ${isIconOnly ? "col-span-1" : "col-span-2"}`}>
           <Button
             icon={IconEnum.upload}
             isDisabled={isDisabled || !permissions?.create_assets}
