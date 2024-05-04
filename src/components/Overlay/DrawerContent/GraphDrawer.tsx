@@ -120,6 +120,7 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
               onChange={handleChange}
               placeholder="Eg. Family tree"
               value={graph?.title || ""}
+              variant={graph?.title ? "primary" : "error"}
             />
             <div className="self-end pb-1.5">
               <IconPicker icon={graph?.icon || IconEnum.graph} name="icon" onChange={handleChange} />
