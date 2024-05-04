@@ -74,9 +74,9 @@ const SearchClasses = tv({
         helperText: "text-orange-400",
       },
       error: {
-        base: "border-red-600",
-        input: "border-red-600",
-        label: "text-red-500",
+        base: "border-red-700",
+        input: "border-red-700",
+        label: "text-red-600",
         helperText: "text-red-500",
       },
     },

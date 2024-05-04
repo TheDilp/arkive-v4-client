@@ -43,8 +43,8 @@ const InputClasses = tv({
         helperText: "text-orange-400",
       },
       error: {
-        inputContainer: "border-red-600",
-        label: "text-red-500",
+        inputContainer: "border-red-700",
+        label: "text-red-600",
         helperText: "text-red-500",
       },
     },
