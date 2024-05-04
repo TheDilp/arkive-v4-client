@@ -67,9 +67,8 @@ export function TemplateCharacterField({
           }}
           placeholder="Press enter to search."
           searchEntity="characters"
-          value={currentValue?.map((c) => c.related_id)}
+          value={fieldType === "characters_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
         />
-
         {(currentValue || [])?.map((val) => {
           return (
             <EntityPreview

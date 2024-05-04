@@ -67,6 +67,7 @@ export function TemplateDocumentField({
             }}
             placeholder="Press enter to search."
             searchEntity="documents"
+            value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
         )}
         {(currentValue || [])?.map((val) => {
