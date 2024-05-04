@@ -1,4 +1,4 @@
-import { Size } from "../../baseTypes";
+import { Size, Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
 export interface CollapsibleType {
@@ -9,4 +9,5 @@ export interface CollapsibleType {
   initialOpen?: boolean;
   actions?: ButtonType[];
   size?: Size;
+  variant?: Variant;
 }
