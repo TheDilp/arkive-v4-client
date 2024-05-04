@@ -501,9 +501,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
               value={instance?.parent_id}
             />
           ) : null}
-          {!!blueprint?.data && !blueprint?.data?.blueprint_fields?.length && instance?.parent_id ? (
-            <Alert label="This blueprint has no fields." variant="info" />
-          ) : null}
+
           {instance?.parent_id ? (
             <>
               <div>
@@ -513,6 +511,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
                   name="title"
                   onChange={handleChange}
                   value={instance?.title}
+                  variant={instance?.title ? "primary" : "error"}
                 />
               </div>
               <div className="mt-2 flex w-full items-center justify-between">
@@ -528,13 +527,18 @@ export function BlueprintInstanceDrawer({ data }: Props) {
           ) : null}
         </div>
       ) : null}
-      {tabs[selectedTab].id === "2" && blueprint?.data?.blueprint_fields?.length ? (
-        <FieldTemplateRows
-          blueprint_fields={blueprint.data.blueprint_fields}
-          blueprint_fields_data={instance.blueprint_fields}
-          handleChange={handleChange}
-          isDisabled={!canCreateOrEdit}
-        />
+      {tabs[selectedTab].id === "2" ? (
+        <>
+          {!!blueprint?.data && !blueprint?.data?.blueprint_fields?.length && instance?.parent_id ? (
+            <Alert label="This blueprint has no fields." variant="info" />
+          ) : null}
+          <FieldTemplateRows
+            blueprint_fields={blueprint?.data?.blueprint_fields || []}
+            blueprint_fields_data={instance.blueprint_fields}
+            handleChange={handleChange}
+            isDisabled={!canCreateOrEdit}
+          />
+        </>
       ) : null}
       {tabs[selectedTab].id === "3" ? (
         <div>
