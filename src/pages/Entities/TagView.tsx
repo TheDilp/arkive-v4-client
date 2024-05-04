@@ -359,6 +359,7 @@ export function TagView() {
       <div className="sticky top-0 flex h-12 w-full items-center justify-end gap-x-2">
         <div className="w-52">
           <Input
+            isClearable
             name="quick_filter"
             onChange={({ value }) => setFilter(value as string)}
             placeholder="Quick search by title"
