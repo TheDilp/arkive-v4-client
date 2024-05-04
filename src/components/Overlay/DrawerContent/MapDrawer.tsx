@@ -89,6 +89,7 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
             name="title"
             onChange={handleChange}
             value={map?.title || ""}
+            variant={map?.title ? "primary" : "error"}
           />
           <ImageSelect
             isDisabled={!canCreateOrEdit}
@@ -98,6 +99,7 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
             onChange={handleChange}
             type="map_images"
             value={map?.image_id}
+            variant={map?.image_id ? "primary" : "error"}
           />
           <FolderSelect
             handleChange={handleChange}
