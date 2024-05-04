@@ -15,6 +15,10 @@
   }
 }
 
+.remirror-editor-wrapper:has(.remirror-is-empty) {
+  @apply min-h-96;
+}
+
 .remirror-editor,
 .staticRendererContainer {
   @apply max-w-full p-4 font-lato focus-visible:outline-none;
