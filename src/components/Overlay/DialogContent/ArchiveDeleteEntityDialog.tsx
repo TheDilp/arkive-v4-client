@@ -46,12 +46,12 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
             Deleting a folder will also delete all of its children!
           </p>
         ) : null}
-        {action === "arkive" ? (
+        {/* {action === "arkive" ? (
           <p className="text-center text-red-500">
             <span className="text-red-600">WARNING: </span>
             Arkived entities are deleted automatically after 14 days!
           </p>
-        ) : null}
+        ) : null} */}
         {action === "delete" ? <p className="text-center text-sm text-red-400">This action cannot be undone.</p> : null}
       </div>
 
