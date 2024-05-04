@@ -281,7 +281,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   );
 
   const permissions = useHasPermissions(
-    ["read_character_fields_templates", "update_character_fields_templates"],
+    ["read_character_fields_templates", "create_character_fields_templates", "update_character_fields_templates"],
     existingTemplate?.data?.owner_id,
   );
   const tabs = getTabs(permissions, existingTemplate?.data?.id);
