@@ -131,6 +131,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               onChange={handleChange}
               placeholder="E.g. Important document"
               value={document?.title || ""}
+              variant={document?.title ? "primary" : "error"}
             />
             <div className="self-end pb-1.5">
               <IconPicker
