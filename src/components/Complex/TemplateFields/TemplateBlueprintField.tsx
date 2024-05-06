@@ -39,6 +39,7 @@ export function TemplateBlueprintField({
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}
+            isMultiple={fieldType === "blueprints_multiple"}
             label={isCollapsible ? "" : title}
             name={name}
             onChange={({ value, label, icon }) => {
