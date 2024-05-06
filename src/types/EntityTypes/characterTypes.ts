@@ -51,6 +51,10 @@ export interface CharacterCharacterFieldType {
   parent_id: string;
   field_type: FieldTypes;
 
+  characters: {
+    character: { id: string; full_name: string; portrait_id: string; project_id: string };
+    related_id: string;
+  }[];
   blueprint_instances: {
     blueprint_instance: Pick<BlueprintInstanceType, "id" | "title" | "parent_id"> & { icon: string; project_id: string };
     related_id: string;

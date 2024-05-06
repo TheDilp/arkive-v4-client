@@ -41,6 +41,7 @@ import {
   Skeleton,
   TemplateBlueprintField,
   TemplateBooleanField,
+  TemplateCharacterField,
   TemplateDiceRollField,
   TemplateDocumentField,
   TemplateEventField,
@@ -235,6 +236,24 @@ function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 name={baseName}
                 random_table={template_field.random_table}
+                title={template_field.title}
+              />
+            );
+          }
+
+          if (template_field.field_type === "characters_single" || template_field.field_type === "characters_multiple") {
+            return (
+              <TemplateCharacterField
+                key={template_field.id}
+                currentValue={
+                  character_fields_data[`${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}`]
+                    ?.characters
+                }
+                fieldType={template_field.field_type}
+                handleChange={handleChange}
+                id={template_field.id}
+                isDisabled={!hasCreateOrEdit}
+                name={baseName}
                 title={template_field.title}
               />
             );

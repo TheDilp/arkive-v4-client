@@ -134,6 +134,25 @@ export function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "date" ? <DateField field={character_field} fieldData={character_field_data} /> : null}
 
+      {character_field.field_type === "characters_single" || character_field.field_type === "characters_multiple" ? (
+        <div className="grid w-full grid-cols-6 gap-1 truncate">
+          <CarouselEntityPreview
+            field_label={character_field.title}
+            isPublic={isPublic}
+            items={(character_field_data?.characters || [])
+              .filter((character) => !!character.character)
+              .map((character) => ({
+                id: character.character.id,
+                parent_id: undefined,
+                title: character.character.full_name || "",
+                image_id: character?.character?.portrait_id,
+                icon: IconEnum.character,
+                type: "characters",
+                link: getEntityLink(project_id as string, "characters", character.related_id, null, isPublic),
+              }))}
+          />
+        </div>
+      ) : null}
       {character_field.field_type === "blueprints_single" || character_field.field_type === "blueprints_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <CarouselEntityPreview

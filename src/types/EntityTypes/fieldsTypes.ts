@@ -19,6 +19,8 @@ export type FieldTypes =
   | "locations_multiple"
   | "number"
   | "textarea"
+  | "characters_single"
+  | "characters_multiple"
   | "blueprints_single"
   | "blueprints_multiple"
   | "events_single"
