@@ -15,7 +15,7 @@ const NotificationClasses = tv({
     titleContainer: "text-sm font-normal truncate h-fit text-center flex items-center gap-x-2 max-w-[25rem] justify-between ",
     title: "text-base truncate",
     description: "text-center text-sm mt-1 flex-1",
-    iconContainer: "flex items-center justify-center rounded",
+    iconContainer: "flex items-center justify-center rounded w-8 h-8 ml-1 min-h-[2rem] min-w-[2rem]",
     userImage: "absolute top-10 left-6",
     progress: "absolute left-0 top-0 h-1 transition-all",
   },
@@ -55,14 +55,7 @@ const NotificationClasses = tv({
         base: "animate-in zoom-in m-auto",
       },
     },
-    hasImage: {
-      true: {
-        iconContainer: "bg-transparent",
-      },
-      false: {
-        iconContainer: "w-8 h-8 min-h-[2rem] min-w-[2rem]",
-      },
-    },
+
     hasTitleBorder: {
       true: {
         titleContainer: "border-b border-zinc-600 pb-2",
@@ -75,6 +68,22 @@ const NotificationClasses = tv({
       },
     },
   },
+  compoundVariants: [
+    {
+      hasUserImage: true,
+      hasEntityImage: true,
+      class: {
+        iconContainer: "bg-transparent",
+      },
+    },
+    {
+      hasUserImage: true,
+      hasEntityImage: false,
+      class: {
+        iconContainer: "rounded",
+      },
+    },
+  ],
 });
 
 function DiceRollNotification({ id, data }: { id: string; data: DiceRollType }) {
@@ -178,7 +187,14 @@ export function Notification({
     progress,
     userImage,
     iconContainer,
-  } = NotificationClasses({ variant, position, hasTitleBorder, hasNoTruncate, hasImage: !!image_id || !!image_url });
+  } = NotificationClasses({
+    variant,
+    position,
+    hasTitleBorder,
+    hasNoTruncate,
+    hasUserImage: !!image_url,
+    hasEntityImage: !!image_id,
+  });
   return (
     <div className={base()} role="alert">
       <div
@@ -191,17 +207,17 @@ export function Notification({
       {!type ? (
         <div className="flex w-fit flex-col items-center justify-between">
           <div className={titleContainer()}>
-            {icon && !image_id && !image_url ? (
+            {icon && !image_id ? (
               <div className={iconContainer()}>
                 <Icon fontSize={22} icon={icon} />
               </div>
             ) : null}
-            {image_id || (!image_id && image_url) ? (
+            {image_id ? (
               <div className={iconContainer()}>
-                <Avatar image={image_id ? getImageURL(project_id as string, "images", image_id) : image_url} />
+                <Avatar image={getImageURL(project_id as string, "images", image_id)} />
               </div>
             ) : null}
-            {image_id && image_url ? (
+            {image_url ? (
               <div className={userImage()}>
                 <Avatar image={image_url} size="xs" />
               </div>
