@@ -125,11 +125,15 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
         if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
-        if (authUser?.id && lastJsonMessage.userId && authUser?.id === lastJsonMessage?.userId) return;
+        // if (authUser?.id && lastJsonMessage.userId && authUser?.id === lastJsonMessage?.userId) return;
         if (lastJsonMessage?.notification_type) {
           const entityType = getEntityTypeFromNotificationType(lastJsonMessage?.notification_type);
           queryClient.invalidateQueries(["allEntities", project_id, entityType]);
-          if (featureFlags?.[lastJsonMessage?.notification_type]) {
+          if (
+            (lastJsonMessage?.notification_type === `${entityType}_arkive_notification` &&
+              featureFlags?.[`${entityType}_delete_notification`]) ||
+            featureFlags?.[lastJsonMessage?.notification_type]
+          ) {
             createNotification({
               icon: getDefaultEntityIcon(lastJsonMessage.entity),
               title: lastJsonMessage.message,

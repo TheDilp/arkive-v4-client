@@ -326,7 +326,7 @@ export function getIconUrlFromIconEnum(icon: string, color?: string): string {
 }
 
 export function getEntityTypeFromNotificationType(notification_type: string): string {
-  const entityType = notification_type.replace("_notification", "").replace(/_(create|update|delete)/, "");
+  const entityType = notification_type.replace("_notification", "").replace(/_(create|update|arkive|delete)/, "");
   return entityType;
 }
 

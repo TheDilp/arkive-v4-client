@@ -16,7 +16,7 @@ const NotificationClasses = tv({
     title: "text-base truncate",
     description: "text-center text-sm mt-1 flex-1",
     iconContainer: "flex items-center justify-center rounded w-8 h-8 ml-1 min-h-[2rem] min-w-[2rem]",
-    userImage: "absolute top-10 left-6",
+    userImage: "absolute top-8 left-6",
     progress: "absolute left-0 top-0 h-1 transition-all",
   },
   variants: {
