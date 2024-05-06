@@ -227,7 +227,7 @@ function CharacterFieldsFilters({
       ) : null}
       {relationFiltersList.includes(field?.field_type) ? (
         <div className="col-span-6">
-          <div className="flex items-center [&>div>*>span>a>span]:max-w-[5.5rem]">
+          <div className="flex items-center [&>div>*>span>a>span]:max-w-[9.5rem]">
             {field?.filter?.value ? (
               <div className="w-full">
                 <EntityPreview
