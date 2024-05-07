@@ -133,6 +133,9 @@ export function getNodeImage(node: NodeType, project_id: string, { width, height
   if (node?.image) {
     return getThumbnailUrl(getImageURL(project_id as string, "images", node.image?.id, true), { width, height });
   }
+  if (node?.image_id) {
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node?.image_id, true), { width, height });
+  }
 
   if (node?.icon) {
     return getIconUrlFromIconEnum(node.icon, "#ffffff");
