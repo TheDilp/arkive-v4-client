@@ -37,6 +37,7 @@ export function TemplateCharacterField({
           isDisabled={isDisabled}
           isGlobal={isGlobal}
           isMultiple={fieldType === "characters_multiple"}
+          label={title}
           name={name}
           onChange={({ value, label, image }) => {
             if ((currentValue || [])?.some((character) => character.related_id === value)) {
