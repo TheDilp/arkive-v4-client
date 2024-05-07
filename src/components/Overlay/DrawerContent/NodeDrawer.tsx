@@ -15,7 +15,7 @@ import {
   TextHAlignEnum,
   TextVAlignEnum,
 } from "../../../utils/enums/GraphEnums";
-import { getNodeImage, getNodeLabel } from "../../../utils/ui/graphUtils";
+import { getNodeLabel } from "../../../utils/ui/graphUtils";
 import { UpdateNodeSchema } from "../../../validation";
 import {
   Alert,
@@ -50,7 +50,6 @@ function UpdateGraphNodes({
   setNodes,
   changedData,
   node,
-  project_id,
   rest,
 }: {
   setNodes: (arg: SetStateAction<NodeType[]>) => void;
@@ -65,7 +64,6 @@ function UpdateGraphNodes({
       const idx = newNodes.findIndex((n) => n.id === node.id);
       if (idx > -1) {
         const alteredNodeData = { ...newNodes[idx], ...(Object.keys(changedData).length ? changedData : rest) };
-
         newNodes[idx] = {
           ...alteredNodeData,
           label: getNodeLabel(alteredNodeData as NodeType),
@@ -73,13 +71,6 @@ function UpdateGraphNodes({
           event: changedData?.event || rest?.event || undefined,
           map_pin: changedData?.map_pin || rest?.map_pin || undefined,
           document: changedData?.document || rest?.document || undefined,
-          // @ts-ignore
-          background_image: alteredNodeData
-            ? getNodeImage((alteredNodeData || rest) as NodeType, project_id as string, {
-                width: alteredNodeData.width || 50,
-                height: alteredNodeData.height || 50,
-              })
-            : null,
         };
         return newNodes;
       }
@@ -155,12 +146,13 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
 
   useEffect(() => {
     if (changedData) {
-      const nodeToUpdate = { ...(changedData || {}), id: node.id };
+      const nodeToUpdate = { ...node, ...(changedData || {}), id: node.id };
       set(nodeToUpdate, "character_id", node?.character?.id ?? null);
       set(nodeToUpdate, "image_id", node?.image?.id ?? null);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { tags, ...rest } = nodeToUpdate;
+
       UpdateGraphNodes({ project_id: project_id as string, rest, node, changedData, setNodes });
     }
   }, [changedData]);
