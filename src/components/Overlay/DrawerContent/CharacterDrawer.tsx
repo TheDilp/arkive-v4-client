@@ -426,20 +426,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     data?.id,
     "characters",
     {
-      relations: { character_fields: true, relationships: true, portrait: true, tags: true },
+      relations: { character_fields: true, relationships: true, portrait: true, is_favorite: true, tags: true },
       permissions: true,
-      fields: [
-        "id",
-        "first_name",
-        "last_name",
-        "nickname",
-        "biography",
-        "age",
-        "portrait_id",
-        "is_favorite",
-        "is_public",
-        "owner_id",
-      ],
+      fields: ["id", "first_name", "last_name", "nickname", "biography", "age", "portrait_id", "is_public", "owner_id"],
     },
     {
       enabled: !!data?.id,
@@ -916,6 +905,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     related_from: character?.related_from,
                     related_to: character?.related_to,
                     related_other: character?.related_other,
+                    is_favorite: character?.is_favorite,
                   },
                 };
                 if (dataToParse?.data?.portrait?.id) {
@@ -937,6 +927,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                     related_from: character?.related_from,
                     related_to: character?.related_to,
                     related_other: character?.related_other,
+                    is_favorite: character?.is_favorite,
                   },
                 };
                 if (dataToParse?.data?.portrait?.id) {

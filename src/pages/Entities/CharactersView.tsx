@@ -666,23 +666,13 @@ export function CharactersView() {
       relations: {
         portrait: true,
         tags: true,
+        is_favorite: true,
       },
       orderBy,
       filters,
       relationFilters,
       pagination,
-      fields: [
-        "id",
-        "deleted_at",
-        "first_name",
-        "nickname",
-        "last_name",
-        "portrait_id",
-        "is_favorite",
-        "is_public",
-        "age",
-        "owner_id",
-      ],
+      fields: ["id", "deleted_at", "first_name", "nickname", "last_name", "portrait_id", "is_public", "age", "owner_id"],
       permissions: true,
       arkived: arkived === "arkive",
     },
@@ -733,7 +723,10 @@ export function CharactersView() {
       },
     },
   );
-  const { mutate } = useUpdateEntity<{ data: Partial<CharacterType> }>("characters", project_id as string);
+  const { mutate } = useUpdateEntity<{ data: Partial<CharacterType>; relations: { is_favorite: boolean } }>(
+    "characters",
+    project_id as string,
+  );
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -847,7 +840,12 @@ export function CharactersView() {
               getLink: (rowData: any) =>
                 arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
               setFavorite: (rowData: any) => {
-                mutate({ data: { id: rowData.id, is_favorite: !rowData.is_favorite } });
+                mutate({
+                  data: { id: rowData.id },
+                  relations: {
+                    is_favorite: !rowData.is_favorite,
+                  },
+                });
               },
               selectedActions,
             }}

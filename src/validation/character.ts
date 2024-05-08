@@ -19,7 +19,6 @@ export const InsertCharacterSchema = z.object({
         return val;
       }),
     map_pin_id: z.string().nullable().optional(),
-    is_favorite: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
   }),
   relations: z.object({
@@ -71,6 +70,7 @@ export const InsertCharacterSchema = z.object({
     related_to: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
     related_from: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
     related_other: z.object({ id: z.string(), relation_type_id: z.string() }).array().optional(),
+    is_favorite: z.boolean().nullable().optional(),
   }),
   permissions: InsertEntityPermissionSchema,
 });
@@ -83,7 +83,6 @@ export const UpdateCharacterSchema = z.object({
     biography: z.any().nullable().optional(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
-    is_favorite: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
     portrait_id: z
       .string()
@@ -153,6 +152,7 @@ export const UpdateCharacterSchema = z.object({
       .object({ id: z.string(), relation_type_id: z.string(), character_relationship_id: z.string().optional() })
       .array()
       .optional(),
+    is_favorite: z.boolean().nullable().optional(),
   }),
   permissions: UpdateEntityPermissionSchema,
 });
