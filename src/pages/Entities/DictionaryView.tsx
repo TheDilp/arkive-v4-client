@@ -5,7 +5,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
-import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useTable } from "../../hooks";
+import { useChangeNavbarTitle, useDeleteMany, useGetEntities, useGetEntity, useHasPermissions, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
 import {
   baseURLS,
@@ -169,6 +169,8 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("words", false, project_id);
 
+  const permissions = useHasPermissions(["read_words", "create_words", "update_words", "delete_words"], undefined);
+
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -198,7 +200,10 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       orderBy,
     },
     "words",
-    { queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || ""], isPublic },
+    {
+      queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || "filters", pagination || "pagination"],
+      isPublic,
+    },
   );
   useChangeNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
 
@@ -326,6 +331,32 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
                   }
                 },
               },
+
+              ...(permissions?.is_owner
+                ? [
+                    {
+                      icon: IconEnum.permissions,
+                      hasNoBackground: true,
+                      isIconOnly: true,
+                      tooltip: "Change access",
+                      onClick: () => {
+                        const ids = Object.values(selection || {}).flatMap((i) => i);
+
+                        setDrawer((prev) => ({
+                          ...prev,
+                          size: "lg",
+                          title: "Edit access",
+                          type: "bulk_access",
+                          data: {
+                            ids,
+                            selectablePermissions: ["read_words", "update_words", "delete_words"],
+                            type: "characters",
+                          },
+                        }));
+                      },
+                    },
+                  ]
+                : []),
             ],
           }}
           data={words?.data || []}
