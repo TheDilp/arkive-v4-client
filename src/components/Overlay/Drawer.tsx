@@ -185,20 +185,26 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
                 {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "from_template" ? <DocumentFromTemplate data={drawer?.data} /> : null}
-                {drawer.type === "maps" ? <MapDrawer data={drawer?.data} /> : null}
+                {drawer.type === "maps" ? <MapDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
-                {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} /> : null}
+                {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
                 {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
                 {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
                 {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
-                {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} /> : null}
+                {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "blueprints" ? <BlueprintDrawer data={drawer?.data} /> : null}
-                {drawer.type === "blueprint_instances" ? <BlueprintInstanceDrawer data={drawer?.data} /> : null}
-                {drawer.type === "events" ? <EventDrawer data={drawer?.data} /> : null}
-                {drawer.type === "dictionaries" ? <DictionaryDrawer data={drawer?.data} /> : null}
-                {drawer.type === "words" ? <WordDrawer data={drawer?.data} /> : null}
-                {drawer.type === "random_tables" ? <RandomTableDrawer data={drawer?.data} /> : null}
+                {drawer.type === "blueprint_instances" ? (
+                  <BlueprintInstanceDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
+                ) : null}
+                {drawer.type === "events" ? <EventDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
+                {drawer.type === "dictionaries" ? (
+                  <DictionaryDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
+                ) : null}
+                {drawer.type === "words" ? <WordDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
+                {drawer.type === "random_tables" ? (
+                  <RandomTableDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
+                ) : null}
                 {drawer.type === "random_table_option" ? <RandomTableOptionDrawer data={drawer?.data} /> : null}
                 {drawer.type === "random_table_options" ? <RandomTableOptionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "tags" ? <TagsDrawer /> : null}

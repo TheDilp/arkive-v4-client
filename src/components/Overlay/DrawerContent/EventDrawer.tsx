@@ -15,6 +15,7 @@ import {
 import {
   AvailableEntityType,
   CalendarType,
+  DrawerAtomType,
   EventStateType,
   EventType,
   onChangeValue,
@@ -60,6 +61,7 @@ type Props = {
     isReadOnly?: boolean;
     isPublic?: boolean;
   };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
@@ -77,7 +79,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function EventDrawer({ data }: Props) {
+export function EventDrawer({ data, exceptions }: Props) {
   const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
   const hasId = "id" in data && data?.id;
@@ -85,14 +87,23 @@ export function EventDrawer({ data }: Props) {
   const resetDrawer = useResetAtom(drawerAtom);
   const setDrawer = useSetAtom(drawerAtom);
 
+  const [event, setEvent] = useState<EventStateType>({
+    start_month: data?.month ?? 0,
+    start_month_id: "",
+    start_day: data?.day,
+    start_year: data?.year,
+    parent_id: exceptions?.globalCreate ? null : (item_id as string),
+  });
+
   const { data: calendar, isFetching: isFetchingMonths } = useGetEntity<CalendarType>(
-    (data?.parent_id as string) || (item_id as string),
+    (data?.parent_id as string) || event?.parent_id || (item_id as string),
     "calendars",
     {
-      fields: ["hours", "minutes"],
+      fields: ["id", "title", "icon", "hours", "minutes"],
       relations: { months: true },
     },
     {
+      enabled: !exceptions?.globalCreate || (exceptions?.globalCreate && !!event?.parent_id),
       isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
     },
@@ -159,16 +170,6 @@ export function EventDrawer({ data }: Props) {
     "events",
     project_id as string,
     item_id as string,
-  );
-
-  const [event, setEvent] = useState<EventStateType>(
-    existingEvent?.data ?? {
-      start_month: data?.month ?? 0,
-      start_month_id: existingMonths?.[data?.month ?? 0]?.id,
-      start_day: data?.day,
-      start_year: data?.year,
-      parent_id: item_id as string,
-    },
   );
 
   useLayoutEffect(() => {
@@ -258,348 +259,386 @@ export function EventDrawer({ data }: Props) {
 
   return (
     <DrawerLayout>
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      <Tabs
+        onChange={(_, index) => setSelectedTab(index)}
+        selectedTab={selectedTab}
+        tabs={calendar?.data?.id ? tabs : tabs.slice(0, 1)}
+      />
       {tabs[selectedTab].id === "1" ? (
         <div className="flex flex-col gap-y-2">
-          <div className="flex flex-nowrap gap-x-2">
-            <Input
-              isReadOnly={data?.isReadOnly}
-              label="Event title (required)"
-              name="title"
+          {exceptions?.globalCreate && !event?.parent_id ? (
+            <Search
+              label="Calendar (required)"
+              name="parent_id"
               onChange={handleChange}
-              placeholder="Event title"
-              value={event?.title || ""}
+              searchEntity="calendars"
+              value={event?.parent_id}
             />
-            <div className="flex flex-col justify-between">
-              <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Color</span>
-              <div className="flex items-center justify-center gap-x-2 pb-2">
-                <ColorPicker
-                  hasCustom
+          ) : null}
+          {exceptions?.globalCreate && event?.parent_id && calendar?.data ? (
+            <EntityPreview
+              clearAction={() => handleChange({ name: "parent_id", value: null })}
+              icon={calendar?.data?.icon || IconEnum.calendar}
+              id={event?.parent_id}
+              title={calendar?.data?.title}
+              type="calendars"
+            />
+          ) : null}
+          {(exceptions?.globalCreate && calendar?.data?.id) || !exceptions?.globalCreate ? (
+            <>
+              <div className="flex flex-nowrap gap-x-2">
+                <Input
+                  isReadOnly={data?.isReadOnly}
+                  label="Event title (required)"
+                  name="title"
+                  onChange={handleChange}
+                  placeholder="Event title"
+                  value={event?.title || ""}
+                />
+                <div className="flex flex-col justify-between">
+                  <span className="block min-h-[20px] truncate text-center text-sm text-zinc-300">Color</span>
+                  <div className="flex items-center justify-center gap-x-2 pb-2">
+                    <ColorPicker
+                      hasCustom
+                      isDisabled={data?.isReadOnly}
+                      name="background_color"
+                      onChange={handleChange}
+                      value={event.background_color || ""}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Collapsible initialOpen label="Start">
+                <div className="flex flex-col gap-y-2 p-2">
+                  <div className="flex items-center justify-between gap-x-2">
+                    <Input
+                      isReadOnly={data?.isReadOnly}
+                      label="Start day (required)"
+                      max={existingMonths?.[event?.start_month || 0]?.days ?? 0}
+                      min={1}
+                      name="start_day"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.start_day || ""}
+                    />
+                    <Select
+                      isDisabled={isFetchingMonths}
+                      isLoading={isFetchingMonths}
+                      isReadOnly={data?.isReadOnly}
+                      label="Start month (required)"
+                      name="start_month"
+                      onChange={handleMonthChange}
+                      options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+                      value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
+                    />
+                    <Input
+                      isReadOnly={data?.isReadOnly}
+                      label="Start year (required)"
+                      name="start_year"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.start_year || ""}
+                    />
+                  </div>
+                  <div className="flex items-center gap-x-2">
+                    <Input
+                      isReadOnly={data?.isReadOnly}
+                      label="Start hour (optional)"
+                      max={calendar?.data?.hours ?? undefined}
+                      min={0}
+                      name="start_hours"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.start_hours ?? ""}
+                    />
+                    <Input
+                      isReadOnly={data?.isReadOnly}
+                      label="Start minutes (optional)"
+                      max={calendar?.data?.minutes ?? undefined}
+                      min={0}
+                      name="start_minutes"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.start_minutes ?? ""}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
+              <Collapsible initialOpen={!!event?.end_day && !!event?.end_month_id && !!event?.end_year} label="End (optional)">
+                <div className="flex flex-col gap-y-2 p-2">
+                  <div className="grid grid-cols-3 gap-x-2">
+                    <Input
+                      helperText={
+                        isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."
+                      }
+                      isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
+                      label="End day (optional)"
+                      max={typeof event.end_month === "number" ? existingMonths[event.end_month].days : 0}
+                      min={1}
+                      name="end_day"
+                      onChange={handleChange}
+                      placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
+                      type="number"
+                      value={event?.end_day || ""}
+                      variant={isDayCorrect ? "primary" : "error"}
+                    />
+                    <Select
+                      helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
+                      isClearable
+                      isDisabled={isFetchingMonths}
+                      isLoading={isFetchingMonths}
+                      isReadOnly={data?.isReadOnly}
+                      label="End month (optional)"
+                      name="end_month"
+                      onChange={handleMonthChange}
+                      options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
+                      value={typeof event?.end_month === "number" ? existingMonths?.[event.end_month].id : undefined}
+                      variant={isMonthCorrect ? "primary" : "error"}
+                    />
+                    <Input
+                      helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
+                      isDisabled={typeof event?.end_month !== "number"}
+                      isReadOnly={data?.isReadOnly}
+                      label="End year (optional)"
+                      name="end_year"
+                      onChange={handleChange}
+                      placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
+                      type="number"
+                      value={event?.end_year || ""}
+                      variant={isYearCorrect ? "primary" : "error"}
+                    />
+                  </div>
+                  <div className="flex items-center gap-x-2">
+                    <Input
+                      isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
+                      isReadOnly={data?.isReadOnly}
+                      label="End hour (optional)"
+                      max={calendar?.data?.hours ?? undefined}
+                      min={0}
+                      name="end_hours"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.end_hours ?? ""}
+                    />
+                    <Input
+                      isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
+                      isReadOnly={data?.isReadOnly}
+                      label="End minutes (optional)"
+                      max={calendar?.data?.minutes ?? undefined}
+                      min={0}
+                      name="end_minutes"
+                      onChange={handleChange}
+                      type="number"
+                      value={event?.end_minutes ?? ""}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
+
+              <div className="flex w-full items-center justify-between">
+                <span>Is public:</span>
+                <Checkbox
                   isDisabled={data?.isReadOnly}
-                  name="background_color"
+                  name="is_public"
                   onChange={handleChange}
-                  value={event.background_color || ""}
+                  value={event?.is_public ?? false}
                 />
               </div>
-            </div>
-          </div>
-
-          <Collapsible initialOpen label="Start">
-            <div className="flex flex-col gap-y-2 p-2">
-              <div className="flex items-center justify-between gap-x-2">
-                <Input
-                  isReadOnly={data?.isReadOnly}
-                  label="Start day (required)"
-                  max={existingMonths?.[event?.start_month || 0]?.days ?? 0}
-                  min={1}
-                  name="start_day"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.start_day || ""}
-                />
-                <Select
-                  isDisabled={isFetchingMonths}
-                  isLoading={isFetchingMonths}
-                  isReadOnly={data?.isReadOnly}
-                  label="Start month (required)"
-                  name="start_month"
-                  onChange={handleMonthChange}
-                  options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
-                  value={typeof event?.start_month === "number" ? existingMonths?.[event?.start_month]?.id : undefined}
-                />
-                <Input
-                  isReadOnly={data?.isReadOnly}
-                  label="Start year (required)"
-                  name="start_year"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.start_year || ""}
-                />
-              </div>
-              <div className="flex items-center gap-x-2">
-                <Input
-                  isReadOnly={data?.isReadOnly}
-                  label="Start hour (optional)"
-                  max={calendar?.data?.hours ?? undefined}
-                  min={0}
-                  name="start_hours"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.start_hours ?? ""}
-                />
-                <Input
-                  isReadOnly={data?.isReadOnly}
-                  label="Start minutes (optional)"
-                  max={calendar?.data?.minutes ?? undefined}
-                  min={0}
-                  name="start_minutes"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.start_minutes ?? ""}
-                />
-              </div>
-            </div>
-          </Collapsible>
-          <Collapsible initialOpen={!!event?.end_day && !!event?.end_month_id && !!event?.end_year} label="End (optional)">
-            <div className="flex flex-col gap-y-2 p-2">
-              <div className="grid grid-cols-3 gap-x-2">
-                <Input
-                  helperText={isDayCorrect ? "" : "End day must be more or equal to start day if in the same month and year."}
-                  isDisabled={typeof event?.end_month !== "number" || data?.isReadOnly}
-                  label="End day (optional)"
-                  max={typeof event.end_month === "number" ? existingMonths[event.end_month].days : 0}
-                  min={1}
-                  name="end_day"
-                  onChange={handleChange}
-                  placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
-                  type="number"
-                  value={event?.end_day || ""}
-                  variant={isDayCorrect ? "primary" : "error"}
-                />
-                <Select
-                  helperText={isMonthCorrect ? "" : "End month must be more or equal to start month if in the same year."}
-                  isClearable
-                  isDisabled={isFetchingMonths}
-                  isLoading={isFetchingMonths}
-                  isReadOnly={data?.isReadOnly}
-                  label="End month (optional)"
-                  name="end_month"
-                  onChange={handleMonthChange}
-                  options={existingMonths?.map((month) => ({ label: month.title, value: month.id })) || []}
-                  value={typeof event?.end_month === "number" ? existingMonths?.[event.end_month].id : undefined}
-                  variant={isMonthCorrect ? "primary" : "error"}
-                />
-                <Input
-                  helperText={isYearCorrect ? "" : "End year must be more or equal to start year."}
-                  isDisabled={typeof event?.end_month !== "number"}
-                  isReadOnly={data?.isReadOnly}
-                  label="End year (optional)"
-                  name="end_year"
-                  onChange={handleChange}
-                  placeholder={typeof event?.end_month !== "number" ? "Select a month." : ""}
-                  type="number"
-                  value={event?.end_year || ""}
-                  variant={isYearCorrect ? "primary" : "error"}
-                />
-              </div>
-              <div className="flex items-center gap-x-2">
-                <Input
-                  isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
-                  isReadOnly={data?.isReadOnly}
-                  label="End hour (optional)"
-                  max={calendar?.data?.hours ?? undefined}
-                  min={0}
-                  name="end_hours"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.end_hours ?? ""}
-                />
-                <Input
-                  isDisabled={!event.end_year || !event.end_month_id || !event.end_day}
-                  isReadOnly={data?.isReadOnly}
-                  label="End minutes (optional)"
-                  max={calendar?.data?.minutes ?? undefined}
-                  min={0}
-                  name="end_minutes"
-                  onChange={handleChange}
-                  type="number"
-                  value={event?.end_minutes ?? ""}
-                />
-              </div>
-            </div>
-          </Collapsible>
-
-          <div className="flex w-full items-center justify-between">
-            <span>Is public:</span>
-            <Checkbox
-              isDisabled={data?.isReadOnly}
-              name="is_public"
-              onChange={handleChange}
-              value={event?.is_public ?? false}
-            />
-          </div>
+            </>
+          ) : null}
         </div>
       ) : null}
 
-      {tabs[selectedTab].id === "2" ? (
+      {(exceptions?.globalCreate && calendar?.data?.id) || !exceptions?.globalCreate ? (
         <>
-          <div className="h-fit py-2">
-            <Textarea
-              helperText={event?.document || event?.document_id ? "Note: using document instead of description." : ""}
-              isDisabled={data?.isReadOnly || !!event?.document || !!event?.document_id}
-              label="Event description (optional)"
-              name="description"
-              onChange={handleChange}
-              placeholder="Note: the event will use a document's content if selected."
-              value={event?.description || ""}
-            />
-          </div>
-          {permissions?.read_assets ? (
-            <div>
-              {event?.image?.id ? (
-                <ImagePreview
-                  clearAction={
-                    data?.isReadOnly || !permissions?.read_assets
-                      ? undefined
-                      : () => {
-                          handleChange({ name: "image", value: null });
-                        }
-                  }
-                  id={event.image.id}
-                  label="Event image (optional)"
-                  title={event.image.title}
-                  url={getImageURL(project_id as string, "images", event.image.id)}
+          {tabs[selectedTab].id === "2" ? (
+            <>
+              <div className="h-fit py-2">
+                <Textarea
+                  helperText={event?.document || event?.document_id ? "Note: using document instead of description." : ""}
+                  isDisabled={data?.isReadOnly || !!event?.document || !!event?.document_id}
+                  label="Event description (optional)"
+                  name="description"
+                  onChange={handleChange}
+                  placeholder="Note: the event will use a document's content if selected."
+                  value={event?.description || ""}
                 />
-              ) : (
-                <ImageSelect
-                  isDisabled={data?.isReadOnly}
-                  label="Event image (optional)"
-                  name="image"
-                  onChange={handleImageChange}
-                  type="images"
-                  value={event.image_id}
-                />
-              )}
-            </div>
+              </div>
+              {permissions?.read_assets ? (
+                <div>
+                  {event?.image?.id ? (
+                    <ImagePreview
+                      clearAction={
+                        data?.isReadOnly || !permissions?.read_assets
+                          ? undefined
+                          : () => {
+                              handleChange({ name: "image", value: null });
+                            }
+                      }
+                      id={event.image.id}
+                      label="Event image (optional)"
+                      title={event.image.title}
+                      url={getImageURL(project_id as string, "images", event.image.id)}
+                    />
+                  ) : (
+                    <ImageSelect
+                      isDisabled={data?.isReadOnly}
+                      label="Event image (optional)"
+                      name="image"
+                      onChange={handleImageChange}
+                      type="images"
+                      value={event.image_id}
+                    />
+                  )}
+                </div>
+              ) : null}
+              <div>
+                {event?.document ? (
+                  <EntityPreview
+                    clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "document", value: null })}
+                    icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
+                    id={event.document.id}
+                    label="Document"
+                    link={getEntityLink(project_id as string, "documents", event.document.id, null, data?.isReadOnly)}
+                    previewAction={
+                      !permissions?.read_documents
+                        ? undefined
+                        : () =>
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: "Preview",
+                              data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
+                              type: "entity_preview",
+                              size: "half",
+                            }))
+                    }
+                    title={event.document.title}
+                    type="documents"
+                  />
+                ) : (
+                  <Search
+                    isDisabled={data?.isReadOnly || !permissions?.read_documents}
+                    label="Event document (optional)"
+                    name="document"
+                    onChange={handleImageChange}
+                    searchEntity="documents"
+                    value={event.document_id}
+                  />
+                )}
+              </div>
+
+              <Collapsible
+                icon={IconEnum.character}
+                initialOpen={false}
+                isDisabled={!permissions?.read_characters}
+                label="Characters">
+                <div className="flex flex-col gap-y-1 p-2">
+                  <Search
+                    isMultiple
+                    label="Characters (optional)"
+                    limit={10}
+                    name="characters"
+                    onChange={({ name, value, label, image }) => {
+                      if ((event.characters || [])?.some((char) => char.id === value)) {
+                        handleChange({
+                          name,
+                          value: (event.characters || []).filter((t) => t.id !== value),
+                        });
+                        return;
+                      }
+
+                      handleChange({
+                        name,
+                        value: (event.characters || []).concat({
+                          full_name: label || "",
+                          id: value,
+                          portrait_id: image,
+                        }),
+                      });
+                    }}
+                    searchEntity="characters"
+                    value={event.characters?.map((char) => char.id)}
+                  />
+                  {event.characters?.map((char) => (
+                    <EntityPreview
+                      clearAction={(id) =>
+                        handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
+                      }
+                      id={char.id}
+                      image_id={char.portrait_id}
+                      title={char.full_name}
+                      type="characters"
+                    />
+                  ))}
+                </div>
+              </Collapsible>
+
+              <Collapsible
+                icon={IconEnum.map_pin}
+                initialOpen={false}
+                isDisabled={!permissions?.read_map_pins}
+                label="Locations">
+                <div className="flex flex-col gap-y-1 p-2">
+                  <Search
+                    isMultiple
+                    label="Locations (optional)"
+                    limit={10}
+                    name="map_pins"
+                    onChange={({ name, value, label, image, icon, parent_id }) => {
+                      if ((event.map_pins || [])?.some((char) => char.id === value)) {
+                        handleChange({
+                          name,
+                          value: (event.map_pins || []).filter((t) => t.id !== value),
+                        });
+                        return;
+                      }
+
+                      handleChange({
+                        name,
+                        value: (event.map_pins || []).concat({
+                          id: value,
+                          title: label || "",
+                          image_id: image,
+                          icon: icon || getDefaultEntityIcon("map_pins"),
+                          parent_id: parent_id || "",
+                          color: "#ffffff",
+                          border_color: "#ffffff",
+                        }),
+                      });
+                    }}
+                    searchEntity="map_pins"
+                    value={event.map_pins?.map((pin) => pin.id)}
+                  />
+                  {event.map_pins?.map((pin) => (
+                    <EntityPreview
+                      clearAction={(id) =>
+                        handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })
+                      }
+                      icon={pin.icon}
+                      id={pin.id}
+                      image_id={pin.image_id}
+                      title={pin.title || ""}
+                      type="map_pins"
+                    />
+                  ))}
+                </div>
+              </Collapsible>
+            </>
           ) : null}
-          <div>
-            {event?.document ? (
-              <EntityPreview
-                clearAction={data?.isReadOnly ? undefined : () => handleChange({ name: "document", value: null })}
-                icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
-                id={event.document.id}
-                label="Document"
-                link={getEntityLink(project_id as string, "documents", event.document.id, null, data?.isReadOnly)}
-                previewAction={
-                  !permissions?.read_documents
-                    ? undefined
-                    : () =>
-                        setDrawer((prev) => ({
-                          ...prev,
-                          title: "Preview",
-                          data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
-                          type: "entity_preview",
-                          size: "half",
-                        }))
-                }
-                title={event.document.title}
-                type="documents"
-              />
-            ) : (
-              <Search
-                isDisabled={data?.isReadOnly || !permissions?.read_documents}
-                label="Event document (optional)"
-                name="document"
-                onChange={handleImageChange}
-                searchEntity="documents"
-                value={event.document_id}
-              />
-            )}
-          </div>
-
-          <Collapsible
-            icon={IconEnum.character}
-            initialOpen={false}
-            isDisabled={!permissions?.read_characters}
-            label="Characters">
-            <div className="flex flex-col gap-y-1 p-2">
-              <Search
-                isMultiple
-                label="Characters (optional)"
-                limit={10}
-                name="characters"
-                onChange={({ name, value, label, image }) => {
-                  if ((event.characters || [])?.some((char) => char.id === value)) {
-                    handleChange({
-                      name,
-                      value: (event.characters || []).filter((t) => t.id !== value),
-                    });
-                    return;
-                  }
-
-                  handleChange({
-                    name,
-                    value: (event.characters || []).concat({
-                      full_name: label || "",
-                      id: value,
-                      portrait_id: image,
-                    }),
-                  });
-                }}
-                searchEntity="characters"
-                value={event.characters?.map((char) => char.id)}
-              />
-              {event.characters?.map((char) => (
-                <EntityPreview
-                  clearAction={(id) =>
-                    handleChange({ name: "characters", value: event.characters?.filter((c) => c.id !== id) })
-                  }
-                  id={char.id}
-                  image_id={char.portrait_id}
-                  title={char.full_name}
-                  type="characters"
-                />
-              ))}
-            </div>
-          </Collapsible>
-
-          <Collapsible icon={IconEnum.map_pin} initialOpen={false} isDisabled={!permissions?.read_map_pins} label="Locations">
-            <div className="flex flex-col gap-y-1 p-2">
-              <Search
-                isMultiple
-                label="Locations (optional)"
-                limit={10}
-                name="map_pins"
-                onChange={({ name, value, label, image, icon, parent_id }) => {
-                  if ((event.map_pins || [])?.some((char) => char.id === value)) {
-                    handleChange({
-                      name,
-                      value: (event.map_pins || []).filter((t) => t.id !== value),
-                    });
-                    return;
-                  }
-
-                  handleChange({
-                    name,
-                    value: (event.map_pins || []).concat({
-                      id: value,
-                      title: label || "",
-                      image_id: image,
-                      icon: icon || getDefaultEntityIcon("map_pins"),
-                      parent_id: parent_id || "",
-                      color: "#ffffff",
-                      border_color: "#ffffff",
-                    }),
-                  });
-                }}
-                searchEntity="map_pins"
-                value={event.map_pins?.map((pin) => pin.id)}
-              />
-              {event.map_pins?.map((pin) => (
-                <EntityPreview
-                  clearAction={(id) => handleChange({ name: "map_pins", value: event.map_pins?.filter((c) => c.id !== id) })}
-                  icon={pin.icon}
-                  id={pin.id}
-                  image_id={pin.image_id}
-                  title={pin.title || ""}
-                  type="map_pins"
-                />
-              ))}
-            </div>
-          </Collapsible>
+          {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
+            <TagInput handleChange={handleChange} isDisabled={data?.isReadOnly} isMultiple tags={event?.tags || []} />
+          ) : null}
+          {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
+            <EntityPermission
+              handleChange={handleChange}
+              owner_id={event?.owner_id}
+              permissions={event?.permissions || []}
+              related_id={event?.id || null}
+              selectablePermissions={["read_events", "update_events", "delete_events"]}
+            />
+          ) : null}
         </>
-      ) : null}
-      {tabs[selectedTab].id === "3" && permissions?.read_tags ? (
-        <TagInput handleChange={handleChange} isDisabled={data?.isReadOnly} isMultiple tags={event?.tags || []} />
-      ) : null}
-      {tabs[selectedTab].id === "4" && (permissions?.is_owner || !data?.id) ? (
-        <EntityPermission
-          handleChange={handleChange}
-          owner_id={event?.owner_id}
-          permissions={event?.permissions || []}
-          related_id={event?.id || null}
-          selectablePermissions={["read_events", "update_events", "delete_events"]}
-        />
       ) : null}
 
       {data?.isReadOnly ? null : (

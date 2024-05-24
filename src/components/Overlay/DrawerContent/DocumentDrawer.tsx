@@ -94,7 +94,11 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     data?.id,
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
-    existingDocument?.data || { title: data.title, parent_id: item_id, project_id: project_id as string },
+    existingDocument?.data || {
+      title: data.title,
+      parent_id: exceptions?.globalCreate ? null : item_id,
+      project_id: project_id as string,
+    },
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
@@ -295,7 +299,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 },
                 permissions: document?.permissions,
               };
-              dataToParse.data.parent_id = item_id;
+              dataToParse.data.parent_id = exceptions?.globalCreate ? null : item_id;
               dataToParse.data.owner_id = user?.id;
               const parsedData = InsertDocumentSchema.parse(dataToParse);
               await create(

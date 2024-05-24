@@ -33,6 +33,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
     end_day: currentValue?.end_day,
     end_month: endMonthIdx,
     end_year: currentValue?.end_year,
+    parent_id: null,
   };
 
   const isYearCorrect = checkIfYearCorrect(currentValue?.start_year, currentValue?.end_year);

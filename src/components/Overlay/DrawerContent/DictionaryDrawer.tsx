@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
-import { DictionaryStateType, DictionaryType, TabType, UserHasPermissionsType } from "../../../types";
+import { DictionaryStateType, DictionaryType, DrawerAtomType, TabType, UserHasPermissionsType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import {
   InsertDictionarySchema,
@@ -19,6 +19,7 @@ import { IconPicker } from "../IconPicker";
 
 type Props = {
   data: { id?: string };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
@@ -30,8 +31,8 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function DictionaryDrawer({ data }: Props) {
-  const { project_id } = useParams();
+export function DictionaryDrawer({ data, exceptions }: Props) {
+  const { project_id, item_id } = useParams();
   const { data: existingDictionary } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
@@ -43,7 +44,11 @@ export function DictionaryDrawer({ data }: Props) {
     "dictionaries",
     project_id as string,
   );
-  const [dictionary, setDictionary] = useState<DictionaryStateType>({ id: data?.id, project_id });
+  const [dictionary, setDictionary] = useState<DictionaryStateType>({
+    id: data?.id,
+    parent_id: exceptions?.globalCreate ? null : item_id,
+    project_id,
+  });
   const [selectedTab, setSelectedTab] = useState(0);
   const permissions = useHasPermissions(
     ["read_dictionaries", "create_dictionaries", "update_dictionaries", "read_tags", "read_character_fields_templates"],

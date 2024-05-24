@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 import {
   useCreateSubEntity,
-  useGetEntities,
   useGetEntity,
   useGetSubEntity,
   useHandleChange,
@@ -16,6 +15,7 @@ import {
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   BlueprintType,
+  DrawerAtomType,
   EventStateType,
   HandleChangePropsType,
   TabType,
@@ -49,12 +49,14 @@ import {
   TemplateTextareaField,
 } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
-import { Button, Checkbox, Input, Select, TagInput } from "../../Form";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Checkbox, Input, Search, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 
 type Props = {
   data: { id?: string; parent_id?: string; title?: string };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_fields"], blueprint?: BlueprintType) {
@@ -79,6 +81,7 @@ function isSaveDisabled(blueprint_fields: BlueprintInstanceType["blueprint_field
         end_day: field?.calendar?.end_day,
         end_month: endMonthIdx,
         end_year: field?.calendar?.end_year,
+        parent_id: null,
       };
 
       const isYearCorrect = checkIfYearCorrect(field?.calendar?.start_year, field?.calendar?.end_year);
@@ -393,7 +396,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function BlueprintInstanceDrawer({ data }: Props) {
+export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -401,7 +404,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
   const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
-    data?.title ? instance?.parent_id : data?.parent_id ?? item_id,
+    data?.title || exceptions?.globalCreate ? instance?.parent_id : data?.parent_id ?? item_id,
     "blueprints",
     {
       data: {
@@ -418,16 +421,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
       queryKeyConcat: ["instance_drawer"],
     },
   );
-  const { data: blueprints, isFetching: isFetchingBlueprints } = useGetEntities(
-    {
-      data: {
-        project_id,
-      },
-      fields: ["id", "title", "title_name", "icon"],
-    },
-    "blueprints",
-    { enabled: !!data?.title, queryKeyConcat: ["blueprint_instance_drawer"] },
-  );
+
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
 
@@ -455,7 +449,7 @@ export function BlueprintInstanceDrawer({ data }: Props) {
         owner_id: "",
         blueprint_fields: [],
         permissions: [],
-        parent_id: data?.title ? "" : (item_id as string),
+        parent_id: data?.title || exceptions?.globalCreate ? "" : (item_id as string),
         tags: [],
       });
     }
@@ -480,25 +474,29 @@ export function BlueprintInstanceDrawer({ data }: Props) {
   );
   const tabs = getTabs(permissions, data?.id);
 
-  if (isFetchingInstance || (!data?.title && isFetchingBlueprint) || isFetchingBlueprints || !instance)
-    return <Skeleton type="drawer_form" />;
+  if (isFetchingInstance || (!data?.title && isFetchingBlueprint) || !instance) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <div className="flex max-h-[90%] flex-col overflow-y-auto">
-          {data?.title ? (
-            <Select
+          {(data?.title || exceptions?.globalCreate) && !instance?.parent_id ? (
+            <Search
               label="Blueprint (required)"
               name="parent_id"
               onChange={handleChange}
-              options={(blueprints?.data || [])?.map((bp) => ({
-                label: bp.title,
-                value: bp.id,
-                icon: bp.icon || IconEnum.blueprint,
-              }))}
+              searchEntity="blueprints"
               value={instance?.parent_id}
+            />
+          ) : null}
+          {(data?.title || exceptions?.globalCreate) && instance?.parent_id && blueprint?.data ? (
+            <EntityPreview
+              clearAction={() => handleChange({ name: "parent_id", value: null })}
+              icon={blueprint?.data?.icon}
+              id={instance?.parent_id}
+              title={blueprint?.data?.title}
+              type="blueprints"
             />
           ) : null}
 

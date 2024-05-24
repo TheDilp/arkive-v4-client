@@ -7,6 +7,7 @@ import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useU
 import {
   CalendarType,
   DayStateType,
+  DrawerAtomType,
   LeapDayConditionType,
   LeapDayStateType,
   MonthStateType,
@@ -26,6 +27,7 @@ import { IconPicker } from "../IconPicker";
 
 type Props = {
   data: { id?: string };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function isSaveDisabled(calendar: Partial<CalendarType>, months: MonthStateType[], days: DayStateType[]) {
@@ -422,10 +424,13 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function CalendarDrawer({ data }: Props) {
-  const { project_id } = useParams();
+export function CalendarDrawer({ data, exceptions }: Props) {
+  const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-  const [calendar, setCalendar] = useState<Partial<CalendarType>>({ project_id });
+  const [calendar, setCalendar] = useState<Partial<CalendarType>>({
+    project_id,
+    parent_id: exceptions?.globalCreate ? null : item_id,
+  });
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
   const [leapDays, setLeapDays] = useState<LeapDayStateType[]>([]);

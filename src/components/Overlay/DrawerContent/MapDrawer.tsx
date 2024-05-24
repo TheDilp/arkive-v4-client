@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
-import { MapType, TabType, UserHasPermissionsType } from "../../../types";
+import { DrawerAtomType, MapType, TabType, UserHasPermissionsType } from "../../../types";
 import { createOrEditPermission, drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { FolderSelect, ImageSelect } from "../../Complex";
@@ -38,7 +38,13 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
+export function MapDrawer({
+  data,
+  exceptions,
+}: {
+  data: { id?: string; title?: string };
+  exceptions: DrawerAtomType["exceptions"];
+}) {
   const { project_id, item_id } = useParams();
 
   const { data: existingMap, isFetching } = useGetEntity<MapType>(
@@ -64,7 +70,11 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
   const tabs = getTabs(permissions, data?.id);
 
   const [map, setMap] = useState<Partial<MapType> & { project_id: string }>(
-    existingMap?.data || { title: data?.title, project_id: project_id as string },
+    existingMap?.data || {
+      title: data?.title,
+      parent_id: exceptions?.globalCreate ? null : item_id,
+      project_id: project_id as string,
+    },
   );
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -138,7 +148,7 @@ export function MapDrawer({ data }: { data: { id?: string; title?: string } }) {
                     value: (map.map_layers || []).concat({
                       id: crypto.randomUUID(),
                       title: "New layer",
-                      parent_id: item_id as string,
+                      parent_id: map?.id || null,
                       image_id: "",
                       is_public: false,
                     }),

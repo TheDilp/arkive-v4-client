@@ -103,7 +103,7 @@ function CalendarPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boole
   return <CalendarView id={id} isPublic={isPublic} />;
 }
 function EventPreviewDrawer({ id, parent_id, isPublic }: { id?: string; parent_id?: string; isPublic?: boolean }) {
-  return <EventDrawer data={{ id, parent_id, isReadOnly: true, isPublic }} />;
+  return <EventDrawer data={{ id, parent_id, isReadOnly: true, isPublic }} exceptions={{}} />;
 }
 function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetType; project_id: string }) {
   const { data, isFetching } = useGetImage(id, project_id, type, { fields: [] });

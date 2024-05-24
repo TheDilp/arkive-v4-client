@@ -34,6 +34,7 @@ type DrawerExceptions = {
   eventDescription?: boolean;
   characterPin?: boolean;
   isReadOnly?: boolean;
+  globalCreate?: boolean;
 };
 
 export type DrawerAtomType = {

@@ -5,17 +5,18 @@ import { useParams } from "react-router-dom";
 
 import {
   useCreateSubEntity,
-  useGetEntities,
+  useGetEntity,
   useGetSubEntity,
   useHandleChange,
   useHasPermissions,
   useUpdateSubEntity,
 } from "../../../hooks";
-import { TabType, UserHasPermissionsType, WordStateType } from "../../../types";
+import { DrawerAtomType, TabType, UserHasPermissionsType, WordStateType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertWordSchema, InsertWordType, UpdateWordSchema } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
-import { Button, Input, Select, Textarea } from "../../Form";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Input, Search, Textarea } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
@@ -24,6 +25,7 @@ type Props = {
     id?: string;
     title?: string;
   };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function isSaveDisabled(word: WordStateType) {
@@ -41,21 +43,17 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function WordDrawer({ data }: Props) {
+export function WordDrawer({ data, exceptions }: Props) {
   const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
   const resetDrawer = useResetAtom(drawerAtom);
   const [word, setWord] = useState<WordStateType>({
     title: data?.title || undefined,
-    parent_id: data?.title ? undefined : item_id,
+    parent_id: data?.title || exceptions?.globalCreate ? undefined : item_id,
   });
   const [selectedTab, setSelectedTab] = useState(0);
   const permissions = useHasPermissions(["read_words", "update_words", "delete_words"], word?.owner_id);
   const tabs = getTabs(permissions, data?.id);
-  const { data: dictionaries } = useGetEntities({ fields: ["id", "title"], data: { project_id } }, "dictionaries", {
-    enabled: !!data?.title,
-    isPublic: false,
-  });
   const { data: existingWord, isFetching } = useGetSubEntity(
     data?.id,
     "words",
@@ -66,9 +64,20 @@ export function WordDrawer({ data }: Props) {
     },
     { enabled: !!data?.id },
   );
+  const { data: dictionary } = useGetEntity(
+    exceptions?.globalCreate ? word?.parent_id : item_id,
+    "dictionaries",
+    { fields: ["id", "title", "icon"] },
+    {
+      enabled: !!data?.title || (!!word?.parent_id && exceptions?.globalCreate),
+      isPublic: false,
+    },
+  );
+
   const { mutateAsync: createWord, isLoading: isCreating } = useCreateSubEntity<InsertWordType>("words", project_id);
   const { mutateAsync: updateWord, isLoading: isUpdating } = useUpdateSubEntity("words", project_id, item_id);
   const { handleChange } = useHandleChange({ data: word, setData: setWord });
+
   useLayoutEffect(() => {
     if (existingWord?.data) setWord(existingWord?.data);
   }, [existingWord]);
@@ -91,31 +100,50 @@ export function WordDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <div className="flex flex-col gap-y-2">
-          {data?.title ? (
-            <Select
+          {(data?.title || exceptions?.globalCreate) && !word?.parent_id ? (
+            <Search
+              label="Dictionary (required)"
               name="parent_id"
               onChange={handleChange}
-              options={(dictionaries?.data || []).map((dict) => ({ label: dict?.title, value: dict?.id }))}
-              value={word?.parent_id || ""}
+              searchEntity="dictionaries"
+              value={word?.parent_id}
             />
           ) : null}
-          <Input
-            label="Word (required)"
-            name="title"
-            onChange={handleChange}
-            value={word?.title || ""}
-            variant={word?.title ? "primary" : "error"}
-          />
-          <Input
-            label="Translation (required)"
-            name="translation"
-            onChange={handleChange}
-            value={word?.translation || ""}
-            variant={word?.translation ? "primary" : "error"}
-          />
-          <div className="h-96">
-            <Textarea label="Context (optional)" name="description" onChange={handleChange} value={word?.description || ""} />
-          </div>
+          {(data?.title || exceptions?.globalCreate) && word?.parent_id && dictionary?.data ? (
+            <EntityPreview
+              clearAction={() => handleChange({ name: "parent_id", value: null })}
+              icon={dictionary?.data?.icon}
+              id={word?.parent_id}
+              title={dictionary?.data?.title}
+              type="dictionaries"
+            />
+          ) : null}
+          {exceptions?.globalCreate && !word?.parent_id ? null : (
+            <>
+              <Input
+                label="Word (required)"
+                name="title"
+                onChange={handleChange}
+                value={word?.title || ""}
+                variant={word?.title ? "primary" : "error"}
+              />
+              <Input
+                label="Translation (required)"
+                name="translation"
+                onChange={handleChange}
+                value={word?.translation || ""}
+                variant={word?.translation ? "primary" : "error"}
+              />
+              <div className="h-96">
+                <Textarea
+                  label="Context (optional)"
+                  name="description"
+                  onChange={handleChange}
+                  value={word?.description || ""}
+                />
+              </div>
+            </>
+          )}
         </div>
       ) : null}
 

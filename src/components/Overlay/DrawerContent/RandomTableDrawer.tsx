@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
-import { HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
+import { DrawerAtomType, HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
 import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import { drawerAtom, IconEnum } from "../../../utils";
 import {
@@ -22,6 +22,7 @@ type Props = {
   data?: {
     id?: string;
   };
+  exceptions: DrawerAtomType["exceptions"];
 };
 
 function isSaveDisabled(random_table: Partial<RandomTableType>) {
@@ -88,7 +89,7 @@ function OptionInput({
   );
 }
 
-export function RandomTableDrawer({ data }: Props) {
+export function RandomTableDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -113,7 +114,7 @@ export function RandomTableDrawer({ data }: Props) {
   );
 
   const [randomTable, setRandomTable] = useState<Partial<RandomTableType> & { project_id: string }>(
-    existingRandomTable?.data || { project_id: project_id as string, parent_id: item_id },
+    existingRandomTable?.data || { project_id: project_id as string, parent_id: exceptions?.globalCreate ? null : item_id },
   );
 
   const { changedData, handleChange } = useHandleChange({ data: randomTable, setData: setRandomTable });

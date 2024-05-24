@@ -95,7 +95,10 @@ export interface EventType {
 export type MonthStateType = Omit<MonthType, "parent_id" | "events">;
 export type DayStateType = { id: string; title: string };
 export type LeapDayStateType = LeapDayType;
-export type EventStateType = Partial<EventType> & { start_month: number | undefined };
+export type EventStateType = Partial<Omit<EventType, "parent_id">> & {
+  parent_id: null | string;
+  start_month: number | undefined;
+};
 
 export interface CurrentDateType {
   month: number;

@@ -28,7 +28,7 @@ export interface MapType {
 export interface MapLayerType {
   id: string;
   title: string;
-  parent_id: string;
+  parent_id: string | null;
   is_public: boolean | null;
   image_id: string;
   image?: ImageType;

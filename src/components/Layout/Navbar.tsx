@@ -1,13 +1,19 @@
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { useIsMutating, useQueryClient } from "@tanstack/react-query";
-import { useAtomValue, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { useLayoutEffect, useState } from "react";
+import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
 import { useHasPermissions } from "../../hooks";
-import { AllAvailableEntities, WebsocketEventType } from "../../types";
+import {
+  AllAvailableEntities,
+  DrawerAtomType,
+  DropdownItemType,
+  UserHasPermissionsType,
+  WebsocketEventType,
+} from "../../types";
 import {
   baseURLS,
   DefaultTagColor,
@@ -24,8 +30,215 @@ import {
 import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
 import { IndeterminateProgressBar } from "../Misc";
-import { Tooltip } from "../Overlay";
+import { Dropdown, Tooltip } from "../Overlay";
 import { Card } from "./Card";
+
+function createNewOptions(
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  project_id: string,
+  permissions: UserHasPermissionsType,
+): DropdownItemType[] {
+  const options: DropdownItemType[] = [];
+
+  if (permissions.create_characters)
+    options.push({
+      id: "character",
+      title: "Character",
+      icon: IconEnum.character,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new character",
+          type: "characters",
+          size: "2xl",
+        })),
+    });
+
+  if (permissions.create_blueprints)
+    options.push({
+      id: "blueprints",
+      title: "Blueprint",
+      icon: IconEnum.blueprint,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new blueprint",
+          type: "blueprints",
+          size: "lg",
+        })),
+    });
+
+  if (permissions.create_blueprint_instances)
+    options.push({
+      id: "blueprint_instances",
+      title: "Blueprint instances",
+      icon: IconEnum.blueprint,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: {},
+          exceptions: { globalCreate: true },
+          title: "Create new blueprint instance",
+          type: "blueprint_instances",
+          size: "lg",
+        })),
+    });
+
+  if (permissions.create_documents)
+    options.push({
+      id: "documents",
+      title: "Document",
+      icon: IconEnum.document,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new document",
+          type: "documents",
+          size: "lg",
+          exceptions: { globalCreate: true },
+        })),
+    });
+
+  if (permissions.create_maps)
+    options.push({
+      id: "maps",
+      title: "Map",
+      icon: IconEnum.map,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new map",
+          type: "maps",
+          size: "lg",
+        })),
+    });
+  if (permissions.create_graphs)
+    options.push({
+      id: "graphs",
+      title: "Graph",
+      icon: IconEnum.graph,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new graph",
+          type: "graphs",
+          size: "lg",
+        })),
+    });
+
+  if (permissions.create_calendars)
+    options.push({
+      id: "calendars",
+      title: "Calendar",
+      icon: IconEnum.calendar,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new calendar",
+          type: "calendars",
+          size: "lg",
+        })),
+    });
+
+  if (permissions.create_events)
+    options.push({
+      id: "event",
+      title: "Event",
+      icon: IconEnum.event,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: {},
+          title: "Create new event",
+          type: "events",
+          size: "lg",
+          exceptions: { globalCreate: true },
+        })),
+    });
+
+  if (permissions.create_dictionaries)
+    options.push({
+      id: "dictionaries",
+      title: "Dictionary",
+      icon: IconEnum.dictionary,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new dictionary",
+          type: "dictionaries",
+          size: "lg",
+          exceptions: { globalCreate: true },
+        })),
+    });
+  if (permissions.create_words)
+    options.push({
+      id: "words",
+      title: "Word",
+      icon: IconEnum.word,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: {},
+          title: "Create new word",
+          type: "words",
+          size: "lg",
+          exceptions: { globalCreate: true },
+        })),
+    });
+  if (permissions.create_random_tables)
+    options.push({
+      id: "random_tables",
+      title: "Random table",
+      icon: IconEnum.random_table,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: {},
+          title: "Create new random table",
+          type: "random_tables",
+          size: "lg",
+          exceptions: { globalCreate: true },
+        })),
+    });
+
+  if (permissions.create_tags)
+    options.push({
+      id: "tags",
+      title: "Tags",
+      icon: IconEnum.tags,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new tag",
+          type: "tags",
+          size: "lg",
+        })),
+    });
+  if (permissions.create_character_fields_templates)
+    options.push({
+      id: "character_field_templates",
+      title: "Character field template",
+      icon: IconEnum.additional_fields,
+      onClick: () =>
+        setDrawer((prev) => ({
+          ...prev,
+          data: { project_id },
+          title: "Create new field template",
+          type: "character_fields_templates",
+          size: "lg",
+        })),
+    });
+
+  return options;
+}
 
 function DiceRoller() {
   const createNotification = useNotifications();
@@ -79,7 +292,25 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const { user: authUser } = useUser();
-  const permissions = useHasPermissions(["create_assets"], undefined);
+  const permissions = useHasPermissions(
+    [
+      "create_characters",
+      "create_blueprints",
+      "create_blueprint_instances",
+      "create_documents",
+      "create_maps",
+      "create_graphs",
+      "create_calendars",
+      "create_events",
+      "create_dictionaries",
+      "create_words",
+      "create_tags",
+      "create_random_tables",
+      "create_character_fields_templates",
+      "create_assets",
+    ],
+    undefined,
+  );
   const user = useAtomValue(userAtom);
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
@@ -190,9 +421,18 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         {project_id && !isDisabled ? (
           <>
             {permissions?.create_assets ? (
-              <div className="w-fit">
-                <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
-              </div>
+              <>
+                <div className="w-fit">
+                  <Dropdown
+                    allowedPlacements={["left", "left-end", "left-start"]}
+                    items={createNewOptions(setDrawer, project_id, permissions)}>
+                    <Button hasNoBackground icon={IconEnum.add} isIconOnly onClick={undefined} tooltip="Create new entity" />
+                  </Dropdown>
+                </div>
+                <div className="w-fit">
+                  <Button hasNoBackground icon={IconEnum.upload} isIconOnly onClick={openImageUploadDialog} />
+                </div>
+              </>
             ) : null}
             <div className="w-fit">
               <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>

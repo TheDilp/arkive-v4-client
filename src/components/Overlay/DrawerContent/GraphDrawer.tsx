@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
-import { EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
+import { DrawerAtomType, EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
 import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
 import {
   Alert,
@@ -45,7 +45,13 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
   return tabs;
 }
 
-export function GraphDrawer({ data }: { data: { id?: string; title?: string } }) {
+export function GraphDrawer({
+  data,
+  exceptions,
+}: {
+  data: { id?: string; title?: string };
+  exceptions: DrawerAtomType["exceptions"];
+}) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useResetAtom(drawerAtom);
@@ -84,7 +90,7 @@ export function GraphDrawer({ data }: { data: { id?: string; title?: string } })
     existingGraph?.data || {
       title: data?.title,
       project_id: project_id as string,
-      parent_id: data?.title ? null : item_id,
+      parent_id: exceptions?.globalCreate ? null : item_id,
       default_node_shape: "rectangle",
     },
   );
