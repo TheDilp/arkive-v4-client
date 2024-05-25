@@ -672,6 +672,10 @@ function getSelectedActions(
             description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
               ids.length === 1 ? getSingularEntityType(type) : getPluralEntityType(type)
             }?`,
+            data: {
+              entity_title: type,
+            },
+            type: arkived === "arkive" ? "delete_many" : "arkive_many",
             warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
             isOverlay: true,
             cancel: {

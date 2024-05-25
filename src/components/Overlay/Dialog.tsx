@@ -97,8 +97,10 @@ export function Dialog() {
     isImageView: dialog?.type === "image_view",
     hasNoContent:
       !dialog?.type ||
-      dialog?.type === "delete_entity" ||
       dialog?.type === "arkive_entity" ||
+      dialog?.type === "arkive_many" ||
+      dialog?.type === "delete_entity" ||
+      dialog?.type === "delete_many" ||
       dialog?.type === "restore_entity",
   });
   const resetDialogAtom = useResetAtom(dialogAtom);
@@ -139,6 +141,12 @@ export function Dialog() {
         {dialog.type === "insert_image" ? <InsertEditorImageDialog data={dialog.data} /> : null}
         {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
         {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
+        {dialog?.type === "delete_many" ? (
+          <p className="text-center text-red-500">
+            <span className="text-red-600">WARNING: </span>
+            Deleting a folder will also delete all of its children!
+          </p>
+        ) : null}
         {dialog?.cancel || dialog?.confirm ? (
           <div className="mt-auto flex items-center justify-center gap-x-2">
             {dialog?.cancel ? (

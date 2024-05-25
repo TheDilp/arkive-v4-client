@@ -9,7 +9,9 @@ export type DialogContentType =
   | "export_graph"
   | "restore_entity"
   | "arkive_entity"
+  | "arkive_many"
   | "delete_entity"
+  | "delete_many"
   | "image_view"
   | "insert_image";
 export interface DialogAtomType {
