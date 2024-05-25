@@ -4,7 +4,7 @@ import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
 import { MapImage, Select } from "../../components";
-import { useChangeNavbarTitle, useGetEntities, useGetEntity, useHasPermissions } from "../../hooks";
+import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
 import { getImageURL } from "../../utils";
 
@@ -48,7 +48,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   const currentMap = data || existingMap?.data;
   const permissions = useHasPermissions(["read_maps", "update_maps"], currentMap?.owner_id);
 
-  useChangeNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
+  useNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
 
   function changeMapPinFilters({ value }: { value: onChangeValue["value"] }) {
     if (Array.isArray(value)) {

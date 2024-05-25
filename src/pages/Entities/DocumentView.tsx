@@ -14,14 +14,7 @@ import { MentionDropdownComponent } from "../../components/Complex/Editor/Extens
 import { Menubar } from "../../components/Complex/Editor/Menubar";
 import { Icon, Skeleton } from "../../components/Misc";
 import { Notification } from "../../components/Overlay";
-import {
-  useChangeNavbarTitle,
-  useGetEntities,
-  useGetEntity,
-  useHandleChange,
-  useHasPermissions,
-  useUpdateEntity,
-} from "../../hooks";
+import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
 import {
   baseURLS,
@@ -94,7 +87,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
 
   const [editorData, setEditorData] = useState({ content: undefined });
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-  useChangeNavbarTitle(` Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
+  useNavbarTitle(` Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
 
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),

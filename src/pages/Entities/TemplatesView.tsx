@@ -8,10 +8,10 @@ import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } 
 import {
   useBreakpoint,
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
 } from "../../hooks";
 import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
@@ -182,7 +182,7 @@ function createColumns(
 export function TemplatesView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
-  useChangeNavbarTitle(" Field templates");
+  useNavbarTitle(" Field templates");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("character-template-table-active") || "active");
 
   const setDrawer = useSetAtom(drawerAtom);

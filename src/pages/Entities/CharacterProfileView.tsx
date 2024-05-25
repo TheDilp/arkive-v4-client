@@ -25,11 +25,11 @@ import {
 } from "../../components";
 import {
   useBreakpoint,
-  useChangeNavbarTitle,
   useDownloadImage,
   useGenerateDocument,
   useGetEntities,
   useGetEntity,
+  useNavbarTitle,
   useRemoveFromEntity,
   useTable,
   useUpdateManyPublic,
@@ -804,7 +804,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     ...(existingCharacter?.data?.related_other || []),
   ].filter((r) => !!r);
 
-  useChangeNavbarTitle(`Characters | ${existingCharacter?.data?.full_name}`, !!existingCharacter?.data);
+  useNavbarTitle(`Characters | ${existingCharacter?.data?.full_name}`, !!existingCharacter?.data);
 
   const [, dispatch] = useTable({});
 

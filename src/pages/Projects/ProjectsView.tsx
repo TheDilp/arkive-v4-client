@@ -18,7 +18,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetAllProjects, useGetUser, useTable } from "../../hooks";
+import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable } from "../../hooks";
 import { ProjectType } from "../../types";
 import {
   drawerAtom,
@@ -109,7 +109,7 @@ export function ProjectsView() {
   const { isLg } = useBreakpoint();
 
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
-  useChangeNavbarTitle("The Arkive");
+  useNavbarTitle("The Arkive");
 
   const { user } = useUser();
   const { data, isLoading } = useGetAllProjects({

@@ -21,12 +21,12 @@ import {
   Tooltip,
 } from "../../components";
 import {
-  useChangeNavbarTitle,
   useDeleteSubEntity,
   useGetEntities,
   useGetEntity,
   useGetSubEntity,
   useHasPermissions,
+  useNavbarTitle,
 } from "../../hooks";
 import { DrawerAtomType, UserHasPermissionsType, UserType } from "../../types";
 import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
@@ -471,7 +471,7 @@ export function CalendarView({
     { enabled: event_id ? !!event_id : !!subitem_id, isPublic },
   );
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
-  useChangeNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
+  useNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
 
   useLayoutEffect(() => {
     if (!firstRender.current) {

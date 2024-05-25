@@ -22,11 +22,11 @@ import {
 import {
   useBreakpoint,
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useGetEntity,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
   useUpdateEntity,
 } from "../../hooks";
@@ -859,7 +859,7 @@ export function FolderView() {
 
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
 
-  useChangeNavbarTitle(
+  useNavbarTitle(
     `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,

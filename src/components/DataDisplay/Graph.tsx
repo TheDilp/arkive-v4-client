@@ -7,13 +7,13 @@ import CytoscapeComponent from "react-cytoscapejs";
 import { useParams } from "react-router-dom";
 
 import {
-  useChangeNavbarTitle,
   useCreateSubEntity,
   useDeleteMany,
   useDeleteSubEntity,
   useGenerateGraph,
   useGetEntity,
   useHasPermissions,
+  useNavbarTitle,
   useUpdateManySubEntities,
 } from "../../hooks";
 import { useBatchUpdateNodePositions } from "../../hooks/graphs/useBatchDragEvents";
@@ -86,7 +86,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     user?.role?.id,
   );
 
-  useChangeNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
+  useNavbarTitle(`Graphs | ${graph?.title}`, !isReadOnly && !isViewOnly && !!graph);
   const { mutate: createNode } = useCreateSubEntity<InsertNodeType>("nodes", project_id);
   const { mutate: createEdges } = useCreateSubEntity<InsertEdgeType>("edges", project_id);
   const { mutateAsync: generateGraph, isLoading: isMutating } = useGenerateGraph<{

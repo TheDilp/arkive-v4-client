@@ -13,11 +13,11 @@ import {
 } from "../../components/DataDisplay/TableComponents/TableColumns";
 import {
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useGetEntity,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
 } from "../../hooks";
 import {
@@ -651,7 +651,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     },
     fields: ["id", "title", "title_name"],
   });
-  useChangeNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
+  useNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprint_instances");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
 

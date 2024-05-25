@@ -8,10 +8,10 @@ import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLa
 import {
   useBreakpoint,
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
 } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
@@ -188,7 +188,7 @@ export function TagView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("tag-table-active") || "active");
-  useChangeNavbarTitle("Tags");
+  useNavbarTitle("Tags");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "tags");

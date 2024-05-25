@@ -8,10 +8,10 @@ import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, Table
 import {
   useBreakpoint,
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
 } from "../../hooks";
 import {
@@ -340,7 +340,7 @@ function getSelectedActions(
 export function BlueprintView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
-  useChangeNavbarTitle("Blueprints");
+  useNavbarTitle("Blueprints");
   const permissions = useHasPermissions(
     ["create_blueprints", "read_blueprints", "update_blueprints", "delete_blueprints", "create_blueprint_instances"],
     undefined,

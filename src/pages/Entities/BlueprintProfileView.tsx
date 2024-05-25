@@ -12,7 +12,7 @@ import {
   Skeleton,
   Tabs,
 } from "../../components";
-import { useBreakpoint, useChangeNavbarTitle, useGetEntity, useGetSubEntity } from "../../hooks";
+import { useBreakpoint, useGetEntity, useGetSubEntity, useNavbarTitle } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { breadcrumbsAtom, drawerAtom, IconEnum } from "../../utils";
 
@@ -92,7 +92,7 @@ export default function BlueprintProfileView({
     }
   }, [blueprint?.data]);
 
-  useChangeNavbarTitle(
+  useNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
     !!blueprint?.data && !!blueprintInstance?.data,
   );

@@ -18,11 +18,11 @@ import {
 import {
   useBreakpoint,
   useBulkUpdate,
-  useChangeNavbarTitle,
   useDeleteMany,
   useGetEntities,
   useGetInfiniteEntities,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
   useUpdateEntity,
   useUpdateManyPublic,
@@ -643,7 +643,7 @@ function CharacterViewHeader({
 }
 
 export function CharactersView() {
-  useChangeNavbarTitle("Characters");
+  useNavbarTitle("Characters");
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");
