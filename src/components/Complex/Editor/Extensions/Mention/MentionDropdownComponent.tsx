@@ -12,7 +12,15 @@ export function MentionDropdownComponent() {
   const { project_id } = useParams();
   const setMentionDropdownAtom = useSetAtom(mentionDropdownAtom);
   const [options, setOptions] = useState<
-    { key: string; id: string; label: string; displayLabel?: string; portrait_id?: string; parent_id?: string }[]
+    {
+      key: string;
+      id: string;
+      alterId: string | null;
+      label: string;
+      displayLabel?: string;
+      portrait_id?: string;
+      parent_id?: string;
+    }[]
   >([]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -26,6 +34,7 @@ export function MentionDropdownComponent() {
       data: {
         key: string;
         id: string;
+        alterId: string | null;
         title: string;
         displayLabel?: string;
         parentId?: string;
@@ -57,6 +66,7 @@ export function MentionDropdownComponent() {
               id: item?.parentId || item.id,
               searchItem: item.translation,
               label: item.title,
+              alterId: null,
               icon: item?.icon,
               displayLabel: `${item.title} (${item.translation})`,
               projectId: project_id,
@@ -65,7 +75,7 @@ export function MentionDropdownComponent() {
           return {
             key: item.id,
             id: item?.parentId || item.id,
-            alterId: item?.parentId ? item.id : null,
+            alterId: item?.alterId || null,
             label: item.title,
             icon: item?.icon,
             projectId: project_id,

@@ -24,7 +24,7 @@ export function MentionReactComponent({ node }: Props) {
       id: string;
       name: string;
       label: string;
-      alterId?: string;
+      alterId: string | null;
       icon?: string;
       parentId?: string;
     };

@@ -9,7 +9,7 @@ import { Card, Icon, Spinner, Tooltip } from "../../../..";
 import { StaticRender } from "../..";
 
 type Props = {
-  alterId: string | undefined;
+  alterId: string | null;
   id: string | undefined;
   label: string;
   project_id: string | undefined;
@@ -57,7 +57,7 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!!id && !data && entry.isIntersecting) refetch();
+        if ((!!id || !!alterId) && !data && entry.isIntersecting) refetch();
       },
       {
         root: null,
@@ -77,7 +77,7 @@ export function DocumentMention({ alterId, title, id, label, project_id, isPubli
     };
   }, []);
 
-  if (id) {
+  if (id || alterId) {
     if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
     if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
 
