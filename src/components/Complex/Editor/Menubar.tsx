@@ -232,6 +232,7 @@ function menuBarItems({
         setDialog({
           data: { getContext },
           type: "insert_image",
+          isOverlay: true,
           title: "Insert image",
           size: "md",
         }),
