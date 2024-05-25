@@ -66,7 +66,7 @@ class SecretExtension extends NodeExtension<SecretOptions> {
     const { classNames, secret } = this.options;
 
     return {
-      content: "block",
+      content: "block+",
       defining: true,
       draggable: false,
       ...override,
