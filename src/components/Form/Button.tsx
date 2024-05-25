@@ -43,7 +43,7 @@ const ButtonClasses = tv({
       "2xl": "text-2xl",
     },
     isDisabled: {
-      true: "bg-zinc-300 text-zinc-100 cursor-not-allowed",
+      true: "bg-zinc-400 text-zinc-200 cursor-not-allowed",
     },
     hasNoBackground: {
       true: "bg-transparent shadow-none",
