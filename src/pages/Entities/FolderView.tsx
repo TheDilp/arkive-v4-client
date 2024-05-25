@@ -730,7 +730,7 @@ export function FolderView() {
       filters: {
         and: [
           ...(filters?.and ? filters.and : []),
-          ...(arkived === "active"
+          ...(arkived === "active" && !filters?.and?.some((f) => f.id === "quick_filter")
             ? [
                 {
                   id: "parent",
