@@ -116,6 +116,10 @@
     @apply border-l-[3px] pl-2 font-merriweather text-2xl font-normal text-zinc-300 !important;
   }
 
+  blockquote p {
+    @apply block !important;
+  }
+
   table {
     @apply table-fixed overflow-visible font-lato !important;
     th {
