@@ -162,7 +162,7 @@ function CharacterFieldsFilters({
       field.field_type !== "select_multiple" &&
       !relationFiltersList.includes(field.field_type) ? (
         <div className="col-span-1">
-          <div className="mt-5 h-10 w-10 self-center">
+          <div className="ml-auto mt-5 h-10 w-10 self-center">
             <Button
               hasNoBackground
               icon={IconEnum.trash}
@@ -209,7 +209,7 @@ function CharacterFieldsFilters({
       ) : null}
       {field.field_type === "select" || field.field_type === "select_multiple" ? (
         <div className="col-span-1">
-          <div className="mt-5 h-10 w-10 self-center">
+          <div className="ml-auto mt-5 h-10 w-10 self-center">
             <Button
               hasNoBackground
               icon={IconEnum.trash}
@@ -268,7 +268,7 @@ function CharacterFieldsFilters({
       ) : null}
       {relationFiltersList.includes(field.field_type) ? (
         <div className="col-span-1">
-          <div className="mt-5 h-10 w-10 self-center">
+          <div className="ml-auto mt-5 h-10 w-10 self-center">
             <Button
               hasNoBackground
               icon={IconEnum.trash}
@@ -464,7 +464,7 @@ function CharacterResourceFilter({
           )}
         </div>
       </div>
-      <div className="w-10 self-center">
+      <div className="ml-auto w-10 self-center">
         <Button
           hasNoBackground
           icon={IconEnum.trash}
