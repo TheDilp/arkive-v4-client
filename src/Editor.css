@@ -241,7 +241,7 @@
 .staticRendererContainer {
   @apply w-full;
   p {
-    @apply min-h-[1rem];
+    @apply my-4 min-h-[1rem];
   }
   a {
     @apply cursor-pointer  hover:text-sky-100  !important;
