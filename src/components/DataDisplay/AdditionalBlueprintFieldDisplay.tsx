@@ -246,20 +246,24 @@ export function AdditionalBlueprintFieldDisplay({
             />
           </div>
         ) : null}
-        {blueprint_field.field_type === "images_single" && blueprint_field_data?.images?.[0]?.image ? (
+        {blueprint_field.field_type === "images_single" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <CarouselEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
-              items={[
-                {
-                  id: blueprint_field_data.images[0].related_id as string,
-                  image_id: blueprint_field_data?.images?.[0].image.id,
-                  title: blueprint_field_data?.images?.[0].image.title,
-                  label: blueprint_field.title,
-                  type: "images",
-                },
-              ]}
+              items={
+                blueprint_field_data?.images?.[0]
+                  ? [
+                      {
+                        id: blueprint_field_data.images[0].related_id as string,
+                        image_id: blueprint_field_data?.images?.[0].image.id,
+                        title: blueprint_field_data?.images?.[0].image.title,
+                        label: blueprint_field.title,
+                        type: "images",
+                      },
+                    ]
+                  : []
+              }
             />
           </div>
         ) : null}
