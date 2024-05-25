@@ -31,6 +31,7 @@ import {
   DiceFormulaExtension,
 } from "../../components/Complex/Editor/Extensions";
 import CustomCalloutExtension from "../../components/Complex/Editor/Extensions/CustomCalloutExtension";
+import GalleryExtension from "../../components/Complex/Editor/Extensions/GalleryExtension";
 import SecretExtension from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { SpoilerExtension } from "../../components/Complex/Editor/Extensions/SpoilerExtension";
 import TableOfContentsExtension from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
@@ -189,6 +190,7 @@ export function DefaultEditorExtensions(
         cellMinWidth: 500,
       },
     }),
+    new GalleryExtension({ imageIds: [] }),
   ];
 }
 export function onError({ json, invalidContent, transformers }: InvalidContentHandlerProps) {
