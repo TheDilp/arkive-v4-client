@@ -270,7 +270,7 @@ export function SearchDrawer() {
                           : getDefaultEntityIcon(searchCategory)
                       }
                       id={item.value}
-                      image_id={item.image}
+                      image_id={searchCategory === "images" ? item.value : item.image}
                       link={getEntityLink(
                         project_id as string,
                         searchCategory === "documents_content" ? "documents" : searchCategory || "",
