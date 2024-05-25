@@ -74,28 +74,30 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
   if (id) {
     if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
     if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
-    <Tooltip content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
-      <Link
-        className="inline-flex items-center font-lato text-sm font-bold transition-colors"
-        to={getMentionLink(
-          id as string,
-          "map_pins",
-          project_id as string,
-          data?.data?.is_public ?? false,
-          isPublic,
-          parent_id,
-        )}>
-        <div ref={mentionRef} className="flex items-start">
-          {data?.data?.image_id ? (
-            <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-              <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.image_id)} size="3xs" />
-            </span>
-          ) : (
-            <Icon fontSize={15} icon={IconEnum.map_pin} />
-          )}
-          <span className="underline hover:text-sky-400">{data?.data?.title || title || label || ""}</span>
-        </div>
-      </Link>
-    </Tooltip>;
+    return (
+      <Tooltip content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
+        <Link
+          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
+          to={getMentionLink(
+            id as string,
+            "map_pins",
+            project_id as string,
+            data?.data?.is_public ?? false,
+            isPublic,
+            parent_id,
+          )}>
+          <div ref={mentionRef} className="flex items-start">
+            {data?.data?.image_id ? (
+              <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
+                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.image_id)} size="3xs" />
+              </span>
+            ) : (
+              <Icon fontSize={15} icon={IconEnum.map_pin} />
+            )}
+            <span className="underline hover:text-sky-400">{data?.data?.title || title || label || ""}</span>
+          </div>
+        </Link>
+      </Tooltip>
+    );
   }
 }
