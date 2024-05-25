@@ -825,7 +825,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       },
     },
     "character_fields_templates",
-    { enabled: selectedTab === 2 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
+    { enabled: selectedTab === 1 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
   );
   const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
