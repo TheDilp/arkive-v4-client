@@ -182,12 +182,13 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
+
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
   const { data, isInitialLoading, error } = useGetEntity<DictionaryType>(
     item_id || id,
     "dictionaries",
     {
-      fields: ["id", "owner_id", "title", "is_public", "owner_id"],
+      fields: ["id", "owner_id", "title", "is_public"],
       permissions: true,
     },
     {

@@ -1,12 +1,23 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
-import { Dispatch } from "react";
+import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
+import { useGetEntities, useGetEntity, useHasPermissions, useTable } from "../../hooks";
 import { DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
-import { RandomTableOptionType } from "../../types/EntityTypes/randomTableTypes";
-import { baseURLS, dialogAtom, drawerAtom, FetchFunction, IconEnum, useNotifications, userAtom } from "../../utils";
+import { RandomTableOptionType, RandomTableType } from "../../types/EntityTypes/randomTableTypes";
+import {
+  baseURLS,
+  dialogAtom,
+  drawerAtom,
+  FetchFunction,
+  hasActionPermission,
+  hasEntityUpdatePermissionForEntityView,
+  IconEnum,
+  isProjectOwnerAtom,
+  useNotifications,
+  userAtom,
+} from "../../utils";
 import { getRollValue } from "../../utils/ui/diceRollerUtils";
 
 const columnHelper = createColumnHelper<RandomTableOptionType>();
@@ -110,25 +121,49 @@ export function RandomTableView() {
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const user = useAtomValue(userAtom);
+
   const createNotification = useNotifications();
   const [{ selection, orderBy }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
   });
   const { project_id, item_id } = useParams();
+
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(["update_random_tables"], undefined);
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
+  const { data: randomTableData } = useGetEntity<RandomTableType>(item_id, "random_tables", {
+    fields: ["id", "owner_id", "title", "is_public"],
+    permissions: true,
+  });
+  const updateRandomTablePermission = hasActionPermission(
+    isProjectOwner,
+    user?.id === randomTableData?.data?.owner_id,
+    permissions,
+    randomTableData?.data?.permissions || [],
+    "update_random_tables",
+    user?.role?.id,
+  );
+
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
     {
       data: { parent_id: item_id as string, project_id },
       fields: ["id", "title", "description", "icon", "icon_color"],
       relations: { random_table_suboptions: true },
+      permissions: true,
       orderBy,
     },
     "random_table_options",
     {
+      enabled: !!randomTableData,
       staleTime: 5 * 60 * 1000,
       prefetch: false,
     },
   );
+
+  useEffect(() => {
+    setEntityUpdatePermission(updateRandomTablePermission);
+  }, [updateRandomTablePermission]);
 
   async function rollOnTable(isValueOnly?: boolean): Promise<{
     option: { title: string; description: string | null } | null;
@@ -258,7 +293,12 @@ export function RandomTableView() {
           </Dropdown>
         </div>
         <div className="w-52">
-          <Button icon={IconEnum.add} label="Create new options" onClick={handleOpenNew} />
+          <Button
+            icon={IconEnum.add}
+            isDisabled={!updateRandomTablePermission}
+            label="Create new options"
+            onClick={handleOpenNew}
+          />
         </div>
       </div>
       <div className="h-full w-full overflow-hidden">

@@ -105,7 +105,7 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
       permissions: true,
       fields: ["id", "title", "description", "icon", "is_public"],
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id, queryKeyConcat: ["drawer"] },
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertRandomTableType>("random_tables");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateRandomTableType>(
