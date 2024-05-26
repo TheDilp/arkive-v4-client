@@ -23,7 +23,7 @@ import {
   sortTags,
   TagFilters,
 } from "../../../utils";
-import { Alert, Avatar, Badge, Button, Checkbox, Dropdown, Tooltip } from "../..";
+import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, Tooltip } from "../..";
 
 export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType): ColumnDef<any> {
   return {
@@ -132,10 +132,44 @@ export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): C
           ) : null}
           {sortedTags?.length > 1 ? (
             <Tooltip
-              content={row.original.tags
-                .slice(1)
-                .map((tag: TagType) => tag.title)
-                .join(", ")}
+              arrowColor="#3f3f46"
+              content={
+                <Card title="Additional tags">
+                  <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
+                    {row.original.tags.slice(1).map((tag: TagType) => (
+                      <div
+                        className="col-span-1 cursor-pointer"
+                        onClick={() => {
+                          if (dispatch) {
+                            dispatch({ type: "clearAllFilters" });
+                            dispatch({
+                              type: "setRelationFilter",
+                              payload: {
+                                and: [
+                                  {
+                                    id: crypto.randomUUID(),
+                                    field: "tags",
+                                    value: tag.id,
+                                    operator: "in",
+                                    header_name: "Tags",
+                                    relationalData: {
+                                      value: tag.id,
+                                      label: tag.title,
+                                      image: "",
+                                      blueprint_field_id: "tags",
+                                    },
+                                  },
+                                ],
+                              },
+                            });
+                          }
+                        }}>
+                        <Badge customColor={tag.color} label={tag.title} />
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              }
               isPortal>
               <div className="w-min max-w-min">
                 <Badge label={`+${row.original.tags.length - 1}`} size="sm" variant="secondary" />
