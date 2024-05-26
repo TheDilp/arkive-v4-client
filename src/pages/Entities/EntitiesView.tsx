@@ -5,8 +5,16 @@ import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph, Input, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
-import { AvailableEntityType, DrawerContentCreateNewType, PermissionCodeType } from "../../types";
-import { drawerAtom, getPermissionsForTypeView, getSingularEntityType, IconEnum, navbarTitleAtom } from "../../utils";
+import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
+import {
+  drawerAtom,
+  getPermissionsForTypeView,
+  getSingularEntityType,
+  hasEntityUpdatePermissionForEntityView,
+  IconEnum,
+  isProjectOwnerAtom,
+  navbarTitleAtom,
+} from "../../utils";
 import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
@@ -15,6 +23,11 @@ import DocumentView from "./DocumentView";
 
 export function EntitiesView() {
   const { project_id, type, item_id } = useParams();
+
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+
+  const canUpdateEntity = useAtomValue(hasEntityUpdatePermissionForEntityView);
+
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const setDrawer = useSetAtom(drawerAtom);
   const navbarTitle = useAtomValue(navbarTitleAtom);
@@ -24,6 +37,7 @@ export function EntitiesView() {
   );
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
   const [filter, setFilter] = useState("");
+
   return (
     <div className="flex h-full flex-col gap-y-2">
       <div className="flex h-12 min-h-[3rem] items-center justify-between">
@@ -63,7 +77,7 @@ export function EntitiesView() {
               <div className="w-52">
                 <Button
                   icon={IconEnum.edit}
-                  isDisabled={!permissions?.[`update_${type}` as PermissionCodeType]}
+                  isDisabled={!canUpdateEntity && !isProjectOwner}
                   label={`Edit current ${entityName}`}
                   onClick={() => {
                     setDrawer((prev) => ({

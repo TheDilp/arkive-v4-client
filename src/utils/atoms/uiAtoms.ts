@@ -15,3 +15,4 @@ export const mentionDropdownAtom = atom<boolean>(false);
 export const mentionPositionAtom = atom<null | "above" | "below">(null);
 export const hasChangedDataAtom = atomWithReset<boolean>(false);
 export const projectFeatureFlagsAtom = atom((get) => get(projectAtom)?.feature_flags);
+export const hasEntityUpdatePermissionForEntityView = atom<boolean>(false);

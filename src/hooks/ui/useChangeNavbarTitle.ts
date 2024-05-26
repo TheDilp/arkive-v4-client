@@ -11,7 +11,7 @@ export function useNavbarTitle(title: string, enabled?: boolean) {
       setNavbarTitleAtom(`${projectData?.title} | ${title || ""}`);
       document.title = `${projectData?.title} | ${title || ""}`;
     } else if (!projectData?.title) {
-      setNavbarTitleAtom(title);
+      setNavbarTitleAtom(title || "");
       document.title = "The Arkive";
     }
   }, [projectData?.title, title, setNavbarTitleAtom, enabled]);

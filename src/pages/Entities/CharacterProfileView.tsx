@@ -29,6 +29,7 @@ import {
   useGenerateDocument,
   useGetEntities,
   useGetEntity,
+  useHasPermissions,
   useNavbarTitle,
   useRemoveFromEntity,
   useTable,
@@ -61,7 +62,9 @@ import {
   getFirstLetters,
   getImageURL,
   getSentenceCase,
+  hasActionPermission,
   IconEnum,
+  isProjectOwnerAtom,
   sortCharactersByName,
   userAtom,
 } from "../../utils";
@@ -765,6 +768,11 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(
+    ["read_characters", "create_characters", "update_characters", "delete_characters"],
+    undefined,
+  );
   const user = useAtomValue(userAtom);
   const queryClient = useQueryClient();
   const {
@@ -787,6 +795,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         portrait: true,
       },
       fields: ["id", "full_name", "nickname", "age", "biography", "is_public"],
+      permissions: true,
     },
     {
       staleTime: 60 * 1000,
@@ -800,7 +809,6 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
 
   const { mutateAsync: removeItem } = useRemoveFromEntity("characters", item_id as string, project_id as string);
   const { mutateAsync: generateDocument } = useGenerateDocument("conversations");
-
   const relationships = [
     ...(existingCharacter?.data?.related_to || []),
     ...(existingCharacter?.data?.related_from || []),
@@ -940,6 +948,16 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             <div className="w-52">
               <Button
                 icon={IconEnum.edit}
+                isDisabled={
+                  !hasActionPermission(
+                    isProjectOwner,
+                    user?.id === existingCharacter?.data?.owner_id,
+                    permissions,
+                    existingCharacter?.data?.permissions || [],
+                    "update_characters",
+                    user?.role?.id,
+                  )
+                }
                 label="Edit current character"
                 onClick={() => {
                   setDrawer((prev) => ({

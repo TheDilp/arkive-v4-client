@@ -24,6 +24,7 @@ import {
   drawerAtom,
   FetchFunction,
   hasActionPermission,
+  hasEntityUpdatePermissionForEntityView,
   IconEnum,
   isProjectOwnerAtom,
   mentionPositionAtom,
@@ -47,6 +48,8 @@ export default function DocumentView({ editable }: { editable: boolean }) {
     enabled: !!user?.id && isProjectOwner,
     staleTime: Infinity,
   });
+
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   const {
     data: currentDocument,
@@ -244,7 +247,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
   useLayoutEffect(() => {
     if (
       (currentDocument?.data?.content || currentDocument?.data?.content === null) &&
-      manager.view.state.doc.textContent === ""
+      manager?.view?.state?.doc?.textContent === ""
     ) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
       // Timeout is necessary for mentions to load and render correctly
@@ -258,6 +261,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
 
   useEffect(() => {
     if (!isFetching) {
+      setEntityUpdatePermission(currentDocument?.data?.permissions?.some((p) => p.code === "update_documents") || false);
       if (currentDocument?.data?.dice_color) {
         Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
       } else {
