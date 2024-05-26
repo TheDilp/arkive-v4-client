@@ -275,6 +275,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         character_fields: true,
         tags: true,
       },
+      permissions: true,
     },
     {
       enabled: !!data?.id,

@@ -219,6 +219,7 @@ export function TemplatesView() {
         tags: true,
       },
       arkived: arkived === "arkive",
+      permissions: true,
     },
     "character_fields_templates",
   );
