@@ -727,7 +727,10 @@ export function FolderView() {
   );
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
-  const [{ selection, pagination, filters }, dispatch] = useTable({ selection: [], pagination: { page: 0, limit: 10 } });
+  const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable({
+    selection: [],
+    pagination: { page: 0, limit: 10 },
+  });
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get(`${entityName}-table-active`) || "active");
@@ -785,6 +788,7 @@ export function FolderView() {
               ]
             : [],
       },
+      relationFilters,
       permissions: true,
       arkived: arkived === "arkive",
       relations: {
@@ -1222,6 +1226,7 @@ export function FolderView() {
             )}
             config={{
               selectedActions,
+              filters,
               hasSelect: true,
               hasArkived: arkived === "arkive",
               hasTags: EntitiesWithTags.includes(type as string),

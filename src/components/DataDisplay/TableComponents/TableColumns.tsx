@@ -138,6 +138,7 @@ export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): C
                   <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
                     {row.original.tags.slice(1).map((tag: TagType) => (
                       <div
+                        key={tag.id}
                         className="col-span-1 cursor-pointer"
                         onClick={() => {
                           if (dispatch) {
