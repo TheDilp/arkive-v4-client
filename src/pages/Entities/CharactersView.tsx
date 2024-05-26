@@ -698,8 +698,9 @@ export function CharactersView() {
       },
       relations: {
         portrait: true,
+        is_favorite: true,
       },
-      fields: ["id", "deleted_at", "full_name", "is_favorite", "age", "owner_id"],
+      fields: ["id", "deleted_at", "full_name", "age", "owner_id"],
       filters,
       pagination: {
         limit: 12,

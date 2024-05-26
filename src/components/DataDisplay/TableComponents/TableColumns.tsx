@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate, useParams } from "react-router-dom";
@@ -79,7 +81,7 @@ export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => void): Co
   };
 }
 
-export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: TagType[] }> {
+export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): ColumnDef<any & { tags: TagType[] }> {
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
   return {
@@ -98,7 +100,33 @@ export function TagColumn(hasTagsWarning?: boolean): ColumnDef<any & { tags: Tag
       return (
         <div className="flex w-full max-w-full items-center justify-center gap-x-2">
           {sortedTags?.length ? (
-            <div className="w-fit">
+            <div
+              className="w-fit"
+              onClick={() => {
+                if (dispatch) {
+                  dispatch({ type: "clearAllFilters" });
+                  dispatch({
+                    type: "setRelationFilter",
+                    payload: {
+                      and: [
+                        {
+                          id: crypto.randomUUID(),
+                          field: "tags",
+                          value: row.original.tags[0].id,
+                          operator: "in",
+                          header_name: "Tags",
+                          relationalData: {
+                            value: row.original.tags[0].id,
+                            label: row.original.tags[0].title,
+                            image: "",
+                            blueprint_field_id: "tags",
+                          },
+                        },
+                      ],
+                    },
+                  });
+                }
+              }}>
               <Badge customColor={row.original.tags[0].color} label={row.original.tags[0].title} />
             </div>
           ) : null}

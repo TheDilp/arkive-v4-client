@@ -60,11 +60,11 @@ export function getTableColumns(
   }
   if (hasTags) {
     if (finalColumns.some((c) => c.id === "is_public")) {
-      finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning));
+      finalColumns.splice(finalColumns.length - 2, 0, TagColumn(config?.hasTagsWarning, dispatch));
     } else if (finalColumns.some((c) => c.id === "action")) {
-      finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning));
+      finalColumns.splice(finalColumns.length - 1, 0, TagColumn(config?.hasTagsWarning, dispatch));
     } else {
-      finalColumns.splice(finalColumns.length, 0, TagColumn(config?.hasTagsWarning));
+      finalColumns.splice(finalColumns.length, 0, TagColumn(config?.hasTagsWarning, dispatch));
     }
   }
   if (hasArkived) {
