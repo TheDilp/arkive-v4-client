@@ -794,7 +794,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         events: true,
         portrait: true,
       },
-      fields: ["id", "full_name", "nickname", "age", "biography", "is_public"],
+      fields: ["id", "full_name", "nickname", "age", "biography", "is_public", "owner_id"],
       permissions: true,
     },
     {

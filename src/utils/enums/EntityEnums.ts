@@ -1,3 +1,32 @@
+export const AllEntities = [
+  "characters",
+  "blueprints",
+  "blueprint_instances",
+  "documents",
+  "maps",
+  "graphs",
+  "calendars",
+  "dictionaries",
+  "character_fields_templates",
+  "character_fields",
+  "conversations",
+  "random_tables",
+  "tags",
+];
+
+export const SubEntityEnum = [
+  "alter_names",
+  "blueprint_instances",
+  "map_pins",
+  "character_map_pins",
+  "map_layers",
+  "nodes",
+  "edges",
+  "events",
+  "random_table_options",
+  "random_table_suboptions",
+  "words",
+];
 export const CharacterFieldTypesEnum = [
   { value: "text", label: "Text" },
   { value: "textarea", label: "Textarea" },

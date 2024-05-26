@@ -5,7 +5,7 @@ import { ImageOverlay, LayerGroup, LayersControl, useMapEvents } from "react-lea
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useParams } from "react-router-dom";
 
-import { MapPinType, MapType } from "../../../types";
+import { MapPinType, MapType, UserHasPermissionsType } from "../../../types";
 import { contextMenuAtom, drawerAtom, getImageURL, IconEnum } from "../../../utils";
 import { MapPin } from "./MapPin";
 
@@ -19,6 +19,7 @@ type Props = {
   isClusteringPins: boolean;
   center_on?: string;
   mapPinFilters: string[];
+  permissions: UserHasPermissionsType;
 };
 
 export function MapImage({
@@ -31,6 +32,7 @@ export function MapImage({
   isClusteringPins,
   center_on,
   mapPinFilters,
+  permissions,
 }: Props) {
   const firstRender = useRef(true);
   const { project_id, item_id, subitem_id } = useParams();
@@ -62,6 +64,7 @@ export function MapImage({
             {
               id: "1",
               icon: IconEnum.add,
+              isDisabled: !permissions?.create_map_pins,
               title: "Add map pin",
               onClick: () => {
                 setDrawer((prev) => ({
@@ -74,6 +77,7 @@ export function MapImage({
             },
             {
               id: "2",
+              isDisabled: !permissions?.create_map_pins,
               icon: IconEnum.character,
               title: "Add character pin",
               onClick: () => {
@@ -81,6 +85,7 @@ export function MapImage({
                   ...prev,
                   data: { lat: e.latlng.lat, lng: e.latlng.lng },
                   title: "Create new map pin",
+
                   type: "map_pins",
                   exceptions: {
                     characterPin: true,
@@ -89,6 +94,7 @@ export function MapImage({
               },
             },
             {
+              isDisabled: !permissions?.delete_map_pins,
               id: "3",
               icon: IconEnum.map_pin,
               title: "Manage pins",

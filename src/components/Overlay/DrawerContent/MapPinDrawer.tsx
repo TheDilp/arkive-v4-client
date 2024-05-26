@@ -11,7 +11,7 @@ import {
   useHasPermissions,
   useUpdateMapSubEntity,
 } from "../../../hooks";
-import { MapPinType, MapPinTypesType, MapType, TabType, UserHasPermissionsType } from "../../../types";
+import { MapPinType, MapPinTypesType, TabType, UserHasPermissionsType } from "../../../types";
 import { drawerAtom, IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -226,10 +226,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 />
 
                 <div className="flex w-16 flex-col justify-between">
-                  <span
-                    className={`block min-h-[20px] truncate text-center text-sm ${
-                      mapPin?.icon ? "text-red-300" : "text-red-500"
-                    }`}>
+                  <span className={`block min-h-[20px] truncate text-center text-sm ${mapPin?.icon ? "" : "text-red-500"}`}>
                     Icon (required)
                   </span>
                   <div className="flex items-center justify-end pb-2">
@@ -460,22 +457,10 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             const parsed = InsertMapPinSchema.parse({ data: mapPin, permissions: mapPin.permissions });
             const final: typeof parsed & { character?: MapPinType["character"] | null } = parsed;
 
-            // Must insert character into query data here as the character prop/data itself
-            // is not sent via request
-            if (character) {
-              queryClient.setQueryData<{ data: MapType }>(["maps", mapPin.parent_id], (old) => {
-                if (old)
-                  return {
-                    ...old,
-                    data: { ...old.data, map_pins: [...(old?.data?.map_pins || []), { ...mapPin, character } as MapPinType] },
-                  };
-                return old;
-              });
-            }
-
             await createMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
+                  queryClient.invalidateQueries({ queryKey: ["maps", mapPin.parent_id] });
                   resetDrawerAtom();
                 }
               },
@@ -487,6 +472,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
             await updateMapPin(final, {
               onSuccess: (res) => {
                 if (res?.ok) {
+                  queryClient.invalidateQueries({ queryKey: ["maps", mapPin.parent_id] });
                   resetDrawerAtom();
                 }
               },

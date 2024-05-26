@@ -12,12 +12,12 @@ import {
   IconEnum,
   useNotifications,
 } from "../../../utils";
+import { AllEntities, SubEntityEnum } from "../../../utils/enums/EntityEnums";
 import { Button } from "../../Form";
 import { Avatar } from "../../Misc";
 
 export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any }; type: DialogContentType }) {
   const action = type?.replace("_entity", "");
-
   const { project_id } = useParams();
   const resetDialogAtom = useResetAtom(dialogAtom);
   const createNotification = useNotifications();
@@ -79,11 +79,12 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
             if (data?.id && project_id && data?.entity_title) {
               if (data?.entity_title === "images") {
                 deleteAsset({ data: { id: data?.id } });
-              } else if (data?.entity_title && data?.parent_id && (data?.entity_type satisfies AvailableSubEntityType)) {
+              } else if (data?.entity_title && data?.parent_id && SubEntityEnum.includes(data?.entity_title)) {
                 deleteSubEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
-              } else if (data?.entity_title satisfies AvailableEntityType) {
+              } else if (AllEntities.includes(data?.entity_title)) {
                 deleteEntity({ data: { id: data?.id, parent_id: data?.parent_id as string } });
               }
+
               resetDialogAtom();
             } else {
               createNotification({

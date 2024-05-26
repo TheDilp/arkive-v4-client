@@ -1,3 +1,4 @@
+import { useSetAtom } from "jotai";
 import { CRS, LatLngBoundsExpression } from "leaflet";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { MapContainer } from "react-leaflet";
@@ -6,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { MapImage, Select } from "../../components";
 import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { MapPinTypesType, MapType, onChangeValue } from "../../types";
-import { getImageURL } from "../../utils";
+import { getImageURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
 
 type Props = {
   data?: MapType;
@@ -26,18 +27,25 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
       enabled: !isPublic,
     },
   );
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
+
   const mapPinTypes = (existingMapPinTypes?.data || []).map((type) => ({ label: type.title, value: type.id }));
   const [mapPinFilters, setMapPinFilters] = useState<string[]>(["all"]);
   const firstRender = useRef(true) as MutableRefObject<boolean>;
   const mapRef = useRef() as any;
   const imgRef = useRef() as any;
-  const { data: existingMap, isFetching } = useGetEntity<MapType>(
+  const {
+    data: existingMap,
+    isFetching,
+    isLoading,
+  } = useGetEntity<MapType>(
     item_id as string,
     "maps",
     {
       data: {},
       fields: ["id", "title", "owner_id", "image_id", "icon", "cluster_pins", "owner_id"],
       relations: { map_pins: true, map_layers: true },
+      permissions: true,
     },
     {
       enabled: !data && !!item_id,
@@ -45,8 +53,16 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     },
   );
 
-  const currentMap = data || existingMap?.data;
-  const permissions = useHasPermissions(["read_maps", "update_maps"], currentMap?.owner_id);
+  const [currentMap, setCurrentMap] = useState<MapType | null>();
+
+  useEffect(() => {
+    setCurrentMap(data || existingMap?.data);
+  }, [data, existingMap?.data, isFetching]);
+
+  const permissions = useHasPermissions(
+    ["read_maps", "update_maps", "create_map_pins", "read_map_pins", "update_map_pins", "delete_map_pins"],
+    currentMap?.owner_id,
+  );
 
   useNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
 
@@ -61,6 +77,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
 
   useEffect(() => {
     if (currentMap && currentMap?.image_id && !bounds) {
+      setEntityUpdatePermission(currentMap?.permissions?.some((p) => p.code === "update_maps") || false);
       const img = new Image();
       img.src = getImageURL(project_id as string, "map_images", currentMap?.image_id);
       img.onload = () => {
@@ -74,7 +91,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
             [img.height, img.width],
           ]);
           imgRef.current.panTo([0, 0]);
-          imgRef.current.leafletElement.fitBounds(bounds);
+          // imgRef.current.leafletElement.fitBounds(bounds);
         }
       };
       setTimeout(() => {
@@ -90,8 +107,8 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
       {isPublic || isViewOnly ? null : (
-        <div className="w-full">
-          <div className="relative mb-3 ml-auto w-52">
+        <div className="relative z-10 w-full">
+          <div className="relative z-10 mb-3 ml-auto w-52">
             <Select
               hasSearch
               isDisabled={isInitialLoadingTypes}
@@ -110,9 +127,9 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           </div>
         </div>
       )}
-      {isFetching ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && !isFetching && !!bounds && permissions?.read_maps ? (
-        <div className="min-h-full min-w-full">
+      {isLoading ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
+      {currentMap && !isLoading && !!bounds && permissions?.read_maps ? (
+        <div className="z-0 min-h-full min-w-full">
           <MapContainer
             ref={(node) => {
               mapRef.current = node;
@@ -145,6 +162,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
               isViewOnly={isViewOnly}
               mapData={currentMap}
               mapPinFilters={mapPinFilters}
+              permissions={permissions}
               src={getImageURL(project_id as string, "map_images", currentMap?.image_id)}
             />
           </MapContainer>

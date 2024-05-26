@@ -2,16 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 
-import {
-  AvailableEntityType,
-  AvailableSubEntityType,
-  EdgeType,
-  GraphType,
-  MapLayerType,
-  MapPinType,
-  MapType,
-  NodeType,
-} from "../../types";
+import { AvailableEntityType, AvailableSubEntityType, EdgeType, GraphType, NodeType } from "../../types";
 import {
   baseURLS,
   edgesAtom,
@@ -137,26 +128,6 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
       onMutate: (vars) => {
         const parentEntityType = getParentEntityType(type);
 
-        if (parentEntityType === "maps") {
-          if (("character_id" in vars.data && !vars.data.character_id) || !("character_id" in vars.data)) {
-            const old = queryClient.getQueryData([parentEntityType, vars.data.parent_id]);
-            queryClient.setQueryData<{ data: MapType }>([parentEntityType, vars.data.parent_id], (oldData) =>
-              oldData
-                ? {
-                    ...oldData,
-                    data: {
-                      ...oldData?.data,
-                      [type]: (oldData.data?.[type as "map_pins" | "map_layers"] || []).concat(
-                        vars.data as MapPinType | MapLayerType,
-                      ),
-                    },
-                  }
-                : oldData,
-            );
-
-            return { old };
-          }
-        }
         if (parentEntityType === "graphs") {
           const old = queryClient.getQueryData(["graph_view", vars.data.parent_id]);
           queryClient.setQueryData<{ data: GraphType }>([parentEntityType, vars.data.parent_id], (oldData) =>

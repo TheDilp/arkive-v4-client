@@ -1,4 +1,4 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -12,9 +12,9 @@ import {
   Skeleton,
   Tabs,
 } from "../../components";
-import { useBreakpoint, useGetEntity, useGetSubEntity, useNavbarTitle } from "../../hooks";
+import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { breadcrumbsAtom, drawerAtom, IconEnum } from "../../utils";
+import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
 
 const tabs = [
   { id: "1", label: "Basic info", icon: IconEnum.info_circle },
@@ -38,7 +38,21 @@ export default function BlueprintProfileView({
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(
+    [
+      "read_blueprints",
+      "create_blueprints",
+      "update_blueprints",
+      "delete_blueprints",
+      "read_blueprint_instances",
+      "create_blueprint_instances",
+      "update_blueprint_instances",
+      "delete_blueprint_instances",
+    ],
+    undefined,
+  );
+  const user = useAtomValue(userAtom);
   const { data: blueprint } = useGetEntity<BlueprintType>(
     parent_id || item_id,
     "blueprints",
@@ -46,11 +60,12 @@ export default function BlueprintProfileView({
       data: {
         id: parent_id || item_id,
       },
-      fields: ["id", "title", "title_name", "icon"],
+      fields: ["id", "title", "title_name", "icon", "owner_id"],
       relations: {
         random_table_options: true,
         blueprint_fields: true,
       },
+      permissions: true,
     },
     { isPublic, staleTime: 3 * 60 * 1000 },
   );
@@ -60,11 +75,12 @@ export default function BlueprintProfileView({
     "blueprint_instances",
     {
       data: { id: id || subitem_id },
-      fields: ["id", "title", "is_public", "parent_id"],
+      fields: ["id", "title", "is_public", "parent_id", "owner_id"],
       relations: {
         blueprint_fields: true,
         tags: true,
       },
+      permissions: true,
     },
     { isPublic, enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 },
   );
@@ -106,6 +122,16 @@ export default function BlueprintProfileView({
             <div className="max-w-[208px] lg:w-52">
               <Button
                 icon={IconEnum.edit}
+                isDisabled={
+                  !hasActionPermission(
+                    isProjectOwner,
+                    user?.id === blueprint?.data?.owner_id,
+                    permissions,
+                    blueprint?.data?.permissions || [],
+                    "update_blueprints",
+                    user?.role?.id,
+                  )
+                }
                 label="Edit current blueprint"
                 onClick={() => {
                   setDrawer((prev) => ({
@@ -122,6 +148,16 @@ export default function BlueprintProfileView({
             <div className="lg:w-52">
               <Button
                 icon={IconEnum.edit}
+                isDisabled={
+                  !hasActionPermission(
+                    isProjectOwner,
+                    user?.id === blueprintInstance?.data?.owner_id,
+                    permissions,
+                    blueprintInstance?.data?.permissions || [],
+                    "update_blueprint_instances",
+                    user?.role?.id,
+                  )
+                }
                 label="Edit current instance"
                 onClick={() => {
                   setDrawer((prev) => ({

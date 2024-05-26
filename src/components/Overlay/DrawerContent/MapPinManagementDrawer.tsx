@@ -114,7 +114,6 @@ export function MapPinManagementDrawer({ data }: { data: { map_id: string } }) {
       },
     },
     "map_pins",
-    { staleTime: 60 * 1000 },
   );
   const [, dispatch] = useTable({});
   const setDialog = useSetAtom(dialogAtom);

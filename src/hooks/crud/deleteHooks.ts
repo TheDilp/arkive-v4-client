@@ -2,16 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cloneDeep from "lodash.clonedeep";
 import set from "lodash.set";
 
-import {
-  AllAvailableEntities,
-  AvailableEntityType,
-  AvailableSubEntityType,
-  ConversationType,
-  MapLayerType,
-  MapPinType,
-  MapType,
-  MessageType,
-} from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType, ConversationType, MessageType } from "../../types";
 import {
   baseURLS,
   FetchFunction,
@@ -75,22 +66,6 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
     },
     {
       onMutate: (vars) => {
-        if (type === "map_pins" || type === "map_layers") {
-          const old = queryClient.getQueryData<MapType>(["maps", vars.data.parent_id]);
-          queryClient.setQueryData<{ data: MapType }>(["maps", vars.data.parent_id], (oldData) => {
-            if (oldData) {
-              const temp = cloneDeep(oldData);
-              set(
-                temp,
-                `data.${type}`,
-                ((temp?.data?.[type] as (MapLayerType | MapPinType)[]) || [])?.filter((item) => item?.id !== vars.data.id),
-              );
-              return temp;
-            }
-            return oldData;
-          });
-          return { old };
-        }
         if (type === "messages") {
           const old = queryClient.getQueryData<ConversationType>(["conversations", vars.data.parent_id]);
           queryClient.setQueryData<{ data: ConversationType }>(["conversations", vars.data.parent_id], (oldData) => {
@@ -113,6 +88,9 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
       onSuccess: (data) => {
         if (type === "events") {
           queryClient.invalidateQueries(["allEntities", project_id, parent_id]);
+        }
+        if (type === "map_pins") {
+          queryClient.invalidateQueries(["maps"]);
         }
 
         queryClient.invalidateQueries(["allEntities", project_id, type]);
