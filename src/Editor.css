@@ -6,7 +6,7 @@
 }
 
 .editor-component {
-  @apply h-full max-h-[30rem] overflow-auto transition-colors duration-200;
+  @apply h-full overflow-auto transition-colors duration-200;
   .remirror-editor.ProseMirror {
     @apply overflow-hidden !important;
   }

@@ -9,6 +9,7 @@ export interface EditorType {
   onChangePlainText?: ({ name, value }: { name: string; value: string }) => void;
   isReadOnly?: boolean;
   isDisabled?: boolean;
+  isFullHeight?: boolean;
   customPlaceholder?: string;
   menubarSize?: Size;
   hooks?: any;

@@ -627,6 +627,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         <Editor
           initialContent={character?.biography || undefined}
           isDisabled={!hasCreateOrEdit}
+          isFullHeight
           name="biography"
           onChange={handleChange}
         />
