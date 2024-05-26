@@ -103,6 +103,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   }, [currentMap, project_id]);
 
   if (!currentMap) return null;
+
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
@@ -127,8 +128,8 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
           </div>
         </div>
       )}
-      {isLoading ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && !isLoading && !!bounds && permissions?.read_maps ? (
+      {isLoading && !currentMap ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
+      {currentMap && (!isLoading || (data && isLoading)) && !!bounds && permissions?.read_maps ? (
         <div className="z-0 min-h-full min-w-full">
           <MapContainer
             ref={(node) => {

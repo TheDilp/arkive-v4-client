@@ -25,7 +25,12 @@ function MapPinMentionTooltip({ id, parent_id, project_id }: Pick<Props, "id" | 
   const { data } = useGetEntity<MapType>(
     parent_id as string,
     "maps",
-    { data: { project_id }, fields: ["title", "image_id"], relations: { map_pins: true } },
+    {
+      data: { project_id },
+      fields: ["title", "image_id", "cluster_pins", "owner_id"],
+      permissions: true,
+      relations: { map_pins: true },
+    },
     { enabled: !!parent_id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000, retry: false },
   );
   return (
@@ -75,7 +80,7 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
     if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
     if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
     return (
-      <Tooltip content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
+      <Tooltip arrowColor="#3f3f46" content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
         <Link
           className="inline-flex items-center font-lato text-sm font-bold transition-colors"
           to={getMentionLink(
