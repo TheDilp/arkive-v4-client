@@ -178,7 +178,17 @@ function getColumns(
           <Button
             hasNoBackground
             icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-            isDisabled={!!row.original.deleted_at}
+            isDisabled={
+              !!row.original.deleted_at ||
+              !hasActionPermission(
+                isProjectOwner,
+                user_id === row.original.owner_id,
+                permissions,
+                row.original?.permissions || [],
+                `update_${entityType}` as PermissionCodeType,
+                user_role_id,
+              )
+            }
             isIconOnly
             onClick={() => {
               updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });

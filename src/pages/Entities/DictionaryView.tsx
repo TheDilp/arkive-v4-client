@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { Dispatch, useLayoutEffect, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
@@ -13,7 +13,10 @@ import {
   drawerAtom,
   FetchFunction,
   getPluralEntityType,
+  hasActionPermission,
+  hasEntityUpdatePermissionForEntityView,
   IconEnum,
+  isProjectOwnerAtom,
   TextFilters,
   useNotifications,
   userAtom,
@@ -168,27 +171,38 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   const setDialog = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutateAsync: deleteMany } = useDeleteMany("words", false, project_id);
-
-  const permissions = useHasPermissions(["read_words", "create_words", "update_words", "delete_words"], undefined);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(
+    ["update_dictionaries", "read_words", "create_words", "update_words", "delete_words"],
+    undefined,
+  );
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
-
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
   const { data, isInitialLoading, error } = useGetEntity<DictionaryType>(
     item_id || id,
     "dictionaries",
     {
-      fields: ["id", "owner_id", "title", "is_public"],
+      fields: ["id", "owner_id", "title", "is_public", "owner_id"],
+      permissions: true,
     },
     {
       staleTime: 5 * 60 * 1000,
       isPublic,
     },
   );
-
+  const updateDictionaryPermission = hasActionPermission(
+    isProjectOwner,
+    user?.id === data?.data?.owner_id,
+    permissions,
+    data?.data?.permissions || [],
+    "update_dictionaries",
+    user?.role?.id,
+  );
   const { data: words, isInitialLoading: isInitialLoadingWords } = useGetEntities<WordType>(
     {
       data: {
@@ -206,6 +220,10 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     },
   );
   useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
+
+  useEffect(() => {
+    setEntityUpdatePermission(updateDictionaryPermission);
+  }, [updateDictionaryPermission]);
 
   useLayoutEffect(() => {
     if (!filter) {
@@ -271,6 +289,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
           <div className="w-52">
             <Button
               icon={IconEnum.add}
+              isDisabled={!updateDictionaryPermission || !permissions?.create_words}
               label="Create new word"
               onClick={() =>
                 setDrawer((prev) => ({
