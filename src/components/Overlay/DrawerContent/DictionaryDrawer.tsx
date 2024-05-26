@@ -15,6 +15,7 @@ import { FolderSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Checkbox, Input } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
+import { Skeleton } from "../../Misc";
 import { IconPicker } from "../IconPicker";
 
 type Props = {
@@ -33,7 +34,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 
 export function DictionaryDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
-  const { data: existingDictionary } = useGetEntity<DictionaryType>(
+  const { data: existingDictionary, isFetching: isFetchingDictionary } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
     { data, fields: ["id", "title", "icon", "is_public", "is_folder", "parent_id"], permissions: true },
@@ -71,6 +72,8 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
       await updateDictionary(parsedData, { onSuccess: resetDrawer });
     }
   }
+
+  if (isFetchingDictionary) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
