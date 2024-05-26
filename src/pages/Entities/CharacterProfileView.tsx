@@ -782,8 +782,9 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
         documents: true,
         images: true,
         events: true,
+        portrait: true,
       },
-      fields: ["id", "full_name", "nickname", "portrait_id", "age", "biography", "is_public"],
+      fields: ["id", "full_name", "nickname", "age", "biography", "is_public"],
     },
     {
       staleTime: 60 * 1000,
@@ -959,8 +960,8 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             <Avatar
               hasShowImage
               image={
-                existingCharacter?.data?.portrait_id
-                  ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait_id)
+                existingCharacter?.data?.portrait
+                  ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
                   : undefined
               }
               initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
