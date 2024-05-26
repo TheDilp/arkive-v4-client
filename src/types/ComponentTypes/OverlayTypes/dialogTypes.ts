@@ -13,7 +13,8 @@ export type DialogContentType =
   | "delete_entity"
   | "delete_many"
   | "image_view"
-  | "insert_image";
+  | "insert_image"
+  | "automention";
 export interface DialogAtomType {
   data: any | null;
   title: string;

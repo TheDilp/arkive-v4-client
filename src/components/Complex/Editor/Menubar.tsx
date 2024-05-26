@@ -342,6 +342,33 @@ function menuBarItems({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
+    {
+      id: "automention",
+      // @ts-ignore
+      icon: IconEnum.mention,
+      onClick: () => {
+        if (isEditorMenubar) {
+          setDialog((prev) => ({
+            ...prev,
+            title: "Automention",
+            size: "xs",
+            type: "automention",
+            position: "top",
+            data: { getContext, title: title || "", id: id || "" },
+          }));
+        } else {
+          setDrawer((prev) => ({
+            ...prev,
+            title: "Automention",
+            size: "xs",
+            type: "autolinker",
+            data: { getContext, title: title || "", id: id || "" },
+          }));
+        }
+      },
+      tooltip: "Automention",
+      variant: "primary",
+    },
   ];
   if (!isEditorMenubar) {
     options.push(
@@ -367,21 +394,7 @@ function menuBarItems({
         },
         tooltip: "Outline",
       },
-      {
-        id: "automention",
-        // @ts-ignore
-        icon: IconEnum.mention,
-        onClick: () =>
-          setDrawer((prev) => ({
-            ...prev,
-            title: "Automention",
-            size: "xs",
-            type: "autolinker",
-            data: { getContext, title: title || "", id: id || "" },
-          })),
-        tooltip: "Automention",
-        variant: "primary",
-      },
+
       {
         id: "show_mentioned",
         icon: IconEnum.mentioned_in_document,

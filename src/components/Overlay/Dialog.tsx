@@ -17,6 +17,7 @@ import {
   InsertEditorImageDialog,
   RestoreEntityDialog,
 } from "./DialogContent";
+import { AutomentionDrawer } from "./DrawerContent";
 
 const DialogClasses = tv({
   slots: {
@@ -30,7 +31,7 @@ const DialogClasses = tv({
   variants: {
     position: {
       top: {
-        container: "justify-center items-start",
+        container: "top-[10%] left-[50%] -translate-x-[50%] -translate-y-[0%]",
       },
       center: {
         container: "justify-center items-center",
@@ -139,6 +140,7 @@ export function Dialog() {
         {dialog.type === "family_tree" ? <FamilyTreeDialog data={dialog.data} /> : null}
         {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
         {dialog.type === "insert_image" ? <InsertEditorImageDialog data={dialog.data} /> : null}
+        {dialog.type === "automention" ? <AutomentionDrawer data={dialog.data} /> : null}
         {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
         {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
         {dialog?.type === "delete_many" ? (
