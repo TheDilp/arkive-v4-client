@@ -27,6 +27,7 @@ import {
   dialogAtom,
   drawerAtom,
   edgesAtom,
+  hasEntityUpdatePermissionForEntityView,
   isProjectOwnerAtom,
   nodesAtom,
   userAtom,
@@ -61,6 +62,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     },
     { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view", item_id as string], isPublic },
   );
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   useLayoutEffect(() => {
     if (!item_id) {
@@ -138,6 +140,10 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       },
     );
   }
+
+  useEffect(() => {
+    setEntityUpdatePermission(updateGraphActionPermission);
+  }, [updateGraphActionPermission]);
 
   useEffect(() => {
     if (graph?.nodes && nodes.length === 0) {
