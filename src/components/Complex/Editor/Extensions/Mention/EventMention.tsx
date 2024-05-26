@@ -61,9 +61,9 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
       )}>
       <div className="top-[0.025rem] flex items-start">
         <span className="relative top-0.5">
-          <Icon fontSize={15} icon={IconEnum.event} />
+          <Icon fontSize={14} icon={IconEnum.event} />
         </span>
-        <span className="text-sm underline hover:text-sky-400">{data?.data?.title || title || label}</span>
+        <span className="text-base leading-4 underline hover:text-sky-400">{data?.data?.title || title || label}</span>
       </div>
     </Link>
   ) : (

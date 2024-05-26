@@ -66,13 +66,13 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
           isPublic,
           parent_id || data?.data?.parent_id,
         )}>
-        <div className="relative -top-[0.0625rem] flex items-start">
+        <div className="flex items-start">
           {icon ? (
-            <span className="relative">
+            <span className="relative top-[2px]">
               <Icon fontSize={14} icon={icon ?? IconEnum.blueprint} />
             </span>
           ) : null}
-          <span className="text-sm underline">{title || label}</span>
+          <span className="text-base leading-4 underline">{title || label}</span>
         </div>
       </Link>
     );

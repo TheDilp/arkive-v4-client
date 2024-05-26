@@ -92,9 +92,11 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
                 <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.image_id)} size="3xs" />
               </span>
             ) : (
-              <Icon fontSize={15} icon={IconEnum.map_pin} />
+              <Icon fontSize={14} icon={IconEnum.map_pin} />
             )}
-            <span className="underline hover:text-sky-400">{data?.data?.title || title || label || ""}</span>
+            <span className="text-base leading-4 underline hover:text-sky-400">
+              {data?.data?.title || title || label || ""}
+            </span>
           </div>
         </Link>
       </Tooltip>

@@ -86,7 +86,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
         arrowColor="#3f3f46"
         content={<WordMentionTooltip id={id} isPublic={isPublic} />}
         isDisabled={isDisabledTooltip ?? false}>
-        <span className="cursor-pointer text-sm font-light italic">
+        <span className="cursor-pointer text-base font-light italic leading-4">
           {data?.data?.title || title || label}
           <sup>*</sup>
         </span>

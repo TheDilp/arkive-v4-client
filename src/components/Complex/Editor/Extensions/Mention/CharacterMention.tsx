@@ -100,7 +100,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
             ) : (
               <Icon fontSize={14} icon={IconEnum.character} />
             )}
-            <span className="underline hover:text-sky-400">{data?.data?.full_name || title || label}</span>
+            <span className="text-base leading-4 underline hover:text-sky-400">{data?.data?.full_name || title || label}</span>
           </div>
         </Link>
       </Tooltip>
