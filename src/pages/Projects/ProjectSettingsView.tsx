@@ -707,6 +707,20 @@ export function ProjectSettingsView() {
               <Collapsible
                 actions={[
                   {
+                    icon: IconEnum.check_circle,
+                    tooltip: "Select all",
+                    variant: "primary",
+                    onClick: () => {
+                      handleChange(
+                        UserNotificationEntities.flatMap((entity) => [
+                          { name: `feature_flags.${entity}_create_notification`, value: true },
+                          { name: `feature_flags.${entity}_update_notification`, value: true },
+                          { name: `feature_flags.${entity}_delete_notification`, value: true },
+                        ]),
+                      );
+                    },
+                  },
+                  {
                     icon: IconEnum.save,
                     variant: "success",
                     onClick: () =>
@@ -753,6 +767,17 @@ export function ProjectSettingsView() {
               </Collapsible>
               <Collapsible
                 actions={[
+                  {
+                    icon: IconEnum.check_circle,
+                    tooltip: "Select all",
+                    variant: "primary",
+                    onClick: () => {
+                      handleChange(
+                        UserSidebarEntitiesEnabled.map((entity) => ({ name: `feature_flags.${entity}_enabled`, value: true })),
+                      );
+                    },
+                  },
+
                   {
                     icon: IconEnum.save,
                     variant: "success",
