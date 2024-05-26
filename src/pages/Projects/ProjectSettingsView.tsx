@@ -571,7 +571,7 @@ export function ProjectSettingsView() {
                 <div className="col-span-12 lg:col-span-8">
                   <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
                 </div>
-                <div className="col-span-12 lg:col-span-4">
+                <div className="col-span-12 self-end lg:col-span-4">
                   <ImageSelect
                     helperText="Ideal image size is 56x56"
                     isIconOnly={isLg}
