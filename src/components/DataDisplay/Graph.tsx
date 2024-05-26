@@ -610,6 +610,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
 
           if (node)
             cyRef?.current?._cy?.animate({
+              zoom: 5,
               center: {
                 eles: node,
               },
