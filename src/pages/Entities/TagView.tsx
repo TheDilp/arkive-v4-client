@@ -216,31 +216,27 @@ export function TagView() {
     "tags",
   );
   const selectedActions = [
-    ...(isProjectOwner
-      ? [
-          {
-            icon: IconEnum.permissions,
-            hasNoBackground: true,
-            isIconOnly: true,
-            tooltip: "Change access",
-            onClick: () => {
-              const ids = Object.values(selection || {}).flatMap((id) => id);
+    {
+      icon: IconEnum.permissions,
+      hasNoBackground: true,
+      isIconOnly: true,
+      tooltip: "Change access",
+      onClick: () => {
+        const ids = Object.values(selection || {}).flatMap((id) => id);
 
-              setDrawer((prev) => ({
-                ...prev,
-                size: "lg",
-                title: "Edit access",
-                type: "bulk_access",
-                data: {
-                  ids,
-                  selectablePermissions: ["read_tags", "update_tags", "delete_tags"],
-                  type: "tags",
-                },
-              }));
-            },
+        setDrawer((prev) => ({
+          ...prev,
+          size: "lg",
+          title: "Edit access",
+          type: "bulk_access",
+          data: {
+            ids,
+            selectablePermissions: ["read_tags", "update_tags", "delete_tags"],
+            type: "tags",
           },
-        ]
-      : []),
+        }));
+      },
+    },
 
     ...(arkived === "arkive" && permissions?.delete_tags
       ? [

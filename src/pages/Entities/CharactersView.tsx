@@ -417,31 +417,30 @@ function getSelectedActions(
           }));
         },
       },
+      {
+        icon: IconEnum.permissions,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Change access",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Edit access",
+            type: "bulk_access",
+            data: {
+              ids,
+              selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+              type: "characters",
+            },
+          }));
+        },
+      },
     );
   }
-  if (permissions?.is_owner) {
-    selectedActions.push({
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
 
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
-            type: "characters",
-          },
-        }));
-      },
-    });
-  }
   if (permissions?.delete_characters) {
     if (arkived === "arkive") {
       selectedActions.push({

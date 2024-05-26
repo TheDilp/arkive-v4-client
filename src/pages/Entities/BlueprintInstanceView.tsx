@@ -511,29 +511,29 @@ function getSelectedActions(
       },
     );
   }
-  if (permissions?.is_owner) {
-    selectedActions.push({
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
 
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
-            type: "blueprint_instances",
-          },
-        }));
-      },
-    });
-  }
+  selectedActions.push({
+    icon: IconEnum.permissions,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Change access",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
+
+      setDrawer((prev) => ({
+        ...prev,
+        size: "lg",
+        title: "Edit access",
+        type: "bulk_access",
+        data: {
+          ids,
+          selectablePermissions: ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
+          type: "blueprint_instances",
+        },
+      }));
+    },
+  });
+
   if (permissions?.delete_blueprint_instances) {
     if (arkived === "arkive") {
       selectedActions.push({

@@ -275,29 +275,27 @@ function getSelectedActions(
       },
     );
   }
-  if (permissions?.is_owner) {
-    selectedActions.push({
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
+  selectedActions.push({
+    icon: IconEnum.permissions,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Change access",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
 
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["read_assets", "update_assets", "delete_assets"],
-            type: "images",
-          },
-        }));
-      },
-    });
-  }
+      setDrawer((prev) => ({
+        ...prev,
+        size: "lg",
+        title: "Edit access",
+        type: "bulk_access",
+        data: {
+          ids,
+          selectablePermissions: ["read_assets", "update_assets", "delete_assets"],
+          type: "images",
+        },
+      }));
+    },
+  });
   if (permissions?.delete_assets) {
     selectedActions.push({
       icon: IconEnum.trash,

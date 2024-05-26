@@ -601,29 +601,27 @@ function getSelectedActions(
         : []),
     );
   }
-  if (permissions?.is_owner) {
-    selectedActions.push({
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
+  selectedActions.push({
+    icon: IconEnum.permissions,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Change access",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
 
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
-            type: "characters",
-          },
-        }));
-      },
-    });
-  }
+      setDrawer((prev) => ({
+        ...prev,
+        size: "lg",
+        title: "Edit access",
+        type: "bulk_access",
+        data: {
+          ids,
+          selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+          type: "characters",
+        },
+      }));
+    },
+  });
   if (permissions?.[`delete_${type}` as PermissionCodeType]) {
     if (arkived === "arkive") {
       selectedActions.push({

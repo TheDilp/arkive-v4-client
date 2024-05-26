@@ -230,29 +230,27 @@ function getSelectedActions(
   },
 ) {
   const selectedActions: TableSelectedAction[] = [];
-  if (permissions?.is_owner) {
-    selectedActions.push({
-      icon: IconEnum.permissions,
-      hasNoBackground: true,
-      isIconOnly: true,
-      tooltip: "Change access",
-      onClick: () => {
-        const ids = Object.values(selection || {}).flatMap((id) => id);
+  selectedActions.push({
+    icon: IconEnum.permissions,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Change access",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
 
-        setDrawer((prev) => ({
-          ...prev,
-          size: "lg",
-          title: "Edit access",
-          type: "bulk_access",
-          data: {
-            ids,
-            selectablePermissions: ["read_blueprints", "update_blueprints", "delete_blueprints"],
-            type: "blueprints",
-          },
-        }));
-      },
-    });
-  }
+      setDrawer((prev) => ({
+        ...prev,
+        size: "lg",
+        title: "Edit access",
+        type: "bulk_access",
+        data: {
+          ids,
+          selectablePermissions: ["read_blueprints", "update_blueprints", "delete_blueprints"],
+          type: "blueprints",
+        },
+      }));
+    },
+  });
   if (permissions?.delete_blueprints) {
     if (arkived === "arkive") {
       selectedActions.push({
