@@ -4,7 +4,7 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import groupBy from "lodash.groupby";
-import { Dispatch, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -47,6 +47,7 @@ import {
   getLeapDays,
   getStartingDayForMonth,
   hasActionPermission,
+  hasEntityUpdatePermissionForEntityView,
   IconEnum,
   isProjectOwnerAtom,
   projectFeatureFlagsAtom,
@@ -370,6 +371,7 @@ export function CalendarView({
     filters.relationFilters.or.length;
 
   const filterBadges = getCalendarFilterBadges(filters);
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   const [queryKey, setQueryKey] = useState<any[]>([]);
 
@@ -378,12 +380,13 @@ export function CalendarView({
     "calendars",
     {
       data: { project_id },
-      fields: ["id", "owner_id", "title", "icon", "days", "hours", "minutes", "is_public"],
+      fields: ["id", "owner_id", "title", "icon", "days", "hours", "minutes", "is_public", "owner_id"],
       relations: {
         eras: featureFlags?.show_eras_in_calendars || featureFlags?.show_eras_in_timelines || false,
         months: true,
         leap_days: true,
       },
+      permissions: true,
     },
     {
       enabled: !data && !!user,
@@ -396,6 +399,7 @@ export function CalendarView({
   const permissions = useHasPermissions(
     [
       "read_calendars",
+      "update_calendars",
       "read_events",
       "create_events",
       "update_events",
@@ -504,6 +508,19 @@ export function CalendarView({
         setDate({ year: subitemEvent?.data?.start_year, month: subitemEvent?.data?.start_month });
     }
   }, [subitem_id, subitemEvent]);
+
+  useEffect(() => {
+    setEntityUpdatePermission(
+      hasActionPermission(
+        isProjectOwner,
+        user?.id === calendar?.owner_id,
+        permissions,
+        calendar?.permissions || [],
+        "update_calendars",
+        user?.role?.id,
+      ),
+    );
+  }, [calendar]);
 
   const leapDayCount = useMemo(() => getLeapDays(calendar?.leap_days || [], calendar?.months || [], date), [date, calendar]);
   const previousMonthLeapDayCount = useMemo(
