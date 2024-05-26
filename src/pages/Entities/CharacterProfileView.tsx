@@ -114,7 +114,7 @@ function relationshipTableColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           <Avatar
-            image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
+            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
             initials={getAvatarInitials(row.original.full_name || "")}
             isBordered
             isTooltipDisabled
@@ -147,7 +147,9 @@ function relationshipTableColumns(
           {(row?.original?.relationships || [])
             .map((rel) => {
               return rel?.relation_title
-                ? `${getSentenceCase(rel?.relation_title || "")} (${rel?.relation_type_title || ""})`
+                ? `${getSentenceCase(rel?.relation_title || "")} ${
+                    rel?.relation_type_title ? `(${rel?.relation_type_title || ""})` : ""
+                  }`
                 : getSentenceCase(rel?.relation_type_title || "");
             })
             .join(",")}
@@ -906,7 +908,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const formattedRelationships: FormattedRelationship[] = Object.entries(groupBy(relationships, "id")).map(([key, value]) => {
     return {
       id: key,
-      portrait_id: value[0].portrait_id,
+      portrait: value[0].portrait || null,
       full_name: value[0].full_name,
       relationships: value.map((v) => ({ relation_title: v.relation_title, relation_type_title: v.relation_type_title })),
     };

@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useResetAtom } from "jotai/utils";
+import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -75,19 +76,19 @@ function isSaveDisabled(character: Partial<CharacterType> | null) {
 
 function RelationshipRow({
   character_name,
-  portrait_id,
+  portrait,
   id,
   handleRemove,
 }: {
   id: string;
   character_name: string;
-  portrait_id?: string;
+  portrait?: CharacterRelatedType["portrait"];
   handleRemove: (char_id: string) => void;
 }) {
   return (
     <li className="flex items-center gap-x-2">
       <div className="flex-1">
-        <EntityPreview id={id} image_id={portrait_id} title={character_name} type="characters" />
+        <EntityPreview id={id} image_id={portrait?.id} title={character_name} type="characters" />
       </div>
       <div className="w-8">
         <Button
@@ -349,6 +350,10 @@ function FieldTemplateRows({
       </div>
     </li>
   );
+}
+
+function formatRelationship(r: CharacterRelatedType) {
+  return omit({ ...r, portait_id: r.portrait?.id || null }, ["portrait"]);
 }
 
 // #region tabs
@@ -694,7 +699,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                 value: (character?.related_other || []).concat({
                                   id: value,
                                   full_name: label,
-                                  portrait_id: image,
+                                  portrait: image ? { id: image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
                                 }),
@@ -756,7 +761,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                 value: (character?.related_to || []).concat({
                                   id: value,
                                   full_name: label,
-                                  portrait_id: image,
+                                  portrait: image ? { id: image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
                                 }),
@@ -815,7 +820,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                                 value: (character?.related_from || []).concat({
                                   id: value,
                                   full_name: label,
-                                  portrait_id: image,
+                                  portrait: image ? { id: image, title: "" } : null,
                                   relation_type_id: rg.id,
                                   character_relationship_id: "",
                                 }),
@@ -903,9 +908,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
                     character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
-                    related_from: character?.related_from,
-                    related_to: character?.related_to,
-                    related_other: character?.related_other,
+                    related_from: character?.related_from?.map(formatRelationship),
+                    related_to: character?.related_to?.map(formatRelationship),
+                    related_other: character?.related_other?.map(formatRelationship),
                     is_favorite: character?.is_favorite,
                   },
                 };
@@ -925,9 +930,9 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
                     character_fields: character?.character_fields || [],
-                    related_from: character?.related_from,
-                    related_to: character?.related_to,
-                    related_other: character?.related_other,
+                    related_from: character?.related_from?.map(formatRelationship),
+                    related_to: character?.related_to?.map(formatRelationship),
+                    related_other: character?.related_other?.map(formatRelationship),
                     is_favorite: character?.is_favorite,
                   },
                 };

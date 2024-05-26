@@ -28,7 +28,7 @@ export interface CharacterRelatedType {
   full_name: string;
   relation_type_id: string;
   relation_type?: CharacterRelationshipType;
-  portrait_id?: string;
+  portrait?: { id: string; title: string } | null;
   relation_title?: string;
   relation_type_title?: string;
   character_relationship_id: string;
@@ -36,7 +36,7 @@ export interface CharacterRelatedType {
 
 export type FormattedRelationship = {
   id: string;
-  portrait_id: string | undefined;
+  portrait: { id: string; title: string } | null;
   full_name: string;
   relationships: {
     relation_title: string | undefined;
