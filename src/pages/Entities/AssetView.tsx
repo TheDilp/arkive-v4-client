@@ -121,6 +121,16 @@ function createColumns(
         <Button
           hasNoBackground
           icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isDisabled={
+            !hasActionPermission(
+              isProjectOwner,
+              user?.id === row.original.owner_id,
+              permissions,
+              row.original?.permissions || [],
+              "update_assets",
+              user?.role?.id,
+            )
+          }
           isIconOnly
           onClick={async () => {
             await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
