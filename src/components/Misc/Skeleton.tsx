@@ -118,9 +118,12 @@ function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "ent
   );
 }
 
-function EditorSkeleton() {
+function EditorSkeleton({ isFullWidth }: Pick<SkeletonType, "isFullWidth">) {
   return (
-    <div className="flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:mx-auto lg:w-[60%]">
+    <div
+      className={`flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:mx-auto ${
+        isFullWidth ? "lg:w-full" : "lg:w-[60%]"
+      }`}>
       <div className="relative flex h-full w-full flex-col content-start focus-visible:outline-none">
         <div className="flex flex-col gap-y-2 px-4 py-4">
           <div className="h-3 w-[20rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
@@ -343,12 +346,12 @@ function SidebarSkeleton() {
   );
 }
 
-export function Skeleton({ type, limit = 0, entity_type }: SkeletonType) {
+export function Skeleton({ type, limit = 0, entity_type, isFullWidth }: SkeletonType) {
   if (type === "table") return <TableSkeleton limit={limit} />;
   if (type === "folder_view") return <FolderViewSkeleton entity_type={entity_type} />;
   if (type === "breadcrumbs") return <BreadcrumbsSkeleton />;
   if (type === "drawer_form") return <DrawerFormSkeleton />;
-  if (type === "editor") return <EditorSkeleton />;
+  if (type === "editor") return <EditorSkeleton isFullWidth={isFullWidth} />;
   if (type === "family_tree") return <FamilyTreeSkeleton />;
   if (type === "character_profile") return <CharacterProfileSkeleton />;
   if (type === "character_profile_main") return <CharacterProfileMainSkeleton />;

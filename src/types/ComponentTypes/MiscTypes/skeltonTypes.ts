@@ -18,4 +18,5 @@ export type SkeletonType = {
     | "sidebar";
   limit?: number;
   entity_type?: AvailableEntityType;
+  isFullWidth?: boolean;
 };
