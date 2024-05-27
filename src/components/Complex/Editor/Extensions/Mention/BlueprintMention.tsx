@@ -53,8 +53,19 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
-    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data && !isPaused && isFetched)
+      return (
+        <span ref={mentionRef} className="font-lato underline">
+          {label}
+        </span>
+      );
+    if (!data)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
     return (
       <Link
         className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
@@ -66,7 +77,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
           isPublic,
           parent_id || data?.data?.parent_id,
         )}>
-        <div className="flex items-start">
+        <div ref={mentionRef} className="flex items-start">
           {icon ? (
             <span className="relative top-[2px]">
               <Icon fontSize={14} icon={icon ?? IconEnum.blueprint} />

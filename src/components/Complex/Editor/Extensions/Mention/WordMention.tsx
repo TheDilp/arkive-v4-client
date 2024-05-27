@@ -78,15 +78,26 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
   }, []);
 
   if (id) {
-    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
-    if (isPublic) return <span>{label}</span>;
+    if (!data?.data && !isPaused && isFetched)
+      return (
+        <span ref={mentionRef} className="font-lato underline">
+          {label}
+        </span>
+      );
+    if (isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
 
     return (
       <Tooltip
         arrowColor="#3f3f46"
         content={<WordMentionTooltip id={id} isPublic={isPublic} />}
         isDisabled={isDisabledTooltip ?? false}>
-        <span className="cursor-pointer text-base font-light italic leading-4">
+        <span ref={mentionRef} className="cursor-pointer text-base font-light italic leading-4">
           {data?.data?.title || title || label}
           <sup>*</sup>
         </span>

@@ -69,7 +69,19 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
 
   if (id) {
     if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
-    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    if (!data?.data && !isPaused && isFetched)
+      return (
+        <span ref={mentionRef} className="font-lato underline">
+          {label}
+        </span>
+      );
+    if (!data)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
+
     return (
       <Tooltip
         arrowColor="#3f3f46"
@@ -80,7 +92,7 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
         <Link
           className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           to={getMentionLink(id as string, "maps", project_id as string, !!data?.data?.is_public, isPublic)}>
-          <div className="flex items-start">
+          <div ref={mentionRef} className="flex items-start">
             <span className="relative top-0.5">
               <Icon fontSize={14} icon={IconEnum.map} />
             </span>

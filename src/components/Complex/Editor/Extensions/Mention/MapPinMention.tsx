@@ -77,8 +77,20 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
-    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data && !isPaused && isFetched)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
+    if (!data)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
+
     return (
       <Tooltip arrowColor="#3f3f46" content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
         <Link

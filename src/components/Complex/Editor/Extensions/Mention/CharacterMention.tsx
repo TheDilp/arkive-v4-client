@@ -80,8 +80,19 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
-    if (!data?.data && !isPaused && isFetched) return <span className="font-lato underline decoration-wavy">{label}</span>;
+    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data && !isPaused && isFetched)
+      return (
+        <span ref={mentionRef} className="font-lato underline">
+          {label}
+        </span>
+      );
+    if (!data)
+      return (
+        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+          {label}
+        </span>
+      );
     return (
       <Tooltip
         arrowColor="#3f3f46"
