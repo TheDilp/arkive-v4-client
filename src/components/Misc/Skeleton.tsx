@@ -120,7 +120,7 @@ function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "ent
 
 function EditorSkeleton() {
   return (
-    <div className="flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800">
+    <div className="flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:mx-auto lg:w-[60%]">
       <div className="relative flex h-full w-full flex-col content-start focus-visible:outline-none">
         <div className="flex flex-col gap-y-2 px-4 py-4">
           <div className="h-3 w-[20rem] max-w-full animate-pulse rounded-r bg-zinc-700 px-4" />
