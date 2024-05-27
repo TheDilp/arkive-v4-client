@@ -494,7 +494,15 @@ export function CalendarDrawer({ data, exceptions }: Props) {
         },
         permissions: calendar?.permissions,
       });
-      await createCalendar(parsedData, { onSuccess: resetDrawer });
+      await createCalendar(parsedData, {
+        onSuccess: () => {
+          resetDrawer();
+          setCalendar({
+            project_id,
+            parent_id: exceptions?.globalCreate ? null : item_id,
+          });
+        },
+      });
     } else {
       const parsedData = UpdateCalendarSchema.parse({
         data: { ...calendar, days: days.map((d) => d.title) },

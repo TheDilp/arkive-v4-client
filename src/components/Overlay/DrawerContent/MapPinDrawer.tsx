@@ -467,6 +467,17 @@ export function MapPinDrawer({ data, exceptions }: Props) {
                 if (res?.ok) {
                   queryClient.invalidateQueries({ queryKey: ["maps", mapPin.parent_id] });
                   resetDrawerAtom();
+                  setMapPin({
+                    id: crypto.randomUUID(),
+                    parent_id: item_id as string,
+                    lat: data.lat,
+                    lng: data.lng,
+                    background_color: "#000000",
+                    border_color: "#ffffff",
+                    show_background: true,
+                    show_border: true,
+                    color: "#ffffff",
+                  });
                 }
               },
             });

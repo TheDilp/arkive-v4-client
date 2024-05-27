@@ -232,6 +232,9 @@ export function GraphDrawer({
                     onSettled: (res) => {
                       if (res?.ok) resetDrawerAtom();
                     },
+                    onSuccess: () => {
+                      setGraph({ project_id: project_id as string });
+                    },
                   },
                 );
             }

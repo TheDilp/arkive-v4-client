@@ -557,6 +557,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                     predicate: (query) => query.queryKey.includes("blueprints"),
                   });
                   resetDrawerAtom();
+                  setBlueprint({
+                    title: "",
+                    project_id: project_id as string,
+                    blueprint_fields: [],
+                  });
                 },
               });
             } else {

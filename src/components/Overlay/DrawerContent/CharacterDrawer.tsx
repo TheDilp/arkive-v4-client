@@ -946,7 +946,10 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                 const parsedData = InsertCharacterSchema.parse(dataToParse);
                 await create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
+                    if (res?.ok) {
+                      resetDrawerAtom();
+                      setCharacter({ project_id });
+                    }
                   },
                 });
               }

@@ -262,7 +262,10 @@ export function RandomTableDrawer({ data, exceptions }: Props) {
               });
               await create(parsed, {
                 onSuccess: (res) => {
-                  if (res?.ok) resetDrawerAtom();
+                  if (res?.ok) {
+                    resetDrawerAtom();
+                    setRandomTable({ project_id: project_id as string, parent_id: exceptions?.globalCreate ? null : item_id });
+                  }
                 },
               });
             }

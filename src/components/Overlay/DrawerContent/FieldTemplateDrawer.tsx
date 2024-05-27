@@ -547,6 +547,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                   queryClient.invalidateQueries({
                     predicate: (query) => query.queryKey.includes("character_fields_templates"),
                   });
+                  setTemplate({
+                    title: "",
+                    project_id: project_id as string,
+                    sort: 0,
+                    tags: [],
+                  });
                   resetDrawerAtom();
                 },
               });

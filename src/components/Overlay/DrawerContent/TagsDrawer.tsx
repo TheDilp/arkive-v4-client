@@ -133,10 +133,16 @@ export function TagsDrawer() {
               permissions: selectedPermissions.permissions,
             });
 
-            await createMany({ data: parsed.data, permissions: parsed.permissions });
+            await createMany(
+              { data: parsed.data, permissions: parsed.permissions },
+              {
+                onSuccess: () => {
+                  resetDrawerAtom();
+                  setTags([]);
+                },
+              },
+            );
           }
-
-          resetDrawerAtom();
         }}
         variant="success"
       />

@@ -222,7 +222,14 @@ export function EventDrawer({ data, exceptions }: Props) {
       await createEvent(parsedData, {
         onSuccess: () => {
           resetDrawer();
-          queryClient.refetchQueries({
+          setEvent({
+            start_month: data?.month ?? 0,
+            start_month_id: "",
+            start_day: data?.day,
+            start_year: data?.year,
+            parent_id: exceptions?.globalCreate ? null : (item_id as string),
+          });
+          queryClient.invalidateQueries({
             queryKey: ["allEntities", project_id, "events"],
             exact: false,
             type: "active",
@@ -242,7 +249,7 @@ export function EventDrawer({ data, exceptions }: Props) {
       await updateEvent(parsedData, {
         onSuccess: () => {
           resetDrawer();
-          queryClient.refetchQueries({
+          queryClient.invalidateQueries({
             queryKey: ["allEntities", project_id, "events"],
             exact: false,
             type: "active",

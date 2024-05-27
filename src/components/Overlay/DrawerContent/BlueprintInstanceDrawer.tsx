@@ -611,7 +611,19 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
 
                 await create(parsedData, {
                   onSuccess: (res) => {
-                    if (res?.ok) resetDrawerAtom();
+                    if (res?.ok) {
+                      resetDrawerAtom();
+
+                      setInstance({
+                        id: "",
+                        title: data?.title || "",
+                        owner_id: "",
+                        blueprint_fields: [],
+                        permissions: [],
+                        parent_id: data?.title || exceptions?.globalCreate ? "" : (item_id as string),
+                        tags: [],
+                      });
+                    }
                   },
                 });
               }

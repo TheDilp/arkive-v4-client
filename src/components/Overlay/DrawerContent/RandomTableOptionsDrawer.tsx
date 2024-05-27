@@ -75,9 +75,10 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
               { data: parsedData },
               {
                 onSuccess: (res) => {
-                  queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
                   if (res?.ok) {
                     resetDrawerAtom();
+                    setOptions([]);
+                    queryClient.invalidateQueries({ queryKey: ["allEntities", project_id, "random_table_options"] });
                   }
                 },
               },

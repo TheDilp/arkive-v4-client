@@ -299,7 +299,11 @@ export function MapDrawer({
               relations: { tags, map_layers: formattedMapLayers },
               permissions: rest.permissions,
             });
-            await create(parsedData);
+            await create(parsedData, {
+              onSuccess: () => {
+                setMap({ project_id: project_id as string });
+              },
+            });
           } else {
             const formattedMapLayers = (map_layers || []).map((layer) => ({
               data: {

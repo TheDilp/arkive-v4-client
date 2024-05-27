@@ -72,11 +72,21 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
   }, [existingDictionary]);
   const { handleChange } = useHandleChange({ data: dictionary, setData: setDictionary });
   const resetDrawer = useToggledResetAtom();
+
   async function handleSave() {
     if (!data?.id) {
       const parsedData = InsertDictionarySchema.parse({ data: dictionary, permissions: dictionary.permissions });
 
-      await createDictionary(parsedData, { onSuccess: resetDrawer });
+      await createDictionary(parsedData, {
+        onSuccess: () => {
+          resetDrawer();
+          setDictionary({
+            id: data?.id,
+            parent_id: exceptions?.globalCreate ? null : item_id,
+            project_id,
+          });
+        },
+      });
     } else {
       const parsedData = UpdateDictionarySchema.parse({ data: dictionary, permissions: dictionary.permissions });
       await updateDictionary(parsedData, { onSuccess: resetDrawer });

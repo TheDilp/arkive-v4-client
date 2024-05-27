@@ -89,7 +89,15 @@ export function WordDrawer({ data, exceptions }: Props) {
   async function handleSave() {
     if (!data?.id) {
       const parsedData = InsertWordSchema.parse({ data: word, permissions: word.permissions });
-      await createWord(parsedData, { onSuccess: resetDrawer });
+      await createWord(parsedData, {
+        onSuccess: () => {
+          resetDrawer();
+          setWord({
+            title: data?.title || undefined,
+            parent_id: data?.title || exceptions?.globalCreate ? undefined : item_id,
+          });
+        },
+      });
     } else {
       const parsedData = UpdateWordSchema.parse({ data: word, permissions: word.permissions });
       await updateWord(parsedData, { onSuccess: resetDrawer });
