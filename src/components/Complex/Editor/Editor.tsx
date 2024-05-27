@@ -49,7 +49,7 @@ export function Editor({
         className={`editor-component flex w-full max-w-full flex-col rounded-md border border-zinc-700 ${
           isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-900"
         } ${isReadOnly ? "cursor-not-allowed" : ""} ${isFullHeight ? "h-full" : "max-h-[30rem]"}`}>
-        {isReadOnly || isDisabled ? null : <Menubar isEditorMenubar size={menubarSize} />}
+        {isReadOnly || isDisabled ? null : <Menubar isEditorMenubar isTemplate={false} size={menubarSize} />}
         <div
           className="flex w-full flex-col content-start focus-visible:outline-none"
           onDrop={(e) => {

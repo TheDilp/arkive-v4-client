@@ -60,7 +60,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
     item_id as string,
     "documents",
     {
-      fields: ["id", "title", "icon", "content", "is_folder", "dice_color", "owner_id"],
+      fields: ["id", "title", "icon", "content", "is_folder", "is_template", "dice_color", "owner_id"],
       relations: {
         parents: true,
       },
@@ -381,6 +381,7 @@ export default function DocumentView({ editable }: { editable: boolean }) {
             <Menubar
               icon={currentDocument?.data?.icon ?? undefined}
               id={currentDocument?.data?.id || ""}
+              isTemplate={!!currentDocument?.data?.is_template}
               size="md"
               title={currentDocument?.data?.title || ""}
             />

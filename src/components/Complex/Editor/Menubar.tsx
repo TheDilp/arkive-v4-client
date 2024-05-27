@@ -19,6 +19,7 @@ function menuBarItems({
   id,
   icon,
   isEditorMenubar,
+  isTemplate,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
@@ -29,6 +30,7 @@ function menuBarItems({
   id?: string;
   icon?: AvailableIcons;
   isEditorMenubar?: boolean;
+  isTemplate?: boolean;
 }) {
   const options: (DropdownItemType & { variant?: Variant; tooltip: string })[] = [
     {
@@ -418,12 +420,20 @@ function menuBarItems({
           setDrawer((prev) => ({
             ...prev,
             title: "Document mentioned in",
-            data: { id: "", title: "", icon, isAll: true },
+            data: { id: id || "", title: title || "", icon, isAll: false },
             type: "mentioned_in",
-            size: "half",
+            size: "half" as DrawerAtomType["size"],
           })),
       },
     );
+  }
+  if (isTemplate) {
+    options.push({
+      id: "template_maker",
+      title: "Create from template",
+      icon: IconEnum.document_template,
+      tooltip: "Create documents from this template",
+    });
   }
 
   return options;
@@ -435,11 +445,13 @@ export function Menubar({
   id,
   icon,
   isEditorMenubar,
+  isTemplate,
 }: {
   size: Size;
   title?: string;
   id?: string;
   icon?: AvailableIcons;
+  isTemplate: boolean;
   isEditorMenubar?: boolean;
 }) {
   const chain = useChainedCommands();
@@ -448,7 +460,7 @@ export function Menubar({
   const setDialog = useSetAtom(dialogAtom);
   const active = useActive();
   const items = useMemo(
-    () => menuBarItems({ active, chain, setDrawer, setDialog, getContext, title, id, icon, isEditorMenubar }),
+    () => menuBarItems({ active, chain, setDrawer, setDialog, getContext, title, id, icon, isEditorMenubar, isTemplate }),
     [chain, isEditorMenubar, id, title],
   );
 
