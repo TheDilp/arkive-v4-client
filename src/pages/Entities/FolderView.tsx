@@ -333,29 +333,7 @@ function getColumns(
             },
           );
         }
-        if (is_document_template && !row.original.deleted_at) {
-          actions.push({
-            id: "create_from_template",
-            title: "Create document from template",
-            icon: IconEnum.document_template,
-            isDisabled: !hasActionPermission(
-              isProjectOwner,
-              user_id === row.original.owner_id,
-              permissions,
-              row.original?.permissions || [],
-              `create_${entityType}`,
-              user_role_id,
-            ),
-            onClick: () =>
-              setDrawer((prev) => ({
-                ...prev,
-                data: { id: row.original.id, title: row.original.title },
-                type: "from_template",
-                size: "lg",
-                title: "Create from template",
-              })),
-          });
-        }
+
         // if (entityType === "dictionaries") {
         //   actions.push({
         //     id: "download_dictionary",
