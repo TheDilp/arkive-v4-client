@@ -402,7 +402,11 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   const [instance, setInstance] = useState<Omit<BlueprintInstanceType, "deleted_at"> | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });
-  const { data: blueprint, isFetching: isFetchingBlueprint } = useGetEntity<BlueprintType>(
+  const {
+    data: blueprint,
+    isInitialLoading: isInitialLoadingBlueprint,
+    isFetching: isFetchingBlueprint,
+  } = useGetEntity<BlueprintType>(
     data?.title || exceptions?.globalCreate ? instance?.parent_id : data?.parent_id ?? item_id,
     "blueprints",
     {
@@ -477,7 +481,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   );
   const tabs = getTabs(permissions, data?.id);
 
-  if (isInitialLoading || (!data?.title && isFetchingBlueprint) || !instance) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading || (!data?.title && isInitialLoadingBlueprint) || !instance) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
