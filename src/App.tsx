@@ -12,6 +12,7 @@ import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView, PublicListView } from "./pages/Public";
 import { PublicLayout } from "./pages/Public/PublicLayout";
 import { UserSettings, UserSettingsWebhooks } from "./pages/User";
+import UserSettingsFeatureFlags from "./pages/User/UserSettingsFeatureFlags";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,7 @@ export default function App() {
               path="/">
               <Route element={<UserSettings />} path="user_settings/*">
                 <Route element={<UserSettingsWebhooks />} path="webhooks" />
+                <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
               </Route>
 
               <Route element={<Outlet />} path="projects/*">

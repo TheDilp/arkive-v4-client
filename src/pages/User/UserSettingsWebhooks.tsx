@@ -68,19 +68,25 @@ export function UserSettingsWebhooks() {
     setDrawer((prev) => ({ ...prev, title: "Create webhook", type: "webhooks", data: {} }));
   }
 
-  const { data: webhooks } = useGetEntities<WebhookType>(
+  const { data: webhooks, isFetching } = useGetEntities<WebhookType>(
     { data: { user_id: user?.data?.id }, fields: ["id", "title", "user_id"] },
     "webhooks",
-    { enabled: !!user?.data?.id },
+    { enabled: !!user?.data?.id, staleTime: 5 * 60 * 1000 },
   );
   return (
-    <div className="flex w-full flex-col gap-y-2 p-4">
+    <div className="flex w-full flex-col gap-y-2">
       <div className="flex items-center justify-end">
         <div>
           <Button icon={IconEnum.add} label="Create webhook" onClick={handleCreateWebhook} />
         </div>
       </div>
-      <Table columns={createColumns(setDrawer)} data={webhooks?.data || []} dispatch={dispatch} type="webhooks" />
+      <Table
+        columns={createColumns(setDrawer)}
+        data={webhooks?.data || []}
+        dispatch={dispatch}
+        isLoading={isFetching}
+        type="webhooks"
+      />
     </div>
   );
 }

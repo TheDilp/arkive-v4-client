@@ -601,7 +601,6 @@ export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntity
     },
   );
 }
-
 export function useBulkUpdate(project_id: string, type: AvailableEntityType | "blueprint_instances") {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -695,7 +694,7 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
 export function useUpdateUser<
   InsertType extends {
     data?: Partial<Pick<UserType, "feature_flags">>;
-    relations: { feature_flags: { project_id: string; feature_flags: UserType["feature_flags"] } };
+    relations?: { feature_flags?: { project_id: string; feature_flags: UserType["feature_flags"] } };
   },
 >(id: string, auth_id: string) {
   const queryClient = useQueryClient();

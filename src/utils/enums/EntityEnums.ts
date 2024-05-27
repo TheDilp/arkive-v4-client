@@ -157,6 +157,8 @@ export const UserSidebarEntitiesEnabled = [
   "character_fields_templates",
 ];
 
+export const DefaultUserFeatureFlags = ["close_drawer_on_save"];
+
 export const MiscellaneousSettings = [
   "sort_tags_alphabetically",
   "show_eras_in_calendars",
