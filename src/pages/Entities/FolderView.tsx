@@ -1227,6 +1227,7 @@ export function FolderView() {
             config={{
               selectedActions,
               filters,
+              relationFilters,
               hasSelect: true,
               hasArkived: arkived === "arkive",
               hasTags: EntitiesWithTags.includes(type as string),

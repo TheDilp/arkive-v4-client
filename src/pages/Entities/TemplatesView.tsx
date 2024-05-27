@@ -199,9 +199,10 @@ export function TemplatesView() {
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "character_fields_templates");
   const { mutateAsync: deleteMany } = useDeleteMany("character_fields_templates", arkived === "active", project_id);
 
-  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "sort", sort: "desc" }],
     filters: {},
+    relationFilters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
@@ -209,6 +210,7 @@ export function TemplatesView() {
   const { data, isLoading } = useGetEntities<CharacterFieldTemplateType>(
     {
       filters,
+      relationFilters,
       orderBy,
       pagination,
       data: {
@@ -352,6 +354,7 @@ export function TemplatesView() {
         <Table
           columns={columns}
           config={{
+            relationFilters,
             hasSelect: true,
             hasArkived: arkived === "arkive",
             expandable: true,
