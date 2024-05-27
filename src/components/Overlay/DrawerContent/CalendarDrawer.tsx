@@ -442,7 +442,11 @@ export function CalendarDrawer({ data, exceptions }: Props) {
   const [leapDays, setLeapDays] = useState<LeapDayStateType[]>([]);
   const resetDrawer = useToggledResetAtom();
 
-  const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
+  const {
+    data: existingCalendar,
+    isInitialLoading,
+    isFetching,
+  } = useGetEntity<CalendarType>(
     data?.id,
     "calendars",
     {
@@ -508,7 +512,7 @@ export function CalendarDrawer({ data, exceptions }: Props) {
     }
   }
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -712,7 +716,7 @@ export function CalendarDrawer({ data, exceptions }: Props) {
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(calendar, months, days) || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(calendar, months, days) || isCreating || isUpdating || isFetching}
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Save" : "Create"}
           onClick={handleSave}

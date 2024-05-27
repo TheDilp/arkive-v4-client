@@ -54,7 +54,11 @@ export function WordDrawer({ data, exceptions }: Props) {
   const [selectedTab, setSelectedTab] = useState(0);
   const permissions = useHasPermissions(["read_words", "update_words", "delete_words"], word?.owner_id);
   const tabs = getTabs(permissions, data?.id);
-  const { data: existingWord, isFetching } = useGetSubEntity(
+  const {
+    data: existingWord,
+    isInitialLoading,
+    isFetching,
+  } = useGetSubEntity(
     data?.id,
     "words",
     {
@@ -93,7 +97,7 @@ export function WordDrawer({ data, exceptions }: Props) {
     queryClient.invalidateQueries(["allEntities", project_id, "words"]);
   }
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -160,7 +164,7 @@ export function WordDrawer({ data, exceptions }: Props) {
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isCreating || isUpdating || isSaveDisabled(word)}
+          isDisabled={isFetching || isCreating || isUpdating || isSaveDisabled(word)}
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Save" : "Create"}
           onClick={handleSave}

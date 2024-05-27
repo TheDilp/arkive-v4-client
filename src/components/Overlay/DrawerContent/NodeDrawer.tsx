@@ -90,7 +90,11 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const createNotification = useNotifications();
-  const { data: existingNode, isFetching } = useGetSubEntity<NodeType>(
+  const {
+    data: existingNode,
+    isInitialLoading,
+    isFetching,
+  } = useGetSubEntity<NodeType>(
     data?.id,
     "nodes",
     {
@@ -163,7 +167,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
     }
   }, [changedData]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 overflow-auto font-lato">
@@ -466,7 +470,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
         />
         <Button
           icon={IconEnum.save}
-          isDisabled={isUpdating || !permissions?.update_graphs}
+          isDisabled={isFetching || isUpdating || !permissions?.update_graphs}
           isLoading={isUpdating}
           label="Save"
           onClick={async () => {

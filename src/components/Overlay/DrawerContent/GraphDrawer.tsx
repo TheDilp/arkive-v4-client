@@ -61,7 +61,11 @@ export function GraphDrawer({
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawerAtom = useToggledResetAtom();
-  const { data: existingGraph, isFetching } = useGetEntity<GraphType>(
+  const {
+    data: existingGraph,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntity<GraphType>(
     data?.id,
     "graphs",
     {
@@ -118,7 +122,7 @@ export function GraphDrawer({
     }
   }, [existingGraph]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -195,7 +199,7 @@ export function GraphDrawer({
       <div>
         <Button
           icon={graph?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(graph) || isCreating || isUpdating || !permissions?.update_graphs}
+          isDisabled={isSaveDisabled(graph) || isFetching || isCreating || isUpdating || !permissions?.update_graphs}
           isLoading={isCreating || isUpdating}
           label={graph?.id ? "Save" : "Create"}
           onClick={async () => {

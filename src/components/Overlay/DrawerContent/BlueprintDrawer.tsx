@@ -272,7 +272,11 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     project_id as string,
   );
 
-  const { data: existingBlueprint, isFetching } = useGetEntity<BlueprintType>(
+  const {
+    data: existingBlueprint,
+    isInitialLoading,
+    isFetching,
+  } = useGetEntity<BlueprintType>(
     data?.id,
     "blueprints",
     {
@@ -313,7 +317,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     }
   }, [existingBlueprint?.data]);
 
-  if (isFetching && !existingBlueprint?.data) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />

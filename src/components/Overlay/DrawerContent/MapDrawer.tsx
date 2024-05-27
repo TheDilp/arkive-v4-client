@@ -53,7 +53,11 @@ export function MapDrawer({
 }) {
   const { project_id, item_id } = useParams();
 
-  const { data: existingMap, isFetching } = useGetEntity<MapType>(
+  const {
+    data: existingMap,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntity<MapType>(
     data?.id,
     "maps",
     {
@@ -93,7 +97,7 @@ export function MapDrawer({
     if (existingMap?.data) setMap(existingMap?.data);
   }, [existingMap]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
     <div className="flex flex-col gap-y-2">
       <Tabs onChange={(_, indx) => setSelectedTab(indx)} selectedTab={selectedTab} tabs={tabs} />
@@ -275,7 +279,7 @@ export function MapDrawer({
       ) : null}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isDisabled(map) || isCreating || isUpdating || !canCreateOrEdit}
+        isDisabled={isDisabled(map) || isFetching || isCreating || isUpdating || !canCreateOrEdit}
         isLoading={isCreating || isUpdating}
         label={data?.id ? "Save" : "Create"}
         onClick={async () => {

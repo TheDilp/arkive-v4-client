@@ -426,7 +426,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
 
-  const { data: existingCharacter, isFetching } = useGetEntity<CharacterType>(
+  const {
+    data: existingCharacter,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntity<CharacterType>(
     data?.id,
     "characters",
     {
@@ -538,7 +542,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       });
     }
   }, [existingCharacter?.data]);
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -891,7 +895,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       <div>
         <Button
           icon={character?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled(character) || !hasCreateOrEdit || isCreating || isUpdating}
+          isDisabled={isSaveDisabled(character) || !hasCreateOrEdit || isFetching || isCreating || isUpdating}
           isLoading={isCreating || isUpdating}
           label={character?.id ? "Update" : "Create"}
           onClick={async () => {

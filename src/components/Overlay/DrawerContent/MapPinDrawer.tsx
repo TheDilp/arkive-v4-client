@@ -70,7 +70,11 @@ export function MapPinDrawer({ data, exceptions }: Props) {
   );
 
   const resetDrawerAtom = useToggledResetAtom();
-  const { data: existingMapPin, isFetching } = useGetSubEntity<MapPinType>(
+  const {
+    data: existingMapPin,
+    isFetching,
+    isInitialLoading,
+  } = useGetSubEntity<MapPinType>(
     data?.id,
     "map_pins",
     {
@@ -147,7 +151,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     }
   }, [character]);
   const tabs = getTabs(permissions, data?.id).toSpliced(exceptions?.characterPin ? 1 : 0, exceptions?.characterPin ? 1 : 0);
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -445,6 +449,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
         icon={IconEnum.save}
         isDisabled={
           isSaveDisabled(mapPin, { exceptions }) ||
+          isFetching ||
           isCreating ||
           isUpdating ||
           (!!data?.id && !permissions?.update_map_pins) ||

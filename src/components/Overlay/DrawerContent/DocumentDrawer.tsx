@@ -68,7 +68,11 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   const user = useAtomValue(userAtom);
   const resetDrawerAtom = useToggledResetAtom();
 
-  const { data: existingDocument, isFetching } = useGetEntity<DocumentType>(
+  const {
+    data: existingDocument,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntity<DocumentType>(
     data?.id,
     "documents",
     {
@@ -118,7 +122,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     if (existingDocument?.data) setDocument(existingDocument?.data);
   }, [existingDocument]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -259,7 +263,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       ) : null}
       <Button
         icon={document?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isCreating || isUpdating}
+        isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isFetching || isCreating || isUpdating}
         isLoading={isCreating || isUpdating}
         label={document?.id ? "Update" : "Create"}
         onClick={async () => {

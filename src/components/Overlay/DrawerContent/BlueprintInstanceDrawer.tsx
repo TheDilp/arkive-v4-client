@@ -424,7 +424,11 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateSubEntity("blueprint_instances", project_id, item_id);
 
-  const { data: existingInstance, isFetching: isFetchingInstance } = useGetSubEntity<BlueprintInstanceType>(
+  const {
+    data: existingInstance,
+    isInitialLoading,
+    isFetching: isFetchingInstance,
+  } = useGetSubEntity<BlueprintInstanceType>(
     data?.id,
     "blueprint_instances",
     {
@@ -473,7 +477,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   );
   const tabs = getTabs(permissions, data?.id);
 
-  if (isFetchingInstance || (!data?.title && isFetchingBlueprint) || !instance) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading || (!data?.title && isFetchingBlueprint) || !instance) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -562,6 +566,8 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
             isSaveDisabled(instance?.blueprint_fields || [], blueprint?.data) ||
             isCreating ||
             isUpdating ||
+            isFetchingInstance ||
+            isFetchingBlueprint ||
             !canCreateOrEdit
           }
           isLoading={isCreating || isUpdating}

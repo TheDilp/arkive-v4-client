@@ -26,7 +26,7 @@ export function ImageDrawer({ data }: Props) {
   const [image, setImage] = useState<ImageType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDrawer = useToggledResetAtom();
-  const { data: imageData } = useGetImage(data?.id, project_id as string, "images", {
+  const { data: imageData, isInitialLoading } = useGetImage(data?.id, project_id as string, "images", {
     fields: ["id", "title", "is_public", "owner_id"],
     permissions: true,
   });
@@ -44,7 +44,7 @@ export function ImageDrawer({ data }: Props) {
 
   const tabs = getTabs(permissions);
 
-  if (!image) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -64,9 +64,10 @@ export function ImageDrawer({ data }: Props) {
         isDisabled={isMutating}
         isLoading={isMutating}
         label="Save"
-        onClick={async () =>
-          update({ data: { title: image.title }, permissions: image?.permissions || [] }, { onSuccess: resetDrawer })
-        }
+        onClick={async () => {
+          if (image?.title)
+            await update({ data: { title: image.title }, permissions: image?.permissions || [] }, { onSuccess: resetDrawer });
+        }}
         variant="success"
       />
     </DrawerLayout>

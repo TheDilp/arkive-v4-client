@@ -109,7 +109,11 @@ export function EventDrawer({ data, exceptions }: Props) {
     },
   );
 
-  const { data: existingEvent, isFetching: isFetchingEvent } = useGetSubEntity<EventType>(
+  const {
+    data: existingEvent,
+    isInitialLoading,
+    isFetching: isFetchingEvent,
+  } = useGetSubEntity<EventType>(
     data?.id,
     "events",
     {
@@ -255,7 +259,7 @@ export function EventDrawer({ data, exceptions }: Props) {
 
   const isLoading = isFetchingEvent || isFetchingMonths;
 
-  if (isLoading) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -645,7 +649,7 @@ export function EventDrawer({ data, exceptions }: Props) {
         <div>
           <Button
             icon={hasId ? IconEnum.save : IconEnum.add}
-            isDisabled={isSaveDisabled(event, { isDateCorrect }) || isCreating || isUpdating}
+            isDisabled={isSaveDisabled(event, { isDateCorrect }) || isLoading || isCreating || isUpdating}
             isLoading={isCreating || isUpdating}
             label={hasId ? "Save" : "Create"}
             onClick={handleSave}

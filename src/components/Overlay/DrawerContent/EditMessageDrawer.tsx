@@ -17,7 +17,11 @@ type Props = {
 };
 
 export function EditMessageDrawer({ data }: Props) {
-  const { data: existingMessage, isFetching } = useGetSubEntity<MessageType>(
+  const {
+    data: existingMessage,
+    isInitialLoading,
+    isFetching,
+  } = useGetSubEntity<MessageType>(
     data?.id,
     "messages",
     {
@@ -76,7 +80,7 @@ export function EditMessageDrawer({ data }: Props) {
     }
   }, [existingMessage]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
     <div className="flex flex-col gap-y-2">
       {existingMessage?.data?.character ? (
@@ -123,7 +127,7 @@ export function EditMessageDrawer({ data }: Props) {
       <div>
         <Button
           icon={IconEnum.save}
-          isDisabled={isUpdating}
+          isDisabled={isUpdating || isFetching}
           isLoading={isUpdating}
           label="Update"
           onClick={handleSave}

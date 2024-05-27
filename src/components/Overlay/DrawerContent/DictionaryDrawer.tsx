@@ -40,7 +40,11 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 
 export function DictionaryDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
-  const { data: existingDictionary, isFetching: isFetchingDictionary } = useGetEntity<DictionaryType>(
+  const {
+    data: existingDictionary,
+    isInitialLoading,
+    isFetching: isFetchingDictionary,
+  } = useGetEntity<DictionaryType>(
     data?.id,
     "dictionaries",
     { data, fields: ["id", "title", "icon", "is_public", "is_folder", "parent_id"], permissions: true },
@@ -79,7 +83,7 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
     }
   }
 
-  if (isFetchingDictionary) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
@@ -118,7 +122,7 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
       ) : null}
       <Button
         icon={data?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={!dictionary.title || isCreating || isUpdating}
+        isDisabled={!dictionary.title || isCreating || isUpdating || isFetchingDictionary}
         isLoading={isCreating || isUpdating}
         label={data?.id ? "Save" : "Create"}
         onClick={handleSave}

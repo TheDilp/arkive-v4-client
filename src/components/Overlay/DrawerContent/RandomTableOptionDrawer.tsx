@@ -25,7 +25,11 @@ export function RandomTableOptionDrawer({ data }: Props) {
 
   const resetDrawer = useToggledResetAtom();
 
-  const { data: existingOption, isFetching } = useGetSubEntity<RandomTableOptionType>(
+  const {
+    data: existingOption,
+    isInitialLoading,
+    isFetching,
+  } = useGetSubEntity<RandomTableOptionType>(
     data?.id,
     "random_table_options",
     {
@@ -51,7 +55,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
     if (existingOption?.data) setRandomTableOption(existingOption?.data);
   }, [existingOption]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   if (!existingOption?.data || !data?.id) return <Alert label="This option does not exist." variant="error" />;
 

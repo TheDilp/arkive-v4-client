@@ -118,7 +118,11 @@ export function EdgeDrawer({ data }: Props) {
     undefined,
   );
   const tabs = getTabs(permissions);
-  const { data: existingEdge, isFetching } = useGetSubEntity<EdgeType>(
+  const {
+    data: existingEdge,
+    isFetching,
+    isInitialLoading,
+  } = useGetSubEntity<EdgeType>(
     data?.id,
     "edges",
     {
@@ -201,7 +205,7 @@ export function EdgeDrawer({ data }: Props) {
     }
   }
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">

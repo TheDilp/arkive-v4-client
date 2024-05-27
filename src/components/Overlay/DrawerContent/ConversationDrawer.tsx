@@ -40,7 +40,11 @@ export function ConversationDrawer({ data }: Props) {
     "conversations",
     project_id as string,
   );
-  const { data: existingConversation, isFetching } = useGetEntity<ConversationType>(
+  const {
+    data: existingConversation,
+    isInitialLoading,
+    isFetching,
+  } = useGetEntity<ConversationType>(
     data?.conversation_id,
     "conversations",
     {
@@ -94,7 +98,7 @@ export function ConversationDrawer({ data }: Props) {
     return null;
   }
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -159,7 +163,7 @@ export function ConversationDrawer({ data }: Props) {
       ))}
       <Button
         icon={IconEnum.conversation}
-        isDisabled={isCreating || isUpdating || isSaveDisabled(conversation, conversation?.characters || [])}
+        isDisabled={isCreating || isUpdating || isFetching || isSaveDisabled(conversation, conversation?.characters || [])}
         isLoading={isCreating || isUpdating}
         label={`${data?.conversation_id ? "Update" : "Start"} conversation`}
         onClick={handleSave}

@@ -269,7 +269,11 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     "character_fields_templates",
     project_id as string,
   );
-  const { data: existingTemplate, isFetching } = useGetEntity<CharacterFieldTemplateType>(
+  const {
+    data: existingTemplate,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntity<CharacterFieldTemplateType>(
     data?.id,
     "character_fields_templates",
     {
@@ -311,7 +315,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     }
   }, [existingTemplate]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>

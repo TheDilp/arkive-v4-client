@@ -122,7 +122,11 @@ export function ManyEdgesDrawer({ data }: Props) {
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
 
-  const { data: existingEdges, isFetching } = useGetEntities<EdgeType>(
+  const {
+    data: existingEdges,
+    isFetching,
+    isInitialLoading,
+  } = useGetEntities<EdgeType>(
     {
       data: { parent_id: item_id },
       fields: [
@@ -201,7 +205,7 @@ export function ManyEdgesDrawer({ data }: Props) {
     }
   }
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2 font-lato">
