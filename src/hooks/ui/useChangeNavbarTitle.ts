@@ -9,7 +9,7 @@ export function useNavbarTitle(title: string, enabled?: boolean) {
   useEffect(() => {
     if (projectData?.title && title && (enabled || enabled === undefined)) {
       setNavbarTitleAtom(`${projectData?.title} | ${title || ""}`);
-      document.title = `${projectData?.title} | ${title || ""}`;
+      document.title = `${title?.split("|")?.at(-1) || "The Arkive"}`;
     } else if (!projectData?.title) {
       setNavbarTitleAtom(title || "");
       document.title = "The Arkive";
