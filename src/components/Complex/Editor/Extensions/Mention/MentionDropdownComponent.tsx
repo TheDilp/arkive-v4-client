@@ -120,7 +120,7 @@ export function MentionDropdownComponent() {
                   item,
                   index,
                 })}
-                key={item.key}>
+                key={`${item.key}_${item.alterId || "NO_ALTER_ID"}`}>
                 {item?.portrait_id ? (
                   <Avatar image={getImageURL(project_id as string, "images", item.portrait_id)} label={item.label} size="xs" />
                 ) : null}
