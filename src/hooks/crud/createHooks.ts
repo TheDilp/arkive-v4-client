@@ -406,10 +406,10 @@ export function useCreateFromTemplate(project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
-    async (vars: { id: string; titles?: string[]; count: number }) =>
+    async (vars: { id_template: string; project_id: string; title: string; matches: Record<string, string> }) =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/documents/create/from_template/${vars.id}`,
-        body: JSON.stringify({ data: { titles: vars.titles, count: vars.count } }),
+        url: `${baseURLS.baseServer}/documents/create/from_template`,
+        body: JSON.stringify({ data: vars }),
         method: "POST",
       }),
 

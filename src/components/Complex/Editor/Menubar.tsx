@@ -433,6 +433,16 @@ function menuBarItems({
       title: "Create from template",
       icon: IconEnum.document_template,
       tooltip: "Create documents from this template",
+      onClick: () => {
+        if (id && title)
+          setDrawer((prev) => ({
+            ...prev,
+            data: { id, title, getContext },
+            type: "from_template",
+            size: "full",
+            title: "Create from template",
+          }));
+      },
     });
   }
 
