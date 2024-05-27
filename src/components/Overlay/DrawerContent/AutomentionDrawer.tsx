@@ -2,9 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-control-regex */
-/* eslint-disable no-restricted-syntax */
 
-import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
@@ -17,10 +15,12 @@ import { SearchableMentionEntities } from "../../../types";
 import {
   AvailableIcons,
   baseURLS,
+  createMentions,
   drawerAtom,
   FetchFunction,
   getElementPosition,
   getImageURL,
+  getRanges,
   IconEnum,
   mentionPositionAtom,
 } from "../../../utils";
@@ -37,106 +37,6 @@ type Props = {
 };
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
-
-function getRanges(doc: Node, potentialMatches: matchItem[], selectedEntity: SearchableMentionEntities | null): matchResult[] {
-  const matchWords = potentialMatches.flatMap((res) => res.title.trim()).join("|");
-  if (!matchWords || !selectedEntity) {
-    return [];
-  }
-
-  const re = new RegExp(`\\b(${matchWords})\\b`, "gui");
-  const ranges: matchResult[] = [];
-  doc.descendants((node, pos) => {
-    if (!node.isTextblock) {
-      return true;
-    }
-    let tc = "";
-
-    node.content.forEach((child) => {
-      if (child.type.name === "mentionAtom") {
-        const textContent = child.attrs.label;
-        if (textContent) {
-          // Must use as replacement for mentions as they
-          // take up space in text (in order to get correct pos of text)
-          tc += " ";
-        }
-      } else if (child.type.name === "image") {
-        tc += " ";
-      } else {
-        tc = tc.concat(child.textContent);
-      }
-    });
-    const start = pos + 1;
-    for (const match of tc.matchAll(re)) {
-      const from = start + (match.index ?? 0);
-      const to = from + match[0].length;
-
-      const matchedItem = potentialMatches.find((item) =>
-        selectedEntity === "characters"
-          ? item.title.toLowerCase().includes(match[0].toLowerCase())
-          : item.title.toLowerCase() === match[0].toLowerCase(),
-      );
-      if (matchedItem)
-        ranges.push({
-          from,
-          to,
-          id: matchedItem.id,
-          title: matchedItem.title,
-          icon: matchedItem.icon,
-          blueprint_title: matchedItem?.blueprint_title,
-          image_id: matchedItem?.image_id,
-        });
-    }
-
-    return false;
-  });
-
-  return selectedEntity === "blueprint_instances"
-    ? ranges.sort((a, b) => {
-        if (a.blueprint_title && b.blueprint_title) {
-          if (a.blueprint_title < b.blueprint_title) return -1;
-          if (a.blueprint_title > b.blueprint_title) return 1;
-          return 0;
-        }
-        return 0;
-      })
-    : ranges;
-}
-
-function createMentions(
-  initialRanges: matchResult[],
-  getContext: ReactFrameworkOutput<Remirror.Extensions>,
-  selectedEntity: SearchableMentionEntities | null,
-  project_id: string,
-) {
-  if (!selectedEntity) return;
-
-  const initialRangesCount = initialRanges.length;
-  let count = initialRangesCount;
-
-  while (count > 0) {
-    if (count > 0) count -= 1;
-    const range = initialRanges[count];
-    getContext.commands.createMentionAtom(
-      {
-        name: selectedEntity,
-        range: {
-          from: range.from,
-          cursor: range.to,
-          to: range.to,
-        },
-      },
-      {
-        id: range.id,
-        label: range.title,
-        name: selectedEntity,
-        icon: range.icon,
-        projectId: project_id,
-        parent_id: range.parent_id,
-      },
-    );
-  }
-}
 
 const MentionEntityOptions: { label: string; value: SearchableMentionEntities; icon: AvailableIcons }[] = [
   {
@@ -211,7 +111,6 @@ export function AutomentionDrawer({ data }: Props) {
   );
 
   const [ranges, setRanges] = useState<matchResult[]>([]);
-
   useLayoutEffect(() => {
     data.getContext.commands.setAnnotations([]);
     setRanges([]);
@@ -238,7 +137,7 @@ export function AutomentionDrawer({ data }: Props) {
 
   useEffect(() => {
     if (links?.data && selectedEntity) {
-      setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity));
+      setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity, "automention"));
     }
   }, [links?.data, selectedEntity]);
   return (
@@ -358,7 +257,7 @@ export function AutomentionDrawer({ data }: Props) {
             );
 
             if (links?.data) {
-              setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity));
+              setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity, "automention"));
               setSelectedLinks([]);
             }
 
