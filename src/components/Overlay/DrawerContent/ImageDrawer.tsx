@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetImage, useHandleChange, useHasPermissions, useUpdateImage } from "../../../hooks";
+import { useGetImage, useHandleChange, useHasPermissions, useToggledResetAtom, useUpdateImage } from "../../../hooks";
 import { ImageType, TabType, UserHasPermissionsType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
@@ -26,7 +25,7 @@ export function ImageDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [image, setImage] = useState<ImageType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const { data: imageData } = useGetImage(data?.id, project_id as string, "images", {
     fields: ["id", "title", "is_public", "owner_id"],
     permissions: true,

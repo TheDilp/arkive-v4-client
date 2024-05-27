@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useBulkUpdateTags } from "../../../hooks";
+import { useBulkUpdateTags, useToggledResetAtom } from "../../../hooks";
 import { AvailableEntityType, AvailableSubEntityType, TableDispatch, TagType } from "../../../types";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { IconEnum, useNotifications } from "../../../utils";
 import { Button, TagInput, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
@@ -19,7 +18,7 @@ type Props = {
 export function BulkTagsDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const [tagsToAdd, setTagsToAdd] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);
   const addedTagIds = tagsToAdd.map((t) => t.id);
   const [tagsToRemove, setTagsToRemove] = useState<Omit<TagType, "owner_id" | "permissions" | "deleted_at">[]>([]);

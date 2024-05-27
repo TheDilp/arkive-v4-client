@@ -1,9 +1,15 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import {
   CalendarType,
   DayStateType,
@@ -14,7 +20,7 @@ import {
   TabType,
   UserHasPermissionsType,
 } from "../../../types";
-import { capitalizeFirstLetter, DefaultTagColor, drawerAtom, IconEnum, onDragEnd } from "../../../utils";
+import { capitalizeFirstLetter, DefaultTagColor, IconEnum, onDragEnd } from "../../../utils";
 import { LeapDayConditionsEnum } from "../../../utils/enums/CalendarEnums";
 import { InsertCalendarSchema, InsertCalendarType, UpdateCalendarSchema, UpdateCalendarType } from "../../../validation";
 import { FolderSelect } from "../../Complex";
@@ -434,7 +440,7 @@ export function CalendarDrawer({ data, exceptions }: Props) {
   const [months, setMonths] = useState<MonthStateType[]>([]);
   const [days, setDays] = useState<DayStateType[]>([]);
   const [leapDays, setLeapDays] = useState<LeapDayStateType[]>([]);
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
 
   const { data: existingCalendar, isFetching } = useGetEntity<CalendarType>(
     data?.id,

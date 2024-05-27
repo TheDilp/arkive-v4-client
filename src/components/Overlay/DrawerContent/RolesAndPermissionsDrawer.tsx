@@ -1,18 +1,10 @@
 import { useAtomValue } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useToggledResetAtom, useUpdateEntity } from "../../../hooks";
 import { RoleType } from "../../../types";
-import {
-  capitalizeFirstLetter,
-  drawerAtom,
-  getSentenceCase,
-  IconEnum,
-  permissionsAtom,
-  permissionsByEntity,
-} from "../../../utils";
+import { capitalizeFirstLetter, getSentenceCase, IconEnum, permissionsAtom, permissionsByEntity } from "../../../utils";
 import { InsertRoleSchema, UpdateRoleSchema } from "../../../validation";
 import { Button, Checkbox, Input } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
@@ -46,7 +38,7 @@ export function RolesAndPermissionsDrawer({ data }: { data: { id?: string } }) {
     };
   }>("roles");
   const { mutate: updateRole, isLoading: isUpdating } = useUpdateEntity("roles", project_id as string);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
 
   const formattedPermissions = permissionsByEntity(permissions || []);
 

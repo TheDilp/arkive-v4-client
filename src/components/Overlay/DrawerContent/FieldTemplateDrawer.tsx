@@ -1,11 +1,17 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import {
   CharacterFieldTemplateType,
   CharacterFieldType,
@@ -15,7 +21,7 @@ import {
   TemplateStateType,
   UserHasPermissionsType,
 } from "../../../types";
-import { CharacterFieldTypesEnum, dialogAtom, drawerAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { CharacterFieldTypesEnum, dialogAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -257,7 +263,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
   const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertTemplateType>("character_fields_templates");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateTemplateType>(
     "character_fields_templates",

@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { CharacterRelationshipType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { InsertCharacterRelationshipSchema } from "../../../validation";
 import { Button, Input, Title } from "../../Form";
 
@@ -18,7 +17,7 @@ function isSaveDisabled(relationship_type: Partial<CharacterRelationshipType>) {
 export function CharacterRelationshipTypeDrawer() {
   const { project_id } = useParams();
   const [relationshipType, setRelationshipType] = useState<Partial<CharacterRelationshipType>>({ project_id });
-  const resetAtom = useResetAtom(drawerAtom);
+  const resetAtom = useToggledResetAtom();
   const { handleChange } = useHandleChange({ data: relationshipType, setData: setRelationshipType });
   const { mutateAsync: createRelationshipType, isLoading: isCreating } = useCreateEntity("character_relationship_types");
 

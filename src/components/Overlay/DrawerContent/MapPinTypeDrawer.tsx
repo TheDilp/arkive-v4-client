@@ -1,11 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useToggledResetAtom, useUpdateEntity } from "../../../hooks";
 import { MapPinTypesType } from "../../../types";
-import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
+import { DefaultTagColor, IconEnum } from "../../../utils";
 import { InsertMapPinTypeSchema, UpdateMapPinTypeSchema } from "../../../validation/maps/map_pin_types";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -44,7 +43,7 @@ export function MapPinTypeDrawer({ data }: Props) {
     data?.project_id as string,
   );
 
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   useLayoutEffect(() => {
     if (existingMapPinType?.data) {
       setMapPinType(existingMapPinType?.data);

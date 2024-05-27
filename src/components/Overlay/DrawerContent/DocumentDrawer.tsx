@@ -1,10 +1,16 @@
 import { useAtomValue } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import {
   DocumentType,
   DrawerAtomType,
@@ -13,15 +19,7 @@ import {
   UpdateDocumentType,
   UserHasPermissionsType,
 } from "../../../types";
-import {
-  AvailableIcons,
-  createOrEditPermission,
-  DefaultTagColor,
-  drawerAtom,
-  IconEnum,
-  useNotifications,
-  userAtom,
-} from "../../../utils";
+import { AvailableIcons, createOrEditPermission, DefaultTagColor, IconEnum, useNotifications, userAtom } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -68,7 +66,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   const createNotification = useNotifications();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
   const user = useAtomValue(userAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
 
   const { data: existingDocument, isFetching } = useGetEntity<DocumentType>(
     data?.id,

@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useGetEntity, useHandleChange, useToggledResetAtom, useUpdateEntity } from "../../../hooks";
 import { EntityPermissionType, TagType } from "../../../types";
-import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
+import { DefaultTagColor, IconEnum } from "../../../utils";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
@@ -28,7 +27,7 @@ export function EditTagDrawer({ data }: Props) {
     fields: ["id", "title", "color", "owner_id"],
     permissions: true,
   });
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const [tag, setTag] = useState<TagType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const { mutate: update, isLoading } = useUpdateEntity<{

@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -10,6 +9,7 @@ import {
   useGetEntity,
   useHandleChange,
   useHasPermissions,
+  useToggledResetAtom,
   useUpdateEntity,
 } from "../../../hooks";
 import {
@@ -26,7 +26,6 @@ import {
 } from "../../../types";
 import {
   createOrEditPermission,
-  drawerAtom,
   getDifferenceForCharacterFields,
   getFieldValueFromType,
   IconEnum,
@@ -423,7 +422,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab ?? 0);
 
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
 

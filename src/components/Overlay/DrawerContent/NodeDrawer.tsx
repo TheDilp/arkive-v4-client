@@ -4,9 +4,15 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetSubEntity, useHandleChange, useHasPermissions, useUpdateGraphSubEntity } from "../../../hooks";
+import {
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateGraphSubEntity,
+} from "../../../hooks";
 import { NodeType, TabType, UserHasPermissionsType } from "../../../types";
-import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
+import { dialogAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   GraphFontFamiliesEnum,
@@ -117,7 +123,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
   const setNodes = useSetAtom(nodesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateGraphSubEntity<
     UpdateNodeType & {

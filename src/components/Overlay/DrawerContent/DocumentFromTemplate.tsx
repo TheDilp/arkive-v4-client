@@ -1,9 +1,8 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateFromTemplate, useHandleChange } from "../../../hooks";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { useCreateFromTemplate, useHandleChange, useToggledResetAtom } from "../../../hooks";
+import { IconEnum } from "../../../utils";
 import { Button, Input, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
@@ -17,7 +16,7 @@ type Props = {
 export function DocumentFromTemplate({ data }: Props) {
   const { project_id } = useParams();
   const [template, setTemplate] = useState<{ titles: string[]; count: number }>({ titles: [], count: 1 });
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
 

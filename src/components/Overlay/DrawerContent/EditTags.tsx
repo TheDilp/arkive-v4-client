@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useHandleChange, useUpdateTags } from "../../../hooks";
+import { useHandleChange, useToggledResetAtom, useUpdateTags } from "../../../hooks";
 import { AvailableEntityType, AvailableSubEntityType, TagType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { Button, TagInput } from "../../Form";
 
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
 };
 
 export function EditTags({ data }: Props) {
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const { project_id } = useParams();
   const [tagsData, setTagsData] = useState<{ tags: Omit<TagType, "owner_id" | "permissions">[] }>({ tags: data.tags || [] });
 

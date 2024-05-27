@@ -1,9 +1,8 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useInviteUserToProject } from "../../../hooks";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { useInviteUserToProject, useToggledResetAtom } from "../../../hooks";
+import { IconEnum } from "../../../utils";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
@@ -12,7 +11,7 @@ export function MemberAddDrawer() {
   const [email, setEmail] = useState("");
   const isEmailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
   const { mutateAsync: invite, isLoading } = useInviteUserToProject();
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   return (
     <DrawerLayout>
       <Input

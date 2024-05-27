@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
-import { useGetSubEntity, useUpdateMessageSubEntity } from "../../../hooks";
+import { useGetSubEntity, useToggledResetAtom, useUpdateMessageSubEntity } from "../../../hooks";
 import { MessagePlaceContentType, MessageType } from "../../../types";
-import { drawerAtom, getCharacterFullName, IconEnum } from "../../../utils";
+import { getCharacterFullName, IconEnum } from "../../../utils";
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
@@ -32,7 +31,7 @@ export function EditMessageDrawer({ data }: Props) {
       enabled: !!data?.id,
     },
   );
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const [content, setContent] = useState<RemirrorJSON | MessagePlaceContentType>();
 
   const { mutateAsync: updateMessage, isLoading: isUpdating } = useUpdateMessageSubEntity<any>(

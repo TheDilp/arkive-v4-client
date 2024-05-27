@@ -1,10 +1,16 @@
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { DictionaryStateType, DictionaryType, DrawerAtomType, TabType, UserHasPermissionsType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import {
   InsertDictionarySchema,
   InsertDictionaryType,
@@ -61,7 +67,7 @@ export function DictionaryDrawer({ data, exceptions }: Props) {
     if (existingDictionary?.data) setDictionary(existingDictionary.data);
   }, [existingDictionary]);
   const { handleChange } = useHandleChange({ data: dictionary, setData: setDictionary });
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   async function handleSave() {
     if (!data?.id) {
       const parsedData = InsertDictionarySchema.parse({ data: dictionary, permissions: dictionary.permissions });

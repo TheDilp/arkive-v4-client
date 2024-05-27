@@ -4,9 +4,9 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntities, useHandleChange, useUpdateManySubEntities } from "../../../hooks";
+import { useGetEntities, useHandleChange, useToggledResetAtom, useUpdateManySubEntities } from "../../../hooks";
 import { NodeType } from "../../../types";
-import { dialogAtom, drawerAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
+import { dialogAtom, getCharacterFullName, IconEnum, nodesAtom, useNotifications } from "../../../utils";
 import {
   DefaultBoardColor,
   DefaultNode,
@@ -154,7 +154,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
   const setNodes = useSetAtom(nodesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
 
   const originalNodes = existingNodes?.data;
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateManySubEntities("nodes");

@@ -1,11 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useDeleteMany, useGetEntities, useHandleChange, useUpdateManySubEntities } from "../../../hooks";
+import { useDeleteMany, useGetEntities, useHandleChange, useToggledResetAtom, useUpdateManySubEntities } from "../../../hooks";
 import { CurrentDateType, EventType } from "../../../types";
-import { DefaultTagColor, drawerAtom, IconEnum } from "../../../utils";
+import { DefaultTagColor, IconEnum } from "../../../utils";
 import { Button, Input } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 import { ColorPicker } from "..";
@@ -19,7 +18,7 @@ type Props = {
 
 export function EventManagementDrawer({ data }: Props) {
   const { project_id, item_id } = useParams();
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const queryClient = useQueryClient();
   const { data: events } = useGetEntities<EventType>(
     {

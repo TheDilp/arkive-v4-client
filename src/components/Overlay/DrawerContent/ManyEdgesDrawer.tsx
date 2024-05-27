@@ -4,13 +4,12 @@ import set from "lodash.set";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetEntities, useHandleChange, useUpdateManySubEntities } from "../../../hooks";
+import { useGetEntities, useHandleChange, useToggledResetAtom, useUpdateManySubEntities } from "../../../hooks";
 import { ArrowFill, ArrowShape, EdgeType, SelectType } from "../../../types";
 import {
   capitalizeFirstLetter,
   DefaultBoardColor,
   dialogAtom,
-  drawerAtom,
   EdgeArrowFillEnum,
   EdgeArrowShapesEnum,
   EdgeCurveStylesEnum,
@@ -119,7 +118,7 @@ export function ManyEdgesDrawer({ data }: Props) {
   const setEdges = useSetAtom(edgesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
 

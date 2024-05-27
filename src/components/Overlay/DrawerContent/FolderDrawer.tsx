@@ -1,11 +1,16 @@
-/* eslint-disable react/prop-types */
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { EntitiesWithFolders, EntityPermissionType, TagType } from "../../../types";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { IconEnum, useNotifications } from "../../../utils";
 import { FolderSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
@@ -75,7 +80,7 @@ export function FolderDrawer({ data }: Props) {
     }
   }, [existingFolder]);
 
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { changedData, handleChange } = useHandleChange({ data: folder, setData: setFolder });
 
   async function handleSave() {

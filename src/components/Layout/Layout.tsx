@@ -5,7 +5,7 @@ import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useParams } from "react-router-dom";
 
-import { useBreakpoint, useGetEntities, useGetEntity, useGetUser } from "../../hooks";
+import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
@@ -78,7 +78,7 @@ export function ProjectLayout() {
   const drawer = useAtomValue(drawerAtom);
   const contextMenu = useAtomValue(contextMenuAtom);
   const createNotification = useNotifications();
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const resetHasChangedData = useResetAtom(hasChangedDataAtom);
 
   const setUserAtom = useSetAtom(userAtom);

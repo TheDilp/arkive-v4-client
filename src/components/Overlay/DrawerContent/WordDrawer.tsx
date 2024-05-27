@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -9,10 +8,11 @@ import {
   useGetSubEntity,
   useHandleChange,
   useHasPermissions,
+  useToggledResetAtom,
   useUpdateSubEntity,
 } from "../../../hooks";
 import { DrawerAtomType, TabType, UserHasPermissionsType, WordStateType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { InsertWordSchema, InsertWordType, UpdateWordSchema } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview } from "../../DataDisplay";
@@ -46,7 +46,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 export function WordDrawer({ data, exceptions }: Props) {
   const queryClient = useQueryClient();
   const { project_id, item_id } = useParams();
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const [word, setWord] = useState<WordStateType>({
     title: data?.title || undefined,
     parent_id: data?.title || exceptions?.globalCreate ? undefined : item_id,

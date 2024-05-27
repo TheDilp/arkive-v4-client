@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -9,10 +8,11 @@ import {
   useGetSubEntity,
   useHandleChange,
   useHasPermissions,
+  useToggledResetAtom,
   useUpdateMapSubEntity,
 } from "../../../hooks";
 import { MapPinType, MapPinTypesType, TabType, UserHasPermissionsType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { InsertMapPinSchema, InsertMapPinType, UpdateMapPinSchema, UpdateMapPinType } from "../../../validation/maps/map_pins";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { EntityPreview, ImagePreview } from "../../DataDisplay";
@@ -69,7 +69,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
     "map_pin_types",
   );
 
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { data: existingMapPin, isFetching } = useGetSubEntity<MapPinType>(
     data?.id,
     "map_pins",

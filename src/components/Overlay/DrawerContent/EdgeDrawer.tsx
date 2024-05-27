@@ -3,13 +3,18 @@ import { useResetAtom } from "jotai/utils";
 import set from "lodash.set";
 import { useEffect, useState } from "react";
 
-import { useGetSubEntity, useHandleChange, useHasPermissions, useUpdateGraphSubEntity } from "../../../hooks";
+import {
+  useGetSubEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateGraphSubEntity,
+} from "../../../hooks";
 import { ArrowFill, ArrowShape, EdgeType, SelectType, TabType, UserHasPermissionsType } from "../../../types";
 import {
   capitalizeFirstLetter,
   DefaultBoardColor,
   dialogAtom,
-  drawerAtom,
   EdgeArrowFillEnum,
   EdgeArrowShapesEnum,
   EdgeCurveStylesEnum,
@@ -105,7 +110,7 @@ export function EdgeDrawer({ data }: Props) {
   const setEdges = useSetAtom(edgesAtom);
   const setDialogAtom = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { handleChange, changedData, resetChanges } = useHandleChange({ data: edge, setData: setEdge });
   const createNotification = useNotifications();
   const permissions = useHasPermissions(

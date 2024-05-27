@@ -1,11 +1,17 @@
-import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { DrawerAtomType, EntityPermissionType, GraphType, TabType, UserHasPermissionsType } from "../../../types";
-import { DefaultBoardColor, drawerAtom, IconEnum, NodeShapesEnum } from "../../../utils";
+import { DefaultBoardColor, IconEnum, NodeShapesEnum } from "../../../utils";
 import {
   Alert,
   Button,
@@ -54,7 +60,7 @@ export function GraphDrawer({
 }) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { data: existingGraph, isFetching } = useGetEntity<GraphType>(
     data?.id,
     "graphs",

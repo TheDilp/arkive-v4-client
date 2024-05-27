@@ -1,11 +1,17 @@
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { DrawerAtomType, HandleChangePropsType, TabType, UserHasPermissionsType } from "../../../types";
 import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import {
   InsertRandomTableSchema,
   InsertRandomTableType,
@@ -92,7 +98,7 @@ function OptionInput({
 export function RandomTableDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
 
   const { data: existingRandomTable, isInitialLoading } = useGetEntity<RandomTableType>(
     data?.id,

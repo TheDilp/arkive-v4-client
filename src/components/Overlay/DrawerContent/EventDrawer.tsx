@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -10,6 +9,7 @@ import {
   useGetSubEntity,
   useHandleChange,
   useHasPermissions,
+  useToggledResetAtom,
   useUpdateSubEntity,
 } from "../../../hooks";
 import {
@@ -84,7 +84,7 @@ export function EventDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const hasId = "id" in data && data?.id;
   const [selectedTab, setSelectedTab] = useState(0);
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const setDrawer = useSetAtom(drawerAtom);
 
   const [event, setEvent] = useState<EventStateType>({

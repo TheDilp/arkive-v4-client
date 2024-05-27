@@ -1,22 +1,20 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { useResetAtom } from "jotai/utils";
 import { MutableRefObject, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { InputOnChangeValue, onChangeValue, TabType, UserHasPermissionsType } from "../../../types";
 import { BlueprintFieldType, BlueprintStateType, BlueprintType } from "../../../types/EntityTypes/blueprintTypes";
-import {
-  BlueprintFieldTypesEnum,
-  createOrEditPermission,
-  dialogAtom,
-  drawerAtom,
-  IconEnum,
-  MessageEnum,
-  reorder,
-} from "../../../utils";
+import { BlueprintFieldTypesEnum, createOrEditPermission, dialogAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertBlueprintSchema, InsertBlueprintType, UpdateBlueprintSchema, UpdateBlueprintType } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -263,7 +261,7 @@ function FieldRow({
 export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
   const { project_id } = useParams();
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const setDialogAtom = useSetAtom(dialogAtom);
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -315,7 +313,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     }
   }, [existingBlueprint?.data]);
 
-  if (isFetching) return <Skeleton type="drawer_form" />;
+  if (isFetching && !existingBlueprint?.data) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -454,7 +452,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                     {
                                       icon: IconEnum.trash,
                                       isIconOnly: true,
-                                      isDisabled: !canCreateOrEdit,
+                                      isDisabled: !canCreateOrEdit || isCreating || isFetching || isLoading,
                                       variant: "error",
                                       onClick: () =>
                                         field?.title
@@ -499,8 +497,8 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                     formula={field?.formula}
                                     id={field.id}
                                     index={index}
-                                    isDisabled={!canCreateOrEdit}
-                                    isLoading={isLoading}
+                                    isDisabled={!canCreateOrEdit || isLoading || isFetching || isCreating || isUpdating}
+                                    isLoading={isLoading || isFetching || isCreating || isUpdating}
                                     options={field?.options || []}
                                     random_table={field?.random_table}
                                     random_table_id={field?.random_table_id}

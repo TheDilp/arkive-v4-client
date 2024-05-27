@@ -1,11 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetSubEntity, useHandleChange, useUpdateSubEntity } from "../../../hooks";
+import { useGetSubEntity, useHandleChange, useToggledResetAtom, useUpdateSubEntity } from "../../../hooks";
 import { RandomTableOptionType, RandomTableSubOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { UpdateRandomTableOptionSchema } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
 import { Collapsible, Tabs } from "../../Layout";
@@ -24,7 +23,7 @@ export function RandomTableOptionDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
 
   const { data: existingOption, isFetching } = useGetSubEntity<RandomTableOptionType>(
     data?.id,

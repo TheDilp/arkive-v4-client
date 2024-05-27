@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useToggledResetAtom, useUpdateEntity } from "../../../hooks";
 import { CharacterType, ConversationType } from "../../../types";
-import { drawerAtom, IconEnum, useNotifications } from "../../../utils";
+import { IconEnum, useNotifications } from "../../../utils";
 import {
   InsertConversationSchema,
   InsertConversationType,
@@ -31,7 +30,7 @@ function isSaveDisabled(conversation: Partial<ConversationType>, characters: Con
 
 export function ConversationDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const createNotification = useNotifications();
   const [conversation, setConversation] = useState<Partial<ConversationType>>({ project_id });
 

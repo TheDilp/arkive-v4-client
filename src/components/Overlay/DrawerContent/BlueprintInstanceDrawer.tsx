@@ -1,4 +1,3 @@
-import { useResetAtom } from "jotai/utils";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -8,6 +7,7 @@ import {
   useGetSubEntity,
   useHandleChange,
   useHasPermissions,
+  useToggledResetAtom,
   useUpdateSubEntity,
 } from "../../../hooks";
 import {
@@ -26,7 +26,6 @@ import {
   checkIfMonthCorrect,
   checkIfYearCorrect,
   createOrEditPermission,
-  drawerAtom,
   getDifferenceForBlueprintInstance,
   getFieldValueFromType,
   IconEnum,
@@ -399,7 +398,7 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined): T
 export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const [instance, setInstance] = useState<Omit<BlueprintInstanceType, "deleted_at"> | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const { handleChange, resetChanges, changedData } = useHandleChange({ data: instance, setData: setInstance });

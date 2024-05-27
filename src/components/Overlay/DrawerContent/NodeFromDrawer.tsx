@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntities } from "../../../hooks";
-import { DefaultNode, drawerAtom, IconEnum } from "../../../utils";
+import { useCreateSubEntities, useToggledResetAtom } from "../../../hooks";
+import { DefaultNode, IconEnum } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Button, Search } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -23,7 +22,7 @@ export function NodeFromDrawer({ data: { type } }: { data: { type: NodeFromType 
   const entity = getEntityFromType(type);
 
   const { mutate: createNodes, isLoading: isMutating } = useCreateSubEntities("nodes", item_id as string);
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const [selectedItems, setSelectedItems] = useState<{ label: string; id: string; image_id: string | undefined }[]>([]);
 
   return (

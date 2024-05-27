@@ -1,12 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useResetAtom } from "jotai/utils";
 import omit from "lodash.omit";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateSubEntities, useHandleChange } from "../../../hooks";
+import { useCreateSubEntities, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { RandomTableOptionType } from "../../../types/EntityTypes/randomTableTypes";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { InsertRandomTableOptionSchema, InsertRandomTableOptionType } from "../../../validation/random_tables";
 import { Button, Input, Textarea } from "../../Form";
 
@@ -16,7 +15,7 @@ export function RandomTableOptionsDrawer({ data }: { data: { parent_id: string }
   const [options, setOptions] = useState<Pick<RandomTableOptionType, "id" | "title" | "description" | "icon" | "icon_color">[]>(
     [],
   );
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntities<{ data: InsertRandomTableOptionType[] }>(
     "random_table_options",
     data.parent_id,

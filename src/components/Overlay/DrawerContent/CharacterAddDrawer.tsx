@@ -1,11 +1,10 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { useAddToEntity, useCreateEntity, useDeleteEntity, useHandleChange } from "../../../hooks";
+import { useAddToEntity, useCreateEntity, useDeleteEntity, useHandleChange, useToggledResetAtom } from "../../../hooks";
 import { DocumentType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { AddToCharacterSchema, AddToCharacterType } from "../../../validation";
 import { Editor } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
@@ -25,7 +24,7 @@ export function CharacterAddDrawer({ data }: Props) {
   const [items, setItems] = useState<{ label: string; value: string; image?: string; color?: string }[]>([]);
   const [newDocument, setNewDocument] = useState<Partial<DocumentType>>({ title: "" });
   const { handleChange } = useHandleChange({ data: newDocument, setData: setNewDocument });
-  const resetDrawer = useResetAtom(drawerAtom);
+  const resetDrawer = useToggledResetAtom();
   const { mutateAsync: addToCharacter, isLoading: isMutating } = useAddToEntity<AddToCharacterType>(
     data.id,
     "characters",

@@ -1,10 +1,9 @@
-import { useResetAtom } from "jotai/utils";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntities, useHandleChange, useHasPermissions } from "../../../hooks";
+import { useCreateEntities, useHandleChange, useHasPermissions, useToggledResetAtom } from "../../../hooks";
 import { EntityPermissionType, TagType } from "../../../types";
-import { drawerAtom, IconEnum } from "../../../utils";
+import { IconEnum } from "../../../utils";
 import { DefaultTagColor } from "../../../utils/enums/ColorEnums";
 import { InsertTagSchema, InsertTagType } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -39,7 +38,7 @@ export function TagsDrawer() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedPermissions, setSelectedPermissions] = useState<{ permissions: EntityPermissionType[] }>({ permissions: [] });
 
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: createMany, isLoading: isCreatingMany } = useCreateEntities<InsertTagType>("tags", project_id as string);
 
   const { handleChange } = useHandleChange({ data: tags, setData: setTags });

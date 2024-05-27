@@ -1,11 +1,17 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { useResetAtom } from "jotai/utils";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { DrawerAtomType, MapType, TabType, UserHasPermissionsType } from "../../../types";
-import { createOrEditPermission, drawerAtom, getImageURL, IconEnum, onDragEnd } from "../../../utils";
+import { createOrEditPermission, getImageURL, IconEnum, onDragEnd } from "../../../utils";
 import { InsertMapSchema, InsertMapType, UpdateMapSchema, UpdateMapType } from "../../../validation/maps/maps";
 import { FolderSelect, ImageSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -77,7 +83,7 @@ export function MapDrawer({
     },
   );
   const [selectedTab, setSelectedTab] = useState(0);
-  const resetDrawerAtom = useResetAtom(drawerAtom);
+  const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertMapType>("maps");
 
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateMapType>("maps", project_id as string);
