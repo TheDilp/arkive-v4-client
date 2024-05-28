@@ -162,6 +162,7 @@ export function DefaultEditorExtensions(
     new LinkExtension({
       defaultTarget: "_blank",
       priority: 0,
+      autoLink: true,
     }),
     DiceRollerExtension,
     new CustomImageExtension({
