@@ -13,7 +13,6 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
-import { useQueryClient } from "@tanstack/react-query";
 import { forwardRef, HTMLProps, MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -207,8 +206,7 @@ export function Search({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
-  const queryClient = useQueryClient();
-  const { data, isFetching, refetch, remove } = useSearch<
+  const { data, isFetching, refetch } = useSearch<
     {
       label: string;
       value: string;
@@ -284,7 +282,7 @@ export function Search({
       };
     }
     if (inputValue.length === 0) {
-      queryClient.removeQueries(["search", searchEntity]);
+      // queryClient.removeQueries(["search", searchEntity]);
       setOpen(false);
     }
     return () => {};
@@ -318,6 +316,7 @@ export function Search({
           className={input()}
           disabled={isDisabled}
           name="search"
+          onBlur={() => setOpen(false)}
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
@@ -332,9 +331,9 @@ export function Search({
             if (e.key === "Enter" && inputValue) {
               e.preventDefault();
 
-              if ((!value || isMultiple) && activeIndex === null && !data?.data.length) {
+              if (activeIndex === null && !data?.data.length) {
                 refetch();
-              } else if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
+              } else if (typeof activeIndex === "number" || activeIndex === null) {
                 const item = (manualResults || data?.data)?.[activeIndex || 0];
                 if (item) {
                   onChange({
@@ -359,7 +358,7 @@ export function Search({
               }
             }
             if (e.key === "Escape") {
-              if (isMultiple) remove();
+              // if (isMultiple) remove();
             }
             if (e.key === "Backspace") {
               if (value || inputValue || displayValue) {
@@ -420,102 +419,100 @@ export function Search({
       </div>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
       <FloatingPortal>
-        {(open || ((searchTerm || displayValue) && !isMultiple)) &&
-          !isOptionsHidden &&
-          (data?.data?.length || manualResults?.length) && (
-            <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
-              <div
-                {...getFloatingProps({
-                  ref: refs.setFloating,
-                  style: floatingStyles,
-                })}
-                className={optionsContainer()}>
-                {(manualResults || data?.data)?.map((item, index) => (
-                  <Item
-                    {...getItemProps({
-                      key: item.value,
-                      ref(node) {
-                        listRef.current[index] = node;
-                      },
-                      onClick(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
-                          const ittem = (manualResults || data?.data)?.[activeIndex || 0];
-                          if (ittem) {
-                            onChange({
-                              name,
-                              value: ittem.value,
-                              label: ittem.label,
-                              color: ittem?.color,
-                              image: ittem?.image,
-                              type: ittem?.type,
-                              parent_id: ittem?.parent_id,
-                              project_id: ittem?.project_id,
-                              icon: ittem?.icon,
-                            });
-                            if (hasShownOption) setDisplayValue(ittem.label);
-                            if (!isMultiple) {
-                              setInputValue("");
-                              setOpen(false);
-                            }
-
-                            inputRef.current?.focus();
+        {open && (searchTerm || displayValue) && !isOptionsHidden && (data?.data?.length || manualResults?.length) && (
+          <FloatingFocusManager context={context} initialFocus={-1} visuallyHiddenDismiss>
+            <div
+              {...getFloatingProps({
+                ref: refs.setFloating,
+                style: floatingStyles,
+              })}
+              className={optionsContainer()}>
+              {(manualResults || data?.data)?.map((item, index) => (
+                <Item
+                  {...getItemProps({
+                    key: item.value,
+                    ref(node) {
+                      listRef.current[index] = node;
+                    },
+                    onClick(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
+                        const ittem = (manualResults || data?.data)?.[activeIndex || 0];
+                        if (ittem) {
+                          onChange({
+                            name,
+                            value: ittem.value,
+                            label: ittem.label,
+                            color: ittem?.color,
+                            image: ittem?.image,
+                            type: ittem?.type,
+                            parent_id: ittem?.parent_id,
+                            project_id: ittem?.project_id,
+                            icon: ittem?.icon,
+                          });
+                          if (hasShownOption) setDisplayValue(ittem.label);
+                          if (!isMultiple) {
+                            setInputValue("");
+                            setOpen(false);
                           }
+
+                          inputRef.current?.focus();
                         }
+                      }
 
-                        if (hasShownOption) setDisplayValue(item.label);
-                        if (!isMultiple) {
-                          remove();
-                          setOpen(false);
-                        }
+                      if (hasShownOption) setDisplayValue(item.label);
+                      if (!isMultiple) {
+                        // remove();
+                        setOpen(false);
+                      }
 
-                        inputRef.current?.focus();
-                      },
-                    })}
-                    isActive={activeIndex === index}
-                    isSelected={(value || [])?.includes(item.value)}>
-                    {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
-                    ((searchEntity === "places" ||
-                      searchEntity === "maps" ||
-                      searchEntity === "characters" ||
-                      searchEntity === "all") &&
-                      item?.image) ? (
-                      <Avatar
-                        image={getImageURL(
-                          item?.project_id || (project_id as string),
-                          imageType || "images",
-                          searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
-                        )}
-                        imageLoading="lazy"
-                        isTooltipDisabled
-                        label={label || ""}
-                        size="xs"
-                      />
-                    ) : null}
-                    {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
-                    <span className="truncate">{item.label}</span>
-                  </Item>
-                ))}
+                      inputRef.current?.focus();
+                    },
+                  })}
+                  isActive={activeIndex === index}
+                  isSelected={(value || [])?.includes(item.value)}>
+                  {((searchEntity === "images" || searchEntity === "map_images") && item?.value) ||
+                  ((searchEntity === "places" ||
+                    searchEntity === "maps" ||
+                    searchEntity === "characters" ||
+                    searchEntity === "all") &&
+                    item?.image) ? (
+                    <Avatar
+                      image={getImageURL(
+                        item?.project_id || (project_id as string),
+                        imageType || "images",
+                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
+                      )}
+                      imageLoading="lazy"
+                      isTooltipDisabled
+                      label={label || ""}
+                      size="xs"
+                    />
+                  ) : null}
+                  {item?.icon && !item?.image ? <Icon icon={item?.icon as AvailableIcons} /> : null}
+                  <span className="truncate">{item.label}</span>
+                </Item>
+              ))}
 
-                {/* If no results for public search display NO RESULTS */}
-                {isPublic && data?.data?.length && !manualResults?.length ? (
-                  <Item
-                    {...getItemProps({
-                      key: "no_results",
-                      onClick(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      },
-                    })}
-                    isActive={false}
-                    isSelected={false}>
-                    <span className="truncate">No results</span>
-                  </Item>
-                ) : null}
-              </div>
-            </FloatingFocusManager>
-          )}
+              {/* If no results for public search display NO RESULTS */}
+              {isPublic && data?.data?.length && !manualResults?.length ? (
+                <Item
+                  {...getItemProps({
+                    key: "no_results",
+                    onClick(e) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    },
+                  })}
+                  isActive={false}
+                  isSelected={false}>
+                  <span className="truncate">No results</span>
+                </Item>
+              ) : null}
+            </div>
+          </FloatingFocusManager>
+        )}
       </FloatingPortal>
     </div>
   );
