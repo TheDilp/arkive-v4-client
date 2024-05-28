@@ -29,6 +29,9 @@
   span.dice-roll {
     @apply cursor-pointer text-white underline decoration-dotted !important;
   }
+  span.document-template-field {
+    @apply font-mono text-white underline decoration-dashed underline-offset-2 !important;
+  }
   :is(h1, h2, h3, h4, h5, h6) {
     @apply font-bold;
   }

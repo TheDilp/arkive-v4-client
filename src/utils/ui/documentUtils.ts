@@ -8,6 +8,9 @@ import { SearchableMentionEntities } from "../../types";
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
 type matchType = "automention" | "template";
+
+export const DocumentTemplateFieldRegex = /%\{([^%{}]*)\}%/g;
+
 export function getRegex(type: matchType, matchWords: string) {
   if (type === "automention") return new RegExp(`\\b(${matchWords})\\b`, "gui");
   return /%{([^%{}]*)}%/g;

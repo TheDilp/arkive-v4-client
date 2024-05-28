@@ -35,6 +35,7 @@ import GalleryExtension from "../../components/Complex/Editor/Extensions/Gallery
 import SecretExtension from "../../components/Complex/Editor/Extensions/SecretExtension";
 import { SpoilerExtension } from "../../components/Complex/Editor/Extensions/SpoilerExtension";
 import TableOfContentsExtension from "../../components/Complex/Editor/Extensions/TableOfContentsExtension";
+import { TemplateFieldExtension } from "../../components/Complex/Editor/Extensions/TemplateFieldsExtension";
 import { useUpdateEntity } from "../../hooks";
 import { ConversationType, DocumentType, MessageKindType, NotificationType, slashMenuItem } from "../../types";
 import { mentionDropdownAtom } from "../atoms";
@@ -183,6 +184,7 @@ export function DefaultEditorExtensions(
     new GapCursorExtension({}),
     new DropCursorExtension({}),
     new TableOfContentsExtension({}),
+    new TemplateFieldExtension({ autoLink: true }),
     new CustomTableExtension({
       tabKeyboardShortcuts: true,
       priority: 0,
