@@ -316,7 +316,9 @@ export function Search({
           className={input()}
           disabled={isDisabled}
           name="search"
-          onBlur={() => setOpen(false)}
+          onBlur={() => {
+            if (activeIndex === null) setOpen(false);
+          }}
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
@@ -437,7 +439,7 @@ export function Search({
                     onClick(e) {
                       e.preventDefault();
                       e.stopPropagation();
-                      if ((!value || isMultiple) && (typeof activeIndex === "number" || activeIndex === null)) {
+                      if (typeof activeIndex === "number" || activeIndex === null) {
                         const ittem = (manualResults || data?.data)?.[activeIndex || 0];
                         if (ittem) {
                           onChange({
@@ -457,12 +459,12 @@ export function Search({
                             setOpen(false);
                           }
 
-                          inputRef.current?.focus();
+                          // inputRef.current?.focus();
                         }
                       }
 
                       if (hasShownOption) setDisplayValue(item.label);
-                      if (!isMultiple) {
+                      if (isMultiple) {
                         // remove();
                         setOpen(false);
                       }
