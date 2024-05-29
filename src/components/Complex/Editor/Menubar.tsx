@@ -431,7 +431,7 @@ function menuBarItems({
     options.push({
       id: "template_maker",
       title: "Create from template",
-      icon: IconEnum.document_template,
+      icon: IconEnum.document_templates,
       tooltip: "Create documents from this template",
       onClick: () => {
         if (id && title)
