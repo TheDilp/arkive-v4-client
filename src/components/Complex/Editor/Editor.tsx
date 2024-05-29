@@ -1,4 +1,5 @@
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
+import { useEffect } from "react";
 
 import { EditorType } from "../../../types";
 import { DefaultEditorExtensions, onError, useNotifications } from "../../../utils";
@@ -14,6 +15,7 @@ export function Editor({
   customPlaceholder,
   menubarSize = "md",
   onChangePlainText,
+  isOutsideControlled,
   isFullHeight,
   hooks,
 }: EditorType) {
@@ -24,6 +26,19 @@ export function Editor({
     onError,
     content: initialContent || undefined,
   });
+
+  useEffect(() => {
+    if (isDisabled && isOutsideControlled) {
+      const timeout = setTimeout(() => {
+        if (manager) manager?.view?.updateState(manager?.createState({ content: initialContent }));
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [isDisabled, isOutsideControlled, initialContent]);
 
   return (
     // @ts-ignore
