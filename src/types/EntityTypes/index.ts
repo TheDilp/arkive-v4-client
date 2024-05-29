@@ -6,6 +6,7 @@ export * from "./characterRelationshipTypes";
 export * from "./characterTypes";
 export * from "./conversationTypes";
 export * from "./dictionaryTypes";
+export * from "./documentTemplateTypes";
 export * from "./documentTypes";
 export * from "./fieldsTypes";
 export * from "./graphTypes";

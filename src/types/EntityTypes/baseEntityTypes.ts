@@ -35,6 +35,7 @@ export type AvailableEntityType =
   | "projects"
   | "characters"
   | "documents"
+  | "document_templates"
   | "maps"
   | "map_pin_types"
   | "graphs"

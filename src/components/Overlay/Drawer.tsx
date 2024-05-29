@@ -56,6 +56,7 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
+import DocumentTemplateDrawer from "./DrawerContent/DocumentTemplateDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -185,6 +186,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
                 {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "from_template" ? <DocumentFromTemplate data={drawer?.data} /> : null}
+                {drawer.type === "document_template" ? <DocumentTemplateDrawer data={drawer?.data} /> : null}
                 {drawer.type === "maps" ? <MapDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
