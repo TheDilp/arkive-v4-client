@@ -254,7 +254,7 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
           const isNodeSeparated = to - from === 2;
 
           // Get previous links
-          const prevMarks = this.getLinkMarksInRange(prevState.doc, prevFrom, prevTo, true)
+          const prevMarks = this.getTemplateMarksInRange(prevState.doc, prevFrom, prevTo, true)
             .filter((item) => item.mark.type === this.type)
             .map(({ from: f, to: t, text }) => ({
               mappedFrom: mapping.map(f),
@@ -268,7 +268,7 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
 
           // Check if links need to be removed or updated.
           prevMarks.forEach(({ mappedFrom: newFrom, mappedTo: newTo, from: prevMarkFrom, to: prevMarkTo }, i) =>
-            this.getLinkMarksInRange(doc, newFrom, newTo, true)
+            this.getTemplateMarksInRange(doc, newFrom, newTo, true)
               .filter((item) => item.mark.type === this.type)
               .forEach((newMark) => {
                 const prevLinkText = prevState.doc.textBetween(prevMarkFrom, prevMarkTo, undefined, " ");
@@ -283,7 +283,6 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
 
                 if (wasLink) {
                   this.removeTemplateField({ from: newMark.from, to: newMark.to });
-
                   prevMarks.splice(i, 1);
                 }
 
@@ -330,7 +329,7 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
                 return fromIsInRange || toIsInRange || isNodeSeparated;
               })
               // Avoid overwriting manually created links.
-              .filter(({ range }) => this.getLinkMarksInRange(tr.doc, range.from, range.to, false).length === 0)
+              .filter(({ range }) => this.getTemplateMarksInRange(tr.doc, range.from, range.to, false).length === 0)
               // Prevent updating existing auto links
               .filter(
                 ({ range: { from: f }, text: txt }) =>
@@ -359,7 +358,7 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
     };
   }
 
-  private getLinkMarksInRange(doc: ProsemirrorNode, from: number, to: number, isAutoLink: boolean): GetMarkRange[] {
+  private getTemplateMarksInRange(doc: ProsemirrorNode, from: number, to: number, isAutoLink: boolean): GetMarkRange[] {
     const linkMarks: GetMarkRange[] = [];
 
     if (from === to) {
