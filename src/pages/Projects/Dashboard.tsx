@@ -2,7 +2,7 @@ import { useSetAtom } from "jotai";
 import { Link, useParams } from "react-router-dom";
 
 import { Alert, EntityPreview, Icon } from "../../components";
-import { useGetProjectDashboard } from "../../hooks";
+import { useGetProjectDashboard, useNavbarTitle } from "../../hooks";
 import { AvailableEntityType, AvailableSubEntityType } from "../../types";
 import {
   capitalizeFirstLetter,
@@ -20,6 +20,8 @@ export function Dashboard() {
   const { data: dashboard } = useGetProjectDashboard(project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
+
+  useNavbarTitle("Dashboard", true);
 
   return (
     <div className="flex max-h-full flex-col overflow-auto">
