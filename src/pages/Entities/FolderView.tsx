@@ -1073,7 +1073,7 @@ export function FolderView() {
                           {
                             id: "3",
                             title: "Create new template",
-                            icon: IconEnum.document_template,
+                            icon: IconEnum.document_templates,
                             onClick: () => {
                               setDrawer((prev) => ({
                                 ...prev,

@@ -34,7 +34,7 @@ import {
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
 
-export default function DocumentView({ editable }: { editable: boolean }) {
+export function DocumentView({ editable }: { editable: boolean }) {
   const { project_id, item_id } = useParams();
   const queryClient = useQueryClient();
   const user = useAtomValue(userAtom);

@@ -6,7 +6,7 @@ import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react
 
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
-import BlueprintProfileView from "./pages/Entities/BlueprintProfileView";
+import { BlueprintProfileView } from "./pages/Entities/BlueprintProfileView";
 import { ProjectsView } from "./pages/Projects";
 import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView, PublicListView } from "./pages/Public";

@@ -23,15 +23,7 @@ const tabs = [
   //   { id: "4", label: "Conversations", icon: IconEnum.conversation },
 ];
 
-export default function BlueprintProfileView({
-  id,
-  parent_id,
-  isPublic,
-}: {
-  id?: string;
-  parent_id?: string;
-  isPublic?: boolean;
-}) {
+export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string; parent_id?: string; isPublic?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isMd, isLg } = useBreakpoint();
   const navigate = useNavigate();
