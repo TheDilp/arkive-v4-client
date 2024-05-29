@@ -42,12 +42,11 @@ export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.map, navigate: "maps", tooltip: "Maps" },
   { icon: IconEnum.graph, navigate: "graphs", tooltip: "Graphs" },
   { icon: IconEnum.calendar, navigate: "calendars", tooltip: "Calendars" },
-  // { icon: IconEnum.timeline, navigate: "timelines", tooltip: "Timelines" },
-  // { icon: IconEnum.screen, navigate: "screens", tooltip: "Screens" },
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
   { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
+  { icon: IconEnum.document_templates, navigate: "document_templates", tooltip: "Document templates" },
   { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];

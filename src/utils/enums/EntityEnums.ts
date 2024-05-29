@@ -155,6 +155,7 @@ export const UserSidebarEntitiesEnabled = [
   "dictionaries",
   "random_tables",
   "character_fields_templates",
+  "document_templates",
 ];
 
 export const DefaultUserFeatureFlags = ["close_drawer_on_save"];
