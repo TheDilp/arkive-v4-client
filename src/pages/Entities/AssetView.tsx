@@ -13,6 +13,7 @@ import {
   useGetImages,
   useGetInfiniteAssets,
   useHasPermissions,
+  useNavbarTitle,
   useTable,
   useUpdateManyPublic,
 } from "../../hooks";
@@ -350,6 +351,7 @@ function getSelectedActions(
 
 export function AssetView() {
   const { project_id } = useParams();
+  useNavbarTitle("Assets", true);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);

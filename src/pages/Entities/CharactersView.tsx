@@ -642,7 +642,7 @@ function CharacterViewHeader({
 }
 
 export function CharactersView() {
-  useNavbarTitle("Characters");
+  useNavbarTitle("Characters", true);
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");

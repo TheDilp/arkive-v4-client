@@ -188,7 +188,7 @@ export function TagView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("tag-table-active") || "active");
-  useNavbarTitle("Tags");
+  useNavbarTitle("Tags", true);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "tags");

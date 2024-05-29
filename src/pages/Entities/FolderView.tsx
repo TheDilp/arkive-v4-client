@@ -80,8 +80,9 @@ import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
 import { BlueprintView } from "./BlueprintView";
 import { CharactersView } from "./CharactersView";
+import { DocumentTemplatesView } from "./DocumentTemplatesView";
 import { TagView } from "./TagView";
-import { TemplatesView } from "./TemplatesView";
+import { CharacterTemplatesView } from "./TemplatesView";
 
 function getEditActionTitle(is_document_template: boolean, is_folder: boolean, entityName: string) {
   if (is_document_template) return "Edit document template";
@@ -853,6 +854,7 @@ export function FolderView() {
     `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
+    !!data?.data?.title,
   );
 
   useLayoutEffect(() => {
@@ -922,8 +924,11 @@ export function FolderView() {
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
+
   if (type === "tags") return <TagView />;
-  if (type === "character_fields_templates") return <TemplatesView />;
+  if (type === "character_fields_templates") return <CharacterTemplatesView />;
+  if (type === "document_templates") return <DocumentTemplatesView />;
+
   if (type === "assets") return <AssetView />;
   if (type === "settings") return <ProjectSettingsView />;
   return (

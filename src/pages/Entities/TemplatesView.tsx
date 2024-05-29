@@ -179,10 +179,10 @@ function createColumns(
   ];
 }
 
-export function TemplatesView() {
+export function CharacterTemplatesView() {
   const { project_id } = useParams();
   const { isMd } = useBreakpoint();
-  useNavbarTitle(" Field templates");
+  useNavbarTitle("Character field templates", true);
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("character-template-table-active") || "active");
 
   const setDrawer = useSetAtom(drawerAtom);

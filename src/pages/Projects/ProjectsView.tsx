@@ -109,7 +109,7 @@ export function ProjectsView() {
   const { isLg } = useBreakpoint();
 
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
-  useNavbarTitle("The Arkive");
+  useNavbarTitle("The Arkive", true);
 
   const { user } = useUser();
   const { data, isLoading } = useGetAllProjects({

@@ -15,7 +15,7 @@ import {
   isProjectOwnerAtom,
   navbarTitleAtom,
 } from "../../utils";
-import { DocumentTemplatesView, MapView, RandomTableView } from ".";
+import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
 import { DictionaryView } from "./DictionaryView";
@@ -120,7 +120,6 @@ export function EntitiesView() {
       {!!item_id && type === "calendars" ? <CalendarView /> : null}
       {!!item_id && type === "dictionaries" ? <DictionaryView /> : null}
       {!!item_id && type === "random_tables" ? <RandomTableView /> : null}
-      {!!item_id && type === "document_templates" ? <DocumentTemplatesView /> : null}
     </div>
   );
 }
