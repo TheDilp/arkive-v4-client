@@ -8,7 +8,8 @@ export type DocumentTemplateFieldType = {
   parent_id: string;
   value: string;
   formula: string | null;
-  derive: { derive_from: string; derive_formula: string } | null;
+  derive_from: string | null;
+  derive_formula: string | null;
   is_randomized: boolean | null;
 };
 export interface DocumentTemplateType {

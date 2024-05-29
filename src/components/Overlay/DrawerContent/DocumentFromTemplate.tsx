@@ -1,11 +1,13 @@
+/* eslint-disable no-restricted-syntax */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useState } from "react";
 
-import { useHandleChange } from "../../../hooks";
+import { useGetEntity, useHandleChange } from "../../../hooks";
 import { DocumentTemplateType, TabType } from "../../../types";
-import { IconEnum } from "../../../utils";
-import { Editor } from "../../Complex";
-import { Button, Input } from "../../Form";
+import { DocumentTemplateFieldRegex, IconEnum } from "../../../utils";
+import { Editor, MatchField } from "../../Complex";
+import { EntityPreview } from "../../DataDisplay";
+import { Button, Input, Search } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 
 type Props = {
@@ -24,25 +26,75 @@ const tabs: TabType[] = [
 
 export function DocumentFromTemplate({ data }: Props) {
   // const { project_id } = useParams();
+
+  const [existingTemplateId, setExistingTemplateId] = useState<string | undefined>(undefined);
+
+  const { data: existingTemplateData } = useGetEntity<DocumentTemplateType>(
+    existingTemplateId,
+    "document_templates",
+    {
+      fields: ["id", "owner_id", "title"],
+      relations: { fields: true },
+    },
+    {
+      enabled: !!existingTemplateId,
+    },
+  );
+
   const [selectedTab, setSelectedTab] = useState(0);
   const [content] = useState(data.getContext.getState().doc);
-  const [template, setTemplate] = useState<DocumentTemplateType | null>(null);
+  const [existingTemplate, setExistingTemplate] = useState<DocumentTemplateType | null>();
+  const [template, setTemplate] = useState<Partial<DocumentTemplateType>>({ fields: [] });
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   // const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
 
   useEffect(() => {
+    if (existingTemplateData?.data) setExistingTemplate(existingTemplateData?.data);
+  }, [existingTemplateData]);
+  useEffect(() => {
+    if (existingTemplate) {
+      const temp = { ...template };
+      for (let index = 0; index < existingTemplate.fields.length || 0; index += 1) {
+        const field = existingTemplate.fields[index];
+
+        const idx = (template.fields || []).findIndex((f) => f.key === field.key);
+        if (typeof idx === "number" && idx > -1 && temp.fields) {
+          temp.fields[idx] = field;
+        }
+      }
+      setTemplate(temp);
+    }
+  }, [existingTemplateId, existingTemplate]);
+
+  useEffect(() => {
     if (content) {
-      // const tempMatches = { ...template.matches };
-      // const { textContent } = content;
-      // if (textContent) {
-      //   for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
-      //     const matchKey = match?.at(1) as string;
-      //     if (match?.at(1) && !tempMatches[matchKey]) {
-      //       tempMatches[matchKey] = { type: null, value: "" };
-      //     }
-      //   }
-      //   setTemplate((prev) => ({ ...prev, matches: tempMatches }));
-      // }
+      // Replace with existing template
+      const tempFields: DocumentTemplateType["fields"] = [];
+      const { textContent } = content;
+      if (textContent) {
+        for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
+          const matchKey = match?.at(1) as string;
+          const idx = tempFields.findIndex((f) => f?.key === matchKey);
+          if (idx > -1) {
+            if (match?.at(1)) {
+              tempFields[idx] = { ...tempFields[idx], key: matchKey as string };
+            }
+          } else if (idx === -1 && match?.at(1)) {
+            tempFields[tempFields.length] = {
+              id: crypto.randomUUID(),
+              value: "",
+              formula: null,
+              parent_id: "",
+              entity_type: null,
+              is_randomized: null,
+              derive_formula: null,
+              derive_from: null,
+              key: matchKey as string,
+            };
+          }
+        }
+        setTemplate((prev) => ({ ...prev, fields: tempFields }));
+      }
     }
   }, []);
 
@@ -64,25 +116,50 @@ export function DocumentFromTemplate({ data }: Props) {
   if (!data.getContext.getState().doc.content) return null;
   return (
     <DrawerLayout>
-      <Input
-        label="New document's title (required)"
-        name="title"
-        onChange={handleChange}
-        value={template?.title || ""}
-        variant={template?.title ? "primary" : "error"}
-      />
+      <div className="flex flex-nowrap gap-x-2">
+        <Input
+          label="New document's title (required)"
+          name="title"
+          onChange={handleChange}
+          value={template?.title || ""}
+          variant={template?.title ? "primary" : "error"}
+        />
+        {existingTemplate ? (
+          <div className="min-w-64">
+            <EntityPreview
+              clearAction={() => {
+                setExistingTemplate(null);
+              }}
+              id={existingTemplate?.id}
+              label="Template"
+              title={existingTemplate?.title}
+              type="document_templates"
+            />
+          </div>
+        ) : (
+          <Search
+            label="Use template (optional)"
+            name="template"
+            onChange={({ value }) => setExistingTemplateId(value as string)}
+            searchEntity="document_templates"
+          />
+        )}
+      </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
-        {/* {Object.entries(template.matches).map(([key, value]) => (
+        {(template.fields || []).map((f, idx) => (
           <MatchField
-            key={key}
-            allMatches={template.matches}
+            key={f.id}
+            allMatches={template?.fields || []}
+            entity_type={f.entity_type}
+            formula={f.formula}
             handleChange={handleChange}
-            match={key}
-            type={value?.type}
-            value={value?.value}
+            idx={idx}
+            is_randomized={false}
+            match={f.key}
+            value={f?.value || ""}
           />
-        ))} */}
+        ))}
       </div>
       {tabs[selectedTab].id === "2" ? (
         <div className="flex h-full justify-center">

@@ -113,7 +113,7 @@ function createColumns(
                           ...prev,
                           data: row.original,
                           title: "Edit template",
-                          size: "lg",
+                          size: "half",
                           type: "document_template",
                         }));
                       },

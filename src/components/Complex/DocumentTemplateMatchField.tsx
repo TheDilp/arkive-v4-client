@@ -68,6 +68,7 @@ export function MatchField({
   value,
   entity_type,
   is_randomized,
+  formula,
   idx,
   isEditable,
   handleChange,
@@ -77,7 +78,7 @@ export function MatchField({
   idx: number;
   isEditable?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
-} & Pick<DocumentTemplateFieldType, "entity_type" | "value" | "is_randomized">) {
+} & Pick<DocumentTemplateFieldType, "entity_type" | "value" | "formula" | "is_randomized">) {
   const [parent, setParent] = useState<{
     label: string;
     value: string;
@@ -95,7 +96,6 @@ export function MatchField({
     derive_from: null,
     derive_formula: null,
   });
-  const [formula, setFormula] = useState("");
   const [isRolling, setIsRolling] = useState(false);
 
   useEffect(() => {
@@ -103,15 +103,6 @@ export function MatchField({
       handleChange({ name: `fields[${idx}].value`, value: selectedEntity.label });
     }
   }, [selectedEntity]);
-  useEffect(() => {
-    const toChange = [{ name: `fields[${idx}].value`, value: null }];
-    if (entity_type === "custom" || entity_type === "derived") {
-      toChange.push({ name: `fields[${idx}].is_randomized`, value: null });
-    }
-    handleChange(toChange);
-    if (selectedEntity) setSelectedEntity(null);
-    if (parent) setParent(null);
-  }, [entity_type]);
 
   useEffect(() => {
     if (derived?.derive_from && derived?.derive_formula) {
@@ -146,7 +137,17 @@ export function MatchField({
           <Select
             label="Entity type"
             name={`fields[${idx}].entity_type`}
-            onChange={handleChange}
+            onChange={(e) => {
+              const toChange = [e, { name: `fields[${idx}].value`, value: null }];
+              if (entity_type === "custom" || entity_type === "derived") {
+                toChange.push({ name: `fields[${idx}].is_randomized`, value: null });
+              }
+              handleChange(toChange);
+              if (selectedEntity) setSelectedEntity(null);
+              if (parent) setParent(null);
+
+              handleChange(toChange);
+            }}
             options={MatchReplacementOptions}
             value={entity_type}
           />
@@ -196,7 +197,7 @@ export function MatchField({
                 <Search
                   isDisabled={entity_type === "blueprint_instances" && !parent}
                   label="Replace with"
-                  name="value"
+                  name={`fields[${idx}].value`}
                   onChange={({ label, value: newValue, image, icon }) =>
                     setSelectedEntity({
                       label: label || "",
@@ -229,18 +230,19 @@ export function MatchField({
               {entity_type === "dice_roll" ? (
                 <Input
                   label="Formula"
-                  name="formula"
+                  name={`fields[${idx}].formula`}
                   onChange={({ value: newValue }) => {
-                    if (newValue && typeof newValue === "string") {
-                      setFormula(newValue);
-                    } else setFormula("");
+                    handleChange({
+                      name: `fields[${idx}].formula`,
+                      value: newValue && typeof newValue === "string" ? newValue : null,
+                    });
                   }}
                   value={formula || ""}
                 />
               ) : null}
               {entity_type === "dice_roll" && !is_randomized ? (
                 <div className="flex gap-x-4">
-                  <Input isDisabled label="Result" name="value" onChange={() => {}} value={selectedEntity?.value || ""} />
+                  <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
                   <div className="flex self-end pb-1.5">
                     <Button
                       hasNoBackground
@@ -258,7 +260,7 @@ export function MatchField({
                             .then((r: any) => {
                               const rollData = DiceRollParser.parseFinalResults(r);
                               if (rollData?.valid) {
-                                setSelectedEntity({ label: rollData.value, value: rollData.value, image: null, icon: null });
+                                handleChange({ name: `fields[${idx}].value`, value: rollData?.value?.toString() });
                                 // handleChange([
                                 //   { name: `${name}.id`, value: id },
                                 //   { name: `${name}.value`, value: rollData.value },
@@ -286,7 +288,6 @@ export function MatchField({
                         }
                         setIsRolling(false);
                       }}
-                      tooltip={`Roll (${formula})`}
                     />
                   </div>
                 </div>
@@ -323,7 +324,7 @@ export function MatchField({
                   </div>
                 </>
               ) : null}
-              {entity_type !== "custom" && entity_type !== "derived" ? (
+              {entity_type !== "custom" && entity_type !== "derived" && !!entity_type ? (
                 <div className="h-full [&>div]:gap-y-2">
                   <Checkbox
                     label="Randomize?"
