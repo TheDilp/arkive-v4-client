@@ -3,8 +3,16 @@ import { Link, useParams } from "react-router-dom";
 
 import { Alert, EntityPreview, Icon } from "../../components";
 import { useGetProjectDashboard } from "../../hooks";
-import { AvailableEntityType } from "../../types";
-import { capitalizeFirstLetter, drawerAtom, getDefaultEntityIcon, getEntityLink, getPluralEntityType } from "../../utils";
+import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import {
+  capitalizeFirstLetter,
+  drawerAtom,
+  getDefaultEntityIcon,
+  getEntityLink,
+  getParentEntityType,
+  getPluralEntityType,
+  SubEntityEnum,
+} from "../../utils";
 
 export function Dashboard() {
   const { project_id } = useParams();
@@ -25,7 +33,11 @@ export function Dashboard() {
             } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}>
             <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
               <Icon icon={getDefaultEntityIcon(d.name as AvailableEntityType)} />
-              <Link className="transition-all duration-150 hover:text-blue-300" to={`/projects/${project_id}/${d.name}`}>
+              <Link
+                className="transition-all duration-150 hover:text-blue-300"
+                to={`/projects/${project_id}/${
+                  SubEntityEnum.includes(d.name) ? getParentEntityType(d.name as AvailableSubEntityType) : d.name
+                }`}>
                 {capitalizeFirstLetter(getPluralEntityType(d.name as AvailableEntityType))}
               </Link>
             </h3>
