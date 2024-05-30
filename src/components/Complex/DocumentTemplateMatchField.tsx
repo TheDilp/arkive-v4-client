@@ -109,12 +109,14 @@ export function MatchField({
   useEffect(() => {
     if (derive_from && derive_formula && !isEditable) {
       if (typeof parentIdx === "number") {
-        const newVal = Math.floor((Number(derivedParentValue || 10) - 10) / 2).toString();
-        if (value !== newVal) {
-          handleChange({
-            name: `template_fields[${idx}].value`,
-            value: Math.floor((Number(derivedParentValue || 10) - 10) / 2).toString(),
-          });
+        if (derive_from === "dnd_5e_ability_bonus") {
+          const newVal = Math.floor((Number(derivedParentValue || 10) - 10) / 2).toString();
+          if (value !== newVal) {
+            handleChange({
+              name: `template_fields[${idx}].value`,
+              value: Math.floor((Number(derivedParentValue || 10) - 10) / 2).toString(),
+            });
+          }
         }
       }
     }

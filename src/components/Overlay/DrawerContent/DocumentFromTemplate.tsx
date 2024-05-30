@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 
 import { useGetEntity, useHandleChange } from "../../../hooks";
 import { DocumentType, TabType } from "../../../types";
-import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, IconEnum } from "../../../utils";
+import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, getSentenceCase, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
-import { DrawerLayout, Tabs } from "../../Layout";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
 type Props = {
@@ -122,6 +122,12 @@ export function DocumentFromTemplate({ data }: Props) {
                       const rollData = await DiceRollParser.parseFinalResults(r);
                       if (rollData?.valid) {
                         tempFields[index].value = rollData?.value?.toString() || "";
+                        const derivedFields = tempFields.filter((f) => f.derive_from === tempFields[index].id);
+                        for (let j = 0; j < derivedFields.length; j += 1) {
+                          if (derivedFields[j].derive_formula === "dnd_5e_ability_bonus") {
+                            derivedFields[j].value = Math.floor((Number(tempFields[index].value || 10) - 10) / 2).toString();
+                          }
+                        }
                       }
                     }
                   }
@@ -137,19 +143,35 @@ export function DocumentFromTemplate({ data }: Props) {
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
         {(template.template_fields || []).map((f, idx) => (
-          <MatchField
-            key={f.id}
-            allMatches={template?.template_fields || []}
-            derive_formula={f.derive_formula}
-            derive_from={f.derive_from}
-            entity_type={f.entity_type}
-            formula={f.formula}
-            handleChange={handleChange}
-            idx={idx}
-            is_randomized={false}
-            match={f.key}
-            value={f?.value || ""}
-          />
+          <Collapsible label={getSentenceCase(f.key)}>
+            <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
+              <MatchField
+                allMatches={template?.template_fields || []}
+                derive_formula={f.derive_formula}
+                derive_from={f.derive_from}
+                entity_type={f?.entity_type}
+                formula={f.formula}
+                handleChange={handleChange}
+                idx={idx}
+                is_randomized={f?.is_randomized}
+                match={f?.key}
+                value={f?.value}
+              />
+            </div>
+          </Collapsible>
+          // <MatchField
+          //   key={f.id}
+          //   allMatches={template?.template_fields || []}
+          //   derive_formula={f.derive_formula}
+          //   derive_from={f.derive_from}
+          //   entity_type={f.entity_type}
+          //   formula={f.formula}
+          //   handleChange={handleChange}
+          //   idx={idx}
+          //   is_randomized={false}
+          //   match={f.key}
+          //   value={f?.value || ""}
+          // />
         ))}
       </div>
       {tabs[selectedTab].id === "2" ? (
