@@ -62,7 +62,7 @@ const ButtonClasses = tv({
     {
       variant: ["primary", "secondary", "info", "success", "warning", "error"],
       isIconOnly: true,
-      class: "[&:not]:focus:border-transparent",
+      class: "[&:not(:focus)]:border-transparent",
     },
 
     {
