@@ -350,7 +350,21 @@ export function Select({
   }, [options, isOpen]);
 
   return (
-    <div className={base()}>
+    <div
+      className={base()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          onClick({
+            isMultiple,
+            name,
+            index: activeIndex,
+            onChange,
+            options: filteredItems,
+            value,
+            setIsOpen,
+          });
+        }
+      }}>
       {label ? <span className={labelClasses()}>{label}</span> : null}
       <div
         ref={refs.setReference}
@@ -359,6 +373,19 @@ export function Select({
         className={select()}
         tabIndex={0}
         {...getReferenceProps({
+          onKeyDown(e) {
+            if (e.key === "Enter") {
+              onClick({
+                isMultiple,
+                name,
+                index: activeIndex,
+                onChange,
+                options: filteredItems,
+                value,
+                setIsOpen,
+              });
+            }
+          },
           onClick(event) {
             event.preventDefault();
             event.stopPropagation();
