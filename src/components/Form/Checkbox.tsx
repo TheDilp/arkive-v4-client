@@ -3,6 +3,7 @@ import { tv } from "tailwind-variants";
 import { CheckboxType } from "../../types";
 import { IconEnum } from "../../utils/enums/IconEnums";
 import { Icon } from "../Misc/Icon";
+import { Tooltip } from "../Overlay";
 
 const CheckboxClasses = tv({
   slots: {
@@ -62,7 +63,17 @@ const CheckboxClasses = tv({
   },
 });
 
-export function Checkbox({ label, value = false, name, helperText, onChange, variant, isDisabled, isReadOnly }: CheckboxType) {
+export function Checkbox({
+  label,
+  value = false,
+  name,
+  helperText,
+  onChange,
+  variant,
+  isDisabled,
+  isReadOnly,
+  tooltip,
+}: CheckboxType) {
   const {
     base,
     label: labelClasses,
@@ -72,19 +83,25 @@ export function Checkbox({ label, value = false, name, helperText, onChange, var
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
-
-      <div
-        aria-checked={value}
-        className={checkbox()}
-        onClick={(e) => {
-          if (isDisabled || isReadOnly) return;
-          onChange({ name, value: !value }, e);
-        }}
-        onKeyDown={() => {}}
-        role="checkbox"
-        tabIndex={-1}>
-        {value ? <Icon fontSize={18} icon={IconEnum.check} /> : null}
-      </div>
+      <Tooltip
+        allowedPlacements={["top"]}
+        content={tooltip || null}
+        delay={{ openDelay: 300 }}
+        isClickable={false}
+        isDisabled={!tooltip}>
+        <div
+          aria-checked={value}
+          className={checkbox()}
+          onClick={(e) => {
+            if (isDisabled || isReadOnly) return;
+            onChange({ name, value: !value }, e);
+          }}
+          onKeyDown={() => {}}
+          role="checkbox"
+          tabIndex={-1}>
+          {value ? <Icon fontSize={18} icon={IconEnum.check} /> : null}
+        </div>
+      </Tooltip>
       {helperText ? <span className={helperTextClasses()}>{helperText}</span> : null}
     </div>
   );
