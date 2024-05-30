@@ -81,12 +81,13 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     "documents",
     {
       data: {},
-      relations: { alter_names: true, tags: true, image: true },
+      relations: { alter_names: true, tags: true, image: true, template_fields: true },
       permissions: true,
       fields: ["id", "title", "icon", "parent_id", "is_template", "dice_color", "is_public", "owner_id"],
     },
     {
       enabled: !!data?.id,
+      queryKeyConcat: ["drawer"],
     },
   );
   const permissions = useHasPermissions(
@@ -261,9 +262,9 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               icon: IconEnum.add,
               onClick: () =>
                 handleChange({
-                  name: "fields",
+                  name: "template_fields",
                   value: (document?.template_fields || []).concat({
-                    id: "",
+                    id: crypto.randomUUID(),
                     key: "",
                     parent_id: "",
                     value: "",
@@ -283,6 +284,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               <MatchField
                 key={f.id}
                 allMatches={document?.template_fields || []}
+                derive_formula={f.derive_formula}
+                derive_from={f.derive_from}
                 entity_type={f?.entity_type}
                 formula={f.formula}
                 handleChange={handleChange}
@@ -309,74 +312,83 @@ export function DocumentDrawer({ data, exceptions }: Props) {
           selectablePermissions={["read_documents", "update_documents", "delete_documents"]}
         />
       ) : null}
-      <Button
-        icon={document?.id ? IconEnum.save : IconEnum.add}
-        isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isFetching || isCreating || isUpdating}
-        isLoading={isCreating || isUpdating}
-        label={document?.id ? "Update" : "Create"}
-        onClick={async () => {
-          if (changedData) {
-            if (document?.id) {
-              const documentToUpdate = { ...(changedData || {}), id: document.id, parent_id: document.parent_id };
-              const { alter_names, tags, image, ...rest } = documentToUpdate;
-              const parsedData = UpdateDocumentSchema.parse({
-                data: { ...rest, image_id: image?.id },
-                relations: {
-                  tags,
-                  alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
-                },
-                permissions: document?.permissions,
-              });
-              await update(
-                {
-                  ...parsedData,
-                  data: {
-                    ...parsedData.data,
-                    icon: parsedData.data.icon as AvailableIcons | null,
-                    content: parsedData.data.content as RemirrorJSON,
+      <div>
+        <Button
+          icon={document?.id ? IconEnum.save : IconEnum.add}
+          isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isFetching || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
+          label={document?.id ? "Update" : "Create"}
+          onClick={async () => {
+            if (changedData) {
+              if (document?.id) {
+                const documentToUpdate = {
+                  ...(changedData || {}),
+                  id: document.id,
+                  parent_id: document.parent_id,
+                } as DocumentType;
+                const { alter_names, template_fields, tags, image, ...rest } = documentToUpdate;
+
+                const parsedData = UpdateDocumentSchema.parse({
+                  data: { ...rest, image_id: image?.id },
+                  relations: {
+                    tags,
+                    alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
+                    template_fields: template_fields.map((f) => ({ ...f, key: f.key.trim() })),
                   },
-                },
-                {
-                  onSuccess: resetDrawerAtom,
-                },
-              );
+                  permissions: document?.permissions,
+                });
+                await update(
+                  {
+                    ...parsedData,
+                    data: {
+                      ...parsedData.data,
+                      icon: parsedData.data.icon as AvailableIcons | null,
+                      content: parsedData.data.content as RemirrorJSON,
+                    },
+                  },
+                  {
+                    onSuccess: resetDrawerAtom,
+                  },
+                );
+              } else {
+                const dataToParse = {
+                  data: { ...document, image_id: document?.image?.id },
+                  relations: {
+                    alter_names: document?.alter_names,
+                    tags: document?.tags,
+                    template_fields: (document?.template_fields || []).map((f) => ({ ...f, key: f.key.trim() })),
+                  },
+                  permissions: document?.permissions,
+                };
+                dataToParse.data.parent_id = exceptions?.globalCreate ? null : item_id;
+                dataToParse.data.owner_id = user?.id;
+                const parsedData = InsertDocumentSchema.parse(dataToParse);
+                await create(
+                  {
+                    ...parsedData,
+                    data: {
+                      ...parsedData.data,
+                      icon: parsedData.data.icon as AvailableIcons | null,
+                      content: parsedData.data.content as RemirrorJSON,
+                    },
+                  },
+                  {
+                    onSuccess: resetDrawerAtom,
+                  },
+                );
+              }
             } else {
-              const dataToParse = {
-                data: { ...document, image_id: document?.image?.id },
-                relations: {
-                  alter_names: document?.alter_names,
-                  tags: document?.tags,
-                },
-                permissions: document?.permissions,
-              };
-              dataToParse.data.parent_id = exceptions?.globalCreate ? null : item_id;
-              dataToParse.data.owner_id = user?.id;
-              const parsedData = InsertDocumentSchema.parse(dataToParse);
-              await create(
-                {
-                  ...parsedData,
-                  data: {
-                    ...parsedData.data,
-                    icon: parsedData.data.icon as AvailableIcons | null,
-                    content: parsedData.data.content as RemirrorJSON,
-                  },
-                },
-                {
-                  onSuccess: resetDrawerAtom,
-                },
-              );
+              createNotification({
+                variant: "info",
+                icon: IconEnum.info_circle,
+                title: "No data was changed.",
+                timer: 3,
+              });
             }
-          } else {
-            createNotification({
-              variant: "info",
-              icon: IconEnum.info_circle,
-              title: "No data was changed.",
-              timer: 3,
-            });
-          }
-        }}
-        variant="success"
-      />
+          }}
+          variant="success"
+        />
+      </div>
     </DrawerLayout>
   );
 }
