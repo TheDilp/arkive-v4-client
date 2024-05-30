@@ -8,6 +8,7 @@ import {
   FloatingFocusManager,
   FloatingPortal,
   offset,
+  ReferenceType,
   size as sizeMiddleware,
   useClick,
   useDismiss,
@@ -16,7 +17,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { SelectOptionType, SelectType } from "../../types";
@@ -200,9 +201,11 @@ function onClick({
   name,
   index,
   setIsOpen,
+  ref,
 }: Pick<SelectType, "isMultiple" | "value" | "options" | "onChange" | "name"> & {
   index: number | null;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  ref: MutableRefObject<ReferenceType | null>;
 }) {
   if (typeof index === "number") {
     if (isMultiple) {
@@ -232,6 +235,8 @@ function onClick({
       if (selectedItem) {
         onChange({ name, value: selectedItem?.value });
         setIsOpen(false);
+        // @ts-ignore
+        ref.current.focus();
       }
     }
   }
@@ -362,6 +367,7 @@ export function Select({
             options: filteredItems,
             value,
             setIsOpen,
+            ref: refs.reference,
           });
         }
       }}>
@@ -383,6 +389,7 @@ export function Select({
                 options: filteredItems,
                 value,
                 setIsOpen,
+                ref: refs.reference,
               });
             }
           },
@@ -460,6 +467,7 @@ export function Select({
                         options: filteredItems,
                         value,
                         setIsOpen,
+                        ref: refs.reference,
                       });
                     }
                   }}
@@ -495,6 +503,7 @@ export function Select({
                             options: filteredItems,
                             value,
                             setIsOpen,
+                            ref: refs.reference,
                           });
                       },
                       onKeyDown: (e) => {
@@ -507,6 +516,7 @@ export function Select({
                             options: filteredItems,
                             value,
                             setIsOpen,
+                            ref: refs.reference,
                           });
                         }
                       },
