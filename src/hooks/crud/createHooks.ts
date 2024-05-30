@@ -1,8 +1,17 @@
+import { Node } from "@remirror/pm/model";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
+import { RemirrorJSON } from "remirror";
 
-import { AvailableEntityType, AvailableSubEntityType, EdgeType, GraphType, NodeType } from "../../types";
+import {
+  AvailableEntityType,
+  AvailableSubEntityType,
+  DocumentTemplateFieldType,
+  EdgeType,
+  GraphType,
+  NodeType,
+} from "../../types";
 import {
   baseURLS,
   edgesAtom,
@@ -402,14 +411,17 @@ export function useMutateWebhook(action: "create" | "update", id?: string) {
     },
   );
 }
-export function useCreateFromTemplate(project_id: string) {
+export function useCreateFromTemplate(id: string, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
-    async (vars: { id_template: string; project_id: string; title: string; matches: Record<string, string> }) =>
+    async (vars: {
+      data: { title: string; content: RemirrorJSON | Node | string };
+      relations: { template_fields: DocumentTemplateFieldType[] };
+    }) =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/documents/create/from_template`,
-        body: JSON.stringify({ data: vars }),
+        url: `${baseURLS.baseServer}/documents/create/from_template/${id}`,
+        body: JSON.stringify(vars),
         method: "POST",
       }),
 

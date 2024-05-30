@@ -125,20 +125,13 @@ export function MatchField({
       fields: ["id", "title", "icon"],
     },
     {
-      enabled: !!related_id && entity_type === "blueprints",
+      enabled: !!related_id && entity_type === "blueprint_instances",
     },
   );
 
   useEffect(() => {
     if (relatedBlueprint?.data) {
-      if (entity_type === "characters") {
-        // setParent({
-        //   label: relatedBlueprint?.data?.full_name,
-        //   value: relatedBlueprint?.data?.id,
-        //   icon: null,
-        //   image: relatedBlueprint?.data?.portrait_id,
-        // });
-      } else {
+      if (entity_type === "blueprint_instances") {
         setParent({
           label: relatedBlueprint?.data?.title,
           value: relatedBlueprint?.data?.id,
@@ -358,6 +351,7 @@ export function MatchField({
                   label="Randomize?"
                   name={`template_fields[${idx}].is_randomized`}
                   onChange={handleChange}
+                  tooltip="Keys will be replaced when generating the document."
                   value={!!is_randomized}
                 />
               </div>

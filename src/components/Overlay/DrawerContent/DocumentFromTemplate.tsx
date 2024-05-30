@@ -2,8 +2,9 @@
 /* eslint-disable no-restricted-syntax */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { useGetEntity, useHandleChange } from "../../../hooks";
+import { useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
 import { DocumentType, TabType } from "../../../types";
 import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, getSentenceCase, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
@@ -26,7 +27,7 @@ const tabs: TabType[] = [
 ];
 
 export function DocumentFromTemplate({ data }: Props) {
-  // const { project_id } = useParams();
+  const { project_id } = useParams();
 
   const { data: existingTemplate, isLoading } = useGetEntity<DocumentType>(
     data?.id,
@@ -44,7 +45,10 @@ export function DocumentFromTemplate({ data }: Props) {
   const [content, setContent] = useState(data.getContext.getState().doc);
   const [template, setTemplate] = useState<Partial<DocumentType>>({});
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
-  // const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
+  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreating } = useCreateFromTemplate(
+    existingTemplate?.data?.id as string,
+    project_id as string,
+  );
 
   const hasDiceRollFields = (template?.template_fields || []).some((f) => f.entity_type === "dice_roll");
 
@@ -191,11 +195,15 @@ export function DocumentFromTemplate({ data }: Props) {
         isDisabled={
           !template?.title ||
           !template?.template_fields?.length ||
-          (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id)
+          (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
+          isCreating
         }
         label="Create"
         onClick={() => {
-          // createDocumentFromTemplate(template);
+          createDocumentFromTemplate({
+            data: { title: template.title || "", content },
+            relations: { template_fields: template?.template_fields || [] },
+          });
         }}
         variant="success"
       />
