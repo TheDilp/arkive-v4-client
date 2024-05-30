@@ -439,7 +439,7 @@ function menuBarItems({
             ...prev,
             data: { id, title, getContext },
             type: "from_template",
-            size: "full",
+            size: "half",
             title: "Create from template",
           }));
       },
