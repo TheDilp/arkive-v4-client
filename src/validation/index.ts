@@ -7,7 +7,6 @@ export * from "./character_relationship_types";
 export * from "./conversations";
 export * from "./dictionaries";
 export * from "./document";
-export * from "./document_templates";
 export * from "./fieldTemplates";
 export * from "./graphs";
 export * from "./maps/map_layers";
