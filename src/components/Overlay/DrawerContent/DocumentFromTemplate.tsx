@@ -1,14 +1,15 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useState } from "react";
 
 import { useGetEntity, useHandleChange } from "../../../hooks";
 import { DocumentType, TabType } from "../../../types";
-import { DocumentTemplateFieldRegex, IconEnum } from "../../../utils";
+import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
-import { EntityPreview } from "../../DataDisplay";
-import { Button, Input, Search } from "../../Form";
+import { Button, Input } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -27,59 +28,36 @@ const tabs: TabType[] = [
 export function DocumentFromTemplate({ data }: Props) {
   // const { project_id } = useParams();
 
-  const [existingTemplateId, setExistingTemplateId] = useState<string | undefined>(undefined);
-
-  const { data: existingTemplateData } = useGetEntity<DocumentType>(
-    existingTemplateId,
-    "document_templates",
+  const { data: existingTemplate, isLoading } = useGetEntity<DocumentType>(
+    data?.id,
+    "documents",
     {
-      fields: ["id", "owner_id", "title"],
-      relations: { fields: true },
+      fields: ["id"],
+      relations: { template_fields: true },
     },
     {
-      enabled: !!existingTemplateId,
+      enabled: !!data?.id,
     },
   );
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [content] = useState(data.getContext.getState().doc);
-  const [existingTemplate, setExistingTemplate] = useState<DocumentType | null>();
-  const [template, setTemplate] = useState<Partial<DocumentType>>({ template_fields: [] });
+  const [content, setContent] = useState(data.getContext.getState().doc);
+  const [template, setTemplate] = useState<Partial<DocumentType>>({});
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   // const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
 
-  useEffect(() => {
-    if (existingTemplateData?.data) setExistingTemplate(existingTemplateData?.data);
-  }, [existingTemplateData]);
-  useEffect(() => {
-    if (existingTemplate) {
-      const temp = { ...template };
-      for (let index = 0; index < existingTemplate.template_fields.length || 0; index += 1) {
-        const field = existingTemplate.template_fields[index];
-
-        const idx = (template.template_fields || []).findIndex((f) => f.key === field.key);
-        if (typeof idx === "number" && idx > -1 && temp.template_fields) {
-          temp.template_fields[idx] = field;
-        }
-      }
-      setTemplate(temp);
-    }
-  }, [existingTemplateId, existingTemplate]);
+  const hasDiceRollFields = (template?.template_fields || []).some((f) => f.entity_type === "dice_roll");
 
   useEffect(() => {
-    if (content) {
+    if (content && existingTemplate?.data) {
       // Replace with existing template
-      const tempFields: DocumentType["template_fields"] = [];
+      const tempFields: DocumentType["template_fields"] = existingTemplate?.data?.template_fields || [];
       const { textContent } = content;
       if (textContent) {
         for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
           const matchKey = match?.at(1) as string;
-          const idx = tempFields.findIndex((f) => f?.key === matchKey);
-          if (idx > -1) {
-            if (match?.at(1)) {
-              tempFields[idx] = { ...tempFields[idx], key: matchKey as string };
-            }
-          } else if (idx === -1 && match?.at(1)) {
+          const idx = tempFields?.findIndex((f) => f?.key === matchKey);
+          if (idx === -1 && match?.at(1)?.trim()) {
             tempFields[tempFields.length] = {
               id: crypto.randomUUID(),
               value: "",
@@ -93,27 +71,29 @@ export function DocumentFromTemplate({ data }: Props) {
             };
           }
         }
-        setTemplate((prev) => ({ ...prev, fields: tempFields }));
+        setTemplate((prev) => ({ ...prev, template_fields: tempFields }));
       }
     }
-  }, []);
+  }, [existingTemplate]);
 
   useEffect(() => {
-    // const templateContent = data.getContext.getState().doc;
-    // if (templateContent && template.matches) {
-    //   let contentToAlter = JSON.stringify(templateContent);
-    //   const matches = Object.entries(template.matches);
-    //   for (let index = 0; index < matches.length; index += 1) {
-    //     if (matches[index][0] && matches[index][1]?.value) {
-    //       contentToAlter = contentToAlter.replaceAll(`%{${matches[index][0]}}%`, matches[index][1]?.value);
-    //     }
-    //   }
-    //   const newContent = JSON.parse(contentToAlter);
-    //   const state = data.getContext.manager.createState({ content: newContent });
-    //   setContent(state.doc);}
+    const templateContent = data.getContext.getState().doc;
+    if (templateContent && template.template_fields) {
+      let contentToAlter = JSON.stringify(templateContent);
+      const matches = template.template_fields || [];
+      for (let index = 0; index < matches.length; index += 1) {
+        if (matches[index].key && matches[index]?.value) {
+          contentToAlter = contentToAlter.replaceAll(`%{${matches[index].key}}%`, matches[index]?.value || "");
+        }
+      }
+      const newContent = JSON.parse(contentToAlter);
+      const state = data.getContext.manager.createState({ content: newContent });
+      setContent(state.doc);
+    }
   }, [template]);
 
   if (!data.getContext.getState().doc.content) return null;
+  if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <div className="flex flex-nowrap gap-x-2">
@@ -124,26 +104,34 @@ export function DocumentFromTemplate({ data }: Props) {
           value={template?.title || ""}
           variant={template?.title ? "primary" : "error"}
         />
-        {existingTemplate ? (
-          <div className="min-w-64">
-            <EntityPreview
-              clearAction={() => {
-                setExistingTemplate(null);
+        {hasDiceRollFields ? (
+          <div className="w-24 self-end">
+            <Button
+              icon={IconEnum.d20}
+              label="Roll all"
+              onClick={async () => {
+                if (hasDiceRollFields) {
+                  const tempFields = [...(template?.template_fields || [])];
+                  Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: true });
+
+                  for (let index = 0; index < tempFields?.length || 0; index += 1) {
+                    if (tempFields[index]?.entity_type === "dice_roll" && !!tempFields[index].formula) {
+                      const parsedNotation = await DiceRollParser.parseNotation(tempFields[index].formula);
+                      const r = await Dice.roll(parsedNotation);
+                      const rollData = await DiceRollParser.parseFinalResults(r);
+                      if (rollData?.valid) {
+                        tempFields[index].value = rollData?.value?.toString() || "";
+                      }
+                    }
+                  }
+
+                  setTemplate((prev) => ({ ...prev, template_fields: tempFields }));
+                }
               }}
-              id={existingTemplate?.id}
-              label="Template"
-              title={existingTemplate?.title}
-              type="document_templates"
+              variant="info"
             />
           </div>
-        ) : (
-          <Search
-            label="Use template (optional)"
-            name="template"
-            onChange={({ value }) => setExistingTemplateId(value as string)}
-            searchEntity="document_templates"
-          />
-        )}
+        ) : null}
       </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
@@ -151,6 +139,8 @@ export function DocumentFromTemplate({ data }: Props) {
           <MatchField
             key={f.id}
             allMatches={template?.template_fields || []}
+            derive_formula={f.derive_formula}
+            derive_from={f.derive_from}
             entity_type={f.entity_type}
             formula={f.formula}
             handleChange={handleChange}
@@ -163,7 +153,7 @@ export function DocumentFromTemplate({ data }: Props) {
       </div>
       {tabs[selectedTab].id === "2" ? (
         <div className="flex h-full justify-center">
-          <div className="lg:max-w-[60%] [&>.editor-component]:bg-zinc-800">
+          <div className="[&>.editor-component]:bg-zinc-800">
             {/* @ts-ignore */}
             <Editor initialContent={content || undefined} isDisabled isFullHeight isOutsideControlled isReadOnly />
           </div>
