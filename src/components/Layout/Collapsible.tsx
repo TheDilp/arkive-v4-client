@@ -11,7 +11,8 @@ import { Button, Icon } from "..";
 const CollapsibleClasses = tv({
   slots: {
     label: "flex select-none items-center gap-x-2 text-white",
-    summary: "cursor-pointer flex items-center gap-x-2 border-b pb-1 font-lato outline-none focus:border focus:border-zinc-400",
+    summary:
+      "cursor-pointer flex items-center gap-x-2 border-b pb-1 font-lato outline-none focus:border-blue-400 focus:border-zinc-400",
   },
   variants: {
     variant: {

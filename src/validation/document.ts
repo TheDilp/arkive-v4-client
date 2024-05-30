@@ -10,6 +10,7 @@ export const InsertDocumentTemplateFieldSchema = z.object({
   derive_from: z.string().nullable(),
   derive_formula: z.string().nullable(),
   is_randomized: z.boolean().nullable(),
+  related_id: z.string().nullable(),
   sort: z.number(),
 });
 export const UpdateDocumentTemplateFieldSchema = z.object({
@@ -21,6 +22,7 @@ export const UpdateDocumentTemplateFieldSchema = z.object({
   derive_from: z.string().nullable(),
   derive_formula: z.string().nullable(),
   is_randomized: z.boolean().nullable(),
+  related_id: z.string().nullable(),
   sort: z.number(),
 });
 

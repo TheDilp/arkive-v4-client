@@ -67,16 +67,18 @@ export function DocumentFromTemplate({ data }: Props) {
               is_randomized: null,
               derive_formula: null,
               derive_from: null,
+              related_id: null,
               key: matchKey as string,
               sort: tempFields.length,
             };
           }
         }
         setTemplate((prev) => ({ ...prev, template_fields: tempFields }));
+      } else {
+        setTemplate((prev) => ({ ...prev, template_fields: existingTemplate?.data?.template_fields || [] }));
       }
     }
   }, [existingTemplate]);
-
   useEffect(() => {
     const templateContent = data.getContext.getState().doc;
     if (templateContent && template.template_fields) {
@@ -155,6 +157,7 @@ export function DocumentFromTemplate({ data }: Props) {
                 idx={idx}
                 is_randomized={f?.is_randomized}
                 match={f?.key}
+                related_id={f?.related_id}
                 value={f?.value}
               />
             </div>
@@ -176,7 +179,7 @@ export function DocumentFromTemplate({ data }: Props) {
       </div>
       {tabs[selectedTab].id === "2" ? (
         <div className="flex h-full justify-center">
-          <div className="[&>.editor-component]:bg-zinc-800">
+          <div className="w-full [&>.editor-component]:bg-zinc-800">
             {/* @ts-ignore */}
             <Editor initialContent={content || undefined} isDisabled isFullHeight isOutsideControlled isReadOnly />
           </div>
@@ -185,7 +188,11 @@ export function DocumentFromTemplate({ data }: Props) {
 
       <Button
         icon={IconEnum.add}
-        isDisabled
+        isDisabled={
+          !template?.title ||
+          !template?.template_fields?.length ||
+          (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id)
+        }
         label="Create"
         onClick={() => {
           // createDocumentFromTemplate(template);

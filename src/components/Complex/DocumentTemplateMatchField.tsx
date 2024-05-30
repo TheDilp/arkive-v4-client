@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { AvailableEntityType, DocumentTemplateFieldType, DocumentType, HandleChangePropsType, MatchType } from "../../types";
+import { useGetEntity } from "../../hooks";
+import {
+  AvailableEntityType,
+  BlueprintType,
+  DocumentTemplateFieldType,
+  DocumentType,
+  HandleChangePropsType,
+  MatchType,
+} from "../../types";
 import { AvailableIcons, DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../Form";
@@ -68,6 +76,7 @@ export function MatchField({
   value,
   entity_type,
   is_randomized,
+  related_id,
   formula,
   idx,
   isEditable,
@@ -80,7 +89,10 @@ export function MatchField({
   idx: number;
   isEditable?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
-} & Pick<DocumentTemplateFieldType, "entity_type" | "value" | "derive_formula" | "derive_from" | "formula" | "is_randomized">) {
+} & Pick<
+  DocumentTemplateFieldType,
+  "entity_type" | "value" | "derive_formula" | "derive_from" | "formula" | "related_id" | "is_randomized"
+>) {
   const [parent, setParent] = useState<{
     label: string;
     value: string;
@@ -103,13 +115,47 @@ export function MatchField({
     }
   }, [selectedEntity]);
 
+  const { data: relatedBlueprint, isFetching } = useGetEntity<BlueprintType>(
+    related_id as string | undefined,
+    "blueprints",
+    {
+      data: {
+        id: related_id,
+      },
+      fields: ["id", "title", "icon"],
+    },
+    {
+      enabled: !!related_id && entity_type === "blueprints",
+    },
+  );
+
+  useEffect(() => {
+    if (relatedBlueprint?.data) {
+      if (entity_type === "characters") {
+        // setParent({
+        //   label: relatedBlueprint?.data?.full_name,
+        //   value: relatedBlueprint?.data?.id,
+        //   icon: null,
+        //   image: relatedBlueprint?.data?.portrait_id,
+        // });
+      } else {
+        setParent({
+          label: relatedBlueprint?.data?.title,
+          value: relatedBlueprint?.data?.id,
+          icon: relatedBlueprint?.data?.icon || null,
+          image: null,
+        });
+      }
+    }
+  }, [relatedBlueprint]);
+
   const parentIdx = entity_type === "derived" ? allMatches.findIndex((m) => m?.id === derive_from) : null;
   const derivedParentValue = typeof parentIdx === "number" && parentIdx > -1 ? allMatches[parentIdx].value : null;
 
   useEffect(() => {
     if (derive_from && derive_formula && !isEditable) {
       if (typeof parentIdx === "number") {
-        if (derive_from === "dnd_5e_ability_bonus") {
+        if (derive_formula === "dnd_5e_ability_bonus") {
           const newVal = Math.floor((Number(derivedParentValue || 10) - 10) / 2).toString();
           if (value !== newVal) {
             handleChange({
@@ -124,20 +170,18 @@ export function MatchField({
 
   return (
     <div className="flex w-full flex-col gap-y-2 border-b border-zinc-700 pb-1">
-      <div className="flex w-full max-w-full flex-nowrap items-center gap-x-1">
-        {isEditable ? (
-          <div className="min-w-48">
-            <Input label="Key (must be unique)" name={`template_fields[${idx}].key`} onChange={handleChange} value={match} />
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            <span className="min-w-48 max-w-[25%] self-end pb-2.5 text-sm text-zinc-300">Key</span>
+      <div className="grid w-full max-w-full grid-cols-2 items-center gap-x-1 gap-y-2">
+        <div className="col-span-1">
+          <Input
+            isDisabled={!isEditable}
+            label="Key (must be unique)"
+            name={`template_fields[${idx}].key`}
+            onChange={handleChange}
+            value={match}
+          />
+        </div>
 
-            <span className="min-w-48 max-w-[25%] self-end">{match}</span>
-          </div>
-        )}
-
-        <div className="min-w-36">
+        <div className="col-span-1 flex items-center gap-x-1">
           <Select
             hasSearch
             label="Entity type"
@@ -156,29 +200,37 @@ export function MatchField({
             options={MatchReplacementOptions}
             value={entity_type}
           />
+          {entity_type === "derived" && !isEditable ? (
+            <div>
+              <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
+            </div>
+          ) : null}
         </div>
         {entity_type === "custom" ? (
-          <div className="w-full">
+          <div className="col-span-1 w-full">
             <Input label="Replace with" name={`template_fields[${idx}].value`} onChange={handleChange} value={value || ""} />
           </div>
         ) : null}
         {entity_type !== "custom" && entity_type !== "derived" ? (
-          <div className="flex w-full flex-1 gap-x-4">
+          <div className="col-span-2 flex w-full flex-1 gap-x-4">
             {!!entity_type && entity_type === "blueprint_instances" && !parent ? (
               <div className="flex-1">
                 <Search
+                  isDisabled={isFetching}
+                  isLoading={isFetching}
                   label="Blueprint"
                   name="value"
-                  onChange={({ label, value: newValue, image, icon }) =>
+                  onChange={({ label, value: newValue, image, icon }) => {
+                    handleChange({ name: `template_fields[${idx}].related_id`, value: newValue });
                     setParent({
                       label: label || "",
                       value: newValue,
                       image: image || null,
                       icon: icon || null,
-                    })
-                  }
+                    });
+                  }}
                   searchEntity="blueprints"
-                  value={value}
+                  value={related_id}
                 />
               </div>
             ) : null}
@@ -203,7 +255,8 @@ export function MatchField({
               entity_type !== "blueprint_instances") ? (
               <div className="flex-1">
                 <Search
-                  isDisabled={entity_type === "blueprint_instances" && !parent}
+                  isDisabled={(entity_type === "blueprint_instances" && !parent) || isFetching}
+                  isLoading={isFetching}
                   label="Replace with"
                   name={`template_fields[${idx}].value`}
                   onChange={({ label, value: newValue, image, icon }) =>
@@ -299,7 +352,7 @@ export function MatchField({
               </div>
             ) : null}
 
-            {entity_type !== "dice_roll" && isEditable && !!entity_type ? (
+            {entity_type !== "dice_roll" && !!entity_type ? (
               <div className="h-full [&>div]:gap-y-2">
                 <Checkbox
                   label="Randomize?"
@@ -309,12 +362,6 @@ export function MatchField({
                 />
               </div>
             ) : null}
-          </div>
-        ) : null}
-
-        {entity_type === "derived" && !isEditable ? (
-          <div>
-            <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
           </div>
         ) : null}
       </div>

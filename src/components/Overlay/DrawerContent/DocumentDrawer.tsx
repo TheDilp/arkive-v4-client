@@ -62,7 +62,6 @@ type documentRelationsType = {
 
 function getTabs(permissions: UserHasPermissionsType, isTemplate: boolean | null | undefined, id: string | undefined) {
   const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
-
   if (isTemplate) {
     tabs.push({ id: "template", label: "Template keys", icon: IconEnum.document_templates });
   }
@@ -128,7 +127,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   }>("documents", project_id as string);
 
   const [alterNameInput, setAlterNameInput] = useState("");
-  const tabs = getTabs(permissions, document?.is_template, data?.id);
+  const tabs = getTabs(permissions, document?.is_template || exceptions?.createTemplate, data?.id);
   const currentAlterNames = document?.alter_names?.map((alter_name) => alter_name.title);
 
   const { changedData, handleChange } = useHandleChange({ data: document, setData: setDocument });
@@ -283,6 +282,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                       derive_formula: null,
                       derive_from: null,
                       entity_type: null,
+                      related_id: null,
                       is_randomized: null,
                       sort: document?.template_fields?.length || 0,
                     }),
@@ -337,7 +337,9 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                 },
                               ]}
                               label={getSentenceCase(f.key) || "New key"}>
-                              <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
+                              <div
+                                key={f.id}
+                                className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2">
                                 <MatchField
                                   allMatches={document?.template_fields || []}
                                   derive_formula={f.derive_formula}
@@ -349,6 +351,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                   is_randomized={f?.is_randomized}
                                   isEditable
                                   match={f?.key}
+                                  related_id={f.related_id}
                                   value={f?.value}
                                 />
                               </div>

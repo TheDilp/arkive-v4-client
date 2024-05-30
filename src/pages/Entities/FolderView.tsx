@@ -1086,7 +1086,7 @@ export function FolderView() {
                                 exceptions: {
                                   createTemplate: true,
                                 },
-                                size: "lg",
+                                size: "half",
                               }));
                             },
                           },

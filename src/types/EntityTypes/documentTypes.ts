@@ -19,6 +19,7 @@ export type DocumentTemplateFieldType = {
   formula: string | null;
   derive_from: string | null;
   derive_formula: string | null;
+  related_id: string | null;
   is_randomized: boolean | null;
   sort: number;
 };
