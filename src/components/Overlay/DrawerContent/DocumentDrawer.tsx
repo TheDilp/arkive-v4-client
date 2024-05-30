@@ -1,5 +1,6 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useAtomValue } from "jotai";
+import set from "lodash.set";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
@@ -397,15 +398,30 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 } as DocumentType;
                 const { alter_names, template_fields, tags, image, ...rest } = documentToUpdate;
 
-                const parsedData = UpdateDocumentSchema.parse({
+                const dataToParse = {
                   data: { ...rest, image_id: image?.id },
-                  relations: {
-                    tags,
-                    alter_names: (alter_names || []).map((alter_name: { title: string }) => ({ ...alter_name, project_id })),
-                    template_fields: template_fields.map((f) => ({ ...f, key: f.key.trim() })),
-                  },
+                  relations: {},
                   permissions: document?.permissions,
-                });
+                };
+
+                if (tags) {
+                  set(dataToParse, "relations.tags", tags);
+                }
+                if (alter_names) {
+                  set(dataToParse, "relations.alter_names", alter_names);
+                }
+                if (template_fields) {
+                  set(
+                    dataToParse,
+                    "relations.template_fields",
+                    template_fields.map((f) => ({
+                      ...f,
+                      key: f.key.trim(),
+                    })),
+                  );
+                }
+
+                const parsedData = UpdateDocumentSchema.parse(dataToParse);
                 await update(
                   {
                     ...parsedData,
