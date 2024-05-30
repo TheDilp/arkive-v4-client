@@ -11,9 +11,9 @@ export function useHandleChange({ data, setData, ignoreDataChange }: { data: any
   const setHasChangedDataAtom = useSetAtom(hasChangedDataAtom);
   const [changedFields, setChangedFields] = useState<any[]>([]);
   const [changedData, setChangedData] = useState<any>();
+  const updatedData = cloneDeep(data);
   function handleChange(newData: HandleChangePropsType) {
     const changedFieldsUpdated = [...changedFields];
-    const updatedData = cloneDeep(data);
 
     if (Array.isArray(newData)) {
       for (let index = 0; index < newData.length; index += 1) {

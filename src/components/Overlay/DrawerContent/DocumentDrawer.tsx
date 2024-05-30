@@ -323,7 +323,20 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                             <Icon fontSize={24} icon={IconEnum.menu} />
                           </div>
                           <div className="w-full">
-                            <Collapsible label={getSentenceCase(f.key)}>
+                            <Collapsible
+                              actions={[
+                                {
+                                  icon: IconEnum.trash,
+                                  onClick: () => {
+                                    const newFields = (document?.template_fields || []).filter((_, i) => i !== idx);
+                                    handleChange({ name: "template_fields", value: newFields });
+                                  },
+                                  variant: "error",
+                                  isIconOnly: true,
+                                  hasNoBackground: true,
+                                },
+                              ]}
+                              label={getSentenceCase(f.key) || "New key"}>
                               <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
                                 <MatchField
                                   allMatches={document?.template_fields || []}

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AvailableEntityType, DocumentTemplateFieldType, DocumentType, HandleChangePropsType, MatchType } from "../../types";
 import { AvailableIcons, DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
-import { Button, Input, Search, Select } from "../Form";
+import { Button, Checkbox, Input, Search, Select } from "../Form";
 
 const MatchReplacementOptions: { label: string; value: MatchType; icon: AvailableIcons }[] = [
   {
@@ -126,7 +126,7 @@ export function MatchField({
     <div className="flex w-full flex-col gap-y-2 border-b border-zinc-700 pb-1">
       <div className="flex w-full max-w-full flex-nowrap items-center gap-x-1">
         {isEditable ? (
-          <div className="min-w-48 flex-1">
+          <div className="min-w-48">
             <Input label="Key (must be unique)" name={`template_fields[${idx}].key`} onChange={handleChange} value={match} />
           </div>
         ) : (
@@ -137,7 +137,7 @@ export function MatchField({
           </div>
         )}
 
-        <div className="min-w-48 flex-1">
+        <div className="min-w-36">
           <Select
             hasSearch
             label="Entity type"
@@ -163,40 +163,45 @@ export function MatchField({
           </div>
         ) : null}
         {entity_type !== "custom" && entity_type !== "derived" ? (
-          <div className="flex w-full gap-x-4">
+          <div className="flex w-full flex-1 gap-x-4">
             {!!entity_type && entity_type === "blueprint_instances" && !parent ? (
-              <Search
-                label="Blueprint"
-                name="value"
-                onChange={({ label, value: newValue, image, icon }) =>
-                  setParent({
-                    label: label || "",
-                    value: newValue,
-                    image: image || null,
-                    icon: icon || null,
-                  })
-                }
-                searchEntity="blueprints"
-                value={value}
-              />
+              <div className="flex-1">
+                <Search
+                  label="Blueprint"
+                  name="value"
+                  onChange={({ label, value: newValue, image, icon }) =>
+                    setParent({
+                      label: label || "",
+                      value: newValue,
+                      image: image || null,
+                      icon: icon || null,
+                    })
+                  }
+                  searchEntity="blueprints"
+                  value={value}
+                />
+              </div>
             ) : null}
-            {!!entity_type && !is_randomized && entity_type === "blueprint_instances" && parent ? (
-              <EntityPreview
-                clearAction={() => setParent(null)}
-                icon={parent.icon || ""}
-                id={parent.value}
-                image_id={parent.image}
-                label="Blueprint"
-                title={parent.label}
-                type="blueprints"
-              />
+            {!!entity_type && entity_type === "blueprint_instances" && parent ? (
+              <div className="flex-1">
+                <EntityPreview
+                  clearAction={() => setParent(null)}
+                  icon={parent.icon || ""}
+                  id={parent.value}
+                  image_id={parent.image}
+                  label="Blueprint"
+                  title={parent.label}
+                  type="blueprints"
+                />
+              </div>
             ) : null}
             {entity_type !== "dice_roll" &&
             !is_randomized &&
             !!entity_type &&
             !selectedEntity &&
-            ((entity_type === "blueprint_instances" && parent) || entity_type !== "blueprint_instances") ? (
-              <div>
+            ((entity_type === "blueprint_instances" && parent && (!is_randomized || !isEditable)) ||
+              entity_type !== "blueprint_instances") ? (
+              <div className="flex-1">
                 <Search
                   isDisabled={entity_type === "blueprint_instances" && !parent}
                   label="Replace with"
@@ -216,15 +221,17 @@ export function MatchField({
               </div>
             ) : null}
             {entity_type !== "dice_roll" && !!entity_type && !is_randomized && selectedEntity?.value && entity_type ? (
-              <EntityPreview
-                clearAction={() => setSelectedEntity(null)}
-                icon={selectedEntity.icon || ""}
-                id={selectedEntity.value}
-                image_id={selectedEntity.image}
-                label="Replace with"
-                title={selectedEntity.label}
-                type={entity_type as AvailableEntityType}
-              />
+              <div className="flex-1">
+                <EntityPreview
+                  clearAction={() => setSelectedEntity(null)}
+                  icon={selectedEntity.icon || ""}
+                  id={selectedEntity.value}
+                  image_id={selectedEntity.image}
+                  label="Replace with"
+                  title={selectedEntity.label}
+                  type={entity_type as AvailableEntityType}
+                />
+              </div>
             ) : null}
             {entity_type === "dice_roll" ? (
               <Input
@@ -292,37 +299,22 @@ export function MatchField({
               </div>
             ) : null}
 
-            {/* {entity_type !== "custom" && entity_type !== "derived" && !!entity_type ? (
-                <div className="h-full [&>div]:gap-y-2">
-                  <Checkbox
-                    label="Randomize?"
-                    name={`template_fields[${idx}].is_randomized`}
-                    onChange={handleChange}
-                    value={!!is_randomized}
-                  />
-                </div>
-              ) : null} */}
+            {entity_type !== "dice_roll" && isEditable && !!entity_type ? (
+              <div className="h-full [&>div]:gap-y-2">
+                <Checkbox
+                  label="Randomize?"
+                  name={`template_fields[${idx}].is_randomized`}
+                  onChange={handleChange}
+                  value={!!is_randomized}
+                />
+              </div>
+            ) : null}
           </div>
         ) : null}
 
         {entity_type === "derived" && !isEditable ? (
           <div>
             <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
-          </div>
-        ) : null}
-        {isEditable ? (
-          <div className="mt-5 w-min">
-            <Button
-              hasNoBackground
-              icon={IconEnum.trash}
-              iconSize={22}
-              isIconOnly
-              onClick={() => {
-                const newFields = allMatches.filter((_, i) => i !== idx);
-                handleChange({ name: "template_fields", value: newFields });
-              }}
-              variant="error"
-            />
           </div>
         ) : null}
       </div>
