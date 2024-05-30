@@ -82,7 +82,7 @@ export function EntitiesView() {
                   onClick={() => {
                     setDrawer((prev) => ({
                       ...prev,
-                      size: "lg",
+                      size: type === "documents" ? "half" : "lg",
                       title: `Edit ${entityName}`,
                       type: type as DrawerContentCreateNewType,
                       data: { id: item_id as string, project_id: project_id as string },

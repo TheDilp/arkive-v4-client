@@ -273,7 +273,7 @@ function getColumns(
                           ...prev,
                           data: row.original,
                           title: `Edit ${entityName} - ${row.original.title}`,
-                          size: "lg",
+                          size: entityType === "documents" && is_document_template ? "half" : "lg",
                           type: entityType,
                         },
                   );
@@ -1029,7 +1029,7 @@ export function FolderView() {
                     onClick={() => {
                       setDrawer((prev) => ({
                         ...prev,
-                        size: "lg",
+                        size: type === "documents" && documentType === "templates" ? "half" : "lg",
                         title: `Edit ${entityName}`,
                         type: type as DrawerContentCreateNewType,
                         data: { id: item_id as string, project_id: project_id as string },
