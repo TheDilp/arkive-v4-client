@@ -1,3 +1,4 @@
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useAtomValue } from "jotai";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -19,14 +20,23 @@ import {
   UpdateDocumentType,
   UserHasPermissionsType,
 } from "../../../types";
-import { AvailableIcons, createOrEditPermission, DefaultTagColor, IconEnum, useNotifications, userAtom } from "../../../utils";
+import {
+  AvailableIcons,
+  createOrEditPermission,
+  DefaultTagColor,
+  getSentenceCase,
+  IconEnum,
+  reorder,
+  useNotifications,
+  userAtom,
+} from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
 import { FolderSelect, ImageSelect, MatchField } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Badge, Skeleton } from "../../Misc";
+import { Badge, Icon, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
 
@@ -255,49 +265,92 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       ) : null}
 
       {tabs[selectedTab].id === "template" ? (
-        <Collapsible
-          actions={[
-            {
-              variant: "info",
-              icon: IconEnum.add,
-              onClick: () =>
-                handleChange({
-                  name: "template_fields",
-                  value: (document?.template_fields || []).concat({
-                    id: crypto.randomUUID(),
-                    key: "",
-                    parent_id: "",
-                    value: "",
-                    formula: null,
-                    derive_formula: null,
-                    derive_from: null,
-                    entity_type: null,
-                    is_randomized: null,
-                  }),
-                }),
-            },
-          ]}
-          initialOpen
-          label="Keys">
-          <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
-            {(document?.template_fields || [])?.map((f, idx) => (
-              <MatchField
-                key={f.id}
-                allMatches={document?.template_fields || []}
-                derive_formula={f.derive_formula}
-                derive_from={f.derive_from}
-                entity_type={f?.entity_type}
-                formula={f.formula}
-                handleChange={handleChange}
-                idx={idx}
-                is_randomized={f?.is_randomized}
-                isEditable
-                match={f?.key}
-                value={f?.value}
+        <div className="flex flex-col gap-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-lg">Add key:</span>
+            <div className="ml-auto h-8 w-8">
+              <Button
+                icon={IconEnum.add}
+                onClick={() =>
+                  handleChange({
+                    name: "template_fields",
+                    value: (document?.template_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      key: "",
+                      parent_id: "",
+                      value: "",
+                      formula: null,
+                      derive_formula: null,
+                      derive_from: null,
+                      entity_type: null,
+                      is_randomized: null,
+                      sort: document?.template_fields?.length || 0,
+                    }),
+                  })
+                }
+                variant="info"
               />
-            ))}
+            </div>
           </div>
-        </Collapsible>
+
+          <DragDropContext
+            onDragEnd={(result) => {
+              if (!result.destination) {
+                return;
+              }
+
+              const newData = reorder(document?.template_fields || [], result.source.index, result.destination.index).map(
+                (f, i) => ({ ...f, sort: i }),
+              );
+              handleChange({
+                name: "template_fields",
+                // Saving sort field is not required
+                // As the order is preserved in JSON
+                value: newData,
+              });
+            }}>
+            <Droppable droppableId="template_droppable">
+              {(providedDroppable) => (
+                <div className="flex w-full flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
+                  {(document?.template_fields || [])?.map((f, idx) => (
+                    <Draggable key={f.id} draggableId={f.id || f.key + idx} index={idx}>
+                      {(providedDraggable) => (
+                        <div
+                          className="my-1 flex w-full flex-nowrap gap-x-2"
+                          {...providedDraggable.draggableProps}
+                          ref={providedDraggable.innerRef}>
+                          <div {...providedDraggable.dragHandleProps} className="self-center">
+                            <Icon fontSize={24} icon={IconEnum.menu} />
+                          </div>
+                          <div className="w-full">
+                            <Collapsible label={getSentenceCase(f.key)}>
+                              <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
+                                <MatchField
+                                  allMatches={document?.template_fields || []}
+                                  derive_formula={f.derive_formula}
+                                  derive_from={f.derive_from}
+                                  entity_type={f?.entity_type}
+                                  formula={f.formula}
+                                  handleChange={handleChange}
+                                  idx={idx}
+                                  is_randomized={f?.is_randomized}
+                                  isEditable
+                                  match={f?.key}
+                                  value={f?.value}
+                                />
+                              </div>
+                            </Collapsible>
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {providedDroppable.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
       ) : null}
 
       {tabs[selectedTab].id === "2" && permissions?.read_tags ? (

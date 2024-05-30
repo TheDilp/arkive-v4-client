@@ -20,6 +20,7 @@ export type DocumentTemplateFieldType = {
   derive_from: string | null;
   derive_formula: string | null;
   is_randomized: boolean | null;
+  sort: number;
 };
 
 export interface DocumentType extends BaseEntityType {

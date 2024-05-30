@@ -68,6 +68,7 @@ export function DocumentFromTemplate({ data }: Props) {
               derive_formula: null,
               derive_from: null,
               key: matchKey as string,
+              sort: tempFields.length,
             };
           }
         }

@@ -124,7 +124,7 @@ export function MatchField({
     <div className="flex w-full flex-col gap-y-2 border-b border-zinc-700 pb-1">
       <div className="flex w-full max-w-full flex-nowrap items-center gap-x-1">
         {isEditable ? (
-          <div className="flex-1">
+          <div className="min-w-48 flex-1">
             <Input label="Key (must be unique)" name={`template_fields[${idx}].key`} onChange={handleChange} value={match} />
           </div>
         ) : (
