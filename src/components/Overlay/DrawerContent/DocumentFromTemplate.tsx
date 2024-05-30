@@ -3,7 +3,7 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useState } from "react";
 
 import { useGetEntity, useHandleChange } from "../../../hooks";
-import { DocumentTemplateType, TabType } from "../../../types";
+import { DocumentType, TabType } from "../../../types";
 import { DocumentTemplateFieldRegex, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { EntityPreview } from "../../DataDisplay";
@@ -29,7 +29,7 @@ export function DocumentFromTemplate({ data }: Props) {
 
   const [existingTemplateId, setExistingTemplateId] = useState<string | undefined>(undefined);
 
-  const { data: existingTemplateData } = useGetEntity<DocumentTemplateType>(
+  const { data: existingTemplateData } = useGetEntity<DocumentType>(
     existingTemplateId,
     "document_templates",
     {
@@ -43,8 +43,8 @@ export function DocumentFromTemplate({ data }: Props) {
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [content] = useState(data.getContext.getState().doc);
-  const [existingTemplate, setExistingTemplate] = useState<DocumentTemplateType | null>();
-  const [template, setTemplate] = useState<Partial<DocumentTemplateType>>({ fields: [] });
+  const [existingTemplate, setExistingTemplate] = useState<DocumentType | null>();
+  const [template, setTemplate] = useState<Partial<DocumentType>>({ template_fields: [] });
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   // const { mutateAsync: createDocumentFromTemplate, isLoading } = useCreateFromTemplate(project_id as string);
 
@@ -54,12 +54,12 @@ export function DocumentFromTemplate({ data }: Props) {
   useEffect(() => {
     if (existingTemplate) {
       const temp = { ...template };
-      for (let index = 0; index < existingTemplate.fields.length || 0; index += 1) {
-        const field = existingTemplate.fields[index];
+      for (let index = 0; index < existingTemplate.template_fields.length || 0; index += 1) {
+        const field = existingTemplate.template_fields[index];
 
-        const idx = (template.fields || []).findIndex((f) => f.key === field.key);
-        if (typeof idx === "number" && idx > -1 && temp.fields) {
-          temp.fields[idx] = field;
+        const idx = (template.template_fields || []).findIndex((f) => f.key === field.key);
+        if (typeof idx === "number" && idx > -1 && temp.template_fields) {
+          temp.template_fields[idx] = field;
         }
       }
       setTemplate(temp);
@@ -69,7 +69,7 @@ export function DocumentFromTemplate({ data }: Props) {
   useEffect(() => {
     if (content) {
       // Replace with existing template
-      const tempFields: DocumentTemplateType["fields"] = [];
+      const tempFields: DocumentType["template_fields"] = [];
       const { textContent } = content;
       if (textContent) {
         for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
@@ -147,10 +147,10 @@ export function DocumentFromTemplate({ data }: Props) {
       </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
-        {(template.fields || []).map((f, idx) => (
+        {(template.template_fields || []).map((f, idx) => (
           <MatchField
             key={f.id}
-            allMatches={template?.fields || []}
+            allMatches={template?.template_fields || []}
             entity_type={f.entity_type}
             formula={f.formula}
             handleChange={handleChange}

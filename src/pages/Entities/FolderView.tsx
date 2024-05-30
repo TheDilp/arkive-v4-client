@@ -80,7 +80,6 @@ import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
 import { BlueprintView } from "./BlueprintView";
 import { CharactersView } from "./CharactersView";
-import { DocumentTemplatesView } from "./DocumentTemplatesView";
 import { TagView } from "./TagView";
 import { CharacterTemplatesView } from "./TemplatesView";
 
@@ -927,7 +926,6 @@ export function FolderView() {
 
   if (type === "tags") return <TagView />;
   if (type === "character_fields_templates") return <CharacterTemplatesView />;
-  if (type === "document_templates") return <DocumentTemplatesView />;
 
   if (type === "assets") return <AssetView />;
   if (type === "settings") return <ProjectSettingsView />;

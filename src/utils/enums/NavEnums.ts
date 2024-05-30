@@ -46,7 +46,6 @@ export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
   { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
   { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
-  { icon: IconEnum.document_templates, navigate: "document_templates", tooltip: "Document templates" },
   { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];

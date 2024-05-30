@@ -21,11 +21,11 @@ import {
 } from "../../../types";
 import { AvailableIcons, createOrEditPermission, DefaultTagColor, IconEnum, useNotifications, userAtom } from "../../../utils";
 import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
-import { FolderSelect, ImageSelect } from "../../Complex";
+import { FolderSelect, ImageSelect, MatchField } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, TagInput } from "../../Form";
-import { DrawerLayout, Tabs } from "../../Layout";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Badge, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
@@ -50,8 +50,12 @@ type documentRelationsType = {
   alter_names?: { title: string }[];
 };
 
-function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
+function getTabs(permissions: UserHasPermissionsType, isTemplate: boolean | null | undefined, id: string | undefined) {
   const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
+
+  if (isTemplate) {
+    tabs.push({ id: "template", label: "Template keys", icon: IconEnum.document_templates });
+  }
 
   if (permissions?.read_tags) {
     tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
@@ -79,7 +83,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       data: {},
       relations: { alter_names: true, tags: true, image: true },
       permissions: true,
-      fields: ["id", "title", "icon", "parent_id", "dice_color", "is_public", "owner_id"],
+      fields: ["id", "title", "icon", "parent_id", "is_template", "dice_color", "is_public", "owner_id"],
     },
     {
       enabled: !!data?.id,
@@ -113,7 +117,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
   }>("documents", project_id as string);
 
   const [alterNameInput, setAlterNameInput] = useState("");
-  const tabs = getTabs(permissions, data?.id);
+  const tabs = getTabs(permissions, document?.is_template, data?.id);
   const currentAlterNames = document?.alter_names?.map((alter_name) => alter_name.title);
 
   const { changedData, handleChange } = useHandleChange({ data: document, setData: setDocument });
@@ -247,6 +251,50 @@ export function DocumentDrawer({ data, exceptions }: Props) {
             />
           </div>
         </div>
+      ) : null}
+
+      {tabs[selectedTab].id === "template" ? (
+        <Collapsible
+          actions={[
+            {
+              variant: "info",
+              icon: IconEnum.add,
+              onClick: () =>
+                handleChange({
+                  name: "fields",
+                  value: (document?.template_fields || []).concat({
+                    id: "",
+                    key: "",
+                    parent_id: "",
+                    value: "",
+                    formula: null,
+                    derive_formula: null,
+                    derive_from: null,
+                    entity_type: null,
+                    is_randomized: null,
+                  }),
+                }),
+            },
+          ]}
+          initialOpen
+          label="Keys">
+          <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
+            {(document?.template_fields || [])?.map((f, idx) => (
+              <MatchField
+                key={f.id}
+                allMatches={document?.template_fields || []}
+                entity_type={f?.entity_type}
+                formula={f.formula}
+                handleChange={handleChange}
+                idx={idx}
+                is_randomized={f?.is_randomized}
+                isEditable
+                match={f?.key}
+                value={f?.value}
+              />
+            ))}
+          </div>
+        </Collapsible>
       ) : null}
 
       {tabs[selectedTab].id === "2" && permissions?.read_tags ? (

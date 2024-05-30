@@ -4,7 +4,7 @@ export const InsertDocumentTemplateFieldSchema = z.object({
   data: z.object({
     key: z.string(),
     entity_type: z.string(),
-    value: z.string(),
+    value: z.string().nullable(),
     formula: z.string().nullable(),
     derive_from: z.string().nullable(),
     derive_formula: z.string().nullable(),
@@ -16,7 +16,7 @@ export const UpdateDocumentTemplateFieldSchema = z.object({
     id: z.string(),
     key: z.string(),
     entity_type: z.string(),
-    value: z.string(),
+    value: z.string().nullable(),
     formula: z.string().nullable(),
     derive_from: z.string().nullable(),
     derive_formula: z.string().nullable(),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { DocumentTemplateFieldType, DocumentTemplateType, HandleChangePropsType, MatchType } from "../../types";
+import { AvailableEntityType, DocumentTemplateFieldType, DocumentType, HandleChangePropsType, MatchType } from "../../types";
 import { AvailableIcons, DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../Form";
@@ -73,7 +73,7 @@ export function MatchField({
   isEditable,
   handleChange,
 }: {
-  allMatches: DocumentTemplateType["fields"];
+  allMatches: DocumentType["template_fields"];
   match: DocumentTemplateFieldType["key"];
   idx: number;
   isEditable?: boolean;
@@ -216,7 +216,8 @@ export function MatchField({
               entity_type !== "derived" &&
               !!entity_type &&
               !is_randomized &&
-              selectedEntity?.value ? (
+              selectedEntity?.value &&
+              entity_type ? (
                 <EntityPreview
                   clearAction={() => setSelectedEntity(null)}
                   icon={selectedEntity.icon || ""}
@@ -224,7 +225,7 @@ export function MatchField({
                   image_id={selectedEntity.image}
                   label="Replace with"
                   title={selectedEntity.label}
-                  type={entity_type}
+                  type={entity_type as AvailableEntityType}
                 />
               ) : null}
               {entity_type === "dice_roll" ? (
