@@ -31,7 +31,7 @@ export function WebhookDrawer({ data }: Props) {
   const { mutateAsync, isLoading: isCreating } = useMutateWebhook(data?.id ? "update" : "create", data?.id);
   const [webhook, setWebhook] = useState<WebhookType | null>();
   const { handleChange } = useHandleChange({ data: webhook, setData: setWebhook });
-  const resetDrawer = useToggledResetAtom();
+  const resetDrawer = useToggledResetAtom(true);
   useLayoutEffect(() => {
     if (existingWebhook?.data) {
       setWebhook(existingWebhook?.data);
