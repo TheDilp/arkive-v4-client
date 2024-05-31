@@ -26,7 +26,7 @@ export function PublicDocument() {
     },
   );
 
-  if (!document?.data) return <Skeleton type="editor" />;
+  if (!document?.data) return <Skeleton isFullWidth type="editor" />;
   if (!document?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
