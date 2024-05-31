@@ -853,7 +853,7 @@ export function FolderView() {
     `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
-    !!data?.data?.title,
+    true,
   );
 
   useLayoutEffect(() => {
