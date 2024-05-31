@@ -919,7 +919,7 @@ export function FolderView() {
       };
     }
     return () => {};
-  }, [filter, dispatch, arkived]);
+  }, [filter, dispatch, documentType, arkived]);
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
