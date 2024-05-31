@@ -28,10 +28,12 @@ import {
   ProsemirrorAttributes,
   ProsemirrorNode,
   removeMark,
+  StateUpdateLifecycleProps,
   Static,
   updateMark,
 } from "@remirror/core";
 import { undoDepth } from "@remirror/pm/history";
+import { Node } from "@remirror/pm/model";
 import { MarkPasteRule } from "@remirror/pm/paste-rules";
 import { Selection } from "@remirror/pm/state";
 import { ReplaceAroundStep, ReplaceStep } from "@remirror/pm/transform";
@@ -41,13 +43,13 @@ import { DiceRollRegex } from "../../../../utils";
 
 const DEFAULT_AUTO_LINK_REGEX = DiceRollRegex;
 
-export interface FoundAutoLink {
+export interface FoundDiceRoll {
   /** link text */
   text: string;
   /** offset of matched text */
-  start: number;
+  from: number;
   /** index of next char after match end */
-  end: number;
+  to: number;
 }
 export type LinkAttributes = ProsemirrorAttributes<{
   /**
@@ -60,7 +62,7 @@ export type LinkAttributes = ProsemirrorAttributes<{
 }>;
 export interface LinkClickData extends GetMarkRange, LinkAttributes {}
 
-interface LinkWithProperties extends Omit<FoundAutoLink, "href"> {
+interface LinkWithProperties extends Omit<FoundDiceRoll, "href"> {
   range: FromToProps;
   attrs: LinkAttributes;
 }
@@ -182,6 +184,31 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     ];
   }
 
+  onStateUpdate(props: StateUpdateLifecycleProps): void {
+    if (props.tr) {
+      const onUpdateCallbacks: Array<Pick<EventMeta, "range" | "attrs"> & { text: string }> = [];
+      const { updateDiceRoll } = this.store.chain(props.tr);
+
+      const matches = this.findAllAutoLinks(props.state.doc);
+
+      for (let index = 0; index < matches.length; index += 1) {
+        updateDiceRoll({ auto: true }, { from: matches[index].from, to: matches[index].to }).tr();
+        onUpdateCallbacks.push({
+          attrs: { auto: true },
+          range: { from: matches[index].from, to: matches[index].to },
+          text: matches[index].text,
+        });
+      }
+
+      window.requestAnimationFrame(() => {
+        onUpdateCallbacks.forEach(({ attrs, range }) => {
+          if (typeof range?.from === "number" && typeof range?.to === "number")
+            this.updateDiceRoll(attrs, { from: range?.from, to: (range?.to || 0) - 1 });
+        });
+      });
+    }
+  }
+
   onCreate(): void {
     const { autoLinkRegex } = this.options;
     // Remove the global flag from autoLinkRegex, and wrap in start (^) and end ($) terminator to test for exact match
@@ -245,7 +272,6 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
         const changes = getChangedRanges(composedTransaction, [ReplaceAroundStep, ReplaceStep]);
         const { mapping } = composedTransaction;
         const { tr, doc } = state;
-
         changes.forEach(({ prevFrom, prevTo, from, to }) => {
           // Store all the callbacks we need to make
           const onUpdateCallbacks: Array<Pick<EventMeta, "range" | "attrs"> & { text: string }> = [];
@@ -298,13 +324,12 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
                     .map((link) =>
                       this.addLinkProperties({
                         ...link,
-                        from: newFrom + link.start,
-                        to: newFrom + link.end,
+                        from: newFrom + link.from,
+                        to: newFrom + link.to,
                       }),
                     )
                     .forEach(({ attrs, range, text }) => {
                       updateDiceRoll(attrs, range).tr();
-
                       onUpdateCallbacks.push({ attrs, range, text });
                     });
               }),
@@ -318,8 +343,8 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
                 this.addLinkProperties({
                   ...link,
                   // Calculate link position.
-                  from: positionStart + link.start + 1,
-                  to: positionStart + link.end + 1,
+                  from: positionStart + link.from + 1,
+                  to: positionStart + link.to + 1,
                 }),
               )
               // Check if link is within the changed range.
@@ -411,16 +436,18 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     }));
   }
 
-  private addLinkProperties({ from, to, ...link }: FoundAutoLink & FromToProps): LinkWithProperties {
+  private addLinkProperties({ from, to, ...link }: FoundDiceRoll & FromToProps): LinkWithProperties {
     return {
       ...link,
+      from,
+      to,
       range: { from, to },
       attrs: { auto: true },
     };
   }
 
-  private findAutoLinks(str: string): FoundAutoLink[] {
-    const toAutoLink: FoundAutoLink[] = [];
+  private findAutoLinks(str: string): FoundDiceRoll[] {
+    const toAutoLink: FoundDiceRoll[] = [];
 
     for (const match of findMatches(str, this.options.autoLinkRegex)) {
       const text = getMatchString(match);
@@ -435,12 +462,41 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
       }
       toAutoLink.push({
         text,
-        start: match.index,
-        end: match.index + text.length,
+        from: match.index,
+        to: match.index + text.length,
       });
     }
 
     return toAutoLink;
+  }
+
+  private findAllAutoLinks(doc: Node) {
+    const re = DiceRollRegex;
+    const ranges: FoundDiceRoll[] = [];
+    doc?.descendants((node, pos) => {
+      if (!node.isTextblock) {
+        return true;
+      }
+      let tc = "";
+      node.content.forEach((child) => {
+        tc = tc.concat(child.textContent);
+      });
+      const start = pos + 1;
+      for (const match of tc.matchAll(re)) {
+        const from = start + (match.index ?? 0);
+        const to = from + match[0].length;
+
+        ranges.push({
+          from,
+          to,
+          text: match[1],
+        });
+      }
+
+      return false;
+    });
+
+    return ranges;
   }
 
   createEventHandlers(): CreateEventHandlers {
