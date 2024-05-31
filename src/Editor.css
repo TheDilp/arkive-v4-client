@@ -124,18 +124,22 @@
   }
 
   table {
-    @apply block table-auto overflow-auto font-lato !important;
+    @apply block table-auto overflow-auto !important;
     tbody {
       @apply overflow-auto !important;
       tr {
         @apply max-h-fit !important;
         td {
-          @apply max-h-fit min-h-fit w-56 min-w-56 p-1 !important;
+          @apply max-h-fit w-56 min-w-56  !important;
+
+          p {
+            @apply my-2 !important;
+          }
         }
       }
     }
     th {
-      @apply h-10 p-0 text-xl;
+      @apply h-10 border p-0 text-xl;
 
       img {
         @apply py-2;
