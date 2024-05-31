@@ -18,6 +18,7 @@ export function InsertEditorImageDialog({ data }: Props) {
   return (
     <div>
       <Search
+        isAutofocused
         isMultiple
         name="images"
         onChange={({ label, value }) => {

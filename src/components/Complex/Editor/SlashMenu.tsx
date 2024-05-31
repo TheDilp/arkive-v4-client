@@ -42,6 +42,7 @@ export function SlashMenu() {
         chain.delete(range).run();
         setDialog({
           data: { getContext: context },
+          isOverlay: true,
           type: "insert_image",
           title: "Insert image",
           size: "md",
