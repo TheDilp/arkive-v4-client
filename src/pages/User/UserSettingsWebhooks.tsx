@@ -1,15 +1,29 @@
 import { useUser } from "@clerk/clerk-react";
+import { UseMutateFunction } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { Dispatch, SetStateAction } from "react";
+import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useGetEntities, useGetUser, useTable } from "../../hooks";
+import { useDeleteEntity, useGetEntities, useGetUser, useTable } from "../../hooks";
 import { DrawerAtomType, WebhookType } from "../../types";
 import { drawerAtom, getDefaultEntityIcon, IconEnum } from "../../utils";
 
 const rolesColumnHelper = createColumnHelper<WebhookType>();
 
-function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
+type DeleteWebhookType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      id: string;
+      parent_id?: string | undefined;
+    };
+  },
+  unknown
+>;
+
+function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>, mutate: DeleteWebhookType) {
   return [
     rolesColumnHelper.display({
       id: "icon",
@@ -49,7 +63,12 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
                     type: "webhooks",
                   })),
               },
-              { id: "2", title: "Delete webhook", icon: IconEnum.trash },
+              {
+                id: "2",
+                title: "Delete webhook",
+                onClick: () => mutate({ data: { id: row.original.id } }),
+                icon: IconEnum.trash,
+              },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
@@ -60,8 +79,10 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
 }
 export function UserSettingsWebhooks() {
   const { user: authUser } = useUser();
+  const { project_id } = useParams();
   const { data: user } = useGetUser({ data: { auth_id: authUser?.id as string }, fields: ["id"] });
   const setDrawer = useSetAtom(drawerAtom);
+  const { mutate } = useDeleteEntity("webhooks", project_id as string, false);
   const [, dispatch] = useTable({});
 
   function handleCreateWebhook() {
@@ -81,7 +102,7 @@ export function UserSettingsWebhooks() {
         </div>
       </div>
       <Table
-        columns={createColumns(setDrawer)}
+        columns={createColumns(setDrawer, mutate)}
         data={webhooks?.data || []}
         dispatch={dispatch}
         isLoading={isFetching}

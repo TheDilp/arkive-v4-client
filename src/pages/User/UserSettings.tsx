@@ -1,12 +1,13 @@
-import { RedirectToSignIn, SignedOut } from "@clerk/clerk-react";
+import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 // import { deepMerge } from "remirror";
 import { Drawer, Navbar, Sidebar, Tabs } from "../../components";
-import { useBreakpoint } from "../../hooks";
+import { useBreakpoint, useGetUser } from "../../hooks";
 import { TabType } from "../../types";
-import { getProjectsViewNavItems, IconEnum } from "../../utils";
+import { currentUserPermissionsAtom, getProjectsViewNavItems, IconEnum, userAtom } from "../../utils";
 
 export function UserSettings() {
   const { pathname } = useLocation();
@@ -14,11 +15,27 @@ export function UserSettings() {
   const [view, setView] = useState<boolean | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const tabs: TabType[] = [
     { id: "1", label: "Webhooks", icon: IconEnum.webhooks },
     { id: "2", label: "Feature flags", icon: IconEnum.webhooks },
   ];
+
+  const setUserAtom = useSetAtom(userAtom);
+  const setUserPermissions = useSetAtom(currentUserPermissionsAtom);
+
+  const { data: userData } = useGetUser(
+    {
+      data: { auth_id: user?.id as string },
+      relations: {
+        webhooks: true,
+        roles: true,
+      },
+      fields: ["id", "feature_flags", "email"],
+    },
+    { enabled: !!user?.id },
+  );
 
   useEffect(() => {
     if (pathname.endsWith("webhooks")) {
@@ -27,6 +44,20 @@ export function UserSettings() {
       setSelectedTab(1);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    if (userData?.data) {
+      if (user)
+        user?.update({
+          unsafeMetadata: {
+            user_id: userData?.data?.id,
+            project_id: "",
+          },
+        });
+      setUserAtom(userData.data);
+      setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
+    }
+  }, [userData?.data]);
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">

@@ -948,6 +948,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   onSuccess: (res) => {
                     if (res?.ok) {
                       resetDrawerAtom();
+                      setSelectedTab(0);
                       setCharacter({ project_id });
                     }
                   },
