@@ -178,8 +178,12 @@ export function DocumentFromTemplate({ data }: Props) {
       {tabs[selectedTab].id === "2" ? (
         <div className="flex h-full justify-center">
           <div className="w-full [&>.editor-component]:bg-zinc-800">
-            {/* @ts-ignore */}
-            <Editor initialContent={content || undefined} isDisabled isFullHeight isOutsideControlled isReadOnly />
+            {isGeneratingPreview ? (
+              <Skeleton isFullWidth type="editor" />
+            ) : (
+              // @ts-ignore
+              <Editor initialContent={content || undefined} isDisabled isFullHeight isOutsideControlled isReadOnly />
+            )}
           </div>
         </div>
       ) : null}
@@ -216,7 +220,9 @@ export function DocumentFromTemplate({ data }: Props) {
           isDisabled={
             !template?.title ||
             !template?.template_fields?.length ||
-            (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
+            (template?.template_fields || []).some(
+              (f) => !f.value && !f.is_randomized && (f.entity_type === "blueprint_instances" ? !f.related_id : false),
+            ) ||
             isCreating ||
             isGeneratingPreview
           }

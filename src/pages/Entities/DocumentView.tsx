@@ -388,7 +388,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
             />
           ) : null}
           <div
-            className="relative flex h-full w-full flex-col content-start focus-visible:outline-none"
+            className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
             onContextMenu={canUpdate ? (e) => getContextActions(e) : undefined}
             onDrop={
               canUpdate
