@@ -7,13 +7,13 @@ import {
   DocumentTemplateFieldType,
   DocumentType,
   HandleChangePropsType,
-  MatchType,
+  SelectOptionType,
 } from "../../types";
-import { AvailableIcons, DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
+import { DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../Form";
 
-const MatchReplacementOptions: { label: string; value: MatchType; icon: AvailableIcons }[] = [
+const MatchReplacementOptions: SelectOptionType[] = [
   {
     label: "Characters",
     value: "characters",
@@ -66,6 +66,31 @@ const MatchReplacementOptions: { label: string; value: MatchType; icon: Availabl
     icon: IconEnum.additional_fields,
   },
 ];
+const RandomCountOptions: SelectOptionType[] = [
+  {
+    label: "Single",
+    value: "single",
+  },
+  { label: "Max 2", value: "max_2" },
+  { label: "Max 3", value: "max_3" },
+  { label: "Max 4", value: "max_4" },
+  { label: "Max 5", value: "max_5" },
+  { label: "Max 6", value: "max_6" },
+  { label: "Max 7", value: "max_7" },
+  { label: "Max 8", value: "max_8" },
+  { label: "Max 9", value: "max_9" },
+  { label: "Max 10", value: "max_10" },
+  { label: "Max 11", value: "max_11" },
+  { label: "Max 12", value: "max_12" },
+  { label: "Max 13", value: "max_13" },
+  { label: "Max 14", value: "max_14" },
+  { label: "Max 15", value: "max_15" },
+  { label: "Max 16", value: "max_16" },
+  { label: "Max 17", value: "max_17" },
+  { label: "Max 18", value: "max_18" },
+  { label: "Max 19", value: "max_19" },
+  { label: "Max 20", value: "max_20" },
+];
 const DeriveFromFormulas: { label: string; value: string }[] = [
   { label: "D&D 5e ability bonus", value: "dnd_5e_ability_bonus" as const },
 ];
@@ -82,6 +107,7 @@ export function MatchField({
   isEditable,
   derive_formula,
   derive_from,
+  random_count,
   handleChange,
 }: {
   allMatches: DocumentType["template_fields"];
@@ -91,7 +117,7 @@ export function MatchField({
   handleChange: (props: HandleChangePropsType) => void;
 } & Pick<
   DocumentTemplateFieldType,
-  "entity_type" | "value" | "derive_formula" | "derive_from" | "formula" | "related_id" | "is_randomized"
+  "entity_type" | "value" | "derive_formula" | "derive_from" | "formula" | "related_id" | "is_randomized" | "random_count"
 >) {
   const [parent, setParent] = useState<{
     label: string;
@@ -346,14 +372,28 @@ export function MatchField({
             ) : null}
 
             {entity_type !== "dice_roll" && !!entity_type ? (
-              <div className="h-full [&>div]:gap-y-2">
-                <Checkbox
-                  label="Randomize?"
-                  name={`template_fields[${idx}].is_randomized`}
-                  onChange={handleChange}
-                  tooltip="Keys will be replaced when generating the document."
-                  value={!!is_randomized}
-                />
+              <div className="flex flex-1 flex-nowrap gap-x-1">
+                <div className="h-full [&>div]:gap-y-2">
+                  <Checkbox
+                    label="Randomize"
+                    name={`template_fields[${idx}].is_randomized`}
+                    onChange={handleChange}
+                    tooltip="Keys will be replaced when generating the document."
+                    value={!!is_randomized}
+                  />
+                </div>
+                {is_randomized ? (
+                  <div className="w-3/4">
+                    <Select
+                      hasSearch
+                      label="Random count"
+                      name={`template_fields[${idx}].random_count`}
+                      onChange={handleChange}
+                      options={RandomCountOptions}
+                      value={random_count}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>

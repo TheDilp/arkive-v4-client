@@ -2,15 +2,34 @@ import { z } from "zod";
 
 import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./permissions";
 
+const DeriveFormulas = z.literal("dnd_5e_ability_bonus");
+const RandomCountOptions = z
+  .union([
+    z.literal("single"),
+    z.literal("max_2"),
+    z.literal("max_3"),
+    z.literal("max_4"),
+    z.literal("max_5"),
+    z.literal("max_6"),
+    z.literal("max_7"),
+    z.literal("max_8"),
+    z.literal("max_9"),
+    z.literal("max_10"),
+    z.literal("max_15"),
+    z.literal("max_20"),
+  ])
+  .optional();
+
 export const InsertDocumentTemplateFieldSchema = z.object({
   key: z.string(),
   entity_type: z.string(),
   value: z.string().nullable(),
   formula: z.string().nullable(),
   derive_from: z.string().nullable(),
-  derive_formula: z.string().nullable(),
+  derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
   related_id: z.string().nullable(),
+  random_count: RandomCountOptions.nullable(),
   sort: z.number(),
 });
 export const UpdateDocumentTemplateFieldSchema = z.object({
@@ -20,9 +39,10 @@ export const UpdateDocumentTemplateFieldSchema = z.object({
   value: z.string().nullable(),
   formula: z.string().nullable(),
   derive_from: z.string().nullable(),
-  derive_formula: z.string().nullable(),
+  derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
   related_id: z.string().nullable(),
+  random_count: RandomCountOptions.nullable(),
   sort: z.number(),
 });
 

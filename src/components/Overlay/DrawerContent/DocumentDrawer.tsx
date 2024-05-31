@@ -285,6 +285,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                       entity_type: null,
                       related_id: null,
                       is_randomized: null,
+                      random_count: "single",
                       sort: document?.template_fields?.length || 0,
                     }),
                   })
@@ -352,6 +353,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                   is_randomized={f?.is_randomized}
                                   isEditable
                                   match={f?.key}
+                                  random_count={f.random_count}
                                   related_id={f.related_id}
                                   value={f?.value}
                                 />

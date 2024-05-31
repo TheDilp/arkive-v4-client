@@ -361,6 +361,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
 
       {/* @ts-ignore */}
       <Remirror
+        autoFocus
         editable={canUpdate}
         hooks={documentEditorHooks(changedData, resetChanges, refetch)}
         initialContent={state}

@@ -4,8 +4,8 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
-import { DocumentType, TabType } from "../../../types";
+import { useCreateEntity, useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
+import { DocumentType, InsertDocumentType, TabType } from "../../../types";
 import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, getSentenceCase, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
@@ -45,10 +45,15 @@ export function DocumentFromTemplate({ data }: Props) {
   const [content, setContent] = useState(data.getContext.getState().doc);
   const [template, setTemplate] = useState<Partial<DocumentType>>({});
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
-  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreating } = useCreateFromTemplate(
+  const { mutateAsync: generatePreview, isLoading: isGeneratingPreview } = useCreateFromTemplate(
     existingTemplate?.data?.id as string,
     project_id as string,
   );
+
+  const { mutate, isLoading: isCreating } = useCreateEntity<{
+    data: Partial<InsertDocumentType> & { project_id: string };
+    relations: { [key: string]: any };
+  }>("documents");
 
   const hasDiceRollFields = (template?.template_fields || []).some((f) => f.entity_type === "dice_roll");
 
@@ -72,6 +77,7 @@ export function DocumentFromTemplate({ data }: Props) {
               derive_formula: null,
               derive_from: null,
               related_id: null,
+              random_count: "single",
               key: matchKey as string,
               sort: tempFields.length,
             };
@@ -149,7 +155,7 @@ export function DocumentFromTemplate({ data }: Props) {
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
         {(template.template_fields || []).map((f, idx) => (
-          <Collapsible label={getSentenceCase(f.key)}>
+          <Collapsible key={f.id} label={getSentenceCase(f.key)}>
             <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
               <MatchField
                 allMatches={template?.template_fields || []}
@@ -161,24 +167,12 @@ export function DocumentFromTemplate({ data }: Props) {
                 idx={idx}
                 is_randomized={f?.is_randomized}
                 match={f?.key}
+                random_count={f.random_count}
                 related_id={f?.related_id}
                 value={f?.value}
               />
             </div>
           </Collapsible>
-          // <MatchField
-          //   key={f.id}
-          //   allMatches={template?.template_fields || []}
-          //   derive_formula={f.derive_formula}
-          //   derive_from={f.derive_from}
-          //   entity_type={f.entity_type}
-          //   formula={f.formula}
-          //   handleChange={handleChange}
-          //   idx={idx}
-          //   is_randomized={false}
-          //   match={f.key}
-          //   value={f?.value || ""}
-          // />
         ))}
       </div>
       {tabs[selectedTab].id === "2" ? (
@@ -189,24 +183,68 @@ export function DocumentFromTemplate({ data }: Props) {
           </div>
         </div>
       ) : null}
-
-      <Button
-        icon={IconEnum.add}
-        isDisabled={
-          !template?.title ||
-          !template?.template_fields?.length ||
-          (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
-          isCreating
-        }
-        label="Create"
-        onClick={() => {
-          createDocumentFromTemplate({
-            data: { title: template.title || "", content },
-            relations: { template_fields: template?.template_fields || [] },
-          });
-        }}
-        variant="success"
-      />
+      <div className="flex flex-nowrap gap-x-2">
+        <Button
+          icon={IconEnum.add}
+          isDisabled={
+            !template?.template_fields?.length ||
+            (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
+            isCreating ||
+            isGeneratingPreview
+          }
+          label="Generate preview"
+          onClick={async () => {
+            await generatePreview(
+              {
+                data: { title: template.title || "", content },
+                relations: { template_fields: template?.template_fields || [] },
+              },
+              {
+                onSuccess: (res: { data: DocumentType }) => {
+                  if (res?.data && res?.data?.content) {
+                    setContent(res?.data?.content as any);
+                    setSelectedTab(1);
+                  }
+                },
+              },
+            );
+          }}
+          variant="info"
+        />
+        <Button
+          icon={IconEnum.add}
+          isDisabled={
+            !template?.title ||
+            !template?.template_fields?.length ||
+            (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
+            isCreating ||
+            isGeneratingPreview
+          }
+          isLoading={isCreating}
+          label="Create document"
+          onClick={() =>
+            mutate(
+              {
+                data: {
+                  project_id: project_id as string,
+                  title: template.title || "",
+                  content: JSON.stringify(content),
+                },
+                relations: { template_fields: template?.template_fields || [] },
+              },
+              {
+                onSuccess: (res: { data: DocumentType }) => {
+                  if (res?.data && res?.data?.content) {
+                    setContent(res?.data?.content as any);
+                    setSelectedTab(1);
+                  }
+                },
+              },
+            )
+          }
+          variant="success"
+        />
+      </div>
     </DrawerLayout>
   );
 }

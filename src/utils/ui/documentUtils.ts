@@ -4,15 +4,17 @@ import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { FromToProps } from "remirror";
 
 import { SearchableMentionEntities } from "../../types";
+import { DiceRollRegex } from "./diceRollerUtils";
 
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
-type matchType = "automention" | "template";
+type matchType = "automention" | "dice_roll";
 
 export const DocumentTemplateFieldRegex = /%\{([^%{}]*)\}%/g;
 
 export function getRegex(type: matchType, matchWords: string) {
   if (type === "automention") return new RegExp(`\\b(${matchWords})\\b`, "gui");
+  if (type === "dice_roll") return DiceRollRegex;
   return /%{([^%{}]*)}%/g;
 }
 
@@ -72,6 +74,8 @@ export function getRanges(
 
     return false;
   });
+
+  if (type === "dice_roll") return ranges;
 
   return selectedEntity === "blueprint_instances"
     ? ranges.sort((a, b) => {
