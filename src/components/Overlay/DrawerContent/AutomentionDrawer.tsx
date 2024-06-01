@@ -254,6 +254,7 @@ export function AutomentionDrawer({ data }: Props) {
               data.getContext,
               selectedEntity,
               project_id as string,
+              links?.data || [],
             );
 
             if (links?.data) {

@@ -94,15 +94,18 @@ export function createMentions(
   getContext: ReactFrameworkOutput<Remirror.Extensions>,
   selectedEntity: SearchableMentionEntities | null,
   project_id: string,
+  links: matchItem[],
 ) {
   if (!selectedEntity) return;
 
   const initialRangesCount = initialRanges.length;
+  let newRanges;
+
   let count = initialRangesCount;
 
   while (count > 0) {
     if (count > 0) count -= 1;
-    const range = initialRanges[count];
+    const range = (newRanges || initialRanges)[count];
     getContext.commands.createMentionAtom(
       {
         name: selectedEntity,
@@ -121,5 +124,6 @@ export function createMentions(
         parent_id: range.parent_id,
       },
     );
+    newRanges = getRanges(getContext.getState().doc, links, selectedEntity, "automention");
   }
 }
