@@ -375,7 +375,14 @@ export function AssetView() {
   const { data: assets, isLoading } = useGetImages(
     project_id as string,
     type,
-    { orderBy, fields: ["id", "title", "type", "is_public"], filters, pagination, permissions: true },
+    {
+      relations: { tags: true },
+      orderBy,
+      fields: ["id", "title", "type", "is_public"],
+      filters,
+      pagination,
+      permissions: true,
+    },
     { enabled: view === "table", prefetch: false },
   );
 
@@ -540,6 +547,7 @@ export function AssetView() {
             )}
             config={{
               hasSelect: true,
+              hasTags: true,
               orderBy,
               filters,
               selection,

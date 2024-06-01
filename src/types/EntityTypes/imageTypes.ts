@@ -1,5 +1,6 @@
 import { AssetType } from "../baseTypes";
 import { EntityPermissionType } from "./baseEntityTypes";
+import { TagType } from "./tagTypes";
 
 export interface ImageType {
   id: string;
@@ -10,5 +11,6 @@ export interface ImageType {
   project_image_id?: string;
   character_id?: string | null;
   is_public?: boolean | null;
+  tags: TagType[];
   type: AssetType;
 }

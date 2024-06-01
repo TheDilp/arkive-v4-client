@@ -2,7 +2,7 @@ import { AssetType, Size } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
 export interface GalleryType {
-  images: Omit<ImageType, "owner_id" | "permissions">[];
+  images: Omit<ImageType, "owner_id" | "permissions" | "tags">[];
   columns: number;
   isOpenable?: boolean;
   size?: Size;

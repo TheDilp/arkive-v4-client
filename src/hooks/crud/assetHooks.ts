@@ -150,11 +150,9 @@ export function useGetImage(
     },
   );
 }
-export function useUpdateImage<InsertType extends { data: { title: string }; permissions?: EntityPermissionType[] }>(
-  id: string,
-  project_id: string | undefined,
-  type: AssetType,
-) {
+export function useUpdateImage<
+  InsertType extends { data: { title: string }; relations: { tags: { id: string }[] }; permissions?: EntityPermissionType[] },
+>(id: string, project_id: string | undefined, type: AssetType) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
