@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
-import { DocumentType, InsertDocumentType, TabType } from "../../../types";
+import { DocumentType, InsertDocumentType, TabType, Variant } from "../../../types";
 import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, getSentenceCase, IconEnum } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
@@ -66,6 +66,15 @@ async function generateAllDiceRollFields({
     return tempContent;
   }
   return content;
+}
+
+function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
+  if (!field.entity_type) return "error";
+  if (field.entity_type === "custom" && !field.value) return "error";
+  if ((field.entity_type === "blueprint_instances" || field.entity_type === "map_pins") && !field.parent_id) return "error";
+  if (!field.value && !field.is_randomized && field.entity_type !== "dice_roll" && field.entity_type !== "derived")
+    return "error";
+  return "primary";
 }
 
 export function DocumentFromTemplate({ data }: Props) {
@@ -168,7 +177,7 @@ export function DocumentFromTemplate({ data }: Props) {
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
         {(template.template_fields || []).map((f, idx) => (
-          <Collapsible key={f.id} label={getSentenceCase(f.key)}>
+          <Collapsible key={f.id} label={getSentenceCase(f.key)} variant={getMatchFieldVariant(f)}>
             <div key={f.id} className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2">
               <MatchField
                 allMatches={template?.template_fields || []}
