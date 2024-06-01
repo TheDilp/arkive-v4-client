@@ -5,8 +5,16 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
-import { DocumentType, InsertDocumentType, TabType, Variant } from "../../../types";
-import { DefaultTagColor, Dice, DiceRollParser, DocumentTemplateFieldRegex, getSentenceCase, IconEnum } from "../../../utils";
+import { DocumentType, InsertDocumentType, TabType } from "../../../types";
+import {
+  DefaultTagColor,
+  Dice,
+  DiceRollParser,
+  DocumentTemplateFieldRegex,
+  getMatchFieldVariant,
+  getSentenceCase,
+  IconEnum,
+} from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
@@ -66,15 +74,6 @@ async function generateAllDiceRollFields({
     return tempContent;
   }
   return content;
-}
-
-function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
-  if (!field.entity_type) return "error";
-  if (field.entity_type === "custom" && !field.value) return "error";
-  if ((field.entity_type === "blueprint_instances" || field.entity_type === "map_pins") && !field.parent_id) return "error";
-  if (!field.value && !field.is_randomized && field.entity_type !== "dice_roll" && field.entity_type !== "derived")
-    return "error";
-  return "primary";
 }
 
 export function DocumentFromTemplate({ data }: Props) {

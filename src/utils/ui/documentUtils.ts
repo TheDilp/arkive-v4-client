@@ -3,7 +3,7 @@ import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { FromToProps } from "remirror";
 
-import { SearchableMentionEntities } from "../../types";
+import { DocumentType, SearchableMentionEntities, Variant } from "../../types";
 import { DiceRollRegex } from "./diceRollerUtils";
 
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
@@ -126,4 +126,13 @@ export function createMentions(
     );
     newRanges = getRanges(getContext.getState().doc, links, selectedEntity, "automention");
   }
+}
+
+export function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
+  if (!field.entity_type) return "error";
+  if (field.entity_type === "custom" && !field.value) return "error";
+  if ((field.entity_type === "blueprint_instances" || field.entity_type === "map_pins") && !field.parent_id) return "error";
+  if (!field.value && !field.is_randomized && field.entity_type !== "dice_roll" && field.entity_type !== "derived")
+    return "error";
+  return "primary";
 }

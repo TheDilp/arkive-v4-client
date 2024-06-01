@@ -137,7 +137,14 @@ export function MatchField({
 
   useEffect(() => {
     if (selectedEntity) {
-      handleChange({ name: `template_fields[${idx}].value`, value: selectedEntity.label });
+      if (entity_type === "random_tables") {
+        handleChange([
+          { name: `template_fields[${idx}].value`, value: selectedEntity.label },
+          { name: `template_fields[${idx}].related_id`, value: selectedEntity.value },
+        ]);
+      } else {
+        handleChange({ name: `template_fields[${idx}].value`, value: selectedEntity.label });
+      }
     }
   }, [selectedEntity]);
 
@@ -372,18 +379,20 @@ export function MatchField({
             ) : null}
 
             {entity_type !== "dice_roll" && !!entity_type ? (
-              <div className="flex flex-1 flex-nowrap gap-x-1">
-                <div className="h-full [&>div]:gap-y-2">
-                  <Checkbox
-                    label="Randomize"
-                    name={`template_fields[${idx}].is_randomized`}
-                    onChange={handleChange}
-                    tooltip="Keys will be replaced when generating the document."
-                    value={!!is_randomized}
-                  />
-                </div>
-                {is_randomized ? (
-                  <div className="w-3/4">
+              <div className={`flex flex-nowrap gap-x-1 ${is_randomized ? "flex-1" : ""}`}>
+                {entity_type !== "random_tables" ? (
+                  <div className="h-full [&>div]:gap-y-2">
+                    <Checkbox
+                      label="Randomize"
+                      name={`template_fields[${idx}].is_randomized`}
+                      onChange={handleChange}
+                      tooltip="Keys will be replaced when generating the document."
+                      value={!!is_randomized}
+                    />
+                  </div>
+                ) : null}
+                {is_randomized || entity_type === "random_tables" ? (
+                  <div className="flex-1">
                     <Select
                       hasSearch
                       label="Random count"
