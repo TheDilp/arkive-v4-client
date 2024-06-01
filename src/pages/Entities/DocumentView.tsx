@@ -245,10 +245,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
   });
 
   useLayoutEffect(() => {
-    if (
-      (currentDocument?.data?.content || currentDocument?.data?.content === null) &&
-      manager?.view?.state?.doc?.textContent === ""
-    ) {
+    if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
       setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
       // Timeout is necessary for mentions to load and render correctly
       setTimeout(() => {

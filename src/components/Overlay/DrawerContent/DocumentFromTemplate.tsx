@@ -85,7 +85,6 @@ export function DocumentFromTemplate({ data }: Props) {
 
   const [previewContext, setPreviewContext] = useState<ReactFrameworkOutput<Remirror.Extensions> | undefined>(undefined);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [content, setContent] = useState(data.getContext?.getState().doc);
   const [template, setTemplate] = useState<Partial<DocumentType>>({});
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { mutateAsync: generatePreview, isLoading: isGeneratingPreview } = useCreateFromTemplate(
@@ -101,10 +100,10 @@ export function DocumentFromTemplate({ data }: Props) {
   const hasDiceRollFields = (template?.template_fields || []).some((f) => f.entity_type === "dice_roll");
 
   useEffect(() => {
-    if (content && existingTemplate?.data) {
+    if (previewContext?.getState()?.doc && existingTemplate?.data && !template.template_fields) {
       // Replace with existing template
       const tempFields: DocumentType["template_fields"] = existingTemplate?.data?.template_fields || [];
-      const { textContent } = content;
+      const { textContent } = previewContext?.getState()?.doc || { textContent: {} };
       if (textContent) {
         for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
           const matchKey = match?.at(1) as string;
@@ -131,21 +130,27 @@ export function DocumentFromTemplate({ data }: Props) {
         setTemplate((prev) => ({ ...prev, template_fields: existingTemplate?.data?.template_fields || [] }));
       }
     }
-  }, [existingTemplate]);
+  }, [previewContext?.getState()?.doc, existingTemplate]);
   useEffect(() => {
-    const templateContent = data.getContext.getState().doc;
-    if (templateContent && template.template_fields) {
-      let contentToAlter = JSON.stringify(templateContent);
-      const matches = template.template_fields || [];
-      for (let index = 0; index < matches.length; index += 1) {
-        if (matches[index].key && matches[index]?.value) {
-          contentToAlter = contentToAlter.replaceAll(`%{${matches[index].key}}%`, matches[index]?.value || "");
+    const timeout = setTimeout(() => {
+      const templateContent = previewContext?.getState().doc;
+      if (templateContent && template.template_fields) {
+        let contentToAlter = JSON.stringify(templateContent);
+        const matches = template.template_fields || [];
+        for (let index = 0; index < matches.length; index += 1) {
+          if (matches[index].key && matches[index]?.value) {
+            contentToAlter = contentToAlter.replaceAll(`%{${matches[index].key}}%`, matches[index]?.value || "");
+          }
         }
+        const newContent = JSON.parse(contentToAlter);
+        const state = previewContext?.manager?.createState({ content: newContent });
+        if (state) previewContext?.manager?.view?.updateState(state);
       }
-      const newContent = JSON.parse(contentToAlter);
-      const state = data.getContext?.manager?.createState({ content: newContent });
-      setContent(state.doc);
-    }
+    }, 500);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [template]);
 
   if (isLoading) return <Skeleton type="drawer_form" />;
@@ -159,23 +164,6 @@ export function DocumentFromTemplate({ data }: Props) {
           value={template?.title || ""}
           variant={template?.title ? "primary" : "error"}
         />
-        {/* {hasDiceRollFields ? (
-          <div className="w-24 self-end">
-            <Button
-              icon={IconEnum.d20}
-              label="Roll all"
-              onClick={async () =>
-                generateAllDiceRollFields({
-                  hasDiceRollFields,
-                  template_fields: template?.template_fields || [],
-                  setTemplate,
-                  content: JSON.stringify(template.content || {}),
-                })
-              }
-              variant="info"
-            />
-          </div>
-        ) : null} */}
       </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
@@ -200,28 +188,25 @@ export function DocumentFromTemplate({ data }: Props) {
           </Collapsible>
         ))}
       </div>
-      {tabs[selectedTab].id === "2" ? (
-        <div className="flex h-full justify-center">
-          <div className="w-full [&>.editor-component]:bg-zinc-800">
-            {isGeneratingPreview ? (
-              <Skeleton isFullWidth type="editor" />
-            ) : (
-              <Editor
-                // @ts-ignore
-                initialContent={content || undefined}
-                isDisabled
-                isFullHeight
-                isOutsideControlled
-                isReadOnly
-                setContext={setPreviewContext}
-              />
-            )}
-          </div>
+
+      {isGeneratingPreview ? <Skeleton isFullWidth type="editor" /> : null}
+      <div className={`flex h-full justify-center ${tabs[selectedTab].id === "2" && !isGeneratingPreview ? "" : "hidden"}`}>
+        <div className="w-full [&>.editor-component]:bg-zinc-800">
+          <Editor
+            // @ts-ignore
+            initialContent={previewContext?.getState()?.doc || undefined}
+            isDisabled
+            isFullHeight
+            isOutsideControlled
+            isReadOnly
+            setContext={setPreviewContext}
+          />
         </div>
-      ) : null}
+      </div>
+
       {tabs[selectedTab].id === "3" && previewContext ? (
         <div className="flex h-full justify-center">
-          <AutomentionDrawer data={{ getContext: previewContext, id: data.id, title: data.title }} setContent={setContent} />
+          <AutomentionDrawer data={{ getContext: previewContext, id: data.id, title: data.title }} />
         </div>
       ) : null}
       <div className="flex flex-nowrap gap-x-2">
@@ -260,7 +245,6 @@ export function DocumentFromTemplate({ data }: Props) {
                       content: JSON.parse(res?.data?.content as string),
                     });
                     if (state) {
-                      setContent(state.doc);
                       previewContext?.manager?.view?.updateState(state);
                     }
                     setSelectedTab(1);
@@ -290,14 +274,13 @@ export function DocumentFromTemplate({ data }: Props) {
                 data: {
                   project_id: project_id as string,
                   title: template.title || "",
-                  content: JSON.stringify(content),
+                  content: JSON.stringify(previewContext?.getState()?.doc || {}),
                 },
                 relations: { template_fields: template?.template_fields || [] },
               },
               {
                 onSuccess: (res: { data: DocumentType }) => {
                   if (res?.data && res?.data?.content) {
-                    setContent(res?.data?.content as any);
                     setSelectedTab(1);
                   }
                 },

@@ -16,7 +16,6 @@ export function Editor({
   menubarSize = "md",
   onChangePlainText,
   setContext,
-  isOutsideControlled,
   isFullHeight,
   hooks,
 }: EditorType) {
@@ -32,12 +31,6 @@ export function Editor({
     // @ts-ignore
     if (setContext) setContext(getContext);
   }, []);
-
-  useEffect(() => {
-    if (isDisabled && isOutsideControlled && initialContent) {
-      if (manager) manager?.view?.updateState(manager?.createState({ content: initialContent }));
-    }
-  }, [isDisabled, isOutsideControlled, initialContent]);
 
   return (
     // @ts-ignore
