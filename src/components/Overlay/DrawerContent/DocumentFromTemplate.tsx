@@ -103,7 +103,7 @@ export function DocumentFromTemplate({ data }: Props) {
     if (previewContext?.getState()?.doc && existingTemplate?.data && !template.template_fields) {
       // Replace with existing template
       const tempFields: DocumentType["template_fields"] = existingTemplate?.data?.template_fields || [];
-      const { textContent } = previewContext?.getState()?.doc || { textContent: {} };
+      const { textContent } = data?.getContext?.getState()?.doc || { textContent: "" };
       if (textContent) {
         for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
           const matchKey = match?.at(1) as string;
@@ -130,7 +130,7 @@ export function DocumentFromTemplate({ data }: Props) {
         setTemplate((prev) => ({ ...prev, template_fields: existingTemplate?.data?.template_fields || [] }));
       }
     }
-  }, [previewContext?.getState()?.doc, existingTemplate]);
+  }, [previewContext?.getState()?.doc, isGeneratingPreview, existingTemplate]);
   useEffect(() => {
     const timeout = setTimeout(() => {
       const templateContent = previewContext?.getState().doc;
@@ -146,7 +146,7 @@ export function DocumentFromTemplate({ data }: Props) {
         const state = previewContext?.manager?.createState({ content: newContent });
         if (state) previewContext?.manager?.view?.updateState(state);
       }
-    }, 500);
+    }, 200);
 
     return () => {
       clearTimeout(timeout);
