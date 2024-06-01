@@ -1,3 +1,6 @@
+import { ReactFrameworkOutput, Remirror } from "@remirror/react";
+import { SetStateAction } from "jotai";
+import { Dispatch } from "react";
 import { RemirrorJSON } from "remirror";
 
 import { Size } from "../../baseTypes";
@@ -13,6 +16,7 @@ export interface EditorType {
   isFullHeight?: boolean;
   customPlaceholder?: string;
   menubarSize?: Size;
+  setContext?: Dispatch<SetStateAction<ReactFrameworkOutput<Remirror.Extensions> | undefined>>;
   hooks?: any;
 }
 

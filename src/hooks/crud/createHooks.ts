@@ -416,7 +416,7 @@ export function useCreateFromTemplate(id: string, project_id: string) {
   const createNotification = useNotifications();
   return useMutation(
     async (vars: {
-      data: { title: string; content: RemirrorJSON | Node | string };
+      data: { project_id: string; title: string; content: RemirrorJSON | Node | string };
       relations: { template_fields: DocumentTemplateFieldType[] };
     }) =>
       FetchFunction({

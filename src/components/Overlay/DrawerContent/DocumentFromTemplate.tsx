@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
@@ -11,6 +11,7 @@ import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
+import { AutomentionDrawer } from "./AutomentionDrawer";
 
 type Props = {
   data: {
@@ -25,6 +26,47 @@ const tabs: TabType[] = [
   { id: "2", label: "Preview", icon: IconEnum.document },
   { id: "3", label: "Automention", icon: IconEnum.mention },
 ];
+
+async function generateAllDiceRollFields({
+  hasDiceRollFields,
+  template_fields,
+  setTemplate,
+  content,
+}: {
+  hasDiceRollFields: boolean;
+  template_fields: DocumentType["template_fields"];
+  setTemplate: Dispatch<SetStateAction<Partial<DocumentType>>>;
+  content: string;
+}) {
+  if (hasDiceRollFields) {
+    let tempContent = content;
+    const tempFields = [...(template_fields || [])];
+    Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: true });
+
+    for (let index = 0; index < tempFields?.length || 0; index += 1) {
+      if (tempFields[index]?.entity_type === "dice_roll" && !!tempFields[index].formula) {
+        const parsedNotation = await DiceRollParser.parseNotation(tempFields[index].formula);
+        const r = await Dice.roll(parsedNotation);
+        const rollData = await DiceRollParser.parseFinalResults(r);
+        if (rollData?.valid) {
+          tempFields[index].value = rollData?.value?.toString() || "";
+          tempContent = tempContent.replaceAll(`%{${tempFields[index].key}}%`, tempFields[index].value || "");
+          const derivedFields = tempFields.filter((f) => f.derive_from === tempFields[index].id);
+          for (let j = 0; j < derivedFields.length; j += 1) {
+            if (derivedFields[j].derive_formula === "dnd_5e_ability_bonus") {
+              derivedFields[j].value = Math.floor((Number(tempFields[index].value || 10) - 10) / 2).toString();
+              tempContent = tempContent.replaceAll(`%{${derivedFields[j].key}}%`, derivedFields[j].value || "");
+            }
+          }
+        }
+      }
+    }
+
+    setTemplate((prev) => ({ ...prev, template_fields: tempFields, content: JSON.parse(tempContent) }));
+    return tempContent;
+  }
+  return content;
+}
 
 export function DocumentFromTemplate({ data }: Props) {
   const { project_id } = useParams();
@@ -41,8 +83,9 @@ export function DocumentFromTemplate({ data }: Props) {
     },
   );
 
+  const [previewContext, setPreviewContext] = useState<ReactFrameworkOutput<Remirror.Extensions> | undefined>(undefined);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [content, setContent] = useState(data.getContext.getState().doc);
+  const [content, setContent] = useState(data.getContext?.getState().doc);
   const [template, setTemplate] = useState<Partial<DocumentType>>({});
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { mutateAsync: generatePreview, isLoading: isGeneratingPreview } = useCreateFromTemplate(
@@ -100,12 +143,11 @@ export function DocumentFromTemplate({ data }: Props) {
         }
       }
       const newContent = JSON.parse(contentToAlter);
-      const state = data.getContext.manager.createState({ content: newContent });
+      const state = data.getContext?.manager?.createState({ content: newContent });
       setContent(state.doc);
     }
   }, [template]);
 
-  if (!data.getContext.getState().doc.content) return null;
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
@@ -117,40 +159,23 @@ export function DocumentFromTemplate({ data }: Props) {
           value={template?.title || ""}
           variant={template?.title ? "primary" : "error"}
         />
-        {hasDiceRollFields ? (
+        {/* {hasDiceRollFields ? (
           <div className="w-24 self-end">
             <Button
               icon={IconEnum.d20}
               label="Roll all"
-              onClick={async () => {
-                if (hasDiceRollFields) {
-                  const tempFields = [...(template?.template_fields || [])];
-                  Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: true });
-
-                  for (let index = 0; index < tempFields?.length || 0; index += 1) {
-                    if (tempFields[index]?.entity_type === "dice_roll" && !!tempFields[index].formula) {
-                      const parsedNotation = await DiceRollParser.parseNotation(tempFields[index].formula);
-                      const r = await Dice.roll(parsedNotation);
-                      const rollData = await DiceRollParser.parseFinalResults(r);
-                      if (rollData?.valid) {
-                        tempFields[index].value = rollData?.value?.toString() || "";
-                        const derivedFields = tempFields.filter((f) => f.derive_from === tempFields[index].id);
-                        for (let j = 0; j < derivedFields.length; j += 1) {
-                          if (derivedFields[j].derive_formula === "dnd_5e_ability_bonus") {
-                            derivedFields[j].value = Math.floor((Number(tempFields[index].value || 10) - 10) / 2).toString();
-                          }
-                        }
-                      }
-                    }
-                  }
-
-                  setTemplate((prev) => ({ ...prev, template_fields: tempFields }));
-                }
-              }}
+              onClick={async () =>
+                generateAllDiceRollFields({
+                  hasDiceRollFields,
+                  template_fields: template?.template_fields || [],
+                  setTemplate,
+                  content: JSON.stringify(template.content || {}),
+                })
+              }
               variant="info"
             />
           </div>
-        ) : null}
+        ) : null} */}
       </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
       <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
@@ -181,10 +206,22 @@ export function DocumentFromTemplate({ data }: Props) {
             {isGeneratingPreview ? (
               <Skeleton isFullWidth type="editor" />
             ) : (
-              // @ts-ignore
-              <Editor initialContent={content || undefined} isDisabled isFullHeight isOutsideControlled isReadOnly />
+              <Editor
+                // @ts-ignore
+                initialContent={content || undefined}
+                isDisabled
+                isFullHeight
+                isOutsideControlled
+                isReadOnly
+                setContext={setPreviewContext}
+              />
             )}
           </div>
+        </div>
+      ) : null}
+      {tabs[selectedTab].id === "3" && previewContext ? (
+        <div className="flex h-full justify-center">
+          <AutomentionDrawer data={{ getContext: previewContext, id: data.id, title: data.title }} setContent={setContent} />
         </div>
       ) : null}
       <div className="flex flex-nowrap gap-x-2">
@@ -192,21 +229,40 @@ export function DocumentFromTemplate({ data }: Props) {
           icon={IconEnum.add}
           isDisabled={
             !template?.template_fields?.length ||
-            (template?.template_fields || []).some((f) => !f.value && !f.is_randomized && !f.related_id) ||
+            (template?.template_fields || []).some(
+              (f) => !f.value && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived",
+            ) ||
             isCreating ||
             isGeneratingPreview
           }
           label="Generate preview"
           onClick={async () => {
+            const c = await generateAllDiceRollFields({
+              hasDiceRollFields,
+              template_fields: template?.template_fields || [],
+              setTemplate,
+              content: JSON.stringify(data.getContext.getState().doc),
+            });
             await generatePreview(
               {
-                data: { title: template.title || "", content },
+                data: {
+                  project_id: project_id as string,
+                  title: template.title || "",
+                  content: c,
+                },
                 relations: { template_fields: template?.template_fields || [] },
               },
               {
                 onSuccess: (res: { data: DocumentType }) => {
                   if (res?.data && res?.data?.content) {
-                    setContent(res?.data?.content as any);
+                    // setContent(res?.data?.content as any);
+                    const state = previewContext?.manager?.createState({
+                      content: JSON.parse(res?.data?.content as string),
+                    });
+                    if (state) {
+                      setContent(state.doc);
+                      previewContext?.manager?.view?.updateState(state);
+                    }
                     setSelectedTab(1);
                   }
                 },

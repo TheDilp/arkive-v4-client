@@ -3,11 +3,12 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-control-regex */
 
+import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { findElementAtPosition, FromToProps } from "remirror";
 
@@ -34,6 +35,7 @@ type Props = {
     title: string;
     getContext: ReactFrameworkOutput<Remirror.Extensions>;
   };
+  setContent?: Dispatch<SetStateAction<Node>>;
 };
 type matchItem = { id: string; title: string; blueprint_title?: string; image_id?: string; icon?: string; parent_id?: string };
 type matchResult = FromToProps & matchItem;
@@ -76,7 +78,7 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
   },
 ];
 
-export function AutomentionDrawer({ data }: Props) {
+export function AutomentionDrawer({ data, setContent }: Props) {
   const { project_id } = useParams();
   const resetAtomDrawer = useResetAtom(drawerAtom);
   const setMentionPosition = useSetAtom(mentionPositionAtom);
@@ -264,6 +266,8 @@ export function AutomentionDrawer({ data }: Props) {
             const activeAnnotations = data.getContext.helpers.getAnnotations();
             if (activeAnnotations.length)
               data.getContext.commands.removeAnnotations(activeAnnotations.map((a: { id: string }) => a.id));
+
+            if (setContent) setContent(data.getContext.getState().doc);
           }}
           variant="info"
         />

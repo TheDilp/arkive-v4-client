@@ -15,6 +15,7 @@ export function Editor({
   customPlaceholder,
   menubarSize = "md",
   onChangePlainText,
+  setContext,
   isOutsideControlled,
   isFullHeight,
   hooks,
@@ -28,16 +29,14 @@ export function Editor({
   });
 
   useEffect(() => {
-    if (isDisabled && isOutsideControlled) {
-      const timeout = setTimeout(() => {
-        if (manager) manager?.view?.updateState(manager?.createState({ content: initialContent }));
-      }, 500);
+    // @ts-ignore
+    if (setContext) setContext(getContext);
+  }, []);
 
-      return () => {
-        clearTimeout(timeout);
-      };
+  useEffect(() => {
+    if (isDisabled && isOutsideControlled && initialContent) {
+      if (manager) manager?.view?.updateState(manager?.createState({ content: initialContent }));
     }
-    return () => {};
   }, [isDisabled, isOutsideControlled, initialContent]);
 
   return (
