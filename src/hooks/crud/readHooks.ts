@@ -355,5 +355,18 @@ export function useGetIcons(type: IconCategories | null) {
     },
   );
 }
+export function useGetStats(project_id: string | undefined) {
+  return useQuery(
+    ["stats", project_id],
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/stats/${project_id}`,
+        method: "GET",
+      }),
 
+    {
+      staleTime: 60 * 60 * 1000,
+    },
+  );
+}
 // #endregion misc

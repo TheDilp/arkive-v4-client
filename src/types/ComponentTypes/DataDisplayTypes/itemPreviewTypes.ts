@@ -1,3 +1,4 @@
+import { AvailableIcons } from "../../../utils";
 import { Size, Variant } from "../../baseTypes";
 import { AvailableEntityType, AvailableSubEntityType } from "../../EntityTypes";
 
@@ -5,7 +6,7 @@ export interface ItemPreviewType {
   id: string;
   title: string;
   parent_id?: string;
-  icon?: string;
+  icon?: AvailableIcons | string | null;
   link?: string;
   label?: string;
   image_id?: string | null;
