@@ -126,7 +126,7 @@ export function ProjectLayout() {
     if (history.length === 0 && parsedTitle === "The Arkive") return;
     if (history.at(0)?.link === pathname) return;
     if (parsedTitle === "undefined") return;
-    setHistory([{ label: parsedTitle, link: pathname }, ...history].toSpliced(9));
+    setHistory([{ label: parsedTitle, link: pathname }, ...history].slice(0, 10));
   }, [title]);
 
   const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
