@@ -355,7 +355,7 @@ export function useGetIcons(type: IconCategories | null) {
     },
   );
 }
-export function useGetStats(project_id: string | undefined) {
+export function useGetStats(project_id: string | undefined, options?: UseQueryOptions<any>) {
   return useQuery(
     ["stats", project_id],
     async () =>
@@ -366,6 +366,7 @@ export function useGetStats(project_id: string | undefined) {
 
     {
       staleTime: 60 * 60 * 1000,
+      enabled: options?.enabled || false,
     },
   );
 }

@@ -262,13 +262,13 @@ export function Dashboard() {
     "words",
   ]);
   const { project_id } = useParams();
-  const { data: dashboard } = useGetProjectDashboard(project_id as string);
+  const { data: dashboard, isFetching } = useGetProjectDashboard(project_id as string);
 
   const characterStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const tagEntityStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const tagColorStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { isLg } = useBreakpoint();
-  const { data: stats } = useGetStats(project_id);
+  const { data: stats } = useGetStats(project_id, { enabled: !!dashboard?.data && !isFetching });
 
   useEffect(() => {
     if (stats?.data && characterStatRef.current && tagColorStatRef.current && tagEntityStatRef.current) {
