@@ -13,7 +13,6 @@ export const UpdateMonthSchema = z.object({
     id: z.string(),
     title: z.string().optional(),
     days: z.number().optional(),
-    owner_id: z.string().optional(),
     sort: z.number().optional(),
   }),
 });
