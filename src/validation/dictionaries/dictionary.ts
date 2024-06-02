@@ -20,6 +20,7 @@ export const UpdateDictionarySchema = z.object({
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
+    owner_id: z.string().optional(),
     parent_id: z.string().nullable().optional(),
   }),
   permissions: UpdateEntityPermissionSchema,

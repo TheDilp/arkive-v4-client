@@ -68,6 +68,7 @@ export const UpdateCalendarSchema = z.object({
         if (typeof arg === "string") return Number(arg);
         return arg;
       }),
+    owner_id: z.string().optional(),
   }),
   relations: z.object({
     eras: UpdateEraSchema.array().or(UpdateEraSchema.array()).optional(),

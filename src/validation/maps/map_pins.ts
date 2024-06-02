@@ -41,6 +41,7 @@ export const UpdateMapPinSchema = z.object({
     doc_id: z.string().nullable().optional(),
     image_id: z.string().nullable().optional(),
     character_id: z.string().nullable().optional(),
+    owner_id: z.string().optional(),
     map_pin_type_id: z.string().nullable().optional(),
   }),
   permissions: UpdateEntityPermissionSchema,

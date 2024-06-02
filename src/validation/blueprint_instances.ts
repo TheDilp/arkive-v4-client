@@ -61,6 +61,7 @@ export const InsertBlueprintInstanceSchema = z.object({
 export const UpdateBlueprintInstanceSchema = z.object({
   data: z.object({
     id: z.string(),
+    owner_id: z.string().optional(),
     title: z.string().optional(),
     is_public: z.boolean().nullable().optional(),
   }),

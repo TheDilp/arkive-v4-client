@@ -1,20 +1,12 @@
 import { useAtomValue } from "jotai";
 
-import { EntityPermissionType, HandleChangePropsType, UserType } from "../../types";
+import { EntityPermissionType, HandleChangePropsType, ProjectType, UserType } from "../../types";
 import { IconEnum, membersAtom, permissionsAtom, userAtom } from "../../utils";
-import { Checkbox, Title } from "../Form";
+import { Checkbox, Select, Title } from "../Form";
 import { Collapsible } from "../Layout";
 import { Badge } from "../Misc";
 
-function OwnerDisplay({
-  owner_id,
-  members,
-  user,
-}: {
-  owner_id: string | undefined;
-  members: UserType[] | undefined;
-  user: UserType | null;
-}) {
+function getOwnerEmail(owner_id: string | undefined, user: UserType | null, members: ProjectType["members"] | undefined) {
   let ownerEmail = "";
   if (owner_id && user && members) {
     if (user?.id === owner_id && user?.email) {
@@ -26,6 +18,19 @@ function OwnerDisplay({
       }
     }
   }
+  return ownerEmail;
+}
+
+function OwnerDisplay({
+  owner_id,
+  members,
+  user,
+}: {
+  owner_id: string | undefined;
+  members: UserType[] | undefined;
+  user: UserType | null;
+}) {
+  const ownerEmail = getOwnerEmail(owner_id, user, members);
   if (ownerEmail)
     return (
       <div>
@@ -47,13 +52,20 @@ type Props = {
 export function EntityPermission({ related_id, permissions, handleChange, selectablePermissions, owner_id }: Props) {
   const user = useAtomValue(userAtom);
   const members = useAtomValue(membersAtom);
-
   const availablePermissions = useAtomValue(permissionsAtom)
     .filter((p) => selectablePermissions.includes(p.code as string))
     .toReversed();
+  if (!user) return null;
   return (
     <div className="flex flex-col gap-y-4">
       <OwnerDisplay members={members} owner_id={owner_id} user={user} />
+      <Select
+        label="Transfer ownership"
+        name="owner_id"
+        onChange={handleChange}
+        options={members.concat(user).map((m) => ({ label: m.nickname || m.email, value: m.id }))}
+        value={owner_id}
+      />
       {/* {isProjectOwner ? (
         <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
           <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">

@@ -41,6 +41,7 @@ export const UpdateMapSchema = z.object({
     cluster_pins: z.boolean().nullable().optional(),
     icon: z.string().nullable().optional(),
     parent_id: z.string().nullable().optional(),
+    owner_id: z.string().optional(),
     image_id: z.string().optional(),
   }),
   relations: z

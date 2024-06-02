@@ -56,7 +56,7 @@ export const UpdateEventSchema = z.object({
     start_minutes: z.number().optional().nullable(),
     end_hours: z.number().optional().nullable(),
     end_minutes: z.number().optional().nullable(),
-
+    owner_id: z.string().optional(),
     document_id: z.string().optional().nullable(),
     image_id: z.string().optional().nullable(),
   }),

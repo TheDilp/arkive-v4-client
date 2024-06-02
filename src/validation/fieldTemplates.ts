@@ -55,6 +55,7 @@ export const UpdateTemplateSchema = z
     data: z.object({
       id: z.string(),
       sort: z.number().optional(),
+      owner_id: z.string().optional(),
       title: z.string().optional(),
     }),
     relations: z.object({

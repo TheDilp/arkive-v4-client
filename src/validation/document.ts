@@ -81,6 +81,7 @@ export const UpdateDocumentSchema = z.object({
     parent_id: z.string().nullable().optional(),
     image_id: z.string().nullable().optional(),
     dice_color: z.string().nullable().optional(),
+    owner_id: z.string().optional(),
   }),
   relations: z
     .object({

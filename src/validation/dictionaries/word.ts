@@ -16,6 +16,7 @@ export const UpdateWordSchema = z.object({
     id: z.string(),
     title: z.string().optional(),
     translation: z.string().optional(),
+    owner_id: z.string().optional(),
     description: z.string().nullable().optional(),
   }),
   permissions: UpdateEntityPermissionSchema,

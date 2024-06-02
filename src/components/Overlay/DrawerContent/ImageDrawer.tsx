@@ -92,7 +92,7 @@ export function ImageDrawer({ data }: Props) {
           if (image?.title)
             await update(
               {
-                data: { title: image.title },
+                data: { title: image.title, owner_id: image.owner_id },
                 relations: { tags: image.tags.map((t) => ({ id: t.id })) },
                 permissions: image?.permissions || [],
               },

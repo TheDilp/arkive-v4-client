@@ -56,6 +56,7 @@ export const UpdateBlueprintSchema = z
       id: z.string(),
       title: z.string().optional(),
       title_name: z.string().optional(),
+      owner_id: z.string().optional(),
       icon: z.string().optional().nullable(),
     }),
     relations: z.object({

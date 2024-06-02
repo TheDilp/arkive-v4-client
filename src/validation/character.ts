@@ -83,6 +83,7 @@ export const UpdateCharacterSchema = z.object({
     biography: z.any().nullable().optional(),
     nickname: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
+    owner_id: z.string().optional(),
     is_public: z.boolean().nullable().optional(),
     portrait_id: z
       .string()

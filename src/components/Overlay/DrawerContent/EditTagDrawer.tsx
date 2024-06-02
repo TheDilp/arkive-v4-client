@@ -31,13 +31,16 @@ export function EditTagDrawer({ data }: Props) {
   const [tag, setTag] = useState<TagType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const { mutate: update, isLoading } = useUpdateEntity<{
-    data: Pick<TagType, "id" | "title" | "color">;
+    data: Pick<TagType, "id" | "title" | "color" | "owner_id">;
     permissions: EntityPermissionType[];
   }>("tags", project_id as string);
 
   function handleSave() {
     if (tag) {
-      update({ data: { id: data.id, title: tag?.title, color: tag?.color }, permissions: tag.permissions });
+      update({
+        data: { id: data.id, title: tag?.title, color: tag?.color, owner_id: tag?.owner_id },
+        permissions: tag.permissions,
+      });
       resetDrawer();
     }
   }

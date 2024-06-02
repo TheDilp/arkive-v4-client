@@ -10,6 +10,7 @@ export const UpdateRandomTableSchema = z.object({
     parent_id: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
+    owner_id: z.string().optional(),
     is_public: z.boolean().nullable().optional(),
   }),
   relations: z
