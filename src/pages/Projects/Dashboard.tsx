@@ -128,7 +128,11 @@ function createTagEntityStats(
   // Create SVG container
   const svg = d3.select(reff.current).append("svg").attr("width", width).attr("height", height).append("g");
 
-  const entitiesToShow = Object.entries(data);
+  const entitiesToShow = Object.entries(data).sort(([, a], [, b]) => {
+    if (a.count < b.count) return 1;
+    if (a.count > b.count) return -1;
+    return 0;
+  });
 
   const x = d3
     .scaleBand()
