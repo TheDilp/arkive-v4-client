@@ -112,7 +112,14 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .attr("height", (d) => height - y(d[1] - 3));
 
   // Add X axis
-  svg.append("g").attr("class", "x-axis").call(d3.axisBottom(x)).selectAll("text").attr("class", "axis-label");
+  svg
+    .append("g")
+    .attr("class", "x-axis")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("class", "axis-label")
+    .attr("font-size", 11)
+    .attr("font-family", "Lato");
 
   svg.append("g").attr("class", "y-axis").attr("transform", `translate(0,${0})`).call(yAxis);
 }
@@ -191,6 +198,7 @@ function createTagEntityStats(
     .attr("class", "axis-label")
     .attr("transform", `translate(-20,-${200}), rotate(-90)`)
     .attr("font-size", isLg ? 26 : 14)
+    .attr("font-family", "Lato")
     .attr("fill", "white")
     .attr("stroke", "black")
     .attr("stroke-width", isLg ? "1px" : "0.2px");
