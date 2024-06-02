@@ -175,14 +175,14 @@ function createTagEntityStats(
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1].count})` || "") || "")
     .attr("y", (d) => y(d[1].count))
     .attr("width", x.bandwidth())
-    .attr("height", (d) => height - y(d[1].count - 0.25));
+    .attr("height", (d) => height - y(d[1].count - 1));
 
   // Add X axis
   svg
     .append("g")
     .attr("class", "x-axis")
     .call(d3.axisBottom(x))
-    .attr("transform", `translate(0, ${height - 25})`)
+    .attr("transform", `translate(0, ${height - 0})`)
     .selectAll("text")
     .attr("class", "axis-label")
     .attr("transform", `translate(-20,-${200}), rotate(-90)`)
