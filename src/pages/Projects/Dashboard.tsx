@@ -201,7 +201,7 @@ function createTagEntityStats(
     .attr("font-family", "Lato")
     .attr("fill", "white")
     .attr("stroke", "black")
-    .attr("stroke-width", isLg ? "1px" : "0.2px");
+    .attr("stroke-width", isLg ? "0.6px" : "0.2px");
   svg.append("g").attr("class", "y-axis").attr("transform", `translate(0,${0})`).call(yAxis);
 }
 
