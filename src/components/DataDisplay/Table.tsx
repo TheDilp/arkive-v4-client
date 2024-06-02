@@ -54,7 +54,7 @@ const TableClasses = tv({
     subheaderRowTitle: "font-medium",
     rowContainer:
       "flex flex-col bg-zinc-950 min-h-[3rem] relative min-w-fit last:border-b last:min-h-[3.05rem] border-zinc-800",
-    row: "flex flex-1 cursor-default min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-800",
+    row: "flex flex-1 min-h-[3rem] max-h-[3rem] transition-all duration-100 font-lato border-t border-r border-zinc-800",
     hasLinkRow: "cursor-pointer",
     hasRowAction: "cursor-pointer",
     contentWrapper: "flex items-center truncate h-full",
@@ -825,7 +825,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                        }
                       ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""}
                       ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""}
-                    
+                       ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"}
                       `}
                         onClick={(e) => {
                           if (

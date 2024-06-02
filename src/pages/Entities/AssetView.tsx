@@ -363,9 +363,11 @@ export function AssetView() {
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
   const [type, setType] = useState<AssetType>("images");
-  const [{ orderBy, filters, selection, pagination }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
+    relationFilters: {},
+    filters: {},
   });
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
@@ -376,6 +378,7 @@ export function AssetView() {
     project_id as string,
     type,
     {
+      relationFilters,
       relations: { tags: true },
       orderBy,
       fields: ["id", "title", "type", "is_public"],
@@ -546,6 +549,7 @@ export function AssetView() {
               permissions,
             )}
             config={{
+              relationFilters,
               hasSelect: true,
               hasTags: true,
               orderBy,

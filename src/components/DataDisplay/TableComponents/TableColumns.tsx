@@ -101,7 +101,7 @@ export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): C
         <div className="flex w-full max-w-full items-center justify-center gap-x-2">
           {sortedTags?.length ? (
             <div
-              className="w-fit"
+              className="w-fit cursor-pointer"
               onClick={() => {
                 if (dispatch) {
                   dispatch({ type: "clearAllFilters" });
