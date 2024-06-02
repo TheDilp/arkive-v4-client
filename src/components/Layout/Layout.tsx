@@ -1,9 +1,9 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
-import { Navigate, Outlet, useBlocker, useParams } from "react-router-dom";
+import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
@@ -14,7 +14,9 @@ import {
   dialogAtom,
   drawerAtom,
   hasChangedDataAtom,
+  historyAtom,
   IconEnum,
+  navbarTitleAtom,
   permissionsAtom,
   projectAtom,
   projectNavItems,
@@ -32,7 +34,7 @@ export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
   const { user } = useUser();
-
+  const { pathname } = useLocation();
   const { data, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
@@ -70,6 +72,8 @@ export function ProjectLayout() {
       staleTime: Infinity,
     },
   );
+  const title = useAtomValue(navbarTitleAtom);
+  const [history, setHistory] = useAtom(historyAtom);
   const setProjectAtom = useSetAtom(projectAtom);
   const setDialog = useSetAtom(dialogAtom);
   const setPermissions = useSetAtom(permissionsAtom);
@@ -110,6 +114,21 @@ export function ProjectLayout() {
     }
   }, [permissions]);
 
+  useEffect(() => {
+    const parsedTitle = (title?.split("|")?.at(-1) || "The Arkive").trim();
+    if (parsedTitle === "undefined") return;
+    if (history.length >= 10) {
+      if (history[0].link === pathname || parsedTitle === "The Arkive") return;
+      if (parsedTitle === "undefined") return;
+      setHistory([{ label: parsedTitle, link: pathname }]);
+    }
+
+    if (history.length === 0 && parsedTitle === "The Arkive") return;
+    if (history.at(0)?.link === pathname) return;
+    if (parsedTitle === "undefined") return;
+    setHistory([{ label: parsedTitle, link: pathname }, ...history].toSpliced(9));
+  }, [title]);
+
   const { proceed, reset } = useBlocker(({ currentLocation, nextLocation }) => {
     if (hasChangedData && !!drawer?.title && currentLocation.pathname !== nextLocation.pathname) {
       if (proceed) {
@@ -140,6 +159,7 @@ export function ProjectLayout() {
 
     return false;
   });
+
   if (
     data?.data?.owner_id !== userData?.data?.id &&
     (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id === userData?.data?.id)) &&

@@ -19,6 +19,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { cloneElement, ReactElement, useRef, useState } from "react";
+import { isArray } from "remirror";
 import { tv } from "tailwind-variants";
 
 import { DefaultTooltipType, TooltipType, Variant } from "../../types";
@@ -46,6 +47,11 @@ function getArrowColor(variant: Variant) {
   if (variant === "primary") return "#000000";
   if (variant === "secondary") return "#3f3f46";
   return "#000000";
+}
+
+function OnlySoleChild({ children }: { children: JSX.Element | JSX.Element[] }) {
+  if (isArray(children)) return children?.at(-1) || null;
+  return children;
 }
 
 export function Tooltip({
@@ -128,7 +134,9 @@ export function Tooltip({
                 {content}
               </DefaultTooltip>
             ) : (
-              cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
+              <OnlySoleChild>
+                {cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })}
+              </OnlySoleChild>
             )}
             <FloatingArrow
               ref={arrowRef}

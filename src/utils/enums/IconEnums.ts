@@ -73,6 +73,7 @@ export const IconEnum = {
   heading_six: "ph:text-h-six" as const,
   heading_three: "ph:text-h-three" as const,
   heading_two: "ph:text-h-two" as const,
+  history: "ph:clock-counter-clockwise" as const,
   home: "ph:house" as const,
   horizontal: "ph:arrows-out-line-horizontal" as const,
   image: "ph:images" as const,

@@ -154,5 +154,5 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .cl-button {
-  @apply text-white;
+  @apply text-white hover:text-white;
 }

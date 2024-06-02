@@ -5,6 +5,7 @@ import { navbarTitleAtom, projectAtom } from "../../utils";
 
 export function useNavbarTitle(title: string, enabled: boolean) {
   const setNavbarTitleAtom = useSetAtom(navbarTitleAtom);
+
   const projectData = useAtomValue(projectAtom);
   useEffect(() => {
     if (projectData?.title && title && enabled) {

@@ -46,7 +46,7 @@ const ButtonClasses = tv({
       true: "bg-zinc-400 text-zinc-200 cursor-not-allowed",
     },
     hasNoBackground: {
-      true: "bg-transparent shadow-none",
+      true: "bg-transparent shadow-none border-0",
     },
     hasNoLabel: {
       true: "p-0 w-full h-full",

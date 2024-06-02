@@ -3,7 +3,7 @@ import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
 import { useHasPermissions } from "../../hooks";
@@ -21,6 +21,7 @@ import {
   drawerAtom,
   getDefaultEntityIcon,
   getEntityTypeFromNotificationType,
+  historyAtom,
   IconEnum,
   navbarTitleAtom,
   projectFeatureFlagsAtom,
@@ -284,6 +285,27 @@ function DiceRoller() {
     </Card>
   );
 }
+function HistoryList({ history, closeTooltip }: { history: { label: string; link: string }[]; closeTooltip?: () => void }) {
+  const navigate = useNavigate();
+  return (
+    <ul className="flex flex-col gap-y-1 rounded bg-zinc-700 p-2 shadow">
+      {history.map((link, i) => (
+        <li
+          key={(link.link + i).toString()}
+          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400">
+          <Button
+            hasNoBackground
+            label={link.label}
+            onClick={() => {
+              navigate(link.link);
+              if (closeTooltip) closeTooltip();
+            }}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
@@ -316,7 +338,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
-
   function openSearchDrawer() {
     setDrawer((prev) => ({ ...prev, title: "Search", size: "lg", type: "search", data: null }));
   }
@@ -392,6 +413,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
       }
     }
   }, [lastJsonMessage]);
+  const history = useAtomValue(historyAtom);
 
   // useLayoutEffect(() => {
   //   if (versionMessage) {
@@ -445,6 +467,13 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
               <div className="h-full">
                 <Button hasNoBackground icon={IconEnum.search} iconSize={24} isIconOnly onClick={openSearchDrawer} />
               </div>
+            </div>
+            <div className="w-fit">
+              <Tooltip arrowColor="#3f3f46" content={<HistoryList history={history} />} isClickable isInline passCloseTooltip>
+                <div className="h-full">
+                  <Button hasNoBackground icon={IconEnum.history} iconSize={24} isIconOnly onClick={undefined} />
+                </div>
+              </Tooltip>
             </div>
           </>
         ) : null}
