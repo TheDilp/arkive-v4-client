@@ -351,36 +351,40 @@ export function Dashboard() {
           </div>
         ))}
       </div>
-      <h2 className="pb-2 font-merriweather text-xl">Statistics</h2>
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
-        <div className="col-span-1 flex min-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-          <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
-            <span>Entity stats</span>
-            <div className="absolute right-0 max-w-48 text-base font-normal">
-              <Select
-                isMultiple
-                name="selectedEntities"
-                onChange={({ value }) => setSelectedEntities(value as string[])}
-                options={graphEntityOptions.map((opt) => ({ label: getSentenceCase(opt), value: opt }))}
-                value={selectedEntities}
-              />
+      {stats?.data ? (
+        <>
+          <h2 className="pb-2 font-merriweather text-xl">Statistics</h2>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
+            <div className="col-span-1 flex min-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
+              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+                <span>Entity stats</span>
+                <div className="absolute right-0 max-w-48 text-base font-normal">
+                  <Select
+                    isMultiple
+                    name="selectedEntities"
+                    onChange={({ value }) => setSelectedEntities(value as string[])}
+                    options={graphEntityOptions.map((opt) => ({ label: getSentenceCase(opt), value: opt }))}
+                    value={selectedEntities}
+                  />
+                </div>
+              </h3>
+              <div ref={characterStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
             </div>
-          </h3>
-          <div ref={characterStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
-        </div>
-        <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-          <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
-            <span>Tag stats</span>
-          </h3>
-          <div ref={tagEntityStatRef} className="h-full max-h-full w-full max-w-full overflow-auto" />
-        </div>
-        <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
-          <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
-            Tags by color
-          </h3>
-          <div ref={tagColorStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
-        </div>
-      </div>
+            <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
+              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+                <span>Tag stats</span>
+              </h3>
+              <div ref={tagEntityStatRef} className="h-full max-h-full w-full max-w-full overflow-auto" />
+            </div>
+            <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
+              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+                Tags by color
+              </h3>
+              <div ref={tagColorStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
+            </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
