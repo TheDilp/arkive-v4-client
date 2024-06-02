@@ -73,7 +73,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .scaleLinear()
     .domain([0, Math.max(...entitiesToShow.map(([, count]) => count))])
     .nice()
-    .range([height - 10, 10]);
+    .range([height - 0, 10]);
 
   const yAxis = d3
     .axisRight(y)
@@ -109,7 +109,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1]})` || "") || "")
     .attr("y", (d) => y(d[1]))
     .attr("width", x.bandwidth())
-    .attr("height", (d) => height - y(d[1] - 3));
+    .attr("height", (d) => height - y(d[1]));
 
   // Add X axis
   svg
@@ -150,7 +150,7 @@ function createTagEntityStats(
     .scaleLinear()
     .domain([0, Math.max(...entitiesToShow.map(([, item]) => item.count))])
     .nice()
-    .range([height - 10, 10]);
+    .range([height, 10]);
 
   const yTicks = y.ticks().filter((tick) => Number.isInteger(tick));
   const yAxis = d3
@@ -186,7 +186,7 @@ function createTagEntityStats(
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1].count})` || "") || "")
     .attr("y", (d) => y(d[1].count))
     .attr("width", x.bandwidth())
-    .attr("height", (d) => height - y(d[1].count - 1));
+    .attr("height", (d) => height - y(d[1].count));
 
   // Add X axis
   svg
