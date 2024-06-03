@@ -372,7 +372,6 @@ export function useGetStats(project_id: string | undefined, options?: UseQueryOp
       }),
 
     {
-      staleTime: 60 * 60 * 1000,
       enabled: options?.enabled || false,
     },
   );
