@@ -34,6 +34,13 @@ export function CharacterAddDrawer({ data }: Props) {
     data: Pick<DocumentType, "id" | "title" | "project_id" | "content">;
   }>("documents");
   const { mutate: deleteDocument } = useDeleteEntity("documents", project_id as string, false);
+
+  function onSuccess() {
+    setItems([]);
+    setNewDocument({ title: "" });
+    resetDrawer();
+  }
+
   return (
     <DrawerLayout>
       <Search
@@ -88,7 +95,7 @@ export function CharacterAddDrawer({ data }: Props) {
             const payload = { relations: { [data.type]: items.map((i) => ({ id: i.value })) } };
             const parsedPayload = AddToCharacterSchema.parse(payload);
             await addToCharacter(parsedPayload, {
-              onSuccess: resetDrawer,
+              onSuccess,
             });
             return;
           }
@@ -105,7 +112,7 @@ export function CharacterAddDrawer({ data }: Props) {
             await addToCharacter(
               { relations: { documents: [{ id }] } },
               {
-                onSuccess: resetDrawer,
+                onSuccess,
                 onError: () => {
                   deleteDocument({ data: { id } });
                   resetDrawer();
