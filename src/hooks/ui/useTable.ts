@@ -161,7 +161,6 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
 
       return newState;
     }
-
     case "setPagination":
       return { ...state, pagination: { ...state.pagination, ...action.payload } };
     case "setSort": {
@@ -225,6 +224,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
         },
       };
     }
+
     case "selectAll": {
       return { ...state, selection: { ...(state.selection || {}), [state?.pagination?.page || 0]: action.payload.rows } };
     }

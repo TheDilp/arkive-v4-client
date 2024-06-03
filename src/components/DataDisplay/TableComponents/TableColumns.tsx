@@ -49,13 +49,29 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
       />
     ),
 
-    cell: ({ table, row }) => (
-      <Checkbox
-        name={row.id}
-        onChange={() => dispatch({ type: "setSelection", payload: { row: row.original.id } })}
-        value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.original.id)}
-      />
-    ),
+    cell: ({ table, row }) => {
+      return (
+        <Checkbox
+          name={row.id}
+          onChange={(_, e) => {
+            if (e.shiftKey) {
+              dispatch({
+                type: "selectAll",
+                payload: {
+                  rows: table
+                    .getPaginationRowModel()
+                    .flatRows.slice(0, row.index + 1)
+                    .map((r) => r.original.id),
+                },
+              });
+            } else {
+              dispatch({ type: "setSelection", payload: { row: row.original.id } });
+            }
+          }}
+          value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.original.id)}
+        />
+      );
+    },
     meta: {
       centered: true,
     },
