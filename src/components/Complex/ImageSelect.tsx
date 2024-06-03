@@ -45,7 +45,7 @@ export function ImageSelect({
               imageType={type}
               isDisabled={isDisabled || !permissions?.read_assets}
               label={label}
-              limit={100}
+              limit={25}
               name={name}
               onChange={onChange}
               placeholder="Search images"
