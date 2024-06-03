@@ -394,6 +394,42 @@ export function Dashboard() {
               </h3>
               <div ref={tagColorStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
             </div>
+            <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
+              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+                Mentioned entities in documents
+              </h3>
+              <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2">
+                {stats?.data?.mentions ? (
+                  <ul className="flex flex-col gap-y-2">
+                    <li className="flex items-center justify-between text-xl">
+                      <span>Entity</span>
+                      <span># of mentions</span>
+                    </li>
+                    {Object.entries(stats.data.mentions)
+                      .toSorted(([, a], [, b]) => {
+                        if (a.count > b.count) return -1;
+                        if (a.count < b.count) return 1;
+                        return 0;
+                      })
+                      .map(([id, { icon, image_id, entity_type, title, count }]) => (
+                        <li key={id} className="flex items-center justify-between border-b border-zinc-700 last:border-0">
+                          <EntityPreview
+                            hasNoBackground
+                            icon={icon}
+                            id={id}
+                            image_id={image_id}
+                            title={title}
+                            type={entity_type}
+                          />
+                          <span className="text-2xl font-bold">{count}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <Alert label="There is no content." />
+                )}
+              </div>
+            </div>
           </div>
         </>
       ) : null}

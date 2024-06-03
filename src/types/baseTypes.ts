@@ -1,5 +1,7 @@
 import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
 
+import { AllAvailableEntities } from "./EntityTypes";
+
 export type Size = "4xl" | "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type Variant =
   | "primary"
@@ -114,4 +116,17 @@ export type BulkUpdateType = UseMutateFunction<
     }[];
   },
   unknown
+>;
+
+export type TagColorStatType = Record<string, number>;
+export type TagEntityStatType = Record<string, { color: string; count: number }>;
+export type MentionStatType = Record<
+  string,
+  {
+    title: string;
+    icon: string | undefined;
+    image_id: string | undefined;
+    entity_type: AllAvailableEntities;
+    count: number;
+  }
 >;

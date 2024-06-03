@@ -4,8 +4,11 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   IconCategories,
+  MentionStatType,
   RequestBodyType,
   SearchableEntities,
+  TagColorStatType,
+  TagEntityStatType,
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
@@ -356,7 +359,11 @@ export function useGetIcons(type: IconCategories | null) {
   );
 }
 export function useGetStats(project_id: string | undefined, options?: UseQueryOptions<any>) {
-  return useQuery(
+  return useQuery<{
+    data: Record<string, number> & { tag_colors: TagColorStatType } & { tag_entities: TagEntityStatType } & {
+      mentions: MentionStatType;
+    };
+  }>(
     ["stats", project_id],
     async () =>
       FetchFunction({
