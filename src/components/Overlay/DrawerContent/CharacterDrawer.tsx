@@ -493,10 +493,8 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     "character_fields_templates",
     {
       enabled:
-        tabs[selectedTab].id === "5" &&
-        !!character?.tags?.length &&
-        permissions?.read_character_fields_templates &&
-        permissions?.read_tags,
+        // tabs[selectedTab].id === "5" &&
+        !!character?.tags?.length && permissions?.read_character_fields_templates && permissions?.read_tags,
       staleTime: 5 * 60 * 1000,
     },
   );
@@ -507,7 +505,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_relationship_types",
     {
-      enabled: tabs[selectedTab].id === "3",
+      // enabled: tabs[selectedTab].id === "3",
       staleTime: 5 * 60 * 1000,
     },
   );
