@@ -367,7 +367,7 @@ export function useAddToEntity<
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/add/${id}`,
+        url: `${baseURLS.baseServer}/${type.toLowerCase()}/resource/add/${id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
