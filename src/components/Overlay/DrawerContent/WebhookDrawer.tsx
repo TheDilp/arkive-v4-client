@@ -31,7 +31,7 @@ export function WebhookDrawer({ data }: Props) {
   const { mutateAsync, isLoading: isCreating } = useMutateWebhook(data?.id ? "update" : "create", data?.id);
   const [webhook, setWebhook] = useState<WebhookType | null>();
   const { handleChange } = useHandleChange({ data: webhook, setData: setWebhook });
-  const resetDrawer = useToggledResetAtom(true);
+  const resetDrawer = useToggledResetAtom();
   useLayoutEffect(() => {
     if (existingWebhook?.data) {
       setWebhook(existingWebhook?.data);
@@ -66,7 +66,7 @@ export function WebhookDrawer({ data }: Props) {
               const parsedData = UpdateWebhookSchema.parse({ data: webhook });
               await mutateAsync(parsedData);
             }
-            resetDrawer();
+            resetDrawer(true);
             queryClient.invalidateQueries(["projects"]);
           }}
           variant="success"
