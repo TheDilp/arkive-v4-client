@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Alert, EntityPreview, Icon, Select } from "../../components";
 import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
-import { AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
 import {
   capitalizeFirstLetter,
   drawerAtom,
@@ -35,22 +35,22 @@ const graphEntityOptions = [
   "images",
 ];
 
-function getBarColor(i: number) {
-  if (i === 0) return "fill-yellow-400";
-  if (i === 1) return "fill-blue-400";
-  if (i === 2) return "fill-blue-600";
-  if (i === 3) return "fill-orange-400";
-  if (i === 4) return "fill-red-800";
-  if (i === 5) return "fill-red-600";
-  if (i === 6) return "fill-green-600";
-  if (i === 7) return "fill-green-500";
-  if (i === 8) return "fill-gray-500";
-  if (i === 9) return "fill-gray-300";
-  if (i === 10) return "fill-lime-300";
-  if (i === 11) return "fill-lime-400";
-  if (i === 12) return "fill-violet-700";
-  if (i === 13) return "fill-sky-700";
-  if (i === 14) return "fill-sky-500";
+function getBarColor(i: AllAvailableEntities) {
+  if (i === "characters") return "fill-yellow-400";
+  if (i === "blueprints") return "fill-blue-400";
+  if (i === "blueprint_instances") return "fill-blue-600";
+  if (i === "documents") return "fill-orange-400";
+  if (i === "maps") return "fill-red-800";
+  if (i === "map_pins") return "fill-red-600";
+  if (i === "graphs") return "fill-green-600";
+  if (i === "nodes") return "fill-green-500";
+  if (i === "calendars") return "fill-gray-500";
+  if (i === "events") return "fill-gray-300";
+  if (i === "dictionaries") return "fill-lime-300";
+  if (i === "words") return "fill-lime-400";
+  if (i === "random_tables") return "fill-violet-700";
+  if (i === "tags") return "fill-sky-700";
+  if (i === "images") return "fill-sky-500";
   return "fill-emerald-400";
 }
 
@@ -105,7 +105,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
     .data(entitiesToShow)
     .enter()
     .append("rect")
-    .attr("class", (_, i) => getBarColor(i))
+    .attr("class", (d) => getBarColor(d[0] as AllAvailableEntities))
     .attr("x", (d) => x(`${getSentenceCase(d[0])} (${d[1]})` || "") || "")
     .attr("y", (d) => y(d[1]))
     .attr("width", x.bandwidth())
