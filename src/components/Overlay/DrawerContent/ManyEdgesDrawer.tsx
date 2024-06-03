@@ -395,7 +395,7 @@ export function ManyEdgesDrawer({ data }: Props) {
                       });
                     }
                     resetChanges();
-                    resetDrawerAtom();
+                    resetDrawerAtom(true);
                     resetDialogAtom();
                   },
                 },
@@ -403,7 +403,7 @@ export function ManyEdgesDrawer({ data }: Props) {
                   action: () => resetDialogAtom(),
                 },
               });
-            else resetDrawerAtom();
+            else resetDrawerAtom(true);
           }}
           variant="secondary"
         />

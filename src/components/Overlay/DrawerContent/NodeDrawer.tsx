@@ -453,7 +453,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                       });
                     }
                     resetChanges();
-                    resetDrawerAtom();
+                    resetDrawerAtom(true);
                     resetDialogAtom();
                   },
                 },
@@ -463,7 +463,7 @@ export function NodeDrawer({ data }: { data: { id: string; parent_id: string } }
                 },
               });
             else {
-              resetDrawerAtom();
+              resetDrawerAtom(true);
             }
           }}
           variant="secondary"

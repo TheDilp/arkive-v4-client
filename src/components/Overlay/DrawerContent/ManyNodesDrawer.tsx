@@ -477,7 +477,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
                       });
                     }
                     resetChanges();
-                    resetDrawerAtom();
+                    resetDrawerAtom(true);
                     resetDialogAtom();
                   },
                 },
@@ -486,7 +486,7 @@ export function ManyNodesDrawer({ data }: { data: { ids: string[]; parent_id: st
                 },
               });
             else {
-              resetDrawerAtom();
+              resetDrawerAtom(true);
             }
           }}
           variant="secondary"
