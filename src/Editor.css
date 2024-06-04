@@ -124,7 +124,7 @@
   }
 
   table {
-    @apply block table-auto overflow-auto !important;
+    @apply block table-auto overflow-auto pb-1.5 !important;
     tbody {
       @apply overflow-auto !important;
       tr {
@@ -149,9 +149,30 @@
         @apply m-0 -mt-px flex h-full items-center justify-center text-center;
       }
     }
-
     .selectedCell {
       @apply bg-blue-600 text-white !important;
+    }
+
+    &::-webkit-scrollbar {
+      @apply h-2 w-2 cursor-pointer;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+      @apply z-0 bg-zinc-700;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      @apply z-0 bg-zinc-500  cursor-pointer;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+      @apply bg-zinc-400;
+    }
+    .scrollbar-hidden::-webkit-scrollbar {
+      @apply hidden;
     }
   }
 
@@ -484,8 +505,10 @@
 .remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight {
   @apply bg-blue-400;
 }
-.remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight .remirror-mention-atom-popup-name,
-.remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered .remirror-mention-atom-popup-name {
+.remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight
+  .remirror-mention-atom-popup-name,
+.remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered
+  .remirror-mention-atom-popup-name {
   @apply text-white;
 }
 .remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered {
