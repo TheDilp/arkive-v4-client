@@ -6,7 +6,7 @@
   "printWidth": 128,
   "proseWrap": "preserve",
   "tabWidth": 2,
-  "trailingComma": "all",
+  "trailingComma": "none",
   "jsxSingleQuote": false,
   "semi": true,
   "endOfLine": "auto",

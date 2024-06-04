@@ -69,7 +69,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   return [
     columnHelper.display({
@@ -79,11 +79,20 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
-            initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
+            image={getImageURL(
+              project_id,
+              "images",
+              row.original?.portrait?.id || ""
+            )}
+            initials={getAvatarInitials(
+              `${row.original.first_name} ${row.original?.last_name || ""}`
+            )}
             isBordered
             isTooltipDisabled
-            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
+            label={getCharacterFullName(
+              row.original.first_name,
+              row.original?.last_name || ""
+            )}
             size="sm"
           />
         </div>
@@ -155,7 +164,12 @@ function createColumns(
           isDisabled={!!row.original.deleted_at}
           isIconOnly
           onClick={async () => {
-            await updatePublicMany({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            await updatePublicMany({
+              data: {
+                ids: [row.original.id],
+                is_public: !row.original.is_public,
+              },
+            });
           }}
         />
       ),
@@ -199,20 +213,24 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_characters",
-                        user_role_id,
+                        user_role_id
                       ),
                     },
                     {
                       id: "delete_character",
-                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
-                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      title: row.original.deleted_at
+                        ? "Delete character"
+                        : "Arkive character",
+                      icon: row.original.deleted_at
+                        ? IconEnum.trash
+                        : IconEnum.archive,
                       isDisabled: !hasActionPermission(
                         isProjectOwner,
                         user_id === row.original.owner_id,
                         permissions,
                         row.original?.permissions || [],
                         "delete_characters",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -221,9 +239,13 @@ function createColumns(
                             ...row.original,
                             entity_title: "characters",
                           },
-                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                          title: row.original.deleted_at
+                            ? "Delete character"
+                            : "Arkive character",
                           size: "sm",
-                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          type: row.original.deleted_at
+                            ? "delete_entity"
+                            : "arkive_entity",
                           isOverlay: true,
                         }));
                       },
@@ -240,7 +262,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "update_characters",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -249,7 +271,7 @@ function createColumns(
                           title: `Edit character - ${getCharacterFullName(
                             row.original.first_name,
                             "",
-                            row.original?.last_name,
+                            row.original?.last_name
                           )}`,
                           size: "2xl",
                           type: "characters",
@@ -266,7 +288,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "read_characters",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog({
@@ -274,7 +296,7 @@ function createColumns(
                           title: `Relationship tree of ${getCharacterFullName(
                             row.original.first_name,
                             "",
-                            row.original?.last_name || "",
+                            row.original?.last_name || ""
                           )}`,
                           data: { id: row.original.id },
                           size: "lg",
@@ -303,20 +325,28 @@ function createColumns(
                       id: "view_public",
                       title: "View public page",
                       icon: IconEnum.public,
-                      onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
+                      onClick: () =>
+                        window.open(
+                          `/public/${project_id}/characters/${row.original.id}`,
+                          "_blank"
+                        ),
                       isDisabled: !row.original.is_public,
                     },
                     {
                       id: "delete_character",
-                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
-                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
+                      title: row.original.deleted_at
+                        ? "Delete character"
+                        : "Arkive character",
+                      icon: row.original.deleted_at
+                        ? IconEnum.trash
+                        : IconEnum.archive,
                       isDisabled: !hasActionPermission(
                         isProjectOwner,
                         user_id === row.original.owner_id,
                         permissions,
                         row.original?.permissions || [],
                         "delete_characters",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -325,16 +355,27 @@ function createColumns(
                             ...row.original,
                             entity_title: "characters",
                           },
-                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                          title: row.original.deleted_at
+                            ? "Delete character"
+                            : "Arkive character",
                           size: "sm",
-                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
+                          type: row.original.deleted_at
+                            ? "delete_entity"
+                            : "arkive_entity",
                           isOverlay: true,
                         }));
                       },
                     },
                   ]
-            }>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
+            }
+          >
+            <Button
+              hasNoBackground
+              icon={IconEnum.actions}
+              iconSize={28}
+              isIconOnly
+              onClick={undefined}
+            />
           </Dropdown>
         </div>
       ),
@@ -364,7 +405,7 @@ function getSelectedActions(
     resetDialogAtom: () => unknown;
     data: CharacterType[];
     dispatch: TableDispatch;
-  },
+  }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   if (permissions?.update_characters) {
@@ -376,9 +417,13 @@ function getSelectedActions(
         tooltip: "Set public",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          const entitesNotFolders = (data || [])?.filter((e) =>
+            ids.includes(e.id)
+          );
           if (entitesNotFolders.length) {
-            updateMany({ data: ids.map((id) => ({ data: { id, is_public: true } })) });
+            updateMany({
+              data: ids.map((id) => ({ data: { id, is_public: true } })),
+            });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -390,9 +435,13 @@ function getSelectedActions(
         tooltip: "Set private",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          const entitesNotFolders = (data || [])?.filter((e) =>
+            ids.includes(e.id)
+          );
           if (entitesNotFolders.length) {
-            updateMany({ data: ids.map((id) => ({ data: { id, is_public: false } })) });
+            updateMany({
+              data: ids.map((id) => ({ data: { id, is_public: false } })),
+            });
             dispatch({ type: "clearSelection" });
           }
         },
@@ -432,12 +481,16 @@ function getSelectedActions(
             type: "bulk_access",
             data: {
               ids,
-              selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
+              selectablePermissions: [
+                "read_characters",
+                "update_characters",
+                "delete_characters",
+              ],
               type: "characters",
             },
           }));
         },
-      },
+      }
     );
   }
 
@@ -467,10 +520,14 @@ function getSelectedActions(
                 icon: IconEnum.restore,
                 action: () => {
                   updateMany(
-                    { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
+                    {
+                      data: ids.map((id) => ({
+                        data: { id, deleted_at: null },
+                      })),
+                    },
                     {
                       onSuccess: () => dispatch({ type: "clearSelection" }),
-                    },
+                    }
                   );
                   dispatch({ type: "clearSelection" });
                 },
@@ -496,7 +553,10 @@ function getSelectedActions(
             description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
               ids.length === 1 ? "character" : "characters"
             }?`,
-            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
+            warning:
+              arkived === "arkive"
+                ? "This action cannot be undone."
+                : undefined,
             isOverlay: true,
             cancel: {
               label: "Cancel",
@@ -511,7 +571,7 @@ function getSelectedActions(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 );
                 dispatch({ type: "clearSelection" });
               },
@@ -644,17 +704,29 @@ function CharacterViewHeader({
 export function CharactersView() {
   useNavbarTitle("Characters", true);
   const { isMd } = useBreakpoint();
-  const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
-  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");
+  const [view, setView] = useState<"card" | "table">(
+    ls.get("characters_view") || "table"
+  );
+  const [arkived, setArkived] = useState<"active" | "arkive">(
+    ls.get("characters-table-active") || "active"
+  );
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
-    ["read_characters", "create_characters", "update_characters", "delete_characters"],
-    undefined,
+    [
+      "read_characters",
+      "create_characters",
+      "update_characters",
+      "delete_characters",
+    ],
+    undefined
   );
-  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
+  const [
+    { orderBy, filters, relationFilters, pagination, selection },
+    dispatch,
+  ] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
@@ -671,7 +743,17 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
-      fields: ["id", "deleted_at", "first_name", "nickname", "last_name", "portrait_id", "is_public", "age", "owner_id"],
+      fields: [
+        "id",
+        "deleted_at",
+        "first_name",
+        "nickname",
+        "last_name",
+        "portrait_id",
+        "is_public",
+        "age",
+        "owner_id",
+      ],
       permissions: true,
       arkived: arkived === "arkive",
     },
@@ -680,12 +762,22 @@ export function CharactersView() {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
       enabled: view === "table" && !!permissions?.read_characters,
-    },
+    }
   );
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
-  const { mutate: updateMany } = useBulkUpdate(project_id as string, "characters");
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(
+    "characters",
+    project_id as string
+  );
+  const { mutate: updateMany } = useBulkUpdate(
+    project_id as string,
+    "characters"
+  );
 
-  const { mutateAsync: deleteMany } = useDeleteMany("characters", arkived === "active", project_id);
+  const { mutateAsync: deleteMany } = useDeleteMany(
+    "characters",
+    arkived === "active",
+    project_id
+  );
   const {
     data: cardData,
     isFetching,
@@ -721,12 +813,12 @@ export function CharactersView() {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
         return allPages.length;
       },
-    },
+    }
   );
-  const { mutate } = useUpdateEntity<{ data: Partial<CharacterType>; relations: { is_favorite: boolean } }>(
-    "characters",
-    project_id as string,
-  );
+  const { mutate } = useUpdateEntity<{
+    data: Partial<CharacterType>;
+    relations: { is_favorite: boolean };
+  }>("characters", project_id as string);
 
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -761,7 +853,15 @@ export function CharactersView() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", header_name: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
+              and: [
+                {
+                  id: "quick_filter",
+                  header_name: "quick_filter",
+                  field: "first_name",
+                  operator: "ilike",
+                  value: filter,
+                },
+              ],
               field: "first_name",
             },
           });
@@ -792,15 +892,21 @@ export function CharactersView() {
         <div
           className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-4"
           onScroll={(e) => {
-            const { target } = e;
-            if (target) {
+            const { currentTarget } = e;
+
+            if (currentTarget) {
               // @ts-ignore
-              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 600;
+              const scrollFetchMarker =
+                currentTarget.scrollHeight -
+                  currentTarget.scrollTop -
+                  currentTarget.clientHeight <=
+                600;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
             }
-          }}>
+          }}
+        >
           {(cardData?.pages || [])?.map((page) =>
             page.data.map((char: CharacterType) => (
               <CharacterCard
@@ -810,7 +916,7 @@ export function CharactersView() {
                 is_favorite={char?.is_favorite}
                 portrait_id={char?.portrait_id}
               />
-            )),
+            ))
           )}
         </div>
       ) : (
@@ -826,7 +932,7 @@ export function CharactersView() {
               permissions,
               isProjectOwner,
               user?.id as string,
-              user?.role?.id,
+              user?.role?.id
             )}
             config={{
               hasSelect: true,
@@ -838,7 +944,9 @@ export function CharactersView() {
               relationFilters,
               selection,
               getLink: (rowData: any) =>
-                arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
+                arkived === "active"
+                  ? `/projects/${project_id}/characters/${rowData.id}/biography`
+                  : "#",
               setFavorite: (rowData: any) => {
                 mutate({
                   data: { id: rowData.id },

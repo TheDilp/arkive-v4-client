@@ -5,7 +5,17 @@ import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
+import {
+  Avatar,
+  Button,
+  createColumnHelper,
+  Dropdown,
+  Image,
+  Input,
+  Select,
+  Table,
+  TablePageLayout,
+} from "../../components";
 import {
   useBreakpoint,
   useDeleteMany,
@@ -76,7 +86,7 @@ function createColumns(
     },
     unknown
   >,
-  permissions: UserHasPermissionsType,
+  permissions: UserHasPermissionsType
 ) {
   return [
     columnHelper.display({
@@ -129,12 +139,17 @@ function createColumns(
               permissions,
               row.original?.permissions || [],
               "update_assets",
-              user?.role?.id,
+              user?.role?.id
             )
           }
           isIconOnly
           onClick={async () => {
-            await updatePublic({ data: { ids: [row.original.id], is_public: !row.original.is_public } });
+            await updatePublic({
+              data: {
+                ids: [row.original.id],
+                is_public: !row.original.is_public,
+              },
+            });
           }}
         />
       ),
@@ -162,7 +177,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "update_assets",
-                  user?.role?.id,
+                  user?.role?.id
                 ),
                 onClick: () => {
                   setDrawer((prev) => ({
@@ -207,7 +222,7 @@ function createColumns(
                   permissions,
                   row.original?.permissions || [],
                   "delete_assets",
-                  user?.role?.id,
+                  user?.role?.id
                 ),
                 onClick: () => {
                   setDialog((prev) => ({
@@ -223,8 +238,14 @@ function createColumns(
                   }));
                 },
               },
-            ]}>
-            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+            ]}
+          >
+            <Button
+              hasNoBackground
+              icon={IconEnum.actions}
+              iconSize={28}
+              onClick={undefined}
+            />
           </Dropdown>
         </div>
       ),
@@ -251,7 +272,7 @@ function getSelectedActions(
     resetDialog: () => unknown;
     data: ImageType[];
     dispatch: TableDispatch;
-  },
+  }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   if (permissions?.update_assets) {
@@ -263,7 +284,9 @@ function getSelectedActions(
         tooltip: "Set public",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          const entitesNotFolders = (data || [])?.filter((e) =>
+            ids.includes(e.id)
+          );
           if (entitesNotFolders.length) {
             await updatePublicMany({ data: { ids, is_public: true } });
             dispatch({ type: "clearSelection" });
@@ -277,13 +300,35 @@ function getSelectedActions(
         tooltip: "Set private",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
+          const entitesNotFolders = (data || [])?.filter((e) =>
+            ids.includes(e.id)
+          );
           if (entitesNotFolders.length) {
             await updatePublicMany({ data: { ids, is_public: false } });
             dispatch({ type: "clearSelection" });
           }
         },
       },
+      {
+        icon: IconEnum.tags,
+        hasNoBackground: true,
+        isIconOnly: true,
+        tooltip: "Add/remove tags",
+        onClick: () => {
+          const ids = Object.values(selection || {}).flatMap((id) => id);
+          const imagesWithTags = (data || [])
+            ?.filter((e) => ids.includes(e.id))
+            .map((e) => ({ id: e.id, tags: (e.tags || []).map((t) => t.id) }));
+
+          setDrawer((prev) => ({
+            ...prev,
+            size: "lg",
+            title: "Bulk edit tags",
+            type: "bulk_tags",
+            data: { items: imagesWithTags, dispatch, type: "images" },
+          }));
+        },
+      }
     );
   }
   selectedActions.push({
@@ -301,7 +346,11 @@ function getSelectedActions(
         type: "bulk_access",
         data: {
           ids,
-          selectablePermissions: ["read_assets", "update_assets", "delete_assets"],
+          selectablePermissions: [
+            "read_assets",
+            "update_assets",
+            "delete_assets",
+          ],
           type: "images",
         },
       }));
@@ -336,7 +385,7 @@ function getSelectedActions(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 ),
               variant: "error",
             },
@@ -357,20 +406,35 @@ export function AssetView() {
   const resetDialog = useResetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
   const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("images", project_id as string);
-  const { mutateAsync: deleteMany } = useDeleteMany("images", false, project_id);
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(
+    "images",
+    project_id as string
+  );
+  const { mutateAsync: deleteMany } = useDeleteMany(
+    "images",
+    false,
+    project_id
+  );
 
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
+  const [view, setView] = useState<"card" | "table">(
+    ls.get("assets_view") || "table"
+  );
   const [type, setType] = useState<AssetType>("images");
-  const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
+  const [
+    { orderBy, filters, relationFilters, selection, pagination },
+    dispatch,
+  ] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     relationFilters: {},
     filters: {},
   });
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-  const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
+  const permissions = useHasPermissions(
+    ["read_assets", "create_assets", "update_assets", "delete_assets"],
+    undefined
+  );
 
   const user = useAtomValue(userAtom);
 
@@ -386,7 +450,7 @@ export function AssetView() {
       pagination,
       permissions: true,
     },
-    { enabled: view === "table", prefetch: false },
+    { enabled: view === "table", prefetch: false }
   );
 
   const {
@@ -417,7 +481,7 @@ export function AssetView() {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
         return allPages.length;
       },
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -435,7 +499,15 @@ export function AssetView() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", header_name: "title", field: "title", operator: "ilike", value: filter }],
+              and: [
+                {
+                  id: "quick_filter",
+                  header_name: "title",
+                  field: "title",
+                  operator: "ilike",
+                  value: filter,
+                },
+              ],
               field: "title",
             },
           });
@@ -515,23 +587,35 @@ export function AssetView() {
         <div
           className="grid grid-cols-1 gap-4 overflow-y-auto p-4 pb-36 md:grid-cols-2 lg:grid-cols-6 xl:grid-cols-8"
           onScroll={(e) => {
-            const { target } = e;
-            if (target) {
+            const { currentTarget } = e;
+            if (currentTarget) {
               // @ts-ignore
-              const scrollFetchMarker = target.scrollHeight - target.scrollTop - target.clientHeight <= 1000;
+              const scrollFetchMarker =
+                currentTarget.scrollHeight -
+                  currentTarget.scrollTop -
+                  currentTarget.clientHeight <=
+                1000;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
             }
-          }}>
+          }}
+        >
           {(infiniteAssets?.pages || [])?.map((page) =>
             page.data.map((img: ImageType) => (
               <div
                 key={img.id}
-                className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in">
-                <Image hasTitle image={img} isLazyLoading isOpenable type={type} />
+                className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
+              >
+                <Image
+                  hasTitle
+                  image={img}
+                  isLazyLoading
+                  isOpenable
+                  type={type}
+                />
               </div>
-            )),
+            ))
           )}
         </div>
       ) : (
@@ -546,7 +630,7 @@ export function AssetView() {
               type,
               project_id as string,
               updatePublicMany,
-              permissions,
+              permissions
             )}
             config={{
               relationFilters,

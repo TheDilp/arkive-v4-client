@@ -14,7 +14,12 @@
       }
     }
   },
-  "extends": ["airbnb", "plugin:prettier/recommended", "eslint:recommended", "plugin:import/recommended"],
+  "extends": [
+    "airbnb",
+    "plugin:prettier/recommended",
+    "eslint:recommended",
+    "plugin:import/recommended"
+  ],
   "overrides": [],
   "ignorePatterns": ["node_modules*/", "e2e/", "dist/"],
   "parser": "@typescript-eslint/parser",
@@ -26,7 +31,15 @@
     "JSX": true
   },
   "root": true,
-  "plugins": ["prettier", "react", "react-hooks", "simple-import-sort", "import", "@typescript-eslint", "eslint-plugin-import"],
+  "plugins": [
+    "prettier",
+    "react",
+    "react-hooks",
+    "simple-import-sort",
+    "import",
+    "@typescript-eslint",
+    "eslint-plugin-import"
+  ],
   "rules": {
     "no-underscore-dangle": "off",
     "func-style": ["error", "declaration"],
@@ -56,15 +69,23 @@
       }
     ],
     "import/prefer-default-export": "off",
-    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ],
     "prettier/prettier": [
       "error",
       {
-        "endOfLine": "auto"
+        "endOfLine": "auto",
+        "trailingComma": "es5"
       }
     ],
     "jsx-a11y/control-has-associated-label": "off",
-    "react/jsx-filename-extension": ["error", { "extensions": [".ts", ".tsx"] }],
+    "react/jsx-filename-extension": [
+      "error",
+      { "extensions": [".ts", ".tsx"] }
+    ],
     "react/jsx-sort-props": "error",
     "react/jsx-no-bind": "off",
     "react/jsx-props-no-spreading": ["off"],
