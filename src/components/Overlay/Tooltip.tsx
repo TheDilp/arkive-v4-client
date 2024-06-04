@@ -94,7 +94,7 @@ export function Tooltip({
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context, {
-      enabled: !isClickable ?? true,
+      enabled: !isClickable,
       handleClose: isIgnoringHover ? null : safePolygon(),
       delay: {
         open: delay?.openDelay ?? 250,
@@ -116,7 +116,7 @@ export function Tooltip({
         getReferenceProps({
           ref: refs.setReference,
           ...children.props,
-        }),
+        })
       )}
       {!isDisabled && open && isPortal ? (
         <FloatingPortal>
