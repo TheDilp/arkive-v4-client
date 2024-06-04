@@ -49,7 +49,11 @@ function getArrowColor(variant: Variant) {
   return "#000000";
 }
 
-function OnlySoleChild({ children }: { children: JSX.Element | JSX.Element[] }) {
+function OnlySoleChild({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) {
   if (isArray(children)) return children?.at(-1) || null;
   return children;
 }
@@ -98,7 +102,7 @@ export function Tooltip({
       },
     }),
     useClick(context, {
-      enabled: isClickable ?? false,
+      enabled: isClickable || false,
     }),
     useFocus(context),
     useRole(context, { role: "tooltip" }),
@@ -128,14 +132,19 @@ export function Tooltip({
             {...getFloatingProps({
               ref: refs.setFloating,
               style: { ...floatingStyles, zIndex: 9999 },
-            })}>
+            })}
+          >
             {typeof content === "string" ? (
               <DefaultTooltip isInline={isInline} variant={variant}>
                 {content}
               </DefaultTooltip>
             ) : (
               <OnlySoleChild>
-                {cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })}
+                {cloneElement(content as ReactElement, {
+                  ...(passCloseTooltip
+                    ? { closeTooltip: () => setOpen(false) }
+                    : {}),
+                })}
               </OnlySoleChild>
             )}
             <FloatingArrow
@@ -161,11 +170,16 @@ export function Tooltip({
           {...getFloatingProps({
             ref: refs.setFloating,
             style: { ...floatingStyles, zIndex: 9999 },
-          })}>
+          })}
+        >
           {typeof content === "string" ? (
             <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
           ) : (
-            cloneElement(content as ReactElement, { ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}) })
+            cloneElement(content as ReactElement, {
+              ...(passCloseTooltip
+                ? { closeTooltip: () => setOpen(false) }
+                : {}),
+            })
           )}
           <FloatingArrow
             ref={arrowRef}
