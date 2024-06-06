@@ -808,14 +808,14 @@ export function useAssignRole<InsertType extends { data: { user_id: string; role
     }
   );
 }
-export function useReadNotification() {
+export function useReadNotification(project_id: string, isReadAll: boolean) {
   const queryClient = useQueryClient();
 
   return useMutation(
     async (updateValues: { data: { user_id: string; notification_id: string } }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/notifications/read`,
-        body: JSON.stringify(updateValues),
+        url: `${baseURLS.baseServer}/notifications/read${isReadAll ? `/${project_id}/${updateValues.data.user_id}` : ""}`,
+        body: isReadAll ? "" : JSON.stringify(updateValues),
         method: "POST",
       });
     },

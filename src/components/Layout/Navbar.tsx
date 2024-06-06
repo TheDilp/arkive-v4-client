@@ -37,7 +37,7 @@ import {
 } from "../../utils";
 import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
-import { Avatar, Icon, IndeterminateProgressBar } from "../Misc";
+import { Alert, Avatar, Icon, IndeterminateProgressBar } from "../Misc";
 import { Dropdown, Tooltip } from "../Overlay";
 import { Card } from "./Card";
 
@@ -348,71 +348,76 @@ function NotificationList({
   notifications: NotificationEntityType[];
   closeTooltip?: () => void;
 }) {
-  const { mutate } = useReadNotification();
+  const { mutate } = useReadNotification(project_id, false);
+  const { mutate: readAll } = useReadNotification(project_id, true);
   return (
-    <div className="flex h-80 w-[28rem] flex-col gap-y-2 overflow-auto rounded-md bg-zinc-800 p-2 shadow">
+    <div className="flex max-h-80 w-[28rem] flex-col gap-y-2 overflow-auto rounded-md bg-zinc-800 p-2 shadow">
       <div className="flex items-center gap-x-2">
         <div className="flex-1 text-xl font-bold">Notifications</div>
         <div className="w-46 ml-auto">
           <Button
             icon={IconEnum.check_circle}
+            isDisabled={notifications.length === 0}
             label="Mark all as read"
             onClick={(e) => {
               e?.preventDefault();
               e?.stopPropagation();
+              readAll({ data: { user_id, notification_id: "" } });
             }}
             variant="info"
           />
         </div>
       </div>
       <ul className="overflow-aut flex max-h-64 flex-col gap-y-2">
-        {notifications?.length
-          ? notifications?.map((notif) => (
-              <li
-                key={notif?.id}
-                className="flex max-w-full flex-nowrap gap-x-1 rounded bg-zinc-700 p-2 shadow"
-                onClick={() => {
-                  if (closeTooltip) closeTooltip();
-                }}>
-                <div className="self-center">
-                  {notif?.image_id ? (
-                    <Avatar hasShowImage image={getImageURL(project_id as string, "images", notif?.image_id)} size="xs" />
-                  ) : (
-                    <Icon fontSize={22} icon={getDefaultEntityIcon(notif?.entity_type)} />
-                  )}
-                </div>
+        {notifications?.length ? (
+          notifications?.map((notif) => (
+            <li
+              key={notif?.id}
+              className="flex max-w-full flex-nowrap gap-x-1 rounded bg-zinc-700 p-2 shadow"
+              onClick={() => {
+                if (closeTooltip) closeTooltip();
+              }}>
+              <div className="self-center">
+                {notif?.image_id ? (
+                  <Avatar hasShowImage image={getImageURL(project_id as string, "images", notif?.image_id)} size="xs" />
+                ) : (
+                  <Icon fontSize={22} icon={getDefaultEntityIcon(notif?.entity_type)} />
+                )}
+              </div>
 
-                <div className="flex flex-col gap-x-2">
-                  <span className="w-full text-xs">
-                    <NotificationDate created_at={notif?.created_at} />
-                  </span>
-                  <div className="flex items-center text-sm">
-                    <p className="gap-x-1 whitespace-normal break-words">
-                      {`${notif.user_name} ${`${notif.action}d`} ${getSingularEntityType(notif.entity_type)?.toLowerCase()} `}
-                      <Link
-                        className="text-nowrap font-semibold text-blue-400 transition-colors hover:text-blue-300 active:text-blue-500"
-                        to={getEntityLink(project_id as string, notif.entity_type, notif.related_id, notif.parent_id, false)}>
-                        {notif.title}
-                      </Link>
-                    </p>
-                  </div>
+              <div className="flex flex-col gap-x-2">
+                <span className="w-full text-xs">
+                  <NotificationDate created_at={notif?.created_at} />
+                </span>
+                <div className="flex items-center text-sm">
+                  <p className="gap-x-1 whitespace-normal break-words">
+                    {`${notif.user_name} ${`${notif.action}d`} ${getSingularEntityType(notif.entity_type)?.toLowerCase()} `}
+                    <Link
+                      className="text-nowrap font-semibold text-blue-400 transition-colors hover:text-blue-300 active:text-blue-500"
+                      to={getEntityLink(project_id as string, notif.entity_type, notif.related_id, notif.parent_id, false)}>
+                      {notif.title}
+                    </Link>
+                  </p>
                 </div>
-                <div className="ml-auto w-min">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.check_circle}
-                    isIconOnly
-                    onClick={(e) => {
-                      e?.preventDefault();
-                      e?.stopPropagation();
-                      mutate({ data: { notification_id: notif?.id, user_id } });
-                    }}
-                    tooltip="Mark as read"
-                  />
-                </div>
-              </li>
-            ))
-          : null}
+              </div>
+              <div className="ml-auto w-min">
+                <Button
+                  hasNoBackground
+                  icon={IconEnum.check_circle}
+                  isIconOnly
+                  onClick={(e) => {
+                    e?.preventDefault();
+                    e?.stopPropagation();
+                    mutate({ data: { notification_id: notif?.id, user_id } });
+                  }}
+                  tooltip="Mark as read"
+                />
+              </div>
+            </li>
+          ))
+        ) : (
+          <Alert label="There are no unread notifications." variant="info-bordered" />
+        )}
       </ul>
     </div>
   );
@@ -620,7 +625,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
                     hasNoBackground
                     icon={IconEnum.notifications}
                     iconSize={24}
-                    iconThickness="fill"
+                    iconThickness={notifications?.data?.length ? "fill" : "regular"}
                     isIconOnly
                     onClick={undefined}
                   />
