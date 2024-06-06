@@ -9,7 +9,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-import { useGetNotifications, useHasPermissions } from "../../hooks";
+import { useGetNotifications, useHasPermissions, useReadNotification } from "../../hooks";
 import {
   AllAvailableEntities,
   DrawerAtomType,
@@ -338,14 +338,17 @@ function NotificationDate({ created_at }: { created_at: string }) {
 }
 
 function NotificationList({
+  user_id,
   project_id,
   notifications,
   closeTooltip,
 }: {
+  user_id: string;
   project_id: string;
   notifications: NotificationEntityType[];
   closeTooltip?: () => void;
 }) {
+  const { mutate } = useReadNotification();
   return (
     <div className="flex h-80 w-[28rem] flex-col gap-y-2 overflow-auto rounded-md bg-zinc-800 p-2 shadow">
       <div className="flex items-center gap-x-2">
@@ -402,6 +405,7 @@ function NotificationList({
                     onClick={(e) => {
                       e?.preventDefault();
                       e?.stopPropagation();
+                      mutate({ data: { notification_id: notif?.id, user_id } });
                     }}
                     tooltip="Mark as read"
                   />
@@ -561,7 +565,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       <div className="ml-auto flex items-center gap-x-2 pr-4">
-        {project_id && !isDisabled ? (
+        {project_id && user?.id && !isDisabled ? (
           <>
             {permissions?.create_assets ? (
               <>
@@ -600,7 +604,9 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
               <Tooltip
                 allowedPlacements={["bottom-end"]}
                 arrowColor="#3f3f46"
-                content={<NotificationList notifications={notifications?.data || []} project_id={project_id} />}
+                content={
+                  <NotificationList notifications={notifications?.data || []} project_id={project_id} user_id={user?.id} />
+                }
                 isClickable
                 isInline
                 passCloseTooltip>
