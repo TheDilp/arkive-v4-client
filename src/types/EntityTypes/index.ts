@@ -13,6 +13,7 @@ export * from "./graphTypes";
 export * from "./imageTypes";
 export * from "./mapTypes";
 export * from "./messageTypes";
+export * from "./notificationTypes";
 export * from "./permissionsTypes";
 export * from "./projectTypes";
 export * from "./randomTableTypes";

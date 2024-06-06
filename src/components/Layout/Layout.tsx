@@ -28,7 +28,11 @@ import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
 const projectSidebarItems = [...projectNavItems];
-projectSidebarItems.unshift({ icon: IconEnum.dasboard, tooltip: "Dasboard", navigate: "/" });
+projectSidebarItems.unshift({
+  icon: IconEnum.dasboard,
+  tooltip: "Dasboard",
+  navigate: "/",
+});
 
 export function ProjectLayout() {
   const { project_id } = useParams();
@@ -45,7 +49,7 @@ export function ProjectLayout() {
         feature_flags: true,
       },
     },
-    { staleTime: 60 * 60 * 1 },
+    { staleTime: 60 * 60 * 1 }
   );
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
@@ -56,7 +60,7 @@ export function ProjectLayout() {
       },
       fields: ["id", "feature_flags", "email"],
     },
-    { enabled: !!user?.id && !!project_id },
+    { enabled: !!user?.id && !!project_id }
   );
 
   const { data: permissions } = useGetEntities<PermissionType>(
@@ -70,7 +74,7 @@ export function ProjectLayout() {
     "permissions",
     {
       staleTime: Infinity,
-    },
+    }
   );
   const title = useAtomValue(navbarTitleAtom);
   const [history, setHistory] = useAtom(historyAtom);

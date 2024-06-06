@@ -24,7 +24,10 @@ import {
 } from "../../utils";
 
 export function useUpdateEntity<
-  InsertType extends { data: { id?: string; parent_id?: string | null }; relations?: { [key: string]: any } },
+  InsertType extends {
+    data: { id?: string; parent_id?: string | null };
+    relations?: { [key: string]: any };
+  },
 >(type: AvailableEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -92,7 +95,7 @@ export function useUpdateEntity<
                       },
                     }
                   : old;
-              },
+              }
             );
           }
 
@@ -127,13 +130,13 @@ export function useUpdateEntity<
           });
         }
       },
-    },
+    }
   );
 }
 
 export function useUpdateMapSubEntity<InsertType extends { data: { id?: string } }>(
   subtype: "map_pins" | "map_layers",
-  parent_id: string,
+  parent_id: string
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -185,12 +188,12 @@ export function useUpdateMapSubEntity<InsertType extends { data: { id?: string }
           timer: 2,
         });
       },
-    },
+    }
   );
 }
 export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string } }>(
   subtype: "nodes" | "edges",
-  parent_id: string,
+  parent_id: string
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -242,7 +245,7 @@ export function useUpdateGraphSubEntity<InsertType extends { data: { id?: string
           timer: 2,
         });
       },
-    },
+    }
   );
 }
 export function useUpdateMessageSubEntity<
@@ -260,7 +263,12 @@ export function useUpdateMessageSubEntity<
     async (updateValues: InsertType) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/messages/update/${updateValues?.data?.id}`,
-        body: JSON.stringify({ data: { id: updateValues.data.id, content: updateValues.data.content } }),
+        body: JSON.stringify({
+          data: {
+            id: updateValues.data.id,
+            content: updateValues.data.content,
+          },
+        }),
         method: "POST",
       });
     },
@@ -302,14 +310,14 @@ export function useUpdateMessageSubEntity<
           timer: 2,
         });
       },
-    },
+    }
   );
 }
 
 export function useUpdateSubEntity(
   type: AvailableSubEntityType,
   project_id: string | undefined,
-  parent_id: string | undefined,
+  parent_id: string | undefined
 ) {
   const createNotification = useNotifications();
 
@@ -342,7 +350,7 @@ export function useUpdateSubEntity(
           timer: 2,
         });
       },
-    },
+    }
   );
 }
 export function useUpdateManySubEntities(type: AvailableSubEntityType) {
@@ -392,7 +400,7 @@ export function useAddToEntity<
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
@@ -430,12 +438,15 @@ export function useRemoveFromEntity<
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
 export function useUpdateTags<
-  InsertType extends { data: { id?: string; parent_id?: string | null }; relations?: { [key: string]: any } },
+  InsertType extends {
+    data: { id?: string; parent_id?: string | null };
+    relations?: { [key: string]: any };
+  },
 >(type: AvailableEntityType | AvailableSubEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -479,7 +490,7 @@ export function useUpdateTags<
                       },
                     }
                   : old;
-              },
+              }
             );
           }
 
@@ -505,13 +516,13 @@ export function useUpdateTags<
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
 export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; is_public: boolean } }>(
   type: AvailableEntityType | AvailableSubEntityType,
-  project_id: string,
+  project_id: string
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -551,7 +562,7 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
@@ -560,7 +571,12 @@ export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntity
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
-    async (updateValues: { data: { add: { A: string; B: string }[]; remove: { A: string; B: string }[] } }) => {
+    async (updateValues: {
+      data: {
+        add: { A: string; B: string }[];
+        remove: { A: string; B: string }[];
+      };
+    }) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/bulk/tags/${type.toLowerCase()}`,
         body: JSON.stringify(updateValues),
@@ -598,14 +614,18 @@ export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntity
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 export function useBulkUpdate(project_id: string, type: AvailableEntityType | "blueprint_instances") {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
-    async (updateItemValues: { data: { data: { id: string; parent_id?: string | null; [key: string]: any } }[] }) => {
+    async (updateItemValues: {
+      data: {
+        data: { id: string; parent_id?: string | null; [key: string]: any };
+      }[];
+    }) => {
       if (updateItemValues.data.length) {
         return FetchFunction({
           url: `${baseURLS.baseServer}/bulk/update/${type}`,
@@ -634,7 +654,7 @@ export function useBulkUpdate(project_id: string, type: AvailableEntityType | "b
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 export function useBulkUpdateAccess(project_id: string | undefined, type: AvailableEntityType | AvailableSubEntityType) {
@@ -645,7 +665,12 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
       data: {
         permissions: (
           | Omit<EntityPermissionType, "code">
-          | { related_id: string; permission_id: null; user_id: null; role_id: null }
+          | {
+              related_id: string;
+              permission_id: null;
+              user_id: null;
+              role_id: null;
+            }
         )[];
       };
     }) => {
@@ -688,13 +713,18 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 export function useUpdateUser<
   InsertType extends {
     data?: Partial<Pick<UserType, "feature_flags">>;
-    relations?: { feature_flags?: { project_id: string; feature_flags: UserType["feature_flags"] } };
+    relations?: {
+      feature_flags?: {
+        project_id: string;
+        feature_flags: UserType["feature_flags"];
+      };
+    };
   },
 >(id: string, auth_id: string) {
   const queryClient = useQueryClient();
@@ -734,7 +764,7 @@ export function useUpdateUser<
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 export function useAssignRole<InsertType extends { data: { user_id: string; role_id: string } }>() {
@@ -775,7 +805,7 @@ export function useAssignRole<InsertType extends { data: { user_id: string; role
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 

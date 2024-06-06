@@ -5,6 +5,7 @@ import {
   AvailableSubEntityType,
   IconCategories,
   MentionStatType,
+  NotificationEntityType,
   RequestBodyType,
   SearchableEntities,
   TagColorStatType,
@@ -34,7 +35,7 @@ export function useGetAllProjects(request: RequestBodyType<ProjectType>, options
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
-    },
+    }
   );
 }
 
@@ -49,13 +50,15 @@ export function useGetProjectDashboard(project_id: string, options?: UseQueryOpt
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
-    },
+    }
   );
 }
 
 export function useGetUser(
-  request: RequestBodyType<UserType> & { data: { auth_id: string; project_id?: string | undefined } },
-  options?: UseQueryOptions,
+  request: RequestBodyType<UserType> & {
+    data: { auth_id: string; project_id?: string | undefined };
+  },
+  options?: UseQueryOptions
 ) {
   return useQuery<{ data: UserType }>(
     ["user", request.data.project_id, request.data.auth_id],
@@ -68,7 +71,7 @@ export function useGetUser(
     {
       enabled: options?.enabled,
       staleTime: options?.staleTime,
-    },
+    }
   );
 }
 
@@ -76,7 +79,11 @@ export function useGetEntity<EntityType>(
   id: string | undefined,
   type: AvailableEntityType,
   body: RequestBodyType<EntityType>,
-  options?: UseQueryOptions<any> & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[]; isPublic?: boolean },
+  options?: UseQueryOptions<any> & {
+    queryKeyOverwrite?: string[];
+    queryKeyConcat?: string[];
+    isPublic?: boolean;
+  }
 ) {
   const createNotification = useNotifications();
   let queryKey = [type, id];
@@ -111,14 +118,18 @@ export function useGetEntity<EntityType>(
       retry: options?.retry,
       enabled: options?.enabled,
       staleTime: options?.staleTime,
-    },
+    }
   );
 }
 export function useGetSubEntity<EntityType>(
   id: string | undefined,
   type: AvailableSubEntityType,
   body: RequestBodyType<EntityType>,
-  options?: UseQueryOptions & { queryKeyOverwrite?: string[]; queryKeyConcat?: string[]; isPublic?: boolean },
+  options?: UseQueryOptions & {
+    queryKeyOverwrite?: string[];
+    queryKeyConcat?: string[];
+    isPublic?: boolean;
+  }
 ) {
   return useQuery<{ data: EntityType }>(
     options?.queryKeyOverwrite ?? [type, id, ...(options?.queryKeyConcat || [])],
@@ -132,7 +143,7 @@ export function useGetSubEntity<EntityType>(
       enabled: options?.enabled,
       staleTime: options?.staleTime,
       retry: options?.retry ?? 3,
-    },
+    }
   );
 }
 
@@ -144,7 +155,7 @@ export function useGetEntities<ReturnType>(
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
     queryKeyConcat?: (string | number | Record<any, any>)[];
     isPublic?: boolean;
-  },
+  }
 ) {
   const createNotification = useNotifications();
   const baseQueryKey = [
@@ -159,7 +170,12 @@ export function useGetEntities<ReturnType>(
   ];
   let mainRequestQueryKey = [...baseQueryKey];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
-    const data: { data: any; message: string; ok: boolean; role_access?: boolean } = await FetchFunction({
+    const data: {
+      data: any;
+      message: string;
+      ok: boolean;
+      role_access?: boolean;
+    } = await FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
       url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
@@ -222,7 +238,7 @@ export function useGetEntities<ReturnType>(
                   page: request.pagination.page + 1,
                 },
               }
-            : request,
+            : request
         ),
       ...configuredOptions,
     });
@@ -237,7 +253,7 @@ export function useGetInfiniteEntities<ReturnType>(
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
     queryKeyConcat?: (string | number | Record<any, any>)[];
-  },
+  }
 ) {
   let baseQueryKey = [
     "allEntities",
@@ -274,13 +290,19 @@ export function useGetInfiniteEntities<ReturnType>(
   return useInfiniteQuery<{ data: ReturnType[] }, unknown>(
     baseQueryKey,
     async ({ pageParam = 0 }) => {
-      const formattedRequest = { ...request, pagination: { limit: request?.pagination?.limit || 10, page: pageParam } };
+      const formattedRequest = {
+        ...request,
+        pagination: {
+          limit: request?.pagination?.limit || 10,
+          page: pageParam,
+        },
+      };
       return queryFn(formattedRequest);
     },
     {
       ...configuredOptions,
       ...options,
-    },
+    }
   );
 }
 
@@ -293,7 +315,11 @@ export function useSearch<ReturnType>(
   type: SearchableEntities,
   project_id: string,
   isGlobal?: boolean,
-  options?: UseQueryOptions<any> & { queryKeyConcat?: string[]; isPublic?: boolean; isFolders?: boolean },
+  options?: UseQueryOptions<any> & {
+    queryKeyConcat?: string[];
+    isPublic?: boolean;
+    isFolders?: boolean;
+  }
 ) {
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
@@ -306,14 +332,14 @@ export function useSearch<ReturnType>(
         body: JSON.stringify(request),
         isPublic: options?.isPublic,
       }),
-    { ...options, enabled: !!type && !!options?.enabled },
+    { ...options, enabled: !!type && !!options?.enabled }
   );
 }
 export function useGetCharacterFamily(
   character_id: string | undefined,
   relationship_type_id: string,
   count?: string,
-  options?: UseQueryOptions & { isPublic?: boolean },
+  options?: UseQueryOptions & { isPublic?: boolean }
 ) {
   return useQuery(
     ["family", character_id, relationship_type_id, count || "5"],
@@ -327,7 +353,7 @@ export function useGetCharacterFamily(
     {
       enabled: options?.enabled && !!character_id,
       staleTime: options?.staleTime,
-    },
+    }
   );
 }
 export function useGetIcons(type: IconCategories | null) {
@@ -355,12 +381,14 @@ export function useGetIcons(type: IconCategories | null) {
       select: (data: { total: number; uncategorized: string[] }) => {
         return data;
       },
-    },
+    }
   );
 }
 export function useGetStats(project_id: string | undefined, options?: UseQueryOptions<any>) {
   return useQuery<{
-    data: Record<string, number> & { tag_colors: TagColorStatType } & { tag_entities: TagEntityStatType } & {
+    data: Record<string, number> & { tag_colors: TagColorStatType } & {
+      tag_entities: TagEntityStatType;
+    } & {
       mentions: MentionStatType;
     };
   }>(
@@ -373,7 +401,27 @@ export function useGetStats(project_id: string | undefined, options?: UseQueryOp
 
     {
       enabled: options?.enabled || false,
-    },
+    }
+  );
+}
+export function useGetNotifications(
+  project_id: string | undefined,
+  user_id: string | undefined,
+  options?: UseQueryOptions<any>
+) {
+  return useQuery<{
+    data: NotificationEntityType[];
+  }>(
+    ["notifications", project_id],
+    async () =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/notifications/${project_id}/${user_id}`,
+        method: "GET",
+      }),
+
+    {
+      enabled: options?.enabled ?? true,
+    }
   );
 }
 // #endregion misc

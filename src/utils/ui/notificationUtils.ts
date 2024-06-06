@@ -19,7 +19,7 @@ export function removeNotification(setNotificationAtom: any, id: string) {
 export function getEntityCRUDNotification(
   type: AllAvailableEntities | AssetType,
   action_type: "create" | "update" | "arkive" | "delete",
-  bulk?: boolean,
+  bulk?: boolean
 ) {
   let action = "";
   if (action_type === "create") {

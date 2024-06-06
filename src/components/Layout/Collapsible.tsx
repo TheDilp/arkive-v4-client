@@ -57,7 +57,11 @@ export function Collapsible({
   size = "xl",
   variant = "primary",
 }: CollapsibleType) {
-  const { label: labelClasses, summary: summaryClasses } = CollapsibleClasses({ variant, size, isDisabled });
+  const { label: labelClasses, summary: summaryClasses } = CollapsibleClasses({
+    variant,
+    size,
+    isDisabled,
+  });
   const [open, setOpen] = useState<boolean>(initialOpen ?? false);
   return (
     <details
