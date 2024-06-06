@@ -1,13 +1,28 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  MutableRefObject,
+  SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
 import { Button, Input, Select } from "../../components";
 import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
-import { EraType, EventType, MonthType, UserHasPermissionsType, UserType } from "../../types";
+import {
+  EraType,
+  EventType,
+  MonthType,
+  UserHasPermissionsType,
+  UserType,
+} from "../../types";
 import {
   contextMenuAtom,
   DefaultTagColor,
@@ -28,8 +43,14 @@ function truncateLongEventText(texts: any) {
     // @ts-ignore
     const text = d3.select(this);
     const words = text.text().split(/\s+/);
-    const ellipsis = text.text("").append("tspan").attr("class", "elip").text("...");
-    const width = parseFloat(text.attr("width")) - (ellipsis?.node()?.getComputedTextLength() ?? 0);
+    const ellipsis = text
+      .text("")
+      .append("tspan")
+      .attr("class", "elip")
+      .text("...");
+    const width =
+      parseFloat(text.attr("width")) -
+      (ellipsis?.node()?.getComputedTextLength() || 0);
     const numWords = words.length;
 
     const tspan = text.insert("tspan", ":first-child").text(words.join(" "));
@@ -37,7 +58,10 @@ function truncateLongEventText(texts: any) {
     // Try the whole line
     // While it's too long, and we have words left, keep removing words
 
-    while ((tspan?.node()?.getComputedTextLength() ?? 10) > width && words.length) {
+    while (
+      (tspan?.node()?.getComputedTextLength() || 10) > width &&
+      words.length
+    ) {
       words.pop();
       tspan.text(words.join(" "));
     }
@@ -48,9 +72,17 @@ function truncateLongEventText(texts: any) {
   });
 }
 
-function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
+function changeZoom(
+  type: "in" | "out",
+  setZoom: Dispatch<SetStateAction<number>>,
+  id: string
+) {
   setZoom((prev) => {
-    const newZoom = clamp({ min: 2, max: 100, value: prev + (type === "in" ? 2 : -2) });
+    const newZoom = clamp({
+      min: 2,
+      max: 100,
+      value: prev + (type === "in" ? 2 : -2),
+    });
     ls.set(`timeline_${id}_zoom`, newZoom);
     return newZoom;
   });
@@ -78,7 +110,7 @@ export function TimelineView({
   const { project_id, item_id } = useParams();
   const { isLg } = useBreakpoint();
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
-  const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) ?? 2);
+  const [zoom, setZoom] = useState(ls.get(`timeline_${item_id}_zoom`) || 2);
   const [numberOfTicks, setNumberOfTicks] = useState(0);
   const [goToYear, setGoToYear] = useState(1);
   const [borders, setBorders] = useState({ start: 0, end: 0 });
@@ -88,7 +120,11 @@ export function TimelineView({
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
-  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
+  const { mutate: deleteEvent } = useDeleteSubEntity(
+    "events",
+    project_id as string,
+    item_id
+  );
   useLayoutEffect(() => {
     if (
       timelineContainer.current &&
@@ -126,7 +162,8 @@ export function TimelineView({
       const height = clamp({
         min: timelineContainer?.current?.clientHeight || 0 - 5,
         max: timelineContainer?.current?.clientHeight || 0 - 5,
-        value: events.length * 30 || timelineContainer?.current?.clientHeight || 1,
+        value:
+          events.length * 30 || timelineContainer?.current?.clientHeight || 1,
       });
       const svg = d3.select(timelineContainer.current);
       const x = d3
@@ -139,7 +176,10 @@ export function TimelineView({
         .domain([0, (events.length * zoom) / 2])
         .rangeRound([50, height * 1.05]);
 
-      const numOfTicks = Math.floor((maxYearCount - Math.abs(minYearCount)) / clamp({ min: 1, max: 1000, value: zoom % 2 }));
+      const numOfTicks = Math.floor(
+        (maxYearCount - Math.abs(minYearCount)) /
+          clamp({ min: 1, max: 1000, value: zoom % 2 })
+      );
       if (numberOfTicks !== numOfTicks) {
         setNumberOfTicks(numOfTicks);
       } else {
@@ -164,11 +204,17 @@ export function TimelineView({
           .filter((e) => e.start_year <= endRange)
           .map((e, i) => {
             return {
-              x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+              x: isYearsOnly
+                ? e.start_year - 1
+                : (e.start_year - 1) * monthCount +
+                  e.start_month +
+                  e.start_day * 0.01,
               y: e.start_year + Math.floor(i / 10) * 30,
               width: isYearsOnly
                 ? Number(e?.end_year) - e.start_year - 30
-                : Number(e?.end_year ?? 0) - e.start_year + Math.abs(Number(e?.end_month ?? 0) - e.start_month),
+                : Number(e?.end_year || 0) -
+                  e.start_year +
+                  Math.abs(Number(e?.end_month || 0) - e.start_month),
               background_color: e.color || DefaultTagColor,
               title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
                 e.start_year
@@ -179,30 +225,36 @@ export function TimelineView({
           });
 
         // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
-        const points = (events?.filter((e) => !e.end_year) || [])?.map((e, i) => {
-          return {
-            id: e.id,
-            parent_id: e.parent_id,
-            owner_id: e.owner_id,
-            permissions: e.permissions,
-            x: isYearsOnly
-              ? e.start_year - 1 + e.start_day * 0.01
-              : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
-            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
-            background_color: e.background_color || DefaultTagColor,
-            title: `${e?.title || ""} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
-              e.start_year
-            })`,
-            description: e.description,
-          };
-        });
+        const points = (events?.filter((e) => !e.end_year) || [])?.map(
+          (e, i) => {
+            return {
+              id: e.id,
+              parent_id: e.parent_id,
+              owner_id: e.owner_id,
+              permissions: e.permissions,
+              x: isYearsOnly
+                ? e.start_year - 1 + e.start_day * 0.01
+                : (e.start_year - 1) * monthCount +
+                  e.start_month +
+                  e.start_day * 0.01,
+              y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
+              background_color: e.background_color || DefaultTagColor,
+              title: `${e?.title || ""} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
+                e.start_year
+              })`,
+              description: e.description,
+            };
+          }
+        );
 
         const event_bars = events
           .filter((e) => !!e.end_year)
           .map((e, index) => {
             return {
               id: e.id,
-              start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
+              start_x: isYearsOnly
+                ? e.start_year - 1
+                : (e.start_year - 1) * monthCount + e.start_month,
               start_year: e.start_year,
               owner_id: e.owner_id,
               permissions: e.permissions,
@@ -210,7 +262,9 @@ export function TimelineView({
               index,
               end_x: isYearsOnly
                 ? (e.end_year || 0) - 1
-                : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
+                : ((e.end_year || 0) - 1) * monthCount +
+                  (e.end_month || 0) +
+                  (e.end_day || 0),
               parent_id: e.parent_id,
               background_color: e.background_color || DefaultTagColor,
               date_string: `(${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
@@ -235,10 +289,13 @@ export function TimelineView({
           .select(container.current)
           .attr(
             "class",
-            "tooltip pointer-events-none absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2",
+            "tooltip pointer-events-none absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2"
           );
 
-        const groupForEras = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForEras");
+        const groupForEras = svg
+          .append("g")
+          .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
+          .attr("id", "groupForEras");
         const groupForBars = svg
           .append("g")
           .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
@@ -291,7 +348,7 @@ export function TimelineView({
                   permissions,
                   event?.permissions || [],
                   "update_events",
-                  user?.role?.id,
+                  user?.role?.id
                 )
               ) {
                 setDrawer((prev) => ({
@@ -321,7 +378,11 @@ export function TimelineView({
                               ...prev,
                               title: "Preview event",
                               type: "entity_preview",
-                              data: { id: event.id, parent_id: event.parent_id, entity_type: "events" },
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                                entity_type: "events",
+                              },
                               size: "lg",
                             })),
                         },
@@ -337,14 +398,17 @@ export function TimelineView({
                             permissions,
                             event?.permissions || [],
                             "update_events",
-                            user?.role?.id,
+                            user?.role?.id
                           ),
                           onClick: () =>
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Edit event",
                               type: "events",
-                              data: { id: event.id, parent_id: event.parent_id },
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                              },
                               size: "lg",
                             })),
                         },
@@ -357,11 +421,16 @@ export function TimelineView({
                             permissions,
                             event?.permissions || [],
                             "delete_events",
-                            user?.role?.id,
+                            user?.role?.id
                           ),
                           icon: IconEnum.trash,
                           onClick: () => {
-                            deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
+                            deleteEvent({
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                              },
+                            });
                           },
                         },
                       ],
@@ -371,16 +440,18 @@ export function TimelineView({
               // Activate tooltip only if the text of the event
               // has an ellipsis i.e. isn't fully visible
               if (
-                evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
-                !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
+                evt.currentTarget.parentElement?.lastChild?.lastChild
+                  ?.textContent === "..." ||
+                !evt.currentTarget.parentElement?.lastChild?.firstChild
+                  ?.textContent?.length
               )
                 tooltip
                   .style("display", "block")
                   .style(
                     "transform",
-                    `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET ?? 0}px, ${
-                      Number(evt.currentTarget.getAttribute("y")) - 25 ?? 0
-                    }px)`,
+                    `translate(${Number(evt.currentTarget.getAttribute("x")) + X_AXIS_OFFSET || 0}px, ${
+                      Number(evt.currentTarget.getAttribute("y")) - 25 || 0
+                    }px)`
                   )
                   .html(`${event.title} ${event.date_string}`);
             })
@@ -428,9 +499,9 @@ export function TimelineView({
                 .style("display", "block")
                 .style(
                   "transform",
-                  `translate(${Number(evt.currentTarget.getAttribute("cx")) + 5 ?? 0}px, ${
-                    Number(evt.currentTarget.getAttribute("cy")) ?? 0
-                  }px)`,
+                  `translate(${Number(evt.currentTarget.getAttribute("cx")) + 5 || 0}px, ${
+                    Number(evt.currentTarget.getAttribute("cy")) || 0
+                  }px)`
                 )
                 .html(event.title);
             })
@@ -445,7 +516,7 @@ export function TimelineView({
                   permissions,
                   event?.permissions || [],
                   "update_events",
-                  user?.role?.id,
+                  user?.role?.id
                 )
               ) {
                 setDrawer((prev) => ({
@@ -475,7 +546,11 @@ export function TimelineView({
                               ...prev,
                               title: "Preview event",
                               type: "entity_preview",
-                              data: { id: event.id, parent_id: event.parent_id, entity_type: "events" },
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                                entity_type: "events",
+                              },
                               size: "lg",
                             })),
                         },
@@ -491,14 +566,17 @@ export function TimelineView({
                             permissions,
                             event?.permissions || [],
                             "update_events",
-                            user?.role?.id,
+                            user?.role?.id
                           ),
                           onClick: () =>
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Edit event",
                               type: "events",
-                              data: { id: event.id, parent_id: event.parent_id },
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                              },
                               size: "lg",
                             })),
                         },
@@ -511,11 +589,16 @@ export function TimelineView({
                             permissions,
                             event?.permissions || [],
                             "delete_events",
-                            user?.role?.id,
+                            user?.role?.id
                           ),
                           icon: IconEnum.trash,
                           onClick: () => {
-                            deleteEvent({ data: { id: event.id, parent_id: event.parent_id } });
+                            deleteEvent({
+                              data: {
+                                id: event.id,
+                                parent_id: event.parent_id,
+                              },
+                            });
                           },
                         },
                       ],
@@ -535,9 +618,11 @@ export function TimelineView({
               value:
                 e.clientX +
                 scrollContainer.current.scrollLeft -
-                (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
+                (document.body.clientWidth -
+                  timelineLayoutContainer.current.clientWidth) /
+                  2 -
                 (isLg && !isPublic ? 32 : 0),
-            })}, 0)`,
+            })}, 0)`
           );
         });
         const ticks = d3.selectAll(".axis--x .tick text");
@@ -550,12 +635,16 @@ export function TimelineView({
       return () => {
         d3.select(timelineContainer.current).select("#groupForEras").remove();
         d3.select(timelineContainer.current).select("#groupForBars").remove();
-        d3.select(timelineContainer.current).select("#groupForCircles").remove();
+        d3.select(timelineContainer.current)
+          .select("#groupForCircles")
+          .remove();
         d3.select(".axis--x").remove();
         d3.select(timelineContainer.current).select(".axis--y").remove();
         d3.select(timelineContainer.current).select(".highlighter").remove();
         d3.select(timelineContainer.current).select(".tooltip").remove();
-        d3.select(timelineContainer.current).select(".year-highlighter-text").remove();
+        d3.select(timelineContainer.current)
+          .select(".year-highlighter-text")
+          .remove();
       };
     }
     return () => {};
@@ -565,7 +654,11 @@ export function TimelineView({
     const timeout = setTimeout(() => {
       const tick = document.querySelector(`._${goToYear}`);
       if (tick) {
-        tick.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        tick.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center",
+        });
       } else {
         let closestTick: Element | null = null;
 
@@ -577,7 +670,11 @@ export function TimelineView({
           }
         }
         if (closestTick) {
-          closestTick.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+          closestTick.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+          });
         }
       }
     }, 500);
@@ -596,7 +693,11 @@ export function TimelineView({
           />
         </div>
         <div className="h-10 w-10 self-end">
-          <Button icon={IconEnum.add} isDisabled={zoom === 100} onClick={() => changeZoom("in", setZoom, item_id as string)} />
+          <Button
+            icon={IconEnum.add}
+            isDisabled={zoom === 100}
+            onClick={() => changeZoom("in", setZoom, item_id as string)}
+          />
         </div>
         <div className="w-20">
           <Select
@@ -625,7 +726,8 @@ export function TimelineView({
       </div>
       <div
         ref={scrollContainer}
-        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}>
+        className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}
+      >
         <div ref={container} className="hidden w-fit" />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
@@ -633,11 +735,18 @@ export function TimelineView({
           style={{
             height: events.length * 50,
             width: `${zoom * numberOfTicks}rem`,
-          }}>
+          }}
+        >
           {events.length ? (
             <>
-              <svg className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black" id="xAxisContainer" />
-              <svg ref={timelineContainer} className="block  min-h-full w-full min-w-full overflow-y-auto bg-zinc-900" />
+              <svg
+                className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black"
+                id="xAxisContainer"
+              />
+              <svg
+                ref={timelineContainer}
+                className="block  min-h-full w-full min-w-full overflow-y-auto bg-zinc-900"
+              />
             </>
           ) : null}
         </div>
