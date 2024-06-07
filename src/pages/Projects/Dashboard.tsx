@@ -413,13 +413,14 @@ export function Dashboard() {
                         if (a.count < b.count) return 1;
                         return 0;
                       })
-                      .map(([id, { icon, image_id, entity_type, title, count }]) => (
+                      .map(([id, { icon, image_id, entity_type, title, parent_id, count }]) => (
                         <li key={id} className="flex items-center justify-between border-b border-zinc-700 last:border-0">
                           <EntityPreview
                             hasNoBackground
                             icon={icon}
                             id={id}
                             image_id={image_id}
+                            link={getEntityLink(project_id as string, entity_type, id, parent_id, false)}
                             title={title}
                             type={entity_type}
                           />

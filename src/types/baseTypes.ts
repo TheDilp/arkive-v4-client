@@ -126,6 +126,7 @@ export type MentionStatType = Record<
     title: string;
     icon: string | undefined;
     image_id: string | undefined;
+    parent_id: string | null;
     entity_type: AllAvailableEntities;
     count: number;
   }
