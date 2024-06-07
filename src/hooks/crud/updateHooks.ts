@@ -815,7 +815,7 @@ export function useReadNotification(project_id: string, isReadAll: boolean) {
     async (updateValues: { data: { user_id: string; notification_id: string } }) => {
       return FetchFunction({
         url: `${baseURLS.baseServer}/notifications/read${isReadAll ? `/${project_id}/${updateValues.data.user_id}` : ""}`,
-        body: isReadAll ? "" : JSON.stringify(updateValues),
+        body: isReadAll ? "{}" : JSON.stringify(updateValues),
         method: "POST",
       });
     },
