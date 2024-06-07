@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -15,6 +15,7 @@ import {
   getPluralEntityType,
   getSentenceCase,
   SubEntityEnum,
+  userAtom,
 } from "../../utils";
 
 const graphEntityOptions = [
@@ -127,7 +128,7 @@ function createEntityStats(reff: MutableRefObject<HTMLDivElement>, data: Record<
 function createTagEntityStats(
   reff: MutableRefObject<HTMLDivElement>,
   data: Record<string, { color: string; count: number }>,
-  isLg: boolean,
+  isLg: boolean
 ) {
   const width = reff.current.clientWidth;
   const height = reff.current.clientHeight - 20;
@@ -273,6 +274,7 @@ export function Dashboard() {
     "nodes",
     "words",
   ]);
+  const user = useAtomValue(userAtom);
   const { project_id } = useParams();
   const { data: dashboard, isFetching } = useGetProjectDashboard(project_id as string);
 
@@ -280,7 +282,7 @@ export function Dashboard() {
   const tagEntityStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const tagColorStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { isLg } = useBreakpoint();
-  const { data: stats } = useGetStats(project_id, { enabled: !!dashboard?.data && !isFetching });
+  const { data: stats } = useGetStats(project_id, user?.id, { enabled: !!dashboard?.data && !isFetching });
 
   useEffect(() => {
     if (stats?.data && characterStatRef.current && tagColorStatRef.current && tagEntityStatRef.current) {
@@ -333,7 +335,7 @@ export function Dashboard() {
                         project_id as string,
                         d.name as AvailableEntityType,
                         r.id,
-                        "parent_id" in r ? r?.parent_id : undefined,
+                        "parent_id" in r ? r?.parent_id : undefined
                       )}
                       previewAction={() =>
                         setDrawer((prev) => ({

@@ -384,7 +384,7 @@ export function useGetIcons(type: IconCategories | null) {
     }
   );
 }
-export function useGetStats(project_id: string | undefined, options?: UseQueryOptions<any>) {
+export function useGetStats(project_id: string | undefined, user_id: string | undefined, options?: UseQueryOptions<any>) {
   return useQuery<{
     data: Record<string, number> & { tag_colors: TagColorStatType } & {
       tag_entities: TagEntityStatType;
@@ -395,12 +395,12 @@ export function useGetStats(project_id: string | undefined, options?: UseQueryOp
     ["stats", project_id],
     async () =>
       FetchFunction({
-        url: `${baseURLS.baseServer}/stats/${project_id}`,
+        url: `${baseURLS.baseServer}/stats/${project_id}/${user_id}`,
         method: "GET",
       }),
 
     {
-      enabled: options?.enabled || false,
+      enabled: (options?.enabled && !!project_id && !!user_id) || false,
     }
   );
 }
