@@ -368,7 +368,7 @@ function NotificationList({
           />
         </div>
       </div>
-      <ul className="overflow-aut flex max-h-64 flex-col gap-y-2">
+      <ul className="flex max-h-64 flex-col gap-y-2 overflow-auto">
         {notifications?.length ? (
           notifications?.map((notif) => (
             <li
