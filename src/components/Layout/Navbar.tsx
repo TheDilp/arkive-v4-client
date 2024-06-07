@@ -511,6 +511,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         if (lastJsonMessage?.notification_type) {
           const entityType = getEntityTypeFromNotificationType(lastJsonMessage?.notification_type);
           queryClient.invalidateQueries(["allEntities", project_id, entityType]);
+          queryClient.invalidateQueries(["notifications", project_id]);
           if (
             (lastJsonMessage?.notification_type === `${entityType}_arkive_notification` &&
               featureFlags?.[`${entityType}_delete_notification`]) ||
@@ -617,7 +618,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
                 passCloseTooltip>
                 <div className="relative h-full">
                   {notifications?.data?.length ? (
-                    <div className="absolute -right-1 -top-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-green-600 text-sm font-bold">
+                    <div className="absolute -right-1 -top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 p-1.5 text-sm font-bold">
                       {notifications?.data?.length}
                     </div>
                   ) : null}
