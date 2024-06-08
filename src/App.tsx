@@ -7,6 +7,7 @@ import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react
 import { NotificationContainer, ProjectLayout } from "./components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
 import { BlueprintProfileView } from "./pages/Entities/BlueprintProfileView";
+import { GameLayout, GameView } from "./pages/Game";
 import { ProjectsView } from "./pages/Projects";
 import { Dashboard } from "./pages/Projects/Dashboard";
 import { PublicEntitiesView, PublicListView } from "./pages/Public";
@@ -27,63 +28,66 @@ export default function App() {
   return (
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
-        <ClerkProvider
-          // afterSignInUrl="/projects"
-          appearance={{
-            baseTheme: dark,
-          }}
-          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-          routerPush={(to: string) => navigate(to)}
-          routerReplace={(to: string) => navigate(to)}>
-          <NotificationContainer />
-          <ReactQueryDevtools position="top-left" />
+        <NotificationContainer />
+        <ReactQueryDevtools position="top-left" />
 
-          <Routes>
-            <Route
-              element={
-                <>
-                  <SignedOut>
-                    <RedirectToSignIn />
-                  </SignedOut>
-                  <SignedIn>
-                    <Outlet />
-                    {pathname === "/" ? <Navigate to="/projects" /> : null}
-                  </SignedIn>
-                </>
-              }
-              path="/">
-              <Route element={<UserSettings />} path="user_settings/*">
-                <Route element={<UserSettingsWebhooks />} path="webhooks" />
-                <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
-              </Route>
+        <Routes>
+          <Route
+            element={
+              <ClerkProvider
+                appearance={{
+                  baseTheme: dark,
+                }}
+                publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+                routerPush={(to: string) => navigate(to)}
+                routerReplace={(to: string) => navigate(to)}>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+                <SignedIn>
+                  <Outlet />
+                  {pathname === "/" ? <Navigate to="/projects" /> : null}
+                </SignedIn>
+              </ClerkProvider>
+            }
+            path="/">
+            <Route element={<UserSettings />} path="user_settings/*">
+              <Route element={<UserSettingsWebhooks />} path="webhooks" />
+              <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
+            </Route>
 
-              <Route element={<Outlet />} path="projects/*">
-                <Route element={<ProjectsView />} path="*" />
-                <Route element={<ProjectLayout />} path=":project_id/*">
-                  <Route element={<FolderView />} path=":type" />
-                  <Route element={<CharacterProfileView />} path="characters/:item_id" />
-                  <Route element={<CharacterProfileView />} path="characters/:item_id/:type" />
-                  <Route element={<CharacterProfileView />} path="characters/:item_id/:type/:subitem_id" />
-                  <Route element={<BlueprintProfileView />} path="blueprints/:item_id/:subitem_id/:type" />
-                  <Route element={<EntitiesView />} path=":type/:item_id/*" />
-                  <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
-                  <Route element={<FolderView />} path=":type/folder/:item_id/*" />
-                  <Route element={<Dashboard />} path="*" />
-                </Route>
+            <Route element={<Outlet />} path="projects/*">
+              <Route element={<ProjectsView />} path="*" />
+              <Route element={<ProjectLayout />} path=":project_id/*">
+                <Route element={<FolderView />} path=":type" />
+                <Route element={<CharacterProfileView />} path="characters/:item_id" />
+                <Route element={<CharacterProfileView />} path="characters/:item_id/:type" />
+                <Route element={<CharacterProfileView />} path="characters/:item_id/:type/:subitem_id" />
+                <Route element={<BlueprintProfileView />} path="blueprints/:item_id/:subitem_id/:type" />
+                <Route element={<EntitiesView />} path=":type/:item_id/*" />
+                <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
+                <Route element={<FolderView />} path=":type/folder/:item_id/*" />
+                <Route element={<Dashboard />} path="*" />
               </Route>
             </Route>
-          </Routes>
-          <Routes>
-            <Route path="public/*">
-              {/* <Route path="*" /> */}
-              <Route element={<PublicLayout />} path=":project_id/*">
-                <Route element={<PublicListView />} path=":type" />
-                <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
-                <Route element={<PublicEntitiesView />} path=":type/:item_id/:subitem_id" />
-              </Route>
+          </Route>
+        </Routes>
+        <Routes>
+          <Route path="game/*">
+            <Route element={<GameLayout />}>
+              <Route element={<GameView />} path="123" />
             </Route>
-          </Routes>
-        </ClerkProvider>
+          </Route>
+        </Routes>
+        <Routes>
+          <Route path="public/*">
+            <Route element={<PublicLayout />} path=":project_id/*">
+              <Route element={<PublicListView />} path=":type" />
+              <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
+              <Route element={<PublicEntitiesView />} path=":type/:item_id/:subitem_id" />
+            </Route>
+          </Route>
+        </Routes>
       </QueryClientProvider>
     </main>
   );

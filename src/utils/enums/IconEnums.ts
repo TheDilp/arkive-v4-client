@@ -94,6 +94,7 @@ export const IconEnum = {
   mention: "ph:at" as const,
   mentioned_in_document: "fluent:document-mention-16-regular" as const,
   moon: "ph:moon" as const,
+  music: "ph:music-notes" as const,
   node: "ph:graph-light" as const,
   notifications: "ph:bell" as const,
   numbered_list: "ph:list-numbers" as const,
