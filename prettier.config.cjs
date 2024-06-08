@@ -9,7 +9,7 @@ module.exports = {
   trailingComma: "es5",
   jsxSingleQuote: false,
   semi: true,
-  endOfLine: "auto",
+  endOfLine: "crlf",
   singleQuote: false,
-  plugins: ["prettier-plugin-tailwindcss"]
+  plugins: ["prettier-plugin-tailwindcss"],
 };
