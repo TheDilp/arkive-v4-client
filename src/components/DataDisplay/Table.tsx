@@ -372,7 +372,7 @@ function TableColumnFilter({
                             value: relationType === "boolean" ? false : "",
                             operator: filterOptions[0].value as RequestFilterTypes,
                             header_name: columnHeader,
-                          },
+                          }
                     ),
                   }));
               }}
@@ -412,7 +412,7 @@ function TableColumnFilter({
                   ],
                 },
                 dispatch,
-                !!isRelationFilter,
+                !!isRelationFilter
               );
             } else if (orFilter && orFilter?.value === true) {
               applyFilter(
@@ -423,7 +423,7 @@ function TableColumnFilter({
                   or: [{ ...orFilter, header_name: columnId, value: true }],
                 },
                 dispatch,
-                !!isRelationFilter,
+                !!isRelationFilter
               );
             }
           } else if (isRelationFilter) {
@@ -441,7 +441,7 @@ function TableColumnFilter({
                   })),
                 },
                 dispatch,
-                !!isRelationFilter,
+                !!isRelationFilter
               );
           } else if (columnFilters.and?.length || columnFilters.or?.length)
             applyFilter(columnId as string, columnFilters, dispatch, !!isRelationFilter);
@@ -625,7 +625,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   (filt) =>
                     filt.field === id ||
                     filt.relationalData?.blueprint_field_id === id ||
-                    filt?.relationalData?.character_field_id === id,
+                    filt?.relationalData?.character_field_id === id
                 ),
               or: (filters?.or || [])
                 .concat(relationFilters?.or || [])
@@ -633,19 +633,14 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   (filt) =>
                     filt.field === id ||
                     filt.relationalData?.blueprint_field_id === id ||
-                    filt?.relationalData?.character_field_id === id,
+                    filt?.relationalData?.character_field_id === id
                 ),
             };
 
             return (
               <Fragment key={hdr.id}>
                 <div
-                  className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""}
-                    ${(meta as MetaType)?.centered ? centeredContent() : ""}
-                    ${(meta as MetaType)?.pinned ? "sticky z-10" : ""}
-                    ${hdr.column.getCanSort() ? sortableHeader() : ""}
-                    ${hdr.id === "select" ? "sticky left-0 " : ""}
-                    bg-zinc-950 first:border-l`}
+                  className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""} ${(meta as MetaType)?.centered ? centeredContent() : ""} ${(meta as MetaType)?.pinned ? "sticky z-10" : ""} ${hdr.column.getCanSort() ? sortableHeader() : ""} ${hdr.id === "select" ? "sticky left-0" : ""} bg-zinc-950 first:border-l`}
                   style={{
                     ...getTableColumnWidths(hdr.column.id, {
                       minSize: hdr.column.columnDef.minSize,
@@ -816,17 +811,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                         key={cell.id}
                         className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                        } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"}
-                      ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""}
-                       ${
-                         config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
-                           ? "bg-blue-400"
-                           : "bg-zinc-950"
-                       }
-                      ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""}
-                      ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""}
-                       ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"}
-                      `}
+                        } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"} ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
+                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
+                            ? "bg-blue-400"
+                            : "bg-zinc-950"
+                        } ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""} ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
                         onClick={(e) => {
                           if (
                             cell.column.id === "select" ||

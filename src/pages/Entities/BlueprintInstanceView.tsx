@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -86,7 +86,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   const fieldColumns: ColumnDef<BlueprintInstanceType, any>[] = [
     columnHelper.accessor("title", {
@@ -244,14 +244,14 @@ function createColumns(
               field.field_type,
               field.field_type === "select" || field.field_type === "select_multiple"
                 ? (field?.options || []).map((opt) => ({ label: opt.value, value: opt.id }))
-                : undefined,
+                : undefined
             ),
             relationType: field.field_type,
             isRelationFilter: true,
           },
           minSize,
           maxSize,
-        }),
+        })
       );
     });
 
@@ -277,7 +277,7 @@ function createColumns(
       ),
       minSize: 3.25,
       maxSize: 3.25,
-    }),
+    })
   );
 
   fieldColumns.push(
@@ -305,7 +305,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprint_instances",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -332,7 +332,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprint_instances",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -360,7 +360,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "update_blueprint_instances",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -407,7 +407,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprint_instances",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -428,7 +428,7 @@ function createColumns(
           </Dropdown>
         </div>
       ),
-    }),
+    })
   );
 
   return fieldColumns;
@@ -456,7 +456,7 @@ function getSelectedActions(
     resetDialog: () => unknown;
     data: BlueprintInstanceType[];
     dispatch: TableDispatch;
-  },
+  }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   if (permissions?.update_blueprint_instances) {
@@ -508,7 +508,7 @@ function getSelectedActions(
             data: { items: bpiWithTags, dispatch, type: "blueprint_instances" },
           }));
         },
-      },
+      }
     );
   }
 
@@ -565,7 +565,7 @@ function getSelectedActions(
                     { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
                     {
                       onSuccess: () => dispatch({ type: "clearSelection" }),
-                    },
+                    }
                   );
                   dispatch({ type: "clearSelection" });
                 },
@@ -606,7 +606,7 @@ function getSelectedActions(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 );
                 dispatch({ type: "clearSelection" });
               },
@@ -631,7 +631,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["read_blueprint_instances", "update_blueprint_instances", "delete_blueprint_instances"],
-    undefined,
+    undefined
   );
   const createNotification = useNotifications();
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
@@ -676,7 +676,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     "blueprint_instances",
     {
       enabled: !!blueprint?.data,
-    },
+    }
   );
 
   useEffect(() => {
@@ -716,54 +716,52 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
   }, [filter, dispatch, arkived]);
 
   return (
-    <TablePageLayout>
-      <div>
-        {blueprint?.data ? (
-          <Table
-            columns={createColumns(
-              blueprint?.data,
-              blueprint?.data?.title_name || "",
-              project_id as string,
-              setDrawer,
-              setDialog,
-              createNotification,
-              updateMany,
-              user?.webhooks || [],
-              permissions,
-              isProjectOwner,
-              user?.id as string,
-              user?.role?.id,
-            )}
-            config={{
-              hasSelect: true,
-              hasArkived: arkived === "arkive",
-              hasTags: true,
-              orderBy,
+    <div className="overflow-hidden">
+      {blueprint?.data ? (
+        <Table
+          columns={createColumns(
+            blueprint?.data,
+            blueprint?.data?.title_name || "",
+            project_id as string,
+            setDrawer,
+            setDialog,
+            createNotification,
+            updateMany,
+            user?.webhooks || [],
+            permissions,
+            isProjectOwner,
+            user?.id as string,
+            user?.role?.id
+          )}
+          config={{
+            hasSelect: true,
+            hasArkived: arkived === "arkive",
+            hasTags: true,
+            orderBy,
+            selection,
+            filters,
+            relationFilters,
+            selectedActions: getSelectedActions(permissions, {
+              data: instances?.data || [],
               selection,
-              filters,
-              relationFilters,
-              selectedActions: getSelectedActions(permissions, {
-                data: instances?.data || [],
-                selection,
-                arkived,
-                updateMany,
-                resetDialog,
-                deleteMany,
-                dispatch,
-                setDialog,
-                setDrawer,
-              }),
-              getLink: (rowData: BlueprintInstanceType) =>
-                arkived === "active" ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources` : "#",
-            }}
-            data={instances?.data || []}
-            dispatch={dispatch}
-            isLoading={isLoading}
-            pagination={pagination}
-            type="blueprint_instances"
-          />
-        ) : null}
-      </div>
-    </TablePageLayout>
+              arkived,
+              updateMany,
+              resetDialog,
+              deleteMany,
+              dispatch,
+              setDialog,
+              setDrawer,
+            }),
+            getLink: (rowData: BlueprintInstanceType) =>
+              arkived === "active" ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources` : "#",
+          }}
+          data={instances?.data || []}
+          dispatch={dispatch}
+          isLoading={isLoading}
+          pagination={pagination}
+          type="blueprint_instances"
+        />
+      ) : null}
+    </div>
   );
 }
