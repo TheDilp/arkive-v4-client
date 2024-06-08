@@ -14,7 +14,7 @@ export const Dice = new DiceBox(
     themeColor: DefaultTagColor,
     scale: 4,
     throwForce: 10,
-  },
+  }
 );
 
 Dice.init().then(() => {
@@ -49,9 +49,10 @@ export async function getRollValue(notation: string, hasNoSimulation?: boolean) 
 }
 
 export async function rollDiceWithNotification(
+  // eslint-disable-next-line no-unused-vars
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   diceRoll: string,
-  hasNoSimulation?: boolean,
+  hasNoSimulation?: boolean
 ) {
   if (diceRoll) {
     try {
@@ -60,6 +61,7 @@ export async function rollDiceWithNotification(
       Dice.roll(parsedNotation)
         .then((r: any) => {
           const rollData = DiceRollParser.parseFinalResults(r);
+          console.log(rollData);
           if (rollData?.valid) {
             createNotification({
               timer: 15,

@@ -32,6 +32,7 @@ export function DiceRollInput() {
         }}
         placeholder="E.g. d20+d4-2"
         value={diceRoll}
+        variant="primary"
       />
       <div>
         <Button
@@ -44,6 +45,7 @@ export function DiceRollInput() {
               themeColor: DefaultTagColor,
             });
             await rollDiceWithNotification(createNotification, diceRoll);
+
             setDiceRoll("");
           }}
           variant="info"
