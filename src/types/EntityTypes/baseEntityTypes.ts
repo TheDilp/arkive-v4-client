@@ -107,7 +107,7 @@ export type SearchableMentionEntities =
   | "maps"
   | "map_pins"
   | "graphs"
-  | "nodes"
+  | "events"
   | "words";
 
 export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars" | "random_tables";

@@ -3,13 +3,22 @@ import { useEffect, useState } from "react";
 import { useGetEntity } from "../../hooks";
 import {
   AvailableEntityType,
-  BlueprintType,
+  AvailableSubEntityType,
   DocumentTemplateFieldType,
   DocumentType,
   HandleChangePropsType,
+  SearchableEntities,
   SelectOptionType,
 } from "../../types";
-import { DefaultTagColor, Dice, DiceRollParser, IconEnum, useNotifications } from "../../utils";
+import {
+  DefaultTagColor,
+  Dice,
+  DiceRollParser,
+  getParentEntityType,
+  getSingularEntityType,
+  IconEnum,
+  useNotifications,
+} from "../../utils";
 import { EntityPreview } from "../DataDisplay";
 import { Button, Checkbox, Input, Search, Select } from "../Form";
 
@@ -43,6 +52,11 @@ const MatchReplacementOptions: SelectOptionType[] = [
     label: "Graph",
     value: "graphs",
     icon: IconEnum.graph,
+  },
+  {
+    label: "Events",
+    value: "events",
+    icon: IconEnum.event,
   },
   {
     label: "Words",
@@ -148,9 +162,9 @@ export function MatchField({
     }
   }, [selectedEntity]);
 
-  const { data: relatedBlueprint, isFetching } = useGetEntity<BlueprintType>(
+  const { data: relatedBlueprint, isFetching } = useGetEntity<{ id: string; title: string; icon?: string }>(
     related_id as string | undefined,
-    "blueprints",
+    getParentEntityType(entity_type as AvailableSubEntityType) as AvailableEntityType,
     {
       data: {
         id: related_id,
@@ -158,20 +172,18 @@ export function MatchField({
       fields: ["id", "title", "icon"],
     },
     {
-      enabled: !!related_id && entity_type === "blueprint_instances",
-    },
+      enabled: !!related_id && !!entity_type,
+    }
   );
 
   useEffect(() => {
     if (relatedBlueprint?.data) {
-      if (entity_type === "blueprint_instances") {
-        setParent({
-          label: relatedBlueprint?.data?.title,
-          value: relatedBlueprint?.data?.id,
-          icon: relatedBlueprint?.data?.icon || null,
-          image: null,
-        });
-      }
+      setParent({
+        label: relatedBlueprint?.data?.title,
+        value: relatedBlueprint?.data?.id,
+        icon: relatedBlueprint?.data?.icon || null,
+        image: null,
+      });
     }
   }, [relatedBlueprint]);
 
@@ -239,12 +251,17 @@ export function MatchField({
         ) : null}
         {entity_type !== "custom" && entity_type !== "derived" ? (
           <div className="col-span-2 flex w-full flex-1 gap-x-4">
-            {!!entity_type && entity_type === "blueprint_instances" && !parent ? (
+            {!!entity_type &&
+            (entity_type === "blueprint_instances" ||
+              entity_type === "events" ||
+              entity_type === "map_pins" ||
+              entity_type === "words") &&
+            !parent ? (
               <div className="flex-1">
                 <Search
                   isDisabled={isFetching}
                   isLoading={isFetching}
-                  label="Blueprint"
+                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
                   name="value"
                   onChange={({ label, value: newValue, image, icon }) => {
                     handleChange({ name: `template_fields[${idx}].related_id`, value: newValue });
@@ -255,21 +272,26 @@ export function MatchField({
                       icon: icon || null,
                     });
                   }}
-                  searchEntity="blueprints"
+                  searchEntity={getParentEntityType(entity_type) as SearchableEntities}
                   value={related_id}
                 />
               </div>
             ) : null}
-            {!!entity_type && entity_type === "blueprint_instances" && parent ? (
+            {!!entity_type &&
+            (entity_type === "blueprint_instances" ||
+              entity_type === "events" ||
+              entity_type === "map_pins" ||
+              entity_type === "words") &&
+            parent ? (
               <div className="flex-1">
                 <EntityPreview
                   clearAction={() => setParent(null)}
                   icon={parent.icon || ""}
                   id={parent.value}
                   image_id={parent.image}
-                  label="Blueprint"
+                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
                   title={parent.label}
-                  type="blueprints"
+                  type={getParentEntityType(entity_type) as AvailableEntityType}
                 />
               </div>
             ) : null}
