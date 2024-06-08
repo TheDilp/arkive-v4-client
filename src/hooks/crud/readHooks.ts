@@ -312,7 +312,7 @@ export function useSearch<ReturnType>(
     data: { search_term: string; project_id: string; parent_id?: string } | { tag_ids: string[]; match: "all" | "any" };
     limit: number;
   },
-  type: SearchableEntities,
+  type: SearchableEntities | null,
   project_id: string,
   isGlobal?: boolean,
   options?: UseQueryOptions<any> & {
@@ -323,16 +323,19 @@ export function useSearch<ReturnType>(
 ) {
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
-    async () =>
-      FetchFunction({
-        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
-          isGlobal ? "global" : project_id
-        }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}`,
-        method: "POST",
-        body: JSON.stringify(request),
-        isPublic: options?.isPublic,
-      }),
-    { ...options, enabled: !!type && !!options?.enabled }
+    async () => {
+      if (type)
+        return FetchFunction({
+          url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
+            isGlobal ? "global" : project_id
+          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}`,
+          method: "POST",
+          body: JSON.stringify(request),
+          isPublic: options?.isPublic,
+        });
+      return { data: [], ok: false, role_access: true };
+    },
+    { ...options, enabled: !!type && !!options?.enabled && !!type }
   );
 }
 export function useGetCharacterFamily(

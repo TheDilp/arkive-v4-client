@@ -59,7 +59,7 @@ export interface SearchType extends BaseFormComponentType {
   offset?: OffsetOptions;
   value?: string | string[] | undefined | null;
   initialOptions?: SelectOptionType[];
-  searchEntity: SearchableEntities;
+  searchEntity: SearchableEntities | null;
   name: string;
   label?: string;
   helperText?: string;
