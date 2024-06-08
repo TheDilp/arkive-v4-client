@@ -70,6 +70,11 @@ const MentionEntityOptions: { label: string; value: SearchableMentionEntities; i
     icon: IconEnum.graph,
   },
   {
+    label: "Events",
+    value: "events",
+    icon: IconEnum.event,
+  },
+  {
     label: "Words",
     value: "words",
     icon: IconEnum.word,
@@ -107,7 +112,7 @@ export function AutomentionDrawer({ data }: Props) {
     },
     {
       enabled: text.length > 0 && !!selectedEntity,
-    },
+    }
   );
 
   const [ranges, setRanges] = useState<matchResult[]>([]);
@@ -161,7 +166,7 @@ export function AutomentionDrawer({ data }: Props) {
                   onMouseOut={() => {
                     const highlighted = data.getContext.helpers.getAnnotations();
                     const notSelected = highlighted.filter(
-                      (highlight: { id: string }) => !selectedLinks.includes(highlight.id),
+                      (highlight: { id: string }) => !selectedLinks.includes(highlight.id)
                     );
                     const notSelectedIds = notSelected.map((s: { id: string }) => s.id);
                     if (!selectedLinks.includes(idWithRange))
@@ -200,7 +205,7 @@ export function AutomentionDrawer({ data }: Props) {
                     className="flex items-center justify-between gap-x-2 truncate"
                     onClick={() =>
                       setSelectedLinks((prev) =>
-                        prev.includes(idWithRange) ? prev.filter((id) => id !== idWithRange) : prev.concat(idWithRange),
+                        prev.includes(idWithRange) ? prev.filter((id) => id !== idWithRange) : prev.concat(idWithRange)
                       )
                     }>
                     <span className="flex items-center gap-x-2">
@@ -254,7 +259,7 @@ export function AutomentionDrawer({ data }: Props) {
               data.getContext,
               selectedEntity,
               project_id as string,
-              links?.data || [],
+              links?.data || []
             );
 
             if (links?.data) {
