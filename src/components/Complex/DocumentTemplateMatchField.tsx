@@ -151,6 +151,13 @@ export function MatchField({
   const [isRolling, setIsRolling] = useState(false);
 
   useEffect(() => {
+    if (entity_type) {
+      handleChange({ name: `template_fields[${idx}].related_id`, value: null });
+      setParent(null);
+    }
+  }, [entity_type]);
+
+  useEffect(() => {
     if (selectedEntity) {
       if (entity_type === "random_tables") {
         handleChange([
@@ -251,7 +258,7 @@ export function MatchField({
           </div>
         ) : null}
         {entity_type !== "custom" && entity_type !== "derived" ? (
-          <div className="col-span-2 flex w-full flex-1 gap-x-4">
+          <div className="col-span-2 flex w-full flex-1 gap-x-2">
             {!!entity_type &&
             (entity_type === "blueprint_instances" ||
               entity_type === "events" ||
@@ -402,11 +409,11 @@ export function MatchField({
             ) : null}
 
             {entity_type !== "dice_roll" && !!entity_type ? (
-              <div className={`flex flex-nowrap gap-x-1 ${is_randomized ? "flex-1" : ""}`}>
+              <div className={`flex flex-nowrap ${is_randomized && parent ? "w-[49%]" : "flex-1"}`}>
                 {entity_type !== "random_tables" ? (
                   <div className="h-full [&>div]:gap-y-2">
                     <Checkbox
-                      label="Randomize"
+                      label="Random"
                       name={`template_fields[${idx}].is_randomized`}
                       onChange={handleChange}
                       tooltip="Keys will be replaced when generating the document."
@@ -415,7 +422,7 @@ export function MatchField({
                   </div>
                 ) : null}
                 {is_randomized || entity_type === "random_tables" ? (
-                  <div className="flex-1">
+                  <div className="flex-1 pl-2">
                     <Select
                       hasSearch
                       label="Random count"
