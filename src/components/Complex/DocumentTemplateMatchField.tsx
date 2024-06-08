@@ -11,6 +11,7 @@ import {
   SelectOptionType,
 } from "../../types";
 import {
+  capitalizeFirstLetter,
   DefaultTagColor,
   Dice,
   DiceRollParser,
@@ -261,7 +262,7 @@ export function MatchField({
                 <Search
                   isDisabled={isFetching}
                   isLoading={isFetching}
-                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
+                  label={capitalizeFirstLetter(getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType))}
                   name="value"
                   onChange={({ label, value: newValue, image, icon }) => {
                     handleChange({ name: `template_fields[${idx}].related_id`, value: newValue });
