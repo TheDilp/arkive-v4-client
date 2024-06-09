@@ -70,15 +70,14 @@ export default function App() {
                 <Route element={<Dashboard />} path="*" />
               </Route>
             </Route>
-          </Route>
-        </Routes>
-        <Routes>
-          <Route path="game/*">
-            <Route element={<GameLayout />}>
-              <Route element={<GameView />} path="123" />
+            <Route path="game/*">
+              <Route element={<GameLayout />}>
+                <Route element={<GameView />} path="123" />
+              </Route>
             </Route>
           </Route>
         </Routes>
+
         <Routes>
           <Route path="public/*">
             <Route element={<PublicLayout />} path=":project_id/*">
