@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Input, Select, Table } from "../../components";
 import { useDeleteMany, useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle, useTable } from "../../hooks";
 import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
 import {
@@ -29,7 +29,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   parent_id: string,
   webhooks: WebhookType[],
-  is_public?: boolean,
+  is_public?: boolean
 ) {
   const columns: ColumnDef<any, any>[] = [
     columnHelper.accessor("title", {
@@ -128,7 +128,7 @@ function createColumns(
             </Dropdown>
           </div>
         ),
-      }),
+      })
     );
 
   if (is_public)
@@ -155,7 +155,7 @@ function createColumns(
             </Dropdown>
           </div>
         ),
-      }),
+      })
     );
 
   return columns;
@@ -174,7 +174,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["update_dictionaries", "read_words", "create_words", "update_words", "delete_words"],
-    undefined,
+    undefined
   );
 
   const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
@@ -194,7 +194,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     {
       staleTime: 5 * 60 * 1000,
       isPublic,
-    },
+    }
   );
   const updateDictionaryPermission = hasActionPermission(
     isProjectOwner,
@@ -202,7 +202,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     permissions,
     data?.data?.permissions || [],
     "update_dictionaries",
-    user?.role?.id,
+    user?.role?.id
   );
   const { data: words, isInitialLoading: isInitialLoadingWords } = useGetEntities<WordType>(
     {
@@ -218,7 +218,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     {
       queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || "filters", pagination || "pagination"],
       isPublic,
-    },
+    }
   );
   useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
 
@@ -262,7 +262,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   }
 
   return (
-    <TablePageLayout>
+    <>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
         {isPublic ? <h2 className="flex-1 font-lato text-3xl">{data?.data?.title || ""}</h2> : null}
         <div className="w-48">
@@ -305,7 +305,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
           </div>
         )}
       </div>
-      <div className="h-fit w-full">
+      <div className="overflow-hidden">
         <Table
           columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [], isPublic)}
           config={{
@@ -343,7 +343,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
                             { data: { ids } },
                             {
                               onSuccess: () => dispatch({ type: "clearSelection" }),
-                            },
+                            }
                           ),
                         variant: "error",
                       },
@@ -386,6 +386,6 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
           type="words"
         />
       </div>
-    </TablePageLayout>
+    </>
   );
 }
