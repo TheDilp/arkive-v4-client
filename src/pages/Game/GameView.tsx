@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Avatar, Button, Select, Tooltip } from "../../components";
-import { useHandleChange } from "../../hooks";
-import { AvailableIcons, IconEnum } from "../../utils";
+import { Avatar, Button, Input, Select, Tooltip } from "../../components";
+import { useGetEntities, useHandleChange } from "../../hooks";
+import { CharacterType } from "../../types";
+import { AvailableIcons, getAvatarInitials, getImageURL, IconEnum } from "../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
 const sections: { tooltip: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
@@ -37,40 +38,111 @@ function RollHistory() {
     },
     {
       id: "2",
-      user: "A",
-      title: "Persuasion check",
-
+      user: "B",
+      title: "Ranged attack",
       character: {
-        id: "123",
-        title: "Aurelian",
+        id: "124",
+        title: "Viktor",
         image:
           "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
       },
-      result: 2,
+      result: 18,
     },
     {
       id: "3",
-      user: "D",
-      title: "Strength check",
+      user: "C",
+      title: "Magic spell",
       character: {
-        id: "456",
-        title: "Aurelian",
+        id: "125",
+        title: "Selene",
         image:
           "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
       },
-      result: 17,
+      result: 27,
     },
     {
       id: "4",
-      user: "V",
-      title: "Dexterity saving throw",
+      user: "D",
+      title: "Stealth move",
       character: {
-        id: "456",
-        title: "Aurelian",
+        id: "126",
+        title: "Nyx",
         image:
           "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
       },
-      result: 12,
+      result: 15,
+    },
+    {
+      id: "5",
+      user: "E",
+      title: "Heal",
+      character: {
+        id: "127",
+        title: "Luna",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 20,
+    },
+    {
+      id: "6",
+      user: "F",
+      title: "Defense boost",
+      character: {
+        id: "128",
+        title: "Brutus",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 25,
+    },
+    {
+      id: "7",
+      user: "G",
+      title: "Special attack",
+      character: {
+        id: "129",
+        title: "Athena",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 30,
+    },
+    {
+      id: "8",
+      user: "H",
+      title: "Summon",
+      character: {
+        id: "130",
+        title: "Zephyr",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 22,
+    },
+    {
+      id: "9",
+      user: "I",
+      title: "Quick strike",
+      character: {
+        id: "131",
+        title: "Drake",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 19,
+    },
+    {
+      id: "10",
+      user: "J",
+      title: "Ultimate move",
+      character: {
+        id: "132",
+        title: "Xander",
+        image:
+          "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+      },
+      result: 35,
     },
   ];
 
@@ -93,10 +165,9 @@ function RollHistory() {
           label="Filter"
           name="value"
           onChange={handleChange}
-          options={[
-            { label: "Aurelian", value: "123" },
-            { label: "Baurelian", value: "456" },
-          ]}
+          options={rolls.map((r) =>
+            filter.type === "character" ? { label: r.character.title, value: r.character.id } : { label: r.user, value: r.user }
+          )}
           value={filter.value}
         />
       </div>
@@ -120,12 +191,69 @@ function RollHistory() {
   );
 }
 
+function Characters() {
+  const [importedCharacters, setImportedCharacters] = useState<CharacterType[]>([]);
+  const [filter, setFilter] = useState("");
+  const { data: characters } = useGetEntities<CharacterType>(
+    {
+      data: { project_id: "43e1c879-415b-4394-95ad-f9a4c42a43c5" },
+      fields: ["id", "project_id", "full_name", "portrait_id"],
+    },
+    "characters"
+  );
+
+  useEffect(() => {
+    if (characters?.data) setImportedCharacters(characters?.data || []);
+  }, [characters]);
+
+  useEffect(() => {
+    if (filter) {
+      const timeout = setTimeout(() => {
+        setImportedCharacters((prev) => prev.filter((char) => char.full_name.toLowerCase().includes(filter.toLowerCase())));
+      }, 300);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    } else {
+      setImportedCharacters(characters?.data || []);
+    }
+  }, [filter]);
+
+  return (
+    <div>
+      <div className="flex flex-col gap-y-1 p-2">
+        <h2 className="">Characters</h2>
+        {/* <Search placeholder="Import characters" /> */}
+        <Input name="filter" onChange={({ value }) => setFilter(value as string)} placeholder="Search" value={filter} />
+      </div>
+      <ul className="h-full max-h-full overflow-y-auto">
+        {importedCharacters?.length
+          ? importedCharacters?.map((char) => (
+              <li className="flex items-center gap-x-2 border-b border-zinc-600 bg-zinc-700 p-2 first:border-t" key={char.id}>
+                <Avatar
+                  image={getImageURL(char.project_id, "images", char.portrait_id)}
+                  initials={getAvatarInitials(char.full_name)}
+                  size="sm"
+                />
+                <span>{char.full_name}</span>
+                <div>
+                  <Button icon={IconEnum.image} onClick={undefined} tooltip="Reveal image" />
+                </div>
+              </li>
+            ))
+          : null}
+      </ul>
+    </div>
+  );
+}
+
 export function GameView() {
   const [drawer, setDrawer] = useState<GameDrawerType>(null);
 
   return (
     <div className="flex h-full w-full flex-col text-white">
-      <nav className={`absolute transition-all ${drawer ? "right-96" : "right-0"}`}>
+      <nav className={`absolute top-4 transition-all ${drawer ? "right-96" : "right-0"}`}>
         <ul className="flex flex-col gap-y-4">
           {sections.map((section) => (
             <li
@@ -151,6 +279,7 @@ export function GameView() {
       </nav>
       <div className={`${drawer ? "" : "translate-x-96"} ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
+        {drawer === "characters" ? <Characters /> : null}
       </div>
       <div className="mt-auto p-4">
         <DiceRollInput />
