@@ -14,7 +14,7 @@
       }
     }
   },
-  "extends": ["airbnb", "eslint:recommended", "plugin:import/recommended"],
+  "extends": ["eslint:recommended", "plugin:import/recommended"],
   "overrides": [],
   "ignorePatterns": ["node_modules*/", "e2e/", "dist/"],
   "parser": "@typescript-eslint/parser",
