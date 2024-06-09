@@ -1,5 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useQueryClient } from "@tanstack/react-query";
+import { QueryObserverResult, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -41,8 +41,9 @@ import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
 export function DefaultEditorExtensions(
+   
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
-  customPlaceholder?: string,
+  customPlaceholder?: string
 ): AnyExtension[] {
   const CME = new CustomMentionExtension({
     priority: 10,
@@ -199,14 +200,14 @@ export function onError({ json, invalidContent, transformers }: InvalidContentHa
 export function documentEditorHooks(
   changedData: any,
   resetChanges: () => void,
-  refetch: (options?: (RefetchOptions & RefetchQueryFilters<unknown>) | undefined) => Promise<
+  refetch: () => Promise<
     QueryObserverResult<
       {
         data: DocumentType;
       },
       unknown
     >
-  >,
+  >
 ) {
   return [
     () => {
@@ -225,11 +226,11 @@ export function documentEditorHooks(
             },
             {
               onSuccess: resetChanges,
-            },
+            }
           );
           return true; // Prevents any further key handlers from being run.
         },
-        [getJSON, item_id],
+        [getJSON, item_id]
       );
       const handleCancelSaveShortcut = useCallback(() => {
         if (changedData) {
@@ -264,7 +265,7 @@ export function messageEditorHooks(
   sendJsonMessage: SendJsonMessage,
   conversation: Partial<ConversationType> | undefined,
   canSend: boolean,
-  setMessageLength: Dispatch<SetStateAction<number>>,
+  setMessageLength: Dispatch<SetStateAction<number>>
 ) {
   return [
     () => {

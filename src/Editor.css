@@ -67,7 +67,7 @@
   ul {
     list-style-position: inside !important;
     padding-inline-start: 0.75rem;
-    p {
+    p:not(.ProseMirror-staticTrailingBreak) {
       display: inline !important;
     }
     li {
@@ -130,7 +130,7 @@
       tr {
         @apply max-h-fit !important;
         td {
-          @apply max-h-fit w-56 min-w-56  !important;
+          @apply max-h-fit w-56 min-w-56 !important;
 
           p {
             @apply my-2 !important;
@@ -164,7 +164,7 @@
 
     /* Handle */
     &::-webkit-scrollbar-thumb {
-      @apply z-0 bg-zinc-500  cursor-pointer;
+      @apply z-0 cursor-pointer bg-zinc-500;
     }
 
     /* Handle on hover */
@@ -274,11 +274,11 @@
 }
 .staticRendererContainer {
   @apply w-full;
-  p {
-    @apply my-4 min-h-[1rem];
+  p:not(.ProseMirror-staticTrailingBreak) {
+    @apply h-6 max-h-6 min-h-[1.5rem];
   }
   a {
-    @apply cursor-pointer  hover:text-sky-100  !important;
+    @apply cursor-pointer hover:text-sky-100 !important;
   }
   hr {
     @apply border-zinc-600 !important;
@@ -505,10 +505,8 @@
 .remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight {
   @apply bg-blue-400;
 }
-.remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight
-  .remirror-mention-atom-popup-name,
-.remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered
-  .remirror-mention-atom-popup-name {
+.remirror-mention-atom-popup-item.remirror-mention-atom-popup-highlight .remirror-mention-atom-popup-name,
+.remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered .remirror-mention-atom-popup-name {
   @apply text-white;
 }
 .remirror-mention-atom-popup-item.remirror-mention-atom-popup-hovered {

@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import { Doc, Heading, RemirrorRenderer, TextHandler } from "@remirror/react";
 import { useSetAtom } from "jotai";
 import { ComponentType, ReactElement } from "react";
@@ -27,7 +24,7 @@ function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }
     {
       fields: ["is_public"],
     },
-    { enabled: isPublic, isPublic },
+    { enabled: isPublic, isPublic }
   );
 
   if (isInitialLoading) return null;
@@ -75,7 +72,11 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       );
     },
     doc: Doc,
-    hardBreak: "br",
+    hardBreak: () => (
+      <p className="ProseMirror-staticTrailingBreak my-0">
+        <br />
+      </p>
+    ),
     heading: (args: any) => {
       return (
         <div id={args?.node?.attrs?.id} style={{ textAlign: args?.node?.attrs?.nodetextalignment || "left" }}>
@@ -89,7 +90,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     paragraph: (data: any) => {
       return (
         // @ts-ignore
-        // eslint-disable-next-line react/no-unknown-property
+         
         <p data-node-text-align={data?.node?.attrs?.nodetextalignment} nodetextalignment={data?.node?.attrs?.nodetextalignment}>
           {data?.children ?? null}
         </p>
@@ -149,7 +150,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
           {props?.[0]?.children?.map((c: ReactElement) => {
             const id = crypto.randomUUID();
             return (
-              <div key={id} className="max-w-sm break-all ">
+              <div className="max-w-sm break-all" key={id}>
                 {c}
               </div>
             );
@@ -215,7 +216,6 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       }
       return null;
     },
-    undefined: () => null,
   };
 }
 

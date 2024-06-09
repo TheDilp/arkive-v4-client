@@ -71,7 +71,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       enabled: !!editable && !!item_id,
       staleTime: 1000,
       queryKeyConcat: ["content"],
-    },
+    }
   );
 
   const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id);
@@ -81,7 +81,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
     permissions,
     currentDocument?.data?.permissions || [],
     "update_documents",
-    user?.role?.id,
+    user?.role?.id
   );
 
   const { mutate: updateDocument, isLoading: isUpdating } = useUpdateEntity<{
@@ -234,7 +234,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
 
   useBlocker(() => {
     if (changedData) {
-      // eslint-disable-next-line no-alert
+       
       const response = !window.confirm("You have unsaved changes, are you sure you want to leave?");
       if (!response) queryClient.removeQueries({ queryKey: ["documents", item_id] });
 
@@ -250,7 +250,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
       // Timeout is necessary for mentions to load and render correctly
       setTimeout(() => {
         manager.view.updateState(
-          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
+          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType })
         );
       }, 0.0001);
     }
@@ -320,7 +320,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                         queryClient.invalidateQueries(["documents", item_id, "mention"]);
                         resetChanges();
                       },
-                    },
+                    }
                   );
                 },
               },
@@ -394,7 +394,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                     if (!stringData) return;
                     if (stringData) {
                       const data: { index: number; title: string; description?: string } = JSON.parse(
-                        e.dataTransfer.getData("Text"),
+                        e.dataTransfer.getData("Text")
                       );
                       if (!data) return;
                       getContext()?.commands.insertText(`${data.title}: ${data?.description}`);

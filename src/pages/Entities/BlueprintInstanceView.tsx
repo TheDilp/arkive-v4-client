@@ -158,7 +158,7 @@ function createColumns(
               return (
                 <div className="flex w-full">
                   {fieldData?.images?.map((image) => (
-                    <div key={image.related_id} className="-ml-4 flex items-center first:ml-0 hover:z-10">
+                    <div className="-ml-4 flex items-center first:ml-0 hover:z-10" key={image.related_id}>
                       <Avatar
                         hasShowImage
                         image={getImageURL(project_id as string, "images", image.related_id)}
