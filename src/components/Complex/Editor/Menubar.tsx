@@ -424,7 +424,7 @@ function menuBarItems({
             type: "mentioned_in",
             size: "half" as DrawerAtomType["size"],
           })),
-      },
+      }
     );
   }
   if (isTemplate) {
@@ -449,6 +449,18 @@ function menuBarItems({
   return options;
 }
 
+function getSavingIcon(isMutating: boolean, hasChanges?: boolean) {
+  if (hasChanges && isMutating) return IconEnum.loading;
+  if (hasChanges && !isMutating) return IconEnum.error;
+  if (!hasChanges && !isMutating) return IconEnum.check_double;
+  return IconEnum.check_double;
+}
+function getSavingTooltip(isMutating: boolean, hasChanges?: boolean) {
+  if (hasChanges && isMutating) return "Saving...";
+  if (hasChanges && !isMutating) return "There are unsaved changes.";
+  if (!hasChanges && !isMutating) return "All changes saved.";
+}
+
 export function Menubar({
   size,
   title,
@@ -456,13 +468,17 @@ export function Menubar({
   icon,
   isEditorMenubar,
   isTemplate,
+  isMutating,
+  hasChanges,
 }: {
   size: Size;
   title?: string;
   id?: string;
   icon?: AvailableIcons;
   isTemplate: boolean;
+  isMutating: boolean;
   isEditorMenubar?: boolean;
+  hasChanges?: boolean;
 }) {
   const chain = useChainedCommands();
   const getContext = useRemirrorContext();
@@ -471,7 +487,7 @@ export function Menubar({
   const active = useActive();
   const items = useMemo(
     () => menuBarItems({ active, chain, setDrawer, setDialog, getContext, title, id, icon, isEditorMenubar, isTemplate }),
-    [chain, isEditorMenubar, id, title],
+    [chain, isEditorMenubar, id, title]
   );
 
   return (
@@ -507,6 +523,19 @@ export function Menubar({
           )}
         </div>
       ))}
+      {isEditorMenubar ? null : (
+        <li className="relative ml-auto">
+          <Button
+            hasNoBackground
+            icon={getSavingIcon(isMutating, hasChanges)}
+            isIconOnly
+            isLoading={hasChanges && isMutating}
+            onClick={undefined}
+            tooltip={getSavingTooltip(isMutating, hasChanges)}
+            variant="success"
+          />
+        </li>
+      )}
     </ul>
   );
 }

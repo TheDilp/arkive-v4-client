@@ -106,13 +106,14 @@ export function useUpdateEntity<
           if (MentionableEntites.includes(type)) {
             queryClient.invalidateQueries([type, vars.data.id, "mention"]);
           }
-
-          createNotification({
-            title: getEntityCRUDNotification(type, "update"),
-            variant: "success",
-            icon: IconEnum.check,
-            timer: 2,
-          });
+          if (type !== "documents") {
+            createNotification({
+              title: getEntityCRUDNotification(type, "update"),
+              variant: "success",
+              icon: IconEnum.check,
+              timer: 2,
+            });
+          }
         } else if (!data?.role_access) {
           createNotification({
             title: `You do not have permission to edit this ${getSingularEntityType(type).toLowerCase()}.`,
