@@ -25,7 +25,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     "map_pin_types",
     {
       enabled: !isPublic,
-    },
+    }
   );
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
@@ -50,7 +50,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     {
       enabled: !data && !!item_id,
       isPublic,
-    },
+    }
   );
 
   const [currentMap, setCurrentMap] = useState<MapType | null>();
@@ -61,7 +61,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
 
   const permissions = useHasPermissions(
     ["read_maps", "update_maps", "create_map_pins", "read_map_pins", "update_map_pins", "delete_map_pins"],
-    currentMap?.owner_id,
+    currentMap?.owner_id
   );
 
   useNavbarTitle(`Maps | ${currentMap?.title || ""}`, !!currentMap?.title);
@@ -102,6 +102,8 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     }
   }, [currentMap, project_id]);
 
+  console.log(currentMap);
+
   if (!currentMap) return null;
 
   return (
@@ -129,21 +131,9 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
         </div>
       )}
       {isLoading && !currentMap ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && (!isLoading || (data && isLoading)) && !!bounds && permissions?.read_maps ? (
+      {currentMap && (!isLoading || (data && isLoading)) && !!bounds && (isPublic || permissions?.read_maps) ? (
         <div className="z-0 min-h-full min-w-full">
           <MapContainer
-            ref={(node) => {
-              mapRef.current = node;
-              if (bounds && firstRender.current) {
-                if (!center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
-                if (center_on) {
-                  const pin = currentMap?.map_pins?.find((map_pin) =>
-                    center_on ? map_pin.id === center_on : map_pin.id === subitem_id,
-                  );
-                  if (pin) node?.panTo([pin.lat, pin.lng], {});
-                }
-              }
-            }}
             attributionControl={false}
             bounds={bounds as LatLngBoundsExpression}
             center={[bounds[1][0] / 2, bounds[1][1] / 2]}
@@ -151,6 +141,18 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
             crs={CRS.Simple}
             maxZoom={5}
             minZoom={-3}
+            ref={(node) => {
+              mapRef.current = node;
+              if (bounds && firstRender.current) {
+                if (!center_on && !subitem_id) node?.fitBounds(bounds as LatLngBoundsExpression);
+                if (center_on) {
+                  const pin = currentMap?.map_pins?.find((map_pin) =>
+                    center_on ? map_pin.id === center_on : map_pin.id === subitem_id
+                  );
+                  if (pin) node?.panTo([pin.lat, pin.lng], {});
+                }
+              }
+            }}
             scrollWheelZoom
             zoom={1}
             zoomSnap={0}>
