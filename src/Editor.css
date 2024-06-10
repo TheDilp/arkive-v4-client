@@ -273,9 +273,10 @@
   }
 }
 .staticRendererContainer {
-  @apply w-full;
+  @apply h-full w-full;
+
   p:not(.ProseMirror-staticTrailingBreak) {
-    @apply h-6 max-h-6 min-h-[1.5rem];
+    @apply min-h-[1.5rem];
   }
   a {
     @apply cursor-pointer hover:text-sky-100 !important;
