@@ -57,7 +57,7 @@ export function PublicCharacter() {
     {
       staleTime: 60 * 1000,
       isPublic: true,
-    },
+    }
   );
 
   const { data: existingTemplates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
@@ -77,7 +77,7 @@ export function PublicCharacter() {
       },
     },
     "character_fields_templates",
-    { enabled: !!character?.data?.tags?.length, staleTime: 5 * 60 * 1000, isPublic: true },
+    { enabled: !!character?.data?.tags?.length, staleTime: 5 * 60 * 1000, isPublic: true }
   );
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
@@ -91,18 +91,20 @@ export function PublicCharacter() {
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>
       <div className="flex h-full flex-1 flex-col gap-y-2 overflow-auto px-2">
         <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
-          {character?.data?.biography ? (
-            <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
-          ) : (
-            <Alert label="Nothing has been written yet." />
-          )}
+          <div className="h-96 overflow-auto">
+            {character?.data?.biography ? (
+              <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
+            ) : (
+              <Alert label="Nothing has been written yet." />
+            )}
+          </div>
         </Collapsible>
         <Collapsible icon={IconEnum.additional_fields} label="Additional fields">
           <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {(existingTemplates?.data || []).map((t) => {
               return (
-                <div key={t.id} className="grid h-full grid-cols-6 flex-col content-start gap-y-2">
+                <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2" key={t.id}>
                   <div className="col-span-6">
                     <Title isDrawerTitle label={t.title} size="lg" variant="secondary" />
                   </div>
@@ -111,11 +113,11 @@ export function PublicCharacter() {
                     if (characterField)
                       return (
                         <AdditionalFieldDisplay
-                          key={template_field.id}
                           character_field={template_field}
                           character_field_data={characterField ?? null}
                           isPreview={false}
                           isPublic
+                          key={template_field.id}
                         />
                       );
                     return null;
@@ -146,7 +148,7 @@ export function PublicCharacter() {
             <Tabs onChange={(_, tab) => setSelectedTab(tab)} selectedTab={selectedTab} tabs={tabs} />
             <div className="grid grid-cols-1 gap-2 py-2 md:grid-cols-3 xl:grid-cols-6">
               {(relatedEntities.items || []).map((d) => (
-                <div key={d.id} className="col-span-1 xl:col-span-2">
+                <div className="col-span-1 xl:col-span-2" key={d.id}>
                   <EntityPreview
                     id={d.id}
                     image_id={"image_id" in d ? d.image_id : ""}
@@ -155,7 +157,7 @@ export function PublicCharacter() {
                       relatedEntities.type,
                       d.id,
                       "parent_id" in d ? d.parent_id : null,
-                      true,
+                      true
                     )}
                     title={d.title}
                     type={relatedEntities.type}
