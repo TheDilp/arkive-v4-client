@@ -102,8 +102,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     }
   }, [currentMap, project_id]);
 
-  console.log(currentMap);
-
   if (!currentMap) return null;
 
   return (
