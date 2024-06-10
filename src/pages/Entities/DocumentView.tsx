@@ -108,8 +108,8 @@ export function DocumentView({ editable }: { editable: boolean }) {
       queryKeyConcat: ["content"],
     }
   );
-
-  useNavbarTitle(` Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
+  console.log(!!currentDocument?.data?.title, currentDocument?.data?.title);
+  useNavbarTitle(`Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id);
@@ -198,7 +198,9 @@ function DocumentViewEditor({
 
   const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
-  }>("documents", project_id as string);
+  }>("documents", project_id as string, {
+    mutationKey: ["document_view", "update"],
+  });
 
   const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
 

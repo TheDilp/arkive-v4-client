@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
@@ -260,7 +257,6 @@ function createNewOptions(
 
   return options;
 }
-
 function DiceRoller() {
   const createNotification = useNotifications();
   const [diceRoll, setDiceRoll] = useState("");
@@ -315,8 +311,8 @@ function HistoryList({ history, closeTooltip }: { history: { label: string; link
     <ul className="flex flex-col gap-y-1 rounded bg-zinc-700 p-2 shadow">
       {history.map((link, i) => (
         <li
-          key={(link.link + i).toString()}
-          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400">
+          className="cursor-pointer text-lg transition-all [&>button]:p-0 [&>button]:hover:text-blue-400"
+          key={(link.link + i).toString()}>
           <Button
             hasNoBackground
             label={link.label}
@@ -330,7 +326,6 @@ function HistoryList({ history, closeTooltip }: { history: { label: string; link
     </ul>
   );
 }
-
 function NotificationDate({ created_at }: { created_at: string }) {
   const date = new Date(created_at);
 
@@ -372,8 +367,8 @@ function NotificationList({
         {notifications?.length ? (
           notifications?.map((notif) => (
             <li
-              key={notif?.id}
               className="flex max-w-full flex-nowrap gap-x-1 rounded bg-zinc-700 p-2 shadow"
+              key={notif?.id}
               onClick={() => {
                 if (closeTooltip) closeTooltip();
               }}>
@@ -427,6 +422,8 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
+  const isMutatingDocument = useIsMutating({ mutationKey: ["document_view", "update"] });
+
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const { user: authUser } = useUser();
@@ -566,7 +563,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   // }, [versionMessage]);
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
-      {isMutating ? <IndeterminateProgressBar /> : null}
+      {isMutating && !isMutatingDocument ? <IndeterminateProgressBar /> : null}
       <h1 className="flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>

@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate, useParams } from "react-router-dom";
@@ -154,8 +152,8 @@ export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): C
                   <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
                     {row.original.tags.slice(1).map((tag: TagType) => (
                       <div
-                        key={tag.id}
                         className="col-span-1 cursor-pointer"
+                        key={tag.id}
                         onClick={() => {
                           if (dispatch) {
                             dispatch({ type: "clearAllFilters" });
@@ -256,14 +254,14 @@ export function CharacterColumn({ characters }: { characters: BlueprintInstanceB
         {characters?.slice(0, 5)?.map((char) => {
           return (
             <Avatar
-              key={char?.related_id}
               image={getImageURL(
                 char?.character?.project_id || (project_id as string),
                 "images",
-                char?.character?.portrait_id || "",
+                char?.character?.portrait_id || ""
               )}
               initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
+              key={char?.related_id}
               label={char?.character?.full_name || ""}
               size="sm"
               tooltipAllowedPlacements={["left", "right"]}

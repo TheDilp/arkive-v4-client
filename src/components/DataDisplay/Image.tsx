@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch } from "react";
 import { useParams } from "react-router-dom";
@@ -34,7 +32,7 @@ export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, o
   return (
     <div className="group relative h-full w-full overflow-hidden rounded-md">
       {hasTitle ? (
-        <h2 className="pointer-events-none absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
+        <h2 className="pointer-events-none absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all">
           {image.title}
         </h2>
       ) : null}

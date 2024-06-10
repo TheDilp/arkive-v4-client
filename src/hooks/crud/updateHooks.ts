@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { MutationOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RemirrorJSON } from "remirror";
 
 import {
@@ -28,7 +28,7 @@ export function useUpdateEntity<
     data: { id?: string; parent_id?: string | null };
     relations?: { [key: string]: any };
   },
->(type: AvailableEntityType, project_id: string) {
+>(type: AvailableEntityType, project_id: string, options?: MutationOptions) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -41,6 +41,7 @@ export function useUpdateEntity<
       });
     },
     {
+      mutationKey: options?.mutationKey,
       onMutate: (vars) => {
         if (type !== "projects" && type !== "questionnaires" && type !== "documents") {
           const old = queryClient.getQueryData([type, vars.data.id]);
@@ -62,7 +63,6 @@ export function useUpdateEntity<
         }
         return {};
       },
-
       onError: (_, vars, context) => {
         queryClient.setQueryData([type, vars.data.id], context?.old);
 

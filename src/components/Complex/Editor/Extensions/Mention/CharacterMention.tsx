@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Icon } from "@iconify/react";
 import { MutableRefObject, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -27,7 +25,7 @@ function CharacterMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "ti
     id as string,
     "characters",
     { data: { id }, fields: ["biography", "is_public", "portrait_id"] },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"], isPublic },
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"], isPublic }
   );
   return (
     <Card avatar={getImageURL(project_id as string, "images", data?.data.portrait_id)} title={title || ""}>
@@ -53,7 +51,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     {
       fields: ["id", "full_name", "is_public", "portrait_id"],
     },
-    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
   );
 
   useEffect(() => {
@@ -65,7 +63,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
         root: null,
         rootMargin: "0px",
         threshold: 1, // 100% of target visible
-      },
+      }
     );
 
     if (mentionRef.current) {
@@ -83,13 +81,13 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
-        <span ref={mentionRef} className="font-lato underline">
+        <span className="font-lato underline" ref={mentionRef}>
           {label}
         </span>
       );
     if (!data)
       return (
-        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+        <span className="font-lato underline decoration-wavy" ref={mentionRef}>
           {label}
         </span>
       );
@@ -103,7 +101,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
         <Link
           className="inline-flex items-center font-lato text-sm font-bold transition-colors"
           to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
-          <div ref={mentionRef} className="flex items-start">
+          <div className="flex items-start" ref={mentionRef}>
             {data?.data?.portrait_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
                 <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />

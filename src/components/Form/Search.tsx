@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-autofocus */
 import {
   autoPlacement,
   autoUpdate,
@@ -149,11 +148,11 @@ const Item = forwardRef<HTMLDivElement, ItemProps & HTMLProps<HTMLDivElement>>(
   ({ children, isActive, isSelected, ...rest }, ref) => {
     const id = useId();
     return (
-      <div ref={ref} aria-selected={isActive} className={SearchItem({ isActive, isSelected })} id={id} role="option" {...rest}>
+      <div aria-selected={isActive} className={SearchItem({ isActive, isSelected })} id={id} ref={ref} role="option" {...rest}>
         {children}
       </div>
     );
-  },
+  }
 );
 
 export function Search({
@@ -228,7 +227,7 @@ export function Search({
       queryKeyConcat: [searchTerm, name],
       isPublic,
       isFolders,
-    },
+    }
   );
 
   const { refs, floatingStyles, context } = useFloating<HTMLInputElement>({
@@ -310,7 +309,6 @@ export function Search({
           />
         ) : null}
         <input
-          ref={inputRef}
           autoComplete="off"
           autoFocus={isAutofocused}
           className={input()}
@@ -390,6 +388,7 @@ export function Search({
             }
           }}
           placeholder={placeholder}
+          ref={inputRef}
           type="search"
           value={hasShownOption && !inputValue ? displayValue : inputValue}
         />
@@ -484,7 +483,7 @@ export function Search({
                       image={getImageURL(
                         item?.project_id || (project_id as string),
                         imageType || "images",
-                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image,
+                        searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image
                       )}
                       imageLoading="lazy"
                       isTooltipDisabled

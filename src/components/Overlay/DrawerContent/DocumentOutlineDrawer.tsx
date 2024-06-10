@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useNoDataChangedDrawer } from "../../../hooks";
 import { getTextSizeFromHeadingLevel } from "../../../utils";
 import { DrawerLayout } from "../../Layout";
@@ -18,8 +16,8 @@ export function DocumentOutlineDrawer({ data }: Props) {
       <ul>
         {data.headings.map((h) => (
           <li
-            key={h.id}
             className={`${getTextSizeFromHeadingLevel(h.level)} cursor-pointer hover:text-blue-400`}
+            key={h.id}
             onClick={() => {
               const el = document.getElementById(h.id);
               if (el) {
