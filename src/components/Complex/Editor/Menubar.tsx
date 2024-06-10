@@ -532,7 +532,7 @@ export function Menubar({
             isLoading={hasChanges && isMutating}
             onClick={undefined}
             tooltip={getSavingTooltip(isMutating, hasChanges)}
-            variant="success"
+            variant={hasChanges ? "warning" : "success"}
           />
         </li>
       )}
