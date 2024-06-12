@@ -22,7 +22,7 @@ function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
       },
       fields: ["id", "title", "translation", "description"],
     },
-    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], retry: false, staleTime: 5 * 60 * 1000, isPublic },
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], retry: false, staleTime: 5 * 60 * 1000, isPublic }
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-600 bg-zinc-700 p-2 shadow-lg">
@@ -51,7 +51,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
       },
       fields: ["id", "title"],
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
         root: null,
         rootMargin: "0px",
         threshold: 1, // 100% of target visible
-      },
+      }
     );
 
     if (mentionRef.current) {
@@ -80,14 +80,15 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
   if (id) {
     if (!data?.data && !isPaused && isFetched)
       return (
-        <span ref={mentionRef} className="font-lato underline">
+        <span className="font-lato underline" ref={mentionRef}>
           {label}
         </span>
       );
-    if (isPublic) return <span ref={mentionRef}>{label}</span>;
+    // @ts-ignore
+    if (isPublic && data?.data?.is_public) return <span ref={mentionRef}>{label}</span>;
     if (!data)
       return (
-        <span ref={mentionRef} className="font-lato underline decoration-wavy">
+        <span className="font-lato underline decoration-wavy" ref={mentionRef}>
           {label}
         </span>
       );
@@ -97,7 +98,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
         arrowColor="#3f3f46"
         content={<WordMentionTooltip id={id} isPublic={isPublic} />}
         isDisabled={isDisabledTooltip ?? false}>
-        <span ref={mentionRef} className="cursor-pointer text-base font-light italic leading-4">
+        <span className="cursor-pointer text-base font-light italic leading-4" ref={mentionRef}>
           {data?.data?.title || title || label}
           <sup>*</sup>
         </span>
