@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 
 import { useGetImage, useHandleChange, useHasPermissions, useToggledResetAtom, useUpdateImage } from "../../../hooks";
 import { ImageType, TabType, UserHasPermissionsType } from "../../../types";
-import { createOrEditPermission, IconEnum } from "../../../utils";
+import { createOrEditPermission, getPreviewImageURLs, IconEnum } from "../../../utils";
 import { EntityPermission } from "../../Complex/EntityPermission";
-import { Button, Input, TagInput } from "../../Form";
+import { ImagePreview } from "../../DataDisplay";
+import { Button, ImageUpload, Input, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
@@ -28,7 +29,12 @@ export function ImageDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [image, setImage] = useState<ImageType | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [replacementImage, setReplacementImage] = useState<File[]>([]);
+
+  const imageUrls = replacementImage ? getPreviewImageURLs(replacementImage) : [];
+
   const resetDrawer = useToggledResetAtom();
+
   const { data: imageData, isInitialLoading } = useGetImage(data?.id, project_id as string, "images", {
     fields: ["id", "title", "is_public", "owner_id"],
     relations: {
@@ -52,17 +58,48 @@ export function ImageDrawer({ data }: Props) {
     permissions?.create_assets,
     permissions?.update_assets,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
 
   const tabs = getTabs(permissions);
+
+  useEffect(() => {
+    if (replacementImage.length > 1) {
+      setReplacementImage([replacementImage[0]]);
+    }
+  }, [replacementImage]);
 
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {tabs[selectedTab].id === "1" ? <Input name="title" onChange={handleChange} value={image?.title || ""} /> : null}
+      {tabs[selectedTab].id === "1" ? (
+        <>
+          <Input name="title" onChange={handleChange} value={image?.title || ""} />
+          {replacementImage.length ? (
+            imageUrls.map((img) => (
+              <ImagePreview
+                clearAction={() => setReplacementImage([])}
+                id={img.name}
+                key={`${img.name}${img.url}`}
+                title={img.name}
+                url={img.url}
+              />
+            ))
+          ) : (
+            <div className="mb-6 max-h-56">
+              <span className="text-sm text-zinc-400">Replace image</span>
+              <ImageUpload
+                images={[]}
+                isDisabled={!permissions?.update_assets}
+                isMultiple={false}
+                onChange={setReplacementImage}
+              />
+            </div>
+          )}
+        </>
+      ) : null}
       {tabs[selectedTab].id === "2" && permissions?.read_tags ? (
         <div className="flex flex-col gap-y-2">
           <TagInput
@@ -92,11 +129,11 @@ export function ImageDrawer({ data }: Props) {
           if (image?.title)
             await update(
               {
-                data: { title: image.title, owner_id: image.owner_id },
+                data: { title: image.title, owner_id: image.owner_id, file: replacementImage[0] },
                 relations: { tags: image.tags.map((t) => ({ id: t.id })) },
                 permissions: image?.permissions || [],
               },
-              { onSuccess: resetDrawer },
+              { onSuccess: resetDrawer }
             );
         }}
         variant="success"

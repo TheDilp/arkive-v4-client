@@ -41,7 +41,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
           });
         }
       },
-    },
+    }
   );
 }
 
@@ -53,7 +53,7 @@ export function useGetImages<InsertType>(
     prefetch?: boolean;
     queryKeyConcat?: string[];
     queryKeyOverwrite?: string[];
-  },
+  }
 ) {
   const baseQueryKey = [
     "allEntities",
@@ -118,7 +118,7 @@ export function useGetImages<InsertType>(
                   page: request.pagination.page + 1,
                 },
               }
-            : request,
+            : request
         ),
       ...configuredOptions,
     });
@@ -135,7 +135,7 @@ export function useGetImage(
     isPublic?: boolean;
     queryKeyConcat?: string[];
     queryKeyOverwrite?: string[];
-  },
+  }
 ) {
   return useQuery<{ data: ImageType }, unknown>(
     [type, id, project_id],
@@ -147,12 +147,12 @@ export function useGetImage(
       }),
     {
       enabled: options?.enabled,
-    },
+    }
   );
 }
 export function useUpdateImage<
   InsertType extends {
-    data: { title: string; owner_id?: string };
+    data: { title: string; owner_id?: string; file?: File };
     relations: { tags: { id: string }[] };
     permissions?: EntityPermissionType[];
   },
@@ -162,6 +162,25 @@ export function useUpdateImage<
 
   return useMutation(
     async (updateValues: InsertType) => {
+      if (updateValues?.data?.file) {
+        const formData = new FormData();
+
+        if (updateValues?.data?.title) {
+          formData.append("title", updateValues.data.title);
+        }
+
+        if (updateValues?.data?.owner_id) {
+          formData.append("owner_id", updateValues.data.owner_id);
+        }
+
+        formData.append("file", updateValues?.data?.file, updateValues?.data?.file?.name);
+        return FetchFunction({
+          url: `${baseURLS.baseServer}/assets/update/${id}`,
+          body: formData,
+          method: "POST",
+        });
+      }
+
       return FetchFunction({
         url: `${baseURLS.baseServer}/assets/update/${id}`,
         body: JSON.stringify(updateValues),
@@ -195,7 +214,7 @@ export function useUpdateImage<
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 export function useDownloadImage(project_id: string | undefined, type: AssetType) {
@@ -220,19 +239,19 @@ export function useDownloadImage(project_id: string | undefined, type: AssetType
 
             {
               type: "image/webp",
-            },
+            }
           ),
-          `${vars.data.title}.webp`,
+          `${vars.data.title}.webp`
         );
       },
-    },
+    }
   );
 }
 export function useGetInfiniteAssets<ReturnType>(
   request: RequestBodyType<ReturnType>,
   type: AssetType,
   project_id: string | undefined,
-  options?: UseQueryOptions<any> & { prefetch?: boolean },
+  options?: UseQueryOptions<any> & { prefetch?: boolean }
 ) {
   const baseQueryKey = ["allEntities", "infinite", project_id, type, request.data?.item_id, request?.filters];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
@@ -258,7 +277,7 @@ export function useGetInfiniteAssets<ReturnType>(
     {
       ...configuredOptions,
       ...options,
-    },
+    }
   );
 }
 export function useDeleteAsset<InsertType extends { data: { id: string } }>(project_id: string | undefined, type: AssetType) {
@@ -285,6 +304,6 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
           icon: IconEnum.error,
         });
       },
-    },
+    }
   );
 }
