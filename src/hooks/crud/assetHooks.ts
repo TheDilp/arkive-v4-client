@@ -217,7 +217,7 @@ export function useUpdateImage<
     }
   );
 }
-export function useDownloadImage(project_id: string | undefined, type: AssetType) {
+export function useDownloadImages(project_id: string | undefined, type: AssetType) {
   return useMutation(
     async ({ data: { id } }: { data: { id: string; title: string } }) => {
       return FetchFunction({

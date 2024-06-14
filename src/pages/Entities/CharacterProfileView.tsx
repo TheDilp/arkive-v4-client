@@ -25,7 +25,7 @@ import {
 } from "../../components";
 import {
   useBreakpoint,
-  useDownloadImage,
+  useDownloadImages,
   useGenerateDocument,
   useGetEntities,
   useGetEntity,
@@ -108,7 +108,7 @@ function relationshipTableColumns(
   project_id: string,
   navigate: NavigateFunction,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
-  isPreview?: boolean,
+  isPreview?: boolean
 ) {
   return [
     relationshipColumnHelper.display({
@@ -242,7 +242,7 @@ function documentsTableColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   queryClient: QueryClient,
   project_id: string,
-  character_id: string,
+  character_id: string
 ) {
   return [
     documentsColumnHelper.display({
@@ -362,7 +362,7 @@ function eventsTableColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   queryClient: QueryClient,
   project_id: string,
-  character_id: string,
+  character_id: string
 ) {
   return [
     eventsColumnHelper.display({
@@ -530,7 +530,7 @@ function assetTableColumns(
     unknown
   >,
   queryClient: QueryClient,
-  character_id: string,
+  character_id: string
 ) {
   return [
     assetColumnHelper.display({
@@ -651,7 +651,7 @@ function conversationTableColumns(
   item_id: string,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
-  generateDocument: GenerateDocumentType,
+  generateDocument: GenerateDocumentType
 ) {
   return [
     conversationColumnHelper.display({
@@ -660,7 +660,7 @@ function conversationTableColumns(
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center">
           {row.original.characters.map((char) => (
-            <div key={char.id} className="-ml-4 first:ml-0">
+            <div className="-ml-4 first:ml-0" key={char.id}>
               <Avatar
                 image={getImageURL(project_id, "images", char?.portrait_id || "")}
                 initials={getAvatarInitials(char?.full_name || "")}
@@ -771,7 +771,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["read_characters", "create_characters", "update_characters", "delete_characters"],
-    undefined,
+    undefined
   );
   const user = useAtomValue(userAtom);
   const queryClient = useQueryClient();
@@ -800,9 +800,9 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     {
       staleTime: 60 * 1000,
       isPublic,
-    },
+    }
   );
-  const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
+  const { mutateAsync: downloadImage } = useDownloadImages(project_id, "images");
   const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
   const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
   const { mutateAsync: updateEventsPublic } = useUpdateManyPublic("events", project_id as string);
@@ -836,7 +836,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       },
     },
     "character_fields_templates",
-    { enabled: selectedTab === 1 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 },
+    { enabled: selectedTab === 1 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 }
   );
   const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
@@ -850,7 +850,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       },
     },
     "conversations",
-    { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] },
+    { enabled: selectedTab === 4 && !!existingCharacter?.data, queryKeyConcat: [item_id as string] }
   );
   function showRelationshipTree() {
     if (existingCharacter?.data)
@@ -955,7 +955,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                     permissions,
                     existingCharacter?.data?.permissions || [],
                     "update_characters",
-                    user?.role?.id,
+                    user?.role?.id
                   )
                 }
                 label="Edit current character"
@@ -1107,14 +1107,14 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                     <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
                       {t.character_fields.map((template_field) => {
                         const characterField = existingCharacter?.data?.character_fields?.find(
-                          (f) => f.id === template_field.id,
+                          (f) => f.id === template_field.id
                         );
                         return (
                           <AdditionalFieldDisplay
-                            key={template_field.id}
                             character_field={template_field}
                             character_field_data={characterField ?? null}
                             isPreview={!!id}
+                            key={template_field.id}
                           />
                         );
                       })}
@@ -1154,7 +1154,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                         setDrawer,
                         queryClient,
                         project_id as string,
-                        item_id as string,
+                        item_id as string
                       )}
                       config={{
                         expandable: true,
@@ -1204,7 +1204,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                         setDrawer,
                         queryClient,
                         project_id as string,
-                        item_id as string,
+                        item_id as string
                       )}
                       config={{
                         expandable: true,
@@ -1254,7 +1254,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                           user?.webhooks || [],
                           updateImagesPublic,
                           queryClient,
-                          existingCharacter?.data?.id,
+                          existingCharacter?.data?.id
                         )}
                         config={{
                           hasNoHeaderGap: true,
@@ -1316,7 +1316,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                       item_id as string,
                       setDialog,
                       setDrawer,
-                      generateDocument,
+                      generateDocument
                     )}
                     config={{
                       onRowClick: isPreview
