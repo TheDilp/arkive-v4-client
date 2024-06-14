@@ -136,29 +136,42 @@ function createColumns(
             }
 
             if (field.field_type === "characters_single" || field.field_type === "characters_multiple") {
-              return <CharacterColumn characters={fieldData?.characters || []} />;
+              return (
+                <CharacterColumn
+                  characters={fieldData?.characters || []}
+                  isMultiple={field.field_type === "characters_multiple"}
+                />
+              );
             }
             if (field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") {
               return (
                 <ShowMultipleWithBadge
+                  isMultiple={field.field_type === "blueprints_multiple"}
                   titles={(fieldData?.blueprint_instances || []).map((instance) => instance.blueprint_instance.title)}
                 />
               );
             }
             if (field.field_type === "documents_single" || field.field_type === "documents_multiple") {
-              return <ShowMultipleWithBadge titles={(fieldData?.documents || []).map((doc) => doc.document.title)} />;
+              return (
+                <ShowMultipleWithBadge
+                  isMultiple={field.field_type === "documents_multiple"}
+                  titles={(fieldData?.documents || []).map((doc) => doc.document.title)}
+                />
+              );
             }
             if (field.field_type === "locations_single" || field.field_type === "locations_multiple") {
-              return <LocationColumn locations={fieldData?.map_pins || []} />;
+              return (
+                <LocationColumn isMultiple={field.field_type === "locations_multiple"} locations={fieldData?.map_pins || []} />
+              );
             }
             if (field.field_type === "events_single" || field.field_type === "events_multiple") {
-              return <EventColumn locations={fieldData?.events || []} />;
+              return <EventColumn isMultiple={field.field_type === "events_multiple"} locations={fieldData?.events || []} />;
             }
             if (field.field_type === "images_single" || field.field_type === "images_multiple") {
               return (
                 <div className="flex w-full">
-                  {fieldData?.images?.map((image) => (
-                    <div className="-ml-4 flex items-center first:ml-0 hover:z-10" key={image.related_id}>
+                  {fieldData?.images?.slice(0, field.field_type === "images_multiple" ? undefined : 1)?.map((image) => (
+                    <div className="-ml-4 flex items-center first:ml-0 hover:z-10">
                       <Avatar
                         hasShowImage
                         image={getImageURL(project_id as string, "images", image.related_id)}

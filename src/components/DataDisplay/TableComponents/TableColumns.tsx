@@ -226,11 +226,11 @@ export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }
   };
 }
 
-export function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
+export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]; isMultiple: boolean }) {
   return (
     <div className="flex max-w-full items-center gap-x-2">
       <div className="max-w-full truncate">{titles?.[0]}</div>
-      {titles?.length > 1 ? (
+      {titles?.length > 1 && isMultiple ? (
         <Tooltip
           content={titles
             ?.slice(1)
@@ -246,12 +246,18 @@ export function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
   );
 }
 
-export function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
+export function CharacterColumn({
+  characters,
+  isMultiple,
+}: {
+  isMultiple: boolean;
+  characters: BlueprintInstanceBlueprintFieldType["characters"];
+}) {
   const { project_id } = useParams();
   return (
     <div className="flex w-full items-center gap-x-2">
       <div className="z-0 flex w-full items-center justify-center -space-x-4">
-        {characters?.slice(0, 5)?.map((char) => {
+        {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
               image={getImageURL(
@@ -284,14 +290,20 @@ export function CharacterColumn({ characters }: { characters: BlueprintInstanceB
   );
 }
 
-export function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
+export function LocationColumn({
+  locations,
+  isMultiple,
+}: {
+  isMultiple: boolean;
+  locations: BlueprintInstanceBlueprintFieldType["map_pins"];
+}) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.map_pin?.title || "")} />
+      <ShowMultipleWithBadge isMultiple={isMultiple} titles={(locations || [])?.map((l) => l?.map_pin?.title || "")} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(locations || []).map((location) => {
@@ -329,14 +341,20 @@ export function LocationColumn({ locations }: { locations: BlueprintInstanceBlue
   );
 }
 
-export function EventColumn({ locations: events }: { locations: BlueprintInstanceBlueprintFieldType["events"] }) {
+export function EventColumn({
+  isMultiple,
+  locations: events,
+}: {
+  isMultiple: boolean;
+  locations: BlueprintInstanceBlueprintFieldType["events"];
+}) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(events || [])?.map((e) => e?.event?.title).filter((l) => !!l)} />
+      <ShowMultipleWithBadge isMultiple={isMultiple} titles={(events || [])?.map((e) => e?.event?.title).filter((l) => !!l)} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(events || []).map((e) => {
