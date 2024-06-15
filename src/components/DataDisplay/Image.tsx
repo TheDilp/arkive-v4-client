@@ -25,23 +25,23 @@ function openImageView(setDialog: Dispatch<SetStateAction<DialogAtomType>>, imag
 
 export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, objectFit = "cover" }: ImageComponentType) {
   const { project_id } = useParams();
-  const imageUrl = url || getImageURL(project_id as string, type, image.id);
+  const imageUrl = url || getImageURL(project_id as string, type, image?.id);
   const classes = ImageClasses({ isOpenable, objectFit });
   const setDialog = useSetAtom(dialogAtom);
 
   return (
     <div className="group relative h-full w-full overflow-hidden rounded-md">
-      {hasTitle ? (
+      {hasTitle && image?.title ? (
         <h2 className="pointer-events-none absolute top-[20%] z-10 w-full max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all">
           {image.title}
         </h2>
       ) : null}
       <img
-        alt={image.title}
+        alt={image?.title || ""}
         className={classes}
         loading={isLazyLoading ? "lazy" : "eager"}
         onClick={() => {
-          if (isOpenable) openImageView(setDialog, imageUrl, image.title);
+          if (isOpenable && image?.title) openImageView(setDialog, imageUrl, image?.title || "");
         }}
         src={imageUrl}
       />
