@@ -41,7 +41,7 @@ export function Image({ image, isOpenable, hasTitle, isLazyLoading, url, type, o
         className={classes}
         loading={isLazyLoading ? "lazy" : "eager"}
         onClick={() => {
-          if (isOpenable && image?.title) openImageView(setDialog, imageUrl, image?.title || "");
+          if (isOpenable) openImageView(setDialog, imageUrl, image?.title || "");
         }}
         src={imageUrl}
       />
