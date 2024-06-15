@@ -490,7 +490,7 @@ function locationsTableColumns(project_id: string) {
   ];
 }
 function assetTableColumns(
-  downloadImage: UseMutateAsyncFunction<
+  downloadImages: UseMutateAsyncFunction<
     {
       data: (string | null)[];
     },
@@ -608,7 +608,7 @@ function assetTableColumns(
                 id: "download_image",
                 title: "Download",
                 icon: IconEnum.download,
-                onClick: () => downloadImage({ data: [row.original] }),
+                onClick: () => downloadImages({ data: [row.original] }),
               },
               {
                 id: "send_to_discord",
@@ -802,7 +802,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
       isPublic,
     }
   );
-  const { mutateAsync: downloadImage } = useDownloadImages(project_id, "images");
+  const { mutateAsync: downloadImages } = useDownloadImages(project_id, "images");
   const { mutateAsync: updateDocumentsPublic } = useUpdateManyPublic("documents", project_id as string);
   const { mutateAsync: updateImagesPublic } = useUpdateManyPublic("images", project_id as string);
   const { mutateAsync: updateEventsPublic } = useUpdateManyPublic("events", project_id as string);
@@ -1234,6 +1234,14 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                           onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
                         },
                         {
+                          icon: IconEnum.download,
+                          tooltip: "Download all",
+                          onClick: () =>
+                            downloadImages({
+                              data: (existingCharacter?.data?.images || []).map((img) => ({ id: img.id, title: img.title })),
+                            }),
+                        },
+                        {
                           icon: IconEnum.add,
                           tooltip: "Add assets",
                           onClick: openAddImageDrawer,
@@ -1248,7 +1256,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                     {assetView === "table" ? (
                       <Table
                         columns={assetTableColumns(
-                          downloadImage,
+                          downloadImages,
                           project_id,
                           removeItem,
                           user?.webhooks || [],
