@@ -36,7 +36,7 @@ export function ImageDrawer({ data }: Props) {
   const resetDrawer = useToggledResetAtom();
 
   const { data: imageData, isInitialLoading } = useGetImage(data?.id, project_id as string, "images", {
-    fields: ["id", "title", "is_public", "owner_id"],
+    fields: ["id", "title", "is_public", "owner_id", "type"],
     relations: {
       tags: true,
     },
