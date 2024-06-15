@@ -219,30 +219,38 @@ export function useUpdateImage<
 }
 export function useDownloadImages(project_id: string | undefined, type: AssetType) {
   return useMutation(
-    async ({ data: { id } }: { data: { id: string; title: string } }) => {
+    async (images: { data: { id: string; title: string }[] }) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/assets/download/${project_id}/${type}/${id}`,
-        method: "GET",
+        url: `${baseURLS.baseServer}/assets/download/${project_id}/${type}`,
+        method: "POST",
+        body: JSON.stringify(images),
       });
     },
     {
-      onSuccess: (data: { data: string }, vars) => {
-        const bytesFromBase64 = atob(data.data);
-        const nums = new Array(bytesFromBase64.length);
-        for (let i = 0; i < bytesFromBase64.length; i += 1) {
-          nums[i] = bytesFromBase64.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(nums);
-        saveAs(
-          new Blob(
-            [byteArray],
+      onSuccess: (data: { data: (string | null)[] }, vars) => {
+        for (let index = 0; index < data.data.length; index++) {
+          const title = vars.data[index];
 
-            {
-              type: "image/webp",
+          console.log(title, data.data[index]);
+          if (title && data.data[index]) {
+            const bytesFromBase64 = atob(data.data[index] as string);
+            const nums = new Array(bytesFromBase64.length);
+            for (let i = 0; i < bytesFromBase64.length; i += 1) {
+              nums[i] = bytesFromBase64.charCodeAt(i);
             }
-          ),
-          `${vars.data.title}.webp`
-        );
+            const byteArray = new Uint8Array(nums);
+            saveAs(
+              new Blob(
+                [byteArray],
+
+                {
+                  type: "image/webp",
+                }
+              ),
+              `${vars.data[index].title}.webp`
+            );
+          }
+        }
       },
     }
   );

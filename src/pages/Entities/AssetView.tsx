@@ -53,7 +53,7 @@ type downloadImageMutationType = UseMutateAsyncFunction<
     data: {
       id: string;
       title: string;
-    };
+    }[];
   },
   unknown
 >;
@@ -200,7 +200,7 @@ function createColumns(
                 id: "2",
                 title: "Download",
                 icon: IconEnum.download,
-                onClick: () => downloadImage({ data: row.original }),
+                onClick: () => downloadImage({ data: [{ id: row.original.id, title: row.original.title }] }),
               },
               {
                 id: "delete_image",
@@ -247,6 +247,7 @@ function getSelectedActions(
     data,
     setDrawer,
     setDialog,
+    downloadImages,
   }: {
     updatePublicMany: UpdatePublicManyType;
     deleteMany: DeleteManyType;
@@ -255,6 +256,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialog: () => unknown;
     data: ImageType[];
+    downloadImages: downloadImageMutationType;
     dispatch: TableDispatch;
   }
 ) {
@@ -332,6 +334,18 @@ function getSelectedActions(
       }));
     },
   });
+  selectedActions.push({
+    icon: IconEnum.download,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Download selected images",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
+      downloadImages({
+        data: data.filter((image) => ids.includes(image.id)).map((image) => ({ title: image.title, id: image.id })),
+      });
+    },
+  });
   if (permissions?.delete_assets) {
     selectedActions.push({
       icon: IconEnum.trash,
@@ -381,13 +395,14 @@ export function AssetView() {
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
-  const { mutateAsync: downloadImage } = useDownloadImages(project_id, "images");
+  const [type, setType] = useState<AssetType>("images");
+
+  const { mutateAsync: downloadImages } = useDownloadImages(project_id, type);
   const { mutateAsync: updatePublicMany } = useUpdateManyPublic("images", project_id as string);
   const { mutateAsync: deleteMany } = useDeleteMany("images", false, project_id);
 
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
-  const [type, setType] = useState<AssetType>("images");
   const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
@@ -574,7 +589,7 @@ export function AssetView() {
             columns={createColumns(
               setDrawer,
               setDialog,
-              downloadImage,
+              downloadImages,
               user,
               isProjectOwner,
               type,
@@ -594,6 +609,7 @@ export function AssetView() {
                 setDialog,
                 setDrawer,
                 resetDialog,
+                downloadImages,
                 updatePublicMany,
                 dispatch,
                 deleteMany,
