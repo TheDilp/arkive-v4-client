@@ -275,6 +275,10 @@
 .staticRendererContainer {
   @apply h-full w-full;
 
+  :is(h1, h2, h3, h4, h5, h6) {
+    @apply text-zinc-300 !important;
+  }
+
   p:not(.ProseMirror-staticTrailingBreak) {
     @apply min-h-[1.5rem];
   }
