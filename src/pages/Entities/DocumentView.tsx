@@ -108,7 +108,6 @@ export function DocumentView({ editable }: { editable: boolean }) {
       queryKeyConcat: ["content"],
     }
   );
-  console.log(!!currentDocument?.data?.title, currentDocument?.data?.title);
   useNavbarTitle(`Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 

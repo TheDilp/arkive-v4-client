@@ -5,7 +5,8 @@ import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetImage } from "../../../hooks";
-import { deleteObjectPropsRecursive, dialogAtom, IconEnum } from "../../../utils";
+import { NotificationType } from "../../../types";
+import { deleteObjectPropsRecursive, dialogAtom, Dice, DiceRollParser, IconEnum, useNotifications } from "../../../utils";
 import { Collapsible } from "../../Layout";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
@@ -90,7 +91,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
     paragraph: (data: any) => {
       return (
         // @ts-ignore
-         
+
         <p data-node-text-align={data?.node?.attrs?.nodetextalignment} nodetextalignment={data?.node?.attrs?.nodetextalignment}>
           {data?.children ?? null}
         </p>
@@ -219,19 +220,53 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
   };
 }
 
-const markMap: MarkMap = {
-  italic: "em",
-  bold: "strong",
-  underline: "u",
-  link: "a",
-  spoiler: (data: any) => {
-    return <span className="spoiler">{data?.children || null}</span>;
-  },
-};
+function markMap(createNotification: (notif: Omit<NotificationType, "id">) => void): MarkMap {
+  return {
+    italic: "em",
+    bold: "strong",
+    underline: "u",
+    link: "a",
+    spoiler: (data: any) => {
+      return <span className="spoiler">{data?.children || null}</span>;
+    },
+    dice_roll: (...props) => {
+      return (
+        <span
+          className="dice-roll"
+          onClick={async () => {
+            const parsedNotation = DiceRollParser.parseNotation(props?.[0]?.children?.props?.children);
+            const res = await Dice.roll(parsedNotation);
+            const rollData = DiceRollParser.parseFinalResults(res);
+            if (rollData?.valid) {
+              if (createNotification)
+                createNotification({
+                  timer: 2,
+                  title: "Dice roll",
+                  variant: "info",
+                  position: "top",
+                  data: rollData,
+                  type: "dice_roll",
+                });
+            } else if (createNotification)
+              createNotification({
+                timer: 2,
+                title: "The dice roll notation is not valid.",
+                icon: IconEnum.warning,
+                variant: "error",
+                position: "top",
+              });
 
+            return true;
+          }}>
+          {props?.[0]?.children || ""}
+        </span>
+      );
+    },
+  };
+}
 export function StaticRender({ content, isPublicView }: { content: RemirrorJSON | undefined; isPublicView?: boolean }) {
   const { project_id } = useParams();
-
+  const createNotification = useNotifications();
   if (!content) return null;
 
   const parsedContent = deleteObjectPropsRecursive(content, ["style", "closed", "resizable", "nested"]);
@@ -242,7 +277,7 @@ export function StaticRender({ content, isPublicView }: { content: RemirrorJSON 
       <RemirrorRenderer
         json={parsedContent as RemirrorJSON}
         // @ts-ignore
-        markMap={markMap}
+        markMap={markMap(createNotification)}
         typeMap={typeMap(project_id as string, content, isPublicView)}
       />
     </div>
