@@ -492,14 +492,14 @@ function locationsTableColumns(project_id: string) {
 function assetTableColumns(
   downloadImage: UseMutateAsyncFunction<
     {
-      data: string;
+      data: (string | null)[];
     },
     unknown,
     {
       data: {
         id: string;
         title: string;
-      };
+      }[];
     },
     unknown
   >,
@@ -608,7 +608,7 @@ function assetTableColumns(
                 id: "download_image",
                 title: "Download",
                 icon: IconEnum.download,
-                onClick: () => downloadImage({ data: row.original }),
+                onClick: () => downloadImage({ data: [row.original] }),
               },
               {
                 id: "send_to_discord",

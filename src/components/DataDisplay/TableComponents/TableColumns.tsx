@@ -53,15 +53,22 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
           name={row.id}
           onChange={(_, e) => {
             if (e.shiftKey) {
-              dispatch({
-                type: "selectAll",
-                payload: {
-                  rows: table
-                    .getPaginationRowModel()
-                    .flatRows.slice(0, row.index + 1)
-                    .map((r) => r.original.id),
-                },
-              });
+              const firstIdx = table
+                .getPaginationRowModel()
+                .flatRows.findIndex(
+                  (row) => row?.original?.id === (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.[0]
+                );
+              if (firstIdx > -1) {
+                dispatch({
+                  type: "selectAll",
+                  payload: {
+                    rows: table
+                      .getPaginationRowModel()
+                      .flatRows.slice(firstIdx, row.index + 1)
+                      .map((r) => r.original.id),
+                  },
+                });
+              }
             } else {
               dispatch({ type: "setSelection", payload: { row: row.original.id } });
             }
