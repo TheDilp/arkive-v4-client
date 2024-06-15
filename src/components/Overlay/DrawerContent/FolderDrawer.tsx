@@ -14,6 +14,7 @@ import { IconEnum, useNotifications } from "../../../utils";
 import { FolderSelect } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input } from "../../Form";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -47,7 +48,7 @@ export function FolderDrawer({ data }: Props) {
 
   const permissions = useHasPermissions(
     [`read_${data?.type}`, `create_${data?.type}`, `update_${data?.type}`],
-    folder?.owner_id,
+    folder?.owner_id
   );
 
   const { mutateAsync: createFolder, isLoading: isCreating } = useCreateEntity<{
@@ -60,7 +61,7 @@ export function FolderDrawer({ data }: Props) {
     relations?: { tags: { id: string }[] };
     permissions: EntityPermissionType[];
   }>(data.type, project_id as string);
-  const { data: existingFolder } = useGetEntity<ExistingFolderType>(
+  const { data: existingFolder, isLoading } = useGetEntity<ExistingFolderType>(
     data?.id,
     data.type,
     {
@@ -71,7 +72,7 @@ export function FolderDrawer({ data }: Props) {
     },
     {
       enabled: !!data?.id,
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -99,7 +100,7 @@ export function FolderDrawer({ data }: Props) {
               },
           {
             onSuccess: resetDrawerAtom,
-          },
+          }
         );
       } else {
         const { tags, title, parent_id } = folder;
@@ -113,11 +114,13 @@ export function FolderDrawer({ data }: Props) {
               },
           {
             onSuccess: resetDrawerAtom,
-          },
+          }
         );
       }
     }
   }
+
+  if (isLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
