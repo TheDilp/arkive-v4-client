@@ -142,26 +142,30 @@ export function MapImage({
     {
       nonCharacterPins: [],
       characterPins: [],
-    },
+    }
   );
   return (
     <LayersControl position="topright">
       <LayersControl.BaseLayer checked name="Map">
-        <ImageOverlay ref={imgRef} bounds={bounds} url={src} />
+        <ImageOverlay bounds={bounds} ref={imgRef} url={src} />
       </LayersControl.BaseLayer>
       {/* Characters layer */}
       <LayersControl.Overlay checked name="Character pins">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {characterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
+            {characterPins
+              ?.filter(PinFilter)
+              ?.map((pin) => (
+                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+              ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {characterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
+            {characterPins
+              ?.filter(PinFilter)
+              ?.map((pin) => (
+                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+              ))}
           </LayerGroup>
         )}
       </LayersControl.Overlay>
@@ -169,15 +173,19 @@ export function MapImage({
       <LayersControl.Overlay checked name="Map pins">
         {isClusteringPins ? (
           <MarkerClusterGroup chunkedLoading removeOutsideVisibleBounds showCoverageOnHover>
-            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
+            {nonCharacterPins
+              ?.filter(PinFilter)
+              ?.map((pin) => (
+                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+              ))}
           </MarkerClusterGroup>
         ) : (
           <LayerGroup>
-            {nonCharacterPins?.filter(PinFilter)?.map((pin) => (
-              <MapPin key={pin.id} isReadOnly={isReadOnly} isViewOnly={isViewOnly} map_id={item_id as string} pinData={pin} />
-            ))}
+            {nonCharacterPins
+              ?.filter(PinFilter)
+              ?.map((pin) => (
+                <MapPin isReadOnly={isReadOnly} isViewOnly={isViewOnly} key={pin.id} map_id={item_id as string} pinData={pin} />
+              ))}
           </LayerGroup>
         )}
       </LayersControl.Overlay>

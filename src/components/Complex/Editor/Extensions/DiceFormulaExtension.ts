@@ -1,5 +1,5 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable class-methods-use-this */
+ 
+ 
 import {
   ApplySchemaAttributes,
   command,
@@ -51,7 +51,7 @@ export interface FoundDiceRoll {
   /** index of next char after match end */
   to: number;
 }
-export type LinkAttributes = ProsemirrorAttributes<{
+export type DiceRollAttributes = ProsemirrorAttributes<{
   /**
    * True when this was an automatically generated link. False when the link was
    * added specifically by the user.
@@ -60,27 +60,27 @@ export type LinkAttributes = ProsemirrorAttributes<{
    */
   auto?: boolean;
 }>;
-export interface LinkClickData extends GetMarkRange, LinkAttributes {}
+export interface DiceRollClickData extends GetMarkRange, DiceRollAttributes {}
 
-interface LinkWithProperties extends Omit<FoundDiceRoll, "href"> {
+interface DiceRollWithProperties extends FoundDiceRoll {
   range: FromToProps;
-  attrs: LinkAttributes;
+  attrs: DiceRollAttributes;
 }
 
 interface EventMeta {
   selection: Selection;
   range: FromToProps | undefined;
   doc: ProsemirrorNode;
-  attrs: LinkAttributes;
+  attrs: DiceRollAttributes;
 }
 
-interface ShortcutHandlerActiveLink extends FromToProps {
-  attrs: LinkAttributes;
+interface ShortcutHandlerActiveDiceRoll extends FromToProps {
+  attrs: DiceRollAttributes;
 }
 
 export interface ShortcutHandlerProps extends FromToProps {
   selectedText: string;
-  activeLink: ShortcutHandlerActiveLink | undefined;
+  activeLink: ShortcutHandlerActiveDiceRoll | undefined;
 }
 
 export interface DiceFormulaOptions {
@@ -94,7 +94,7 @@ export interface DiceFormulaOptions {
   /**
    * Listen to click events for links.
    */
-  onClick?: Handler<(event: MouseEvent, data: LinkClickData) => boolean>;
+  onClick?: Handler<(event: MouseEvent, data: DiceRollClickData) => boolean>;
 
   /**
    * Whether automatic links should be created.
@@ -189,7 +189,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
       const onUpdateCallbacks: Array<Pick<EventMeta, "range" | "attrs"> & { text: string }> = [];
       const { updateDiceRoll } = this.store.chain(props.tr);
 
-      const matches = this.findAllAutoLinks(props.state.doc);
+      const matches = this.findAllAutoRolls(props.state.doc);
 
       for (let index = 0; index < matches.length; index += 1) {
         updateDiceRoll({ auto: true }, { from: matches[index].from, to: matches[index].to }).tr();
@@ -216,7 +216,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
   }
 
   @command()
-  updateDiceRoll(attrs: LinkAttributes, range?: FromToProps): CommandFunction {
+  updateDiceRoll(attrs: DiceRollAttributes, range?: FromToProps): CommandFunction {
     return (props) => {
       const { tr } = props;
       const selectionIsValid =
@@ -280,7 +280,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
           const isNodeSeparated = to - from === 2;
 
           // Get previous links
-          const prevMarks = this.getLinkMarksInRange(prevState.doc, prevFrom, prevTo, true)
+          const prevMarks = this.getDiceRollMarksInRange(prevState.doc, prevFrom, prevTo, true)
             .filter((item) => item.mark.type === this.type)
             .map(({ from: f, to: t, text }) => ({
               mappedFrom: mapping.map(f),
@@ -294,20 +294,20 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
 
           // Check if links need to be removed or updated.
           prevMarks.forEach(({ mappedFrom: newFrom, mappedTo: newTo, from: prevMarkFrom, to: prevMarkTo }, i) =>
-            this.getLinkMarksInRange(doc, newFrom, newTo, true)
+            this.getDiceRollMarksInRange(doc, newFrom, newTo, true)
               .filter((item) => item.mark.type === this.type)
               .forEach((newMark) => {
                 const prevLinkText = prevState.doc.textBetween(prevMarkFrom, prevMarkTo, undefined, " ");
                 const newLinkText = doc.textBetween(newMark.from, newMark.to + 1, undefined, " ").trim();
 
-                const wasLink = this.isValidDiceRoll(prevLinkText);
-                const isLink = this.isValidDiceRoll(newLinkText);
+                const wasRoll = this.isValidDiceRoll(prevLinkText);
+                const isRoll = this.isValidDiceRoll(newLinkText);
 
-                if (isLink) {
+                if (isRoll) {
                   return;
                 }
 
-                if (wasLink) {
+                if (wasRoll) {
                   this.removeDiceRoll({ from: newMark.from, to: newMark.to });
 
                   prevMarks.splice(i, 1);
@@ -320,32 +320,32 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
                 // If link characters have been deleted
                 if (from === to)
                   // Check newLinkText for a remaining valid link
-                  this.findAutoLinks(newLinkText)
+                  this.findAutoRolls(newLinkText)
                     .map((link) =>
-                      this.addLinkProperties({
+                      this.addDiceRollProperties({
                         ...link,
                         from: newFrom + link.from,
                         to: newFrom + link.to,
-                      }),
+                      })
                     )
                     .forEach(({ attrs, range, text }) => {
                       updateDiceRoll(attrs, range).tr();
                       onUpdateCallbacks.push({ attrs, range, text });
                     });
-              }),
+              })
           );
 
           // Find text that can be auto linked
           this.findTextBlocksInRange(doc, { from, to }).forEach(({ text, positionStart }) => {
             // Match links in text node
-            this.findAutoLinks(text)
+            this.findAutoRolls(text)
               .map((link) =>
-                this.addLinkProperties({
+                this.addDiceRollProperties({
                   ...link,
                   // Calculate link position.
                   from: positionStart + link.from + 1,
                   to: positionStart + link.to + 1,
-                }),
+                })
               )
               // Check if link is within the changed range.
               .filter(({ range }) => {
@@ -355,11 +355,11 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
                 return fromIsInRange || toIsInRange || isNodeSeparated;
               })
               // Avoid overwriting manually created links.
-              .filter(({ range }) => this.getLinkMarksInRange(tr.doc, range.from, range.to, false).length === 0)
+              .filter(({ range }) => this.getDiceRollMarksInRange(tr.doc, range.from, range.to, false).length === 0)
               // Prevent updating existing auto links
               .filter(
                 ({ range: { from: f }, text: txt }) =>
-                  !prevMarks.some(({ text: prevMarkText, mappedFrom }) => mappedFrom === f && prevMarkText === txt),
+                  !prevMarks.some(({ text: prevMarkText, mappedFrom }) => mappedFrom === f && prevMarkText === txt)
               )
               .forEach(({ attrs, text: txt, range }) => {
                 updateDiceRoll(attrs, range).tr();
@@ -384,7 +384,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     };
   }
 
-  private getLinkMarksInRange(doc: ProsemirrorNode, from: number, to: number, isAutoLink: boolean): GetMarkRange[] {
+  private getDiceRollMarksInRange(doc: ProsemirrorNode, from: number, to: number, isAutoLink: boolean): GetMarkRange[] {
     const linkMarks: GetMarkRange[] = [];
 
     if (from === to) {
@@ -436,7 +436,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     }));
   }
 
-  private addLinkProperties({ from, to, ...link }: FoundDiceRoll & FromToProps): LinkWithProperties {
+  private addDiceRollProperties({ from, to, ...link }: FoundDiceRoll & FromToProps): DiceRollWithProperties {
     return {
       ...link,
       from,
@@ -446,18 +446,18 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     };
   }
 
-  private findAutoLinks(str: string): FoundDiceRoll[] {
+  private findAutoRolls(str: string): FoundDiceRoll[] {
     const toAutoLink: FoundDiceRoll[] = [];
 
     for (const match of findMatches(str, this.options.autoLinkRegex)) {
       const text = getMatchString(match);
 
       if (!text) {
-        // eslint-disable-next-line no-continue
+         
         continue;
       }
       if (!this.isValidDiceRoll(text)) {
-        // eslint-disable-next-line no-continue
+         
         continue;
       }
       toAutoLink.push({
@@ -470,7 +470,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     return toAutoLink;
   }
 
-  private findAllAutoLinks(doc: Node) {
+  private findAllAutoRolls(doc: Node) {
     const re = DiceRollRegex;
     const ranges: FoundDiceRoll[] = [];
     doc?.descendants((node, pos) => {
@@ -508,8 +508,8 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
           return;
         }
 
-        const attrs = markRange.mark.attrs as LinkAttributes;
-        const data: LinkClickData = { ...attrs, ...markRange };
+        const attrs = markRange.mark.attrs as DiceRollAttributes;
+        const data: DiceRollClickData = { ...attrs, ...markRange };
 
         // If one of the handlers returns `true` then return early.
         if (this.options.onClick(event, data)) {

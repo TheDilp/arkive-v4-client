@@ -76,6 +76,11 @@ const ButtonClasses = tv({
       class: "text-green-400",
     },
     {
+      variant: ["warning"],
+      hasNoBackground: true,
+      class: "text-orange-600",
+    },
+    {
       variant: ["error"],
       hasNoBackground: true,
       class: "text-red-600",

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
@@ -58,7 +57,7 @@ export function MentionedInDocumentDrawer({ data }: Props) {
           },
         }),
         url: `${baseURLS.baseServer}/documents/mentions_in_document`,
-      }),
+      })
   );
   if ((!mentionsData?.data && !isFetching) || mentionsData?.data?.length === 0)
     return <Alert label="No mentions found." variant="info" />;
@@ -74,8 +73,8 @@ export function MentionedInDocumentDrawer({ data }: Props) {
 
             return (
               <li
-                key={mention.idWithPosition}
                 className="flex items-center gap-x-2 border-b border-zinc-700 py-2 last:border-b-0"
+                key={mention.idWithPosition}
                 onMouseOut={() => {
                   data.getContext.commands.setAnnotations([]);
                   setMentionPosition(null);

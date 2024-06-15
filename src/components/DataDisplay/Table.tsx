@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -139,7 +137,7 @@ function TableColumnFilterList({
         const filterType = filterOptions?.find((opt) => opt.value === filt.operator);
 
         return (
-          <div key={filt.id} className="flex flex-col gap-y-2">
+          <div className="flex flex-col gap-y-2" key={filt.id}>
             <div className="flex w-full flex-nowrap items-center gap-x-2">
               <div className="w-1/3">
                 <Select
@@ -468,9 +466,9 @@ function TableSubheaderFilterBadges({
     <div className={subheaderFilterBadges()}>
       {fields.map((field) => (
         <Tooltip
-          key={field}
           content={getFilterTooltip({ and: andFiltersByField[field] || [], or: orFiltersByField[field] || [] })}
-          isPortal>
+          isPortal
+          key={field}>
           <div>
             <Badge
               clearAction={() =>
@@ -487,12 +485,12 @@ function TableSubheaderFilterBadges({
       ))}
       {relationFields.map((field) => (
         <Tooltip
-          key={field}
           content={getFilterTooltip({
             and: andRelationFiltersByField[field] || [],
             or: orRelationFiltersByField[field] || [],
           })}
           isPortal
+          key={field}
           variant="secondary">
           <div>
             <Badge
@@ -614,8 +612,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const pinned = columns.filter((col) => col?.meta?.pinned);
   return (
     <>
-      <div ref={bodyRef} className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800">
-        <div ref={headerRef} className={head()}>
+      <div className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800" ref={bodyRef}>
+        <div className={head()} ref={headerRef}>
           {table.getFlatHeaders().map((hdr) => {
             const { header, id, meta } = hdr.column.columnDef;
             const activeColumnFilters = {
@@ -790,12 +788,12 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
           rows.map((row) => {
             return (
               <div
-                key={row.id}
                 className={`${rowContainer()} ${
                   config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                     ? "group hover:text-white"
                     : "hover:bg-zinc-800"
-                }`}>
+                }`}
+                key={row.id}>
                 <Link
                   onClick={(e) => {
                     if (onRowClick) {
@@ -808,7 +806,6 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                   <div className={`${rowClasses()} ${onRowClick ? hasRowAction() : ""} group`}>
                     {row.getVisibleCells().map((cell) => (
                       <div
-                        key={cell.id}
                         className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
                         } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"} ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
@@ -816,6 +813,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             ? "bg-blue-400"
                             : "bg-zinc-950"
                         } ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""} ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
+                        key={cell.id}
                         onClick={(e) => {
                           if (
                             cell.column.id === "select" ||

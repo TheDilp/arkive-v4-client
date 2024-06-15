@@ -32,14 +32,15 @@ export function PublicMap() {
       queryKeyConcat: ["public"],
       isPublic: true,
       retry: false,
-    },
+    }
   );
-
   if (!map?.data) return <Skeleton type="project_view" />;
   if (!map?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/public/${project_id}/maps`} />;
   }
+  console.log(map?.data);
+
   return (
     <PublicEntityLayout title={subitem_id && map_pin_id ? "" : map?.data?.title}>
       {isInitialLoading ? (

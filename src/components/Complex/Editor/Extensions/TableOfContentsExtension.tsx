@@ -1,8 +1,5 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
-/* eslint-disable func-names */
-/* eslint-disable class-methods-use-this */
+ 
+ 
 import { TextSelection } from "@remirror/pm/state";
 import {
   ApplySchemaAttributes,
@@ -43,7 +40,7 @@ class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
         <h2 className="font-merriweather underline">Table of contents</h2>
         {headings?.length ? (
           headings.map((heading, i) => (
-            <li key={heading.id || i.toString()} className="pointer-events-auto font-lato">
+            <li className="pointer-events-auto font-lato" key={heading.id || i.toString()}>
               <span
                 className="pointer-events-auto cursor-pointer select-none hover:text-blue-400"
                 onClick={() => {
@@ -139,7 +136,7 @@ export function TableOfContents({ headings }: { headings: TOCHeadingType[] }) {
       <h2 className="font-merriweather underline">Table of contents</h2>
       {headings?.length ? (
         headings.map((heading, i) => (
-          <li key={`${heading}+${i.toString()}`} className="pointer-events-auto font-lato">
+          <li className="pointer-events-auto font-lato" key={`${heading}+${i.toString()}`}>
             <span
               className="pointer-events-auto cursor-pointer select-none hover:text-blue-400"
               onClick={() => {

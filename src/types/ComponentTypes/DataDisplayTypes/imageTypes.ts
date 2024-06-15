@@ -1,12 +1,20 @@
 import { AssetType } from "../../baseTypes";
 import { ImageType } from "../../EntityTypes";
 
-export interface ImageComponentType {
-  image: Omit<ImageType, "owner_id" | "permissions" | "tags">;
+export type ImageComponentType = {
   isOpenable?: boolean;
   hasTitle?: boolean;
   isLazyLoading?: boolean;
-  url?: string;
+
   objectFit?: "cover" | "contain";
   type: AssetType;
-}
+} & (
+  | {
+      image: Omit<ImageType, "owner_id" | "permissions" | "tags">;
+      url?: string;
+    }
+  | {
+      image?: Omit<ImageType, "owner_id" | "permissions" | "tags">;
+      url: string;
+    }
+);

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import {
   arrow,
   autoPlacement,
@@ -49,11 +48,7 @@ function getArrowColor(variant: Variant) {
   return "#000000";
 }
 
-function OnlySoleChild({
-  children,
-}: {
-  children: JSX.Element | JSX.Element[];
-}) {
+function OnlySoleChild({ children }: { children: JSX.Element | JSX.Element[] }) {
   if (isArray(children)) return children?.at(-1) || null;
   return children;
 }
@@ -132,8 +127,7 @@ export function Tooltip({
             {...getFloatingProps({
               ref: refs.setFloating,
               style: { ...floatingStyles, zIndex: 9999 },
-            })}
-          >
+            })}>
             {typeof content === "string" ? (
               <DefaultTooltip isInline={isInline} variant={variant}>
                 {content}
@@ -141,17 +135,15 @@ export function Tooltip({
             ) : (
               <OnlySoleChild>
                 {cloneElement(content as ReactElement, {
-                  ...(passCloseTooltip
-                    ? { closeTooltip: () => setOpen(false) }
-                    : {}),
+                  ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
                 })}
               </OnlySoleChild>
             )}
             <FloatingArrow
-              ref={arrowRef}
               className="z-[9998] [&>path:first-of-type]:stroke-none"
               context={context}
               fill={arrowColor || getArrowColor(variant) || "black"}
+              ref={arrowRef}
               strokeWidth={0}
             />
           </div>
@@ -170,22 +162,19 @@ export function Tooltip({
           {...getFloatingProps({
             ref: refs.setFloating,
             style: { ...floatingStyles, zIndex: 9999 },
-          })}
-        >
+          })}>
           {typeof content === "string" ? (
             <DefaultTooltip variant={variant}>{content}</DefaultTooltip>
           ) : (
             cloneElement(content as ReactElement, {
-              ...(passCloseTooltip
-                ? { closeTooltip: () => setOpen(false) }
-                : {}),
+              ...(passCloseTooltip ? { closeTooltip: () => setOpen(false) } : {}),
             })
           )}
           <FloatingArrow
-            ref={arrowRef}
             className="z-[9998] [&>path:first-of-type]:stroke-none"
             context={context}
             fill={arrowColor || getArrowColor(variant) || "black"}
+            ref={arrowRef}
             strokeWidth={0}
           />
         </div>

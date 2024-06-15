@@ -58,11 +58,11 @@ export function ImageUploadDialog({ size }: { size: Size }) {
         {imageUrls?.length && !isUploadingImages && selectedTab === 0
           ? imageUrls.map((img) => (
               <ImagePreview
-                key={`${img.name}${img.url}`}
                 clearAction={(name) => {
                   setImages((prev) => prev.filter((f) => f.name !== name));
                 }}
                 id={img.name}
+                key={`${img.name}${img.url}`}
                 title={img.name}
                 url={img.url}
               />
@@ -71,11 +71,11 @@ export function ImageUploadDialog({ size }: { size: Size }) {
         {mapImageUrls?.length && !isUploadingMapImages && selectedTab === 1
           ? mapImageUrls.map((img) => (
               <ImagePreview
-                key={`${img.name}${img.url}`}
                 clearAction={(name) => {
                   setMapImages((prev) => prev.filter((f) => f.name !== name));
                 }}
                 id={img.name}
+                key={`${img.name}${img.url}`}
                 title={img.name}
                 url={img.url}
               />

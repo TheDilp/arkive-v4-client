@@ -1,10 +1,7 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { useState } from "react";
 import { tv } from "tailwind-variants";
 
-import { CollapsibleType } from "../../types";
+import { CollapsibleType, Size } from "../../types";
 import { AvailableIcons, IconEnum } from "../../utils";
 import { Button, Icon } from "..";
 
@@ -46,6 +43,13 @@ const CollapsibleClasses = tv({
     },
   },
 });
+
+function getIconSize(size: Size) {
+  if (size === "xl") return 28;
+  if (size === "lg") return 24;
+  if (size === "md") return 20;
+  return 24;
+}
 
 export function Collapsible({
   label,
@@ -102,7 +106,7 @@ export function Collapsible({
                 </div>
               ))
             : null}
-          <Icon fontSize={24} icon={IconEnum.chevron_up} />
+          <Icon fontSize={getIconSize(size)} icon={IconEnum.chevron_up} />
         </span>
       </summary>
       {open ? (

@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-
 import { ColorPaletteType, ColorPickerType } from "../../types";
 import { validateHexCode } from "../../utils";
 import { ColorPresets, DefaultTagColor } from "../../utils/enums/ColorEnums";
@@ -47,11 +44,11 @@ function ColorPalette({ name, hasCustom, onChange, closeTooltip, value, isDisabl
           />
         </div>
       ) : null}
-      <div className="flex flex-wrap justify-between gap-4 overflow-auto  p-4 shadow">
+      <div className="flex flex-wrap justify-between gap-4 overflow-auto p-4 shadow">
         {ColorPresets.map((color) => (
           <div
-            key={color}
             className={`h-6 w-6 cursor-pointer rounded-full ${isDisabled ? "cursor-not-allowed" : ""}`}
+            key={color}
             onClick={() => {
               if (isDisabled) return;
 

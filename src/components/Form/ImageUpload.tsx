@@ -1,7 +1,7 @@
 import { ImageUploadType } from "../../types";
 import { changeImagesForUpload, IconEnum, useNotifications } from "../../utils";
 
-export function ImageUpload({ images, onChange, isDisabled }: ImageUploadType) {
+export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }: ImageUploadType) {
   const createNotification = useNotifications();
   return (
     <div
@@ -61,7 +61,7 @@ export function ImageUpload({ images, onChange, isDisabled }: ImageUploadType) {
           className="hidden"
           disabled={isDisabled}
           id="dropzone-file"
-          multiple
+          multiple={isMultiple}
           onChange={(e) => {
             if (e.target.files?.length) {
               const files = Array.from(e.target.files);

@@ -6,10 +6,10 @@ import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, RandomTableOpt
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { StaticRender } from "../Complex";
 import { Input } from "../Form";
-import { FormattedDate } from "../Misc";
+import { Alert, FormattedDate } from "../Misc";
 import { Tooltip } from "../Overlay";
-import { CarouselEntityPreview } from "./CarouselEntityPreview";
 import { Gallery } from "./Gallery";
+import { GroupEntityPreview } from "./GroupEntityPreview";
 
 const tooltipFields = ["text", "number", "select_multiple"];
 
@@ -64,13 +64,13 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
     fieldData?.calendar?.start_day,
     fieldData?.calendar?.start_year,
     fieldData?.calendar?.start_month_id,
-    field?.calendar?.months,
+    field?.calendar?.months
   );
   const endStringDate = formatDateToString(
     fieldData?.calendar?.end_day,
     fieldData?.calendar?.end_year,
     fieldData?.calendar?.end_month_id,
-    field?.calendar?.months,
+    field?.calendar?.months
   );
 
   return (
@@ -154,11 +154,11 @@ export function AdditionalBlueprintFieldDisplay({
             value={selectMultipleFormatted}
           />
         ) : null}
-        {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
+        {blueprint_field.field_type === "textarea" ? (
           <>
-            <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
-            <div className="rounded-md border border-zinc-700 bg-zinc-900">
-              <StaticRender content={(value || {}) as any} />
+            <span className="mb-2 border-b border-zinc-700 text-sm text-zinc-300">{blueprint_field.title}</span>
+            <div className="rounded-md bg-zinc-900">
+              {isRemirrorJSON(value) ? <StaticRender content={(value || {}) as any} /> : <Alert label="There is no content." />}
             </div>
           </>
         ) : null}
@@ -166,7 +166,7 @@ export function AdditionalBlueprintFieldDisplay({
 
         {blueprint_field.field_type === "characters_single" || blueprint_field.field_type === "characters_multiple" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <CarouselEntityPreview
+            <GroupEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
               items={(blueprint_field_data.characters || [])
@@ -183,7 +183,7 @@ export function AdditionalBlueprintFieldDisplay({
         ) : null}
         {blueprint_field.field_type === "blueprints_single" || blueprint_field.field_type === "blueprints_multiple" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <CarouselEntityPreview
+            <GroupEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
               items={(blueprint_field_data.blueprint_instances || [])
@@ -199,7 +199,7 @@ export function AdditionalBlueprintFieldDisplay({
                     "blueprint_instances",
                     blueprint_instance.related_id,
                     blueprint_instance.blueprint_instance.parent_id,
-                    isPublic,
+                    isPublic
                   ),
                 }))}
             />
@@ -207,7 +207,7 @@ export function AdditionalBlueprintFieldDisplay({
         ) : null}
         {blueprint_field.field_type === "documents_single" || blueprint_field.field_type === "documents_multiple" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <CarouselEntityPreview
+            <GroupEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
               items={(blueprint_field_data.documents || [])
@@ -224,7 +224,7 @@ export function AdditionalBlueprintFieldDisplay({
         ) : null}
         {blueprint_field.field_type === "locations_single" || blueprint_field.field_type === "locations_multiple" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <CarouselEntityPreview
+            <GroupEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
               items={(blueprint_field_data.map_pins || [])
@@ -240,7 +240,7 @@ export function AdditionalBlueprintFieldDisplay({
                     "map_pins",
                     map_pin.related_id,
                     map_pin.map_pin.parent_id,
-                    isPublic,
+                    isPublic
                   ),
                 }))}
             />
@@ -248,7 +248,7 @@ export function AdditionalBlueprintFieldDisplay({
         ) : null}
         {blueprint_field.field_type === "images_single" ? (
           <div className="grid w-full grid-cols-6 gap-1 truncate">
-            <CarouselEntityPreview
+            <GroupEntityPreview
               field_label={blueprint_field.title}
               isPublic={isPublic}
               items={

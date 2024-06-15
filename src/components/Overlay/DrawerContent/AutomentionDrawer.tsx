@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-control-regex */
 
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
@@ -161,8 +158,8 @@ export function AutomentionDrawer({ data }: Props) {
               const idWithRange = `${potentialMatch.from}-${potentialMatch.id}-${potentialMatch.to}`;
               return (
                 <li
-                  key={idWithRange}
                   className="flex cursor-pointer flex-nowrap items-center gap-x-2 hover:text-blue-300"
+                  key={idWithRange}
                   onMouseOut={() => {
                     const highlighted = data.getContext.helpers.getAnnotations();
                     const notSelected = highlighted.filter(

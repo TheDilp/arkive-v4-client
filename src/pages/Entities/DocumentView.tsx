@@ -2,21 +2,21 @@ import "remirror/styles/all.css";
 import "../../Editor.css";
 
 import { EditorComponent, Remirror, useRemirror } from "@remirror/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { QueryClient, UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import { MouseEvent, useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
-import { RemirrorContentType } from "remirror";
+import { RemirrorJSON } from "remirror";
 
 import { SlashMenu } from "../../components";
 import { MentionDropdownComponent } from "../../components/Complex/Editor/Extensions/Mention";
 import { Menubar } from "../../components/Complex/Editor/Menubar";
 import { Icon, Skeleton } from "../../components/Misc";
-import { Notification } from "../../components/Overlay";
 import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
 import {
+  AvailableIcons,
   baseURLS,
   breadcrumbsAtom,
   contextMenuAtom,
@@ -34,27 +34,62 @@ import {
 import { Dice } from "../../utils/ui/diceRollerUtils";
 import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
 
-export function DocumentView({ editable }: { editable: boolean }) {
-  const { project_id, item_id } = useParams();
-  const queryClient = useQueryClient();
-  const user = useAtomValue(userAtom);
-  const createNotification = useNotifications();
-  const drawer = useAtomValue(drawerAtom);
-  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-  const mentionPosition = useAtomValue(mentionPositionAtom);
-  const setContextMenu = useSetAtom(contextMenuAtom);
-  const setDrawer = useSetAtom(drawerAtom);
-  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
-    enabled: !!user?.id && isProjectOwner,
-    staleTime: Infinity,
-  });
+type UpdateDocumentType = UseMutateFunction<
+  any,
+  unknown,
+  {
+    data: {
+      id: string;
+      content: string | undefined;
+    };
+  },
+  | {
+      old: unknown;
+    }
+  | {
+      old?: undefined;
+    }
+>;
 
-  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
+function update({
+  item_id,
+  queryClient,
+  resetChanges,
+  editorData,
+  updateDocument,
+}: {
+  item_id: string;
+  queryClient: QueryClient;
+  resetChanges: () => void;
+  editorData: RemirrorJSON;
+  updateDocument: UpdateDocumentType;
+}) {
+  updateDocument(
+    {
+      data: {
+        id: item_id as string,
+        content: editorData.content as string | undefined,
+      },
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["documents", item_id, "mention"]);
+        resetChanges();
+      },
+    }
+  );
+}
+
+export function DocumentView({ editable }: { editable: boolean }) {
+  const { item_id } = useParams();
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const {
     data: currentDocument,
     isFetching,
-    isRefetching,
     refetch,
   } = useGetEntity<DocumentType>(
     item_id as string,
@@ -71,31 +106,109 @@ export function DocumentView({ editable }: { editable: boolean }) {
       enabled: !!editable && !!item_id,
       staleTime: 1000,
       queryKeyConcat: ["content"],
-    },
+    }
   );
+  console.log(!!currentDocument?.data?.title, currentDocument?.data?.title);
+  useNavbarTitle(`Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
+  const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
   const permissions = useHasPermissions(["update_documents"], currentDocument?.data?.owner_id);
-  const canUpdate = hasActionPermission(
+  const can_update = hasActionPermission(
     isProjectOwner,
     user?.id === currentDocument?.data?.owner_id,
     permissions,
     currentDocument?.data?.permissions || [],
     "update_documents",
-    user?.role?.id,
+    user?.role?.id
   );
 
-  const { mutate: updateDocument, isLoading: isUpdating } = useUpdateEntity<{
-    data: { id: string; content: string | undefined };
-  }>("documents", project_id as string);
+  useEffect(() => {
+    if (!isFetching) {
+      if (currentDocument?.data) {
+        setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
+        setEntityUpdatePermission(currentDocument?.data?.permissions?.some((p) => p.code === "update_documents") || false);
+        if (currentDocument?.data?.dice_color) {
+          Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
+        } else {
+          const defaultDiceColor: string | null = ls.get("default_dice_color");
+          Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
+        }
+      }
+    }
+  }, [currentDocument]);
 
-  const [editorData, setEditorData] = useState({ content: undefined });
-  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
-  useNavbarTitle(` Documents | ${currentDocument?.data?.title}`, !!currentDocument?.data?.title);
+  if (isFetching)
+    return (
+      <div className="max-h-full min-h-full w-full">
+        <Skeleton type="editor" />
+      </div>
+    );
+  if (!currentDocument && !isFetching) {
+    return <Navigate to="../" />;
+  }
+  if (currentDocument?.data?.is_folder) {
+    return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
+  }
+  if (currentDocument?.data)
+    return (
+      <DocumentViewEditor
+        can_update={can_update}
+        content={currentDocument.data.content as RemirrorJSON | undefined}
+        icon={currentDocument.data.icon}
+        id={currentDocument.data.id}
+        is_template={currentDocument.data.is_template}
+        refetch={refetch}
+        title={currentDocument.data.title}
+      />
+    );
+
+  return null;
+}
+
+function DocumentViewEditor({
+  id,
+  title,
+  icon,
+  can_update,
+  content,
+  is_template,
+  refetch,
+}: {
+  id: string;
+  title: string;
+  icon: AvailableIcons | undefined | null;
+  can_update: boolean;
+  is_template: boolean | null;
+  content: RemirrorJSON | undefined;
+  refetch: () => void;
+}) {
+  const { project_id, item_id } = useParams();
+  const queryClient = useQueryClient();
+  const createNotification = useNotifications();
+  const drawer = useAtomValue(drawerAtom);
+  const user = useAtomValue(userAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const mentionPosition = useAtomValue(mentionPositionAtom);
+  const setContextMenu = useSetAtom(contextMenuAtom);
+  const setDrawer = useSetAtom(drawerAtom);
+  const { data: webhooks } = useGetEntities<WebhookType>({ data: { user_id: user?.id }, fields: ["id", "title"] }, "webhooks", {
+    enabled: !!user?.id && isProjectOwner,
+    staleTime: Infinity,
+  });
+
+  const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
+    data: { id: string; content: string | undefined };
+  }>("documents", project_id as string, {
+    mutationKey: ["document_view", "update"],
+  });
+
+  const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
 
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),
     selection: "start",
     onError,
+    content,
   });
 
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
@@ -220,7 +333,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
                 FetchFunction({
                   url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
                   body: JSON.stringify({
-                    data: { title: currentDocument?.data?.title, description: title, type: "document_text" },
+                    data: { title, description: title, type: "document_text" },
                   }),
                   method: "POST",
                 });
@@ -234,7 +347,6 @@ export function DocumentView({ editable }: { editable: boolean }) {
 
   useBlocker(() => {
     if (changedData) {
-      // eslint-disable-next-line no-alert
       const response = !window.confirm("You have unsaved changes, are you sure you want to leave?");
       if (!response) queryClient.removeQueries({ queryKey: ["documents", item_id] });
 
@@ -244,105 +356,29 @@ export function DocumentView({ editable }: { editable: boolean }) {
     return false;
   });
 
-  useLayoutEffect(() => {
-    if (currentDocument?.data?.content || currentDocument?.data?.content === null) {
-      setBreadcrumbs({ items: currentDocument?.data?.parents || [], type: "documents" });
-      // Timeout is necessary for mentions to load and render correctly
-      setTimeout(() => {
-        manager.view.updateState(
-          manager.createState({ content: (currentDocument.data.content || undefined) as RemirrorContentType }),
-        );
-      }, 0.0001);
-    }
-  }, [currentDocument, isRefetching]);
-
-  useEffect(() => {
-    if (!isFetching) {
-      setEntityUpdatePermission(currentDocument?.data?.permissions?.some((p) => p.code === "update_documents") || false);
-      if (currentDocument?.data?.dice_color) {
-        Dice.updateConfig({ themeColor: currentDocument?.data?.dice_color });
-      } else {
-        const defaultDiceColor: string | null = ls.get("default_dice_color");
-        Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor });
-      }
-    }
-  }, [currentDocument]);
-
-  useEffect(() => {
-    if (item_id) {
-      resetChanges();
-      if (manager) manager?.view?.updateState(manager?.createState({ content: undefined }));
-    }
-  }, [item_id]);
-
   useEffect(() => {
     if (!drawer.type) {
-      // console.log(getContext());
       getContext()?.commands.setAnnotations([]);
     }
   }, [drawer.type]);
 
-  if (isFetching)
-    return (
-      <div className="max-h-full min-h-full w-full">
-        <Skeleton type="editor" />
-      </div>
-    );
-  if (!currentDocument && !isFetching) {
-    return <Navigate to="../" />;
-  }
-  if (currentDocument?.data?.is_folder) {
-    return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
-  }
+  useEffect(() => {
+    if (changedData) {
+      const timeout = setTimeout(() => {
+        if (editorData?.content || editorData === undefined) {
+          update({ item_id: item_id as string, queryClient, resetChanges, updateDocument, editorData });
+        }
+      }, 800);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [editorData]);
 
   return (
     <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:w-[60%]">
-      {changedData ? (
-        <div className="absolute right-4 top-2 z-40 duration-300 ease-out animate-in slide-in-from-right-10">
-          <Notification
-            actions={[
-              {
-                icon: IconEnum.save,
-                label: "Save",
-                variant: "success",
-                isDisabled: isUpdating,
-                isLoading: isUpdating,
-                onClick: () => {
-                  updateDocument(
-                    {
-                      data: {
-                        id: item_id as string,
-                        content: editorData.content,
-                      },
-                    },
-                    {
-                      onSuccess: () => {
-                        queryClient.invalidateQueries(["documents", item_id, "mention"]);
-                        resetChanges();
-                      },
-                    },
-                  );
-                },
-              },
-              {
-                icon: IconEnum.close,
-                label: "Discard",
-                variant: "primary",
-                onClick: () => {
-                  resetChanges();
-                  refetch();
-                },
-              },
-            ]}
-            hasNoTruncate
-            id={currentDocument?.data?.id || crypto.randomUUID()}
-            position="top-right"
-            timer={0}
-            title="You have unsaved changes. Press CTRL/CMD+S to save, CTRL/CMD+K to discard changes."
-            variant="info"
-          />
-        </div>
-      ) : null}
       {mentionPosition ? (
         <div
           className={`absolute fade-in-30 ${
@@ -356,10 +392,8 @@ export function DocumentView({ editable }: { editable: boolean }) {
         </div>
       ) : null}
 
-      {/* @ts-ignore */}
       <Remirror
-        autoFocus
-        editable={canUpdate}
+        editable={can_update}
         hooks={documentEditorHooks(changedData, resetChanges, refetch)}
         initialContent={state}
         manager={manager}
@@ -375,26 +409,28 @@ export function DocumentView({ editable }: { editable: boolean }) {
         <div
           className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
           id="editor">
-          {canUpdate ? (
+          {can_update ? (
             <Menubar
-              icon={currentDocument?.data?.icon ?? undefined}
-              id={currentDocument?.data?.id || ""}
-              isTemplate={!!currentDocument?.data?.is_template}
+              hasChanges={!!changedData}
+              icon={icon ?? undefined}
+              id={id || ""}
+              isMutating={isMutating}
+              isTemplate={!!is_template}
               size="md"
-              title={currentDocument?.data?.title || ""}
+              title={title || ""}
             />
           ) : null}
           <div
             className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
-            onContextMenu={canUpdate ? (e) => getContextActions(e) : undefined}
+            onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
             onDrop={
-              canUpdate
+              can_update
                 ? (e) => {
                     const stringData = e.dataTransfer.getData("Text");
                     if (!stringData) return;
                     if (stringData) {
                       const data: { index: number; title: string; description?: string } = JSON.parse(
-                        e.dataTransfer.getData("Text"),
+                        e.dataTransfer.getData("Text")
                       );
                       if (!data) return;
                       getContext()?.commands.insertText(`${data.title}: ${data?.description}`);

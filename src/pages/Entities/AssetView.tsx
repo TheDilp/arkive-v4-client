@@ -5,21 +5,11 @@ import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  Avatar,
-  Button,
-  createColumnHelper,
-  Dropdown,
-  Image,
-  Input,
-  Select,
-  Table,
-  TablePageLayout,
-} from "../../components";
+import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
 import {
   useBreakpoint,
   useDeleteMany,
-  useDownloadImage,
+  useDownloadImages,
   useGetImages,
   useGetInfiniteAssets,
   useHasPermissions,
@@ -63,7 +53,7 @@ type downloadImageMutationType = UseMutateAsyncFunction<
     data: {
       id: string;
       title: string;
-    };
+    }[];
   },
   unknown
 >;
@@ -210,7 +200,7 @@ function createColumns(
                 id: "2",
                 title: "Download",
                 icon: IconEnum.download,
-                onClick: () => downloadImage({ data: row.original }),
+                onClick: () => downloadImage({ data: [{ id: row.original.id, title: row.original.title }] }),
               },
               {
                 id: "delete_image",
@@ -238,14 +228,8 @@ function createColumns(
                   }));
                 },
               },
-            ]}
-          >
-            <Button
-              hasNoBackground
-              icon={IconEnum.actions}
-              iconSize={28}
-              onClick={undefined}
-            />
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
         </div>
       ),
@@ -263,6 +247,7 @@ function getSelectedActions(
     data,
     setDrawer,
     setDialog,
+    downloadImages,
   }: {
     updatePublicMany: UpdatePublicManyType;
     deleteMany: DeleteManyType;
@@ -271,6 +256,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialog: () => unknown;
     data: ImageType[];
+    downloadImages: downloadImageMutationType;
     dispatch: TableDispatch;
   }
 ) {
@@ -284,9 +270,7 @@ function getSelectedActions(
         tooltip: "Set public",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) =>
-            ids.includes(e.id)
-          );
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
             await updatePublicMany({ data: { ids, is_public: true } });
             dispatch({ type: "clearSelection" });
@@ -300,9 +284,7 @@ function getSelectedActions(
         tooltip: "Set private",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) =>
-            ids.includes(e.id)
-          );
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
             await updatePublicMany({ data: { ids, is_public: false } });
             dispatch({ type: "clearSelection" });
@@ -346,14 +328,22 @@ function getSelectedActions(
         type: "bulk_access",
         data: {
           ids,
-          selectablePermissions: [
-            "read_assets",
-            "update_assets",
-            "delete_assets",
-          ],
+          selectablePermissions: ["read_assets", "update_assets", "delete_assets"],
           type: "images",
         },
       }));
+    },
+  });
+  selectedActions.push({
+    icon: IconEnum.download,
+    hasNoBackground: true,
+    isIconOnly: true,
+    tooltip: "Download selected images",
+    onClick: () => {
+      const ids = Object.values(selection || {}).flatMap((id) => id);
+      downloadImages({
+        data: data.filter((image) => ids.includes(image.id)).map((image) => ({ title: image.title, id: image.id })),
+      });
     },
   });
   if (permissions?.delete_assets) {
@@ -405,36 +395,22 @@ export function AssetView() {
   const setDialog = useSetAtom(dialogAtom);
   const resetDialog = useResetAtom(dialogAtom);
   const { isMd, isLg } = useBreakpoint();
-  const { mutateAsync: downloadImage } = useDownloadImage(project_id, "images");
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(
-    "images",
-    project_id as string
-  );
-  const { mutateAsync: deleteMany } = useDeleteMany(
-    "images",
-    false,
-    project_id
-  );
+  const [type, setType] = useState<AssetType>("images");
+
+  const { mutateAsync: downloadImages } = useDownloadImages(project_id, type);
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("images", project_id as string);
+  const { mutateAsync: deleteMany } = useDeleteMany("images", false, project_id);
 
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState<"card" | "table">(
-    ls.get("assets_view") || "table"
-  );
-  const [type, setType] = useState<AssetType>("images");
-  const [
-    { orderBy, filters, relationFilters, selection, pagination },
-    dispatch,
-  ] = useTable({
+  const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
+  const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     relationFilters: {},
     filters: {},
   });
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
-  const permissions = useHasPermissions(
-    ["read_assets", "create_assets", "update_assets", "delete_assets"],
-    undefined
-  );
+  const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
 
   const user = useAtomValue(userAtom);
 
@@ -591,29 +567,18 @@ export function AssetView() {
             if (currentTarget) {
               // @ts-ignore
               const scrollFetchMarker =
-                currentTarget.scrollHeight -
-                  currentTarget.scrollTop -
-                  currentTarget.clientHeight <=
-                1000;
+                currentTarget.scrollHeight - currentTarget.scrollTop - currentTarget.clientHeight <= 1000;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
             }
-          }}
-        >
+          }}>
           {(infiniteAssets?.pages || [])?.map((page) =>
             page.data.map((img: ImageType) => (
               <div
-                key={img.id}
                 className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
-              >
-                <Image
-                  hasTitle
-                  image={img}
-                  isLazyLoading
-                  isOpenable
-                  type={type}
-                />
+                key={img.id}>
+                <Image hasTitle image={img} isLazyLoading isOpenable type={type} />
               </div>
             ))
           )}
@@ -624,7 +589,7 @@ export function AssetView() {
             columns={createColumns(
               setDrawer,
               setDialog,
-              downloadImage,
+              downloadImages,
               user,
               isProjectOwner,
               type,
@@ -644,6 +609,7 @@ export function AssetView() {
                 setDialog,
                 setDrawer,
                 resetDialog,
+                downloadImages,
                 updatePublicMany,
                 dispatch,
                 deleteMany,

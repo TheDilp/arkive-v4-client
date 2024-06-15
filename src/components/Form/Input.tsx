@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-autofocus */
 import { tv } from "tailwind-variants";
 
 import { InputType } from "../../types";

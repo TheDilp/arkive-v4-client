@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { ColumnDef } from "@tanstack/react-table";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useNavigate, useParams } from "react-router-dom";
@@ -55,15 +53,22 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
           name={row.id}
           onChange={(_, e) => {
             if (e.shiftKey) {
-              dispatch({
-                type: "selectAll",
-                payload: {
-                  rows: table
-                    .getPaginationRowModel()
-                    .flatRows.slice(0, row.index + 1)
-                    .map((r) => r.original.id),
-                },
-              });
+              const firstIdx = table
+                .getPaginationRowModel()
+                .flatRows.findIndex(
+                  (row) => row?.original?.id === (table.options.meta as MetaType)?.selection?.[pagination?.page || 0]?.[0]
+                );
+              if (firstIdx > -1) {
+                dispatch({
+                  type: "selectAll",
+                  payload: {
+                    rows: table
+                      .getPaginationRowModel()
+                      .flatRows.slice(firstIdx, row.index + 1)
+                      .map((r) => r.original.id),
+                  },
+                });
+              }
             } else {
               dispatch({ type: "setSelection", payload: { row: row.original.id } });
             }
@@ -154,8 +159,8 @@ export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): C
                   <div className="grid max-w-48 grid-cols-2 gap-2 overflow-auto">
                     {row.original.tags.slice(1).map((tag: TagType) => (
                       <div
-                        key={tag.id}
                         className="col-span-1 cursor-pointer"
+                        key={tag.id}
                         onClick={() => {
                           if (dispatch) {
                             dispatch({ type: "clearAllFilters" });
@@ -228,11 +233,11 @@ export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }
   };
 }
 
-export function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
+export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]; isMultiple: boolean }) {
   return (
     <div className="flex max-w-full items-center gap-x-2">
       <div className="max-w-full truncate">{titles?.[0]}</div>
-      {titles?.length > 1 ? (
+      {titles?.length > 1 && isMultiple ? (
         <Tooltip
           content={titles
             ?.slice(1)
@@ -248,22 +253,28 @@ export function ShowMultipleWithBadge({ titles }: { titles: string[] }) {
   );
 }
 
-export function CharacterColumn({ characters }: { characters: BlueprintInstanceBlueprintFieldType["characters"] }) {
+export function CharacterColumn({
+  characters,
+  isMultiple,
+}: {
+  isMultiple: boolean;
+  characters: BlueprintInstanceBlueprintFieldType["characters"];
+}) {
   const { project_id } = useParams();
   return (
     <div className="flex w-full items-center gap-x-2">
       <div className="z-0 flex w-full items-center justify-center -space-x-4">
-        {characters?.slice(0, 5)?.map((char) => {
+        {characters?.slice(0, isMultiple ? 5 : 1)?.map((char) => {
           return (
             <Avatar
-              key={char?.related_id}
               image={getImageURL(
                 char?.character?.project_id || (project_id as string),
                 "images",
-                char?.character?.portrait_id || "",
+                char?.character?.portrait_id || ""
               )}
               initials={getAvatarInitials(char?.character?.full_name || "")}
               isBordered
+              key={char?.related_id}
               label={char?.character?.full_name || ""}
               size="sm"
               tooltipAllowedPlacements={["left", "right"]}
@@ -286,14 +297,20 @@ export function CharacterColumn({ characters }: { characters: BlueprintInstanceB
   );
 }
 
-export function LocationColumn({ locations }: { locations: BlueprintInstanceBlueprintFieldType["map_pins"] }) {
+export function LocationColumn({
+  locations,
+  isMultiple,
+}: {
+  isMultiple: boolean;
+  locations: BlueprintInstanceBlueprintFieldType["map_pins"];
+}) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(locations || [])?.map((l) => l?.map_pin?.title || "")} />
+      <ShowMultipleWithBadge isMultiple={isMultiple} titles={(locations || [])?.map((l) => l?.map_pin?.title || "")} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(locations || []).map((location) => {
@@ -331,14 +348,20 @@ export function LocationColumn({ locations }: { locations: BlueprintInstanceBlue
   );
 }
 
-export function EventColumn({ locations: events }: { locations: BlueprintInstanceBlueprintFieldType["events"] }) {
+export function EventColumn({
+  isMultiple,
+  locations: events,
+}: {
+  isMultiple: boolean;
+  locations: BlueprintInstanceBlueprintFieldType["events"];
+}) {
   const { project_id } = useParams();
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
 
   return (
     <div className="group flex w-full max-w-full items-center gap-x-2 truncate">
-      <ShowMultipleWithBadge titles={(events || [])?.map((e) => e?.event?.title).filter((l) => !!l)} />
+      <ShowMultipleWithBadge isMultiple={isMultiple} titles={(events || [])?.map((e) => e?.event?.title).filter((l) => !!l)} />
       <Dropdown
         allowedPlacements={["left-start"]}
         items={(events || []).map((e) => {

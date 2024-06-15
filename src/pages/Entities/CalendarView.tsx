@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import groupBy from "lodash.groupby";
@@ -137,7 +134,7 @@ function CalendarRangeEvents({
   const grouped = groupBy(events, "start_year");
   return Object.entries(grouped).map(([year, groupedEvents]) => {
     return (
-      <div key={year} className="my-2">
+      <div className="my-2" key={year}>
         <h3 className="font-merriweather text-xl">Year {year}</h3>
         {groupedEvents.map((event) => {
           const updatePermissions = hasActionPermission(
@@ -146,7 +143,7 @@ function CalendarRangeEvents({
             permissions,
             event?.permissions || [],
             "update_events",
-            user?.role?.id,
+            user?.role?.id
           );
           const deletePermissions = hasActionPermission(
             isProjectOwner,
@@ -154,12 +151,12 @@ function CalendarRangeEvents({
             permissions,
             event?.permissions || [],
             "delete_events",
-            user?.role?.id,
+            user?.role?.id
           );
           return (
             <div
-              key={event.id}
-              className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2">
+              className="my-0.5 flex h-12 items-center rounded border border-zinc-700 bg-zinc-900 bg-cover bg-no-repeat p-2"
+              key={event.id}>
               <div className="flex items-center gap-x-2">
                 <span>{event.title}</span>
                 <Tooltip
@@ -192,21 +189,23 @@ function CalendarRangeEvents({
                   </div>
                 ) : null}
                 <div className="flex items-center -space-x-4">
-                  {event?.map_pins?.slice(0, 5)?.map((pin) => (
-                    <Avatar
-                      key={pin.id}
-                      image={
-                        pin.image_id
-                          ? getImageURL(project_id as string, "images", pin.image_id)
-                          : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
-                      }
-                      initials={getAvatarInitials(pin.title || "")}
-                      isPreview
-                      label={pin.title || ""}
-                      size="xs"
-                      tooltipAllowedPlacements={["top"]}
-                    />
-                  ))}
+                  {event?.map_pins
+                    ?.slice(0, 5)
+                    ?.map((pin) => (
+                      <Avatar
+                        image={
+                          pin.image_id
+                            ? getImageURL(project_id as string, "images", pin.image_id)
+                            : getIconUrlFromIconEnum(pin.icon, pin.color || "#ffffff")
+                        }
+                        initials={getAvatarInitials(pin.title || "")}
+                        isPreview
+                        key={pin.id}
+                        label={pin.title || ""}
+                        size="xs"
+                        tooltipAllowedPlacements={["top"]}
+                      />
+                    ))}
                   {event.characters && event.characters?.length && event.characters?.length > 5 ? (
                     <Tooltip
                       content={event.characters
@@ -220,16 +219,18 @@ function CalendarRangeEvents({
                   ) : null}
                 </div>
                 <div className="flex items-center -space-x-4">
-                  {event?.characters?.slice(0, 5)?.map((char) => (
-                    <Avatar
-                      key={char.id}
-                      image={getImageURL(project_id as string, "images", char.portrait_id)}
-                      initials={getAvatarInitials(char.full_name)}
-                      label={char.full_name}
-                      size="xs"
-                      tooltipAllowedPlacements={["top"]}
-                    />
-                  ))}
+                  {event?.characters
+                    ?.slice(0, 5)
+                    ?.map((char) => (
+                      <Avatar
+                        image={getImageURL(project_id as string, "images", char.portrait_id)}
+                        initials={getAvatarInitials(char.full_name)}
+                        key={char.id}
+                        label={char.full_name}
+                        size="xs"
+                        tooltipAllowedPlacements={["top"]}
+                      />
+                    ))}
                   {event.characters && event.characters?.length && event.characters?.length > 5 ? (
                     <Tooltip
                       content={event.characters
@@ -358,7 +359,7 @@ export function CalendarView({
     end: undefined,
   });
   const [view, setView] = useState<"calendar" | "range" | "timeline">(
-    isCharacterCalendar ? "range" : ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar",
+    isCharacterCalendar ? "range" : ls.get(`calendar_or_timeline_view_${item_id}`) ?? "calendar"
   );
   const [filters, setFilters] = useState<CalendarFilters>({
     filters: { and: [], or: [] },
@@ -391,7 +392,7 @@ export function CalendarView({
     {
       enabled: !data && !!user,
       isPublic,
-    },
+    }
   );
 
   const calendar = data ?? existingCalendar?.data;
@@ -409,7 +410,7 @@ export function CalendarView({
       "read_assets",
       "read_documents",
     ],
-    calendar?.owner_id,
+    calendar?.owner_id
   );
 
   const { data: events, isLoading } = useGetEntities<EventType>(
@@ -440,7 +441,7 @@ export function CalendarView({
         range.start,
         range.end,
         calendar?.months?.[date.month]?.id as string,
-        filters,
+        filters
       ),
       relationFilters: filters.relationFilters || {},
       relations:
@@ -463,7 +464,7 @@ export function CalendarView({
       queryKeyOverwrite: queryKey,
       staleTime: 5 * 60 * 1000,
       isPublic,
-    },
+    }
   );
   const { data: subitemEvent } = useGetSubEntity<EventType>(
     event_id || subitem_id,
@@ -472,7 +473,7 @@ export function CalendarView({
       data: { parent_id: item_id || id },
       fields: ["start_month", "start_year", "is_public"],
     },
-    { enabled: event_id ? !!event_id : !!subitem_id, isPublic },
+    { enabled: event_id ? !!event_id : !!subitem_id, isPublic }
   );
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
@@ -517,8 +518,8 @@ export function CalendarView({
         permissions,
         calendar?.permissions || [],
         "update_calendars",
-        user?.role?.id,
-      ),
+        user?.role?.id
+      )
     );
   }, [calendar]);
 
@@ -529,7 +530,7 @@ export function CalendarView({
         year: date.month - 1 === -1 ? date.year - 1 : date.year,
         month: date.month - 1 === -1 ? (calendar?.months?.length ?? 1) - 1 : date.month - 1,
       }),
-    [date, calendar],
+    [date, calendar]
   );
 
   if (!calendar) return null;
@@ -541,7 +542,7 @@ export function CalendarView({
     date?.month,
     calendar?.days?.length,
     calendar?.starts_on_day || 0,
-    previousMonthLeapDayCount,
+    previousMonthLeapDayCount
   );
 
   if (isInitalLoadingCalendar) return <Skeleton type="calendar_view" />;
@@ -585,11 +586,11 @@ export function CalendarView({
           {hasFiltersEnabled && filterBadges.fields.length && !isPublic
             ? filterBadges.fields.map((badge) => (
                 <Tooltip
-                  key={badge}
                   content={getFilterTooltip({
                     and: filterBadges.andFiltersByField[badge],
                     or: filterBadges.orFiltersByField[badge],
-                  })}>
+                  })}
+                  key={badge}>
                   <div>
                     <Badge label={badge} size="sm" variant="info" />
                   </div>
@@ -600,11 +601,11 @@ export function CalendarView({
             ? filterBadges.relationFields.map((badge) => {
                 return (
                   <Tooltip
-                    key={badge}
                     content={getFilterTooltip({
                       and: filterBadges.andRelationFiltersByField[badge],
                       or: filterBadges.orRelationFiltersByField[badge],
-                    })}>
+                    })}
+                    key={badge}>
                     <div>
                       <Badge label={badge} size="sm" variant="info" />
                     </div>
@@ -719,8 +720,8 @@ export function CalendarView({
           }}>
           {calendar?.days?.map((day) => (
             <div
-              key={day}
               className="group sticky top-0 col-span-1 h-min border-b border-r border-zinc-700 bg-black px-2 text-white"
+              key={day}
               onKeyDown={() => {}}
               tabIndex={-1}>
               {day}
@@ -730,16 +731,16 @@ export function CalendarView({
             .reverse()
             .map((day) => (
               <div
-                key={day}
                 className="group col-span-1 h-56 border-b border-r border-zinc-700 hover:text-white"
+                key={day}
                 onKeyDown={() => {}}
                 tabIndex={-1}>
                 <DayNumber
-                  key={day}
                   dayNumber={getFillerDayNumber(calendar?.months, date.month, day, previousMonthLeapDayCount)}
                   event_ids={[]}
                   isFiller
                   isReadOnly={isPublic}
+                  key={day}
                   monthNumber={date.month}
                   year={date.year}
                 />
@@ -759,8 +760,8 @@ export function CalendarView({
 
             return (
               <div
-                key={day}
                 className="group col-span-1 flex h-56 flex-col border-b border-r border-zinc-700 bg-opacity-85 hover:text-white"
+                key={day}
                 style={{
                   backgroundColor:
                     matchingEra &&
@@ -770,10 +771,10 @@ export function CalendarView({
                       : "transparent",
                 }}>
                 <DayNumber
-                  key={day}
                   dayNumber={day}
                   event_ids={filteredEvents.map((e) => e.id)}
                   isReadOnly={isPublic}
+                  key={day}
                   monthNumber={date.month}
                   year={date.year}
                 />
@@ -785,7 +786,7 @@ export function CalendarView({
                       permissions,
                       event?.permissions || [],
                       "read_events",
-                      user?.role?.id,
+                      user?.role?.id
                     );
                     const updatePermission = hasActionPermission(
                       isProjectOwner,
@@ -793,12 +794,12 @@ export function CalendarView({
                       permissions,
                       event?.permissions || [],
                       "update_events",
-                      user?.role?.id,
+                      user?.role?.id
                     );
                     return (
                       <div
-                        key={event.id}
                         className={updatePermission ? "cursor-pointer" : "cursor-not-allowed"}
+                        key={event.id}
                         onClick={() => {
                           if ((id && readPermission) || isPublic) {
                             setDrawer((prev) => ({
@@ -863,7 +864,7 @@ export function CalendarView({
                                         permissions,
                                         event?.permissions || [],
                                         "delete_events",
-                                        user?.role?.id,
+                                        user?.role?.id
                                       ),
                                       icon: IconEnum.trash,
                                       onClick: () => {
@@ -879,7 +880,7 @@ export function CalendarView({
                           <div className="relative h-24 w-full overflow-hidden rounded-md">
                             <span className="absolute z-10 max-w-full truncate px-1 text-sm">{event.title}</span>
                             <div
-                              className="absolute h-full w-full bg-cover bg-center opacity-60 "
+                              className="absolute h-full w-full bg-cover bg-center opacity-60"
                               style={{
                                 backgroundImage: `url(${getImageURL(project_id as string, "images", event.image_id)})`,
                               }}
@@ -906,7 +907,7 @@ export function CalendarView({
                               day + 1,
                               date.year,
                               calendar?.months?.[date.month]?.id,
-                              calendar?.months || [],
+                              calendar?.months || []
                             )}`}
                           </h4>
                           <ul className="flex flex-col gap-y-0.5">
@@ -917,7 +918,7 @@ export function CalendarView({
                                 permissions,
                                 event?.permissions || [],
                                 "read_events",
-                                user?.role?.id,
+                                user?.role?.id
                               );
                               const updatePermission = hasActionPermission(
                                 isProjectOwner,
@@ -925,12 +926,12 @@ export function CalendarView({
                                 permissions,
                                 event?.permissions || [],
                                 "update_events",
-                                user?.role?.id,
+                                user?.role?.id
                               );
                               return (
                                 <li
-                                  key={event.id}
                                   className={updatePermission ? "" : "cursor-not-allowed"}
+                                  key={event.id}
                                   onClick={() => {
                                     if ((id && readPermission) || isPublic) {
                                       setDrawer((prev) => ({
@@ -982,7 +983,7 @@ export function CalendarView({
                                                   permissions,
                                                   event?.permissions || [],
                                                   "update_events",
-                                                  user?.role?.id,
+                                                  user?.role?.id
                                                 ),
                                                 onClick: () =>
                                                   setDrawer((prev) => ({
@@ -995,7 +996,7 @@ export function CalendarView({
                                                       permissions,
                                                       event?.permissions || [],
                                                       "delete_events",
-                                                      user?.role?.id,
+                                                      user?.role?.id
                                                     ),
                                                     data: {
                                                       id: evt.id,
@@ -1042,22 +1043,22 @@ export function CalendarView({
             ...Array(
               calendar?.days?.length
                 ? calendar.days.length - ((startingDayForMonth + Number(monthDays)) % calendar.days.length)
-                : 0,
+                : 0
             ).keys(),
           ]
             .reverse()
             .map((day, idx) => (
               <div
-                key={day}
                 className="group col-span-1 h-56 cursor-default border-b border-r border-zinc-700 hover:text-white"
+                key={day}
                 onKeyDown={() => {}}
                 tabIndex={-1}>
                 <DayNumber
-                  key={day}
                   dayNumber={idx}
                   event_ids={[]}
                   isFiller
                   isReadOnly={isPublic}
+                  key={day}
                   monthNumber={date.month}
                   year={date.year}
                 />

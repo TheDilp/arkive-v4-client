@@ -1,7 +1,3 @@
-/* eslint-disable jsx-a11y/no-autofocus */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import {
   autoUpdate,
   flip,
@@ -373,10 +369,10 @@ export function Select({
       }}>
       {label ? <span className={labelClasses()}>{label}</span> : null}
       <div
-        ref={refs.setReference}
         aria-autocomplete="none"
         aria-labelledby="select-label"
         className={select()}
+        ref={refs.setReference}
         tabIndex={0}
         {...getReferenceProps({
           onKeyDown(e) {
@@ -444,7 +440,7 @@ export function Select({
       {isOpen && options.length ? (
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
-            <div ref={refs.setFloating} className={optionsContainer()} style={floatingStyles} {...getFloatingProps()}>
+            <div className={optionsContainer()} ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
               {hasSearch ? (
                 <input
                   // @ts-ignore
@@ -478,9 +474,6 @@ export function Select({
               {filteredItems.map((opt, i) => {
                 return (
                   <div
-                    ref={(node) => {
-                      listRef.current[i] = node;
-                    }}
                     aria-selected={i === activeIndex}
                     className={SelectOption({
                       isActive: activeIndex === i,
@@ -490,6 +483,9 @@ export function Select({
                       isDisabled: opt.isDisabled,
                       size,
                     })}
+                    ref={(node) => {
+                      listRef.current[i] = node;
+                    }}
                     role="option"
                     tabIndex={i === activeIndex ? 0 : -1}
                     {...getItemProps({
