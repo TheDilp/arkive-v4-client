@@ -6,7 +6,7 @@ import { BlueprintFieldType, BlueprintInstanceBlueprintFieldType, RandomTableOpt
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
 import { StaticRender } from "../Complex";
 import { Input } from "../Form";
-import { FormattedDate } from "../Misc";
+import { Alert, FormattedDate } from "../Misc";
 import { Tooltip } from "../Overlay";
 import { Gallery } from "./Gallery";
 import { GroupEntityPreview } from "./GroupEntityPreview";
@@ -154,11 +154,11 @@ export function AdditionalBlueprintFieldDisplay({
             value={selectMultipleFormatted}
           />
         ) : null}
-        {blueprint_field.field_type === "textarea" && isRemirrorJSON(value) ? (
+        {blueprint_field.field_type === "textarea" ? (
           <>
-            <span className="text-sm text-zinc-300">{blueprint_field.title}</span>
-            <div className="rounded-md border border-zinc-700 bg-zinc-900">
-              <StaticRender content={(value || {}) as any} />
+            <span className="mb-2 border-b border-zinc-700 text-sm text-zinc-300">{blueprint_field.title}</span>
+            <div className="rounded-md bg-zinc-900">
+              {isRemirrorJSON(value) ? <StaticRender content={(value || {}) as any} /> : <Alert label="There is no content." />}
             </div>
           </>
         ) : null}
