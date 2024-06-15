@@ -98,24 +98,24 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     {
       enabled: !!data?.id,
       queryKeyConcat: ["drawer"],
-    },
+    }
   );
   const permissions = useHasPermissions(
     ["create_documents", "update_documents", "read_tags"],
-    existingDocument?.data?.owner_id,
+    existingDocument?.data?.owner_id
   );
   const canCreateOrEdit = createOrEditPermission(
     permissions?.create_documents,
     permissions?.update_documents,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
   const [document, setDocument] = useState<Partial<DocumentType | InsertDocumentType> & { project_id: string }>(
     existingDocument?.data || {
       title: data.title,
       parent_id: exceptions?.globalCreate ? null : item_id,
       project_id: project_id as string,
-    },
+    }
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<{
@@ -214,7 +214,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
           <div className="flex flex-wrap gap-2">
             {document?.alter_names?.length
               ? document.alter_names.map((alter_name) => (
-                  <div key={alter_name.title} className="w-fit">
+                  <div className="w-fit" key={alter_name.title}>
                     <Badge
                       clearAction={
                         canCreateOrEdit
@@ -302,7 +302,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               }
 
               const newData = reorder(document?.template_fields || [], result.source.index, result.destination.index).map(
-                (f, i) => ({ ...f, sort: i }),
+                (f, i) => ({ ...f, sort: i })
               );
               handleChange({
                 name: "template_fields",
@@ -315,7 +315,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               {(providedDroppable) => (
                 <div className="flex w-full flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                   {(document?.template_fields || [])?.map((f, idx) => (
-                    <Draggable key={f.id} draggableId={f.id || f.key + idx} index={idx}>
+                    <Draggable draggableId={f.id || f.key + idx} index={idx} key={f.id}>
                       {(providedDraggable) => (
                         <div
                           className="my-1 flex w-full flex-nowrap gap-x-2"
@@ -340,8 +340,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                               ]}
                               label={getSentenceCase(f.key) || "New key"}>
                               <div
-                                key={f.id}
-                                className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2">
+                                className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2"
+                                key={f.id}>
                                 <MatchField
                                   allMatches={document?.template_fields || []}
                                   derive_formula={f.derive_formula}
@@ -350,8 +350,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                   formula={f.formula}
                                   handleChange={handleChange}
                                   idx={idx}
-                                  is_randomized={f?.is_randomized}
                                   isEditable
+                                  is_randomized={f?.is_randomized}
                                   match={f?.key}
                                   random_count={f.random_count}
                                   related_id={f.related_id}
@@ -419,7 +419,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                     template_fields.map((f) => ({
                       ...f,
                       key: f.key.trim(),
-                    })),
+                    }))
                   );
                 }
 
@@ -435,7 +435,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   },
                   {
                     onSuccess: resetDrawerAtom,
-                  },
+                  }
                 );
               } else {
                 const dataToParse = {
@@ -461,7 +461,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   },
                   {
                     onSuccess: resetDrawerAtom,
-                  },
+                  }
                 );
               }
             } else {

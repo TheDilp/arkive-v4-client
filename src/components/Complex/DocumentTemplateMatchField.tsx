@@ -246,9 +246,20 @@ export function MatchField({
             options={MatchReplacementOptions}
             value={entity_type}
           />
-          {entity_type === "derived" && !isEditable ? (
+          {entity_type === "derived" && !isEditable && !is_randomized ? (
             <div>
               <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
+            </div>
+          ) : null}
+          {entity_type !== "random_tables" ? (
+            <div className="h-full [&>div]:gap-y-4">
+              <Checkbox
+                label="Random"
+                name={`template_fields[${idx}].is_randomized`}
+                onChange={handleChange}
+                tooltip="Keys will be replaced when generating the document."
+                value={!!is_randomized}
+              />
             </div>
           ) : null}
         </div>
@@ -307,9 +318,11 @@ export function MatchField({
             !is_randomized &&
             !!entity_type &&
             !selectedEntity &&
-            ((entity_type === "blueprint_instances" && parent && (!is_randomized || !isEditable)) ||
-              entity_type !== "blueprint_instances") ? (
-              <div className="flex-1">
+            (((entity_type === "blueprint_instances" || entity_type === "map_pins" || entity_type === "words") &&
+              parent &&
+              (!is_randomized || !isEditable)) ||
+              (entity_type !== "blueprint_instances" && entity_type !== "map_pins" && entity_type !== "words")) ? (
+              <div className={is_randomized ? "" : "flex w-full flex-nowrap items-center gap-x-2"}>
                 <Search
                   isDisabled={(entity_type === "blueprint_instances" && !parent) || isFetching}
                   isLoading={isFetching}
@@ -327,6 +340,11 @@ export function MatchField({
                   searchEntity={entity_type}
                   value={value}
                 />
+                {is_randomized ? null : (
+                  <div className="w-min self-end pb-2">
+                    <Button hasNoBackground icon={IconEnum.add} isIconOnly onClick={undefined} tooltip="Add" variant="info" />
+                  </div>
+                )}
               </div>
             ) : null}
             {entity_type !== "dice_roll" && !!entity_type && !is_randomized && selectedEntity?.value && entity_type ? (
@@ -408,31 +426,18 @@ export function MatchField({
               </div>
             ) : null}
 
-            {entity_type !== "dice_roll" && !!entity_type ? (
+            {entity_type !== "dice_roll" && !!entity_type && (is_randomized || entity_type === "random_tables") ? (
               <div className={`flex flex-nowrap ${is_randomized && parent ? "w-[49%]" : "flex-1"}`}>
-                {entity_type !== "random_tables" ? (
-                  <div className="h-full [&>div]:gap-y-2">
-                    <Checkbox
-                      label="Random"
-                      name={`template_fields[${idx}].is_randomized`}
-                      onChange={handleChange}
-                      tooltip="Keys will be replaced when generating the document."
-                      value={!!is_randomized}
-                    />
-                  </div>
-                ) : null}
-                {is_randomized || entity_type === "random_tables" ? (
-                  <div className="flex-1 pl-2">
-                    <Select
-                      hasSearch
-                      label="Random count"
-                      name={`template_fields[${idx}].random_count`}
-                      onChange={handleChange}
-                      options={RandomCountOptions}
-                      value={random_count}
-                    />
-                  </div>
-                ) : null}
+                <div className="flex-1">
+                  <Select
+                    hasSearch
+                    label="Random count"
+                    name={`template_fields[${idx}].random_count`}
+                    onChange={handleChange}
+                    options={RandomCountOptions}
+                    value={random_count}
+                  />
+                </div>
               </div>
             ) : null}
           </div>
