@@ -12,7 +12,7 @@ type Props = {
   isPublic?: boolean;
 };
 
-export function CarouselEntityPreview({ items, field_label, isPublic }: Props) {
+export function GroupEntityPreview({ items, field_label, isPublic }: Props) {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   return (
@@ -23,7 +23,7 @@ export function CarouselEntityPreview({ items, field_label, isPublic }: Props) {
           <Alert label="There is no content." />
         </div>
       ) : null}
-      <div className={`grid ${items.length <= 1 ? "grid-cols-1" : "grid-cols-3"} gap-1 `}>
+      <div className={`grid ${items.length <= 1 ? "grid-cols-1" : "grid-cols-3"} gap-1`}>
         {items.map((item) => (
           <div key={item?.id}>
             <EntityPreview

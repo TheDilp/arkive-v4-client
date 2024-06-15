@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useGetSubEntity } from "../../hooks";
 import { CharacterCharacterFieldType, CharacterFieldType, RandomTableOptionType } from "../../types";
 import { FieldClasses, formatDateToString, getEntityLink, IconEnum } from "../../utils";
-import { CarouselEntityPreview, EntityPreview, FormattedDate, Gallery, Input, StaticRender, Tooltip } from "..";
+import { EntityPreview, FormattedDate, Gallery, GroupEntityPreview, Input, StaticRender, Tooltip } from "..";
 
 function RandomTableField({
   random_table_id,
@@ -56,13 +56,13 @@ function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldTyp
     fieldData?.calendar?.start_day,
     fieldData?.calendar?.start_year,
     fieldData?.calendar?.start_month_id,
-    field?.calendar?.months,
+    field?.calendar?.months
   );
   const endStringDate = formatDateToString(
     fieldData?.calendar?.end_day,
     fieldData?.calendar?.end_year,
     fieldData?.calendar?.end_month_id,
-    field?.calendar?.months,
+    field?.calendar?.months
   );
 
   return (
@@ -136,7 +136,7 @@ export function AdditionalFieldDisplay({
 
       {character_field.field_type === "characters_single" || character_field.field_type === "characters_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
+          <GroupEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
             items={(character_field_data?.characters || [])
@@ -155,7 +155,7 @@ export function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "blueprints_single" || character_field.field_type === "blueprints_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
+          <GroupEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
             items={(character_field_data?.blueprint_instances || [])
@@ -171,7 +171,7 @@ export function AdditionalFieldDisplay({
                   "blueprint_instances",
                   blueprint_instance.related_id,
                   blueprint_instance.blueprint_instance.parent_id,
-                  isPublic,
+                  isPublic
                 ),
               }))}
           />
@@ -179,7 +179,7 @@ export function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "documents_single" || character_field.field_type === "documents_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
+          <GroupEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
             items={(character_field_data?.documents || [])
@@ -196,7 +196,7 @@ export function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "locations_single" || character_field.field_type === "locations_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
+          <GroupEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
             items={(character_field_data?.map_pins || [])
@@ -214,7 +214,7 @@ export function AdditionalFieldDisplay({
       ) : null}
       {character_field.field_type === "events_single" || character_field.field_type === "events_multiple" ? (
         <div className="grid w-full grid-cols-6 gap-1 truncate">
-          <CarouselEntityPreview
+          <GroupEntityPreview
             field_label={character_field.title}
             isPublic={isPublic}
             items={(character_field_data?.events || [])

@@ -16,12 +16,7 @@ import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNav
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
 
-const tabs = [
-  { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-  //   { id: "2", label: "Relationships", icon: IconEnum.family_tree },
-  //   { id: "3", label: "Additional fields", icon: IconEnum.additional_fields },
-  //   { id: "4", label: "Conversations", icon: IconEnum.conversation },
-];
+const tabs = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 
 export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string; parent_id?: string; isPublic?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
@@ -42,7 +37,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
       "update_blueprint_instances",
       "delete_blueprint_instances",
     ],
-    undefined,
+    undefined
   );
   const user = useAtomValue(userAtom);
   const { data: blueprint } = useGetEntity<BlueprintType>(
@@ -59,7 +54,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
       },
       permissions: true,
     },
-    { isPublic, staleTime: 3 * 60 * 1000 },
+    { isPublic, staleTime: 3 * 60 * 1000 }
   );
 
   const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
@@ -74,7 +69,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
       },
       permissions: true,
     },
-    { isPublic, enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 },
+    { isPublic, enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 }
   );
 
   function openEditTagDrawer() {
@@ -102,11 +97,11 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
 
   useNavbarTitle(
     `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
-    !!blueprint?.data && !!blueprintInstance?.data,
+    !!blueprint?.data && !!blueprintInstance?.data
   );
 
   return (
-    <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2 ">
+    <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2">
       {item_id && !isPublic ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -121,7 +116,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
                     permissions,
                     blueprint?.data?.permissions || [],
                     "update_blueprints",
-                    user?.role?.id,
+                    user?.role?.id
                   )
                 }
                 label="Edit current blueprint"
@@ -147,7 +142,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
                     permissions,
                     blueprintInstance?.data?.permissions || [],
                     "update_blueprint_instances",
-                    user?.role?.id,
+                    user?.role?.id
                   )
                 }
                 label="Edit current instance"
@@ -179,7 +174,7 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
                 isVertical
                 onChange={(tab, index) => {
                   navigate(
-                    `/projects/${project_id}/blueprints/${parent_id || item_id}/${id || subitem_id}/${tab.label.toLowerCase()}`,
+                    `/projects/${project_id}/blueprints/${parent_id || item_id}/${id || subitem_id}/${tab.label.toLowerCase()}`
                   );
                   setSelectedTab(index);
                 }}
@@ -213,15 +208,15 @@ export function BlueprintProfileView({ id, parent_id, isPublic }: { id?: string;
                       ?.toSorted((a, b) => a.sort - b.sort)
                       .map((blueprint_field) => {
                         const blueprintField = blueprint?.data?.blueprint_fields?.find(
-                          (field) => field.id === blueprint_field.id,
+                          (field) => field.id === blueprint_field.id
                         );
                         if (!blueprintField) return null;
                         return (
                           <AdditionalBlueprintFieldDisplay
-                            key={blueprint_field.id}
                             blueprint_field={blueprintField}
                             blueprint_field_data={blueprint_field}
                             isPreview={!!id}
+                            key={blueprint_field.id}
                           />
                         );
                       })
