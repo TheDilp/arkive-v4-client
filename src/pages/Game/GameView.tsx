@@ -6,14 +6,14 @@ import { CharacterType } from "../../types";
 import { AvailableIcons, getAvatarInitials, getImageURL, IconEnum } from "../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
-const sections: { tooltip: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
-  { tooltip: "roll_history", icon: IconEnum.random_table },
+const sections: { tooltip: string; id: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [
+  { id: "roll_history", tooltip: "Roll history", icon: IconEnum.random_table },
 
-  { tooltip: "characters", icon: IconEnum.character },
+  { id: "characters", tooltip: "Characters", icon: IconEnum.character },
 
-  { tooltip: "journal", icon: IconEnum.info_circle },
+  { id: "journal", tooltip: "Journal", icon: IconEnum.info_circle },
 
-  { tooltip: "music", icon: IconEnum.music },
+  { id: "music", tooltip: "Music", icon: IconEnum.music },
 ];
 type GameDrawerType = "roll_history" | "characters" | "journal" | "music" | null;
 
@@ -257,8 +257,8 @@ export function GameView() {
         <ul className="flex flex-col gap-y-4">
           {sections.map((section) => (
             <li
-              className={`flex cursor-pointer items-center justify-center rounded-l-md p-1 shadow transition-colors ${drawer === section.tooltip.toLowerCase() ? "bg-blue-500" : "bg-zinc-800"}`}
-              key={section.tooltip}>
+              className={`flex cursor-pointer items-center justify-center rounded-l-md p-1 shadow transition-colors ${drawer === section.id.toLowerCase() ? "bg-blue-500" : "bg-zinc-800"}`}
+              key={section.id}>
               <Tooltip content={section.tooltip}>
                 <div>
                   <Button
@@ -267,8 +267,8 @@ export function GameView() {
                     iconSize={32}
                     isIconOnly
                     onClick={() => {
-                      if (drawer && drawer === section.tooltip.toLowerCase()) setDrawer(null);
-                      else setDrawer(section.tooltip.toLowerCase() as GameDrawerType);
+                      if (drawer && drawer === section.id.toLowerCase()) setDrawer(null);
+                      else setDrawer(section.id.toLowerCase() as GameDrawerType);
                     }}
                   />
                 </div>
