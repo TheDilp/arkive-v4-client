@@ -91,7 +91,7 @@
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{ts,tsx,html}": "eslint --fix --report-unused-disable-directives --max-warnings 0"
+    "*.{ts,tsx} !(*.config).ts": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",
   "version": "0.0.0"
