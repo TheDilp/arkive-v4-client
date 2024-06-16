@@ -46,14 +46,35 @@ const InputClasses = tv({
         label: "text-red-600",
         helperText: "text-red-500",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
     },
     size: {
-      sm: {
-        inputContainer: "h-8",
+      "4xs": {
+        inputContainer: "h-6",
+      },
+      "3xs": {
+        inputContainer: "h-6",
+      },
+      "2xs": {
+        inputContainer: "h-6",
       },
       xs: {
         inputContainer: "h-6",
       },
+      sm: {
+        inputContainer: "h-8",
+      },
+      md: {},
+      lg: {},
+      xl: {},
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
     isDisabled: {
       true: {
