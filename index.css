@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@config "./tailwind.config.js";
+@layer base {
+  @font-face {
+    font-family: Lato;
+    src: url("./public/Lato-Regular.ttf");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Lato;
+    src: url("./public/Lato-Bold.ttf");
+    font-weight: 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Merriweather;
+    src: url("./public/Merriweather-Regular.ttf");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: Merriweather;
+    src: url("./public/Merriweather-Bold.ttf");
+    font-weight: 700;
+    font-display: swap;
+  }
+}
+
+body {
+  @apply relative bg-black font-lato text-white;
+}
+
+::-webkit-scrollbar {
+  @apply h-1 w-1;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply z-0 bg-zinc-600;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply z-0 bg-zinc-500;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-400;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  @apply hidden;
+}
+
+summary::-webkit-details-marker {
+  @apply hidden;
+}
+details {
+  @apply cursor-pointer;
+}
+details[open] > summary :not(.no-rotate) > svg {
+  @apply rotate-180 cursor-pointer;
+}
+
+details[open] > summary :not(.no-rotate) div * {
+  @apply rotate-0;
+}
+
+details:not([open]) div {
+  @apply hidden;
+}
+
+input[type="color"] {
+  appearance: none;
+  -webkit-appearance: none;
+  @apply h-6 w-6 appearance-none rounded-full border-none bg-transparent;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  @apply border-none p-0;
+}
+input[type="color"]::-webkit-color-swatch {
+  @apply rounded-full border-none;
+}
+/* clears the ‘X’ from Internet Explorer */
+input[type="search"]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+input[type="search"]::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
+/* clears the ‘X’ from Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+/* Maps */
+.leaflet-container {
+  @apply flex h-[calc(100%-4rem)] flex-1 select-none overflow-visible bg-transparent !important;
+  .leafletImageOverlayLayer {
+    @apply z-10;
+  }
+  .leaflet-pane {
+    @apply z-10;
+    .leaflet-tooltip {
+      @apply border-solid border-zinc-800 bg-zinc-800 p-1 text-sm text-white;
+    }
+    .leaflet-tooltip::before {
+      @apply border-t-zinc-800;
+    }
+  }
+
+  .marker-cluster-small,
+  .marker-cluster-medium,
+  .marker-cluster-large {
+    @apply flex items-center justify-center border border-white bg-zinc-800 !important;
+    div {
+      @apply m-0 bg-transparent font-lato text-base !important;
+    }
+  }
+}
+.leaflet-control-container {
+  @apply z-[10] select-none;
+}
+
+.skeleton_family_tree_parent::after {
+  content: "";
+  @apply absolute left-[-45%] top-[185%] h-[5px] w-[180%] rotate-90 border-t border-zinc-600;
+}
+
+.skeleton_family_tree_child::before,
+.skeleton_family_tree_child::after {
+  @apply absolute right-[50%] top-[-40%] h-[20px] w-[335%] border-t border-solid border-zinc-600;
+  content: "";
+}
+.skeleton_family_tree_child::after {
+  @apply left-[50%] right-auto border-l border-solid border-zinc-600;
+}
+
+#dice-box,
+#dice-box canvas,
+#dice-box-no-sim,
+#dice-box-no-sim canvas {
+  @apply pointer-events-none fixed z-[999] h-full w-full;
+}
+
+.cl-button {
+  @apply text-white hover:text-white;
+}

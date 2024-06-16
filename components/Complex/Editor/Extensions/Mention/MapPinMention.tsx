@@ -3,7 +3,7 @@ import { MutableRefObject, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import { useGetEntity, useGetSubEntity } from "../../../../../hooks";
-import { MapView } from "../../../../../src/pages/Entities/MapView";
+import { MapView } from "../../../../../pages/Entities/MapView";
 import { MapPinType, MapType } from "../../../../../types";
 import { getImageURL, getMentionLink, IconEnum } from "../../../../../utils";
 import { Card } from "../../../../Layout";

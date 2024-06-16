@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", "./components/**/*.{ts,tsx}"],
+  content: ["./index.html", "./components/**/*.{ts,tsx}", "./index.css", "./Editor.css", "./arkive-v4-wiki/src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       transitionProperty: {

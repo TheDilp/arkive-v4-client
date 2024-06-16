@@ -2,8 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetEntity, useGetImage } from "../../../hooks";
-import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../src/pages/Entities";
-import { BlueprintProfileView } from "../../../src/pages/Entities/BlueprintProfileView";
+import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
+import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
 import { AssetType, AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
