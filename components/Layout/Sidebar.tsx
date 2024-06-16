@@ -6,8 +6,7 @@ import { tv } from "tailwind-variants";
 import { useBreakpoint } from "../../hooks";
 import { PermissionCodeType, SidebarType } from "../../types";
 import { currentUserPermissionsAtom, getSidebarLink, isProjectOwnerAtom, projectFeatureFlagsAtom } from "../../utils";
-import { Icon, Skeleton } from "../Misc";
-import { Tooltip } from "../Overlay";
+import { Icon, Skeleton, Tooltip } from "../";
 
 const SidebarClasses = tv({
   slots: {

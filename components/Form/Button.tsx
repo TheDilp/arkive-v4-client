@@ -1,4 +1,4 @@
-import { tv } from "tailwind-variants";
+import { tv, VariantProps } from "tailwind-variants";
 
 import { ButtonType } from "../../types/ComponentTypes/FormTypes";
 import { IconEnum } from "../../utils/enums/IconEnums";
@@ -44,6 +44,9 @@ const ButtonClasses = tv({
     },
     isDisabled: {
       true: "bg-zinc-400 text-zinc-200 cursor-not-allowed",
+    },
+    isIconOnly: {
+      true: "",
     },
     hasNoBackground: {
       true: "bg-transparent shadow-none border-0",
@@ -123,8 +126,8 @@ export function Button({
   size = "md",
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({
-    variant,
-    size,
+    variant: variant as VariantProps<typeof ButtonClasses>["variant"],
+    size: size as VariantProps<typeof ButtonClasses>["size"],
     isDisabled,
     hasNoBackground,
     hasNoLabel: !label,

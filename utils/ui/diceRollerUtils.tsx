@@ -49,7 +49,6 @@ export async function getRollValue(notation: string, hasNoSimulation?: boolean) 
 }
 
 export async function rollDiceWithNotification(
-   
   createNotification: (notification: Omit<NotificationType, "id">) => void,
   diceRoll: string,
   hasNoSimulation?: boolean

@@ -21,6 +21,7 @@ export default defineConfig({
         "../hooks",
         "../utils",
         "..validation",
+        "../public/assets",
         "../public/Lato-Regular.ttf",
         "../public/Merriweather-Regular.ttf",
         "../public/Lato-Bold.ttf",
@@ -46,4 +47,3 @@ export default defineConfig({
     },
   },
 });
-
