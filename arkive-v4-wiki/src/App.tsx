@@ -7,7 +7,6 @@ import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react
 import { NotificationContainer, ProjectLayout } from "../../components";
 import { CharacterProfileView, EntitiesView, FolderView } from "../../pages/Entities";
 import { BlueprintProfileView } from "../../pages/Entities/BlueprintProfileView";
-import { GameLayout, GameView } from "../../pages/Game";
 import { Dashboard } from "../../pages/Projects/Dashboard";
 import { ProjectsView } from "../../pages/Projects/ProjectsView";
 import { PublicEntitiesView, PublicListView } from "../../pages/Public";
@@ -66,11 +65,6 @@ export default function App() {
                 <Route element={<EntitiesView />} path=":type/:item_id/:subitem_id/*" />
                 <Route element={<FolderView />} path=":type/folder/:item_id/*" />
                 <Route element={<Dashboard />} path="*" />
-              </Route>
-            </Route>
-            <Route path="game/*">
-              <Route element={<GameLayout />}>
-                <Route element={<GameView />} path="123" />
               </Route>
             </Route>
           </Route>
