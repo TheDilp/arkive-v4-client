@@ -1,28 +1,13 @@
 import * as d3 from "d3";
 import { useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
-import {
-  Dispatch,
-  MouseEvent,
-  MutableRefObject,
-  SetStateAction,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { clamp } from "remirror";
 
-import { Button, Input, Select } from "../../components";
-import { useBreakpoint, useDeleteSubEntity } from "../../hooks";
-import {
-  EraType,
-  EventType,
-  MonthType,
-  UserHasPermissionsType,
-  UserType,
-} from "../../types";
+import { Button, Input, Select } from "../../../components";
+import { useBreakpoint, useDeleteSubEntity } from "../../../hooks";
+import { EraType, EventType, MonthType, UserHasPermissionsType, UserType } from "../../../types";
 import {
   contextMenuAtom,
   DefaultTagColor,
@@ -32,25 +17,19 @@ import {
   IconEnum,
   projectFeatureFlagsAtom,
   timelineZoomOptions,
-} from "../../utils";
+} from "../../../utils";
 
 const CIRCLE_RADIUS = 6;
 const X_AXIS_OFFSET = 30;
 
 function truncateLongEventText(texts: any) {
-  // eslint-disable-next-line func-names
+   
   texts.each(function () {
     // @ts-ignore
     const text = d3.select(this);
     const words = text.text().split(/\s+/);
-    const ellipsis = text
-      .text("")
-      .append("tspan")
-      .attr("class", "elip")
-      .text("...");
-    const width =
-      parseFloat(text.attr("width")) -
-      (ellipsis?.node()?.getComputedTextLength() || 0);
+    const ellipsis = text.text("").append("tspan").attr("class", "elip").text("...");
+    const width = parseFloat(text.attr("width")) - (ellipsis?.node()?.getComputedTextLength() || 0);
     const numWords = words.length;
 
     const tspan = text.insert("tspan", ":first-child").text(words.join(" "));
@@ -58,10 +37,7 @@ function truncateLongEventText(texts: any) {
     // Try the whole line
     // While it's too long, and we have words left, keep removing words
 
-    while (
-      (tspan?.node()?.getComputedTextLength() || 10) > width &&
-      words.length
-    ) {
+    while ((tspan?.node()?.getComputedTextLength() || 10) > width && words.length) {
       words.pop();
       tspan.text(words.join(" "));
     }
@@ -72,11 +48,7 @@ function truncateLongEventText(texts: any) {
   });
 }
 
-function changeZoom(
-  type: "in" | "out",
-  setZoom: Dispatch<SetStateAction<number>>,
-  id: string
-) {
+function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>>, id: string) {
   setZoom((prev) => {
     const newZoom = clamp({
       min: 2,
@@ -120,11 +92,7 @@ export function TimelineView({
   const timelineContainer = useRef() as MutableRefObject<SVGSVGElement>;
   const container = useRef() as MutableRefObject<HTMLDivElement>;
   const scrollContainer = useRef() as MutableRefObject<HTMLDivElement>;
-  const { mutate: deleteEvent } = useDeleteSubEntity(
-    "events",
-    project_id as string,
-    item_id
-  );
+  const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useLayoutEffect(() => {
     if (
       timelineContainer.current &&
@@ -162,8 +130,7 @@ export function TimelineView({
       const height = clamp({
         min: timelineContainer?.current?.clientHeight || 0 - 5,
         max: timelineContainer?.current?.clientHeight || 0 - 5,
-        value:
-          events.length * 30 || timelineContainer?.current?.clientHeight || 1,
+        value: events.length * 30 || timelineContainer?.current?.clientHeight || 1,
       });
       const svg = d3.select(timelineContainer.current);
       const x = d3
@@ -176,10 +143,7 @@ export function TimelineView({
         .domain([0, (events.length * zoom) / 2])
         .rangeRound([50, height * 1.05]);
 
-      const numOfTicks = Math.floor(
-        (maxYearCount - Math.abs(minYearCount)) /
-          clamp({ min: 1, max: 1000, value: zoom % 2 })
-      );
+      const numOfTicks = Math.floor((maxYearCount - Math.abs(minYearCount)) / clamp({ min: 1, max: 1000, value: zoom % 2 }));
       if (numberOfTicks !== numOfTicks) {
         setNumberOfTicks(numOfTicks);
       } else {
@@ -204,17 +168,11 @@ export function TimelineView({
           .filter((e) => e.start_year <= endRange)
           .map((e, i) => {
             return {
-              x: isYearsOnly
-                ? e.start_year - 1
-                : (e.start_year - 1) * monthCount +
-                  e.start_month +
-                  e.start_day * 0.01,
+              x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
               y: e.start_year + Math.floor(i / 10) * 30,
               width: isYearsOnly
                 ? Number(e?.end_year) - e.start_year - 30
-                : Number(e?.end_year || 0) -
-                  e.start_year +
-                  Math.abs(Number(e?.end_month || 0) - e.start_month),
+                : Number(e?.end_year || 0) - e.start_year + Math.abs(Number(e?.end_month || 0) - e.start_month),
               background_color: e.color || DefaultTagColor,
               title: `${e.title} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
                 e.start_year
@@ -225,36 +183,30 @@ export function TimelineView({
           });
 
         // ! CHANGE TO ONLY BE EVENTS WITHOUT END DAY
-        const points = (events?.filter((e) => !e.end_year) || [])?.map(
-          (e, i) => {
-            return {
-              id: e.id,
-              parent_id: e.parent_id,
-              owner_id: e.owner_id,
-              permissions: e.permissions,
-              x: isYearsOnly
-                ? e.start_year - 1 + e.start_day * 0.01
-                : (e.start_year - 1) * monthCount +
-                  e.start_month +
-                  e.start_day * 0.01,
-              y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
-              background_color: e.background_color || DefaultTagColor,
-              title: `${e?.title || ""} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
-                e.start_year
-              })`,
-              description: e.description,
-            };
-          }
-        );
+        const points = (events?.filter((e) => !e.end_year) || [])?.map((e, i) => {
+          return {
+            id: e.id,
+            parent_id: e.parent_id,
+            owner_id: e.owner_id,
+            permissions: e.permissions,
+            x: isYearsOnly
+              ? e.start_year - 1 + e.start_day * 0.01
+              : (e.start_year - 1) * monthCount + e.start_month + e.start_day * 0.01,
+            y: clamp({ min: 0, max: height / 1.05, value: i * 0.8 * zoom }),
+            background_color: e.background_color || DefaultTagColor,
+            title: `${e?.title || ""} (${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${
+              e.start_year
+            })`,
+            description: e.description,
+          };
+        });
 
         const event_bars = events
           .filter((e) => !!e.end_year)
           .map((e, index) => {
             return {
               id: e.id,
-              start_x: isYearsOnly
-                ? e.start_year - 1
-                : (e.start_year - 1) * monthCount + e.start_month,
+              start_x: isYearsOnly ? e.start_year - 1 : (e.start_year - 1) * monthCount + e.start_month,
               start_year: e.start_year,
               owner_id: e.owner_id,
               permissions: e.permissions,
@@ -262,9 +214,7 @@ export function TimelineView({
               index,
               end_x: isYearsOnly
                 ? (e.end_year || 0) - 1
-                : ((e.end_year || 0) - 1) * monthCount +
-                  (e.end_month || 0) +
-                  (e.end_day || 0),
+                : ((e.end_year || 0) - 1) * monthCount + (e.end_month || 0) + (e.end_day || 0),
               parent_id: e.parent_id,
               background_color: e.background_color || DefaultTagColor,
               date_string: `(${e.start_day}${getDayOrdinal(e.start_day)} ${months[e.start_month].title} ${e.start_year} - ${
@@ -292,10 +242,7 @@ export function TimelineView({
             "tooltip pointer-events-none absolute hidden bg-black border border-zinc-800 shadow-lg font-lato rounded p-2"
           );
 
-        const groupForEras = svg
-          .append("g")
-          .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
-          .attr("id", "groupForEras");
+        const groupForEras = svg.append("g").attr("transform", `translate(${X_AXIS_OFFSET},0)`).attr("id", "groupForEras");
         const groupForBars = svg
           .append("g")
           .attr("transform", `translate(${X_AXIS_OFFSET},0)`)
@@ -440,10 +387,8 @@ export function TimelineView({
               // Activate tooltip only if the text of the event
               // has an ellipsis i.e. isn't fully visible
               if (
-                evt.currentTarget.parentElement?.lastChild?.lastChild
-                  ?.textContent === "..." ||
-                !evt.currentTarget.parentElement?.lastChild?.firstChild
-                  ?.textContent?.length
+                evt.currentTarget.parentElement?.lastChild?.lastChild?.textContent === "..." ||
+                !evt.currentTarget.parentElement?.lastChild?.firstChild?.textContent?.length
               )
                 tooltip
                   .style("display", "block")
@@ -618,9 +563,7 @@ export function TimelineView({
               value:
                 e.clientX +
                 scrollContainer.current.scrollLeft -
-                (document.body.clientWidth -
-                  timelineLayoutContainer.current.clientWidth) /
-                  2 -
+                (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
                 (isLg && !isPublic ? 32 : 0),
             })}, 0)`
           );
@@ -635,16 +578,12 @@ export function TimelineView({
       return () => {
         d3.select(timelineContainer.current).select("#groupForEras").remove();
         d3.select(timelineContainer.current).select("#groupForBars").remove();
-        d3.select(timelineContainer.current)
-          .select("#groupForCircles")
-          .remove();
+        d3.select(timelineContainer.current).select("#groupForCircles").remove();
         d3.select(".axis--x").remove();
         d3.select(timelineContainer.current).select(".axis--y").remove();
         d3.select(timelineContainer.current).select(".highlighter").remove();
         d3.select(timelineContainer.current).select(".tooltip").remove();
-        d3.select(timelineContainer.current)
-          .select(".year-highlighter-text")
-          .remove();
+        d3.select(timelineContainer.current).select(".year-highlighter-text").remove();
       };
     }
     return () => {};
@@ -683,7 +622,7 @@ export function TimelineView({
   }, [goToYear]);
 
   return (
-    <div ref={timelineLayoutContainer} className="flex h-full flex-col gap-y-2">
+    <div className="flex h-full flex-col gap-y-2" ref={timelineLayoutContainer}>
       <div className="flex w-full items-center gap-x-1">
         <div className="h-10 w-10 self-end">
           <Button
@@ -693,11 +632,7 @@ export function TimelineView({
           />
         </div>
         <div className="h-10 w-10 self-end">
-          <Button
-            icon={IconEnum.add}
-            isDisabled={zoom === 100}
-            onClick={() => changeZoom("in", setZoom, item_id as string)}
-          />
+          <Button icon={IconEnum.add} isDisabled={zoom === 100} onClick={() => changeZoom("in", setZoom, item_id as string)} />
         </div>
         <div className="w-20">
           <Select
@@ -725,28 +660,20 @@ export function TimelineView({
         </div>
       </div>
       <div
-        ref={scrollContainer}
         className={`relative ${isLg ? "max-h-[calc(78%)]" : "max-h-[calc(75%)]"} w-full max-w-full flex-1 overflow-x-auto`}
-      >
-        <div ref={container} className="hidden w-fit" />
+        ref={scrollContainer}>
+        <div className="hidden w-fit" ref={container} />
         {/* min-w-1 is required so that the SVG element has minimum clientWidth which is a condition for rendering the timeline */}
         <div
-          className=" min-w-full"
+          className="min-w-full"
           style={{
             height: events.length * 50,
             width: `${zoom * numberOfTicks}rem`,
-          }}
-        >
+          }}>
           {events.length ? (
             <>
-              <svg
-                className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black"
-                id="xAxisContainer"
-              />
-              <svg
-                ref={timelineContainer}
-                className="block  min-h-full w-full min-w-full overflow-y-auto bg-zinc-900"
-              />
+              <svg className="sticky top-0 h-8 w-full min-w-full max-w-fit bg-black" id="xAxisContainer" />
+              <svg className="block min-h-full w-full min-w-full overflow-y-auto bg-zinc-900" ref={timelineContainer} />
             </>
           ) : null}
         </div>

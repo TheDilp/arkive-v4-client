@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 // import { deepMerge } from "remirror";
-import { Drawer, Navbar, Sidebar, Tabs } from "../../components";
-import { useBreakpoint, useGetUser } from "../../hooks";
-import { TabType } from "../../types";
-import { currentUserPermissionsAtom, getProjectsViewNavItems, IconEnum, userAtom } from "../../utils";
+import { Drawer, Navbar, Sidebar, Tabs } from "../../../components";
+import { useBreakpoint, useGetUser } from "../../../hooks";
+import { TabType } from "../../../types";
+import { currentUserPermissionsAtom, getProjectsViewNavItems, IconEnum, userAtom } from "../../../utils";
 
 export function UserSettings() {
   const { pathname } = useLocation();
@@ -34,7 +34,7 @@ export function UserSettings() {
       },
       fields: ["id", "feature_flags", "email"],
     },
-    { enabled: !!user?.id },
+    { enabled: !!user?.id }
   );
 
   useEffect(() => {

@@ -17,9 +17,9 @@ import {
   Skeleton,
   Table,
   TablePageLayout,
-} from "../../components";
-import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable } from "../../hooks";
-import { ProjectType } from "../../types";
+} from "../../../components";
+import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable } from "../../../hooks";
+import { ProjectType } from "../../../types";
 import {
   drawerAtom,
   getAvatarInitials,
@@ -29,7 +29,7 @@ import {
   projectAtom,
   projectCardNavItems,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<ProjectType>();
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
@@ -77,7 +77,7 @@ function createColumns(navigate: NavigateFunction) {
             {projectCardNavItems
               .filter(
                 (item) =>
-                  row.original?.feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate),
+                  row.original?.feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate)
               )
               .map((item) => (
                 <div key={item.icon}>
@@ -125,7 +125,7 @@ export function ProjectsView() {
       },
       fields: ["id"],
     },
-    { enabled: !!user?.id },
+    { enabled: !!user?.id }
   );
   const setUserAtom = useSetAtom(userAtom);
   const resetProjectAtom = useResetAtom(projectAtom);
@@ -199,10 +199,10 @@ export function ProjectsView() {
             <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
               {(data?.data || []).map((project) => (
                 <ProjectCard
-                  key={project.id}
                   feature_flags={project.feature_flags}
                   id={project.id}
                   image={getImageURL(project.id, "images", project.image_id)}
+                  key={project.id}
                   title={project.title}
                 />
               ))}

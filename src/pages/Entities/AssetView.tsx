@@ -5,7 +5,17 @@ import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, createColumnHelper, Dropdown, Image, Input, Select, Table, TablePageLayout } from "../../components";
+import {
+  Avatar,
+  Button,
+  createColumnHelper,
+  Dropdown,
+  Image,
+  Input,
+  Select,
+  Table,
+  TablePageLayout,
+} from "../../../components";
 import {
   useBreakpoint,
   useDeleteMany,
@@ -16,7 +26,7 @@ import {
   useNavbarTitle,
   useTable,
   useUpdateManyPublic,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   AssetType,
   DeleteManyType,
@@ -29,7 +39,7 @@ import {
   UpdatePublicManyType,
   UserHasPermissionsType,
   UserType,
-} from "../../types";
+} from "../../../types";
 import {
   baseURLS,
   BooleanFilters,
@@ -43,7 +53,7 @@ import {
   isProjectOwnerAtom,
   TextFilters,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<ImageType>();
 type downloadImageMutationType = UseMutateAsyncFunction<

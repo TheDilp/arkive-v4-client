@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { Skeleton } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { CalendarType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { Skeleton } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { CalendarType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { CalendarView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 
@@ -26,7 +26,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
       queryKeyConcat: ["public"],
       isPublic: true,
       retry: false,
-    },
+    }
   );
 
   if (error) throw new Error("No public access");

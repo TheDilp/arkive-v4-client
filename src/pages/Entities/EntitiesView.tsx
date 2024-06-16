@@ -3,9 +3,9 @@ import ls from "localstorage-slim";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, Graph, Input, Select } from "../../components";
-import { useHasPermissions } from "../../hooks";
-import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
+import { Breadcrumbs, Button, Graph, Input, Select } from "../../../components";
+import { useHasPermissions } from "../../../hooks";
+import { AvailableEntityType, DrawerContentCreateNewType } from "../../../types";
 import {
   drawerAtom,
   getPermissionsForTypeView,
@@ -14,7 +14,7 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   navbarTitleAtom,
-} from "../../utils";
+} from "../../../utils";
 import { MapView, RandomTableView } from ".";
 import { BlueprintInstanceView } from "./BlueprintInstanceView";
 import { CalendarView } from "./CalendarView";
@@ -33,7 +33,7 @@ export function EntitiesView() {
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const permissions = useHasPermissions(
     getPermissionsForTypeView(type === "blueprints" ? "blueprint_instances" : (type as AvailableEntityType)),
-    undefined,
+    undefined
   );
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");
   const [filter, setFilter] = useState("");

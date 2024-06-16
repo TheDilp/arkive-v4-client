@@ -5,9 +5,9 @@ import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 import { isRemirrorJSON, RemirrorJSON } from "remirror";
 
-import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../components";
-import { useDeleteSubEntity, useGetEntity, useGetInfiniteEntities } from "../../hooks";
-import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../types";
+import { Alert, Avatar, Button, Editor, Icon, Search, Select, Skeleton, StaticRender } from "../../../components";
+import { useDeleteSubEntity, useGetEntity, useGetInfiniteEntities } from "../../../hooks";
+import { ConversationType, MessageKindType, MessageType, WebsocketEventType } from "../../../types";
 import {
   AvailableIcons,
   drawerAtom,
@@ -16,7 +16,7 @@ import {
   IconEnum,
   messageEditorHooks,
   MessageTypeOptions,
-} from "../../utils";
+} from "../../../utils";
 
 type DeleteMessageType = UseMutateAsyncFunction<
   any,
@@ -35,7 +35,7 @@ type DeleteMessageType = UseMutateAsyncFunction<
 function getCharacterSide(
   item_id: string | undefined,
   selectedCharacter: string | undefined,
-  character_id: string | undefined,
+  character_id: string | undefined
 ): boolean {
   if (character_id) {
     if (selectedCharacter) return character_id === selectedCharacter;
@@ -56,12 +56,7 @@ function NarrationMessage({
   deleteMessage: DeleteMessageType;
 }) {
   return (
-    <div
-      className="group relative flex flex-col text-center
-text-xl italic text-zinc-300
-[&>.staticRendererContainer]:inline
-[&>.staticRendererContainer]:p-0
-[&>.staticRendererContainer]:py-2">
+    <div className="group relative flex flex-col text-center text-xl italic text-zinc-300 [&>.staticRendererContainer]:inline [&>.staticRendererContainer]:p-0 [&>.staticRendererContainer]:py-2">
       <div className="absolute right-4 z-20 flex h-min w-min flex-nowrap gap-x-1">
         <div className="w-0 transition-all group-hover:w-4">
           <Button
@@ -103,9 +98,9 @@ function PlaceMessage({
   return (
     <div className="relative my-2 h-fit w-full">
       <div className="group relative flex w-full justify-center">
-        <div className=" flex w-full flex-col items-center">
+        <div className="flex w-full flex-col items-center">
           <div className="absolute right-4 flex flex-nowrap">
-            <div className="w-0 transition-all group-hover:w-4 ">
+            <div className="w-0 transition-all group-hover:w-4">
               <Button
                 hasNoBackground
                 icon={IconEnum.close}
@@ -189,7 +184,7 @@ export function ConversationView({ id }: { id: string }) {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
         return allPages.length;
       },
-    },
+    }
   );
   const { mutateAsync: deleteMessage } = useDeleteSubEntity("messages", project_id as string);
 
@@ -219,7 +214,7 @@ export function ConversationView({ id }: { id: string }) {
         }
       },
     },
-    connect,
+    connect
   );
 
   function handleEditMessageDrawer(message_id: string) {
@@ -268,11 +263,11 @@ export function ConversationView({ id }: { id: string }) {
               if (m.type === "narration")
                 return (
                   <NarrationMessage
-                    key={m?.id}
                     content={m?.content}
                     deleteMessage={deleteMessage}
                     handleEditMessageDrawer={handleEditMessageDrawer}
                     id={m?.id}
+                    key={m?.id}
                     parent_id={existingConversation?.data?.id}
                   />
                 );
@@ -289,7 +284,7 @@ export function ConversationView({ id }: { id: string }) {
                   />
                 );
               return (
-                <div key={m?.id} className="flex flex-nowrap">
+                <div className="flex flex-nowrap" key={m?.id}>
                   <div
                     className={`group flex max-w-[100%] flex-nowrap lg:max-w-[50%] ${
                       getCharacterSide(item_id, selectedCharacter, char?.id)
@@ -297,7 +292,7 @@ export function ConversationView({ id }: { id: string }) {
                         : ""
                     } w-fit`}>
                     {char ? (
-                      <div className=" flex flex-col items-end gap-x-1 self-end px-1">
+                      <div className="flex flex-col items-end gap-x-1 self-end px-1">
                         <Avatar
                           image={getImageURL(project_id as string, "images", char?.portrait_id)}
                           initials={getAvatarInitials(char?.full_name || "") || ""}
@@ -418,10 +413,7 @@ export function ConversationView({ id }: { id: string }) {
             searchEntity="places"
           />
         ) : (
-          <div
-            className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end
-        [&>.editor-component]:overflow-y-auto
-        ">
+          <div className="flex flex-nowrap gap-x-2 [&>.editor-component]:max-h-56 [&>.editor-component]:self-end [&>.editor-component]:overflow-y-auto">
             <Editor
               customPlaceholder={
                 selectedType === "character" && !selectedCharacter ? "Please select a character first." : undefined
@@ -436,7 +428,7 @@ export function ConversationView({ id }: { id: string }) {
                   title: existingConversation?.data?.title,
                 },
                 messageLength > 0,
-                setMessageLength,
+                setMessageLength
               )}
               initialContent={message}
               isDisabled={selectedType === "character" && !selectedCharacter}

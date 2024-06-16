@@ -4,10 +4,10 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { MapContainer } from "react-leaflet";
 import { useParams } from "react-router-dom";
 
-import { MapImage, Select } from "../../components";
-import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
-import { MapPinTypesType, MapType, onChangeValue } from "../../types";
-import { getImageURL, hasEntityUpdatePermissionForEntityView } from "../../utils";
+import { MapImage, Select } from "../../../components";
+import { useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle } from "../../../hooks";
+import { MapPinTypesType, MapType, onChangeValue } from "../../../types";
+import { getImageURL, hasEntityUpdatePermissionForEntityView } from "../../../utils";
 
 type Props = {
   data?: MapType;

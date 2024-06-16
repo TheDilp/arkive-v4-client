@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { Graph, Skeleton } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { GraphType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { Graph, Skeleton } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { GraphType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicGraph() {
@@ -26,7 +26,7 @@ export function PublicGraph() {
       queryKeyConcat: ["public"],
       isPublic: true,
       retry: false,
-    },
+    }
   );
 
   if (!graph?.data) return <Skeleton type="editor" />;

@@ -6,6 +6,4 @@ dist/*
 build/*
 coverage/*
 
-# data definition files
-**/*.d.ts
 

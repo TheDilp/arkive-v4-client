@@ -11,10 +11,10 @@ import {
   Collapsible,
   Skeleton,
   Tabs,
-} from "../../components";
-import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
-import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
+} from "../../../components";
+import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../../hooks";
+import { BlueprintInstanceType, BlueprintType } from "../../../types";
+import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../../utils";
 
 const tabs = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 

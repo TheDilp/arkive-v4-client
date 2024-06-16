@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
-import { NotificationContainer, ProjectLayout } from "./components";
+import { NotificationContainer, ProjectLayout } from "../components";
 import { CharacterProfileView, EntitiesView, FolderView } from "./pages/Entities";
 import { BlueprintProfileView } from "./pages/Entities/BlueprintProfileView";
 import { GameLayout, GameView } from "./pages/Game";
@@ -55,7 +55,6 @@ export default function App() {
               <Route element={<UserSettingsWebhooks />} path="webhooks" />
               <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
             </Route>
-
             <Route element={<Outlet />} path="projects/*">
               <Route element={<ProjectsView />} path="*" />
               <Route element={<ProjectLayout />} path=":project_id/*">

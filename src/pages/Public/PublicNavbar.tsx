@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { capitalCase } from "remirror";
 
-import { Button, Search } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
-import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
+import { Button, Search } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
+import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../../utils";
 
 const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
@@ -26,7 +26,7 @@ export function PublicNavbar() {
       staleTime: Infinity,
       queryKeyConcat: ["public"],
       isPublic: true,
-    },
+    }
   );
   const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ export function PublicNavbar() {
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
               {navItems.map((item) => (
-                <li key={item} className={item === type ? "text-blue-400" : ""}>
+                <li className={item === type ? "text-blue-400" : ""} key={item}>
                   <Link className="hover:text-blue-400" to={`/public/${project_id}/${item}`}>
                     {capitalCase(item || "")}
                   </Link>
@@ -65,7 +65,7 @@ export function PublicNavbar() {
               result.result.map((r) => {
                 return {
                   icon: getDefaultEntityIcon(
-                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableEntityType),
+                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableEntityType)
                   ),
                   value: r.id,
                   label: r.label,
@@ -73,7 +73,7 @@ export function PublicNavbar() {
                   parent_id: r?.parent_id,
                   type: result.name as AllAvailableEntities,
                 };
-              }),
+              })
             )}
             name="search"
             onChange={({ type: searchType, value, parent_id }) => {

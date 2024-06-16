@@ -85,13 +85,12 @@
   "scripts": {
     "build": "tsc && vite build",
     "start": "vite",
-    "lint": "eslint --ext ts,tsx src --fix --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint --ext ts,tsx \"src\" --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "husky install",
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.{ts,tsx}": "bash -c tsc -p ./tsconfig.json --noEmit",
     "*.{ts,tsx,html}": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",

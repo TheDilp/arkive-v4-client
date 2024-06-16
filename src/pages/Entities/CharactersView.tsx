@@ -14,7 +14,7 @@ import {
   Select,
   Table,
   TablePageLayout,
-} from "../../components";
+} from "../../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -26,7 +26,7 @@ import {
   useTable,
   useUpdateEntity,
   useUpdateManyPublic,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   BulkUpdateType,
   CharacterType,
@@ -39,7 +39,7 @@ import {
   UpdatePublicManyType,
   UserHasPermissionsType,
   WebhookType,
-} from "../../types";
+} from "../../../types";
 import {
   baseURLS,
   BooleanFilters,
@@ -55,7 +55,7 @@ import {
   NumberFilters,
   TextFilters,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<CharacterType>();
 
@@ -79,20 +79,11 @@ function createColumns(
         <div className="flex w-full items-center justify-center">
           <Avatar
             hasShowImage
-            image={getImageURL(
-              project_id,
-              "images",
-              row.original?.portrait?.id || ""
-            )}
-            initials={getAvatarInitials(
-              `${row.original.first_name} ${row.original?.last_name || ""}`
-            )}
+            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
+            initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
             isBordered
             isTooltipDisabled
-            label={getCharacterFullName(
-              row.original.first_name,
-              row.original?.last_name || ""
-            )}
+            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
             size="sm"
           />
         </div>
@@ -218,12 +209,8 @@ function createColumns(
                     },
                     {
                       id: "delete_character",
-                      title: row.original.deleted_at
-                        ? "Delete character"
-                        : "Arkive character",
-                      icon: row.original.deleted_at
-                        ? IconEnum.trash
-                        : IconEnum.archive,
+                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
                       isDisabled: !hasActionPermission(
                         isProjectOwner,
                         user_id === row.original.owner_id,
@@ -239,13 +226,9 @@ function createColumns(
                             ...row.original,
                             entity_title: "characters",
                           },
-                          title: row.original.deleted_at
-                            ? "Delete character"
-                            : "Arkive character",
+                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
                           size: "sm",
-                          type: row.original.deleted_at
-                            ? "delete_entity"
-                            : "arkive_entity",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
                           isOverlay: true,
                         }));
                       },
@@ -325,21 +308,13 @@ function createColumns(
                       id: "view_public",
                       title: "View public page",
                       icon: IconEnum.public,
-                      onClick: () =>
-                        window.open(
-                          `/public/${project_id}/characters/${row.original.id}`,
-                          "_blank"
-                        ),
+                      onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
                       isDisabled: !row.original.is_public,
                     },
                     {
                       id: "delete_character",
-                      title: row.original.deleted_at
-                        ? "Delete character"
-                        : "Arkive character",
-                      icon: row.original.deleted_at
-                        ? IconEnum.trash
-                        : IconEnum.archive,
+                      title: row.original.deleted_at ? "Delete character" : "Arkive character",
+                      icon: row.original.deleted_at ? IconEnum.trash : IconEnum.archive,
                       isDisabled: !hasActionPermission(
                         isProjectOwner,
                         user_id === row.original.owner_id,
@@ -355,27 +330,16 @@ function createColumns(
                             ...row.original,
                             entity_title: "characters",
                           },
-                          title: row.original.deleted_at
-                            ? "Delete character"
-                            : "Arkive character",
+                          title: row.original.deleted_at ? "Delete character" : "Arkive character",
                           size: "sm",
-                          type: row.original.deleted_at
-                            ? "delete_entity"
-                            : "arkive_entity",
+                          type: row.original.deleted_at ? "delete_entity" : "arkive_entity",
                           isOverlay: true,
                         }));
                       },
                     },
                   ]
-            }
-          >
-            <Button
-              hasNoBackground
-              icon={IconEnum.actions}
-              iconSize={28}
-              isIconOnly
-              onClick={undefined}
-            />
+            }>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} isIconOnly onClick={undefined} />
           </Dropdown>
         </div>
       ),
@@ -417,9 +381,7 @@ function getSelectedActions(
         tooltip: "Set public",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) =>
-            ids.includes(e.id)
-          );
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
             updateMany({
               data: ids.map((id) => ({ data: { id, is_public: true } })),
@@ -435,9 +397,7 @@ function getSelectedActions(
         tooltip: "Set private",
         onClick: async () => {
           const ids = Object.values(selection || {}).flatMap((id) => id);
-          const entitesNotFolders = (data || [])?.filter((e) =>
-            ids.includes(e.id)
-          );
+          const entitesNotFolders = (data || [])?.filter((e) => ids.includes(e.id));
           if (entitesNotFolders.length) {
             updateMany({
               data: ids.map((id) => ({ data: { id, is_public: false } })),
@@ -481,11 +441,7 @@ function getSelectedActions(
             type: "bulk_access",
             data: {
               ids,
-              selectablePermissions: [
-                "read_characters",
-                "update_characters",
-                "delete_characters",
-              ],
+              selectablePermissions: ["read_characters", "update_characters", "delete_characters"],
               type: "characters",
             },
           }));
@@ -553,10 +509,7 @@ function getSelectedActions(
             description: `Are you sure you want to ${arkived === "arkive" ? "delete" : "arkive"} ${ids.length} ${
               ids.length === 1 ? "character" : "characters"
             }?`,
-            warning:
-              arkived === "arkive"
-                ? "This action cannot be undone."
-                : undefined,
+            warning: arkived === "arkive" ? "This action cannot be undone." : undefined,
             isOverlay: true,
             cancel: {
               label: "Cancel",
@@ -704,29 +657,17 @@ function CharacterViewHeader({
 export function CharactersView() {
   useNavbarTitle("Characters", true);
   const { isMd } = useBreakpoint();
-  const [view, setView] = useState<"card" | "table">(
-    ls.get("characters_view") || "table"
-  );
-  const [arkived, setArkived] = useState<"active" | "arkive">(
-    ls.get("characters-table-active") || "active"
-  );
+  const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
+  const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");
   const [filter, setFilter] = useState("");
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
-    [
-      "read_characters",
-      "create_characters",
-      "update_characters",
-      "delete_characters",
-    ],
+    ["read_characters", "create_characters", "update_characters", "delete_characters"],
     undefined
   );
-  const [
-    { orderBy, filters, relationFilters, pagination, selection },
-    dispatch,
-  ] = useTable({
+  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
@@ -743,17 +684,7 @@ export function CharactersView() {
       filters,
       relationFilters,
       pagination,
-      fields: [
-        "id",
-        "deleted_at",
-        "first_name",
-        "nickname",
-        "last_name",
-        "portrait_id",
-        "is_public",
-        "age",
-        "owner_id",
-      ],
+      fields: ["id", "deleted_at", "first_name", "nickname", "last_name", "portrait_id", "is_public", "age", "owner_id"],
       permissions: true,
       arkived: arkived === "arkive",
     },
@@ -764,20 +695,10 @@ export function CharactersView() {
       enabled: view === "table" && !!permissions?.read_characters,
     }
   );
-  const { mutateAsync: updatePublicMany } = useUpdateManyPublic(
-    "characters",
-    project_id as string
-  );
-  const { mutate: updateMany } = useBulkUpdate(
-    project_id as string,
-    "characters"
-  );
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("characters", project_id as string);
+  const { mutate: updateMany } = useBulkUpdate(project_id as string, "characters");
 
-  const { mutateAsync: deleteMany } = useDeleteMany(
-    "characters",
-    arkived === "active",
-    project_id
-  );
+  const { mutateAsync: deleteMany } = useDeleteMany("characters", arkived === "active", project_id);
   const {
     data: cardData,
     isFetching,
@@ -897,23 +818,19 @@ export function CharactersView() {
             if (currentTarget) {
               // @ts-ignore
               const scrollFetchMarker =
-                currentTarget.scrollHeight -
-                  currentTarget.scrollTop -
-                  currentTarget.clientHeight <=
-                600;
+                currentTarget.scrollHeight - currentTarget.scrollTop - currentTarget.clientHeight <= 600;
               if (scrollFetchMarker && !isFetching) {
                 fetchNextPage();
               }
             }
-          }}
-        >
+          }}>
           {(cardData?.pages || [])?.map((page) =>
             page.data.map((char: CharacterType) => (
               <CharacterCard
-                key={char.id}
                 full_name={char.full_name}
                 id={char?.id}
                 is_favorite={char?.is_favorite}
+                key={char.id}
                 portrait_id={char?.portrait_id}
               />
             ))
@@ -944,9 +861,7 @@ export function CharactersView() {
               relationFilters,
               selection,
               getLink: (rowData: any) =>
-                arkived === "active"
-                  ? `/projects/${project_id}/characters/${rowData.id}/biography`
-                  : "#",
+                arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
               setFavorite: (rowData: any) => {
                 mutate({
                   data: { id: rowData.id },

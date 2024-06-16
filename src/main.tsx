@@ -2,17 +2,19 @@ import cytoscape from "cytoscape";
 import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
 import gridguide from "cytoscape-grid-guide";
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import { ProjectLayout } from "../components";
 import App from "./App";
-import { ProjectLayout } from "./components";
 import { EntitiesView } from "./pages/Entities";
 import { ErrorPage } from "./pages/Misc";
 import { ProjectsView } from "./pages/Projects";
 
+// eslint-disable-next-line import/no-named-as-default-member
 cytoscape.use(edgehandles);
+// eslint-disable-next-line import/no-named-as-default-member
 cytoscape.use(dagre);
 gridguide(cytoscape);
 
@@ -47,8 +49,8 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>,
+  </StrictMode>
 );

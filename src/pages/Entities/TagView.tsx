@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -13,9 +13,17 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
-} from "../../hooks";
-import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../types";
-import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
+} from "../../../hooks";
+import { DialogAtomType, DrawerAtomType, TagType, UserHasPermissionsType } from "../../../types";
+import {
+  dialogAtom,
+  drawerAtom,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  TextFilters,
+  userAtom,
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<TagType>();
 
@@ -25,7 +33,7 @@ function createColumns(
   isProjectOwner: boolean,
   permissions: UserHasPermissionsType,
   user_id: string,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   return [
     columnHelper.accessor("title", {
@@ -90,7 +98,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_tags",
-                        user_role_id,
+                        user_role_id
                       ),
                     },
                     {
@@ -103,7 +111,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_tags",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -131,7 +139,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "update_tags",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -159,7 +167,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_tags",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -213,7 +221,7 @@ export function TagView() {
       orderBy,
       arkived: arkived === "arkive",
     },
-    "tags",
+    "tags"
   );
   const selectedActions = [
     {
@@ -267,7 +275,7 @@ export function TagView() {
                         { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
                         {
                           onSuccess: () => dispatch({ type: "clearSelection" }),
-                        },
+                        }
                       );
                       dispatch({ type: "clearSelection" });
                     },
@@ -309,7 +317,7 @@ export function TagView() {
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 ),
               variant: "error",
             },

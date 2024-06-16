@@ -22,7 +22,7 @@ import {
   StaticRender,
   Table,
   Tabs,
-} from "../../components";
+} from "../../../components";
 import {
   useBreakpoint,
   useDownloadImages,
@@ -34,7 +34,7 @@ import {
   useRemoveFromEntity,
   useTable,
   useUpdateManyPublic,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   CharacterFieldTemplateType,
   CharacterLocationType,
@@ -48,7 +48,7 @@ import {
   ImageType,
   MapType,
   WebhookType,
-} from "../../types";
+} from "../../../types";
 import {
   baseURLS,
   dialogAtom,
@@ -67,8 +67,8 @@ import {
   isProjectOwnerAtom,
   sortCharactersByName,
   userAtom,
-} from "../../utils";
-import { RemoveFromCharacterSchema } from "../../validation";
+} from "../../../utils";
+import { RemoveFromCharacterSchema } from "../../../validation";
 import { ConversationView } from ".";
 
 const relationshipColumnHelper = createColumnHelper<FormattedRelationship>();

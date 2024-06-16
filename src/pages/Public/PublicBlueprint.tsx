@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../components";
-import { useGetEntity, useGetSubEntity } from "../../hooks";
-import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../../components";
+import { useGetEntity, useGetSubEntity } from "../../../hooks";
+import { BlueprintInstanceType, BlueprintType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicBlueprint() {
@@ -20,7 +20,7 @@ export function PublicBlueprint() {
         tags: true,
       },
     },
-    { isPublic: true, staleTime: 3 * 60 * 1000 },
+    { isPublic: true, staleTime: 3 * 60 * 1000 }
   );
 
   const { data: blueprint } = useGetEntity<BlueprintType>(
@@ -40,7 +40,7 @@ export function PublicBlueprint() {
       enabled: !!blueprint_instance?.data?.parent_id && blueprint_instance?.data?.is_public,
       isPublic: true,
       staleTime: 3 * 60 * 1000,
-    },
+    }
   );
 
   if (!blueprint_instance?.data) return <Skeleton type="character_profile_main" />;
@@ -61,11 +61,11 @@ export function PublicBlueprint() {
                     if (!blueprintField || !blueprint_field) return null;
                     return (
                       <AdditionalBlueprintFieldDisplay
-                        key={blueprint_field.id}
                         blueprint_field={blueprintField}
                         blueprint_field_data={blueprint_field}
                         isPreview={!!item_id}
                         isPublic
+                        key={blueprint_field.id}
                       />
                     );
                   })

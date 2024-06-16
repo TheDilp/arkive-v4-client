@@ -9,12 +9,19 @@ import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { SlashMenu } from "../../components";
-import { MentionDropdownComponent } from "../../components/Complex/Editor/Extensions/Mention";
-import { Menubar } from "../../components/Complex/Editor/Menubar";
-import { Icon, Skeleton } from "../../components/Misc";
-import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
-import { DocumentType, WebhookType } from "../../types";
+import { SlashMenu } from "../../../components";
+import { MentionDropdownComponent } from "../../../components/Complex/Editor/Extensions/Mention";
+import { Menubar } from "../../../components/Complex/Editor/Menubar";
+import { Icon, Skeleton } from "../../../components/Misc";
+import {
+  useGetEntities,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useNavbarTitle,
+  useUpdateEntity,
+} from "../../../hooks";
+import { DocumentType, WebhookType } from "../../../types";
 import {
   AvailableIcons,
   baseURLS,
@@ -30,9 +37,9 @@ import {
   mentionPositionAtom,
   useNotifications,
   userAtom,
-} from "../../utils";
-import { Dice } from "../../utils/ui/diceRollerUtils";
-import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../utils/ui/editorUtils";
+} from "../../../utils";
+import { Dice } from "../../../utils/ui/diceRollerUtils";
+import { DefaultEditorExtensions, documentEditorHooks, onError } from "../../../utils/ui/editorUtils";
 
 type UpdateDocumentType = UseMutateFunction<
   any,

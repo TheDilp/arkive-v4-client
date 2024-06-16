@@ -2,10 +2,10 @@ import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../components";
-import { useGetEntities, useGetEntity, useHasPermissions, useTable } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, WebhookType } from "../../types";
-import { RandomTableOptionType, RandomTableType } from "../../types/EntityTypes/randomTableTypes";
+import { Button, createColumnHelper, Dropdown, Table, TablePageLayout } from "../../../components";
+import { useGetEntities, useGetEntity, useHasPermissions, useTable } from "../../../hooks";
+import { DialogAtomType, DrawerAtomType, WebhookType } from "../../../types";
+import { RandomTableOptionType, RandomTableType } from "../../../types/EntityTypes/randomTableTypes";
 import {
   baseURLS,
   dialogAtom,
@@ -17,15 +17,15 @@ import {
   isProjectOwnerAtom,
   useNotifications,
   userAtom,
-} from "../../utils";
-import { getRollValue } from "../../utils/ui/diceRollerUtils";
+} from "../../../utils";
+import { getRollValue } from "../../../utils/ui/diceRollerUtils";
 
 const columnHelper = createColumnHelper<RandomTableOptionType>();
 
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
-  webhooks: WebhookType[],
+  webhooks: WebhookType[]
 ) {
   return [
     columnHelper.accessor("title", {
@@ -142,7 +142,7 @@ export function RandomTableView() {
     permissions,
     randomTableData?.data?.permissions || [],
     "update_random_tables",
-    user?.role?.id,
+    user?.role?.id
   );
 
   const { data, isLoading } = useGetEntities<RandomTableOptionType>(
@@ -158,7 +158,7 @@ export function RandomTableView() {
       enabled: !!randomTableData,
       staleTime: 5 * 60 * 1000,
       prefetch: false,
-    },
+    }
   );
 
   useEffect(() => {

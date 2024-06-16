@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Select, Table, TablePageLayout } from "../../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -13,9 +13,17 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
-} from "../../hooks";
-import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
-import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
+} from "../../../hooks";
+import { CharacterFieldTemplateType, DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../../types";
+import {
+  dialogAtom,
+  drawerAtom,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  TextFilters,
+  userAtom,
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<CharacterFieldTemplateType>();
 
@@ -25,7 +33,7 @@ function createColumns(
   isProjectOwner: boolean,
   permissions: UserHasPermissionsType,
   user_id: string,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   return [
     columnHelper.accessor("title", {
@@ -85,7 +93,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_character_fields_templates",
-                        user_role_id,
+                        user_role_id
                       ),
                     },
                     {
@@ -98,7 +106,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_character_fields_templates",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -126,7 +134,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "update_character_fields_templates",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -154,7 +162,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_character_fields_templates",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -192,7 +200,7 @@ export function CharacterTemplatesView() {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["create_character_fields_templates", "update_character_fields_templates", "delete_character_fields_templates"],
-    undefined,
+    undefined
   );
 
   const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
@@ -223,7 +231,7 @@ export function CharacterTemplatesView() {
       arkived: arkived === "arkive",
       permissions: true,
     },
-    "character_fields_templates",
+    "character_fields_templates"
   );
 
   const selectedActions = [
@@ -258,7 +266,7 @@ export function CharacterTemplatesView() {
                         { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
                         {
                           onSuccess: () => dispatch({ type: "clearSelection" }),
-                        },
+                        }
                       );
                       dispatch({ type: "clearSelection" });
                     },
@@ -300,7 +308,7 @@ export function CharacterTemplatesView() {
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 ),
               variant: "error",
             },

@@ -4,9 +4,9 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table } from "../../components";
-import { useDeleteMany, useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle, useTable } from "../../hooks";
-import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
+import { Button, createColumnHelper, Dropdown, Input, Select, Table } from "../../../components";
+import { useDeleteMany, useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle, useTable } from "../../../hooks";
+import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../../types";
 import {
   baseURLS,
   dialogAtom,
@@ -20,7 +20,7 @@ import {
   TextFilters,
   useNotifications,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 type FilterType = "title" | "translation";
 const columnHelper = createColumnHelper<WordType>();

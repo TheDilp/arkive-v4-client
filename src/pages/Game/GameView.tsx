@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Avatar, Button, Input, Select, Tooltip } from "../../components";
-import { useGetEntities, useHandleChange } from "../../hooks";
-import { CharacterType } from "../../types";
-import { AvailableIcons, getAvatarInitials, getImageURL, IconEnum } from "../../utils";
+import { Avatar, Button, Input, Select, Tooltip } from "../../../components";
+import { useGetEntities, useHandleChange } from "../../../hooks";
+import { CharacterType } from "../../../types";
+import { AvailableIcons, getAvatarInitials, getImageURL, IconEnum } from "../../../utils";
 import { DiceRollInput } from "./DiceRollInput";
 
 const sections: { tooltip: string; id: "roll_history" | "characters" | "journal" | "music"; icon: AvailableIcons }[] = [

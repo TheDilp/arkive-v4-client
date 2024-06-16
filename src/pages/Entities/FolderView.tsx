@@ -18,7 +18,7 @@ import {
   Skeleton,
   Table,
   TablePageLayout,
-} from "../../components";
+} from "../../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -29,7 +29,7 @@ import {
   useNavbarTitle,
   useTable,
   useUpdateEntity,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -49,7 +49,7 @@ import {
   TagType,
   UserHasPermissionsType,
   WebhookType,
-} from "../../types";
+} from "../../../types";
 import {
   AvailableIcons,
   baseURLS,
@@ -75,7 +75,7 @@ import {
   useNotifications,
   userAtom,
   userSettingsAtom,
-} from "../../utils";
+} from "../../../utils";
 import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
 import { BlueprintView } from "./BlueprintView";
@@ -125,7 +125,7 @@ function getColumns(
   isProjectOwner: boolean,
   user_id: string,
   user_role_id: string | undefined,
-  show_image?: boolean,
+  show_image?: boolean
 ) {
   return [
     columnHelper.display({
@@ -137,7 +137,7 @@ function getColumns(
             image={getImageURL(
               project_id,
               entityType === "maps" ? "map_images" : "images",
-              (row.original.image as ImageType)?.id || "",
+              (row.original.image as ImageType)?.id || ""
             )}
             isBordered
             isTooltipDisabled
@@ -163,7 +163,7 @@ function getColumns(
     columnHelper.display({
       id: "title",
       header: "Title",
-      cell: ({ row }) => <div className=" truncate">{row.original.title}</div>,
+      cell: ({ row }) => <div className="truncate">{row.original.title}</div>,
       size: 15,
     }),
     columnHelper.display({
@@ -186,7 +186,7 @@ function getColumns(
                 permissions,
                 row.original?.permissions || [],
                 `update_${entityType}` as PermissionCodeType,
-                user_role_id,
+                user_role_id
               )
             }
             isIconOnly
@@ -228,7 +228,7 @@ function getColumns(
                   permissions,
                   row.original?.permissions || [],
                   `delete_${entityType}` as PermissionCodeType,
-                  user_role_id,
+                  user_role_id
                 ),
                 onClick: () => {
                   setDialog((prev) => ({
@@ -257,7 +257,7 @@ function getColumns(
                   permissions,
                   row.original?.permissions || [],
                   `update_${entityType}` as PermissionCodeType,
-                  user_role_id,
+                  user_role_id
                 ),
                 onClick: () => {
                   setDrawer((prev) =>
@@ -275,7 +275,7 @@ function getColumns(
                           title: `Edit ${entityName} - ${row.original.title}`,
                           size: entityType === "documents" && is_document_template ? "half" : "lg",
                           type: entityType,
-                        },
+                        }
                   );
                 },
               },
@@ -291,7 +291,7 @@ function getColumns(
               permissions,
               row.original?.permissions || [],
               "read_documents",
-              user_role_id,
+              user_role_id
             ),
             onClick: () => {
               setDrawer((prev) => ({
@@ -330,7 +330,7 @@ function getColumns(
                     method: "POST",
                   }),
               })),
-            },
+            }
           );
         }
 
@@ -359,7 +359,7 @@ function getColumns(
             permissions,
             row.original?.permissions || [],
             `delete_${entityType}`,
-            user_role_id,
+            user_role_id
           ),
           onClick: () => {
             setDialog((prev) => ({
@@ -493,7 +493,7 @@ function getSelectedActions(
     arkived: "active" | "arkive";
     dispatch: TableDispatch;
     type: AvailableEntityType | AvailableSubEntityType;
-  },
+  }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   if (permissions?.[`update_${type}` as PermissionCodeType]) {
@@ -576,7 +576,7 @@ function getSelectedActions(
               },
             },
           ]
-        : []),
+        : [])
     );
   }
   selectedActions.push({
@@ -631,7 +631,7 @@ function getSelectedActions(
                     { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
                     {
                       onSuccess: () => dispatch({ type: "clearSelection" }),
-                    },
+                    }
                   );
                   dispatch({ type: "clearSelection" });
                 },
@@ -677,7 +677,7 @@ function getSelectedActions(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 ),
               variant: "error",
             },
@@ -701,7 +701,7 @@ export function FolderView() {
   const createNotification = useNotifications();
   const permissions = useHasPermissions(
     getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
-    undefined,
+    undefined
   );
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
@@ -794,7 +794,7 @@ export function FolderView() {
         !noFetchTypes.includes(type) &&
         !!permissions?.[`read_${type}` as PermissionCodeType],
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
   const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
@@ -822,7 +822,7 @@ export function FolderView() {
         !!permissions?.[`read_${type}` as PermissionCodeType],
       staleTime: 5 * 60 * 1000,
       queryKeyConcat: [item_id as string],
-    },
+    }
   );
   const { mutateAsync: updateMany } = useBulkUpdate(project_id as string, type as AvailableEntityType);
   const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, arkived === "active", project_id);
@@ -853,7 +853,7 @@ export function FolderView() {
     `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
-    true,
+    true
   );
 
   useLayoutEffect(() => {
@@ -880,7 +880,7 @@ export function FolderView() {
     ) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(
-          type as AvailableEntityType,
+          type as AvailableEntityType
         )}.`,
         timer: 5,
         hasNoTruncate: true,
@@ -1022,7 +1022,7 @@ export function FolderView() {
                         permissions,
                         data?.data?.permissions || [],
                         `update_${type}` as PermissionCodeType,
-                        user?.role?.id,
+                        user?.role?.id
                       )
                     }
                     label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
@@ -1118,13 +1118,12 @@ export function FolderView() {
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && (!item_id || isFolder) ? base.data : []).map((item) => (
             <EntityItem
-              key={item.id}
               changeParent={changeParent}
               icon={item.icon}
               id={item.id}
               image_id={item?.image_id}
               is_folder={item?.is_folder ?? false}
-              show_image={show_image_folder_view}
+              key={item.id}
               showContextMenu={(event: MouseEvent<HTMLDivElement, MouseEvent>, id: string) =>
                 setContextMenuAtom({
                   event,
@@ -1174,6 +1173,7 @@ export function FolderView() {
                   ],
                 })
               }
+              show_image={show_image_folder_view}
               title={item.title}
               type={type as AvailableEntityType}
             />
@@ -1189,7 +1189,6 @@ export function FolderView() {
       {view === "table" ? (
         <div className="w-full flex-1 overflow-hidden">
           <Table
-            key={type}
             columns={getColumns(
               setDrawer,
               setDialog,
@@ -1203,7 +1202,7 @@ export function FolderView() {
               isProjectOwner,
               user?.id as string,
               user?.role?.id,
-              show_image_table_view,
+              show_image_table_view
             )}
             config={{
               selectedActions,
@@ -1221,6 +1220,7 @@ export function FolderView() {
             data={base?.data || []}
             dispatch={dispatch}
             isLoading={isInitialLoading || isInitialLoadingFolder}
+            key={type}
             pagination={pagination}
             type={type as AvailableEntityType}
           />

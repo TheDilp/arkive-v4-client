@@ -4,10 +4,10 @@ import { useSetAtom } from "jotai";
 import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useDeleteEntity, useGetEntities, useGetUser, useTable } from "../../hooks";
-import { DrawerAtomType, WebhookType } from "../../types";
-import { drawerAtom, getDefaultEntityIcon, IconEnum } from "../../utils";
+import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../../components";
+import { useDeleteEntity, useGetEntities, useGetUser, useTable } from "../../../hooks";
+import { DrawerAtomType, WebhookType } from "../../../types";
+import { drawerAtom, getDefaultEntityIcon, IconEnum } from "../../../utils";
 
 const rolesColumnHelper = createColumnHelper<WebhookType>();
 
@@ -92,7 +92,7 @@ export function UserSettingsWebhooks() {
   const { data: webhooks, isFetching } = useGetEntities<WebhookType>(
     { data: { user_id: user?.data?.id }, fields: ["id", "title", "user_id"] },
     "webhooks",
-    { enabled: !!user?.data?.id, staleTime: 5 * 60 * 1000 },
+    { enabled: !!user?.data?.id, staleTime: 5 * 60 * 1000 }
   );
   return (
     <div className="flex w-full flex-col gap-y-2">

@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import { Dispatch, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -13,7 +13,7 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   BulkUpdateType,
   DeleteManyType,
@@ -23,8 +23,8 @@ import {
   TableSelectedAction,
   TableSelectionType,
   UserHasPermissionsType,
-} from "../../types";
-import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
+} from "../../../types";
+import { BlueprintType } from "../../../types/EntityTypes/blueprintTypes";
 import {
   dialogAtom,
   drawerAtom,
@@ -34,7 +34,7 @@ import {
   isProjectOwnerAtom,
   TextFilters,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<BlueprintType>();
 
@@ -44,7 +44,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   return [
     columnHelper.display({
@@ -103,7 +103,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprints",
-                        user_role_id,
+                        user_role_id
                       ),
                     },
                     {
@@ -116,7 +116,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprints",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -144,7 +144,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "update_blueprints",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -182,7 +182,7 @@ function createColumns(
                         permissions,
                         row.original?.permissions || [],
                         "delete_blueprints",
-                        user_role_id,
+                        user_role_id
                       ),
                       onClick: () => {
                         setDialog((prev) => ({
@@ -227,7 +227,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialogAtom: () => unknown;
     dispatch: TableDispatch;
-  },
+  }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   selectedActions.push({
@@ -280,7 +280,7 @@ function getSelectedActions(
                     { data: ids.map((id) => ({ data: { id, deleted_at: null } })) },
                     {
                       onSuccess: () => dispatch({ type: "clearSelection" }),
-                    },
+                    }
                   );
                   dispatch({ type: "clearSelection" });
                 },
@@ -322,7 +322,7 @@ function getSelectedActions(
                   { data: { ids } },
                   {
                     onSuccess: () => dispatch({ type: "clearSelection" }),
-                  },
+                  }
                 ),
               variant: "error",
             },
@@ -341,7 +341,7 @@ export function BlueprintView() {
   useNavbarTitle("Blueprints", true);
   const permissions = useHasPermissions(
     ["create_blueprints", "read_blueprints", "update_blueprints", "delete_blueprints", "create_blueprint_instances"],
-    undefined,
+    undefined
   );
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const user = useAtomValue(userAtom);
@@ -372,7 +372,7 @@ export function BlueprintView() {
       permissions: true,
       arkived: arkived === "arkive",
     },
-    "blueprints",
+    "blueprints"
   );
 
   const selectedActions = getSelectedActions(permissions, {

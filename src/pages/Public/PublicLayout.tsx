@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
-import { Avatar, Dialog, Drawer } from "../../components";
-import { getImageURL } from "../../utils";
+import { Avatar, Dialog, Drawer } from "../../../components";
+import { getImageURL } from "../../../utils";
 import { PublicNavbar } from "./PublicNavbar";
 
 export function PublicLayout() {

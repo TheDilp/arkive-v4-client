@@ -3,9 +3,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Alert, EntityPreview, Icon, Select } from "../../components";
-import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { Alert, EntityPreview, Icon, Select } from "../../../components";
+import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../../hooks";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../../types";
 import {
   capitalizeFirstLetter,
   drawerAtom,
@@ -16,7 +16,7 @@ import {
   getSentenceCase,
   SubEntityEnum,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const graphEntityOptions = [
   "characters",
@@ -308,10 +308,10 @@ export function Dashboard() {
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         {(dashboard?.data || []).map((d, i, arr) => (
           <div
-            key={d.name}
             className={`${
               i === arr.length - 1 ? "col-span-1 md:col-span-2 lg:col-span-1" : "col-span-1"
-            } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}>
+            } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}
+            key={d.name}>
             <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
               <Icon icon={getDefaultEntityIcon(d.name as AvailableEntityType)} />
               <Link
@@ -325,7 +325,7 @@ export function Dashboard() {
             <ul className="flex w-full flex-1 flex-col items-center justify-start py-4 text-lg">
               {d.result.length ? (
                 d.result.map((r) => (
-                  <li key={r.id} className="w-full [&>div>span>div:has(button)]:ml-auto">
+                  <li className="w-full [&>div>span>div:has(button)]:ml-auto" key={r.id}>
                     <EntityPreview
                       hasNoBackground
                       icon={"icon" in r ? r.icon : getDefaultEntityIcon(d.name as AvailableEntityType | AvailableSubEntityType)}
@@ -382,19 +382,19 @@ export function Dashboard() {
                   />
                 </div>
               </h3>
-              <div ref={characterStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
+              <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={characterStatRef} />
             </div>
             <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
               <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 <span>Tag stats</span>
               </h3>
-              <div ref={tagEntityStatRef} className="h-full max-h-full w-full max-w-full overflow-auto" />
+              <div className="h-full max-h-full w-full max-w-full overflow-auto" ref={tagEntityStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
               <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 Tags by color
               </h3>
-              <div ref={tagColorStatRef} className="h-full max-h-full w-full max-w-full overflow-hidden p-2" />
+              <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={tagColorStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
               <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
@@ -414,7 +414,7 @@ export function Dashboard() {
                         return 0;
                       })
                       .map(([id, { icon, image_id, entity_type, title, parent_id, count }]) => (
-                        <li key={id} className="flex items-center justify-between border-b border-zinc-700 last:border-0">
+                        <li className="flex items-center justify-between border-b border-zinc-700 last:border-0" key={id}>
                           <EntityPreview
                             hasNoBackground
                             icon={icon}

@@ -16,7 +16,7 @@ import {
   Select,
   Skeleton,
   Tooltip,
-} from "../../components";
+} from "../../../components";
 import {
   useDeleteSubEntity,
   useGetEntities,
@@ -24,9 +24,9 @@ import {
   useGetSubEntity,
   useHasPermissions,
   useNavbarTitle,
-} from "../../hooks";
-import { DrawerAtomType, UserHasPermissionsType, UserType } from "../../types";
-import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../types/EntityTypes/calendarTypes";
+} from "../../../hooks";
+import { DrawerAtomType, UserHasPermissionsType, UserType } from "../../../types";
+import { CalendarFilters, CalendarType, CurrentDateType, EventType, MonthType } from "../../../types/EntityTypes/calendarTypes";
 import {
   contextMenuAtom,
   DefaultTagColor,
@@ -49,7 +49,7 @@ import {
   isProjectOwnerAtom,
   projectFeatureFlagsAtom,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 import { TimelineView } from "./TimelineView";
 
 function DayNumber({

@@ -1,9 +1,9 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
+import { Avatar, createColumnHelper, Icon, Input, Table } from "../../../components";
+import { useGetEntities, useTable } from "../../../hooks";
+import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
 import {
   getAvatarInitials,
   getCharacterFullName,
@@ -12,7 +12,7 @@ import {
   getEntityLink,
   getImageURL,
   IconEnum,
-} from "../../utils";
+} from "../../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
@@ -65,7 +65,7 @@ function characterColumns(project_id: string) {
 }
 function columns(
   entityType: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
-  project_id: string,
+  project_id: string
 ) {
   return [
     columnHelper.display({
@@ -77,7 +77,7 @@ function columns(
             image={getImageURL(
               project_id,
               entityType === "maps" ? "map_images" : "images",
-              (row.original?.image_id as string) || "",
+              (row.original?.image_id as string) || ""
             )}
             isBordered
             isTooltipDisabled
@@ -99,7 +99,7 @@ function columns(
     columnHelper.display({
       id: "title",
       header: "Title",
-      cell: ({ row }) => <div className="truncate ">{row.original.title}</div>,
+      cell: ({ row }) => <div className="truncate">{row.original.title}</div>,
       size: 15,
     }),
   ];
@@ -131,7 +131,7 @@ function PublicCharacterList() {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
       isPublic: true,
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -240,16 +240,15 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
     {
       isPublic: true,
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
 
   return (
     <div className="h-full w-full p-2">
       <Table
-        key={type}
         columns={columns(
           type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
-          project_id as string,
+          project_id as string
         )}
         config={{
           getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null, true),
@@ -257,6 +256,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         data={base?.data || []}
         dispatch={dispatch}
         isLoading={isInitialLoading}
+        key={type}
         pagination={pagination}
         type={type as AvailableEntityType}
       />

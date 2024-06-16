@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { Button, Input } from "../../components";
-import { DefaultTagColor, Dice, DiceRollRegex, IconEnum, rollDiceWithNotification, useNotifications } from "../../utils";
+import { Button, Input } from "../../../components";
+import { DefaultTagColor, Dice, DiceRollRegex, IconEnum, rollDiceWithNotification, useNotifications } from "../../../utils";
 
 export function DiceRollInput() {
   const createNotification = useNotifications();

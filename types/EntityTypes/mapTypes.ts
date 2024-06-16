@@ -1,0 +1,73 @@
+import { AvailableIcons } from "../../utils";
+import { EntityPermissionType } from "./baseEntityTypes";
+import { EventType } from "./calendarTypes";
+import { CharacterType } from "./characterTypes";
+import { DocumentType } from "./documentTypes";
+import { ImageType } from "./imageTypes";
+import { TagType } from "./tagTypes";
+
+ 
+export interface MapType {
+  id: string;
+  title: string;
+  is_folder?: boolean | null;
+  is_public?: boolean | null;
+  cluster_pins?: boolean | null;
+  icon?: string | null;
+  project_id: string;
+  parent_id?: string | null;
+  image_id: string | null;
+  owner_id: string;
+  map_pins?: MapPinType[];
+  map_layers?: MapLayerType[];
+  characters: CharacterType[];
+  permissions: EntityPermissionType[];
+  tags?: Omit<TagType, "owner_id" | "permissions">[];
+}
+
+export interface MapLayerType {
+  id: string;
+  title: string;
+  parent_id: string | null;
+  is_public: boolean | null;
+  image_id: string;
+  image?: ImageType;
+}
+
+export interface MapPinType {
+  id: string;
+  owner_id: string;
+  title: string | null;
+  parent_id: string;
+  lat: number;
+  lng: number;
+  color: string | null;
+  border_color: string | null;
+  background_color: string | null;
+  icon: AvailableIcons;
+  show_background: boolean;
+  show_border: boolean;
+  is_public: boolean | null;
+  map_link?: string | null;
+  doc_id?: string | null;
+  image_id?: string | null;
+  character_id?: string | null;
+  map_pin_type_id?: string | null;
+  document?: DocumentType;
+  linked_map?: MapType;
+  image?: ImageType;
+  character?: Pick<CharacterType, "id" | "full_name" | "portrait_id">;
+  events: Pick<EventType, "id" | "title" | "image_id" | "parent_id">[];
+  map_pin_type?: MapPinType | null;
+  permissions: EntityPermissionType[];
+}
+
+export interface MapPinTypesType {
+  id: string;
+  title: string;
+  project_id: string;
+  default_icon?: AvailableIcons | null;
+  default_icon_color?: string | null;
+}
+
+export type CharacterLocationType = Pick<MapType, "id" | "title" | "image_id"> & { map_pin_id: string };

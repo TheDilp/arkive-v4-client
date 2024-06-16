@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { Skeleton } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { MapType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { Skeleton } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { MapType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { MapView } from "../Entities";
 import { PublicEntityLayout } from "./PublicLayout";
 

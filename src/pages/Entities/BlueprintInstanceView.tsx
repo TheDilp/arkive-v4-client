@@ -4,13 +4,13 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../../components";
 import {
   CharacterColumn,
   EventColumn,
   LocationColumn,
   ShowMultipleWithBadge,
-} from "../../components/DataDisplay/TableComponents/TableColumns";
+} from "../../../components/DataDisplay/TableComponents/TableColumns";
 import {
   useBulkUpdate,
   useDeleteMany,
@@ -19,7 +19,7 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   BlueprintInstanceType,
   BulkUpdateType,
@@ -32,8 +32,8 @@ import {
   TableSelectionType,
   UserHasPermissionsType,
   WebhookType,
-} from "../../types";
-import { BlueprintType } from "../../types/EntityTypes/blueprintTypes";
+} from "../../../types";
+import { BlueprintType } from "../../../types/EntityTypes/blueprintTypes";
 import {
   baseURLS,
   BooleanFilters,
@@ -52,7 +52,7 @@ import {
   TextFilters,
   useNotifications,
   userAtom,
-} from "../../utils";
+} from "../../../utils";
 
 const columnHelper = createColumnHelper<BlueprintInstanceType>();
 const centeredColumns = [

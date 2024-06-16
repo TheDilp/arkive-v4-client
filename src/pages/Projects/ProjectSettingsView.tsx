@@ -19,7 +19,7 @@ import {
   Table,
   Tabs,
   Tooltip,
-} from "../../components";
+} from "../../../components";
 import {
   useAssignRole,
   useBreakpoint,
@@ -31,7 +31,7 @@ import {
   useTable,
   useUpdateEntity,
   useUpdateUser,
-} from "../../hooks";
+} from "../../../hooks";
 import {
   AllAvailableEntities,
   CharacterRelationshipType,
@@ -41,7 +41,7 @@ import {
   ProjectType,
   RoleType,
   UserType,
-} from "../../types";
+} from "../../../types";
 import {
   capitalizeFirstLetter,
   DefaultTagColor,
@@ -58,8 +58,8 @@ import {
   userAtom,
   UserNotificationEntities,
   UserSidebarEntitiesEnabled,
-} from "../../utils";
-import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
+} from "../../../utils";
+import { UpdateProjectSchema, UpdateProjectType } from "../../../validation";
 
 type kickUserMutationType = UseMutateFunction<
   any,
@@ -100,7 +100,7 @@ const rolesColumnHelper = createColumnHelper<RoleType>();
 
 function mapPinTypeTableColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
-  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>
 ) {
   return [
     mapPinTypesColumnHelper.display({
@@ -246,7 +246,7 @@ function membersColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   roles: RoleType[],
   assignRole: assignRoleMutationType,
-  project_id: string,
+  project_id: string
 ) {
   return [
     membersColumnHelper.display({
@@ -425,11 +425,11 @@ export function ProjectSettingsView() {
     },
     {
       queryKeyConcat: ["settings"],
-    },
+    }
   );
   const { mutateAsync: updateProject, isLoading: isUpdating } = useUpdateEntity<UpdateProjectType>(
     "projects",
-    project_id as string,
+    project_id as string
   );
   const { mutate: assignRole } = useAssignRole();
   const { mutate: updateUser } = useUpdateUser(user?.id as string, authUser?.id as string);
@@ -437,7 +437,7 @@ export function ProjectSettingsView() {
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
     "roles",
-    { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") },
+    { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") }
   );
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
@@ -567,7 +567,7 @@ export function ProjectSettingsView() {
           </h2>
           {finalTabs[selectedTab].id === "1" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
-              <div className=" grid grid-cols-12 gap-2">
+              <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-12 lg:col-span-8">
                   <Input label="Title" name="title" onChange={handleChange} value={project?.title || ""} />
                 </div>
@@ -632,7 +632,7 @@ export function ProjectSettingsView() {
                                       onSuccess: () => {
                                         navigate("/");
                                       },
-                                    },
+                                    }
                                   );
                                 },
                                 variant: "error-bordered",
@@ -716,7 +716,7 @@ export function ProjectSettingsView() {
                           { name: `feature_flags.${entity}_create_notification`, value: true },
                           { name: `feature_flags.${entity}_update_notification`, value: true },
                           { name: `feature_flags.${entity}_delete_notification`, value: true },
-                        ]),
+                        ])
                       );
                     },
                   },
@@ -730,7 +730,7 @@ export function ProjectSettingsView() {
                             feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
                           },
                         },
-                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) }
                       ),
                   },
                 ]}
@@ -738,8 +738,8 @@ export function ProjectSettingsView() {
                 <div className="bg-zinc-900">
                   {UserNotificationEntities.map((entity) => (
                     <div
-                      key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800"
+                      key={entity}>
                       <span>{capitalizeFirstLetter(getSentenceCase(entity))}:</span>
                       <div className="flex w-52 items-center justify-between gap-x-2 text-center">
                         <Checkbox
@@ -773,7 +773,7 @@ export function ProjectSettingsView() {
                     variant: "primary",
                     onClick: () => {
                       handleChange(
-                        UserSidebarEntitiesEnabled.map((entity) => ({ name: `feature_flags.${entity}_enabled`, value: true })),
+                        UserSidebarEntitiesEnabled.map((entity) => ({ name: `feature_flags.${entity}_enabled`, value: true }))
                       );
                     },
                   },
@@ -788,7 +788,7 @@ export function ProjectSettingsView() {
                             feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
                           },
                         },
-                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) }
                       ),
                   },
                 ]}
@@ -796,8 +796,8 @@ export function ProjectSettingsView() {
                 <div className="bg-zinc-900">
                   {UserSidebarEntitiesEnabled.map((entity) => (
                     <div
-                      key={entity}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800"
+                      key={entity}>
                       <span>Show {getPluralEntityType(entity as AllAvailableEntities)}:</span>
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
@@ -823,7 +823,7 @@ export function ProjectSettingsView() {
                             feature_flags: { project_id: project_id as string, feature_flags: project?.feature_flags || {} },
                           },
                         },
-                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) },
+                        { onSuccess: () => queryClient.invalidateQueries(["projects"]) }
                       ),
                   },
                 ]}
@@ -831,8 +831,8 @@ export function ProjectSettingsView() {
                 <div className="bg-zinc-900">
                   {MiscellaneousSettings.map((setting) => (
                     <div
-                      key={setting}
-                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800">
+                      className="flex flex-nowrap items-center justify-between border-t border-zinc-700 px-2 first:border-t-0 hover:bg-zinc-800"
+                      key={setting}>
                       <span>{getSentenceCase(setting)}:</span>
                       <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                         <Checkbox
