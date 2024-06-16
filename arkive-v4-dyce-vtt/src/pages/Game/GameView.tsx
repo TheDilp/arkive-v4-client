@@ -224,20 +224,24 @@ function Characters() {
     <div>
       <div className="flex flex-col gap-y-1 p-2">
         <h2 className="">Characters</h2>
-        {/* <Search placeholder="Import characters" /> */}
         <Input name="filter" onChange={({ value }) => setFilter(value as string)} placeholder="Search" value={filter} />
       </div>
       <ul className="h-full max-h-full overflow-y-auto">
         {importedCharacters?.length
           ? importedCharacters?.map((char) => (
-              <li className="flex items-center gap-x-2 border-b border-zinc-600 bg-zinc-700 p-2 first:border-t" key={char.id}>
-                <Avatar
-                  image={getImageURL(char.project_id, "images", char.portrait_id)}
-                  initials={getAvatarInitials(char.full_name)}
-                  size="sm"
-                />
-                <span>{char.full_name}</span>
-                <div>
+              <li
+                className="flex items-center justify-between border-b border-zinc-600 bg-zinc-700 p-2 first:border-t"
+                key={char.id}>
+                <div className="flex items-center gap-x-2">
+                  <Avatar
+                    image={getImageURL(char.project_id, "images", char.portrait_id)}
+                    initials={getAvatarInitials(char.full_name)}
+                    size="sm"
+                  />
+                  <span>{char.full_name}</span>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  <Button icon={IconEnum.eye} onClick={undefined} tooltip="Change permissions" />
                   <Button icon={IconEnum.image} onClick={undefined} tooltip="Reveal image" />
                 </div>
               </li>
@@ -257,12 +261,11 @@ export function GameView() {
         <ul className="flex flex-col gap-y-4">
           {sections.map((section) => (
             <li
-              className={`flex cursor-pointer items-center justify-center rounded-l-md p-1 shadow transition-colors ${drawer === section.id.toLowerCase() ? "bg-blue-500" : "bg-zinc-800"}`}
+              className="flex cursor-pointer items-center justify-center rounded-l-md shadow transition-colors"
               key={section.id}>
               <Tooltip content={section.tooltip}>
-                <div>
+                <div className="[&>button]:rounded-r-none">
                   <Button
-                    hasNoBackground
                     icon={section.icon}
                     iconSize={32}
                     isIconOnly
@@ -270,6 +273,7 @@ export function GameView() {
                       if (drawer && drawer === section.id.toLowerCase()) setDrawer(null);
                       else setDrawer(section.id.toLowerCase() as GameDrawerType);
                     }}
+                    variant={drawer === section.id.toLowerCase() ? "info" : "secondary"}
                   />
                 </div>
               </Tooltip>

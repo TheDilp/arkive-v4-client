@@ -42,11 +42,6 @@ export default function App() {
               </ClerkProvider>
             }
             path="/">
-            {/* <Route element={<UserSettings />} path="user_settings/*">
-              <Route element={<UserSettingsWebhooks />} path="webhooks" />
-              <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
-            </Route> */}
-
             <Route path="games/*">
               <Route element={<GameLayout />}>
                 <Route element={<div className="text-white">LIST OF GAMES HERE</div>} path="*" />
