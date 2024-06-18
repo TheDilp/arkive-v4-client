@@ -31,7 +31,7 @@ export default function App() {
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
-        <ReactQueryDevtools position="top-left" />
+        <ReactQueryDevtools position="top-right" />
         <Routes>
           <Route
             element={
@@ -39,9 +39,12 @@ export default function App() {
                 appearance={{
                   baseTheme: dark,
                 }}
+                domain={(url) => url.host}
+                isSatellite
                 publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
                 routerPush={(to: string) => navigate(to)}
-                routerReplace={(to: string) => navigate(to)}>
+                routerReplace={(to: string) => navigate(to)}
+                signInUrl="http://localhost:5173/sign-in">
                 <SignedOut>
                   <RedirectToSignIn />
                 </SignedOut>

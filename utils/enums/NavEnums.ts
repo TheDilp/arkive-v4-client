@@ -7,7 +7,7 @@ import { IconEnum } from "./IconEnums";
 
 export function getProjectsViewNavItems(
   setView: Dispatch<SetStateAction<boolean | null>>,
-  view: boolean | null,
+  view: boolean | null
 ): SidebarItemType[] {
   return [
     {
@@ -51,3 +51,5 @@ export const projectNavItems: SidebarItemType[] = [
 ];
 
 export const projectCardNavItems = projectNavItems.slice(0, -1);
+
+// Dyce VTT

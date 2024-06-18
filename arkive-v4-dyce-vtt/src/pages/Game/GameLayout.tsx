@@ -1,14 +1,55 @@
+import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { useSetAtom } from "jotai";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
-import { Navbar } from "../../../../components";
-import { useNavbarTitle } from "../../../../hooks";
+import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
+import { useBreakpoint, useGetUser, useNavbarTitle } from "../../../../hooks";
+import { userAtom } from "../../../../utils";
 
 export function GameLayout() {
   useNavbarTitle("", true);
+  const { user } = useUser();
+  const { isLg } = useBreakpoint();
+  const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
+    {
+      data: { auth_id: user?.id as string },
+      relations: {
+        webhooks: true,
+      },
+      fields: ["id"],
+    },
+    { enabled: !!user?.id }
+  );
+  const setUserAtom = useSetAtom(userAtom);
+
+  useEffect(() => {
+    if (userData) {
+      if (user)
+        user?.update({
+          unsafeMetadata: {
+            user_id: userData.data.id,
+            project_id: null,
+          },
+        });
+      setUserAtom(userData.data);
+    }
+  }, [userData?.data]);
+
   return (
-    <div className="h-full w-full bg-zinc-950">
-      <Navbar isDisabled />
-      <Outlet />
+    <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
+      <Dialog />
+      <Drawer />
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+      {isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} /> : null}
+      <div className="flex h-full w-full flex-col">
+        <div className="w-full">
+          <Navbar isDisabled={isInitialLoadingUser} />
+        </div>
+        <Outlet />
+      </div>
     </div>
   );
 }
