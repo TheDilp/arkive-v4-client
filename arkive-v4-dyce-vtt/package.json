@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite --port 5176 --config ../vite.config.ts",
+    "start": "vite --port 5175 --config ../vite.config.ts",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -30,3 +30,4 @@
     "vite": "^5.2.0"
   }
 }
+
