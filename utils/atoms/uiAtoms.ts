@@ -5,6 +5,7 @@ import { ContextMenuAtomType, DialogAtomType, DrawerAtomType, NotificationType }
 import { BreadCrumbsType as BreadcrumbsType } from "../../types/ComponentTypes/LayoutTypes/breadcrumbsTypes";
 import { projectAtom } from "./dataAtoms";
 
+export const moduleAtom = atom<"arkive" | "dyce_vtt">("arkive");
 export const navbarTitleAtom = atom<string>("");
 export const breadcrumbsAtom = atom<BreadcrumbsType>({ items: [], type: null });
 export const drawerAtom = atomWithReset<DrawerAtomType>({ size: "md", title: "", position: "right", data: null, type: null });
