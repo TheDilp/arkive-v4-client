@@ -102,6 +102,10 @@ input[type="search"]::-webkit-search-results-decoration {
   display: none;
 }
 
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
+}
+
 /* Maps */
 .leaflet-container {
   @apply flex h-[calc(100%-4rem)] flex-1 select-none overflow-visible bg-transparent !important;
