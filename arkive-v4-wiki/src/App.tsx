@@ -2,6 +2,8 @@ import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/cle
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useSetAtom } from "jotai";
+import { useLayoutEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "../../components";
@@ -13,6 +15,7 @@ import { PublicEntitiesView, PublicListView } from "../../pages/Public";
 import { PublicLayout } from "../../pages/Public/PublicLayout";
 import { UserSettings, UserSettingsWebhooks } from "../../pages/User";
 import UserSettingsFeatureFlags from "../../pages/User/UserSettingsFeatureFlags";
+import { moduleAtom } from "../../utils";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +27,12 @@ const queryClient = new QueryClient({
 export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setModule = useSetAtom(moduleAtom);
+
+  useLayoutEffect(() => {
+    setModule("arkive");
+  }, []);
+
   return (
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
