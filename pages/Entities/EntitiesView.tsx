@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { Breadcrumbs, Button, Graph, Input, Select } from "../../components";
 import { useHasPermissions } from "../../hooks";
-import { AvailableEntityType, DrawerContentCreateNewType } from "../../types";
+import { AvailableWikiEntityType, DrawerContentCreateNewType } from "../../types";
 import {
   drawerAtom,
   getPermissionsForTypeView,
@@ -28,11 +28,11 @@ export function EntitiesView() {
 
   const canUpdateEntity = useAtomValue(hasEntityUpdatePermissionForEntityView);
 
-  const entityName = getSingularEntityType(type as AvailableEntityType);
+  const entityName = getSingularEntityType(type as AvailableWikiEntityType);
   const setDrawer = useSetAtom(drawerAtom);
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const permissions = useHasPermissions(
-    getPermissionsForTypeView(type === "blueprints" ? "blueprint_instances" : (type as AvailableEntityType)),
+    getPermissionsForTypeView(type === "blueprints" ? "blueprint_instances" : (type as AvailableWikiEntityType)),
     undefined
   );
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("blueprint_instance-table-active") || "active");

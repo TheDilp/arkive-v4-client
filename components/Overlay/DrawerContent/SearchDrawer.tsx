@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 
 import { useSearch } from "../../../hooks";
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   SearchableEntities,
   SearchAllEntitiesType,
   SearchResultType,
@@ -67,7 +67,7 @@ export function SearchDrawer() {
     false,
     {
       enabled: false,
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -157,7 +157,7 @@ export function SearchDrawer() {
                       id: value,
                       project_id: project_id as string,
                       color: color as string,
-                    }),
+                    })
                   );
                 }}
                 placeholder="Press enter to add tags for searching."
@@ -234,7 +234,7 @@ export function SearchDrawer() {
                                   project_id as string,
                                   name,
                                   result_item.id,
-                                  "parent_id" in result_item ? result_item.parent_id : undefined,
+                                  "parent_id" in result_item ? result_item.parent_id : undefined
                                 )}
                                 title={`${"title" in result_item ? result_item.title : ""} ${
                                   "label" in result_item ? result_item?.label || "(No label)" : ""
@@ -267,7 +267,7 @@ export function SearchDrawer() {
                         project_id as string,
                         searchCategory || "",
                         item.value,
-                        "parent_id" in item ? item?.parent_id : undefined,
+                        "parent_id" in item ? item?.parent_id : undefined
                       )}
                       title={item.label}
                       type="characters"
@@ -285,13 +285,13 @@ export function SearchDrawer() {
                         project_id as string,
                         searchCategory === "documents_content" ? "documents" : searchCategory || "",
                         item.value,
-                        "parent_id" in item ? item?.parent_id : undefined,
+                        "parent_id" in item ? item?.parent_id : undefined
                       )}
                       title={`${item.label} ${"parent_title" in item && item?.parent_title ? `(${item.parent_title})` : ""}`}
                       type={
                         searchCategory === "documents_content"
                           ? "documents"
-                          : (searchCategory as AvailableEntityType | AvailableSubEntityType)
+                          : (searchCategory as AvailableWikiEntityType | AvailableWikiSubEntityType)
                       }
                     />
                   )}

@@ -2,8 +2,8 @@ import { isEqual, isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   BaseEntityType,
   BlueprintFieldTypes,
   BlueprintInstanceBlueprintFieldType,
@@ -17,7 +17,7 @@ import {
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
-  type: AvailableEntityType | AvailableSubEntityType | SearchableEntities | null,
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType | SearchableEntities | null
 ): AvailableIcons {
   if (type === "characters") return IconEnum.character;
   if (type === "documents") return IconEnum.document;
@@ -42,7 +42,7 @@ export function getDefaultEntityIcon(
   return IconEnum.error;
 }
 
-export function getParentEntityType(type: AvailableSubEntityType): AvailableEntityType | null {
+export function getParentEntityType(type: AvailableWikiSubEntityType): AvailableWikiEntityType | null {
   if (type === "map_pins" || type === "map_layers") return "maps";
   if (type === "nodes" || type === "edges") return "graphs";
   if (type === "random_table_options") return "random_tables";
@@ -54,7 +54,7 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
   return null;
 }
 
-export function getEntityFields(type: AvailableEntityType): string[] {
+export function getEntityFields(type: AvailableWikiEntityType): string[] {
   const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
 
   if (
@@ -86,7 +86,7 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
   return { minSize: 10, maxSize: 10 };
 }
 export function getFieldValueFromType(
-  type: BlueprintFieldTypes | FieldTypes,
+  type: BlueprintFieldTypes | FieldTypes
 ): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "blueprint_instances" | "events" | "value" | null {
   if (
     type === "text" ||
@@ -112,7 +112,7 @@ export function getFieldValueFromType(
 
 export function getDifferenceForBlueprintInstance(
   originalInstance: Omit<BlueprintInstanceType, "deleted_at">,
-  updatedInstance: Omit<BlueprintInstanceType, "deleted_at">,
+  updatedInstance: Omit<BlueprintInstanceType, "deleted_at">
 ): BlueprintInstanceBlueprintFieldType[] {
   const fields = [...updatedInstance.blueprint_fields];
   const originalFields = originalInstance.blueprint_fields;
@@ -158,7 +158,7 @@ export function getDifferenceForBlueprintInstance(
       originalField?.characters?.length === field?.characters?.length
     ) {
       return !field.characters.every((char) =>
-        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField.characters.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (
@@ -167,7 +167,7 @@ export function getDifferenceForBlueprintInstance(
       originalField?.blueprint_instances?.length === field.blueprint_instances?.length
     ) {
       return !field?.blueprint_instances?.every((char) =>
-        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (
@@ -178,7 +178,7 @@ export function getDifferenceForBlueprintInstance(
       return !field.documents.every((char) =>
         originalField.documents.some((original_char) => {
           return original_char?.related_id === char?.related_id;
-        }),
+        })
       );
     }
     if (
@@ -187,17 +187,17 @@ export function getDifferenceForBlueprintInstance(
       originalField?.map_pins?.length === field?.map_pins?.length
     ) {
       return !field?.map_pins?.every((char) =>
-        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (!!originalField?.events?.length && !!field?.events?.length && originalField?.events?.length === field?.events?.length) {
       return !field?.events?.every((char) =>
-        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
       return !field?.images?.every((char) =>
-        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
 
@@ -207,7 +207,7 @@ export function getDifferenceForBlueprintInstance(
 
 export function getDifferenceForCharacterFields(
   originalCharacter: Partial<CharacterType>,
-  updatedCharacter: Partial<CharacterType>,
+  updatedCharacter: Partial<CharacterType>
 ): CharacterCharacterFieldType[] {
   const fields = [...(updatedCharacter.character_fields || [])];
   const originalFields = originalCharacter.character_fields || [];
@@ -250,7 +250,7 @@ export function getDifferenceForCharacterFields(
       originalField?.blueprint_instances?.length === field.blueprint_instances?.length
     ) {
       return !field?.blueprint_instances?.every((char) =>
-        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.blueprint_instances?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (
@@ -261,7 +261,7 @@ export function getDifferenceForCharacterFields(
       return !field.documents.every((char) =>
         originalField.documents.some((original_char) => {
           return original_char?.related_id === char?.related_id;
-        }),
+        })
       );
     }
     if (
@@ -270,17 +270,17 @@ export function getDifferenceForCharacterFields(
       originalField?.map_pins?.length === field?.map_pins?.length
     ) {
       return !field?.map_pins?.every((char) =>
-        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.map_pins?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (!!originalField?.images?.length && !!field?.images?.length && originalField?.images?.length === field?.images?.length) {
       return !field?.images?.every((char) =>
-        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.images?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
     if (!!originalField?.events?.length && !!field?.events?.length && originalField?.events?.length === field?.events?.length) {
       return !field?.events?.every((char) =>
-        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id),
+        originalField?.events?.some((original_char) => original_char?.related_id === char?.related_id)
       );
     }
 
@@ -290,7 +290,7 @@ export function getDifferenceForCharacterFields(
 
 export function chooseRandomItems(
   arr: RandomTableOptionType[],
-  M: number,
+  M: number
 ): { id: string; subitem_id?: string; title: string }[] {
   if (M > arr.length) {
     return [];

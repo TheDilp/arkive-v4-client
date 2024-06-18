@@ -13,7 +13,7 @@ import {
   useUpdateSubEntity,
 } from "../../../hooks";
 import {
-  AvailableEntityType,
+  AvailableWikiEntityType,
   CalendarType,
   DrawerAtomType,
   EventStateType,
@@ -106,7 +106,7 @@ export function EventDrawer({ data, exceptions }: Props) {
       enabled: !exceptions?.globalCreate || (exceptions?.globalCreate && !!event?.parent_id),
       isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
-    },
+    }
   );
 
   const {
@@ -146,7 +146,7 @@ export function EventDrawer({ data, exceptions }: Props) {
       isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
       enabled: !!data?.id,
-    },
+    }
   );
 
   const permissions = useHasPermissions(
@@ -160,7 +160,7 @@ export function EventDrawer({ data, exceptions }: Props) {
       "read_assets",
       "read_documents",
     ],
-    existingEvent?.data?.owner_id,
+    existingEvent?.data?.owner_id
   );
   const tabs = getTabs(permissions, existingEvent?.data?.id);
 
@@ -173,7 +173,7 @@ export function EventDrawer({ data, exceptions }: Props) {
   const { mutateAsync: updateEvent, isLoading: isUpdating } = useUpdateSubEntity(
     "events",
     project_id as string,
-    item_id as string,
+    item_id as string
   );
 
   useLayoutEffect(() => {
@@ -519,7 +519,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Preview",
-                              data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
+                              data: { id: event?.document?.id as string, entity_type: "documents" as AvailableWikiEntityType },
                               type: "entity_preview",
                               size: "half",
                             }))

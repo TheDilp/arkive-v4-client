@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   DocumentTemplateFieldType,
   EdgeType,
   GraphType,
@@ -55,13 +55,13 @@ export function useCreateProject<InsertType>() {
           position: "top-right",
         });
       },
-    },
+    }
   );
 }
 
 export function useCreateEntity<
   InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
->(type: AvailableEntityType, isTemplate?: boolean) {
+>(type: AvailableWikiEntityType, isTemplate?: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -112,13 +112,13 @@ export function useCreateEntity<
           position: "top-right",
         });
       },
-    },
+    }
   );
 }
 
 export function useCreateSubEntity<InsertType extends { data: { parent_id: string } }>(
-  type: AvailableSubEntityType,
-  project_id: string | undefined,
+  type: AvailableWikiSubEntityType,
+  project_id: string | undefined
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -148,7 +148,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
                     [type]: (oldData.data?.[type as "nodes" | "edges"] || []).concat(vars.data as NodeType | EdgeType),
                   },
                 }
-              : oldData,
+              : oldData
           );
           if (type === "nodes") setNodes((prev) => [...(prev || []), vars.data as NodeType]);
           if (type === "edges") setEdges((prev) => [...(prev || []), vars.data as EdgeType]);
@@ -186,13 +186,13 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
           position: "top-right",
         });
       },
-    },
+    }
   );
 }
 
 export function useCreateEntities<InsertType extends { data: { [key: string]: any }[]; relations?: { [key: string]: any } }>(
-  type: AvailableEntityType,
-  project_id: string,
+  type: AvailableWikiEntityType,
+  project_id: string
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -228,13 +228,13 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
           });
         }
       },
-    },
+    }
   );
 }
 
 export function useCreateSubEntities<InsertType extends { data: { data: { parent_id: string } }[] }>(
-  type: AvailableSubEntityType,
-  parent_id: string,
+  type: AvailableWikiSubEntityType,
+  parent_id: string
 ) {
   const queryClient = useQueryClient();
   const setNodes = useSetAtom(nodesAtom);
@@ -261,7 +261,7 @@ export function useCreateSubEntities<InsertType extends { data: { data: { parent
                     [type]: (oldData.data?.nodes || []).concat(newNodes),
                   },
                 }
-              : oldData,
+              : oldData
           );
           if (type === "nodes") setNodes((prev) => [...(prev || [])].concat(newNodes));
           return { old };
@@ -274,7 +274,7 @@ export function useCreateSubEntities<InsertType extends { data: { data: { parent
           queryClient.setQueryData([parentEntityType, parent_id], context?.old);
         }
       },
-    },
+    }
   );
 }
 
@@ -307,7 +307,7 @@ export function useGenerateGraph<
           icon: IconEnum.error,
         });
       },
-    },
+    }
   );
 }
 export function useGenerateDocument<
@@ -337,7 +337,7 @@ export function useGenerateDocument<
           icon: IconEnum.error,
         });
       },
-    },
+    }
   );
 }
 export function useInviteUserToProject() {
@@ -369,7 +369,7 @@ export function useInviteUserToProject() {
           icon: IconEnum.error,
         });
       },
-    },
+    }
   );
 }
 export function useMutateWebhook(action: "create" | "update", id?: string) {
@@ -408,7 +408,7 @@ export function useMutateWebhook(action: "create" | "update", id?: string) {
           position: "top-right",
         });
       },
-    },
+    }
   );
 }
 export function useCreateFromTemplate(id: string, project_id: string) {
@@ -447,7 +447,7 @@ export function useCreateFromTemplate(id: string, project_id: string) {
           position: "top-right",
         });
       },
-    },
+    }
   );
 }
 

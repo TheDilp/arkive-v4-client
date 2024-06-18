@@ -1,4 +1,4 @@
-import { AvailableEntityType } from "../../EntityTypes";
+import { AvailableWikiEntityType } from "../../EntityTypes";
 
 export type SkeletonType = {
   type:
@@ -17,6 +17,6 @@ export type SkeletonType = {
     | "project_view"
     | "sidebar";
   limit?: number;
-  entity_type?: AvailableEntityType;
+  entity_type?: AvailableWikiEntityType;
   isFullWidth?: boolean;
 };

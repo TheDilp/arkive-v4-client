@@ -1,8 +1,8 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   IconCategories,
   MentionStatType,
   NotificationEntityType,
@@ -77,7 +77,7 @@ export function useGetUser(
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
-  type: AvailableEntityType,
+  type: AvailableWikiEntityType,
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions<any> & {
     queryKeyOverwrite?: string[];
@@ -123,7 +123,7 @@ export function useGetEntity<EntityType>(
 }
 export function useGetSubEntity<EntityType>(
   id: string | undefined,
-  type: AvailableSubEntityType,
+  type: AvailableWikiSubEntityType,
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions & {
     queryKeyOverwrite?: string[];
@@ -149,7 +149,7 @@ export function useGetSubEntity<EntityType>(
 
 export function useGetEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableEntityType | AvailableSubEntityType,
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
@@ -248,7 +248,7 @@ export function useGetEntities<ReturnType>(
 }
 export function useGetInfiniteEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableEntityType | AvailableSubEntityType,
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];

@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useHandleChange } from "../../../hooks";
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   CharacterFieldTemplateType,
   FieldTypes,
   HandleChangePropsType,
@@ -141,7 +141,7 @@ function CharacterFieldsFilters({
               value: opt.id,
               label: opt.title,
               isDisabled: nonFilterableEntities.includes(opt.field_type),
-            }),
+            })
           )}
           value={field?.field_id}
         />
@@ -242,7 +242,7 @@ function CharacterFieldsFilters({
                   image_id={field.filter.relationalData?.image}
                   label="Includes"
                   title={field.filter.relationalData?.label}
-                  type={getSearchType(field.field_type) as AvailableEntityType}
+                  type={getSearchType(field.field_type) as AvailableWikiEntityType}
                 />
               </div>
             ) : (
@@ -441,7 +441,7 @@ function CharacterResourceFilter({
                 id={field.filter.relationalData?.value}
                 image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
                 title={field.filter.relationalData?.label}
-                type={f.id as AvailableEntityType}
+                type={f.id as AvailableWikiEntityType}
               />
             </div>
           ) : (
@@ -498,7 +498,9 @@ function CharacterResourceFiltersList({
           <Collapsible
             actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
             icon={
-              f.id === "maps" ? IconEnum.map_pin : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)
+              f.id === "maps"
+                ? IconEnum.map_pin
+                : getDefaultEntityIcon(f.id as AvailableWikiEntityType | AvailableWikiSubEntityType)
             }
             initialOpen
             label={f.template.title}>
@@ -592,7 +594,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
         character_fields: true,
       },
     },
-    "character_fields_templates",
+    "character_fields_templates"
   );
 
   const { handleChange } = useHandleChange({ data: filters, setData: setFilters, ignoreDataChange: true });
@@ -618,7 +620,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
                 isDisabled: filters.some((f) => f.id === "documents"),
@@ -636,7 +638,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
                 isDisabled: filters.some((f) => f.id === "maps"),
@@ -654,7 +656,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
                 isDisabled: filters.some((f) => f.id === "events"),
@@ -672,7 +674,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
                 isDisabled: filters.some((f) => f.id === "images"),
@@ -690,7 +692,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
                 isDisabled: filters.some((f) => f.id === "tags"),
@@ -727,7 +729,7 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
                         and: [],
                         or: [],
                       },
-                    }),
+                    })
                   );
                 },
               }))}>
@@ -750,8 +752,8 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
             setFilters((prev) =>
               prev.toSpliced(
                 prev.findIndex((p) => p.id === id),
-                1,
-              ),
+                1
+              )
             )
           }
         />
@@ -762,8 +764,8 @@ export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatc
             setFilters((prev) =>
               prev.toSpliced(
                 prev.findIndex((p) => p.id === id),
-                1,
-              ),
+                1
+              )
             )
           }
         />

@@ -2,7 +2,7 @@ import { Dispatch } from "react";
 
 import { AssetType } from "../../baseTypes";
 import { RequestFilterType, RequestOrderByType, RequestPaginationType, SortType } from "../../CRUD/CRUDTypes";
-import { AvailableEntityType, AvailableSubEntityType, SearchableEntities } from "../../EntityTypes";
+import { AvailableWikiEntityType, AvailableWikiSubEntityType, SearchableEntities } from "../../EntityTypes";
 import { ButtonType } from "../FormTypes";
 import { SelectOptionType } from "../FormTypes/selectTypes";
 
@@ -88,7 +88,15 @@ export interface TableType {
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => void;
   };
-  type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships" | "roles";
+  type:
+    | AvailableWikiEntityType
+    | AssetType
+    | AvailableWikiSubEntityType
+    | "icons"
+    | "words"
+    | "context"
+    | "relationships"
+    | "roles";
   skeletonLimit?: number;
 }
 

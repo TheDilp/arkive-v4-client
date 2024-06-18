@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateAccess, useHandleChange, useToggledResetAtom } from "../../../hooks";
-import { AvailableEntityType, AvailableSubEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
+import { AvailableWikiEntityType, AvailableWikiSubEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -10,7 +10,11 @@ import { Button } from "../../Form";
 import { DrawerLayout } from "../../Layout";
 
 type Props = {
-  data: { ids: string[]; selectablePermissions: PermissionCodeType[]; type: AvailableEntityType | AvailableSubEntityType };
+  data: {
+    ids: string[];
+    selectablePermissions: PermissionCodeType[];
+    type: AvailableWikiEntityType | AvailableWikiSubEntityType;
+  };
 };
 
 export function BulkAccessDrawer({ data }: Props) {

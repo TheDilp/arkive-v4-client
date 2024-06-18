@@ -5,7 +5,7 @@ import { tv } from "tailwind-variants";
 
 import { useHandleChange } from "../../hooks";
 import {
-  AvailableEntityType,
+  AvailableWikiEntityType,
   BlueprintFieldTypes,
   FilterEnumType,
   HandleChangePropsType,
@@ -212,7 +212,7 @@ function TableColumnFilterList({
                     image_id={filt.relationalData.image}
                     size="sm"
                     title={filt.relationalData.label}
-                    type={filterType?.searchType as AvailableEntityType}
+                    type={filterType?.searchType as AvailableWikiEntityType}
                   />
                 ) : null}
 

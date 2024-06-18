@@ -4,7 +4,14 @@ import { RemirrorJSON } from "remirror";
 import { useGetEntity, useGetImage } from "../../../hooks";
 import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
-import { AssetType, AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
+import {
+  AssetType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
+  DocumentType,
+  GraphType,
+  MapType,
+} from "../../../types";
 import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Graph, Image } from "../../DataDisplay";
@@ -123,7 +130,7 @@ export function EntityPreviewDrawer({
 }: {
   isPublic?: boolean;
   data:
-    | { id: string; parent_id?: string; entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType }
+    | { id: string; parent_id?: string; entity_type: Omit<AvailableWikiEntityType, "images"> | AvailableWikiSubEntityType }
     | {
         id: string;
         entity_type: "images";
@@ -158,12 +165,12 @@ export function EntityPreviewDrawer({
         <div className="">
           <Button
             icon={IconEnum.edit}
-            label={`Edit ${getSingularEntityType(data.entity_type as AvailableEntityType).toLowerCase()}`}
+            label={`Edit ${getSingularEntityType(data.entity_type as AvailableWikiEntityType).toLowerCase()}`}
             onClick={() =>
               navigate(
                 getEntityLink(
                   project_id as string,
-                  data.entity_type as AvailableEntityType,
+                  data.entity_type as AvailableWikiEntityType,
                   data.id,
                   "parent_id" in data ? data?.parent_id || "" : "",
                   isPublic

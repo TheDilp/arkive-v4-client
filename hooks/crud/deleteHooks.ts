@@ -2,7 +2,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cloneDeep from "lodash.clonedeep";
 import set from "lodash.set";
 
-import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType, ConversationType, MessageType } from "../../types";
+import {
+  AllAvailableEntities,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
+  ConversationType,
+  MessageType,
+} from "../../types";
 import {
   baseURLS,
   FetchFunction,
@@ -12,7 +18,7 @@ import {
   useNotifications,
 } from "../../utils";
 
-export function useDeleteEntity(type: AvailableEntityType, project_id: string, arkive: boolean) {
+export function useDeleteEntity(type: AvailableWikiEntityType, project_id: string, arkive: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -50,11 +56,11 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
-export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string, parent_id?: string) {
+export function useDeleteSubEntity(type: AvailableWikiSubEntityType, project_id: string, parent_id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -74,7 +80,7 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
               set(
                 temp,
                 `data.${type}`,
-                ((temp?.data?.[type] as MessageType[]) || [])?.filter((item) => item?.id !== vars.data.id),
+                ((temp?.data?.[type] as MessageType[]) || [])?.filter((item) => item?.id !== vars.data.id)
               );
               return temp;
             }
@@ -105,14 +111,14 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
       onError: (_, vars, context) => {
         queryClient.setQueryData(["dictionaries", vars.data.parent_id], context?.old);
       },
-    },
+    }
   );
 }
 export function useDeleteMany(
   type: AllAvailableEntities,
   arkive: boolean,
   project_id?: string | undefined,
-  parent_id?: string | undefined,
+  parent_id?: string | undefined
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
@@ -148,7 +154,7 @@ export function useDeleteMany(
             timer: 5,
           });
       },
-    },
+    }
   );
 }
 
@@ -183,6 +189,6 @@ export function useKickMember() {
             timer: 5,
           });
       },
-    },
+    }
   );
 }

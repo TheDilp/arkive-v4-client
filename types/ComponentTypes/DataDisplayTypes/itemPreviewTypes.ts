@@ -1,6 +1,6 @@
 import { AvailableIcons } from "../../../utils";
 import { Size, Variant } from "../../baseTypes";
-import { AvailableEntityType, AvailableSubEntityType } from "../../EntityTypes";
+import { AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../EntityTypes";
 
 export interface ItemPreviewType {
   id: string;
@@ -15,7 +15,7 @@ export interface ItemPreviewType {
   clearAction?: (id: string) => void;
   otherAction?: (id: string) => void;
   otherActionIcon?: string;
-  type: AvailableEntityType | AvailableSubEntityType | "images";
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType | "images";
   variant?: Variant;
   size?: Size;
 }

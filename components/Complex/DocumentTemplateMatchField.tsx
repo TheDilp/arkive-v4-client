@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useGetEntity } from "../../hooks";
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   DocumentTemplateFieldType,
   DocumentType,
   HandleChangePropsType,
@@ -172,7 +172,7 @@ export function MatchField({
 
   const { data: relatedBlueprint, isFetching } = useGetEntity<{ id: string; title: string; icon?: string }>(
     related_id as string | undefined,
-    getParentEntityType(entity_type as AvailableSubEntityType) as AvailableEntityType,
+    getParentEntityType(entity_type as AvailableWikiSubEntityType) as AvailableWikiEntityType,
     {
       data: {
         id: related_id,
@@ -280,7 +280,9 @@ export function MatchField({
                 <Search
                   isDisabled={isFetching}
                   isLoading={isFetching}
-                  label={capitalizeFirstLetter(getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType))}
+                  label={capitalizeFirstLetter(
+                    getSingularEntityType(getParentEntityType(entity_type) as AvailableWikiEntityType)
+                  )}
                   name="value"
                   onChange={({ label, value: newValue, image, icon }) => {
                     handleChange({ name: `template_fields[${idx}].related_id`, value: newValue });
@@ -308,9 +310,9 @@ export function MatchField({
                   icon={parent.icon || ""}
                   id={parent.value}
                   image_id={parent.image}
-                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
+                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableWikiEntityType)}
                   title={parent.label}
-                  type={getParentEntityType(entity_type) as AvailableEntityType}
+                  type={getParentEntityType(entity_type) as AvailableWikiEntityType}
                 />
               </div>
             ) : null}
@@ -356,7 +358,7 @@ export function MatchField({
                   image_id={selectedEntity.image}
                   label="Replace with"
                   title={selectedEntity.label}
-                  type={entity_type as AvailableEntityType}
+                  type={entity_type as AvailableWikiEntityType}
                 />
               </div>
             ) : null}

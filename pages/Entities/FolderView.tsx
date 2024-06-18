@@ -31,8 +31,8 @@ import {
   useUpdateEntity,
 } from "../../hooks";
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   BaseEntityType,
   BulkUpdateType,
   DeleteManyType,
@@ -399,7 +399,7 @@ function EntityItem({
   showContextMenu,
   changeParent,
 }: EntityItemType & {
-  type: AvailableEntityType;
+  type: AvailableWikiEntityType;
   show_image?: boolean;
   changeParent: UseMutateFunction<
     any,
@@ -463,7 +463,7 @@ function EntityItem({
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : (icon as AvailableIcons) || getDefaultEntityIcon(type)} />
           )}
         </div>
-        <span className="max-w-full truncate font-lato text-white hover:text-white">{title}</span>
+        <span className="font-lato max-w-full truncate text-white hover:text-white">{title}</span>
       </div>
     </Link>
   );
@@ -492,13 +492,13 @@ function getSelectedActions(
     data: any[];
     arkived: "active" | "arkive";
     dispatch: TableDispatch;
-    type: AvailableEntityType | AvailableSubEntityType;
+    type: AvailableWikiEntityType | AvailableWikiSubEntityType;
   }
 ) {
   const selectedActions: TableSelectedAction[] = [];
   if (permissions?.[`update_${type}` as PermissionCodeType]) {
     selectedActions.push(
-      ...(PublicEntities.includes(type as AvailableEntityType)
+      ...(PublicEntities.includes(type as AvailableWikiEntityType)
         ? [
             {
               icon: IconEnum.eye,
@@ -548,7 +548,7 @@ function getSelectedActions(
           }));
         },
       },
-      ...(EntitiesWithTags.includes(type as AvailableEntityType)
+      ...(EntitiesWithTags.includes(type as AvailableWikiEntityType)
         ? [
             {
               icon: IconEnum.tags,
@@ -556,7 +556,7 @@ function getSelectedActions(
               isIconOnly: true,
               tooltip: "Add/remove tags",
               onClick: () => {
-                if (EntitiesWithTags.includes(type as AvailableEntityType)) {
+                if (EntitiesWithTags.includes(type as AvailableWikiEntityType)) {
                   const ids = Object.values(selection || {}).flatMap((id) => id);
                   const charactersWithTags = (data || [])
                     ?.filter((e) => ids.includes(e.id))
@@ -570,7 +570,7 @@ function getSelectedActions(
                     size: "lg",
                     title: "Bulk edit tags",
                     type: "bulk_tags",
-                    data: { items: charactersWithTags, dispatch, type: type as AvailableEntityType },
+                    data: { items: charactersWithTags, dispatch, type: type as AvailableWikiEntityType },
                   }));
                 }
               },
@@ -695,12 +695,12 @@ export function FolderView() {
   const { pathname } = useLocation();
   const breakpoints = useBreakpoint();
   const user = useAtomValue(userAtom);
-  const entityName = getSingularEntityType(type as AvailableEntityType);
+  const entityName = getSingularEntityType(type as AvailableWikiEntityType);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const isFolder = pathname.includes("/folder/");
   const createNotification = useNotifications();
   const permissions = useHasPermissions(
-    getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
+    getPermissionsForTypeView(type as AvailableWikiEntityType | AvailableWikiSubEntityType),
     undefined
   );
 
@@ -774,7 +774,7 @@ export function FolderView() {
         image: type === "documents" || type === "maps",
       },
       // @ts-ignore
-      fields: getEntityFields(type as AvailableEntityType),
+      fields: getEntityFields(type as AvailableWikiEntityType),
       orderBy: [
         {
           field: "is_folder",
@@ -786,7 +786,7 @@ export function FolderView() {
         },
       ],
     },
-    type as AvailableEntityType,
+    type as AvailableWikiEntityType,
     {
       enabled:
         (!item_id || isFolder) &&
@@ -798,7 +798,7 @@ export function FolderView() {
   );
   const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
-    type as AvailableEntityType,
+    type as AvailableWikiEntityType,
     {
       data: {
         project_id,
@@ -807,7 +807,7 @@ export function FolderView() {
       permissions: true,
       arkived: arkived === "arkive",
       // @ts-ignore
-      fields: getEntityFields(type as AvailableEntityType),
+      fields: getEntityFields(type as AvailableWikiEntityType),
       relations: {
         parents: arkived === "active",
         tags: EntitiesWithTags.includes(type as string),
@@ -824,9 +824,9 @@ export function FolderView() {
       queryKeyConcat: [item_id as string],
     }
   );
-  const { mutateAsync: updateMany } = useBulkUpdate(project_id as string, type as AvailableEntityType);
-  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableEntityType, arkived === "active", project_id);
-  const { mutate: changeParent } = useUpdateEntity(type as AvailableEntityType, project_id as string);
+  const { mutateAsync: updateMany } = useBulkUpdate(project_id as string, type as AvailableWikiEntityType);
+  const { mutateAsync: deleteMany } = useDeleteMany(type as AvailableWikiEntityType, arkived === "active", project_id);
+  const { mutate: changeParent } = useUpdateEntity(type as AvailableWikiEntityType, project_id as string);
   const navigate = useNavigate();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -842,7 +842,7 @@ export function FolderView() {
     deleteMany,
     resetDialogAtom,
     updateMany,
-    type: type as AvailableEntityType | AvailableSubEntityType,
+    type: type as AvailableWikiEntityType | AvailableWikiSubEntityType,
     dispatch,
     data: base?.data || [],
   });
@@ -850,7 +850,7 @@ export function FolderView() {
   const setContextMenuAtom = useSetAtom(contextMenuAtom);
 
   useNavbarTitle(
-    `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableEntityType | "settings") || "")} ${
+    `${capitalizeFirstLetter(getNavbarEntityType(type as AvailableWikiEntityType | "settings") || "")} ${
       data?.data?.title ? `| ${data.data.title}` : ""
     }`,
     true
@@ -858,9 +858,9 @@ export function FolderView() {
 
   useLayoutEffect(() => {
     if (!item_id) {
-      setBreadcrumbs({ items: [], type: type as AvailableEntityType });
+      setBreadcrumbs({ items: [], type: type as AvailableWikiEntityType });
     } else if (data?.data?.parents && data?.data?.parents?.length) {
-      setBreadcrumbs({ items: data?.data?.parents, type: type as AvailableEntityType });
+      setBreadcrumbs({ items: data?.data?.parents, type: type as AvailableWikiEntityType });
     }
   }, [data, type, setBreadcrumbs, item_id]);
 
@@ -871,7 +871,7 @@ export function FolderView() {
   }, [item_id, arkived]);
   useEffect(() => {
     if (
-      EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&
+      EntitiesWithFoldersEnum.includes(type as AvailableWikiEntityType) &&
       Object.keys(permissions).length > 1 &&
       !permissions?.[`read_${type}` as PermissionCodeType] &&
       user &&
@@ -880,7 +880,7 @@ export function FolderView() {
     ) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(
-          type as AvailableEntityType
+          type as AvailableWikiEntityType
         )}.`,
         timer: 5,
         hasNoTruncate: true,
@@ -1046,7 +1046,7 @@ export function FolderView() {
                     {
                       id: "1",
                       title: `Create new ${entityName}`,
-                      icon: getDefaultEntityIcon(type as AvailableEntityType),
+                      icon: getDefaultEntityIcon(type as AvailableWikiEntityType),
                       onClick: () => {
                         setDrawer((prev) => ({
                           ...prev,
@@ -1110,7 +1110,7 @@ export function FolderView() {
 
         {(isInitialLoading || isInitialLoadingFolder) && view === "folders" ? (
           <div className="mt-72 w-full">
-            <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
+            <Skeleton entity_type={type as AvailableWikiEntityType} type="folder_view" />
           </div>
         ) : null}
       </div>
@@ -1175,7 +1175,7 @@ export function FolderView() {
               }
               show_image={show_image_folder_view}
               title={item.title}
-              type={type as AvailableEntityType}
+              type={type as AvailableWikiEntityType}
             />
           ))}
 
@@ -1222,7 +1222,7 @@ export function FolderView() {
             isLoading={isInitialLoading || isInitialLoadingFolder}
             key={type}
             pagination={pagination}
-            type={type as AvailableEntityType}
+            type={type as AvailableWikiEntityType}
           />
         </div>
       ) : null}

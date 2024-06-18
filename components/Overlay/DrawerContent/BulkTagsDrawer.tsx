@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateTags, useToggledResetAtom } from "../../../hooks";
-import { AvailableEntityType, AvailableSubEntityType, TableDispatch, TagType } from "../../../types";
+import { AvailableWikiEntityType, AvailableWikiSubEntityType, TableDispatch, TagType } from "../../../types";
 import { IconEnum, useNotifications } from "../../../utils";
 import { Button, TagInput, Title } from "../../Form";
 import { DrawerLayout } from "../../Layout";
@@ -11,7 +11,7 @@ type Props = {
   data: {
     items: { id: string; tags: string[] }[];
     dispatch: TableDispatch;
-    type: AvailableEntityType | AvailableSubEntityType;
+    type: AvailableWikiEntityType | AvailableWikiSubEntityType;
   };
 };
 

@@ -1,6 +1,6 @@
 import {
-  AvailableEntityType,
-  AvailableSubEntityType,
+  AvailableWikiEntityType,
+  AvailableWikiSubEntityType,
   EntityPermissionType,
   PermissionCodeType,
   SearchableEntities,
@@ -11,7 +11,7 @@ export function createOrEditPermission(
   create: boolean | undefined,
   edit: boolean | undefined,
   is_owner: boolean | undefined,
-  id: string | undefined,
+  id: string | undefined
 ): boolean {
   if (is_owner) return true;
   if (create && !id) return true;
@@ -19,7 +19,7 @@ export function createOrEditPermission(
   return false;
 }
 
-export function getPermissionsForTypeView(type: AvailableEntityType | AvailableSubEntityType): PermissionCodeType[] {
+export function getPermissionsForTypeView(type: AvailableWikiEntityType | AvailableWikiSubEntityType): PermissionCodeType[] {
   if (type === "blueprints")
     return ["create_blueprint_instances", "create_blueprints", "delete_blueprints", "update_blueprints"];
   if (type === "blueprint_instances")
@@ -41,13 +41,13 @@ export function hasActionPermission(
   userPermissions: UserHasPermissionsType,
   entityPermissions: Pick<EntityPermissionType, "code" | "role_id">[],
   required_permission: PermissionCodeType,
-  user_role_id: string | undefined,
+  user_role_id: string | undefined
 ) {
   if (isProjectOwner) return true;
   if (!userPermissions?.[required_permission]) return false;
   if (isEntityOwner) return true;
   return entityPermissions?.some(
-    (perm) => (user_role_id && user_role_id === perm?.role_id) || perm?.code === required_permission,
+    (perm) => (user_role_id && user_role_id === perm?.role_id) || perm?.code === required_permission
   );
 }
 

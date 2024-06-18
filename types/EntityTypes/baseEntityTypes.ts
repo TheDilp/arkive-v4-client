@@ -31,7 +31,7 @@ export interface BaseEntityType {
   owner_id: string;
 }
 
-export type AvailableEntityType =
+export type AvailableWikiEntityType =
   | "projects"
   | "characters"
   | "documents"
@@ -55,7 +55,7 @@ export type AvailableEntityType =
   | "permissions"
   | "questionnaires";
 
-export type AvailableSubEntityType =
+export type AvailableWikiSubEntityType =
   | "alter_names"
   | "map_pins"
   | "character_map_pins"
@@ -112,4 +112,4 @@ export type SearchableMentionEntities =
 
 export type EntitiesWithFolders = "documents" | "maps" | "graphs" | "dictionaries" | "calendars" | "random_tables";
 
-export type AllAvailableEntities = AvailableEntityType | AvailableSubEntityType;
+export type AllAvailableEntities = AvailableWikiEntityType | AvailableWikiSubEntityType;
