@@ -2,10 +2,14 @@ import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/cle
 import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useSetAtom } from "jotai";
+import { useLayoutEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { NotificationContainer } from "../../components";
+import { moduleAtom } from "../../utils";
 import { GameLayout, GameView } from "./pages/Game";
+import { GamesList } from "./pages/GamesList";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +21,12 @@ const queryClient = new QueryClient({
 export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setModule = useSetAtom(moduleAtom);
+
+  useLayoutEffect(() => {
+    setModule("dyce_vtt");
+  }, []);
+
   return (
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
@@ -44,7 +54,7 @@ export default function App() {
             path="/">
             <Route path="games/*">
               <Route element={<GameLayout />}>
-                <Route element={<div className="text-white">LIST OF GAMES HERE</div>} path="*" />
+                <Route element={<GamesList />} path="*" />
                 <Route element={<GameView />} path="123" />
               </Route>
             </Route>

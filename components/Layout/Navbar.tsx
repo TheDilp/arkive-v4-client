@@ -490,14 +490,14 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     nickname?: string;
     userImageUrl?: string;
     notification_type: string;
-  }>(`${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`, {
-    reconnectInterval: 5000,
-    reconnectAttempts: 10,
-  });
-
-  // const { lastJsonMessage: versionMessage } = useWebSocket<{
-  //   timestamp: number;
-  // }>(`${baseURLS.baseWebsocketServer}/ws/version`);
+  }>(
+    `${baseURLS.baseWebsocketServer}/ws/notifications/${project_id}`,
+    {
+      reconnectInterval: 5000,
+      reconnectAttempts: 10,
+    },
+    !!project_id
+  );
 
   useLayoutEffect(() => {
     if (lastJsonMessage && !isDisabled) {
@@ -564,7 +564,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   return (
     <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
       {isMutating && !isMutatingDocument ? <IndeterminateProgressBar /> : null}
-      <h1 className="flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
+      <h1 className="font-merriweather flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       <div className="ml-auto flex items-center gap-x-2 pr-4">
