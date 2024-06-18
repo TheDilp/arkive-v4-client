@@ -75,6 +75,7 @@ export function EntityPreview({
   label,
   hasNoBackground,
   otherActionIcon,
+  manual_project_id,
   variant = "secondary",
   size = "md",
   previewAction,
@@ -98,7 +99,11 @@ export function EntityPreview({
         {image_id ? (
           <Avatar
             hasShowImage
-            image={getImageURL(project_id as string, type === "maps" ? "map_images" : "images", image_id)}
+            image={getImageURL(
+              (manual_project_id || project_id) as string,
+              type === "maps" ? "map_images" : "images",
+              image_id
+            )}
             isTooltipDisabled
             label={title}
             size={size === "md" ? "sm" : "xs"}

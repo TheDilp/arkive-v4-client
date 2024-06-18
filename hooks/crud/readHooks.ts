@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 
 import {
   AvailableDyceEntityType,
@@ -21,6 +22,7 @@ import {
   getSearchURL,
   getSingularEntityType,
   IconEnum,
+  moduleAtom,
   useNotifications,
 } from "../../utils";
 
@@ -324,6 +326,7 @@ export function useSearch<ReturnType>(
     isFolders?: boolean;
   }
 ) {
+  const module = useAtomValue(moduleAtom);
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
@@ -331,7 +334,7 @@ export function useSearch<ReturnType>(
       if (type)
         return FetchFunction({
           url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
-            isGlobal ? "global" : project_id
+            isGlobal ? "global/" : `${module === "dyce_vtt" ? "" : project_id}`
           }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? type : ""}`,
           method: "POST",
           body: JSON.stringify(request),

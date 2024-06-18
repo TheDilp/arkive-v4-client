@@ -25,8 +25,8 @@ export function getImageURL(project_id: string, type: AssetType, image_id?: stri
 
 export function getSearchURL(type: SearchableEntities) {
   if (type === "all" || type === "projects") return "";
-  if (type === "by_tags") return "/all/tags";
-  return `/${type}`;
+  if (type === "by_tags") return "all/tags";
+  return `${type}`;
 }
 
 export function getThumbnailUrl(url: string, dimensions?: { width: number; height: number }) {

@@ -38,6 +38,7 @@ export function ImageSelect({
               }
               id={value as string}
               image_id={value as string}
+              manual_project_id={manual_project_id}
               title={label || ""}
               type={type === "map_images" ? "maps" : "images"}
             />

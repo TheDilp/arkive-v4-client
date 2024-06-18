@@ -10,6 +10,7 @@ export interface ItemPreviewType {
   link?: string;
   label?: string;
   image_id?: string | null;
+  manual_project_id?: string | null;
   hasNoBackground?: boolean;
   previewAction?: (id: string, parent_id?: string) => void;
   clearAction?: (id: string) => void;
