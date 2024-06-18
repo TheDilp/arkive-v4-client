@@ -56,6 +56,7 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
+import GameDrawer from "./DrawerContent/GameDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -65,11 +66,17 @@ const DrawerClasses = tv({
   },
   variants: {
     size: {
+      "4xs": "w-full md:w-[24rem]",
+      "3xs": "w-full md:w-[24rem]",
+      "2xs": "w-full md:w-[24rem]",
+      xs: "w-full md:w-[24rem]",
       sm: "w-full md:w-[24rem]",
       md: "w-full md:w-[28rem]",
       lg: "w-full md:w-[32rem]",
       xl: "w-full md:w-[36rem]",
       "2xl": "w-full md:w-[40rem]",
+      "3xl": "w-full md:w-[40rem]",
+      "4xl": "w-full md:w-[40rem]",
       half: "w-full lg:w-1/2",
       full: "w-full",
     },
@@ -232,6 +239,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
+                {drawer.type === "games" ? <GameDrawer data={drawer?.data} /> : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}

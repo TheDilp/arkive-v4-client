@@ -61,7 +61,7 @@ export type DrawerAtomType = {
         | "questionnaires";
       data: { id?: string; project_id?: string; preselectedTab?: number; title?: string };
     }
-  | { type: "document_template"; data: { id?: string } }
+  | { type: "document_template" | "games"; data: { id?: string } }
   | { type: "from_template"; data: { id: string; title: string; getContext: ReactFrameworkOutput<Remirror.Extensions> } }
   | { type: "nodes" | "edges"; data: { id: string; parent_id: string } }
   | { type: "many_nodes" | "many_edges"; data: { ids: string[]; parent_id: string } }
