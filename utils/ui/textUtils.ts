@@ -1,4 +1,4 @@
-import { AssetType, AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../types";
+import { AssetType, AvailableDyceEntityType, AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../types";
 
 export function getFirstLetters(sentence: string): string {
   const words = sentence.split(" ");
@@ -34,7 +34,9 @@ export function getSentenceCase(field: string) {
   const result = field?.replaceAll("_", " ")?.replace(/([A-Z])/g, " $1") || "";
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
-export function getSingularEntityType(type: AvailableWikiEntityType | AvailableWikiSubEntityType | AssetType) {
+export function getSingularEntityType(
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType | AssetType
+) {
   if (type === "alter_names") return "alter name";
   if (type === "character_fields") return "character field";
   if (type === "character_fields_templates") return "character field template";
@@ -45,7 +47,9 @@ export function getSingularEntityType(type: AvailableWikiEntityType | AvailableW
   if (type === "dictionaries") return "dictionary";
   return getSentenceCase(type.slice(0, type.length - 1));
 }
-export function getPluralEntityType(type: AvailableWikiEntityType | AvailableWikiSubEntityType | AssetType) {
+export function getPluralEntityType(
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType | AssetType
+) {
   return type.replaceAll("_", " ");
 }
 export function validateHexCode(hex: string) {

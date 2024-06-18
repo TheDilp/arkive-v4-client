@@ -74,6 +74,8 @@ export type AvailableWikiSubEntityType =
   | "questions"
   | "answers";
 
+export type AvailableDyceEntityType = "games";
+
 export type SearchableEntities =
   | "all"
   | "by_tags"

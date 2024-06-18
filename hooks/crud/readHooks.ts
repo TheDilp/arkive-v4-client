@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 import {
+  AvailableDyceEntityType,
   AvailableWikiEntityType,
   AvailableWikiSubEntityType,
   IconCategories,
@@ -149,7 +150,7 @@ export function useGetSubEntity<EntityType>(
 
 export function useGetEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
+  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
