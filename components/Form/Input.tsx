@@ -9,7 +9,7 @@ const InputClasses = tv({
     base: "relative flex flex-col font-lato w-full max-w-full",
     inputContainer:
       "flex items-center h-10 bg-zinc-950 text-white [&:has(:focus)]:bg-black rounded-md border p-2 text-base outline-none",
-    input: "flex w-full items-center justify-center placeholder:italic bg-transparent outline-none",
+    input: "flex w-full items-center justify-center placeholder:italic fill-white bg-transparent outline-none",
     label: "text-sm truncate block min-h-[20px]",
     helperText: "text-xs",
   },

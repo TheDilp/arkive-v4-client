@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import {
+  AvailableDyceEntityType,
   AvailableWikiEntityType,
   AvailableWikiSubEntityType,
   DocumentTemplateFieldType,
@@ -61,7 +62,7 @@ export function useCreateProject<InsertType>() {
 
 export function useCreateEntity<
   InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
->(type: AvailableWikiEntityType, isTemplate?: boolean) {
+>(type: AvailableWikiEntityType | AvailableDyceEntityType, isTemplate?: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
