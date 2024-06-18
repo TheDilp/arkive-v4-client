@@ -1,46 +1,49 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { BaseCardType, CharacterType, ProjectCardType } from "../../types";
+import { BaseCardType, CharacterType, ProjectGameCardType } from "../../types";
 import { getImageURL, IconEnum, projectCardNavItems } from "../../utils";
 import { Avatar, Icon } from "../Misc";
 import { Tooltip } from "../Overlay/Tooltip";
 
 const alwaysEnabledItems = ["/", "settings", "tags", "assets"];
 
-export function ProjectCard({ id, title, image, feature_flags }: ProjectCardType) {
+export function ProjectGameCard({ id, title, image, feature_flags, module }: ProjectGameCardType) {
+  const baseUrl = module === "arkive" ? "projects" : "games";
   const navigate = useNavigate();
 
   return (
     <Link
-      className="group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500 animate-in fade-in"
-      to={`/projects/${id}`}>
-      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow transition-all ">
+      className="animate-in fade-in group relative col-span-1 flex h-[28rem] flex-col items-center justify-center rounded bg-zinc-950 bg-cover bg-center bg-no-repeat shadow transition-all duration-500"
+      to={`/${baseUrl}/${id}`}>
+      <h2 className="font-merriweather absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center text-4xl font-semibold text-white drop-shadow transition-all">
         {title}
       </h2>
-      <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
-        {projectCardNavItems
-          .filter((item) => feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate))
-          .map((item, index) => (
-            <div
-              key={item.tooltip}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                navigate(`/projects/${id}/${item.navigate}`);
-              }}
-              onKeyDown={() => {}}
-              role="link"
-              tabIndex={0}>
-              <span className="col-span-1 flex items-center justify-center text-5xl">
-                <Tooltip allowedPlacements={index <= 3 ? ["top"] : ["bottom"]} content={item.tooltip}>
-                  <div className="w-fit transition-colors hover:text-blue-400">
-                    <Icon icon={item.icon} />
-                  </div>
-                </Tooltip>
-              </span>
-            </div>
-          ))}
-      </div>
+      {module === "arkive" ? (
+        <div className="count absolute top-[50%] z-20 mb-12 grid w-full grid-cols-3 gap-y-2 opacity-0 transition-all group-hover:opacity-100">
+          {projectCardNavItems
+            .filter((item) => feature_flags?.[`${item.navigate}_enabled`] || alwaysEnabledItems.includes(item.navigate))
+            .map((item, index) => (
+              <div
+                key={item.tooltip}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/${baseUrl}/${id}/${item.navigate}`);
+                }}
+                onKeyDown={() => {}}
+                role="link"
+                tabIndex={0}>
+                <span className="col-span-1 flex items-center justify-center text-5xl">
+                  <Tooltip allowedPlacements={index <= 3 ? ["top"] : ["bottom"]} content={item.tooltip}>
+                    <div className="w-fit transition-colors hover:text-blue-400">
+                      <Icon icon={item.icon} />
+                    </div>
+                  </Tooltip>
+                </span>
+              </div>
+            ))}
+        </div>
+      ) : null}
       <div
         className="absolute z-0 flex h-full w-full flex-col items-center justify-end bg-cover bg-center bg-no-repeat transition-all group-hover:brightness-75"
         style={{
@@ -60,14 +63,14 @@ export function CharacterCard({
   const { project_id } = useParams();
   return (
     <Link
-      className="group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
+      className="animate-in fade-in group relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500"
       to={`${id}/biography`}>
       {is_favorite ? (
         <div className="absolute right-0 top-0 z-10 m-4">
           <Icon fontSize={36} icon={IconEnum.star} thickness="fill" />
         </div>
       ) : null}
-      <h2 className="absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center font-merriweather text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all ">
+      <h2 className="font-merriweather absolute top-[20%] z-10 max-w-full select-none truncate px-4 text-center text-4xl font-semibold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] transition-all">
         {full_name}
       </h2>
       <div

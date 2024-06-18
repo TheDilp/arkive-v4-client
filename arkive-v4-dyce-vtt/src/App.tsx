@@ -58,7 +58,7 @@ export default function App() {
             <Route path="games/*">
               <Route element={<GameLayout />}>
                 <Route element={<GamesList />} path="*" />
-                <Route element={<GameView />} path="123" />
+                <Route element={<GameView />} path=":game_id" />
               </Route>
             </Route>
           </Route>

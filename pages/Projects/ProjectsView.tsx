@@ -12,7 +12,7 @@ import {
   Dialog,
   Drawer,
   Navbar,
-  ProjectCard,
+  ProjectGameCard,
   Sidebar,
   Skeleton,
   Table,
@@ -198,11 +198,12 @@ export function ProjectsView() {
           {!view && !isLoading && !isInitialLoadingUser ? (
             <div className="grid h-full max-h-full flex-1 grid-cols-1 gap-4 overflow-auto xl:grid-cols-2 2xl:grid-cols-4">
               {(data?.data || []).map((project) => (
-                <ProjectCard
+                <ProjectGameCard
                   feature_flags={project.feature_flags}
                   id={project.id}
                   image={getImageURL(project.id, "images", project.image_id)}
                   key={project.id}
+                  module="arkive"
                   title={project.title}
                 />
               ))}

@@ -1,7 +1,7 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
 import { useBreakpoint, useGetUser, useNavbarTitle } from "../../../../hooks";
@@ -9,6 +9,7 @@ import { userAtom } from "../../../../utils";
 
 export function GameLayout() {
   useNavbarTitle("", true);
+  const { game_id } = useParams();
   const { user } = useUser();
   const { isLg } = useBreakpoint();
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
@@ -43,7 +44,7 @@ export function GameLayout() {
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      {isLg ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} /> : null}
+      {isLg && !game_id ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} /> : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
           <Navbar isDisabled={isInitialLoadingUser} />

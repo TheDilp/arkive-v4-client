@@ -257,7 +257,7 @@ export function GameView() {
 
   return (
     <div className="flex h-full w-full flex-col text-white">
-      <nav className={`absolute top-4 transition-all ${drawer ? "right-96" : "right-0"}`}>
+      <nav className={`absolute top-20 transition-all ${drawer ? "right-96" : "right-0"}`}>
         <ul className="flex flex-col gap-y-4">
           {sections.map((section) => (
             <li
@@ -281,11 +281,12 @@ export function GameView() {
           ))}
         </ul>
       </nav>
-      <div className={`${drawer ? "" : "translate-x-96"} ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
+      <div
+        className={`${drawer ? "" : "translate-x-96"} absolute right-0 ml-auto h-full w-96 max-w-96 bg-zinc-800 transition-all`}>
         {drawer === "roll_history" ? <RollHistory /> : null}
         {drawer === "characters" ? <Characters /> : null}
       </div>
-      <div className="mt-auto p-4">
+      <div className={`mt-auto ${drawer ? "w-[calc(100%-24rem)]" : "w-full"} transition-width p-4`}>
         <DiceRollInput />
       </div>
     </div>

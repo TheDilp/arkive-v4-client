@@ -6,7 +6,8 @@ export interface BaseCardType {
   image?: string;
 }
 
-export interface ProjectCardType extends BaseCardType {
+export interface ProjectGameCardType extends BaseCardType {
   id: string;
   feature_flags: ProjectType["feature_flags"];
+  module: "arkive" | "dyce_vtt";
 }

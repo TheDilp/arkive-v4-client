@@ -9,6 +9,7 @@ export * from "./dictionaryTypes";
 export * from "./documentTemplateTypes";
 export * from "./documentTypes";
 export * from "./fieldsTypes";
+export * from "./gamesTypes";
 export * from "./graphTypes";
 export * from "./imageTypes";
 export * from "./mapTypes";
