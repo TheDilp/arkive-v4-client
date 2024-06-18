@@ -12,6 +12,7 @@ import {
   useListNavigation,
   useRole,
 } from "@floating-ui/react";
+import { useAtomValue } from "jotai";
 import { forwardRef, HTMLProps, MutableRefObject, ReactNode, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
@@ -19,7 +20,7 @@ import { tv } from "tailwind-variants";
 import { useSearch } from "../../hooks";
 import { AllAvailableEntities } from "../../types";
 import { SearchType } from "../../types/ComponentTypes/FormTypes/searchTypes";
-import { AvailableIcons, getImageURL, IconEnum } from "../../utils";
+import { AvailableIcons, getImageURL, IconEnum, userAtom } from "../../utils";
 import { Avatar, Icon } from "..";
 import { Button } from ".";
 
@@ -77,12 +78,28 @@ const SearchClasses = tv({
         label: "text-red-600",
         helperText: "text-red-500",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
     },
     size: {
-      sm: {
+      "4xs": {},
+      "3xs": {},
+      "2xs": {},
+      xs: {},
+      sm: {},
+      md: {
         base: "max-h-8",
         input: "max-h-8",
       },
+      lg: {},
+      xl: {},
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
     isDisabled: {
       true: {
@@ -182,8 +199,10 @@ export function Search({
   size,
   isPublic,
   parent_id,
+  manual_project_id,
 }: SearchType) {
   const { project_id } = useParams();
+  const user = useAtomValue(userAtom);
   const {
     base,
     input,
@@ -218,9 +237,17 @@ export function Search({
       type?: AllAvailableEntities;
     }[]
   >(
-    { data: { search_term: inputValue, project_id: project_id as string, parent_id }, limit: limit ?? 0 },
+    {
+      data: {
+        search_term: inputValue,
+        project_id: searchEntity === "projects" ? null : ((manual_project_id || project_id) as string),
+        user_id: searchEntity === "projects" ? user?.id || null : null,
+        parent_id,
+      },
+      limit: limit ?? 0,
+    },
     searchEntity,
-    project_id as string,
+    searchEntity === "projects" ? "" : ((manual_project_id || project_id) as string),
     isGlobal,
     {
       enabled: false,
@@ -301,7 +328,7 @@ export function Search({
         })}>
         {(searchEntity === "images" || searchEntity === "map_images") && value && !isMultiple ? (
           <Avatar
-            image={getImageURL(project_id as string, imageType || "images", value as string)}
+            image={getImageURL((manual_project_id || project_id) as string, imageType || "images", value as string)}
             imageLoading="lazy"
             isTooltipDisabled
             label={label || ""}
@@ -481,7 +508,7 @@ export function Search({
                     item?.image) ? (
                     <Avatar
                       image={getImageURL(
-                        item?.project_id || (project_id as string),
+                        item?.project_id || ((manual_project_id || project_id) as string),
                         imageType || "images",
                         searchEntity === "images" || searchEntity === "map_images" ? item?.value : item?.image
                       )}

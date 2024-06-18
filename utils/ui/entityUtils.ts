@@ -38,6 +38,7 @@ export function getDefaultEntityIcon(
   if (type === "images") return IconEnum.image;
   if (type === "roles") return IconEnum.permissions;
   if (type === "webhooks") return IconEnum.webhooks;
+  if (type === "projects") return IconEnum.project;
 
   return IconEnum.error;
 }

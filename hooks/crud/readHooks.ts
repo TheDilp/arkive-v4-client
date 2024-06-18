@@ -310,7 +310,9 @@ export function useGetInfiniteEntities<ReturnType>(
 // #region misc
 export function useSearch<ReturnType>(
   request: {
-    data: { search_term: string; project_id: string; parent_id?: string } | { tag_ids: string[]; match: "all" | "any" };
+    data:
+      | { search_term: string; project_id: string | null; user_id: string | null; parent_id?: string }
+      | { tag_ids: string[]; match: "all" | "any" };
     limit: number;
   },
   type: SearchableEntities | null,
@@ -325,11 +327,12 @@ export function useSearch<ReturnType>(
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
+      console.log(isGlobal ? "global" : project_id);
       if (type)
         return FetchFunction({
           url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
             isGlobal ? "global" : project_id
-          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}`,
+          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? type : ""}`,
           method: "POST",
           body: JSON.stringify(request),
           isPublic: options?.isPublic,

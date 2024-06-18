@@ -62,6 +62,7 @@ export interface SearchType extends BaseFormComponentType {
   searchEntity: SearchableEntities | null;
   name: string;
   label?: string;
+  manual_project_id?: string;
   helperText?: string;
   placeholder?: string;
   buttonIcon?: string;

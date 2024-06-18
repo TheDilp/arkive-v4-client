@@ -15,6 +15,8 @@ export function ImageSelect({
   isIconOnly,
   helperText,
   isDisabled,
+  isIgnoringPermissions,
+  manual_project_id,
   variant,
 }: ImageSelectType) {
   const setDialogAtom = useSetAtom(dialogAtom);
@@ -43,9 +45,10 @@ export function ImageSelect({
             <Search
               helperText={helperText}
               imageType={type}
-              isDisabled={isDisabled || !permissions?.read_assets}
+              isDisabled={isDisabled || (!permissions?.read_assets && !isIgnoringPermissions)}
               label={label}
               limit={25}
+              manual_project_id={manual_project_id}
               name={name}
               onChange={onChange}
               placeholder="Search images"
@@ -59,7 +62,7 @@ export function ImageSelect({
         <div className={`self-end ${isIconOnly ? "col-span-1" : "col-span-2"}`}>
           <Button
             icon={IconEnum.upload}
-            isDisabled={isDisabled || !permissions?.create_assets}
+            isDisabled={isDisabled || (!permissions?.create_assets && !isIgnoringPermissions)}
             isIconOnly={isIconOnly}
             label="Upload new"
             onClick={() =>

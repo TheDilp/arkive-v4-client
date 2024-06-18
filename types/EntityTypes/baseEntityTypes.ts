@@ -78,6 +78,7 @@ export type AvailableDyceEntityType = "games";
 
 export type SearchableEntities =
   | "all"
+  | "projects"
   | "by_tags"
   | "characters"
   | "documents"
