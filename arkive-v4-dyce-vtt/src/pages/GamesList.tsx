@@ -7,7 +7,9 @@ import { drawerAtom, IconEnum, userAtom } from "../../../utils";
 
 export function GamesList() {
   const user = useAtomValue(userAtom);
-  const { data } = useGetEntities<GameType>({ fields: [], data: { user_id: user?.auth_id } }, "games");
+  const { data } = useGetEntities<GameType>({ fields: [] }, "games", {
+    enabled: !!user?.id,
+  });
   const setDrawer = useSetAtom(drawerAtom);
   return (
     <div className="p-4">

@@ -44,7 +44,7 @@ export default function App() {
                 publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
                 routerPush={(to: string) => navigate(to)}
                 routerReplace={(to: string) => navigate(to)}
-                signInUrl="http://localhost:5173/sign-in">
+                signInUrl={import.meta.env.DEV ? "http://localhost:5173" : undefined}>
                 <SignedOut>
                   <RedirectToSignIn />
                 </SignedOut>
