@@ -12,4 +12,5 @@ export interface ButtonType extends BaseFormComponentType {
   hasNoBackground?: boolean;
   tooltip?: TooltipContentType;
   isIconOnly?: boolean;
+  customButtonColor?: string;
 }

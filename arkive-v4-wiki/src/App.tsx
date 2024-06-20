@@ -1,20 +1,27 @@
-import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { dark } from "@clerk/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useSetAtom } from "jotai";
 import { useLayoutEffect } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "../../components";
-import { CharacterProfileView, EntitiesView, FolderView } from "../../pages/Entities";
-import { BlueprintProfileView } from "../../pages/Entities/BlueprintProfileView";
-import { Dashboard } from "../../pages/Projects/Dashboard";
-import { ProjectsView } from "../../pages/Projects/ProjectsView";
-import { PublicEntitiesView, PublicListView } from "../../pages/Public";
-import { PublicLayout } from "../../pages/Public/PublicLayout";
-import { UserSettings, UserSettingsWebhooks } from "../../pages/User";
-import UserSettingsFeatureFlags from "../../pages/User/UserSettingsFeatureFlags";
+import { AuthContext } from "../../context";
+import {
+  AuthWrapper,
+  BlueprintProfileView,
+  CharacterProfileView,
+  Dashboard,
+  EntitiesView,
+  FolderView,
+  Login,
+  ProjectsView,
+  PublicEntitiesView,
+  PublicLayout,
+  PublicListView,
+  UserSettings,
+  UserSettingsFeatureFlags,
+  UserSettingsWebhooks,
+} from "../../pages";
 import { moduleAtom } from "../../utils";
 
 const queryClient = new QueryClient({
@@ -25,8 +32,6 @@ const queryClient = new QueryClient({
   },
 });
 export default function App() {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
   const setModule = useSetAtom(moduleAtom);
 
   useLayoutEffect(() => {
@@ -37,27 +42,18 @@ export default function App() {
     <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
-        <ReactQueryDevtools position="top-left" />
+        <ReactQueryDevtools position="top-right" />
         <Routes>
           <Route
             element={
-              <ClerkProvider
-                appearance={{
-                  baseTheme: dark,
-                }}
-                publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-                routerPush={(to: string) => navigate(to)}
-                routerReplace={(to: string) => navigate(to)}>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-                <SignedIn>
-                  <Outlet />
-                  {pathname === "/" ? <Navigate to="/projects" /> : null}
-                </SignedIn>
-              </ClerkProvider>
+              <AuthContext.Provider value={{ tokens: null }}>
+                <AuthWrapper />
+              </AuthContext.Provider>
             }
             path="/">
+            <Route path="auth/*">
+              <Route element={<Login />} path="login" />
+            </Route>
             <Route element={<UserSettings />} path="user_settings/*">
               <Route element={<UserSettingsWebhooks />} path="webhooks" />
               <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />

@@ -5,7 +5,7 @@ import { Button, Checkbox } from "../../components";
 import { useGetUser, useHandleChange, useUpdateUser } from "../../hooks";
 import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum } from "../../utils";
 
-export default function UserSettingsFeatureFlags() {
+export function UserSettingsFeatureFlags() {
   const { user: authUser } = useUser();
   const { data: user } = useGetUser(
     { data: { auth_id: authUser?.id as string }, fields: ["id", "feature_flags"] },

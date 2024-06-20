@@ -123,6 +123,7 @@ export function Button({
   isIconOnly,
   onClick,
   tooltip,
+  customButtonColor,
   size = "md",
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({
@@ -135,7 +136,12 @@ export function Button({
   });
   return (
     <Tooltip content={tooltip || ""} isDisabled={!tooltip} isIgnoringHover>
-      <button className={base()} disabled={isDisabled} onClick={onClick} type="button">
+      <button
+        className={base()}
+        disabled={isDisabled}
+        onClick={onClick}
+        style={{ backgroundColor: customButtonColor || "" }}
+        type="button">
         {iconPos === "left" && icon ? <Icon fontSize={iconSize} icon={icon} thickness={iconThickness} /> : null}
         {label && !isIconOnly ? <span className={labelClasses()}>{label}</span> : null}
         {(iconPos === "right" && icon) || isLoading ? (
