@@ -15,14 +15,12 @@ export function AuthWrapper() {
   const { data, error, isRefetching, isFetching } = useGetAuthStatus();
 
   useLayoutEffect(() => {
-    if (!loggedIn) {
+    if (!loggedIn && !pathname.endsWith("/auth/login")) {
       navigate("/auth/login");
-    } else if (loggedIn && pathname.includes("auth/")) {
+    } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
       navigate("/projects");
     }
-  }, [loggedIn]);
-  console.log(isFetching || isRefetching || (!data && !error && !loggedIn));
-  console.log(loggedIn);
+  }, [loggedIn, pathname]);
   if (isFetching || isRefetching || (!data && !error && !loggedIn)) return <Spinner />;
   return <Outlet />;
 }

@@ -1,13 +1,17 @@
+import { useAtomValue } from "jotai";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 import { AuthLayout, Button, Input } from "../../components";
 import { useHandleChange } from "../../hooks";
-import { IconEnum } from "../../utils";
+import { IconEnum, loggedInAtom } from "../../utils";
 
 export function Login() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-
+  const loggedIn = useAtomValue(loggedInAtom);
   const { handleChange } = useHandleChange({ data: loginData, setData: setLoginData });
+
+  if (loggedIn) return <Navigate to="/projects" />;
 
   return (
     <AuthLayout>
@@ -23,7 +27,9 @@ export function Login() {
               customButtonColor="#5865F2"
               icon={IconEnum.discord}
               label="Sign in with Discord"
-              onClick={undefined}
+              onClick={() => {
+                document.location = import.meta.env.VITE_DISCORD_LOGIN;
+              }}
               variant="primary"
             />
             <Button icon={IconEnum.google} label="Sign in with Google" onClick={undefined} variant="info" />

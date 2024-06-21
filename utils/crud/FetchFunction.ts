@@ -16,20 +16,16 @@ export async function FetchFunction({
     credentials: isPublic ? "omit" : "include",
     headers: {
       module: "wiki",
-      "Access-Control-Allow-Origin": "*",
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
   });
 
   const data = await res.json();
-  if (!data.ok) {
-    if ((data.message === "NO_PUBLIC_ACCESS" || data.message === "UNAUTHORIZED") && res.status === 401) {
-      throw new Error("No public access");
-    } else if (data.message === "NO_ROLE_ACCESS") {
-      return { role_access: false, ok: false };
-    }
-
-    throw new Error("There was an error with your request.");
+  if ((data.message === "NO_PUBLIC_ACCESS" || data.message === "UNAUTHORIZED") && res.status === 401) {
+    throw new Error("No public access");
+  } else if (data.message === "NO_ROLE_ACCESS") {
+    return { role_access: false, ok: false };
   }
+
   return data;
 }
