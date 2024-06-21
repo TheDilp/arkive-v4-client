@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
 import { useGetEntities, useTable } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
+import { AvailableWikiEntityType, BaseEntityType, CharacterType } from "../../types";
 import {
   getAvatarInitials,
   getCharacterFullName,
@@ -228,7 +228,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
               ],
       },
       // @ts-ignore
-      fields: type === "blueprints" ? ["id", "title"] : getEntityFields(type as AvailableEntityType),
+      fields: type === "blueprints" ? ["id", "title"] : getEntityFields(type as AvailableWikiEntityType),
       orderBy: [
         {
           field: "title",
@@ -236,7 +236,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         },
       ],
     },
-    type as AvailableEntityType,
+    type as AvailableWikiEntityType,
     {
       isPublic: true,
       staleTime: 5 * 60 * 1000,
@@ -258,7 +258,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         isLoading={isInitialLoading}
         key={type}
         pagination={pagination}
-        type={type as AvailableEntityType}
+        type={type as AvailableWikiEntityType}
       />
     </div>
   );

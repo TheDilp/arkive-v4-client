@@ -1,4 +1,4 @@
-import { tv, VariantProps } from "tailwind-variants";
+import { tv } from "tailwind-variants";
 
 import { ButtonType } from "../../types/ComponentTypes/FormTypes";
 import { IconEnum } from "../../utils/enums/IconEnums";
@@ -33,14 +33,23 @@ const ButtonClasses = tv({
       "error-bordered": {
         base: "text-red-700 border-red-700",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
     },
     size: {
+      "4xs": "h-6 text-sm",
+      "3xs": "h-6 text-sm",
+      "2xs": "h-6 text-sm",
       xs: "h-6 text-sm",
       sm: "h-8 text-sm",
       md: "text-base",
       lg: "text-lg",
       xl: "text-xl",
       "2xl": "text-2xl",
+      "3xl": "text-2xl",
+      "4xl": "text-2xl",
     },
     isDisabled: {
       true: "bg-zinc-400 text-zinc-200 cursor-not-allowed",
@@ -127,8 +136,8 @@ export function Button({
   size = "md",
 }: ButtonType) {
   const { base, label: labelClasses } = ButtonClasses({
-    variant: variant as VariantProps<typeof ButtonClasses>["variant"],
-    size: size as VariantProps<typeof ButtonClasses>["size"],
+    variant,
+    size: size,
     isDisabled,
     hasNoBackground,
     hasNoLabel: !label,

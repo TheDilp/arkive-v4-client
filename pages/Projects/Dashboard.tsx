@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Alert, EntityPreview, Icon, Select } from "../../components";
 import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
+import { AllAvailableEntities, AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../types";
 import {
   capitalizeFirstLetter,
   drawerAtom,
@@ -304,7 +304,7 @@ export function Dashboard() {
 
   return (
     <div className="flex max-h-full flex-col gap-y-2 overflow-auto">
-      <h2 className="pb-2 font-merriweather text-xl">Continue working on...</h2>
+      <h2 className="font-merriweather pb-2 text-xl">Continue working on...</h2>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         {(dashboard?.data || []).map((d, i, arr) => (
           <div
@@ -312,14 +312,14 @@ export function Dashboard() {
               i === arr.length - 1 ? "col-span-1 md:col-span-2 lg:col-span-1" : "col-span-1"
             } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}
             key={d.name}>
-            <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
-              <Icon icon={getDefaultEntityIcon(d.name as AvailableEntityType)} />
+            <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+              <Icon icon={getDefaultEntityIcon(d.name as AvailableWikiEntityType)} />
               <Link
                 className="transition-all duration-150 hover:text-blue-300"
                 to={`/projects/${project_id}/${
-                  SubEntityEnum.includes(d.name) ? getParentEntityType(d.name as AvailableSubEntityType) : d.name
+                  SubEntityEnum.includes(d.name) ? getParentEntityType(d.name as AvailableWikiSubEntityType) : d.name
                 }`}>
-                {capitalizeFirstLetter(getPluralEntityType(d.name as AvailableEntityType))}
+                {capitalizeFirstLetter(getPluralEntityType(d.name as AvailableWikiEntityType))}
               </Link>
             </h3>
             <ul className="flex w-full flex-1 flex-col items-center justify-start py-4 text-lg">
@@ -328,12 +328,16 @@ export function Dashboard() {
                   <li className="w-full [&>div>span>div:has(button)]:ml-auto" key={r.id}>
                     <EntityPreview
                       hasNoBackground
-                      icon={"icon" in r ? r.icon : getDefaultEntityIcon(d.name as AvailableEntityType | AvailableSubEntityType)}
+                      icon={
+                        "icon" in r
+                          ? r.icon
+                          : getDefaultEntityIcon(d.name as AvailableWikiEntityType | AvailableWikiSubEntityType)
+                      }
                       id={r.id}
                       image_id={"portrait_id" in r ? r.portrait_id : null}
                       link={getEntityLink(
                         project_id as string,
-                        d.name as AvailableEntityType,
+                        d.name as AvailableWikiEntityType,
                         r.id,
                         "parent_id" in r ? r?.parent_id : undefined
                       )}
@@ -344,7 +348,7 @@ export function Dashboard() {
                           data: {
                             id: r.id,
                             parent_id: "parent_id" in r ? r?.parent_id ?? undefined : undefined,
-                            entity_type: d.name as AvailableEntityType,
+                            entity_type: d.name as AvailableWikiEntityType,
                             isReadOnly: d.name === "events",
                           },
                           type: "entity_preview",
@@ -352,7 +356,7 @@ export function Dashboard() {
                         }))
                       }
                       title={r.title}
-                      type={d.name as AvailableEntityType}
+                      type={d.name as AvailableWikiEntityType}
                     />
                   </li>
                 ))
@@ -367,10 +371,10 @@ export function Dashboard() {
       </div>
       {stats?.data ? (
         <>
-          <h2 className="pb-2 font-merriweather text-xl">Statistics</h2>
+          <h2 className="font-merriweather pb-2 text-xl">Statistics</h2>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
             <div className="col-span-1 flex min-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+              <h3 className="font-lato relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
                 <span>Entity stats</span>
                 <div className="absolute right-0 max-w-48 text-base font-normal">
                   <Select
@@ -385,19 +389,19 @@ export function Dashboard() {
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={characterStatRef} />
             </div>
             <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+              <h3 className="font-lato relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
                 <span>Tag stats</span>
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-auto" ref={tagEntityStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
-              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+              <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
                 Tags by color
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={tagColorStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
-              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
+              <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
                 Mentioned entities in documents
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2">

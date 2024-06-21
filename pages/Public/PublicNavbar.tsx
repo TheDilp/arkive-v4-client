@@ -4,7 +4,7 @@ import { capitalCase } from "remirror";
 
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
+import { AllAvailableEntities, AvailableWikiEntityType, ProjectType } from "../../types";
 import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
 
 const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
@@ -41,7 +41,7 @@ export function PublicNavbar() {
           />
         </div>
         <div className="flex flex-col items-start">
-          <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
+          <h2 className="font-merriweather flex-1 text-xl font-bold">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
               {navItems.map((item) => (
@@ -65,7 +65,7 @@ export function PublicNavbar() {
               result.result.map((r) => {
                 return {
                   icon: getDefaultEntityIcon(
-                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableEntityType)
+                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableWikiEntityType)
                   ),
                   value: r.id,
                   label: r.label,

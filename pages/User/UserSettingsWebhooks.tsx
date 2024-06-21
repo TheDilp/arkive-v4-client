@@ -80,7 +80,7 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>, muta
 export function UserSettingsWebhooks() {
   const { user: authUser } = useUser();
   const { project_id } = useParams();
-  const { data: user } = useGetUser({ data: { auth_id: authUser?.id as string }, fields: ["id"] });
+  const { data: user } = useGetUser({ data: { id: authUser?.id as string }, fields: ["id"] });
   const setDrawer = useSetAtom(drawerAtom);
   const { mutate } = useDeleteEntity("webhooks", project_id as string, false);
   const [, dispatch] = useTable({});

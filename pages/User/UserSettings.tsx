@@ -27,7 +27,7 @@ export function UserSettings() {
 
   const { data: userData } = useGetUser(
     {
-      data: { auth_id: user?.id as string },
+      data: { id: user?.id as string },
       relations: {
         webhooks: true,
         roles: true,
