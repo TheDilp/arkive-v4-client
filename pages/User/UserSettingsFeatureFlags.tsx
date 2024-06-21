@@ -8,7 +8,7 @@ import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum } from "../../
 export function UserSettingsFeatureFlags() {
   const { user: authUser } = useUser();
   const { data: user } = useGetUser(
-    { data: { auth_id: authUser?.id as string }, fields: ["id", "feature_flags"] },
+    { data: { id: authUser?.id as string }, fields: ["id", "feature_flags"] },
     { queryKey: ["user", authUser?.id, "feature_flag_settings"], enabled: !!authUser?.id }
   );
   const { mutate: updateUser } = useUpdateUser(user?.data?.id as string, authUser?.id as string);
