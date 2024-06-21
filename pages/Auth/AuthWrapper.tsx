@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { Spinner } from "../../components";
@@ -14,7 +14,7 @@ export function AuthWrapper() {
 
   const { data, error, isRefetching, isFetching } = useGetAuthStatus();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!loggedIn && !pathname.endsWith("/auth/login")) {
       navigate("/auth/login");
     } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {

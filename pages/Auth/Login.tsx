@@ -10,7 +10,6 @@ export function Login() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const loggedIn = useAtomValue(loggedInAtom);
   const { handleChange } = useHandleChange({ data: loginData, setData: setLoginData });
-
   if (loggedIn) return <Navigate to="/projects" />;
 
   return (

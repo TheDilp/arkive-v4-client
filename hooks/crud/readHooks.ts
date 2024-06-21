@@ -446,14 +446,9 @@ export function useGetAuthStatus() {
       });
 
       const data = await res.text();
-      if (data === "UNAUTHORIZED") throw new Error(data);
       return data;
     },
     {
-      onError: () => {
-        console.log("error");
-        setLoggedIn(false);
-      },
       onSuccess: (data: string) => {
         if (data === "AUTHENTICATED") setLoggedIn(true);
         else setLoggedIn(false);
