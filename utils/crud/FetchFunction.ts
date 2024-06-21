@@ -10,12 +10,12 @@ export async function FetchFunction({
   isPublic?: boolean;
 }) {
   // @ts-ignore
-  const token = isPublic ? null : await window?.Clerk?.session?.getToken();
   const res = await fetch(url, {
     method,
     body,
+    credentials: isPublic ? "omit" : "include",
     headers: {
-      Authorization: isPublic ? "" : `Bearer ${token}`,
+      module: "wiki",
       "Access-Control-Allow-Origin": "*",
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
@@ -23,10 +23,7 @@ export async function FetchFunction({
 
   const data = await res.json();
   if (!data.ok) {
-    if (data.message === "UNAUTHORIZED" && res.status === 403) {
-      // @ts-ignore
-      window?.Clerk?.signOut();
-    } else if (data.message === "NO_PUBLIC_ACCESS" && res.status === 403) {
+    if ((data.message === "NO_PUBLIC_ACCESS" || data.message === "UNAUTHORIZED") && res.status === 401) {
       throw new Error("No public access");
     } else if (data.message === "NO_ROLE_ACCESS") {
       return { role_access: false, ok: false };

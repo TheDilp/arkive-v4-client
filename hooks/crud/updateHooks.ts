@@ -834,5 +834,19 @@ export function useReadNotification(project_id: string, isReadAll: boolean) {
     }
   );
 }
-
+export function useUpdateAuthStatus() {
+  return useMutation(async (project_id: string) => {
+    const res = await fetch("http://localhost:5172/auth/status/update", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ project_id }),
+      method: "POST",
+    });
+    const data = await res.text();
+    if (data !== "UPDATED") throw new Error("STATUS_NOT_UPDATED");
+    return data;
+  });
+}
 // #endregion misc

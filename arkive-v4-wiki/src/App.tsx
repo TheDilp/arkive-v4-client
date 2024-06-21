@@ -5,7 +5,6 @@ import { useLayoutEffect } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 
 import { NotificationContainer, ProjectLayout } from "../../components";
-import { AuthContext } from "../../context";
 import {
   AuthWrapper,
   BlueprintProfileView,
@@ -44,13 +43,7 @@ export default function App() {
         <NotificationContainer />
         <ReactQueryDevtools position="top-right" />
         <Routes>
-          <Route
-            element={
-              <AuthContext.Provider value={{ tokens: null }}>
-                <AuthWrapper />
-              </AuthContext.Provider>
-            }
-            path="/">
+          <Route element={<AuthWrapper />} path="/">
             <Route path="auth/*">
               <Route element={<Login />} path="login" />
             </Route>

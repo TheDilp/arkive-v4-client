@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import {
   AvailableDyceEntityType,
@@ -22,6 +22,7 @@ import {
   getSearchURL,
   getSingularEntityType,
   IconEnum,
+  loggedInAtom,
   moduleAtom,
   useNotifications,
 } from "../../utils";
@@ -59,17 +60,17 @@ export function useGetProjectDashboard(project_id: string, options?: UseQueryOpt
 
 export function useGetUser(
   request: RequestBodyType<UserType> & {
-    data: { auth_id: string; project_id?: string | undefined };
+    data: { id: string; project_id?: string | undefined };
   },
   options?: UseQueryOptions
 ) {
   return useQuery<{ data: UserType }>(
-    ["user", request.data.project_id, request.data.auth_id],
+    ["user", request.data.project_id, request.data.id],
     async () =>
       FetchFunction({
         method: "POST",
         body: JSON.stringify(request),
-        url: `${baseURLS.baseServer}/users/${request.data.auth_id}`,
+        url: `${baseURLS.baseServer}/users/${request.data.id}`,
       }),
     {
       enabled: options?.enabled,
@@ -432,6 +433,36 @@ export function useGetNotifications(
 
     {
       enabled: options?.enabled ?? true,
+    }
+  );
+}
+export function useGetAuthStatus() {
+  const setLoggedIn = useSetAtom(loggedInAtom);
+  return useQuery(
+    ["auth_status"],
+    async () => {
+      const res = await fetch("http://localhost:5172/auth/status", {
+        credentials: "include",
+      });
+
+      const data = await res.text();
+      if (data === "UNAUTHORIZED") throw new Error(data);
+      return data;
+    },
+    {
+      onError: () => {
+        console.log("error");
+        setLoggedIn(false);
+      },
+      onSuccess: (data: string) => {
+        if (data === "AUTHENTICATED") setLoggedIn(true);
+        else setLoggedIn(false);
+      },
+      retryDelay(failureCount) {
+        if (failureCount < 5) return 500;
+        return 0;
+      },
+      staleTime: Infinity,
     }
   );
 }

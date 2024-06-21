@@ -1,10 +1,28 @@
-import { useContext } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAtomValue } from "jotai";
+import { useLayoutEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { AuthContext } from "../../context";
+import { Spinner } from "../../components";
+import { useGetAuthStatus } from "../../hooks";
+import { loggedInAtom } from "../../utils";
 
 export function AuthWrapper() {
   const { pathname } = useLocation();
-  const auth = useContext(AuthContext);
-  return <>{!auth?.tokens && !pathname.endsWith("/auth/login") ? <Navigate to={"/auth/login"} /> : <Outlet />}</>;
+  const navigate = useNavigate();
+
+  const loggedIn = useAtomValue(loggedInAtom);
+
+  const { data, error, isRefetching, isFetching } = useGetAuthStatus();
+
+  useLayoutEffect(() => {
+    if (!loggedIn) {
+      navigate("/auth/login");
+    } else if (loggedIn && pathname.includes("auth/")) {
+      navigate("/projects");
+    }
+  }, [loggedIn]);
+  console.log(isFetching || isRefetching || (!data && !error && !loggedIn));
+  console.log(loggedIn);
+  if (isFetching || isRefetching || (!data && !error && !loggedIn)) return <Spinner />;
+  return <Outlet />;
 }

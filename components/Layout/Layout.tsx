@@ -1,11 +1,18 @@
-import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
-import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
+import {
+  useBreakpoint,
+  useGetEntities,
+  useGetEntity,
+  useGetUser,
+  useToggledResetAtom,
+  useUpdateAuthStatus,
+  useUser,
+} from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
@@ -37,9 +44,10 @@ projectSidebarItems.unshift({
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
-  const { user } = useUser();
+  const user = useUser();
   const { pathname } = useLocation();
-  const { data, isInitialLoading } = useGetEntity<ProjectType>(
+  const { mutate: updateAuthStatus, isLoading } = useUpdateAuthStatus();
+  const { data: projectData, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
     {
@@ -53,7 +61,7 @@ export function ProjectLayout() {
   );
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id as string, project_id },
+      data: { id: user?.id as string, project_id },
       relations: {
         webhooks: true,
         roles: true,
@@ -93,24 +101,18 @@ export function ProjectLayout() {
 
   useEffect(() => {
     if (userData?.data) {
-      if (user)
-        user?.update({
-          unsafeMetadata: {
-            user_id: userData?.data?.id,
-            project_id,
-          },
-        });
       setUserAtom(userData.data);
       setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
     }
   }, [userData?.data]);
 
   useEffect(() => {
-    if (data?.data) {
-      setProjectAtom(data.data);
-      ls.set("default_dice_color", data.data?.default_dice_color || DefaultTagColor);
+    if (projectData?.data) {
+      updateAuthStatus(projectData?.data?.id);
+      setProjectAtom(projectData.data);
+      ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
     }
-  }, [data?.data]);
+  }, [projectData?.data]);
 
   useEffect(() => {
     if (permissions?.data) {
@@ -165,8 +167,8 @@ export function ProjectLayout() {
   });
 
   if (
-    data?.data?.owner_id !== userData?.data?.id &&
-    (data?.data?.members?.length === 0 || !data?.data?.members?.some((m) => m?.id === userData?.data?.id)) &&
+    projectData?.data?.owner_id !== userData?.data?.id &&
+    (projectData?.data?.members?.length === 0 || !projectData?.data?.members?.some((m) => m?.id === userData?.data?.id)) &&
     !isInitialLoading &&
     !isInitialLoadingUser
   ) {
@@ -179,14 +181,11 @@ export function ProjectLayout() {
     return <Navigate to="/" />;
   }
 
-  if (!user?.unsafeMetadata?.project_id || isInitialLoading) return null;
+  if (isInitialLoading || isLoading) return null;
 
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
 
       <Dropdown allowedPlacements={["bottom", "right", "left"]} event={contextMenu.event} items={contextMenu?.items || []} />
       {isLg ? (

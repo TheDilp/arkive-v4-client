@@ -14,7 +14,7 @@ export function GameLayout() {
   const { isLg } = useBreakpoint();
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id as string },
+      data: { id: user?.id as string },
       relations: {
         webhooks: true,
       },

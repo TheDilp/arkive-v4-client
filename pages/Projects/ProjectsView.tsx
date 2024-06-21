@@ -1,4 +1,3 @@
-import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
@@ -18,7 +17,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable } from "../../hooks";
+import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable, useUser } from "../../hooks";
 import { ProjectType } from "../../types";
 import {
   drawerAtom,
@@ -107,11 +106,10 @@ export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
-
+  const user = useUser();
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useNavbarTitle("The Arkive", true);
 
-  const { user } = useUser();
   const { data, isLoading } = useGetAllProjects({
     data: { auth_id: user?.id },
     fields: ["id", "title", "image_id"],
@@ -119,7 +117,7 @@ export function ProjectsView() {
 
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { auth_id: user?.id as string },
+      data: { id: user?.id as string },
       relations: {
         webhooks: true,
       },
@@ -132,13 +130,6 @@ export function ProjectsView() {
   const [, dispatch] = useTable({});
   useEffect(() => {
     if (userData) {
-      if (user)
-        user?.update({
-          unsafeMetadata: {
-            user_id: userData.data.id,
-            project_id: null,
-          },
-        });
       setUserAtom(userData.data);
     }
   }, [userData?.data]);
@@ -151,9 +142,7 @@ export function ProjectsView() {
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Drawer />
       <Dialog />
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
+
       {isLg ? (
         <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={getProjectsViewNavItems(setView, view)} />
       ) : null}

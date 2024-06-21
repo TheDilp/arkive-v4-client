@@ -1,4 +1,3 @@
-import { UserButton, useUser } from "@clerk/clerk-react";
 import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
@@ -6,7 +5,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-import { useGetNotifications, useHasPermissions, useReadNotification } from "../../hooks";
+import { useGetNotifications, useHasPermissions, useReadNotification, useUser } from "../../hooks";
 import {
   AllAvailableEntities,
   DrawerAtomType,
@@ -426,7 +425,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
 
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
-  const { user: authUser } = useUser();
+  const authUser = useUser();
   const permissions = useHasPermissions(
     [
       "create_characters",
@@ -632,9 +631,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
             </div>
           </>
         ) : null}
-        <div className="ml-auto flex items-center">
-          <UserButton />
-        </div>
+        <div className="ml-auto flex items-center">{/* <UserButton /> */}</div>
       </div>
     </div>
   );
