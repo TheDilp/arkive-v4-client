@@ -441,7 +441,7 @@ export function useGetAuthStatus() {
   return useQuery(
     ["auth_status"],
     async () => {
-      const res = await fetch(baseURLS.baseServer, {
+      const res = await fetch(`${baseURLS.baseServer}/auth/status`, {
         credentials: "include",
       });
 
