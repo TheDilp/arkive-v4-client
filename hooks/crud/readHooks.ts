@@ -437,11 +437,12 @@ export function useGetNotifications(
   );
 }
 export function useGetAuthStatus() {
+  const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
   const setLoggedIn = useSetAtom(loggedInAtom);
   return useQuery(
     ["auth_status"],
     async () => {
-      const res = await fetch(`${baseURLS.baseServer}/auth/status`, {
+      const res = await fetch(`${baseAuthUrl}/auth/status`, {
         credentials: "include",
       });
 
