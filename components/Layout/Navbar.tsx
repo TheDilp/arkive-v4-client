@@ -38,8 +38,17 @@ import { Alert, Avatar, Icon, IndeterminateProgressBar } from "../Misc";
 import { Dropdown, Tooltip } from "../Overlay";
 import { Card } from "./Card";
 
-function accountItems(signOut: () => void): DropdownItemType[] {
-  return [{ id: "1", title: "Sign out", icon: IconEnum.logout, onClick: signOut }];
+function accountItems(signOut: () => void, navigate: (path: string) => void): DropdownItemType[] {
+  return [
+    {
+      id: "1",
+      title: "User feature flags",
+      icon: IconEnum.feature_flag,
+      onClick: () => navigate("/user_settings/feature_flags"),
+    },
+    { id: "2", title: "User webhooks", icon: IconEnum.webhooks, onClick: () => navigate("/user_settings/webhooks") },
+    { id: "3", title: "Sign out", icon: IconEnum.logout, onClick: signOut },
+  ];
 }
 
 function createNewOptions(
@@ -423,6 +432,7 @@ function NotificationList({
 
 export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
   const isMutatingDocument = useIsMutating({ mutationKey: ["document_view", "update"] });
@@ -636,7 +646,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           </>
         ) : null}
         {authUser ? (
-          <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut)}>
+          <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut, navigate)}>
             <div className="ml-auto flex cursor-pointer items-center">
               <Avatar image={authUser?.image_url || undefined} isLoading={isSigningOut || !!isGettingStatus} />
             </div>

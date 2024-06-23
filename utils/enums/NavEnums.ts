@@ -27,11 +27,6 @@ export function getProjectsViewNavItems(
         });
       },
     },
-    {
-      icon: IconEnum.user_settings,
-      tooltip: "User settings",
-      navigate: "/user_settings/webhooks",
-    },
   ];
 }
 
