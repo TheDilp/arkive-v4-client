@@ -4,15 +4,7 @@ import ls from "localstorage-slim";
 import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
-import {
-  useBreakpoint,
-  useGetEntities,
-  useGetEntity,
-  useGetUser,
-  useToggledResetAtom,
-  useUpdateAuthStatus,
-  useUser,
-} from "../../hooks";
+import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom, useUpdateAuthStatus } from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
@@ -29,6 +21,7 @@ import {
   projectNavItems,
   useNotifications,
   userAtom,
+  userStatusAtom,
 } from "../../utils";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
@@ -44,7 +37,7 @@ projectSidebarItems.unshift({
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
-  const user = useUser();
+  const userStatus = useAtomValue(userStatusAtom);
   const { pathname } = useLocation();
   const { mutate: updateAuthStatus, isLoading } = useUpdateAuthStatus();
   const { data: projectData, isInitialLoading } = useGetEntity<ProjectType>(
@@ -61,14 +54,14 @@ export function ProjectLayout() {
   );
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { id: user?.id as string, project_id },
+      data: { id: userStatus?.user_id as string, project_id },
       relations: {
         webhooks: true,
         roles: true,
       },
       fields: ["id", "feature_flags", "email"],
     },
-    { enabled: !!user?.id && !!project_id }
+    { enabled: !!userStatus?.user_id && !!project_id }
   );
 
   const { data: permissions } = useGetEntities<PermissionType>(

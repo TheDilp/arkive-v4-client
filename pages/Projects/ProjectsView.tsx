@@ -1,4 +1,4 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -17,7 +17,7 @@ import {
   Table,
   TablePageLayout,
 } from "../../components";
-import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable, useUser } from "../../hooks";
+import { useBreakpoint, useGetAllProjects, useGetUser, useNavbarTitle, useTable } from "../../hooks";
 import { ProjectType } from "../../types";
 import {
   drawerAtom,
@@ -28,6 +28,7 @@ import {
   projectAtom,
   projectCardNavItems,
   userAtom,
+  userStatusAtom,
 } from "../../utils";
 
 const columnHelper = createColumnHelper<ProjectType>();
@@ -106,24 +107,24 @@ export function ProjectsView() {
   const setDrawer = useSetAtom(drawerAtom);
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
-  const user = useUser();
+  const user = useAtomValue(userStatusAtom);
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useNavbarTitle("The Arkive", true);
 
   const { data, isLoading } = useGetAllProjects({
-    data: { auth_id: user?.id },
+    data: { auth_id: user?.user_id },
     fields: ["id", "title", "image_id"],
   });
 
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { id: user?.id as string },
+      data: { id: user?.user_id as string },
       relations: {
         webhooks: true,
       },
       fields: ["id"],
     },
-    { enabled: !!user?.id }
+    { enabled: !!user?.user_id }
   );
   const setUserAtom = useSetAtom(userAtom);
   const resetProjectAtom = useResetAtom(projectAtom);

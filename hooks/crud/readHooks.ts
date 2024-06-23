@@ -12,6 +12,7 @@ import {
   SearchableEntities,
   TagColorStatType,
   TagEntityStatType,
+  UserStatusType,
   UserType,
 } from "../../types";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
@@ -25,6 +26,7 @@ import {
   loggedInAtom,
   moduleAtom,
   useNotifications,
+  userStatusAtom,
 } from "../../utils";
 
 export function useGetAllProjects(request: RequestBodyType<ProjectType>, options?: UseQueryOptions) {
@@ -439,20 +441,36 @@ export function useGetNotifications(
 export function useGetAuthStatus() {
   const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
   const setLoggedIn = useSetAtom(loggedInAtom);
-  return useQuery(
+  const setUserStatus = useSetAtom(userStatusAtom);
+  return useQuery<UserStatusType>(
     ["auth_status"],
     async () => {
       const res = await fetch(`${baseAuthUrl}/auth/status`, {
         credentials: "include",
       });
 
-      const data = await res.text();
+      if (res.status === 401) throw new Error("UNAUTHORIZED");
+
+      const data = (await res.json()) as UserStatusType;
       return data;
     },
     {
-      onSuccess: (data: string) => {
-        if (data === "AUTHENTICATED") setLoggedIn(true);
-        else setLoggedIn(false);
+      onError: () => {
+        setLoggedIn(false);
+        setUserStatus(null);
+        // @ts-ignore
+        document.location = import.meta.env.VITE_HOME;
+      },
+      onSuccess: (data) => {
+        if (data.status === "authenticated") {
+          setLoggedIn(true);
+          setUserStatus(data);
+        } else {
+          setLoggedIn(false);
+          setUserStatus(null);
+          // @ts-ignore
+          document.location = import.meta.env.VITE_HOME;
+        }
       },
       retryDelay(failureCount) {
         if (failureCount < 5) return 500;

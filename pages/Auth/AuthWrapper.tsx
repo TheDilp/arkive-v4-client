@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import { Spinner } from "../../components";
 import { useGetAuthStatus } from "../../hooks";
 import { loggedInAtom } from "../../utils";
 
@@ -11,15 +12,24 @@ export function AuthWrapper() {
 
   const loggedIn = useAtomValue(loggedInAtom);
 
-  useGetAuthStatus();
+  const { data, isInitialLoading, isFetching } = useGetAuthStatus();
 
   useEffect(() => {
-    if (!loggedIn && !pathname.endsWith("/auth/login")) {
-      navigate("/auth/login");
-    } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
-      navigate("/projects");
+    if (!isInitialLoading && !isFetching) {
+      if (!loggedIn && !pathname.endsWith("/auth/login")) {
+        navigate("/auth/login");
+      } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
+        navigate("/projects");
+      }
     }
   }, [loggedIn, pathname]);
+
+  if (!data && (isInitialLoading || isFetching))
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-black">
+        <Spinner />
+      </div>
+    );
 
   return <Outlet />;
 }

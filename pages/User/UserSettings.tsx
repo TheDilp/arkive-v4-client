@@ -1,5 +1,5 @@
-import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
-import { useSetAtom } from "jotai";
+import { RedirectToSignIn, SignedOut } from "@clerk/clerk-react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
@@ -7,7 +7,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Drawer, Navbar, Sidebar, Tabs } from "../../components";
 import { useBreakpoint, useGetUser } from "../../hooks";
 import { TabType } from "../../types";
-import { currentUserPermissionsAtom, getProjectsViewNavItems, IconEnum, userAtom } from "../../utils";
+import { currentUserPermissionsAtom, getProjectsViewNavItems, IconEnum, userAtom, userStatusAtom } from "../../utils";
 
 export function UserSettings() {
   const { pathname } = useLocation();
@@ -15,7 +15,7 @@ export function UserSettings() {
   const [view, setView] = useState<boolean | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const navigate = useNavigate();
-  const { user } = useUser();
+  const user = useAtomValue(userStatusAtom);
 
   const tabs: TabType[] = [
     { id: "1", label: "Webhooks", icon: IconEnum.webhooks },
@@ -27,14 +27,14 @@ export function UserSettings() {
 
   const { data: userData } = useGetUser(
     {
-      data: { id: user?.id as string },
+      data: { id: user?.user_id as string },
       relations: {
         webhooks: true,
         roles: true,
       },
       fields: ["id", "feature_flags", "email"],
     },
-    { enabled: !!user?.id }
+    { enabled: !!user?.user_id }
   );
 
   useEffect(() => {
@@ -48,13 +48,13 @@ export function UserSettings() {
   useEffect(() => {
     if (userData?.data) {
       if (user)
-        user?.update({
-          unsafeMetadata: {
-            user_id: userData?.data?.id,
-            project_id: "",
-          },
-        });
-      setUserAtom(userData.data);
+        // user?.update({
+        //   unsafeMetadata: {
+        //     user_id: userData?.data?.id,
+        //     project_id: "",
+        //   },
+        // });
+        setUserAtom(userData.data);
       setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
     }
   }, [userData?.data]);

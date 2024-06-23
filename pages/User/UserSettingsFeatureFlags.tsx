@@ -1,17 +1,17 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 
 import { Button, Checkbox } from "../../components";
 import { useGetUser, useHandleChange, useUpdateUser } from "../../hooks";
-import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum } from "../../utils";
+import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum, userStatusAtom } from "../../utils";
 
 export function UserSettingsFeatureFlags() {
-  const { user: authUser } = useUser();
+  const authUser = useAtomValue(userStatusAtom);
   const { data: user } = useGetUser(
-    { data: { id: authUser?.id as string }, fields: ["id", "feature_flags"] },
-    { queryKey: ["user", authUser?.id, "feature_flag_settings"], enabled: !!authUser?.id }
+    { data: { id: authUser?.user_id as string }, fields: ["id", "feature_flags"] },
+    { queryKey: ["user", authUser?.user_id, "feature_flag_settings"], enabled: !!authUser?.user_id }
   );
-  const { mutate: updateUser } = useUpdateUser(user?.data?.id as string, authUser?.id as string);
+  const { mutate: updateUser } = useUpdateUser(user?.data?.id as string, authUser?.user_id as string);
 
   const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>({});
 

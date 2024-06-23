@@ -38,10 +38,10 @@ export default function App() {
   }, []);
 
   return (
-    <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden">
+    <main className="relative h-screen max-h-screen w-screen max-w-[100%] overflow-hidden bg-black">
       <QueryClientProvider client={queryClient}>
         <NotificationContainer />
-        <ReactQueryDevtools position="top-right" />
+        <ReactQueryDevtools position="top-left" />
         <Routes>
           <Route element={<AuthWrapper />} path="/">
             <Route path="auth/*">

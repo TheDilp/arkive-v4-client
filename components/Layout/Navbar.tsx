@@ -5,7 +5,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-import { useGetNotifications, useHasPermissions, useReadNotification, useUser } from "../../hooks";
+import { useGetNotifications, useHasPermissions, useReadNotification } from "../../hooks";
 import {
   AllAvailableEntities,
   DrawerAtomType,
@@ -15,8 +15,9 @@ import {
   WebsocketEventType,
 } from "../../types";
 import {
-  baseURLS,
   DefaultTagColor,
+  IconEnum,
+  baseURLS,
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
@@ -25,11 +26,11 @@ import {
   getImageURL,
   getSingularEntityType,
   historyAtom,
-  IconEnum,
   navbarTitleAtom,
   projectFeatureFlagsAtom,
   useNotifications,
   userAtom,
+  userStatusAtom,
 } from "../../utils";
 import { Dice, DiceRollRegex, rollDiceWithNotification } from "../../utils/ui/diceRollerUtils";
 import { Button, Input } from "../Form";
@@ -425,7 +426,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
 
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
-  const authUser = useUser();
+  const authUser = useAtomValue(userStatusAtom);
   const permissions = useHasPermissions(
     [
       "create_characters",
@@ -503,7 +504,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
         if (lastJsonMessage?.conversation_id && subitem_id && subitem_id === lastJsonMessage.conversation_id) return;
-        if (authUser?.id && lastJsonMessage.userId && authUser?.id === lastJsonMessage?.userId) return;
+        if (authUser?.user_id && lastJsonMessage.userId && authUser?.user_id === lastJsonMessage?.userId) return;
         if (lastJsonMessage?.notification_type) {
           const entityType = getEntityTypeFromNotificationType(lastJsonMessage?.notification_type);
           queryClient.invalidateQueries(["allEntities", project_id, entityType]);
@@ -535,7 +536,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
             hasNoTruncate: true,
           });
         }
-        queryClient.invalidateQueries(["user", project_id, authUser?.id]);
+        queryClient.invalidateQueries(["user", project_id, authUser?.user_id]);
         queryClient.invalidateQueries(["allEntities", project_id]);
       }
     }

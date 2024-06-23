@@ -1,9 +1,10 @@
 import { atom } from "jotai";
 
-import { PermissionCodeType, UserType } from "../../types";
+import { PermissionCodeType, UserStatusType, UserType } from "../../types";
 import { projectAtom } from ".";
 
 export const userAtom = atom<UserType | null>(null);
+export const userStatusAtom = atom<UserStatusType | null>(null);
 export const userSettingsAtom = atom(() => {
   return {
     show_image_folder_view: true,

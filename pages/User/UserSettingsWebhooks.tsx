@@ -1,13 +1,12 @@
-import { useUser } from "@clerk/clerk-react";
 import { UseMutateFunction } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
 import { useDeleteEntity, useGetEntities, useGetUser, useTable } from "../../hooks";
 import { DrawerAtomType, WebhookType } from "../../types";
-import { drawerAtom, getDefaultEntityIcon, IconEnum } from "../../utils";
+import { drawerAtom, getDefaultEntityIcon, IconEnum, userStatusAtom } from "../../utils";
 
 const rolesColumnHelper = createColumnHelper<WebhookType>();
 
@@ -78,9 +77,9 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>, muta
   ];
 }
 export function UserSettingsWebhooks() {
-  const { user: authUser } = useUser();
+  const authUser = useAtomValue(userStatusAtom);
   const { project_id } = useParams();
-  const { data: user } = useGetUser({ data: { id: authUser?.id as string }, fields: ["id"] });
+  const { data: user } = useGetUser({ data: { id: authUser?.user_id as string }, fields: ["id"] });
   const setDrawer = useSetAtom(drawerAtom);
   const { mutate } = useDeleteEntity("webhooks", project_id as string, false);
   const [, dispatch] = useTable({});

@@ -1,38 +1,38 @@
 import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Dialog, Drawer, Navbar, Sidebar } from "../../../../components";
 import { useBreakpoint, useGetUser, useNavbarTitle } from "../../../../hooks";
-import { userAtom } from "../../../../utils";
+import { userAtom, userStatusAtom } from "../../../../utils";
 
 export function GameLayout() {
   useNavbarTitle("", true);
   const { game_id } = useParams();
-  const { user } = useUser();
+  const user = useAtomValue(userStatusAtom);
   const { isLg } = useBreakpoint();
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {
-      data: { id: user?.id as string },
+      data: { id: user?.user_id as string },
       relations: {
         webhooks: true,
       },
       fields: ["id"],
     },
-    { enabled: !!user?.id }
+    { enabled: !!user?.user_id }
   );
   const setUserAtom = useSetAtom(userAtom);
 
   useEffect(() => {
     if (userData) {
-      if (user)
-        user?.update({
-          unsafeMetadata: {
-            user_id: userData.data.id,
-            project_id: null,
-          },
-        });
+      // if (user)
+      //   user?.update({
+      //     unsafeMetadata: {
+      //       user_id: userData.data.id,
+      //       project_id: null,
+      //     },
+      //   });
       setUserAtom(userData.data);
     }
   }, [userData?.data]);
