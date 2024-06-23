@@ -1,4 +1,3 @@
-import { useUser } from "@clerk/clerk-react";
 import { UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useLayoutEffect, useState } from "react";
