@@ -647,7 +647,8 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
         ) : null}
         {authUser ? (
           <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut, navigate)}>
-            <div className="ml-auto flex cursor-pointer items-center">
+            <div className="relative ml-auto flex cursor-pointer items-center">
+              <div className="absolute z-10 h-full w-full rounded-full bg-zinc-700 opacity-0 transition-all hover:opacity-50 active:opacity-70" />
               <Avatar image={authUser?.image_url || undefined} isLoading={isSigningOut || !!isGettingStatus} />
             </div>
           </Dropdown>
