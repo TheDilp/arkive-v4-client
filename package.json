@@ -2,8 +2,6 @@
   "dependencies": {
     "@3d-dice/dice-box": "^1.0.12",
     "@3d-dice/dice-parser-interface": "^0.2.1",
-    "@clerk/clerk-react": "^5.2.2",
-    "@clerk/themes": "^2.1.8",
     "@floating-ui/react": "^0.26.16",
     "@hello-pangea/dnd": "^16.6.0",
     "@remirror/core": "^2.0.19",
