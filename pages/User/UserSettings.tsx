@@ -1,4 +1,3 @@
-import { RedirectToSignIn, SignedOut } from "@clerk/clerk-react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -62,9 +61,6 @@ export function UserSettings() {
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Drawer />
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
       {isLg ? <Sidebar isLoading={false} isUsingPermissions={false} items={getProjectsViewNavItems(setView, view)} /> : null}
       <div className="flex flex-1 flex-col">
         <div className="w-full">

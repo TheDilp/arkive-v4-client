@@ -1,4 +1,3 @@
-import { RedirectToSignIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
@@ -43,9 +42,6 @@ export function GameLayout() {
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
       <Drawer />
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
       {isLg && !game_id ? <Sidebar isLoading={isInitialLoadingUser} isUsingPermissions={false} items={[]} /> : null}
       <div className="flex h-full w-full flex-col">
         <div className="w-full">
