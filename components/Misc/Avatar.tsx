@@ -5,15 +5,20 @@ import { AvatarType } from "../../types";
 import { dialogAtom, getFirstLetters, getThumbnailUrl } from "../../utils";
 import { getAvatarThumbnailDimensions } from "../../utils/ui/avatarUtils";
 import { Tooltip } from "../Overlay/Tooltip";
+import { Spinner } from "./Spinner";
 
 const AvatarClasses = tv({
   slots: {
     base: "relative group inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-600 shadow ",
     image: "h-full w-full object-cover",
     text: "font-lato font-bold text-white absolute",
+    spinner: "absolute z-10 flex h-full w-full items-center justify-center bg-zinc-950 opacity-50",
   },
   variants: {
     size: {
+      "4xs": {
+        base: "w-3 h-3 min-w-[0.75rem] min-h-[0.75rem]",
+      },
       "3xs": {
         base: "w-3 h-3 min-w-[0.75rem] min-h-[0.75rem]",
       },
@@ -28,6 +33,12 @@ const AvatarClasses = tv({
       },
       md: {
         base: "w-10 h-10 min-w-[2.5rem] min-h-[2.5rem]",
+      },
+      lg: {
+        base: "w-16 h-16 min-w-[4rem] min-h-[4rem]",
+      },
+      xl: {
+        base: "w-16 h-16 min-w-[4rem] min-h-[4rem]",
       },
       "2xl": {
         base: "w-16 h-16 min-w-[4rem] min-h-[4rem]",
@@ -70,6 +81,7 @@ export function Avatar({
   isTooltipDisabled,
   initials,
   isBordered,
+  isLoading,
   hasShowImage = false,
   tooltipAllowedPlacements = [],
   shape = "circle",
@@ -77,7 +89,7 @@ export function Avatar({
   isPreview,
 }: AvatarType & { isPreview?: boolean }) {
   const setDialog = useSetAtom(dialogAtom);
-  const { base, image: imageClasses, text } = AvatarClasses({ isBordered, size, hasShowImage, shape });
+  const { base, image: imageClasses, text, spinner } = AvatarClasses({ isBordered, size, hasShowImage, shape });
 
   return (
     <Tooltip
@@ -88,6 +100,11 @@ export function Avatar({
       isIgnoringHover
       isPortal>
       <div className={base()}>
+        {isLoading ? (
+          <div className={spinner()}>
+            <Spinner />
+          </div>
+        ) : null}
         {image ? (
           <img
             alt={label}
