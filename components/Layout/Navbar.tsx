@@ -15,9 +15,8 @@ import {
   WebsocketEventType,
 } from "../../types";
 import {
-  DefaultTagColor,
-  IconEnum,
   baseURLS,
+  DefaultTagColor,
   dialogAtom,
   drawerAtom,
   getDefaultEntityIcon,
@@ -26,6 +25,7 @@ import {
   getImageURL,
   getSingularEntityType,
   historyAtom,
+  IconEnum,
   navbarTitleAtom,
   projectFeatureFlagsAtom,
   useNotifications,
@@ -37,6 +37,8 @@ import { Button, Input } from "../Form";
 import { Alert, Avatar, Icon, IndeterminateProgressBar } from "../Misc";
 import { Dropdown, Tooltip } from "../Overlay";
 import { Card } from "./Card";
+
+const accountItems: DropdownItemType[] = [{ id: "1", title: "Sign out", icon: IconEnum.logout, onClick: () => {} }];
 
 function createNewOptions(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -331,7 +333,6 @@ function NotificationDate({ created_at }: { created_at: string }) {
 
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.toLocaleTimeString()}`;
 }
-
 function NotificationList({
   user_id,
   project_id,
@@ -498,7 +499,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     },
     !!project_id
   );
-
+  console.log(authUser);
   useLayoutEffect(() => {
     if (lastJsonMessage && !isDisabled) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
@@ -632,7 +633,13 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
             </div>
           </>
         ) : null}
-        <div className="ml-auto flex items-center">{/* <UserButton /> */}</div>
+        {authUser ? (
+          <Dropdown items={accountItems}>
+            <div className="ml-auto flex items-center">
+              <Avatar image={authUser?.image_url || undefined} />
+            </div>
+          </Dropdown>
+        ) : null}
       </div>
     </div>
   );
