@@ -1,4 +1,3 @@
- 
 import {
   autoPlacement,
   autoUpdate,
@@ -49,14 +48,22 @@ const DropdownItemClasses = tv({
     hasImage: {
       true: "justify-start gap-x-2",
     },
+    hasSubitems: {
+      true: {},
+      false: {},
+    },
     isEvent: {
-      true: " absolute",
+      true: "absolute",
+    },
+    isRoot: {
+      true: {},
+      false: {},
     },
   },
 });
 
 function DropdownComponent({ allowedPlacements = [], children, items, isReferenceMaxSize, event, isDisabled }: DropdownType) {
-  const { base, floatingBase } = DropdownClasses({ isEvent: !!event });
+  const { base, floatingBase } = DropdownClasses({ isEvent: event });
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -235,7 +242,7 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                           subItems={dropdownItem.subItems}
                           title={dropdownItem.title}
                         />
-                      ),
+                      )
                     )
                   : null}
               </div>
@@ -267,7 +274,7 @@ function DropdownItem({
   return (
     <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
       {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
-      {label && !child ? <div className="select-none truncate px-2 ">{label}</div> : null}
+      {label && !child ? <div className="select-none truncate px-2">{label}</div> : null}
       {child ?? null}
       <div className="ml-auto flex pr-2">
         {icon ? (
