@@ -2,15 +2,7 @@ import { AvailableIcons } from "../../../utils";
 import { Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
 
-type NotificationPositionsType =
-  | "top"
-  | "right"
-  | "bottom"
-  | "center"
-  | "top-right"
-  | "top-left"
-  | "bottom-right"
-  | "bottom-left";
+type NotificationPositionsType = "top" | "center" | "top-right";
 
 type NotificationContentType = "dice_roll" | null;
 export interface NotificationType {
