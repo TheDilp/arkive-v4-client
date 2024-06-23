@@ -13,4 +13,12 @@ export interface UserType {
   permissions: PermissionType[];
 }
 
+export type UserStatusType = {
+  status: "authenticated" | "unauthenticated";
+  user_id: string;
+  project_id: string | null;
+  name: string | null;
+  image_url: string | null;
+};
+
 export type UserHasPermissionsType = Partial<Record<PermissionCodeType | "is_owner", boolean>>;
