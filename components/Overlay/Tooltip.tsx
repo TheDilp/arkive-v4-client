@@ -29,6 +29,16 @@ const defaultTooltipClasses = tv({
     variant: {
       primary: "bg-black",
       secondary: "bg-zinc-700",
+      info: "bg-zinc-700",
+      success: "bg-zinc-700",
+      warning: "bg-zinc-700",
+      error: "bg-zinc-700",
+      "primary-bordered": "bg-black",
+      "secondary-bordered": "bg-zinc-700",
+      "info-bordered": "bg-zinc-700",
+      "success-bordered": "bg-zinc-700",
+      "warning-bordered": "bg-zinc-700",
+      "error-bordered": "bg-zinc-700",
     },
     isInline: {
       true: "max-w-fit min-w-fit",
@@ -71,6 +81,7 @@ export function Tooltip({
 }: TooltipType) {
   const [open, setOpen] = useState(false);
   const arrowRef = useRef(null);
+
   const { floatingStyles, refs, context } = useFloating({
     open,
     onOpenChange: setOpen,
