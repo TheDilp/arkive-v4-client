@@ -1,11 +1,11 @@
-import { useIsMutating, useQueryClient } from "@tanstack/react-query";
+import { useIsFetching, useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-import { useGetNotifications, useHasPermissions, useReadNotification } from "../../hooks";
+import { useGetNotifications, useHasPermissions, useReadNotification, useSignout } from "../../hooks";
 import {
   AllAvailableEntities,
   DrawerAtomType,
@@ -38,7 +38,9 @@ import { Alert, Avatar, Icon, IndeterminateProgressBar } from "../Misc";
 import { Dropdown, Tooltip } from "../Overlay";
 import { Card } from "./Card";
 
-const accountItems: DropdownItemType[] = [{ id: "1", title: "Sign out", icon: IconEnum.logout, onClick: () => {} }];
+function accountItems(signOut: () => void): DropdownItemType[] {
+  return [{ id: "1", title: "Sign out", icon: IconEnum.logout, onClick: signOut }];
+}
 
 function createNewOptions(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -424,7 +426,8 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
   const isMutatingDocument = useIsMutating({ mutationKey: ["document_view", "update"] });
-
+  const isGettingStatus = useIsFetching({ queryKey: ["auth_status"] });
+  const { mutate: signOut, isLoading: isSigningOut } = useSignout();
   const createNotification = useNotifications();
   const navbarTitle = useAtomValue(navbarTitleAtom);
   const authUser = useAtomValue(userStatusAtom);
@@ -499,7 +502,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     },
     !!project_id
   );
-  console.log(authUser);
   useLayoutEffect(() => {
     if (lastJsonMessage && !isDisabled) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
@@ -634,9 +636,9 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           </>
         ) : null}
         {authUser ? (
-          <Dropdown items={accountItems}>
-            <div className="ml-auto flex items-center">
-              <Avatar image={authUser?.image_url || undefined} />
+          <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut)}>
+            <div className="ml-auto flex cursor-pointer items-center">
+              <Avatar image={authUser?.image_url || undefined} isLoading={isSigningOut || !!isGettingStatus} />
             </div>
           </Dropdown>
         ) : null}
