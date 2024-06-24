@@ -24,7 +24,7 @@
 	respond /health 200
 
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
-	root * arkive-v4-wiki/dist
+	root * {$BUILD_PATH}
 
 	# enable gzipping responses
 	encode gzip
