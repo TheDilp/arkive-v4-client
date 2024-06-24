@@ -23,6 +23,7 @@ import {
   userAtom,
   userStatusAtom,
 } from "../../utils";
+import { Skeleton } from "../Misc";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -174,8 +175,6 @@ export function ProjectLayout() {
     return <Navigate to="/" />;
   }
 
-  if (isInitialLoading || isLoading) return null;
-
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
@@ -189,7 +188,11 @@ export function ProjectLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser ? null : <Outlet />}
+          {isInitialLoading || isInitialLoadingUser || isLoading ? (
+            <Skeleton isFullWidth limit={10} type="table" />
+          ) : (
+            <Outlet />
+          )}
         </div>
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
