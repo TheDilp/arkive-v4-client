@@ -472,10 +472,7 @@ export function useGetAuthStatus() {
           document.location = import.meta.env.VITE_HOME;
         }
       },
-      retryDelay(failureCount) {
-        if (failureCount < 5) return 500;
-        return 0;
-      },
+      retry: false,
       staleTime: Infinity,
     }
   );
