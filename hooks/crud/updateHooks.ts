@@ -851,22 +851,21 @@ export function useUpdateAuthStatus() {
     return data;
   });
 }
+
 export function useSignout() {
   const queryClient = useQueryClient();
   const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
 
   return useMutation(
     async () => {
-      fetch(`${baseAuthUrl}/auth/sign-out`, {
+      await fetch(`${baseAuthUrl}/auth/sign-out`, {
         credentials: "include",
         method: "GET",
       });
     },
     {
       onSettled: () => {
-        setTimeout(() => {
-          queryClient.invalidateQueries(["auth_status"]);
-        }, 50);
+        queryClient.invalidateQueries(["auth_status"]);
       },
     }
   );
