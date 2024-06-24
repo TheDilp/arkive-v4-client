@@ -5,7 +5,7 @@
 	auto_https off # railway handles https for us, this would cause issues if left enabled
 	# runtime logs
 	log {
-		format json # set runtime log format to json mode 
+		format json # set runtime log format to json mode
 	}
 	# server options
 	servers {
@@ -24,7 +24,7 @@
 	respond /health 200
 
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
-	root * dist
+	root * arkive-v4-wiki/dist
 
 	# enable gzipping responses
 	encode gzip
