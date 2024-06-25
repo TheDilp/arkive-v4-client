@@ -449,7 +449,13 @@ export function useGetAuthStatus() {
         credentials: "include",
       });
 
-      if (res.status === 401) throw new Error("UNAUTHORIZED");
+      if (res.status === 401) {
+        setLoggedIn(false);
+        setUserStatus(null);
+        // @ts-ignore
+        document.location = import.meta.env.VITE_HOME;
+        return { status: "unauthenticated", user_id: "", project_id: null, image_url: null, name: null } as UserStatusType;
+      }
 
       const data = (await res.json()) as UserStatusType;
       return data;
