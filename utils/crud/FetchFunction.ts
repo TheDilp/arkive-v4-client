@@ -19,6 +19,9 @@ export async function FetchFunction({
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
   });
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
 
   const data = await res.json();
   if ((data.message === "NO_PUBLIC_ACCESS" || data.message === "UNAUTHORIZED") && res.status === 401) {
