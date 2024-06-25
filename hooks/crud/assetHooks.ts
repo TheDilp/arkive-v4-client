@@ -231,7 +231,6 @@ export function useDownloadImages(project_id: string | undefined, type: AssetTyp
         for (let index = 0; index < data.data.length; index++) {
           const title = vars.data[index];
 
-          console.log(title, data.data[index]);
           if (title && data.data[index]) {
             const bytesFromBase64 = atob(data.data[index] as string);
             const nums = new Array(bytesFromBase64.length);

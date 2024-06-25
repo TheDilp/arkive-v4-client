@@ -60,7 +60,6 @@ export async function rollDiceWithNotification(
       Dice.roll(parsedNotation)
         .then((r: any) => {
           const rollData = DiceRollParser.parseFinalResults(r);
-          console.log(rollData);
           if (rollData?.valid) {
             createNotification({
               timer: 15,

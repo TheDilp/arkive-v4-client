@@ -39,7 +39,6 @@ export function PublicMap() {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/public/${project_id}/maps`} />;
   }
-  console.log(map?.data);
 
   return (
     <PublicEntityLayout title={subitem_id && map_pin_id ? "" : map?.data?.title}>

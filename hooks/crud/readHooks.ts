@@ -176,7 +176,6 @@ export function useGetEntities<ReturnType>(
   ];
   let mainRequestQueryKey = [...baseQueryKey];
   async function queryFn(finalRequest: RequestBodyType<ReturnType>) {
-    console.log(finalRequest);
     const data: {
       data: any;
       message: string;
@@ -334,7 +333,6 @@ export function useSearch<ReturnType>(
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
-      console.log(isGlobal ? "global" : project_id);
       if (type)
         return FetchFunction({
           url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
