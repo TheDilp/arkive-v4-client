@@ -4,7 +4,7 @@ import { capitalCase } from "remirror";
 
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
-import { AllAvailableEntities, AvailableWikiEntityType, ProjectType } from "../../types";
+import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
 import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
 
 const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
@@ -65,7 +65,7 @@ export function PublicNavbar() {
               result.result.map((r) => {
                 return {
                   icon: getDefaultEntityIcon(
-                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableWikiEntityType)
+                    result.name === "character_map_pins" ? "map_pins" : (result.name as AvailableEntityType)
                   ),
                   value: r.id,
                   label: r.label,

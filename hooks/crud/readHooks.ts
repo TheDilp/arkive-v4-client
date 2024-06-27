@@ -3,8 +3,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 
 import {
   AvailableDyceEntityType,
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   IconCategories,
   MentionStatType,
   NotificationEntityType,
@@ -83,7 +83,7 @@ export function useGetUser(
 
 export function useGetEntity<EntityType>(
   id: string | undefined,
-  type: AvailableWikiEntityType,
+  type: AvailableEntityType,
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions<any> & {
     queryKeyOverwrite?: string[];
@@ -129,7 +129,7 @@ export function useGetEntity<EntityType>(
 }
 export function useGetSubEntity<EntityType>(
   id: string | undefined,
-  type: AvailableWikiSubEntityType,
+  type: AvailableSubEntityType,
   body: RequestBodyType<EntityType>,
   options?: UseQueryOptions & {
     queryKeyOverwrite?: string[];
@@ -155,7 +155,7 @@ export function useGetSubEntity<EntityType>(
 
 export function useGetEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType,
+  type: AvailableEntityType | AvailableSubEntityType | AvailableDyceEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
@@ -254,7 +254,7 @@ export function useGetEntities<ReturnType>(
 }
 export function useGetInfiniteEntities<ReturnType>(
   request: RequestBodyType<ReturnType>,
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
+  type: AvailableEntityType | AvailableSubEntityType,
   options?: UseQueryOptions<any> & {
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];

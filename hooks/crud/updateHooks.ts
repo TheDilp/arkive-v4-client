@@ -2,8 +2,8 @@ import { MutationOptions, useMutation, useQueryClient } from "@tanstack/react-qu
 import { RemirrorJSON } from "remirror";
 
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   ConversationType,
   DocumentType,
   EntityPermissionType,
@@ -28,7 +28,7 @@ export function useUpdateEntity<
     data: { id?: string; parent_id?: string | null };
     relations?: { [key: string]: any };
   },
->(type: AvailableWikiEntityType, project_id: string, options?: MutationOptions) {
+>(type: AvailableEntityType, project_id: string, options?: MutationOptions) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -316,7 +316,7 @@ export function useUpdateMessageSubEntity<
 }
 
 export function useUpdateSubEntity(
-  type: AvailableWikiSubEntityType,
+  type: AvailableSubEntityType,
   project_id: string | undefined,
   parent_id: string | undefined
 ) {
@@ -354,7 +354,7 @@ export function useUpdateSubEntity(
     }
   );
 }
-export function useUpdateManySubEntities(type: AvailableWikiSubEntityType) {
+export function useUpdateManySubEntities(type: AvailableSubEntityType) {
   return useMutation(async (updateItemValues: { data: { data: { [key: string]: any } }[] }) => {
     if (updateItemValues.data.length) {
       return FetchFunction({
@@ -369,7 +369,7 @@ export function useUpdateManySubEntities(type: AvailableWikiSubEntityType) {
 
 export function useAddToEntity<
   InsertType extends { relations: { [key: string]: { id: string }[] } } | { data: { [key: string]: string[] } },
->(id: string, type: AvailableWikiEntityType, project_id: string) {
+>(id: string, type: AvailableEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -407,7 +407,7 @@ export function useAddToEntity<
 
 export function useRemoveFromEntity<
   InsertType extends { relations: { [key: string]: { id: string }[] } } | { data: { [key: string]: string[] } },
->(type: AvailableWikiEntityType, id: string, project_id: string) {
+>(type: AvailableEntityType, id: string, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -448,7 +448,7 @@ export function useUpdateTags<
     data: { id?: string; parent_id?: string | null };
     relations?: { [key: string]: any };
   },
->(type: AvailableWikiEntityType | AvailableWikiSubEntityType, project_id: string) {
+>(type: AvailableEntityType | AvailableSubEntityType, project_id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -522,7 +522,7 @@ export function useUpdateTags<
 }
 
 export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; is_public: boolean } }>(
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
+  type: AvailableEntityType | AvailableSubEntityType,
   project_id: string
 ) {
   const queryClient = useQueryClient();
@@ -569,7 +569,7 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
 
 // #region misc
 export function useBulkUpdateTags(
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType,
+  type: AvailableEntityType | AvailableSubEntityType,
   project_id: string,
   parent_id?: string
 ) {
@@ -599,7 +599,7 @@ export function useBulkUpdateTags(
       },
       onSuccess: (data) => {
         if (data.ok) {
-          const parentEntityType = getParentEntityType(type as AvailableWikiSubEntityType);
+          const parentEntityType = getParentEntityType(type as AvailableSubEntityType);
           if (parentEntityType) {
             queryClient.invalidateQueries([parentEntityType, parent_id]);
           }
@@ -622,7 +622,7 @@ export function useBulkUpdateTags(
     }
   );
 }
-export function useBulkUpdate(project_id: string, type: AvailableWikiEntityType | "blueprint_instances") {
+export function useBulkUpdate(project_id: string, type: AvailableEntityType | "blueprint_instances") {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -664,7 +664,7 @@ export function useBulkUpdate(project_id: string, type: AvailableWikiEntityType 
 }
 export function useBulkUpdateAccess(
   project_id: string | undefined,
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType
+  type: AvailableEntityType | AvailableSubEntityType
 ) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();

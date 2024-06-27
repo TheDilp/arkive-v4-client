@@ -2,7 +2,7 @@ import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
 import { useUpdateEntity } from "../../../hooks";
-import { AvailableWikiEntityType } from "../../../types";
+import { AvailableEntityType } from "../../../types";
 import {
   dialogAtom,
   getCharacterFullName,
@@ -19,7 +19,7 @@ export function RestoreEntityDialog({ data }: { data: { [key: string]: any } }) 
   const resetDialogAtom = useResetAtom(dialogAtom);
   const createNotification = useNotifications();
   const { mutate: updateEntity } = useUpdateEntity<{ data: { id: string; deleted_at: string | null } }>(
-    data?.entity_title as AvailableWikiEntityType,
+    data?.entity_title as AvailableEntityType,
     project_id as string
   );
 

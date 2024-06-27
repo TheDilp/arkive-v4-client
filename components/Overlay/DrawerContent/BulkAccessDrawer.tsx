@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useBulkUpdateAccess, useHandleChange, useToggledResetAtom } from "../../../hooks";
-import { AvailableWikiEntityType, AvailableWikiSubEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, EntityPermissionType, PermissionCodeType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { BulkAccessUpdateSchema } from "../../../validation/bulk/bulk_access";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -13,7 +13,7 @@ type Props = {
   data: {
     ids: string[];
     selectablePermissions: PermissionCodeType[];
-    type: AvailableWikiEntityType | AvailableWikiSubEntityType;
+    type: AvailableEntityType | AvailableSubEntityType;
   };
 };
 

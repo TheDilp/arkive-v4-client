@@ -4,8 +4,8 @@ import set from "lodash.set";
 
 import {
   AllAvailableEntities,
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   ConversationType,
   MessageType,
 } from "../../types";
@@ -18,7 +18,7 @@ import {
   useNotifications,
 } from "../../utils";
 
-export function useDeleteEntity(type: AvailableWikiEntityType, project_id: string, arkive: boolean) {
+export function useDeleteEntity(type: AvailableEntityType, project_id: string, arkive: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -60,7 +60,7 @@ export function useDeleteEntity(type: AvailableWikiEntityType, project_id: strin
   );
 }
 
-export function useDeleteSubEntity(type: AvailableWikiSubEntityType, project_id: string, parent_id?: string) {
+export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: string, parent_id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(

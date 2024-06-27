@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useGetEntity } from "../../hooks";
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   DocumentTemplateFieldType,
   DocumentType,
   HandleChangePropsType,
@@ -172,7 +172,7 @@ export function MatchField({
 
   const { data: relatedBlueprint, isFetching } = useGetEntity<{ id: string; title: string; icon?: string }>(
     related_id as string | undefined,
-    getParentEntityType(entity_type as AvailableWikiSubEntityType) as AvailableWikiEntityType,
+    getParentEntityType(entity_type as AvailableSubEntityType) as AvailableEntityType,
     {
       data: {
         id: related_id,
@@ -281,7 +281,7 @@ export function MatchField({
                   isDisabled={isFetching}
                   isLoading={isFetching}
                   label={capitalizeFirstLetter(
-                    getSingularEntityType(getParentEntityType(entity_type) as AvailableWikiEntityType)
+                    getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)
                   )}
                   name="value"
                   onChange={({ label, value: newValue, image, icon }) => {
@@ -310,9 +310,9 @@ export function MatchField({
                   icon={parent.icon || ""}
                   id={parent.value}
                   image_id={parent.image}
-                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableWikiEntityType)}
+                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
                   title={parent.label}
-                  type={getParentEntityType(entity_type) as AvailableWikiEntityType}
+                  type={getParentEntityType(entity_type) as AvailableEntityType}
                 />
               </div>
             ) : null}
@@ -358,7 +358,7 @@ export function MatchField({
                   image_id={selectedEntity.image}
                   label="Replace with"
                   title={selectedEntity.label}
-                  type={entity_type as AvailableWikiEntityType}
+                  type={entity_type as AvailableEntityType}
                 />
               </div>
             ) : null}

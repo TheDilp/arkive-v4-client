@@ -13,7 +13,7 @@ import {
   useUpdateSubEntity,
 } from "../../../hooks";
 import {
-  AvailableWikiEntityType,
+  AvailableEntityType,
   CalendarType,
   DrawerAtomType,
   EventStateType,
@@ -519,7 +519,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Preview",
-                              data: { id: event?.document?.id as string, entity_type: "documents" as AvailableWikiEntityType },
+                              data: { id: event?.document?.id as string, entity_type: "documents" as AvailableEntityType },
                               type: "entity_preview",
                               size: "half",
                             }))

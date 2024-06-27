@@ -1,4 +1,4 @@
-import { AssetType, AvailableDyceEntityType, AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../types";
+import { AssetType, AvailableDyceEntityType, AvailableEntityType, AvailableSubEntityType } from "../../types";
 
 export function getFirstLetters(sentence: string): string {
   const words = sentence.split(" ");
@@ -14,7 +14,7 @@ export function getAvatarInitials(full_name: string): string {
 export function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
-export function getNavbarEntityType(type: AvailableWikiEntityType | "settings") {
+export function getNavbarEntityType(type: AvailableEntityType | "settings") {
   if (type === "random_tables") {
     return "random tables";
   }
@@ -35,7 +35,7 @@ export function getSentenceCase(field: string) {
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 export function getSingularEntityType(
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType | AssetType
+  type: AvailableEntityType | AvailableSubEntityType | AvailableDyceEntityType | AssetType
 ) {
   if (type === "alter_names") return "alter name";
   if (type === "character_fields") return "character field";
@@ -48,7 +48,7 @@ export function getSingularEntityType(
   return getSentenceCase(type.slice(0, type.length - 1));
 }
 export function getPluralEntityType(
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType | AvailableDyceEntityType | AssetType
+  type: AvailableEntityType | AvailableSubEntityType | AvailableDyceEntityType | AssetType
 ) {
   return type.replaceAll("_", " ");
 }

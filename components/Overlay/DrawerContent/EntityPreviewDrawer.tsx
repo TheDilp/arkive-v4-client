@@ -6,8 +6,8 @@ import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../
 import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
 import {
   AssetType,
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   DocumentType,
   GraphType,
   MapType,
@@ -130,7 +130,7 @@ export function EntityPreviewDrawer({
 }: {
   isPublic?: boolean;
   data:
-    | { id: string; parent_id?: string; entity_type: Omit<AvailableWikiEntityType, "images"> | AvailableWikiSubEntityType }
+    | { id: string; parent_id?: string; entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType }
     | {
         id: string;
         entity_type: "images";
@@ -165,12 +165,12 @@ export function EntityPreviewDrawer({
         <div className="">
           <Button
             icon={IconEnum.edit}
-            label={`Edit ${getSingularEntityType(data.entity_type as AvailableWikiEntityType).toLowerCase()}`}
+            label={`Edit ${getSingularEntityType(data.entity_type as AvailableEntityType).toLowerCase()}`}
             onClick={() =>
               navigate(
                 getEntityLink(
                   project_id as string,
-                  data.entity_type as AvailableWikiEntityType,
+                  data.entity_type as AvailableEntityType,
                   data.id,
                   "parent_id" in data ? data?.parent_id || "" : "",
                   isPublic

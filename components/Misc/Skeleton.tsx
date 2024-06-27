@@ -1,4 +1,4 @@
-import { AvailableWikiEntityType, SkeletonType } from "../../types";
+import { AvailableEntityType, SkeletonType } from "../../types";
 import { getDefaultEntityIcon, IconEnum } from "../../utils";
 import { Icon } from ".";
 
@@ -109,7 +109,7 @@ function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "ent
       {[...Array(limit).keys()].map((key) => (
         <div className="col-span-1 flex flex-col items-center" key={key}>
           {/* <div className="w-24 h-24"> */}
-          <Icon color="darkgrey" fontSize={100} icon={getDefaultEntityIcon(entity_type as AvailableWikiEntityType)} />
+          <Icon color="darkgrey" fontSize={100} icon={getDefaultEntityIcon(entity_type as AvailableEntityType)} />
           <div className="h-4 min-h-[0.125rem] w-full rounded bg-zinc-700" />
         </div>
         // </div>

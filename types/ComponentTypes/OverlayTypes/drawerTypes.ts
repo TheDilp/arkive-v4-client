@@ -5,8 +5,8 @@ import { AvailableIcons } from "../../../utils";
 import { AssetType, Size } from "../../baseTypes";
 import { RequestFilterType } from "../../CRUD";
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   EntitiesWithFolders,
   ImageType,
   MapPinType,
@@ -75,7 +75,7 @@ export type DrawerAtomType = {
       data: {
         items: { id: string; tags: string[] }[];
         dispatch: TableDispatch;
-        type: AvailableWikiEntityType | AvailableWikiSubEntityType;
+        type: AvailableEntityType | AvailableSubEntityType;
       };
     }
   | {
@@ -87,7 +87,7 @@ export type DrawerAtomType = {
       data: {
         ids: string[];
         selectablePermissions: PermissionCodeType[];
-        type: AvailableWikiEntityType | AvailableWikiSubEntityType;
+        type: AvailableEntityType | AvailableSubEntityType;
       };
     }
   | {
@@ -112,7 +112,7 @@ export type DrawerAtomType = {
       type: "edit_tags";
       data: {
         tags: Omit<TagType, "owner_id" | "permissions">[];
-        entity: { type: AvailableWikiEntityType | AvailableWikiSubEntityType; id: string };
+        entity: { type: AvailableEntityType | AvailableSubEntityType; id: string };
       };
     }
   | { type: "events"; data: { id?: string; day?: number; month?: number; year?: number; isReadOnly?: boolean } }
@@ -138,7 +138,7 @@ export type DrawerAtomType = {
         | {
             id: string;
             parent_id?: string;
-            entity_type: Omit<AvailableWikiEntityType, "images"> | AvailableWikiSubEntityType;
+            entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType;
           }
         | {
             id: string;

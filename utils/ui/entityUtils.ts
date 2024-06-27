@@ -2,8 +2,8 @@ import { isEqual, isRemirrorJSON } from "remirror";
 import { tv } from "tailwind-variants";
 
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   BaseEntityType,
   BlueprintFieldTypes,
   BlueprintInstanceBlueprintFieldType,
@@ -17,7 +17,7 @@ import {
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
-  type: AvailableWikiEntityType | AvailableWikiSubEntityType | SearchableEntities | null
+  type: AvailableEntityType | AvailableSubEntityType | SearchableEntities | null
 ): AvailableIcons {
   if (type === "characters") return IconEnum.character;
   if (type === "documents") return IconEnum.document;
@@ -43,7 +43,7 @@ export function getDefaultEntityIcon(
   return IconEnum.error;
 }
 
-export function getParentEntityType(type: AvailableWikiSubEntityType): AvailableWikiEntityType | null {
+export function getParentEntityType(type: AvailableSubEntityType): AvailableEntityType | null {
   if (type === "map_pins" || type === "map_layers") return "maps";
   if (type === "nodes" || type === "edges") return "graphs";
   if (type === "random_table_options") return "random_tables";
@@ -55,7 +55,7 @@ export function getParentEntityType(type: AvailableWikiSubEntityType): Available
   return null;
 }
 
-export function getEntityFields(type: AvailableWikiEntityType): string[] {
+export function getEntityFields(type: AvailableEntityType): string[] {
   const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
 
   if (

@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 
 import { useSearch } from "../../../hooks";
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   SearchableEntities,
   SearchAllEntitiesType,
   SearchResultType,
@@ -291,7 +291,7 @@ export function SearchDrawer() {
                       type={
                         searchCategory === "documents_content"
                           ? "documents"
-                          : (searchCategory as AvailableWikiEntityType | AvailableWikiSubEntityType)
+                          : (searchCategory as AvailableEntityType | AvailableSubEntityType)
                       }
                     />
                   )}

@@ -2,7 +2,7 @@ import { useResetAtom } from "jotai/utils";
 import { useParams } from "react-router-dom";
 
 import { useDeleteAsset, useDeleteEntity, useDeleteSubEntity } from "../../../hooks";
-import { AvailableWikiEntityType, AvailableWikiSubEntityType, DialogContentType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, DialogContentType } from "../../../types";
 import {
   capitalizeFirstLetter,
   dialogAtom,
@@ -22,12 +22,12 @@ export function DeleteEntityDialog({ data, type }: { data: { [key: string]: any 
   const resetDialogAtom = useResetAtom(dialogAtom);
   const createNotification = useNotifications();
   const { mutate: deleteEntity } = useDeleteEntity(
-    data?.entity_title as AvailableWikiEntityType,
+    data?.entity_title as AvailableEntityType,
     project_id as string,
     action === "arkive"
   );
   const { mutate: deleteSubEntity } = useDeleteSubEntity(
-    data?.entity_title as AvailableWikiSubEntityType,
+    data?.entity_title as AvailableSubEntityType,
     project_id as string
   );
   const { mutate: deleteAsset } = useDeleteAsset(project_id as string, data.asset_type);

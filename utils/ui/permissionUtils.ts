@@ -1,6 +1,6 @@
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   EntityPermissionType,
   PermissionCodeType,
   SearchableEntities,
@@ -19,7 +19,7 @@ export function createOrEditPermission(
   return false;
 }
 
-export function getPermissionsForTypeView(type: AvailableWikiEntityType | AvailableWikiSubEntityType): PermissionCodeType[] {
+export function getPermissionsForTypeView(type: AvailableEntityType | AvailableSubEntityType): PermissionCodeType[] {
   if (type === "blueprints")
     return ["create_blueprint_instances", "create_blueprints", "delete_blueprints", "update_blueprints"];
   if (type === "blueprint_instances")

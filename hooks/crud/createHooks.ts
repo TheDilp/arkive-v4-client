@@ -6,8 +6,8 @@ import { RemirrorJSON } from "remirror";
 
 import {
   AvailableDyceEntityType,
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   DocumentTemplateFieldType,
   EdgeType,
   GraphType,
@@ -62,7 +62,7 @@ export function useCreateProject<InsertType>() {
 
 export function useCreateEntity<
   InsertType extends { data: { parent_id?: string | null; project_id: string }; relations?: { [key: string]: any } },
->(type: AvailableWikiEntityType | AvailableDyceEntityType, isTemplate?: boolean) {
+>(type: AvailableEntityType | AvailableDyceEntityType, isTemplate?: boolean) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -118,7 +118,7 @@ export function useCreateEntity<
 }
 
 export function useCreateSubEntity<InsertType extends { data: { parent_id: string } }>(
-  type: AvailableWikiSubEntityType,
+  type: AvailableSubEntityType,
   project_id: string | undefined
 ) {
   const queryClient = useQueryClient();
@@ -192,7 +192,7 @@ export function useCreateSubEntity<InsertType extends { data: { parent_id: strin
 }
 
 export function useCreateEntities<InsertType extends { data: { [key: string]: any }[]; relations?: { [key: string]: any } }>(
-  type: AvailableWikiEntityType,
+  type: AvailableEntityType,
   project_id: string
 ) {
   const queryClient = useQueryClient();
@@ -234,7 +234,7 @@ export function useCreateEntities<InsertType extends { data: { [key: string]: an
 }
 
 export function useCreateSubEntities<InsertType extends { data: { data: { parent_id: string } }[] }>(
-  type: AvailableWikiSubEntityType,
+  type: AvailableSubEntityType,
   parent_id: string
 ) {
   const queryClient = useQueryClient();

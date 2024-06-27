@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 
 import { useGetEntities, useHandleChange } from "../../../hooks";
 import {
-  AvailableWikiEntityType,
-  AvailableWikiSubEntityType,
+  AvailableEntityType,
+  AvailableSubEntityType,
   CharacterFieldTemplateType,
   FieldTypes,
   HandleChangePropsType,
@@ -242,7 +242,7 @@ function CharacterFieldsFilters({
                   image_id={field.filter.relationalData?.image}
                   label="Includes"
                   title={field.filter.relationalData?.label}
-                  type={getSearchType(field.field_type) as AvailableWikiEntityType}
+                  type={getSearchType(field.field_type) as AvailableEntityType}
                 />
               </div>
             ) : (
@@ -441,7 +441,7 @@ function CharacterResourceFilter({
                 id={field.filter.relationalData?.value}
                 image_id={f.id === "images" ? field.filter.value : field.filter.relationalData?.image}
                 title={field.filter.relationalData?.label}
-                type={f.id as AvailableWikiEntityType}
+                type={f.id as AvailableEntityType}
               />
             </div>
           ) : (
@@ -500,7 +500,7 @@ function CharacterResourceFiltersList({
             icon={
               f.id === "maps"
                 ? IconEnum.map_pin
-                : getDefaultEntityIcon(f.id as AvailableWikiEntityType | AvailableWikiSubEntityType)
+                : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)
             }
             initialOpen
             label={f.template.title}>

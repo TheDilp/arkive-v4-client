@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useHandleChange, useToggledResetAtom, useUpdateTags } from "../../../hooks";
-import { AvailableWikiEntityType, AvailableWikiSubEntityType, TagType } from "../../../types";
+import { AvailableEntityType, AvailableSubEntityType, TagType } from "../../../types";
 import { IconEnum } from "../../../utils";
 import { Button, TagInput } from "../../Form";
 
 type Props = {
   data: {
     tags: Omit<TagType, "owner_id" | "permissions">[];
-    entity: { type: AvailableWikiEntityType | AvailableWikiSubEntityType; id: string };
+    entity: { type: AvailableEntityType | AvailableSubEntityType; id: string };
   };
 };
 

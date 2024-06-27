@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Alert, EntityPreview, Icon, Select } from "../../components";
 import { useBreakpoint, useGetProjectDashboard, useGetStats, useNavbarTitle } from "../../hooks";
-import { AllAvailableEntities, AvailableWikiEntityType, AvailableWikiSubEntityType } from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } from "../../types";
 import {
   capitalizeFirstLetter,
   drawerAtom,
@@ -313,13 +313,13 @@ export function Dashboard() {
             } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}
             key={d.name}>
             <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
-              <Icon icon={getDefaultEntityIcon(d.name as AvailableWikiEntityType)} />
+              <Icon icon={getDefaultEntityIcon(d.name as AvailableEntityType)} />
               <Link
                 className="transition-all duration-150 hover:text-blue-300"
                 to={`/projects/${project_id}/${
-                  SubEntityEnum.includes(d.name) ? getParentEntityType(d.name as AvailableWikiSubEntityType) : d.name
+                  SubEntityEnum.includes(d.name) ? getParentEntityType(d.name as AvailableSubEntityType) : d.name
                 }`}>
-                {capitalizeFirstLetter(getPluralEntityType(d.name as AvailableWikiEntityType))}
+                {capitalizeFirstLetter(getPluralEntityType(d.name as AvailableEntityType))}
               </Link>
             </h3>
             <ul className="flex w-full flex-1 flex-col items-center justify-start py-4 text-lg">
@@ -331,13 +331,13 @@ export function Dashboard() {
                       icon={
                         "icon" in r
                           ? r.icon
-                          : getDefaultEntityIcon(d.name as AvailableWikiEntityType | AvailableWikiSubEntityType)
+                          : getDefaultEntityIcon(d.name as AvailableEntityType | AvailableSubEntityType)
                       }
                       id={r.id}
                       image_id={"portrait_id" in r ? r.portrait_id : null}
                       link={getEntityLink(
                         project_id as string,
-                        d.name as AvailableWikiEntityType,
+                        d.name as AvailableEntityType,
                         r.id,
                         "parent_id" in r ? r?.parent_id : undefined
                       )}
@@ -348,7 +348,7 @@ export function Dashboard() {
                           data: {
                             id: r.id,
                             parent_id: "parent_id" in r ? r?.parent_id ?? undefined : undefined,
-                            entity_type: d.name as AvailableWikiEntityType,
+                            entity_type: d.name as AvailableEntityType,
                             isReadOnly: d.name === "events",
                           },
                           type: "entity_preview",
@@ -356,7 +356,7 @@ export function Dashboard() {
                         }))
                       }
                       title={r.title}
-                      type={d.name as AvailableWikiEntityType}
+                      type={d.name as AvailableEntityType}
                     />
                   </li>
                 ))
