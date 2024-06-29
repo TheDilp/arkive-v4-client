@@ -18,8 +18,8 @@
 	# access logs
 	log {
 		format json # set access log format to json mode
+		level debug
 	}
-	debug
 
 	# health check for railway
 	respond /health 200
