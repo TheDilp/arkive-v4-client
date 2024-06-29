@@ -1,0 +1,19 @@
+---
+import Navbar from "./Navbar.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>The Arkive Wiki</title>
+  </head>
+  <body class="min-h-screen h-screen max-h-screen min-w-screen bg-black flex flex-col">
+    <Navbar />
+    <div class="p-4 flex-1 max-w-3xl w-full mx-auto text-white">
+      <slot />
+    </div>
+  </body>
+</html>
