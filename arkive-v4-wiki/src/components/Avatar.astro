@@ -1,0 +1,9 @@
+---
+import { Image } from "astro:assets";
+
+const { src } = Astro.props;
+---
+
+<div class="overflow-hidden rounded-full object-cover">
+  <Image width={32} height={32} alt="avatar" {src} />
+</div>
