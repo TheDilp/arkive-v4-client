@@ -10,9 +10,11 @@ import Navbar from "./Navbar.astro";
     <meta name="generator" content={Astro.generator} />
     <title>The Arkive Wiki</title>
   </head>
-  <body class="min-h-screen h-screen max-h-screen min-w-screen bg-black flex flex-col">
+  <body
+    class="min-w-screen flex h-screen max-h-screen min-h-screen flex-col bg-black"
+  >
     <Navbar />
-    <div class="p-4 flex-1 max-w-3xl w-full mx-auto text-white">
+    <div class="mx-auto w-full max-w-3xl flex-1 p-4 text-white xl:max-w-4xl">
       <slot />
     </div>
   </body>

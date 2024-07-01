@@ -1,21 +1,39 @@
 ---
 import { Image } from "astro:assets";
-const routes = ["characters", "blueprints", "documents", "maps", "connections", "calendars", "dictionaries", "gallery"];
+const routes = [
+  "characters",
+  "blueprints",
+  "documents",
+  "maps",
+  "connections",
+  "calendars",
+  "dictionaries",
+  "gallery",
+];
 ---
 
-<nav class="min-h-8 text-white flex flex-col gap-y-2 items-start px-4 max-w-3xl w-full mx-auto">
+<nav
+  class="mx-auto flex min-h-8 w-full max-w-3xl flex-col items-start gap-y-2 px-4 text-white xl:max-w-4xl"
+>
   <h2 class="flex flex-nowrap items-center text-2xl font-bold">
-    <Image src={"/Logo.webp"} width={64} height={64} alt="ArkiveLogo" class="relative -left-1" />
+    <Image
+      src={"/Logo.webp"}
+      width={64}
+      height={64}
+      alt="ArkiveLogo"
+      class="relative -left-1"
+    />
 
     The Arkive Wiki
   </h2>
-  <ul class="flex gap-x-2 flex-nowrap">
+  <ul class="flex flex-nowrap gap-x-2">
     {
       routes.map((route) => (
         <li>
           <a
-            class="hover:text-blue-400 active:text-blue-600 transition-all"
-            href={`/${route}`}>{`${route.charAt(0).toUpperCase()}${route.slice(1)}`}</a>
+            class="transition-all hover:text-blue-400 active:text-blue-600"
+            href={`/${route}`}
+          >{`${route.charAt(0).toUpperCase()}${route.slice(1)}`}</a>
         </li>
       ))
     }
