@@ -1,0 +1,34 @@
+---
+import Avatar from "../../components/Avatar.astro";
+import Body from "../../components/Body.astro";
+import Content from "../../components/Content.astro";
+import { getImageURL } from "../../utils/imageUtils";
+import type { CharacterType } from "../../types/entityTypes";
+
+const { project_id } = Astro.params;
+
+const res = await fetch(
+  `${import.meta.env.PUBLIC_SERVER}/${project_id}/characters`,
+);
+
+const data = (await res.json()) as CharacterType[];
+---
+
+<Body>
+  <Content>
+    <ul class="flex w-full flex-col border-x border-zinc-500">
+      {
+        data.map((char) => (
+          <li class="flex items-center gap-x-2 border-b border-zinc-500 p-2 first:border-t">
+            {char.image_id ? (
+              <Avatar
+                src={getImageURL(project_id as string, "images", char.image_id)}
+              />
+            ) : null}
+            <span>{char.title}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </Content>
+</Body>
