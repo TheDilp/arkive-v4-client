@@ -31,7 +31,8 @@ const routes = [
       routes.map((route) => (
         <li>
           <a
-            class="transition-all hover:text-blue-400 active:text-blue-600"
+            id={`nav_${route}`}
+            class="transition-all hover:text-blue-300 active:text-blue-600"
             href={`/${route}`}
           >{`${route.charAt(0).toUpperCase()}${route.slice(1)}`}</a>
         </li>
@@ -39,3 +40,11 @@ const routes = [
     }
   </ul>
 </nav>
+
+<script>
+  if (window.location.pathname.includes("characters")) {
+    const navItem = document
+      .getElementById("nav_characters")
+      ?.classList?.toggle("text-blue-400");
+  }
+</script>
