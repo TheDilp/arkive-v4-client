@@ -1,9 +1,23 @@
 ---
 import { Image } from "astro:assets";
+import type { Size } from "../types/baseTypes";
+const { src, size = "md" } = Astro.props;
 
-const { src } = Astro.props;
+function getAvatarSize(size: Size): { classes: string; sizes: number } {
+  if (size === "lg") return { classes: "w-10 h-10", sizes: 40 };
+  if (size === "4xl") return { classes: "w-20 h-20", sizes: 80 };
+  return { classes: "w-[30px] h-[30px]", sizes: 30 };
+}
+const avatarSizes = getAvatarSize(size);
 ---
 
-<div class="h-[30px] w-[30px] overflow-hidden rounded-full object-contain">
-  <Image width={30} height={30} alt="avatar" {src} />
+<div
+  class={`${avatarSizes.classes} overflow-hidden rounded-full object-contain`}
+>
+  <Image
+    width={avatarSizes.sizes}
+    height={avatarSizes.sizes}
+    alt="avatar"
+    {src}
+  />
 </div>

@@ -10,6 +10,7 @@ const routes = [
   "dictionaries",
   "gallery",
 ];
+const { project_id } = Astro.params;
 ---
 
 <nav
@@ -26,14 +27,15 @@ const routes = [
 
     The Arkive Wiki
   </h2>
-  <ul class="flex flex-nowrap gap-x-2">
+
+  <ul id="nav_list" class="flex flex-nowrap gap-x-2">
     {
       routes.map((route) => (
         <li>
           <a
             id={`nav_${route}`}
+            href={`/${project_id}/${route}`}
             class="transition-all hover:text-blue-300 active:text-blue-600"
-            href={`/${route}`}
           >{`${route.charAt(0).toUpperCase()}${route.slice(1)}`}</a>
         </li>
       ))
