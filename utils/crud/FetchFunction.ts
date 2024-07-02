@@ -15,7 +15,7 @@ export async function FetchFunction({
     body,
     credentials: isPublic ? "omit" : "include",
     headers: {
-      module: "wiki",
+      module: "editor",
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
   });
