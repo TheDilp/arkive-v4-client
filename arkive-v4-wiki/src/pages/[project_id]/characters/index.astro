@@ -17,7 +17,7 @@ const data = (await res.json()) as CharacterType[];
 <Body>
   <Content>
     <ul
-      class="flex w-full flex-col rounded border border-x border-zinc-800 bg-zinc-950"
+      class="flex w-full flex-col max-h-full overflow-auto rounded border border-x border-zinc-800 bg-zinc-950"
     >
       {
         data.map((char) => (

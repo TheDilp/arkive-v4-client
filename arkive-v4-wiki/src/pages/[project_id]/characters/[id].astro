@@ -17,10 +17,10 @@ const data = (await res.json()) as CharacterType;
 <Body>
   <Content>
     <h1 class="flex items-center gap-x-8">
-      <Avatar
+     {data?.image_id ? <Avatar
         src={getImageURL(project_id as string, "images", data.image_id)}
         size="4xl"
-      />
+      /> :null}
       <span class="text-4xl font-bold">
         {data.title}
       </span>
