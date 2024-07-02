@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 
 import {
   AvailableDyceEntityType,
@@ -24,7 +24,6 @@ import {
   getSingularEntityType,
   IconEnum,
   loggedInAtom,
-  moduleAtom,
   useNotifications,
   userStatusAtom,
 } from "../../utils";
@@ -329,22 +328,20 @@ export function useSearch<ReturnType>(
     isFolders?: boolean;
   }
 ) {
-  const module = useAtomValue(moduleAtom);
   return useQuery<{ data: ReturnType }, unknown>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
-      if (type)
-       {
+      if (type) {
         const baseUrl = options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer;
-        const global = isGlobal ? "global/" : ""
         return FetchFunction({
           url: `${baseUrl}/search/${
             isGlobal ? "global/" : `${project_id}/`
-          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "/projects" ? type : ""}`,
+          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? `/${type}` : ""}`,
           method: "POST",
           body: JSON.stringify(request),
           isPublic: options?.isPublic,
-        })};
+        });
+      }
       return { data: [], ok: false, role_access: true };
     },
     { ...options, enabled: !!type && !!options?.enabled && !!type }
@@ -485,3 +482,4 @@ export function useGetAuthStatus() {
   );
 }
 // #endregion misc
+
