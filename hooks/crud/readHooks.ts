@@ -334,14 +334,17 @@ export function useSearch<ReturnType>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
       if (type)
+       {
+        const baseUrl = options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer;
+        const global = isGlobal ? "global/" : ""
         return FetchFunction({
-          url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/search/${
-            isGlobal ? "global/" : `${module === "dyce_vtt" ? "" : project_id}`
-          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? type : ""}`,
+          url: `${baseUrl}/search/${
+            isGlobal ? "global/" : `${project_id}/`
+          }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "/projects" ? type : ""}`,
           method: "POST",
           body: JSON.stringify(request),
           isPublic: options?.isPublic,
-        });
+        })};
       return { data: [], ok: false, role_access: true };
     },
     { ...options, enabled: !!type && !!options?.enabled && !!type }
