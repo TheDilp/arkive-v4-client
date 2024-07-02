@@ -60,6 +60,7 @@
     "@typescript-eslint/parser": "^6.20.0",
     "@vitejs/plugin-react": "^4.0.1",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
@@ -84,8 +85,10 @@
   "scripts": {
     "build:editor": "cd arkive-v4-editor && tsc && vite build --config ../vite.config.ts",
     "build:dyce": "cd arkive-v4-dyce-vtt && tsc && vite build --config ../vite.config.ts",
+    "start:wiki": "cd arkive-v4-wiki && astro dev --port 5177 --config",
     "start:editor": "cd arkive-v4-editor && vite --port 5173 --config ../vite.config.ts",
     "start:dyce": "cd arkive-v4-dyce-vtt && vite --port 5175 --config ../vite.config.ts",
+    "start": "concurrently --kill-others \"bun run start:wiki\" \"bun run start:editor\" \"bun run start:dyce\"",
     "lint": "eslint --ext ts,tsx \"src\" --fix --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky install",
     "precommit": "lint-staged"
@@ -94,5 +97,6 @@
     "*.{ts,tsx} !(*.config).ts": "eslint --fix --report-unused-disable-directives --max-warnings 0"
   },
   "type": "module",
-  "version": "0.0.0"
+  "version": "0.0.2"
 }
+
