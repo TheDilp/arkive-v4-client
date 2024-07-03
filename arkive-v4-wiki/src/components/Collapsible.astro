@@ -1,0 +1,24 @@
+---
+import { Icon } from "astro-icon/components";
+const { title } = Astro.props;
+---
+
+<details class="group">
+  <summary class="list-none">
+    <h3
+      class="flex items-center gap-x-2 border-b border-zinc-700 text-2xl font-semibold"
+    >
+      <Icon name="ph:identification-card" />
+      {title}
+      <span class="ml-auto">
+        <span class="caret-up hidden group-open:inline">
+          <Icon name="ph:caret-up" />
+        </span>
+        <span class="caret-down group-open:hidden">
+          <Icon name="ph:caret-down" />
+        </span>
+      </span>
+    </h3>
+  </summary>
+  <slot />
+</details>
