@@ -1,14 +1,14 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { useListPublicEntities } from "../../arkive-v4-wiki/src/hooks/queries";
 import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
+import { useTable } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
 import {
   getAvatarInitials,
   getCharacterFullName,
   getDefaultEntityIcon,
-  getEntityFields,
   getEntityLink,
   getImageURL,
   IconEnum,
@@ -22,39 +22,30 @@ function characterColumns(project_id: string) {
     characterColumnHelper.display({
       id: "portrait_id",
       header: "Portrait",
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center">
-          <Avatar
-            hasShowImage
-            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
-            initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
-            isBordered
-            isTooltipDisabled
-            label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
-            size="xl"
-          />
-        </div>
-      ),
+      cell: ({ row }) =>
+        row?.original?.portrait_id ? (
+          <div className="relative flex w-full items-center justify-center">
+            <Avatar
+              hasShowImage
+              image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
+              initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
+              isBordered
+              isTooltipDisabled
+              label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
+              size="md"
+            />
+          </div>
+        ) : null,
       meta: {
-        pinned: true,
         noLink: true,
         centered: true,
       },
       minSize: 4.5,
       maxSize: 4.5,
     }),
-    characterColumnHelper.accessor("first_name", {
-      id: "first_name",
-      header: "First name",
-      cell: (info) => info.getValue(),
-      meta: {
-        sortable: true,
-      },
-      minSize: 12,
-    }),
-    characterColumnHelper.accessor("last_name", {
-      id: "last_name",
-      header: "Last name",
+    characterColumnHelper.accessor("full_name", {
+      id: "full_name",
+      header: "Full name",
       cell: (info) => info.getValue(),
       meta: {
         sortable: true,
@@ -114,25 +105,7 @@ function PublicCharacterList() {
     selection: {},
   });
 
-  const { data, isLoading } = useGetEntities<CharacterType>(
-    {
-      data: { project_id: project_id as string },
-      relations: {
-        portrait: true,
-        tags: true,
-      },
-      orderBy,
-      filters,
-      pagination,
-      fields: ["id", "first_name", "nickname", "last_name", "portrait_id"],
-    },
-    "characters",
-    {
-      staleTime: 5 * 60 * 1000,
-      prefetch: true,
-      isPublic: true,
-    }
-  );
+  const { data, isLoading } = useListPublicEntities<CharacterType>(project_id as string, "characters");
 
   useLayoutEffect(() => {
     if (!filter) {
@@ -182,7 +155,7 @@ function PublicCharacterList() {
           filters,
           getLink: (rowData: any) => getEntityLink(project_id as string, "characters", rowData.id, null, true),
         }}
-        data={data?.data || []}
+        data={data || []}
         dispatch={dispatch}
         isLoading={isLoading}
         pagination={pagination}
@@ -197,50 +170,9 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
 
   const [{ pagination }, dispatch] = useTable({ selection: [], pagination: { limit: 10, page: 0 } });
 
-  const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
-    {
-      pagination: {
-        limit: 10,
-        page: 0,
-      },
-      data: {
-        project_id,
-      },
-      filters: {
-        or:
-          type === "blueprints"
-            ? []
-            : [
-                {
-                  id: "folder",
-                  header_name: "Folder",
-                  field: "is_folder",
-                  operator: "is",
-                  value: null,
-                },
-                {
-                  id: "folder2",
-                  header_name: "Folder2",
-                  field: "is_folder",
-                  operator: "eq",
-                  value: false,
-                },
-              ],
-      },
-      // @ts-ignore
-      fields: type === "blueprints" ? ["id", "title"] : getEntityFields(type as AvailableEntityType),
-      orderBy: [
-        {
-          field: "title",
-          sort: "asc",
-        },
-      ],
-    },
-    type as AvailableEntityType,
-    {
-      isPublic: true,
-      staleTime: 5 * 60 * 1000,
-    }
+  const { data, isLoading } = useListPublicEntities<{ id: string; icon?: string; image_id?: string; title: string }>(
+    project_id as string,
+    "characters"
   );
 
   return (
@@ -253,9 +185,9 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         config={{
           getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null, true),
         }}
-        data={base?.data || []}
+        data={data || []}
         dispatch={dispatch}
-        isLoading={isInitialLoading}
+        isLoading={isLoading}
         key={type}
         pagination={pagination}
         type={type as AvailableEntityType}
@@ -267,5 +199,6 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
 export function PublicListView() {
   const { type } = useParams();
   if (type === "characters") return <PublicCharacterList />;
-  return <PublicEntitiesList type={type as "documents"} />;
+  return <PublicEntitiesList type={type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints"} />;
 }
+

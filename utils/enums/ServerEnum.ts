@@ -6,7 +6,7 @@ export const baseURLS = {
   }/api/v1`,
   basePublicServer: `${
     import.meta.env.DEV
-      ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}`
+      ? `http://localhost:${import.meta.env.VITE_PUBLIC_SERVER}`
       : "https://arkive-v4-auth-service-production.up.railway.app"
   }/public`,
 
@@ -17,3 +17,4 @@ export const baseURLS = {
       : "wss://arkive-v4-server-production.up.railway.app"
   }`,
 };
+

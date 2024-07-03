@@ -32,11 +32,11 @@ export function PublicNavbar() {
 
   return (
     <div className="mb-2 flex h-14 max-h-14 items-center justify-between gap-x-2 text-lg">
-      <div className="flex flex-nowrap gap-x-2">
+      <div className="flex flex-col gap-x-2">
         <div className="max-h-14 max-w-14 overflow-hidden">
           <img
             alt="Logo"
-            className="h-14 w-14 object-contain"
+            className="h-18 w-18 relative -left-1 object-contain"
             src={getImageURL(project_id as string, "images", project?.data?.image_id) || "/Logo.webp"}
           />
         </div>
@@ -90,3 +90,4 @@ export function PublicNavbar() {
     </div>
   );
 }
+

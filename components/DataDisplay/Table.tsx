@@ -537,7 +537,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const isSubheaderEnabled =
-    !!filters?.and?.length || !!filters?.or?.length || relationFilters?.and?.length || relationFilters?.or?.length;
+    !!filters?.and?.length || !!filters?.or?.length || !!relationFilters?.and?.length || !!relationFilters?.or?.length;
 
   const {
     head,
@@ -561,6 +561,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     paginationButtonsContainer,
   } = TableClasses({
     isSubheaderEnabled,
+    // @ts-ignore
     isLoading,
     hasNoHeaderGap,
     hasNoData: data?.length === 0 && !isSubheaderEnabled,
@@ -931,3 +932,4 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     </>
   );
 }
+

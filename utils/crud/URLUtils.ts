@@ -16,10 +16,10 @@ export function getPreviewImageURLs(files: File[] | undefined): { name: string; 
   return [];
 }
 
-export function getImageURL(project_id: string, type: AssetType, image_id?: string | null, isGraphImage?: boolean): string {
+export function getImageURL(project_id: string, type: AssetType, image_id?: string | null): string {
   if (!image_id) return "";
   return `https://${import.meta.env.VITE_DO_SPACES_NAME}.${
-    isGraphImage ? import.meta.env.VITE_DO_SPACES_ENDPOINT : import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT
+    import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT
   }/assets/${project_id}/${type}/${image_id}.webp`;
 }
 
@@ -38,3 +38,4 @@ export function getThumbnailUrl(url: string, dimensions?: { width: number; heigh
     .replace(/\//g, "_");
   return `${baseURLS.baseThumbnailServer}/${hash}/${sizedUrl}`;
 }
+
