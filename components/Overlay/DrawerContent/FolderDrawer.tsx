@@ -61,7 +61,7 @@ export function FolderDrawer({ data }: Props) {
     relations?: { tags: { id: string }[] };
     permissions: EntityPermissionType[];
   }>(data.type, project_id as string);
-  const { data: existingFolder, isLoading } = useGetEntity<ExistingFolderType>(
+  const { data: existingFolder, isFetching } = useGetEntity<ExistingFolderType>(
     data?.id,
     data.type,
     {
@@ -120,7 +120,7 @@ export function FolderDrawer({ data }: Props) {
     }
   }
 
-  if (isLoading) return <Skeleton type="drawer_form" />;
+  if (isFetching) return <Skeleton type="drawer_form" />;
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -174,3 +174,4 @@ export function FolderDrawer({ data }: Props) {
     </div>
   );
 }
+
