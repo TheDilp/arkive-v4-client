@@ -931,8 +931,8 @@ export function FolderView() {
   if (type === "settings") return <ProjectSettingsView />;
   return (
     <TablePageLayout>
-      <div className="flex h-12 max-h-[3rem] min-h-[3rem] flex-col items-center justify-center">
-        <div className="flex w-full items-start justify-between">
+      <div className="flex h-fit flex-col items-start justify-start gap-y-2">
+        <div className="flex w-full flex-col items-end">
           <Breadcrumbs />
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
@@ -1229,3 +1229,4 @@ export function FolderView() {
     </TablePageLayout>
   );
 }
+

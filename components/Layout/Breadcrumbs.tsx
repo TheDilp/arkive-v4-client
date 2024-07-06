@@ -11,7 +11,7 @@ export function Breadcrumbs() {
   const itemsToShow = items.slice(-3);
   const tooltipItems = items.slice(0, -3);
   return (
-    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2 self-center">
+    <div className="flex h-8 max-h-8 max-w-fit flex-nowrap items-center justify-between gap-x-2 self-start">
       <Link to={`../${type}`}>
         <Icon fontSize={22} icon={IconEnum.home} />
       </Link>
@@ -24,7 +24,7 @@ export function Breadcrumbs() {
             content={<div className="rounded bg-zinc-700 p-2 shadow">{tooltipItems.map((item) => item.title).join(" > ")}</div>}
             delay={{ closeDelay: 500 }}
             isDisabled={!tooltipItems.length}>
-            <span className="cursor-pointer truncate font-lato font-semibold">...</span>
+            <span className="font-lato cursor-pointer truncate font-semibold">...</span>
           </Tooltip>
           <Icon fontSize={22} icon={IconEnum.chevron_right} />
         </div>
@@ -35,7 +35,7 @@ export function Breadcrumbs() {
         <Fragment key={item.id}>
           <div className="flex w-fit min-w-fit max-w-[10rem] items-center text-lg">
             <Link to={getLinkToItem(project_id as string, type as string, item.id, item.is_folder)}>
-              <span className="truncate font-lato font-semibold">{item.title}</span>
+              <span className="font-lato truncate font-semibold">{item.title}</span>
             </Link>
           </div>
           <span>{index + 1 !== itemsToShow?.length ? <Icon fontSize={22} icon={IconEnum.chevron_right} /> : null}</span>
@@ -44,3 +44,4 @@ export function Breadcrumbs() {
     </div>
   );
 }
+
