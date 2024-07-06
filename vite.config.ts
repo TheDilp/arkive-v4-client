@@ -5,6 +5,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
+    IS_PUBLIC: JSON.stringify(process.env.npm_package_name === "arkive-v4-wiki"),
   },
   plugins: [
     nodePolyfills(),
@@ -43,7 +44,6 @@ export default defineConfig({
   build: {
     minify: true,
     rollupOptions: {
-      external: ["crypto"],
       output: {
         manualChunks: (id) => {
           if (id.includes("3d-dice") || id.includes("world.offscreen") || id.includes("world.onscreen")) return "dice";
