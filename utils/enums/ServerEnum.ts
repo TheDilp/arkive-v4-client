@@ -5,9 +5,7 @@ export const baseURLS = {
       : "https://arkive-v4-auth-service-production.up.railway.app"
   }/api/v1`,
   basePublicServer: `${
-    import.meta.env.DEV
-      ? `http://localhost:${import.meta.env.VITE_PUBLIC_SERVER}`
-      : "https://arkive-v4-auth-service-production.up.railway.app"
+    import.meta.env.DEV ? import.meta.env.VITE_PUBLIC_SERVER : "https://arkive-v4-auth-service-production.up.railway.app"
   }/public`,
 
   baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",

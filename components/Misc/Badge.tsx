@@ -14,11 +14,25 @@ const BadgeClasses = tv({
       success: "bg-green-600 text-white",
       warning: "bg-orange-600 text-white",
       error: "bg-red-600 text-white",
+      "primary-bordered": "",
+      "secondary-bordered": "",
+      "info-bordered": "",
+      "success-bordered": "",
+      "warning-bordered": "",
+      "error-bordered": "",
     },
     size: {
+      "4xs": "text-xs h-full",
+      "3xs": "text-xs h-full",
+      "2xs": "text-xs h-full",
+      xs: "text-xs h-full",
       sm: "text-xs h-full",
       md: "text-sm h-full",
       lg: "text-base [&>button>*]:text-base",
+      xl: "text-base [&>button>*]:text-base",
+      "2xl": "text-base [&>button>*]:text-base",
+      "3xl": "text-base [&>button>*]:text-base",
+      "4xl": "text-base [&>button>*]:text-base",
     },
     hasClearAction: {
       true: "pr-1.5 gap-x-0.5",
@@ -53,3 +67,4 @@ export function Badge({ label, size = "md", variant = "primary", clearAction, cu
     </span>
   );
 }
+

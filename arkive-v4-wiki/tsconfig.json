@@ -17,7 +17,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "commitlint.config.js", "components", "pages", "hooks", "types", "utils", "validation"],
-  "exclude": ["components/modules.d.ts"]
+  "include": ["src", "commitlint.config.js", "components", "pages", "hooks", "types", "utils", "validation"]
 }
 

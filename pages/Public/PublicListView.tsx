@@ -1,18 +1,10 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useListPublicEntities } from "../../arkive-v4-wiki/src/hooks/queries";
 import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
-import { useTable } from "../../hooks";
+import { useGetEntities, useTable } from "../../hooks";
 import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
-import {
-  getAvatarInitials,
-  getCharacterFullName,
-  getDefaultEntityIcon,
-  getEntityLink,
-  getImageURL,
-  IconEnum,
-} from "../../utils";
+import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getImageURL, IconEnum } from "../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
@@ -22,21 +14,21 @@ function characterColumns(project_id: string) {
     characterColumnHelper.display({
       id: "portrait_id",
       header: "Portrait",
-      cell: ({ row }) =>
-        row?.original?.portrait_id ? (
-          <div className="relative flex w-full items-center justify-center">
-            <Avatar
-              hasShowImage
-              image={getImageURL(project_id, "images", row.original?.portrait_id || "")}
-              initials={getAvatarInitials(`${row.original.first_name} ${row.original?.last_name || ""}`)}
-              isBordered
-              isTooltipDisabled
-              label={getCharacterFullName(row.original.first_name, row.original?.last_name || "")}
-              size="md"
-            />
-          </div>
-        ) : null,
+      cell: ({ row }) => (
+        <div className="flex w-full items-center justify-center">
+          <Avatar
+            hasShowImage
+            image={getImageURL(project_id, "images", row.original?.portrait?.id || "")}
+            initials={getAvatarInitials(row.original.full_name)}
+            isBordered
+            isTooltipDisabled
+            label={row.original.full_name}
+            size="md"
+          />
+        </div>
+      ),
       meta: {
+        pinned: true,
         noLink: true,
         centered: true,
       },
@@ -100,12 +92,30 @@ function PublicCharacterList() {
   const { project_id } = useParams();
   const [filter, setFilter] = useState("");
   const [{ orderBy, filters, pagination }, dispatch] = useTable({
-    orderBy: [{ field: "first_name", sort: "asc" }],
+    orderBy: [{ field: "full_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
 
-  const { data, isLoading } = useListPublicEntities<CharacterType>(project_id as string, "characters");
+  const { data, isLoading } = useGetEntities<CharacterType>(
+    {
+      data: { project_id: project_id as string },
+      relations: {
+        portrait: true,
+        tags: true,
+      },
+      orderBy,
+      filters,
+      pagination,
+      fields: ["id", "full_name", "portrait_id"],
+    },
+    "characters",
+    {
+      staleTime: 5 * 60 * 1000,
+      prefetch: true,
+      isPublic: true,
+    }
+  );
 
   useLayoutEffect(() => {
     if (!filter) {
@@ -122,8 +132,8 @@ function PublicCharacterList() {
           dispatch({
             type: "setFilter",
             payload: {
-              and: [{ id: "quick_filter", header_name: "quick_filter", field: "first_name", operator: "ilike", value: filter }],
-              field: "first_name",
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "full_name", operator: "ilike", value: filter }],
+              field: "full_name",
             },
           });
         }
@@ -155,7 +165,7 @@ function PublicCharacterList() {
           filters,
           getLink: (rowData: any) => getEntityLink(project_id as string, "characters", rowData.id, null, true),
         }}
-        data={data || []}
+        data={data?.data || []}
         dispatch={dispatch}
         isLoading={isLoading}
         pagination={pagination}
@@ -167,16 +177,75 @@ function PublicCharacterList() {
 
 function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints" }) {
   const { project_id } = useParams();
+  const [filter, setFilter] = useState("");
 
-  const [{ pagination }, dispatch] = useTable({ selection: [], pagination: { limit: 10, page: 0 } });
+  const [{ pagination, filters }, dispatch] = useTable({ selection: [], pagination: { limit: 10, page: 0 } });
 
-  const { data, isLoading } = useListPublicEntities<{ id: string; icon?: string; image_id?: string; title: string }>(
-    project_id as string,
-    "characters"
+  const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
+    {
+      pagination: {
+        limit: 10,
+        page: 0,
+      },
+      data: {
+        project_id,
+      },
+      filters,
+      // @ts-ignore
+      fields: type === "blueprints" ? ["id", "title"] : getEntityFields(type as AvailableEntityType),
+      orderBy: [
+        {
+          field: "title",
+          sort: "asc",
+        },
+      ],
+    },
+    type as AvailableEntityType,
+    {
+      isPublic: true,
+      staleTime: 5 * 60 * 1000,
+    }
   );
+  useLayoutEffect(() => {
+    if (!filter) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+    }
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: {
+              and: [{ id: "quick_filter", header_name: "quick_filter", field: "title", operator: "ilike", value: filter }],
+              field: "title",
+            },
+          });
+        }
+      }, 500);
 
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [filter, dispatch]);
   return (
-    <div className="h-full w-full p-2">
+    <div className="flex h-full w-full flex-col gap-y-2 p-2">
+      <div className="ml-auto w-52">
+        <Input
+          isClearable
+          name="quick_filter"
+          onChange={({ value }) => setFilter(value as string)}
+          placeholder="Quick search by first name"
+          type="search"
+          value={filter}
+        />
+      </div>
       <Table
         columns={columns(
           type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints",
@@ -185,9 +254,9 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
         config={{
           getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null, true),
         }}
-        data={data || []}
+        data={base?.data || []}
         dispatch={dispatch}
-        isLoading={isLoading}
+        isLoading={isInitialLoading}
         key={type}
         pagination={pagination}
         type={type as AvailableEntityType}
@@ -199,6 +268,6 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
 export function PublicListView() {
   const { type } = useParams();
   if (type === "characters") return <PublicCharacterList />;
-  return <PublicEntitiesList type={type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "blueprints"} />;
+  return <PublicEntitiesList type={type as "documents"} />;
 }
 

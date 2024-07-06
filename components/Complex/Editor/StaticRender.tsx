@@ -220,7 +220,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
   };
 }
 
-function markMap(createNotification: (notif: Omit<NotificationType, "id">) => void): MarkMap {
+function markMap(createNotification: (notif: Omit<NotificationType, "id">) => void, isPublic: boolean): MarkMap {
   return {
     italic: "em",
     bold: "strong",
@@ -230,6 +230,7 @@ function markMap(createNotification: (notif: Omit<NotificationType, "id">) => vo
       return <span className="spoiler">{data?.children || null}</span>;
     },
     dice_roll: (...props) => {
+      if (isPublic) return <span>{props?.[0]?.children || ""}</span>;
       return (
         <span
           className="dice-roll"
@@ -277,9 +278,10 @@ export function StaticRender({ content, isPublicView }: { content: RemirrorJSON 
       <RemirrorRenderer
         json={parsedContent as RemirrorJSON}
         // @ts-ignore
-        markMap={markMap(createNotification)}
+        markMap={markMap(createNotification, isPublicView ?? true)}
         typeMap={typeMap(project_id as string, content, isPublicView)}
       />
     </div>
   );
 }
+

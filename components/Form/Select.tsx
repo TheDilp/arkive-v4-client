@@ -73,20 +73,44 @@ const SelectClasses = tv({
         helperText: "text-red-500",
         placeholder: "text-red-500",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
     },
     size: {
+      "4xs": {},
+      "3xs": {},
+      "2xs": {},
+      xs: {},
       sm: {
         select: "h-8",
       },
       md: {
         select: "h-10",
       },
+      lg: {},
+      xl: {},
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
     isExpandingToNewRow: {
       true: {
         displayItem: "whitespace-normal overflow-visible",
         select: "h-fit",
       },
+    },
+    isDisabled: {
+      true: "",
+    },
+    isReadOnly: {
+      true: "",
+    },
+    isOpen: {
+      true: "",
     },
     hasSearch: {
       true: {
@@ -148,7 +172,17 @@ const SelectOption = tv({
   ],
   variants: {
     size: {
+      "4xs": "h-8",
+      "3xs": "h-8",
+      "2xs": "h-8",
+      xs: "h-8",
       sm: "h-8",
+      md: "h-8",
+      lg: "h-8",
+      xl: "h-8",
+      "2xl": "h-8",
+      "3xl": "h-8",
+      "4xl": "h-8",
     },
     isActive: {
       true: "bg-zinc-600",
@@ -540,3 +574,4 @@ export function Select({
     </div>
   );
 }
+

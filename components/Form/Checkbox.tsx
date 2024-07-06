@@ -45,6 +45,15 @@ const CheckboxClasses = tv({
         label: "text-red-500",
         helperText: "text-red-500",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
+    },
+    isChecked: {
+      true: {},
     },
     isDisabled: {
       true: {
@@ -79,7 +88,7 @@ export function Checkbox({
     label: labelClasses,
     checkbox,
     helperText: helperTextClasses,
-  } = CheckboxClasses({ variant, isDisabled, isReadOnly, checked: value });
+  } = CheckboxClasses({ variant, isDisabled, isReadOnly, isChecked: value });
   return (
     <div className={base()}>
       {label ? <div className={labelClasses()}>{label}</div> : null}
@@ -106,3 +115,4 @@ export function Checkbox({
     </div>
   );
 }
+

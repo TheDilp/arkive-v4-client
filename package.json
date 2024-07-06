@@ -85,9 +85,10 @@
   "scripts": {
     "build:editor": "cd arkive-v4-editor && tsc && vite build --config ../vite.config.ts",
     "build:dyce": "cd arkive-v4-dyce-vtt && tsc && vite build --config ../vite.config.ts",
-    "start:wiki": "cd arkive-v4-wiki && astro dev --port 5177 --config",
+    "build:wiki": "cd arkive-v4-wiki && tsc && vite build --config ../vite.config.ts",
     "start:editor": "cd arkive-v4-editor && vite --port 5173 --config ../vite.config.ts",
     "start:dyce": "cd arkive-v4-dyce-vtt && vite --port 5175 --config ../vite.config.ts",
+    "start:wiki": "cd arkive-v4-wiki && vite --port 5177 --config ../vite.config.ts",
     "start": "concurrently --kill-others \"bun run start:wiki\" \"bun run start:editor\" \"bun run start:dyce\"",
     "lint": "eslint --ext ts,tsx \"src\" --fix --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky install",
@@ -99,3 +100,4 @@
   "type": "module",
   "version": "0.0.2"
 }
+

@@ -67,6 +67,9 @@ export function getEntityFields(type: AvailableEntityType): string[] {
     type === "random_tables"
   )
     fields.push("is_public");
+
+  if (type === "documents" || type === "maps") fields.push("image_id");
+
   if (
     (type === "graphs" || type === "random_tables" || type === "calendars" || type === "dictionaries") &&
     fields.includes("image_id")
@@ -334,6 +337,9 @@ export function getEntityTypeFromNotificationType(notification_type: string): st
 export const FieldClasses = tv({
   base: "flex flex-col justify-center mt-1 p-0.5",
   variants: {
+    isPreview: {
+      true: "",
+    },
     type: {
       dice_roll: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       text: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
@@ -341,6 +347,10 @@ export const FieldClasses = tv({
       select_multiple: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       characters_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
       characters_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
+      documents_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      documents_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      events_single: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
+      events_multiple: "col-span-6 sm:col-span-3  md:col-span-2 xl:col-span-1",
       locations_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
       locations_multiple: "col-span-6 sm:col-span-6 md:col-span-6 xl:col-span-6",
       blueprints_single: "col-span-6 sm:col-span-3 md:col-span-2 xl:col-span-1",
@@ -404,3 +414,4 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
   }
   return { tooltip: "", isSoonToBeDeleted: false };
 }
+

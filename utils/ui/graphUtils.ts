@@ -9,7 +9,7 @@ export function changeLockState(
   boardContext: cytoscape.Core,
   locked: boolean,
   updateManyNodesLockState: UseMutateFunction<any, unknown, { data: { data: { [key: string]: any } }[] }>,
-  parent_id: string,
+  parent_id: string
 ) {
   const selected = boardContext.nodes(":selected");
   if (locked) {
@@ -56,7 +56,7 @@ export function exportBoardFunction(
   view: "entire_graph" | "current_view",
   background: "color" | "transparent",
   type: "PNG" | "JPEG" | "JSON",
-  boardTitle?: string,
+  boardTitle?: string
 ) {
   if (!boardRef) return;
   if (type === "PNG") {
@@ -71,9 +71,9 @@ export function exportBoardFunction(
         ],
         {
           type: "image/png",
-        },
+        }
       ),
-      `${boardTitle || "ArkiveBoard"}.png`,
+      `${boardTitle || "ArkiveBoard"}.png`
     );
   } else if (type === "JPEG") {
     saveAs(
@@ -87,16 +87,16 @@ export function exportBoardFunction(
         ],
         {
           type: "image/jpg",
-        },
+        }
       ),
-      `${boardTitle || "ArkiveBoard"}.jpg`,
+      `${boardTitle || "ArkiveBoard"}.jpg`
     );
   } else if (type === "JSON") {
     saveAs(
       new Blob([JSON.stringify(boardRef.json())], {
         type: "application/json",
       }),
-      `${boardTitle || "ArkiveBoard"}.json`,
+      `${boardTitle || "ArkiveBoard"}.json`
     );
   }
 }
@@ -125,16 +125,16 @@ export function getNodeLabel(node: NodeType): string {
 
 export function getNodeImage(node: NodeType, project_id: string, { width, height }: { width: number; height: number }) {
   if (node?.character?.portrait_id) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.character.portrait_id, true), { width, height });
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.character.portrait_id), { width, height });
   }
   if (node?.document?.image) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.document.image_id, true), { width, height });
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.document.image_id), { width, height });
   }
   if (node?.image) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image?.id, true), { width, height });
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node.image?.id), { width, height });
   }
   if (node?.image_id) {
-    return getThumbnailUrl(getImageURL(project_id as string, "images", node?.image_id, true), { width, height });
+    return getThumbnailUrl(getImageURL(project_id as string, "images", node?.image_id), { width, height });
   }
 
   if (node?.icon) {
@@ -246,3 +246,4 @@ export function getCurveStyleIcon(curve_style: CurveStyleType): AvailableIcons {
   if (curve_style === "unbundled-bezier") return IconEnum.unbundled_bezier_edges;
   return IconEnum.straight_edges;
 }
+

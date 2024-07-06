@@ -39,9 +39,11 @@ export default defineConfig({
     host: true,
     strictPort: true,
   },
+
   build: {
     minify: true,
     rollupOptions: {
+      external: ["crypto"],
       output: {
         manualChunks: (id) => {
           if (id.includes("3d-dice") || id.includes("world.offscreen") || id.includes("world.onscreen")) return "dice";

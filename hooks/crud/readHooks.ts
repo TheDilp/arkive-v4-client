@@ -184,6 +184,7 @@ export function useGetEntities<ReturnType>(
       method: "POST",
       body: JSON.stringify(finalRequest),
       url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
+      isPublic: options?.isPublic,
     });
     if (!data?.role_access) {
       createNotification({

@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/extensions
+import "../modules.d.ts";
+
 import DiceBox from "@3d-dice/dice-box";
 import DiceParser from "@3d-dice/dice-parser-interface";
 import ls from "localstorage-slim";
@@ -92,3 +95,4 @@ export async function rollDiceWithNotification(
     }
   }
 }
+

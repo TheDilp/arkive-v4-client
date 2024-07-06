@@ -31,12 +31,12 @@ export function PublicNavbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-2 flex h-14 max-h-14 items-center justify-between gap-x-2 text-lg">
-      <div className="flex flex-col gap-x-2">
-        <div className="max-h-14 max-w-14 overflow-hidden">
+    <div className="mb-2 flex h-16 max-h-16 items-center justify-between gap-x-2 text-lg">
+      <div className="flex gap-x-2">
+        <div className="max max-w-14 overflow-hidden">
           <img
             alt="Logo"
-            className="h-18 w-18 relative -left-1 object-contain"
+            className="relative -left-1 object-contain"
             src={getImageURL(project_id as string, "images", project?.data?.image_id) || "/Logo.webp"}
           />
         </div>
@@ -46,7 +46,7 @@ export function PublicNavbar() {
             <ul className="flex flex-nowrap gap-x-2">
               {navItems.map((item) => (
                 <li className={item === type ? "text-blue-400" : ""} key={item}>
-                  <Link className="hover:text-blue-400" to={`/public/${project_id}/${item}`}>
+                  <Link className="hover:text-blue-400" to={`/${project_id}/${item}`}>
                     {capitalCase(item || "")}
                   </Link>
                 </li>

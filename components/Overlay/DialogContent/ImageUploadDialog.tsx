@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { useHasPermissions, useUploadAsset } from "../../../hooks";
-import { Size } from "../../../types";
 import { dialogAtom, getPreviewImageURLs, IconEnum } from "../../../utils";
 import { ImagePreview } from "../../DataDisplay/ImagePreview";
 import { Button, ImageUpload } from "../../Form";
@@ -30,7 +29,7 @@ const tabs = [
   { id: "2", label: "Map images", icon: IconEnum.map },
 ];
 
-export function ImageUploadDialog({ size }: { size: Size }) {
+export function ImageUploadDialog({ size }: { size: "lg" }) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const resetDialogAtom = useResetAtom(dialogAtom);
@@ -99,3 +98,4 @@ export function ImageUploadDialog({ size }: { size: Size }) {
     </div>
   );
 }
+

@@ -1,4 +1,6 @@
- 
+// eslint-disable-next-line import/extensions
+import "../modules.d.ts";
+
 import { Collection, Core, EventObject, LayoutOptions, NodeSingular } from "cytoscape";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import uniqBy from "lodash.uniqby";
@@ -793,3 +795,4 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
     </div>
   );
 }
+

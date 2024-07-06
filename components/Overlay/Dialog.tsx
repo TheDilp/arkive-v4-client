@@ -31,6 +31,8 @@ const DialogClasses = tv({
       top: {
         container: "top-[10%] left-[50%] -translate-x-[50%] -translate-y-[0%]",
       },
+      "top-left": {},
+      "top-right": {},
       center: {
         container: "justify-center items-center",
       },
@@ -45,6 +47,10 @@ const DialogClasses = tv({
       },
     },
     size: {
+      "4xs": {},
+      "3xs": {},
+      "2xs": {},
+      xs: {},
       sm: {
         container: "h-[20rem] lg:w-[30rem] w-full",
       },
@@ -56,6 +62,10 @@ const DialogClasses = tv({
         imageUploadContainer: "h-[15rem] max-h-[15rem]",
         imagesList: "h-[15rem]",
       },
+      xl: {},
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
     isImageView: {
       true: {
@@ -130,7 +140,7 @@ export function Dialog() {
             <Button hasNoBackground icon={IconEnum.close} isIconOnly onClick={() => resetDialogAtom()} />
           </div>
         </div>
-        {dialog.type === "image_upload" ? <ImageUploadDialog size={dialog.size || "md"} /> : null}
+        {dialog.type === "image_upload" ? <ImageUploadDialog size={"lg"} /> : null}
         {dialog.type === "restore_entity" ? <RestoreEntityDialog data={dialog.data} /> : null}
         {dialog.type === "arkive_entity" || dialog.type === "delete_entity" ? (
           <DeleteEntityDialog data={dialog.data} type={dialog.type} />
@@ -139,8 +149,8 @@ export function Dialog() {
         {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
         {dialog.type === "insert_image" ? <InsertEditorImageDialog data={dialog.data} /> : null}
         {dialog.type === "automention" ? <AutomentionDrawer data={dialog.data} /> : null}
-        {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
-        {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
+        {dialog?.description ? <p className="font-lato text-center text-lg">{dialog.description}</p> : null}
+        {dialog?.warning ? <span className="font-lato py-1 text-center text-base text-red-400">{dialog.warning}</span> : null}
         {dialog?.type === "delete_many" ? (
           <p className="text-center text-red-500">
             <span className="text-red-600">WARNING: </span>
@@ -181,3 +191,4 @@ export function Dialog() {
     </div>
   );
 }
+

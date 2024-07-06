@@ -53,3 +53,4 @@ export function AuthWrapper() {
 
   return <Outlet />;
 }
+

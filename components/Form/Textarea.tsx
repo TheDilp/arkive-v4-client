@@ -43,11 +43,27 @@ const TextareaClasses = tv({
         label: "text-red-500",
         helperText: "text-red-500",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
     },
     size: {
+      "4xs": {},
+      "3xs": {},
+      "2xs": {},
+      xs: {},
       sm: {
         textarea: "h-8",
       },
+      md: {},
+      lg: {},
+      xl: {},
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
     isDisabled: {
       true: {
@@ -102,3 +118,4 @@ export function Textarea({
     </div>
   );
 }
+

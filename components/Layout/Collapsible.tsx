@@ -17,10 +17,20 @@ const CollapsibleClasses = tv({
         label: "text-white",
         summary: "border-zinc-700",
       },
+      secondary: {},
+      info: {},
+      success: {},
+      warning: {},
       error: {
         label: "text-red-600",
         summary: "border-red-700",
       },
+      "primary-bordered": {},
+      "secondary-bordered": {},
+      "info-bordered": {},
+      "success-bordered": {},
+      "warning-bordered": {},
+      "error-bordered": {},
     },
     isDisabled: {
       true: {
@@ -31,6 +41,11 @@ const CollapsibleClasses = tv({
       },
     },
     size: {
+      "4xs": {},
+      "3xs": {},
+      "2xs": {},
+      xs: {},
+      sm: {},
       md: {
         label: "text-base",
       },
@@ -40,6 +55,9 @@ const CollapsibleClasses = tv({
       xl: {
         label: "text-xl",
       },
+      "2xl": {},
+      "3xl": {},
+      "4xl": {},
     },
   },
 });
@@ -117,3 +135,4 @@ export function Collapsible({
     </details>
   );
 }
+

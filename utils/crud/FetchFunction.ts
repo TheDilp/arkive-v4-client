@@ -1,24 +1,36 @@
+type AllowedMethodsType = "GET" | "POST" | "DELETE";
 export async function FetchFunction({
   url,
   method,
   body,
-  isPublic,
+  isPublic = false,
 }: {
   url: string;
-  method: "GET" | "POST" | "DELETE";
+  method: AllowedMethodsType;
   body?: string | FormData;
   isPublic?: boolean;
 }) {
-  // @ts-ignore
-  const res = await fetch(url, {
+  const fetchParams: {
+    method: AllowedMethodsType;
+    headers: Record<string, string>;
+    body?: string | FormData;
+    isPublic?: boolean;
+    credentials?: string;
+  } = {
     method,
     body,
-    credentials: isPublic ? "omit" : "include",
     headers: {
       module: "editor",
       ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
     },
-  });
+  };
+
+  if (isPublic === false || isPublic === undefined) {
+    fetchParams.credentials = "include";
+  }
+
+  // @ts-ignore
+  const res = await fetch(url, fetchParams);
   if (res.status === 401) {
     throw new Error("UNAUTHORIZED");
   }
@@ -32,3 +44,4 @@ export async function FetchFunction({
 
   return data;
 }
+

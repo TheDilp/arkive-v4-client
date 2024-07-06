@@ -77,3 +77,4 @@ export function Gallery({ images, isOpenable, columns = 4, size = "md", type }: 
     </div>
   );
 }
+
