@@ -12,7 +12,6 @@ import {
   Dashboard,
   EntitiesView,
   FolderView,
-  Login,
   ProjectsView,
   PublicEntitiesView,
   PublicLayout,
@@ -44,9 +43,6 @@ export default function App() {
         <ReactQueryDevtools position="top-left" />
         <Routes>
           <Route element={<AuthWrapper />} path="/">
-            <Route path="auth/*">
-              <Route element={<Login />} path="login" />
-            </Route>
             <Route element={<UserSettings />} path="user_settings/*">
               <Route element={<UserSettingsWebhooks />} path="webhooks" />
               <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
@@ -81,3 +77,4 @@ export default function App() {
     </main>
   );
 }
+
