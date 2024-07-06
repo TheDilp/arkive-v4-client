@@ -10,7 +10,7 @@
 [phases.caddy]
     dependsOn = ['setup'] # make sure this phase runs after the default 'setup' phase
     cmds = [
-        'curl -fsSLo caddy.tar.gz "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_buildable_artefact.tar.gz"', # download the caddy release specified by 'CADDY_VERSION' from GitHub
+        'curl -fsSLo caddy.tar.gz "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_buildable-artifact.tar.gz"', # download the caddy release specified by 'CADDY_VERSION' from GitHub
         'tar -zxvf caddy.tar.gz caddy', # only extract 'caddy' from the tarball
         'chmod +x caddy' # enable file execution for caddy, needed to execute downloaded files
     ]
