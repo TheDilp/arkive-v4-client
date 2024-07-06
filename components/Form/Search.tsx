@@ -457,8 +457,8 @@ export function Search({
               className={optionsContainer()}>
               {(manualResults || data?.data)?.map((item, index) => (
                 <Item
+                  key={item.value}
                   {...getItemProps({
-                    key: item.value,
                     ref(node) {
                       listRef.current[index] = node;
                     },
@@ -545,3 +545,4 @@ export function Search({
     </div>
   );
 }
+
