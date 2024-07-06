@@ -83,9 +83,9 @@
   "name": "arkive-v4-client",
   "private": true,
   "scripts": {
-    "build:editor": "cd arkive-v4-editor && tsc && vite build --config ../vite.config.ts",
-    "build:dyce": "cd arkive-v4-dyce-vtt && tsc && vite build --config ../vite.config.ts",
-    "build:wiki": "cd arkive-v4-wiki && tsc && vite build --config ../vite.config.ts",
+    "build:editor": "cd arkive-v4-editor && tsc -b && vite build --config ../vite.config.ts",
+    "build:dyce": "cd arkive-v4-dyce-vtt && tsc -b && vite build --config ../vite.config.ts",
+    "build:wiki": "cd arkive-v4-wiki && tsc -b && vite build --config ../vite.config.ts",
     "start:editor": "cd arkive-v4-editor && vite --port 5173 --config ../vite.config.ts",
     "start:dyce": "cd arkive-v4-dyce-vtt && vite --port 5175 --config ../vite.config.ts",
     "start:wiki": "cd arkive-v4-wiki && vite --port 5177 --config ../vite.config.ts",

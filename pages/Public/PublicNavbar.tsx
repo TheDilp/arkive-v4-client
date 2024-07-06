@@ -36,7 +36,7 @@ export function PublicNavbar() {
         <div className="max max-w-14 overflow-hidden">
           <img
             alt="Logo"
-            className="relative -left-1 object-contain"
+            className="relative -left-1 min-w-14 object-contain"
             src={getImageURL(project_id as string, "images", project?.data?.image_id) || "/Logo.webp"}
           />
         </div>

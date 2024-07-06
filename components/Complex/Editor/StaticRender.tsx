@@ -5,8 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { useGetImage } from "../../../hooks";
-import { NotificationType } from "../../../types";
-import { deleteObjectPropsRecursive, dialogAtom, Dice, DiceRollParser, IconEnum, useNotifications } from "../../../utils";
+import { deleteObjectPropsRecursive, dialogAtom, IconEnum, useNotifications } from "../../../utils";
 import { Collapsible } from "../../Layout";
 import { BlueprintMention, DocumentMention, EventMention, GraphMention, MapMention, WordMention } from "./Extensions/Mention";
 import { CharacterMention } from "./Extensions/Mention/CharacterMention";
@@ -220,7 +219,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
   };
 }
 
-function markMap(createNotification: (notif: Omit<NotificationType, "id">) => void, isPublic: boolean): MarkMap {
+function markMap(): MarkMap {
   return {
     italic: "em",
     bold: "strong",
@@ -230,38 +229,7 @@ function markMap(createNotification: (notif: Omit<NotificationType, "id">) => vo
       return <span className="spoiler">{data?.children || null}</span>;
     },
     dice_roll: (...props) => {
-      if (isPublic) return <span>{props?.[0]?.children || ""}</span>;
-      return (
-        <span
-          className="dice-roll"
-          onClick={async () => {
-            const parsedNotation = DiceRollParser.parseNotation(props?.[0]?.children?.props?.children);
-            const res = await Dice.roll(parsedNotation);
-            const rollData = DiceRollParser.parseFinalResults(res);
-            if (rollData?.valid) {
-              if (createNotification)
-                createNotification({
-                  timer: 2,
-                  title: "Dice roll",
-                  variant: "info",
-                  position: "top",
-                  data: rollData,
-                  type: "dice_roll",
-                });
-            } else if (createNotification)
-              createNotification({
-                timer: 2,
-                title: "The dice roll notation is not valid.",
-                icon: IconEnum.warning,
-                variant: "error",
-                position: "top",
-              });
-
-            return true;
-          }}>
-          {props?.[0]?.children || ""}
-        </span>
-      );
+      return <span>{props?.[0]?.children || ""}</span>;
     },
   };
 }

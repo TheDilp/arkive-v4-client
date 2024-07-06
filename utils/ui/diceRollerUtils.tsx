@@ -9,18 +9,22 @@ import { NotificationType } from "../../types";
 import { DefaultTagColor, IconEnum } from "../enums";
 
 const defaultDiceColor = ls.get("default_dice_color");
-export const DiceRollParser = new DiceParser();
-export const Dice = new DiceBox(
-  "#dice-box", // target DOM element to inject the canvas for rendering
-  {
-    assetPath: "/assets/dice-box/",
-    themeColor: DefaultTagColor,
-    scale: 4,
-    throwForce: 10,
-  }
-);
+// eslint-disable-next-line no-undef
+export const DiceRollParser = IS_PUBLIC ? null : new DiceParser();
+// eslint-disable-next-line no-undef
+export const Dice = IS_PUBLIC
+  ? null
+  : new DiceBox(
+      "#dice-box", // target DOM element to inject the canvas for rendering
+      {
+        assetPath: "/assets/dice-box/",
+        themeColor: DefaultTagColor,
+        scale: 4,
+        throwForce: 10,
+      }
+    );
 
-Dice.init().then(() => {
+Dice?.init()?.then(() => {
   document.addEventListener("mousedown", () => {
     Dice.clear();
   });

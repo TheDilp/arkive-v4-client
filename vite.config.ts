@@ -7,6 +7,7 @@ export default defineConfig({
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
     IS_PUBLIC: JSON.stringify(process.env.npm_package_name === "arkive-v4-wiki"),
   },
+
   plugins: [
     nodePolyfills(),
     react({
@@ -40,10 +41,11 @@ export default defineConfig({
     host: true,
     strictPort: true,
   },
-
   build: {
     minify: true,
+
     rollupOptions: {
+      external: ["../utils/ui/diceRollerUtils.tsx"],
       output: {
         manualChunks: (id) => {
           if (id.includes("3d-dice") || id.includes("world.offscreen") || id.includes("world.onscreen")) return "dice";
