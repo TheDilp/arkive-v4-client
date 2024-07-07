@@ -5,7 +5,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
-    IS_PUBLIC: JSON.stringify(process.env.npm_package_name === "arkive-v4-wiki"),
+    IS_PUBLIC: JSON.stringify(process.env.npm_package_name === "arkive-v4-wiki" && process.env.VITE_IS_PUBLIC),
   },
 
   plugins: [
