@@ -606,11 +606,11 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   useEffect(() => {
     if (!isInitialLoading) {
       const timeout = setTimeout(() => {
+        console.log(subitem_id);
         // If there is a node id in the URL navigate to that node
         if ((subitem_id || center_on) && cyRef?.current?._cy) {
           const node = cyRef?.current?._cy.getElementById(subitem_id || center_on);
-
-          if (node)
+          if (node?.length)
             cyRef?.current?._cy?.animate({
               zoom: 5,
               center: {

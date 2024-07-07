@@ -132,7 +132,7 @@ export function PublicCharacter() {
           </div>
         </Collapsible>
         <Collapsible icon={IconEnum.family_tree} label="Relationships">
-          <div className="h-96 p-2">
+          <div className="h-96 max-h-96 p-2">
             {character?.data?.id ? <FamilyTreeDialog data={{ id: character.data.id, isPublic: true }} /> : null}
           </div>
         </Collapsible>
