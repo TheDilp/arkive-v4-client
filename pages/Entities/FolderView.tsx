@@ -877,7 +877,9 @@ export function FolderView() {
       !permissions?.[`read_${type}` as PermissionCodeType] &&
       user &&
       typeof isProjectOwner !== "undefined" &&
-      isProjectOwner !== null
+      isProjectOwner !== null &&
+      !isInitialLoading &&
+      !isInitialLoadingFolder
     ) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(

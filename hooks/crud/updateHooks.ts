@@ -568,11 +568,7 @@ export function useUpdateManyPublic<InsertType extends { data: { ids: string[]; 
 }
 
 // #region misc
-export function useBulkUpdateTags(
-  type: AvailableEntityType | AvailableSubEntityType,
-  project_id: string,
-  parent_id?: string
-) {
+export function useBulkUpdateTags(type: AvailableEntityType | AvailableSubEntityType, project_id: string, parent_id?: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -662,10 +658,7 @@ export function useBulkUpdate(project_id: string, type: AvailableEntityType | "b
     }
   );
 }
-export function useBulkUpdateAccess(
-  project_id: string | undefined,
-  type: AvailableEntityType | AvailableSubEntityType
-) {
+export function useBulkUpdateAccess(project_id: string | undefined, type: AvailableEntityType | AvailableSubEntityType) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
   return useMutation(
@@ -871,3 +864,4 @@ export function useSignout() {
   );
 }
 // #endregion misc
+

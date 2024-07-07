@@ -65,7 +65,7 @@ export function ProjectLayout() {
     { enabled: !!userStatus?.user_id && !!project_id }
   );
 
-  const { data: permissions } = useGetEntities<PermissionType>(
+  const { data: permissions, isInitialLoading: isInitialLoadingPermissions } = useGetEntities<PermissionType>(
     {
       fields: ["id", "title", "code"],
       orderBy: [
@@ -164,7 +164,8 @@ export function ProjectLayout() {
     projectData?.data?.owner_id !== userData?.data?.id &&
     (projectData?.data?.members?.length === 0 || !projectData?.data?.members?.some((m) => m?.id === userData?.data?.id)) &&
     !isInitialLoading &&
-    !isInitialLoadingUser
+    !isInitialLoadingUser &&
+    !isInitialLoadingPermissions
   ) {
     createNotification({
       title: "You do not have access to this project.",
@@ -188,7 +189,7 @@ export function ProjectLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser || isLoading ? (
+          {isInitialLoading || isInitialLoadingUser || isLoading || isInitialLoadingPermissions ? (
             <Skeleton isFullWidth limit={10} type="table" />
           ) : (
             <Outlet />
@@ -213,3 +214,4 @@ export function AuthLayout({ children }: { children: JSX.Element | JSX.Element[]
     </div>
   );
 }
+
