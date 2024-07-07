@@ -30,7 +30,9 @@
 	encode gzip
 
 	# serve files from 'dist'
-	file_server
+	file_server {
+		 precompressed br
+	}
 
 	# if path doesn't exist, redirect it to 'index.html' for client side routing
 	try_files {path} /index.html.br
