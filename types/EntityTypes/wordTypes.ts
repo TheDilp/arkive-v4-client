@@ -2,6 +2,7 @@ import { EntityPermissionType } from "./baseEntityTypes";
 
 export interface WordType {
   id: string;
+  deleted_at: string;
   owner_id: string;
   title: string;
   translation: string;

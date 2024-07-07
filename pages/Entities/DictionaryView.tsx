@@ -5,10 +5,19 @@ import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Input, Select, Table } from "../../components";
-import { useDeleteMany, useGetEntities, useGetEntity, useHasPermissions, useNavbarTitle, useTable } from "../../hooks";
-import { DialogAtomType, DictionaryType, DrawerAtomType, WebhookType, WordType } from "../../types";
+import {
+  useDeleteMany,
+  useGetEntities,
+  useGetEntity,
+  useHasPermissions,
+  useNavbarTitle,
+  useTable,
+  useUpdateManyPublic,
+} from "../../hooks";
+import { DialogAtomType, DictionaryType, DrawerAtomType, UpdatePublicManyType, WebhookType, WordType } from "../../types";
 import {
   baseURLS,
+  BooleanFilters,
   dialogAtom,
   drawerAtom,
   FetchFunction,
@@ -29,7 +38,7 @@ function createColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   parent_id: string,
   webhooks: WebhookType[],
-  is_public?: boolean
+  updatePublicMany: UpdatePublicManyType
 ) {
   const columns: ColumnDef<any, any>[] = [
     columnHelper.accessor("title", {
@@ -50,8 +59,37 @@ function createColumns(
         filterOptions: TextFilters,
       },
     }),
+
+    columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+        filterOptions: BooleanFilters,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isDisabled={!!row.original.deleted_at}
+          isIconOnly
+          onClick={async () => {
+            await updatePublicMany({
+              data: {
+                ids: [row.original.id],
+                is_public: !row.original.is_public,
+              },
+            });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
   ];
-  if (!is_public)
+
+  if (!IS_PUBLIC)
     columns.push(
       columnHelper.display({
         id: "action",
@@ -88,7 +126,7 @@ function createColumns(
                   id: "send_to_discord",
                   title: "Send to Discord",
                   icon: IconEnum.discord,
-                  isDisabled: !is_public,
+                  isDisabled: !IS_PUBLIC,
                   subItems: webhooks.map((webhook) => ({
                     id: webhook.id,
                     title: webhook.title,
@@ -131,7 +169,7 @@ function createColumns(
       })
     );
 
-  if (is_public)
+  if (IS_PUBLIC)
     columns.push(
       columnHelper.display({
         id: "action",
@@ -167,6 +205,8 @@ export function DictionaryView({ id }: { id?: string }) {
   const [filter, setFilter] = useState("");
   const user = useAtomValue(userAtom);
   const [filterType, setFilterType] = useState<FilterType>("title");
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("words", project_id as string);
+
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const resetDialogAtom = useResetAtom(dialogAtom);
@@ -208,7 +248,7 @@ export function DictionaryView({ id }: { id?: string }) {
       data: {
         parent_id: item_id || id,
       },
-      fields: ["id", "title", "translation"],
+      fields: ["id", "title", "translation", "is_public"],
       filters,
       pagination,
       orderBy,
@@ -305,7 +345,7 @@ export function DictionaryView({ id }: { id?: string }) {
       </div>
       <div className="overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [])}
+          columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [], updatePublicMany)}
           config={{
             hasSelect: !id && !IS_PUBLIC,
             orderBy,
