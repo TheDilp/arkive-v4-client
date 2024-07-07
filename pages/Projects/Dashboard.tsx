@@ -328,11 +328,7 @@ export function Dashboard() {
                   <li className="w-full [&>div>span>div:has(button)]:ml-auto" key={r.id}>
                     <EntityPreview
                       hasNoBackground
-                      icon={
-                        "icon" in r
-                          ? r.icon
-                          : getDefaultEntityIcon(d.name as AvailableEntityType | AvailableSubEntityType)
-                      }
+                      icon={"icon" in r ? r.icon : getDefaultEntityIcon(d.name as AvailableEntityType | AvailableSubEntityType)}
                       id={r.id}
                       image_id={"portrait_id" in r ? r.portrait_id : null}
                       link={getEntityLink(
@@ -424,7 +420,7 @@ export function Dashboard() {
                             icon={icon}
                             id={id}
                             image_id={image_id}
-                            link={getEntityLink(project_id as string, entity_type, id, parent_id, false)}
+                            link={getEntityLink(project_id as string, entity_type, id, parent_id)}
                             title={title}
                             type={entity_type}
                           />
@@ -443,3 +439,4 @@ export function Dashboard() {
     </div>
   );
 }
+

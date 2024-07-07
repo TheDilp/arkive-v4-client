@@ -84,7 +84,7 @@ export function TemplateCharacterField({
               id={val?.character?.id}
               image_id={val?.character?.portrait_id}
               key={val?.character?.id}
-              link={getEntityLink(val?.character?.project_id || project_id || "", "characters", id, undefined, false)}
+              link={getEntityLink(val?.character?.project_id || project_id || "", "characters", id, undefined)}
               title={val?.character?.full_name || ""}
               type="characters"
             />
@@ -94,3 +94,4 @@ export function TemplateCharacterField({
     </TemplateFieldContainer>
   );
 }
+

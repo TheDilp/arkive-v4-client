@@ -401,7 +401,7 @@ function NotificationList({
                     {`${notif.user_name} ${`${notif.action}d`} ${getSingularEntityType(notif.entity_type)?.toLowerCase()} `}
                     <Link
                       className="text-nowrap font-semibold text-blue-400 transition-colors hover:text-blue-300 active:text-blue-500"
-                      to={getEntityLink(project_id as string, notif.entity_type, notif.related_id, notif.parent_id, false)}>
+                      to={getEntityLink(project_id as string, notif.entity_type, notif.related_id, notif.parent_id)}>
                       {notif.title}
                     </Link>
                   </p>
@@ -657,3 +657,4 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     </div>
   );
 }
+

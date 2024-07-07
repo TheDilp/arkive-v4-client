@@ -31,9 +31,9 @@ export function PublicEntityLayout({
 }) {
   const { project_id } = useParams();
   return (
-    <div className="flex h-full max-h-full w-full flex-col gap-y-2 overflow-hidden bg-zinc-900">
+    <div className="flex h-full max-h-full w-full flex-col gap-y-4 overflow-hidden bg-zinc-900">
       {title ? (
-        <h2 className="font-lato flex flex-nowrap items-start gap-x-4 px-4 pt-2 text-3xl">
+        <h2 className="font-lato flex flex-nowrap items-center gap-x-4 px-4 pt-2 text-3xl">
           {image_id ? <Avatar hasShowImage image={getImageURL(project_id as string, "images", image_id)} size="2xl" /> : null}
           <span>{title}</span>
         </h2>

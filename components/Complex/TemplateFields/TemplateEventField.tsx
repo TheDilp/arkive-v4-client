@@ -89,7 +89,7 @@ export function TemplateEventField({
               }
               id={val?.event?.id}
               key={val?.event.id}
-              link={getEntityLink(project_id as string, "events", id, val?.event.parent_id, false)}
+              link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
               title={val?.event.title}
               type="events"
             />
@@ -99,3 +99,4 @@ export function TemplateEventField({
     </TemplateFieldContainer>
   );
 }
+

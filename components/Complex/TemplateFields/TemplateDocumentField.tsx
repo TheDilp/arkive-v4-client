@@ -88,13 +88,7 @@ export function TemplateDocumentField({
               icon={val?.document?.icon || ""}
               id={val?.document?.id}
               key={val.document.id}
-              link={getEntityLink(
-                val?.document?.project_id || project_id || "",
-                "documents",
-                val.document?.id,
-                undefined,
-                false,
-              )}
+              link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
               title={val.document?.title}
               type="documents"
             />
@@ -104,3 +98,4 @@ export function TemplateDocumentField({
     </TemplateFieldContainer>
   );
 }
+

@@ -96,8 +96,7 @@ export function TemplateBlueprintField({
                 val?.blueprint_instance?.project_id || project_id || "",
                 "blueprint_instances",
                 id,
-                val?.blueprint_instance?.parent_id,
-                false,
+                val?.blueprint_instance?.parent_id
               )}
               title={val?.blueprint_instance?.title}
               type="blueprint_instances"
@@ -108,3 +107,4 @@ export function TemplateBlueprintField({
     </TemplateFieldContainer>
   );
 }
+

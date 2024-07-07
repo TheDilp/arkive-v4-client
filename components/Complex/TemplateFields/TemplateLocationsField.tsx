@@ -88,7 +88,7 @@ export function TemplateLocationsField({
               icon={val?.map_pin?.icon || ""}
               id={val?.map_pin?.id}
               key={val.map_pin?.id}
-              link={getEntityLink(project_id as string, "map_pins", id, undefined, false)}
+              link={getEntityLink(project_id as string, "map_pins", id, undefined)}
               title={val?.map_pin?.title || ""}
               type="map_pins"
             />
@@ -98,3 +98,4 @@ export function TemplateLocationsField({
     </TemplateFieldContainer>
   );
 }
+
