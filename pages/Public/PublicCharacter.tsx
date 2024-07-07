@@ -91,7 +91,7 @@ export function PublicCharacter() {
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>
       <div className="flex h-full flex-1 flex-col gap-y-2 overflow-auto px-2">
         <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
-          <div className="h-96 overflow-auto">
+          <div className="h-fit max-h-96 overflow-auto">
             {character?.data?.biography ? (
               <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
             ) : (
@@ -137,11 +137,13 @@ export function PublicCharacter() {
           </div>
         </Collapsible>
         <Collapsible icon={IconEnum.image} label="Images">
-          {character?.data?.images?.length ? (
-            <Gallery columns={6} images={character?.data?.images || []} isOpenable size="xl" type="images" />
-          ) : (
-            <Alert label="This character has no public images available." />
-          )}
+          <div className="p-2">
+            {character?.data?.images?.length ? (
+              <Gallery columns={6} images={character?.data?.images || []} isOpenable size="md" type="images" />
+            ) : (
+              <Alert label="This character has no public images available." />
+            )}
+          </div>
         </Collapsible>
         <Collapsible icon={IconEnum.search} label="Explore">
           <div className="h-full flex-1 p-2">
