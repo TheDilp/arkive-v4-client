@@ -121,8 +121,8 @@ function FolderViewSkeleton({ entity_type, limit = 20 }: Pick<SkeletonType, "ent
 function EditorSkeleton({ isFullWidth }: Pick<SkeletonType, "isFullWidth">) {
   return (
     <div
-      className={`flex min-h-[90%] max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:mx-auto ${
-        isFullWidth ? "lg:w-full" : "lg:w-[60%]"
+      className={`flex h-full max-w-full flex-1 overflow-y-auto rounded border border-zinc-800 lg:mx-auto ${
+        isFullWidth ? "lg:w-full" : "lg:max-w-5xl"
       }`}>
       <div className="relative flex h-full w-full flex-col content-start focus-visible:outline-none">
         <div className="flex flex-col gap-y-2 px-4 py-4">
@@ -363,3 +363,4 @@ export function Skeleton({ type, limit = 0, entity_type, isFullWidth }: Skeleton
   if (type === "sidebar") return <SidebarSkeleton />;
   return null;
 }
+
