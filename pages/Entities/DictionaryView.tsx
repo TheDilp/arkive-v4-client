@@ -59,34 +59,6 @@ function createColumns(
         filterOptions: TextFilters,
       },
     }),
-
-    columnHelper.display({
-      id: "is_public",
-      header: "",
-      meta: {
-        centered: true,
-        noLink: true,
-        filterOptions: BooleanFilters,
-      },
-      cell: ({ row }) => (
-        <Button
-          hasNoBackground
-          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-          isDisabled={!!row.original.deleted_at}
-          isIconOnly
-          onClick={async () => {
-            await updatePublicMany({
-              data: {
-                ids: [row.original.id],
-                is_public: !row.original.is_public,
-              },
-            });
-          }}
-        />
-      ),
-      minSize: 3.25,
-      maxSize: 3.25,
-    }),
   ];
 
   if (!IS_PUBLIC)
@@ -166,6 +138,33 @@ function createColumns(
             </Dropdown>
           </div>
         ),
+      }),
+      columnHelper.display({
+        id: "is_public",
+        header: "",
+        meta: {
+          centered: true,
+          noLink: true,
+          filterOptions: BooleanFilters,
+        },
+        cell: ({ row }) => (
+          <Button
+            hasNoBackground
+            icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+            isDisabled={!!row.original.deleted_at}
+            isIconOnly
+            onClick={async () => {
+              await updatePublicMany({
+                data: {
+                  ids: [row.original.id],
+                  is_public: !row.original.is_public,
+                },
+              });
+            }}
+          />
+        ),
+        minSize: 3.25,
+        maxSize: 3.25,
       })
     );
 
@@ -293,7 +292,7 @@ export function DictionaryView({ id }: { id?: string }) {
     return () => {};
   }, [filter, dispatch, filterType]);
 
-  if ((IS_PUBLIC && !data?.data?.is_public) || error) {
+  if ((IS_PUBLIC && !data?.data?.is_public && !isInitialLoading) || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
     return <Navigate to={`/${project_id}/dictionaries`} />;

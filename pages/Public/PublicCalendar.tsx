@@ -10,7 +10,11 @@ import { PublicEntityLayout } from "./PublicLayout";
 export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: boolean }) {
   const { project_id, item_id, event_id } = useParams();
   const createNotiifcation = useNotifications();
-  const { data: calendar, error } = useGetEntity<CalendarType>(
+  const {
+    data: calendar,
+    error,
+    isInitialLoading,
+  } = useGetEntity<CalendarType>(
     item_id,
     "calendars",
     {
@@ -31,7 +35,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
   if (error) throw new Error("No public access");
 
   if (!calendar?.data) return <Skeleton type="editor" />;
-  if (!calendar?.data?.is_public) {
+  if ((!calendar?.data?.is_public || error) && !isInitialLoading) {
     createNotiifcation({ title: "This entity is not public.", timer: 3, variant: "error", icon: IconEnum.error });
     return <Navigate to={`/${project_id}/calendars`} />;
   }

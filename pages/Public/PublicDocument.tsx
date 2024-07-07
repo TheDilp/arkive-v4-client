@@ -10,7 +10,11 @@ import { PublicEntityLayout } from "./PublicLayout";
 export function PublicDocument() {
   const { project_id, item_id, subitem_id } = useParams();
   const createNotification = useNotifications();
-  const { data: document, error } = useGetEntity<DocumentType>(
+  const {
+    data: document,
+    isInitialLoading,
+    error,
+  } = useGetEntity<DocumentType>(
     subitem_id || item_id,
     "documents",
     {
@@ -26,7 +30,7 @@ export function PublicDocument() {
   );
 
   if (!document?.data) return <Skeleton isFullWidth type="editor" />;
-  if (!document?.data?.is_public || error) {
+  if ((!document?.data?.is_public && !isInitialLoading) || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
     return <Navigate to={`/${project_id}/documents`} />;

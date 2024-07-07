@@ -9,7 +9,11 @@ import { PublicEntityLayout } from "./PublicLayout";
 export function PublicGraph() {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
-  const { data: graph, error } = useGetEntity<GraphType>(
+  const {
+    data: graph,
+    error,
+    isInitialLoading,
+  } = useGetEntity<GraphType>(
     item_id,
     "graphs",
     {
@@ -29,7 +33,7 @@ export function PublicGraph() {
   );
 
   if (!graph?.data) return <Skeleton type="editor" />;
-  if (!graph?.data?.is_public || error) {
+  if ((!graph?.data?.is_public || error) && !isInitialLoading) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/${project_id}/graphs`} />;
   }

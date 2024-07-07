@@ -38,6 +38,7 @@ export function PublicCharacter() {
   const {
     data: character,
     error,
+    isInitialLoading,
     // isLoading,
     // isFetching,
   } = useGetEntity<CharacterType>(
@@ -80,7 +81,7 @@ export function PublicCharacter() {
   );
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
-  if (!character?.data?.is_public || error) {
+  if ((!character?.data?.is_public || error) && !isInitialLoading) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
     return <Navigate to={`/${project_id}/characters`} />;

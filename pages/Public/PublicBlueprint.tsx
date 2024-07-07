@@ -9,7 +9,11 @@ import { PublicEntityLayout } from "./PublicLayout";
 export function PublicBlueprint() {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
-  const { data: blueprint_instance, error } = useGetSubEntity<BlueprintInstanceType>(
+  const {
+    data: blueprint_instance,
+    error,
+    isInitialLoading,
+  } = useGetSubEntity<BlueprintInstanceType>(
     item_id,
     "blueprint_instances",
     {
@@ -23,7 +27,7 @@ export function PublicBlueprint() {
     { staleTime: 3 * 60 * 1000 }
   );
 
-  const { data: blueprint } = useGetEntity<BlueprintType>(
+  const { data: blueprint, isInitialLoading: isInitialLoadingBlueprint } = useGetEntity<BlueprintType>(
     blueprint_instance?.data?.parent_id,
     "blueprints",
     {
@@ -44,7 +48,7 @@ export function PublicBlueprint() {
   );
 
   if (!blueprint_instance?.data) return <Skeleton type="character_profile_main" />;
-  if (!blueprint_instance?.data?.is_public || error) {
+  if ((!blueprint_instance?.data?.is_public || error) && !isInitialLoading && !isInitialLoadingBlueprint) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/${project_id}/blueprints`} />;
   }

@@ -34,7 +34,7 @@ export function PublicMap() {
     }
   );
   if (!map?.data) return <Skeleton type="project_view" />;
-  if (!map?.data?.is_public || error) {
+  if ((!map?.data?.is_public || error) && !isInitialLoading) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
     return <Navigate to={`/${project_id}/maps`} />;
   }
