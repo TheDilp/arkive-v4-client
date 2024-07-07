@@ -59,7 +59,6 @@ export default ({ mode }) =>
             if (id.includes("cytoscape")) return "cytoscape";
             if (id.includes("lodash")) return "lodash";
             if (id.includes("@tanstack")) return "@tanstack";
-            if (id.includes("remirror") || id.includes("prosemirror")) return "remirror";
 
             return "vendor";
           },
