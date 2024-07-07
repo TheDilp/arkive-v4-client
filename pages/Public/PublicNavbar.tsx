@@ -5,12 +5,13 @@ import { capitalCase } from "remirror";
 import { Button, Search } from "../../components";
 import { useGetEntity } from "../../hooks";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../types";
-import { getDefaultEntityIcon, getEntityLink, getImageURL, IconEnum } from "../../utils";
+import { getDefaultEntityIcon, getEntityLink, getImageURL, getThumbnailUrl, IconEnum } from "../../utils";
 
 const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
+
   const [results, setResults] = useState<
     { name: string; result: { id: string; label: string; image?: string; parent_id?: string }[] }[] | null
   >(null);
@@ -30,6 +31,14 @@ export function PublicNavbar() {
 
   useLayoutEffect(() => {
     if (project?.data) {
+      const tabIconEl = document.getElementById("wiki-icon") as HTMLLinkElement;
+
+      if (tabIconEl && project?.data?.image_id)
+        tabIconEl.href = getThumbnailUrl(getImageURL(project_id as string, "images", project?.data?.image_id), {
+          width: 32,
+          height: 32,
+        });
+
       document.title = `${project?.data?.title || "The Arkive"} wiki`;
     }
   }, [project]);
@@ -43,7 +52,14 @@ export function PublicNavbar() {
           <img
             alt="Logo"
             className="relative -left-1 min-w-14 object-contain"
-            src={getImageURL(project_id as string, "images", project?.data?.image_id) || "/Logo.webp"}
+            src={
+              project?.data?.image_id
+                ? getThumbnailUrl(getImageURL(project_id as string, "images", project?.data?.image_id), {
+                    width: 256,
+                    height: 256,
+                  })
+                : "/Logo.webp"
+            }
           />
         </div>
         <div className="flex flex-col items-start">
