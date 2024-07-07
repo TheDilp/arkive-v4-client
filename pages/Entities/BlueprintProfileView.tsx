@@ -16,7 +16,7 @@ import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNav
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
 
-const tabs = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
+const tabs = [{ id: "1", label: "Basic info", icon: IS_PUBLIC ? null : IconEnum.info_circle }];
 
 export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id?: string }) {
   const { project_id, item_id, subitem_id } = useParams();

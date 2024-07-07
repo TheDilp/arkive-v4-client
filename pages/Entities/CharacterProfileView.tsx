@@ -98,11 +98,11 @@ type GenerateDocumentType = UseMutateAsyncFunction<
 >;
 
 const tabs = [
-  { id: "0", label: "Biography", icon: IconEnum.biography },
-  { id: "1", label: "Additional fields", icon: IconEnum.additional_fields },
-  { id: "2", label: "Relationships", icon: IconEnum.family_tree },
-  { id: "3", label: "Resources", icon: IconEnum.document },
-  { id: "4", label: "Conversations", icon: IconEnum.conversation },
+  { id: "0", label: "Biography", icon: IS_PUBLIC ? null : IconEnum.biography },
+  { id: "1", label: "Additional fields", icon: IS_PUBLIC ? null : IconEnum.additional_fields },
+  { id: "2", label: "Relationships", icon: IS_PUBLIC ? null : IconEnum.family_tree },
+  { id: "3", label: "Resources", icon: IS_PUBLIC ? null : IconEnum.document },
+  { id: "4", label: "Conversations", icon: IS_PUBLIC ? null : IconEnum.conversation },
 ];
 
 function relationshipTableColumns(
