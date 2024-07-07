@@ -21,7 +21,7 @@ export default ({ mode }) =>
           },
         },
       }),
-      compression({ algorithm: "brotliCompress" }),
+      compression({ algorithm: "gzip", deleteOriginalAssets: true }),
     ],
     server: {
       fs: {
