@@ -22,8 +22,9 @@ export function PublicEntitiesView() {
   if (type === "dictionaries")
     return (
       <div className="p-2">
-        <DictionaryView isPublic />
+        <DictionaryView />
       </div>
     );
   return null;
 }
+

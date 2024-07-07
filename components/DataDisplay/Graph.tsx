@@ -43,13 +43,12 @@ type Props = {
   data?: Partial<GraphType>;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
-  isPublic?: boolean;
   center_on?: string;
   isFamilyTreeView?: boolean;
   layoutOptions?: Partial<LayoutOptions> & { rankDir?: "LR" | "TB" };
 };
 
-export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFamilyTreeView, layoutOptions }: Props) {
+export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeView, layoutOptions }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const dialogValue = useAtomValue(dialogAtom);
@@ -62,7 +61,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
       relations: { nodes: true, edges: true, parents: true },
       permissions: true,
     },
-    { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view", item_id as string], isPublic }
+    { enabled: !data, queryKeyOverwrite: data ? undefined : ["graph_view", item_id as string] }
   );
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
@@ -654,7 +653,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
   }, [boardState.draw_mode, cyRef?.current?._cy, ehRef?.current]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
-      cyRef?.current?._cy?.gridGuide?.({ ...cytoscapeGridOptions, drawGrid: !isPublic });
+      cyRef?.current?._cy?.gridGuide?.({ ...cytoscapeGridOptions, drawGrid: !IS_PUBLIC });
     }
   }, [boardState.grid, cyRef?.current?._cy]);
   useEffect(() => {
@@ -720,7 +719,7 @@ export function Graph({ data, isReadOnly, isViewOnly, isPublic, center_on, isFam
         className={`absolute z-10 flex h-full w-full items-center justify-center bg-black ${isInitialLoading ? "" : "hidden"}`}>
         {isInitialLoading ? <Spinner /> : null}
       </div>
-      {isFamilyTreeView && !isPublic ? (
+      {isFamilyTreeView && !IS_PUBLIC ? (
         <div className="ml-auto w-min">
           <Button
             icon={IconEnum.add}

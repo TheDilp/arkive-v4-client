@@ -23,7 +23,9 @@
     "sourceType": "module"
   },
   "globals": {
-    "JSX": true
+    "JSX": true,
+    "IS_PUBLIC": "readonly",
+    "APP_VERSION": "readonly"
   },
   "root": true,
   "plugins": ["react", "react-hooks", "simple-import-sort", "import", "@typescript-eslint", "eslint-plugin-import"],
@@ -77,3 +79,4 @@
     "object-curly-newline": "off"
   }
 }
+

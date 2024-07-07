@@ -87,7 +87,6 @@ export function useGetEntity<EntityType>(
   options?: UseQueryOptions<any> & {
     queryKeyOverwrite?: string[];
     queryKeyConcat?: string[];
-    isPublic?: boolean;
   }
 ) {
   const createNotification = useNotifications();
@@ -104,10 +103,9 @@ export function useGetEntity<EntityType>(
       const data = await FetchFunction({
         method: "POST",
         body: JSON.stringify(body),
-        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
-        isPublic: options?.isPublic,
+        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
       });
-      if (!data?.role_access && !options?.isPublic) {
+      if (!data?.role_access && !IS_PUBLIC) {
         createNotification({
           title: `Your current role in this project does not have permission to view this ${getSingularEntityType(type)}.`,
           timer: 5,
@@ -133,7 +131,6 @@ export function useGetSubEntity<EntityType>(
   options?: UseQueryOptions & {
     queryKeyOverwrite?: string[];
     queryKeyConcat?: string[];
-    isPublic?: boolean;
   }
 ) {
   return useQuery<{ data: EntityType }>(
@@ -142,7 +139,7 @@ export function useGetSubEntity<EntityType>(
       FetchFunction({
         method: "POST",
         body: JSON.stringify(body),
-        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type}/${id}`,
+        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type}/${id}`,
       }),
     {
       enabled: options?.enabled,
@@ -159,7 +156,6 @@ export function useGetEntities<ReturnType>(
     prefetch?: boolean;
     queryKeyOverwrite?: (string | number | Record<any, any>)[];
     queryKeyConcat?: (string | number | Record<any, any>)[];
-    isPublic?: boolean;
   }
 ) {
   const createNotification = useNotifications();
@@ -183,8 +179,7 @@ export function useGetEntities<ReturnType>(
     } = await FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
-      isPublic: options?.isPublic,
+      url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
     });
     if (!data?.role_access) {
       createNotification({
@@ -325,7 +320,6 @@ export function useSearch<ReturnType>(
   isGlobal?: boolean,
   options?: UseQueryOptions<any> & {
     queryKeyConcat?: string[];
-    isPublic?: boolean;
     isFolders?: boolean;
   }
 ) {
@@ -333,14 +327,13 @@ export function useSearch<ReturnType>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
       if (type) {
-        const baseUrl = options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer;
+        const baseUrl = IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer;
         return FetchFunction({
           url: `${baseUrl}/search/${
             isGlobal ? "global/" : `${project_id}/`
           }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? `/${type}` : ""}`,
           method: "POST",
           body: JSON.stringify(request),
-          isPublic: options?.isPublic,
         });
       }
       return { data: [], ok: false, role_access: true };
@@ -352,7 +345,7 @@ export function useGetCharacterFamily(
   character_id: string | undefined,
   relationship_type_id: string,
   count?: string,
-  options?: UseQueryOptions & { isPublic?: boolean }
+  options?: UseQueryOptions
 ) {
   return useQuery(
     ["family", character_id, relationship_type_id, count || "5"],
@@ -360,7 +353,7 @@ export function useGetCharacterFamily(
       FetchFunction({
         method: "GET",
         url: `${
-          options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer
+          IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer
         }/characters/family/${relationship_type_id}/${character_id}/${count || "5"}`,
       }),
     {

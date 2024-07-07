@@ -197,7 +197,6 @@ export function Search({
   manualResults,
   onSearch,
   size,
-  isPublic,
   parent_id,
   manual_project_id,
 }: SearchType) {
@@ -252,7 +251,6 @@ export function Search({
     {
       enabled: false,
       queryKeyConcat: [searchTerm, name],
-      isPublic,
       isFolders,
     }
   );
@@ -524,7 +522,7 @@ export function Search({
               ))}
 
               {/* If no results for public search display NO RESULTS */}
-              {isPublic && data?.data?.length && !manualResults?.length ? (
+              {IS_PUBLIC && data?.data?.length && !manualResults?.length ? (
                 <Item
                   {...getItemProps({
                     key: "no_results",

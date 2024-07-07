@@ -97,12 +97,10 @@ function DateField({ fieldData, field }: { fieldData: BlueprintInstanceBlueprint
 
 export function AdditionalBlueprintFieldDisplay({
   isPreview,
-  isPublic,
   blueprint_field,
   blueprint_field_data,
 }: {
   isPreview: boolean;
-  isPublic?: boolean;
   blueprint_field: BlueprintFieldType;
   blueprint_field_data: BlueprintInstanceBlueprintFieldType;
 }) {
@@ -168,7 +166,6 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <GroupEntityPreview
               field_label={blueprint_field.title}
-              isPublic={isPublic}
               items={(blueprint_field_data.characters || [])
                 .filter((char) => !!char.character)
                 .map((char) => ({
@@ -176,7 +173,7 @@ export function AdditionalBlueprintFieldDisplay({
                   title: char.character.full_name || "",
                   image_id: char.character.portrait_id,
                   type: "characters",
-                  link: getEntityLink(project_id as string, "characters", char.related_id, undefined, isPublic),
+                  link: getEntityLink(project_id as string, "characters", char.related_id, undefined),
                 }))}
             />
           </div>
@@ -185,7 +182,6 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <GroupEntityPreview
               field_label={blueprint_field.title}
-              isPublic={isPublic}
               items={(blueprint_field_data.blueprint_instances || [])
                 .filter((bpi) => !!bpi.blueprint_instance)
                 .map((blueprint_instance) => ({
@@ -198,8 +194,7 @@ export function AdditionalBlueprintFieldDisplay({
                     project_id as string,
                     "blueprint_instances",
                     blueprint_instance.related_id,
-                    blueprint_instance.blueprint_instance.parent_id,
-                    isPublic
+                    blueprint_instance.blueprint_instance.parent_id
                   ),
                 }))}
             />
@@ -209,7 +204,6 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <GroupEntityPreview
               field_label={blueprint_field.title}
-              isPublic={isPublic}
               items={(blueprint_field_data.documents || [])
                 .filter((d) => !!d.document)
                 .map((doc) => ({
@@ -217,7 +211,7 @@ export function AdditionalBlueprintFieldDisplay({
                   title: doc.document.title,
                   icon: doc.document.icon || IconEnum.document,
                   type: "documents",
-                  link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
+                  link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined),
                 }))}
             />
           </div>
@@ -226,7 +220,6 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <GroupEntityPreview
               field_label={blueprint_field.title}
-              isPublic={isPublic}
               items={(blueprint_field_data.map_pins || [])
                 .filter((m) => !!m.map_pin)
                 .map((map_pin) => ({
@@ -235,13 +228,7 @@ export function AdditionalBlueprintFieldDisplay({
                   title: map_pin.map_pin.title || "",
                   icon: map_pin.map_pin.icon || IconEnum.document,
                   type: "map_pins",
-                  link: getEntityLink(
-                    project_id as string,
-                    "map_pins",
-                    map_pin.related_id,
-                    map_pin.map_pin.parent_id,
-                    isPublic
-                  ),
+                  link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id),
                 }))}
             />
           </div>
@@ -250,7 +237,6 @@ export function AdditionalBlueprintFieldDisplay({
           <div className="grid w-full grid-cols-6 gap-1 truncate">
             <GroupEntityPreview
               field_label={blueprint_field.title}
-              isPublic={isPublic}
               items={
                 blueprint_field_data?.images?.[0]
                   ? [
@@ -294,3 +280,4 @@ export function AdditionalBlueprintFieldDisplay({
     </Tooltip>
   );
 }
+

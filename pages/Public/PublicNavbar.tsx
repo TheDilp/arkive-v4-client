@@ -25,7 +25,6 @@ export function PublicNavbar() {
     {
       staleTime: Infinity,
       queryKeyConcat: ["public"],
-      isPublic: true,
     }
   );
   const navigate = useNavigate();
@@ -60,7 +59,6 @@ export function PublicNavbar() {
           <Search
             hasNoBackground
             imageType="images"
-            isPublic
             manualResults={(results || []).flatMap((result) =>
               result.result.map((r) => {
                 return {
@@ -77,7 +75,7 @@ export function PublicNavbar() {
             )}
             name="search"
             onChange={({ type: searchType, value, parent_id }) => {
-              navigate(getEntityLink(project_id as string, searchType as string, value, parent_id, true));
+              navigate(getEntityLink(project_id as string, searchType as string, value, parent_id));
               setResults(null);
             }}
             onSearch={(res) => setResults(res)}

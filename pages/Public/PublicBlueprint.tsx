@@ -20,7 +20,7 @@ export function PublicBlueprint() {
         tags: true,
       },
     },
-    { isPublic: true, staleTime: 3 * 60 * 1000 }
+    { staleTime: 3 * 60 * 1000 }
   );
 
   const { data: blueprint } = useGetEntity<BlueprintType>(
@@ -38,7 +38,7 @@ export function PublicBlueprint() {
     },
     {
       enabled: !!blueprint_instance?.data?.parent_id && blueprint_instance?.data?.is_public,
-      isPublic: true,
+
       staleTime: 3 * 60 * 1000,
     }
   );
@@ -64,7 +64,6 @@ export function PublicBlueprint() {
                         blueprint_field={blueprintField}
                         blueprint_field_data={blueprint_field}
                         isPreview={!!item_id}
-                        isPublic
                         key={blueprint_field.id}
                       />
                     );

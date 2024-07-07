@@ -3,18 +3,15 @@ export async function FetchFunction({
   url,
   method,
   body,
-  isPublic = false,
 }: {
   url: string;
   method: AllowedMethodsType;
   body?: string | FormData;
-  isPublic?: boolean;
 }) {
   const fetchParams: {
     method: AllowedMethodsType;
     headers: Record<string, string>;
     body?: string | FormData;
-    isPublic?: boolean;
     credentials?: string;
   } = {
     method,
@@ -25,7 +22,7 @@ export async function FetchFunction({
     },
   };
 
-  if (isPublic === false || isPublic === undefined) {
+  if (IS_PUBLIC === false || IS_PUBLIC === undefined) {
     fetchParams.credentials = "include";
   }
 

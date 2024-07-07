@@ -16,7 +16,6 @@ type Props = {
   label: string;
   project_id: string | undefined;
   parent_id: string | undefined;
-  isPublic?: boolean;
 };
 
 function MapPinMentionTooltip({ id, parent_id, project_id }: Pick<Props, "id" | "parent_id" | "project_id">) {
@@ -40,7 +39,7 @@ function MapPinMentionTooltip({ id, parent_id, project_id }: Pick<Props, "id" | 
   );
 }
 
-export function MapPinMention({ title, id, label, project_id, isPublic, parent_id }: Props) {
+export function MapPinMention({ title, id, label, project_id, parent_id }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isFetched, isPaused, refetch } = useGetSubEntity<MapPinType>(
     id as string,
@@ -48,7 +47,7 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
     {
       fields: ["title", "icon", "image_id", "is_public"],
     },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -75,7 +74,7 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline decoration-wavy" ref={mentionRef}>
@@ -92,15 +91,8 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
     return (
       <Tooltip arrowColor="#3f3f46" content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
         <Link
-          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
-          to={getMentionLink(
-            id as string,
-            "map_pins",
-            project_id as string,
-            data?.data?.is_public ?? false,
-            isPublic,
-            parent_id
-          )}>
+          className="font-lato inline-flex items-center text-sm font-bold transition-colors"
+          to={getMentionLink(id as string, "map_pins", project_id as string, data?.data?.is_public ?? false, parent_id)}>
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.image_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
@@ -118,3 +110,4 @@ export function MapPinMention({ title, id, label, project_id, isPublic, parent_i
     );
   }
 }
+

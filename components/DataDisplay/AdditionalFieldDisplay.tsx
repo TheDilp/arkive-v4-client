@@ -89,12 +89,10 @@ function DateField({ fieldData, field }: { fieldData: CharacterCharacterFieldTyp
 
 export function AdditionalFieldDisplay({
   isPreview,
-  isPublic,
   character_field,
   character_field_data,
 }: {
   isPreview: boolean;
-  isPublic?: boolean;
   character_field: CharacterFieldType;
   character_field_data: CharacterCharacterFieldType | null;
 }) {
@@ -138,7 +136,6 @@ export function AdditionalFieldDisplay({
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <GroupEntityPreview
             field_label={character_field.title}
-            isPublic={isPublic}
             items={(character_field_data?.characters || [])
               .filter((character) => !!character.character)
               .map((character) => ({
@@ -148,7 +145,7 @@ export function AdditionalFieldDisplay({
                 image_id: character?.character?.portrait_id,
                 icon: IconEnum.character,
                 type: "characters",
-                link: getEntityLink(project_id as string, "characters", character.related_id, null, isPublic),
+                link: getEntityLink(project_id as string, "characters", character.related_id, null),
               }))}
           />
         </div>
@@ -157,7 +154,6 @@ export function AdditionalFieldDisplay({
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <GroupEntityPreview
             field_label={character_field.title}
-            isPublic={isPublic}
             items={(character_field_data?.blueprint_instances || [])
               .filter((blueprint_instance) => !!blueprint_instance.blueprint_instance)
               .map((blueprint_instance) => ({
@@ -170,8 +166,7 @@ export function AdditionalFieldDisplay({
                   project_id as string,
                   "blueprint_instances",
                   blueprint_instance.related_id,
-                  blueprint_instance.blueprint_instance.parent_id,
-                  isPublic
+                  blueprint_instance.blueprint_instance.parent_id
                 ),
               }))}
           />
@@ -181,7 +176,6 @@ export function AdditionalFieldDisplay({
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <GroupEntityPreview
             field_label={character_field.title}
-            isPublic={isPublic}
             items={(character_field_data?.documents || [])
               .filter((doc) => !!doc.document)
               .map((doc) => ({
@@ -189,7 +183,7 @@ export function AdditionalFieldDisplay({
                 title: doc.document.title,
                 icon: doc.document.icon || IconEnum.document,
                 type: "documents" as const,
-                link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined, isPublic),
+                link: getEntityLink(project_id as string, "documemnts", doc.related_id, undefined),
               }))}
           />
         </div>
@@ -198,7 +192,6 @@ export function AdditionalFieldDisplay({
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <GroupEntityPreview
             field_label={character_field.title}
-            isPublic={isPublic}
             items={(character_field_data?.map_pins || [])
               .filter((map_pin) => !!map_pin.map_pin)
               .map((map_pin) => ({
@@ -207,7 +200,7 @@ export function AdditionalFieldDisplay({
                 title: map_pin.map_pin.title || "",
                 icon: map_pin.map_pin.icon || IconEnum.document,
                 type: "map_pins",
-                link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id, isPublic),
+                link: getEntityLink(project_id as string, "map_pins", map_pin.related_id, map_pin.map_pin.parent_id),
               }))}
           />
         </div>
@@ -216,7 +209,6 @@ export function AdditionalFieldDisplay({
         <div className="grid w-full grid-cols-6 gap-1 truncate">
           <GroupEntityPreview
             field_label={character_field.title}
-            isPublic={isPublic}
             items={(character_field_data?.events || [])
               .filter((event) => !!event.event)
               .map((event) => ({
@@ -225,7 +217,7 @@ export function AdditionalFieldDisplay({
                 title: event.event.title || "",
                 icon: IconEnum.event,
                 type: "events",
-                link: getEntityLink(project_id as string, "events", event.related_id, event.event.parent_id, isPublic),
+                link: getEntityLink(project_id as string, "events", event.related_id, event.event.parent_id),
               }))}
           />
         </div>
@@ -266,3 +258,4 @@ export function AdditionalFieldDisplay({
     </div>
   );
 }
+

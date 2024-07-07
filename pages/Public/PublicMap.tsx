@@ -30,7 +30,6 @@ export function PublicMap() {
     },
     {
       queryKeyConcat: ["public"],
-      isPublic: true,
       retry: false,
     }
   );
@@ -45,7 +44,7 @@ export function PublicMap() {
       {isInitialLoading ? (
         <Skeleton type="project_view" />
       ) : (
-        <MapView center_on={map_pin_id} data={map?.data} isPublic isReadOnly isViewOnly />
+        <MapView center_on={map_pin_id} data={map?.data} isReadOnly isViewOnly />
       )}
     </PublicEntityLayout>
   );

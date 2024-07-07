@@ -11,7 +11,7 @@ export function PublicLayout() {
       <Dialog />
       <div className="mx-auto flex max-h-full w-full flex-1 flex-col lg:max-w-5xl">
         <PublicNavbar />
-        <Drawer isPublic />
+        <Drawer />
         <div className="flex-1 overflow-auto rounded border border-zinc-700">
           <Outlet />
         </div>
@@ -33,7 +33,7 @@ export function PublicEntityLayout({
   return (
     <div className="flex h-full max-h-full w-full flex-col gap-y-2 overflow-hidden bg-zinc-900">
       {title ? (
-        <h2 className="flex flex-nowrap items-start gap-x-4 px-4 pt-2 font-lato text-3xl">
+        <h2 className="font-lato flex flex-nowrap items-start gap-x-4 px-4 pt-2 text-3xl">
           {image_id ? <Avatar hasShowImage image={getImageURL(project_id as string, "images", image_id)} size="2xl" /> : null}
           <span>{title}</span>
         </h2>
@@ -42,3 +42,4 @@ export function PublicEntityLayout({
     </div>
   );
 }
+

@@ -8,6 +8,8 @@ export interface WordType {
   parent_id: string;
   description?: string;
   permissions: EntityPermissionType[];
+  is_public: boolean | null;
 }
 
 export type WordStateType = Partial<WordType>;
+

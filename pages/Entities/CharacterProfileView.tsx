@@ -761,7 +761,7 @@ function conversationTableColumns(
   ];
 }
 
-export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string; isPreview?: boolean; isPublic?: boolean }) {
+export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview?: boolean }) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
@@ -800,7 +800,6 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     },
     {
       staleTime: 60 * 1000,
-      isPublic,
     }
   );
   const { mutateAsync: downloadImages } = useDownloadImages(project_id, "images");
@@ -1009,7 +1008,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                   setSelectedTab(index);
                 }}
                 selectedTab={selectedTab}
-                tabs={isPublic ? tabs.slice(0, 4) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
+                tabs={IS_PUBLIC ? tabs.slice(0, 4) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
               />
             </div>
           </div>
@@ -1025,7 +1024,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
-              tabs={isPublic ? tabs.slice(0, 4) : tabs}
+              tabs={IS_PUBLIC ? tabs.slice(0, 4) : tabs}
             />
           </div>
         ) : null}
@@ -1133,7 +1132,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
               <Collapsible
                 actions={
-                  isPublic
+                  IS_PUBLIC
                     ? []
                     : [
                         {
@@ -1211,7 +1210,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                         expandable: true,
                         hasNoHeaderGap: true,
                         getLink: (rowData: EventType) =>
-                          getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id, isPublic),
+                          getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id),
                       }}
                       data={existingCharacter?.data?.events || []}
                       dispatch={dispatch}
@@ -1226,7 +1225,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
               </Collapsible>
               <Collapsible
                 actions={
-                  isPublic
+                  IS_PUBLIC
                     ? []
                     : [
                         {
@@ -1285,7 +1284,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
 
               <Collapsible
                 actions={
-                  isPublic
+                  IS_PUBLIC
                     ? []
                     : [
                         {

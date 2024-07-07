@@ -4,14 +4,7 @@ import { RemirrorJSON } from "remirror";
 import { useGetEntity, useGetImage } from "../../../hooks";
 import { CalendarView, CharacterProfileView, DictionaryView, MapView } from "../../../pages/Entities";
 import { BlueprintProfileView } from "../../../pages/Entities/BlueprintProfileView";
-import {
-  AssetType,
-  AvailableEntityType,
-  AvailableSubEntityType,
-  DocumentType,
-  GraphType,
-  MapType,
-} from "../../../types";
+import { AssetType, AvailableEntityType, AvailableSubEntityType, DocumentType, GraphType, MapType } from "../../../types";
 import { getEntityLink, getSingularEntityType, IconEnum } from "../../../utils";
 import { StaticRender } from "../../Complex";
 import { Graph, Image } from "../../DataDisplay";
@@ -20,13 +13,13 @@ import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { EventDrawer } from "./EventDrawer";
 
-function CharacterPreviewDrawer({ id, isPublic }: { id: string; isPublic?: boolean }) {
-  return <CharacterProfileView id={id} isPreview isPublic={isPublic} />;
+function CharacterPreviewDrawer({ id }: { id: string }) {
+  return <CharacterProfileView id={id} isPreview />;
 }
-function BlueprintPreviewDrawer({ id, parent_id, isPublic }: { id: string; parent_id?: string; isPublic?: boolean }) {
-  return <BlueprintProfileView id={id} isPublic={isPublic} parent_id={parent_id} />;
+function BlueprintPreviewDrawer({ id, parent_id }: { id: string; parent_id?: string }) {
+  return <BlueprintProfileView id={id} parent_id={parent_id} />;
 }
-function DocumentPreviewDrawer({ id, isPublic }: { id: string; isPublic?: boolean }) {
+function DocumentPreviewDrawer({ id }: { id: string }) {
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
@@ -35,7 +28,6 @@ function DocumentPreviewDrawer({ id, isPublic }: { id: string; isPublic?: boolea
       fields: ["title", "content", "project_id"],
     },
     {
-      isPublic,
       enabled: !!id,
     }
   );
@@ -57,7 +49,7 @@ function DocumentPreviewDrawer({ id, isPublic }: { id: string; isPublic?: boolea
     </div>
   );
 }
-function MapPreviewDrawer({ id, subitem_id, isPublic }: { id?: string; subitem_id?: string; isPublic?: boolean }) {
+function MapPreviewDrawer({ id, subitem_id }: { id?: string; subitem_id?: string }) {
   const { data: existingMap, isLoading } = useGetEntity<MapType>(
     id,
     "maps",
@@ -67,7 +59,6 @@ function MapPreviewDrawer({ id, subitem_id, isPublic }: { id?: string; subitem_i
       relations: { map_pins: true, map_layers: true },
     },
     {
-      isPublic,
       enabled: !!id,
     }
   );
@@ -79,7 +70,7 @@ function MapPreviewDrawer({ id, subitem_id, isPublic }: { id?: string; subitem_i
     </div>
   );
 }
-function GraphPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boolean }) {
+function GraphPreviewDrawer({ id }: { id?: string }) {
   const { data: graph, isLoading } = useGetEntity<GraphType>(
     id,
     "graphs",
@@ -89,7 +80,6 @@ function GraphPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boolean 
       relations: { nodes: true, edges: true },
     },
     {
-      isPublic,
       enabled: !!id,
     }
   );
@@ -103,14 +93,14 @@ function GraphPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boolean 
     );
   if (!graph?.data) return <Alert label="Could not get graph." variant="error" />;
 }
-function DictionaryPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boolean }) {
-  return <DictionaryView id={id} isPublic={isPublic} />;
+function DictionaryPreviewDrawer({ id }: { id?: string }) {
+  return <DictionaryView id={id} />;
 }
-function CalendarPreviewDrawer({ id, isPublic }: { id?: string; isPublic?: boolean }) {
-  return <CalendarView id={id} isPublic={isPublic} />;
+function CalendarPreviewDrawer({ id }: { id?: string }) {
+  return <CalendarView id={id} />;
 }
-function EventPreviewDrawer({ id, parent_id, isPublic }: { id?: string; parent_id?: string; isPublic?: boolean }) {
-  return <EventDrawer data={{ id, parent_id, isReadOnly: true, isPublic }} exceptions={{}} />;
+function EventPreviewDrawer({ id, parent_id }: { id?: string; parent_id?: string }) {
+  return <EventDrawer data={{ id, parent_id, isReadOnly: true }} exceptions={{}} />;
 }
 function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetType; project_id: string }) {
   const { data, isFetching } = useGetImage(id, project_id, type, { fields: [] });
@@ -125,10 +115,8 @@ function ImagePreviewDrawer({ id, type, project_id }: { id: string; type: AssetT
 }
 
 export function EntityPreviewDrawer({
-  isPublic,
   data,
 }: {
-  isPublic?: boolean;
   data:
     | { id: string; parent_id?: string; entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType }
     | {
@@ -142,26 +130,26 @@ export function EntityPreviewDrawer({
   return (
     <DrawerLayout>
       <div className="flex-1 overflow-y-auto">
-        {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
+        {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "blueprint_instances" && "parent_id" in data ? (
-          <BlueprintPreviewDrawer id={data.id} isPublic={isPublic} parent_id={data.parent_id} />
+          <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} />
         ) : null}
-        {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
-        {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
+        {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "map_pins" && "parent_id" in data ? (
-          <MapPreviewDrawer id={data.parent_id} isPublic={isPublic} subitem_id={data?.id} />
+          <MapPreviewDrawer id={data.parent_id} subitem_id={data?.id} />
         ) : null}
-        {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
-        {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
-        {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} isPublic={isPublic} /> : null}
+        {data.entity_type === "graphs" ? <GraphPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "dictionaries" ? <DictionaryPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "calendars" ? <CalendarPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "events" && "parent_id" in data ? (
-          <EventPreviewDrawer id={data.id} isPublic={isPublic} parent_id={data.parent_id} />
+          <EventPreviewDrawer id={data.id} parent_id={data.parent_id} />
         ) : null}
         {data.entity_type === "images" && "image_type" in data && data?.image_type ? (
           <ImagePreviewDrawer id={data.id} project_id={project_id as string} type={data.image_type} />
         ) : null}
       </div>
-      {isPublic ? null : (
+      {IS_PUBLIC ? null : (
         <div className="">
           <Button
             icon={IconEnum.edit}
@@ -172,8 +160,7 @@ export function EntityPreviewDrawer({
                   project_id as string,
                   data.entity_type as AvailableEntityType,
                   data.id,
-                  "parent_id" in data ? data?.parent_id || "" : "",
-                  isPublic
+                  "parent_id" in data ? data?.parent_id || "" : ""
                 )
               )
             }
@@ -184,3 +171,4 @@ export function EntityPreviewDrawer({
     </DrawerLayout>
   );
 }
+

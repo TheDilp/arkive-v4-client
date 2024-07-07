@@ -24,7 +24,6 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
     },
     {
       queryKeyConcat: ["public"],
-      isPublic: true,
       retry: false,
     }
   );
@@ -38,7 +37,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
   }
   return (
     <PublicEntityLayout title={calendar?.data?.title}>
-      <CalendarView data={calendar?.data} event_id={event_id} id={item_id} isCharacterCalendar={isCharacterCalendar} isPublic />
+      <CalendarView data={calendar?.data} event_id={event_id} id={item_id} isCharacterCalendar={isCharacterCalendar} />
     </PublicEntityLayout>
   );
 }

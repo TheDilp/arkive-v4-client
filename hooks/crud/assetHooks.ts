@@ -132,7 +132,6 @@ export function useGetImage(
   type: AssetType,
   request: RequestBodyType<ImageType>,
   options?: UseQueryOptions<{ data: ImageType }, any, { data: ImageType }> & {
-    isPublic?: boolean;
     queryKeyConcat?: string[];
     queryKeyOverwrite?: string[];
   }
@@ -143,7 +142,7 @@ export function useGetImage(
       FetchFunction({
         method: "POST",
         body: JSON.stringify(request),
-        url: `${options?.isPublic ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${project_id}/${type}/${id}`,
+        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/assets/${project_id}/${type}/${id}`,
       }),
     {
       enabled: options?.enabled,
@@ -314,3 +313,4 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
     }
   );
 }
+

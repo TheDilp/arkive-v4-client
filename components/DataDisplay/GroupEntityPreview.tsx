@@ -9,10 +9,9 @@ import { EntityPreview } from "./EntityPreview";
 type Props = {
   items: ItemPreviewType[];
   field_label: string;
-  isPublic?: boolean;
 };
 
-export function GroupEntityPreview({ items, field_label, isPublic }: Props) {
+export function GroupEntityPreview({ items, field_label }: Props) {
   const { project_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   return (
@@ -30,7 +29,7 @@ export function GroupEntityPreview({ items, field_label, isPublic }: Props) {
               icon={item ? item?.icon : undefined}
               id={item?.id}
               image_id={item?.image_id}
-              link={item.link || getEntityLink(project_id as string, item.type, item.id, item.parent_id, isPublic)}
+              link={item.link || getEntityLink(project_id as string, item.type, item.id, item.parent_id)}
               previewAction={
                 items.length
                   ? () => {
@@ -57,3 +56,4 @@ export function GroupEntityPreview({ items, field_label, isPublic }: Props) {
     </div>
   );
 }
+

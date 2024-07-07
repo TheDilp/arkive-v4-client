@@ -14,26 +14,25 @@ type Props = {
   id: string | undefined;
   label: string;
   project_id: string | undefined;
-  isPublic?: boolean;
 };
 
-function MapMentionTooltip({ id, project_id, isPublic }: Pick<Props, "id" | "project_id"> & { isPublic: boolean }) {
+function MapMentionTooltip({ id, project_id }: Pick<Props, "id" | "project_id">) {
   const { data } = useGetEntity<MapType>(
     id as string,
     "maps",
     { data: { project_id }, fields: ["title", "image_id", "is_public"], relations: { map_pins: true } },
-    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000, retry: false, isPublic }
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000, retry: false }
   );
   return (
     <Card title={data?.data?.title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto whitespace-pre-line">
-        {data?.data ? <MapView data={data?.data} isPublic={isPublic} isReadOnly isViewOnly /> : null}
+        {data?.data ? <MapView data={data?.data} isReadOnly isViewOnly /> : null}
       </div>
     </Card>
   );
 }
 
-export function MapMention({ title, id, label, project_id, isPublic }: Props) {
+export function MapMention({ title, id, label, project_id }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isPaused, isFetched, refetch } = useGetEntity<MapType>(
     id as string,
@@ -41,7 +40,7 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
     {
       fields: ["is_public"],
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -68,7 +67,7 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline" ref={mentionRef}>
@@ -85,13 +84,13 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
     return (
       <Tooltip
         arrowColor="#3f3f46"
-        content={<MapMentionTooltip id={id} isPublic={!!isPublic} project_id={project_id} />}
+        content={<MapMentionTooltip id={id} project_id={project_id} />}
         delay={{ openDelay: 500, closeDelay: 200 }}
-        isDisabled={(isPublic && !data?.data?.is_public) ?? false}
+        isDisabled={(IS_PUBLIC && !data?.data?.is_public) ?? false}
         isPortal={false}>
         <Link
-          className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
-          to={getMentionLink(id as string, "maps", project_id as string, !!data?.data?.is_public, isPublic)}>
+          className="font-lato mt-0 box-border inline-block h-full items-center border-none text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+          to={getMentionLink(id as string, "maps", project_id as string, !!data?.data?.is_public)}>
           <div className="flex items-start" ref={mentionRef}>
             <span className="relative top-0.5">
               <Icon fontSize={14} icon={IconEnum.map} />
@@ -103,3 +102,4 @@ export function MapMention({ title, id, label, project_id, isPublic }: Props) {
     );
   }
 }
+

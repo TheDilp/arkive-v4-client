@@ -13,9 +13,8 @@ type Props = {
   project_id: string | undefined;
   icon?: string;
   parent_id?: string;
-  isPublic?: boolean;
 };
-export function BlueprintMention({ id, project_id, title, label, icon, parent_id, isPublic }: Props) {
+export function BlueprintMention({ id, project_id, title, label, icon, parent_id }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isFetched, isPaused, refetch } = useGetSubEntity<BlueprintInstanceType>(
     id as string,
@@ -26,7 +25,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
       },
       fields: ["id", "title", "is_public", "parent_id"],
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
         root: null,
         rootMargin: "0px",
         threshold: 1, // 100% of target visible
-      },
+      }
     );
 
     if (mentionRef.current) {
@@ -53,7 +52,7 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline" ref={mentionRef}>
@@ -68,14 +67,13 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
       );
     return (
       <Link
-        className="inline-flex items-center font-lato font-bold underline transition-colors hover:text-sky-400"
+        className="font-lato inline-flex items-center font-bold underline transition-colors hover:text-sky-400"
         to={getMentionLink(
           id as string,
           "blueprint_instances",
           project_id as string,
           data?.data?.is_public ?? false,
-          isPublic,
-          parent_id || data?.data?.parent_id,
+          parent_id || data?.data?.parent_id
         )}>
         <div className="flex items-start" ref={mentionRef}>
           {icon ? (
@@ -89,3 +87,4 @@ export function BlueprintMention({ id, project_id, title, label, icon, parent_id
     );
   }
 }
+

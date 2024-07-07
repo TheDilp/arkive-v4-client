@@ -12,15 +12,14 @@ type Props = {
   label: string;
   title?: string;
   project_id: string | undefined;
-  isPublic?: boolean;
 };
 
-function GraphMentionTooltip({ id, project_id, isPublic }: Pick<Props, "id" | "project_id" | "isPublic">) {
+function GraphMentionTooltip({ id, project_id }: Pick<Props, "id" | "project_id">) {
   const { data } = useGetEntity<GraphType>(
     id as string,
     "graphs",
     { data: { project_id }, fields: ["title", "is_public"], relations: { nodes: true, edges: true } },
-    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000, retry: false, isPublic },
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], staleTime: 5 * 60 * 1000, retry: false }
   );
   return (
     <Card title={data?.data?.title || ""}>
@@ -31,13 +30,13 @@ function GraphMentionTooltip({ id, project_id, isPublic }: Pick<Props, "id" | "p
   );
 }
 
-export function GraphMention({ title, id, label, project_id, isPublic }: Props) {
+export function GraphMention({ title, id, label, project_id }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isFetched, isPaused, refetch } = useGetEntity<GraphType>(
     id as string,
     "graphs",
     { data: { project_id }, fields: ["is_public"] },
-    { enabled: false, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -49,7 +48,7 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
         root: null,
         rootMargin: "0px",
         threshold: 1, // 100% of target visible
-      },
+      }
     );
 
     if (mentionRef.current) {
@@ -64,7 +63,7 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline" ref={mentionRef}>
@@ -81,13 +80,13 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
     return (
       <Tooltip
         arrowColor="#3f3f46"
-        content={<GraphMentionTooltip id={id} isPublic={!!isPublic} project_id={project_id} />}
+        content={<GraphMentionTooltip id={id} project_id={project_id} />}
         delay={{ closeDelay: 500 }}
         isPortal={false}>
         <Link
-          className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+          className="font-lato mt-0 box-border inline-block h-full items-center border-none text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           id={`link-${id}`}
-          to={getMentionLink(id as string, "graphs", project_id as string, !!data?.data?.is_public, isPublic)}>
+          to={getMentionLink(id as string, "graphs", project_id as string, !!data?.data?.is_public)}>
           <div className="flex items-start" ref={mentionRef}>
             <span className="relative top-0.5">
               <Icon fontSize={14} icon={IconEnum.graph} />
@@ -99,3 +98,4 @@ export function GraphMention({ title, id, label, project_id, isPublic }: Props) 
     );
   }
 }
+

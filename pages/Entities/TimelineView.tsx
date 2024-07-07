@@ -61,7 +61,6 @@ function changeZoom(type: "in" | "out", setZoom: Dispatch<SetStateAction<number>
 
 export function TimelineView({
   id,
-  isPublic,
   events,
   months,
   eras,
@@ -70,7 +69,6 @@ export function TimelineView({
   permissions,
 }: {
   id?: string;
-  isPublic?: boolean;
   events: EventType[];
   months: MonthType[];
   eras: EraType[];
@@ -313,7 +311,7 @@ export function TimelineView({
               setContextMenu({
                 event: evt as any,
                 items:
-                  id || isPublic
+                  id || IS_PUBLIC
                     ? [
                         {
                           id: "1",
@@ -479,7 +477,7 @@ export function TimelineView({
               setContextMenu({
                 event: evt as any,
                 items:
-                  id || isPublic
+                  id || IS_PUBLIC
                     ? [
                         {
                           id: "1",
@@ -563,7 +561,7 @@ export function TimelineView({
                 e.clientX +
                 scrollContainer.current.scrollLeft -
                 (document.body.clientWidth - timelineLayoutContainer.current.clientWidth) / 2 -
-                (isLg && !isPublic ? 32 : 0),
+                (isLg && !IS_PUBLIC ? 32 : 0),
             })}, 0)`
           );
         });
@@ -680,3 +678,4 @@ export function TimelineView({
     </div>
   );
 }
+

@@ -72,7 +72,6 @@ export interface SearchType extends BaseFormComponentType {
   isOptionsHidden?: boolean;
   isMultiple?: boolean;
   isFolders?: boolean;
-  isPublic?: boolean;
   hasNoBackground?: boolean;
   initialDisplayValue?: string;
   imageType?: AssetType;
@@ -111,3 +110,4 @@ export interface SearchType extends BaseFormComponentType {
     project_id?: string;
   }) => void;
 }
+

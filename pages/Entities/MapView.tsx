@@ -13,19 +13,16 @@ type Props = {
   data?: MapType;
   isReadOnly?: boolean;
   isViewOnly?: boolean;
-  isPublic?: boolean;
+
   center_on?: string;
 };
 
-export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: Props) {
+export function MapView({ data, isReadOnly, isViewOnly, center_on }: Props) {
   const { project_id, item_id, subitem_id } = useParams();
   const [bounds, setBounds] = useState<number[][] | null>(null);
   const { data: existingMapPinTypes, isInitialLoading: isInitialLoadingTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
-    "map_pin_types",
-    {
-      enabled: !isPublic,
-    }
+    "map_pin_types"
   );
   const setEntityUpdatePermission = useSetAtom(hasEntityUpdatePermissionForEntityView);
 
@@ -49,7 +46,6 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     },
     {
       enabled: !data && !!item_id,
-      isPublic,
     }
   );
 
@@ -107,7 +103,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
   return (
     <div className="relative z-[2] flex h-full w-full flex-col overflow-hidden">
       <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-      {isPublic || isViewOnly ? null : (
+      {IS_PUBLIC || isViewOnly ? null : (
         <div className="relative z-10 w-full">
           <div className="relative z-10 mb-3 ml-auto w-52">
             <Select
@@ -129,7 +125,7 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
         </div>
       )}
       {isLoading && !currentMap ? <div className="h-full w-full animate-pulse bg-zinc-900" /> : null}
-      {currentMap && (!isLoading || (data && isLoading)) && !!bounds && (isPublic || permissions?.read_maps) ? (
+      {currentMap && (!isLoading || (data && isLoading)) && !!bounds && (IS_PUBLIC || permissions?.read_maps) ? (
         <div className="z-0 min-h-full min-w-full">
           <MapContainer
             attributionControl={false}
@@ -172,3 +168,4 @@ export function MapView({ data, isReadOnly, isViewOnly, isPublic, center_on }: P
     </div>
   );
 }
+

@@ -17,7 +17,7 @@ function getLayoutDirection(character_relationship_types: CharacterRelationshipD
   return "TB";
 }
 
-export function FamilyTreeDialog({ data }: { data: { id: string; isPublic?: boolean } }) {
+export function FamilyTreeDialog({ data }: { data: { id: string } }) {
   const [relationShipTypeId, setRelationshipTypeId] = useState("");
   const [generationCount, setGenerationCount] = useState("1");
   const { data: characterData, isFetching: isFetchingCharacterData } = useGetEntity<CharacterType>(
@@ -31,15 +31,13 @@ export function FamilyTreeDialog({ data }: { data: { id: string; isPublic?: bool
     },
     {
       queryKeyConcat: ["family_tree"],
-      isPublic: data?.isPublic,
-    },
+    }
   );
   const layoutDirection = getLayoutDirection(characterData?.data?.character_relationship_types || [], relationShipTypeId);
 
   const { data: characterFamilyData, isFetching } = useGetCharacterFamily(data?.id, relationShipTypeId, generationCount, {
     enabled: !!relationShipTypeId && !!generationCount,
-    isPublic: data?.isPublic,
-    staleTime: data?.isPublic ? 60 * 1000 : 0,
+    staleTime: IS_PUBLIC ? 60 * 1000 : 0,
   });
 
   if (isFetching) return <Skeleton type="family_tree" />;
@@ -83,7 +81,6 @@ export function FamilyTreeDialog({ data }: { data: { id: string; isPublic?: bool
             edges: edges || [],
           }}
           isFamilyTreeView
-          isPublic={data?.isPublic}
           isViewOnly
           layoutOptions={{ rankDir: layoutDirection }}
         />
@@ -93,3 +90,4 @@ export function FamilyTreeDialog({ data }: { data: { id: string; isPublic?: bool
     </div>
   );
 }
+

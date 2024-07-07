@@ -66,7 +66,7 @@ export function WordDrawer({ data, exceptions }: Props) {
       fields: ["id", "owner_id", "title", "description", "translation", "parent_id"],
       permissions: true,
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id }
   );
   const { data: dictionary } = useGetEntity(
     exceptions?.globalCreate ? word?.parent_id : item_id,
@@ -74,8 +74,7 @@ export function WordDrawer({ data, exceptions }: Props) {
     { fields: ["id", "title", "icon"] },
     {
       enabled: !!data?.title || (!!word?.parent_id && exceptions?.globalCreate),
-      isPublic: false,
-    },
+    }
   );
 
   const { mutateAsync: createWord, isLoading: isCreating } = useCreateSubEntity<InsertWordType>("words", project_id);
@@ -182,3 +181,4 @@ export function WordDrawer({ data, exceptions }: Props) {
     </DrawerLayout>
   );
 }
+

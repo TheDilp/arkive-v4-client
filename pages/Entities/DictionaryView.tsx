@@ -161,7 +161,7 @@ function createColumns(
   return columns;
 }
 
-export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boolean }) {
+export function DictionaryView({ id }: { id?: string }) {
   const { project_id, item_id } = useParams();
   const createNotification = useNotifications();
   const [filter, setFilter] = useState("");
@@ -193,7 +193,6 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     },
     {
       staleTime: 5 * 60 * 1000,
-      isPublic,
     }
   );
   const updateDictionaryPermission = hasActionPermission(
@@ -217,7 +216,6 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     "words",
     {
       queryKeyOverwrite: ["allEntities", project_id as string, "words", filters || "filters", pagination || "pagination"],
-      isPublic,
     }
   );
   useNavbarTitle(`Dictionaries | ${data?.data?.title}`, !!data?.data?.title);
@@ -255,7 +253,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     return () => {};
   }, [filter, dispatch, filterType]);
 
-  if ((isPublic && !data?.data?.is_public) || error) {
+  if ((IS_PUBLIC && !data?.data?.is_public) || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
     return <Navigate to={`/${project_id}/dictionaries`} />;
@@ -264,7 +262,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   return (
     <>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
-        {isPublic ? <h2 className="font-lato flex-1 text-3xl">{data?.data?.title || ""}</h2> : null}
+        {IS_PUBLIC ? <h2 className="font-lato flex-1 text-3xl">{data?.data?.title || ""}</h2> : null}
         <div className="w-48">
           <Input
             isClearable
@@ -286,7 +284,7 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
             value={filterType}
           />
         </div>
-        {id || isPublic ? null : (
+        {id || IS_PUBLIC ? null : (
           <div className="w-52">
             <Button
               icon={IconEnum.add}
@@ -307,9 +305,9 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
       </div>
       <div className="overflow-hidden">
         <Table
-          columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [], isPublic)}
+          columns={createColumns(setDrawer, setDialog, (item_id || id) as string, user?.webhooks || [])}
           config={{
-            hasSelect: !id && !isPublic,
+            hasSelect: !id && !IS_PUBLIC,
             orderBy,
             filters,
             selection,

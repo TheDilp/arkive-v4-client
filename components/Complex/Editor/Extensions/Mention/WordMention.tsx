@@ -9,10 +9,9 @@ type Props = {
   id: string | undefined;
   label: string;
   isDisabledTooltip?: boolean;
-  isPublic?: boolean;
 };
 
-function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
+function WordMentionTooltip({ id }: Pick<Props, "id">) {
   const { data: existingWord, isLoading } = useGetSubEntity<WordType>(
     id as string,
     "words",
@@ -22,11 +21,11 @@ function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
       },
       fields: ["id", "title", "translation", "description"],
     },
-    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], retry: false, staleTime: 5 * 60 * 1000, isPublic }
+    { enabled: !!id, queryKeyConcat: ["mention", "tooltip"], retry: false, staleTime: 5 * 60 * 1000 }
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-600 bg-zinc-700 p-2 shadow-lg">
-      <div className="flex flex-col whitespace-pre-line font-lato font-light">
+      <div className="font-lato flex flex-col whitespace-pre-line font-light">
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Spinner />
@@ -40,7 +39,7 @@ function WordMentionTooltip({ id, isPublic }: Pick<Props, "id" | "isPublic">) {
     </div>
   );
 }
-export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: Props) {
+export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isFetched, isPaused, refetch } = useGetSubEntity<WordType>(
     id as string,
@@ -51,7 +50,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
       },
       fields: ["id", "title"],
     },
-    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
+    { enabled: false, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -84,8 +83,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
           {label}
         </span>
       );
-    // @ts-ignore
-    if (isPublic && data?.data?.is_public) return <span ref={mentionRef}>{label}</span>;
+    if (IS_PUBLIC && data?.data?.is_public) return <span ref={mentionRef}>{label}</span>;
     if (!data)
       return (
         <span className="font-lato underline decoration-wavy" ref={mentionRef}>
@@ -94,10 +92,7 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
       );
 
     return (
-      <Tooltip
-        arrowColor="#3f3f46"
-        content={<WordMentionTooltip id={id} isPublic={isPublic} />}
-        isDisabled={isDisabledTooltip ?? false}>
+      <Tooltip arrowColor="#3f3f46" content={<WordMentionTooltip id={id} />} isDisabled={isDisabledTooltip ?? false}>
         <span className="cursor-pointer text-base font-light italic leading-4" ref={mentionRef}>
           {data?.data?.title || title || label}
           <sup>*</sup>
@@ -106,3 +101,4 @@ export function WordMention({ title, id, label, isDisabledTooltip, isPublic }: P
     );
   }
 }
+

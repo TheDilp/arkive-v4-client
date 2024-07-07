@@ -59,7 +59,6 @@ type Props = {
     year?: number;
     parent_id?: string;
     isReadOnly?: boolean;
-    isPublic?: boolean;
   };
   exceptions: DrawerAtomType["exceptions"];
 };
@@ -104,7 +103,6 @@ export function EventDrawer({ data, exceptions }: Props) {
     },
     {
       enabled: !exceptions?.globalCreate || (exceptions?.globalCreate && !!event?.parent_id),
-      isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
     }
   );
@@ -143,7 +141,6 @@ export function EventDrawer({ data, exceptions }: Props) {
       permissions: true,
     },
     {
-      isPublic: data?.isPublic,
       queryKeyConcat: ["event_drawer"],
       enabled: !!data?.id,
     }
@@ -511,7 +508,7 @@ export function EventDrawer({ data, exceptions }: Props) {
                     icon={event.document?.icon ?? getDefaultEntityIcon("documents")}
                     id={event.document.id}
                     label="Document"
-                    link={getEntityLink(project_id as string, "documents", event.document.id, null, data?.isReadOnly)}
+                    link={getEntityLink(project_id as string, "documents", event.document.id, null)}
                     previewAction={
                       !permissions?.read_documents
                         ? undefined
@@ -667,3 +664,4 @@ export function EventDrawer({ data, exceptions }: Props) {
     </DrawerLayout>
   );
 }
+

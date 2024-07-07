@@ -1,17 +1,11 @@
-export function getEntityLink(
-  project_id: string,
-  name: string,
-  item_id: string,
-  parent_id?: string | null,
-  isPublic?: boolean
-) {
+export function getEntityLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
   if (name === "") return "#";
-  const linkRoot = isPublic ? "../" : "/projects";
+  const linkRoot = IS_PUBLIC ? "../" : "/projects";
   if (name === "characters") {
     return `${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/biography`;
   }
   if (name === "blueprint_instances") {
-    if (isPublic) return `${linkRoot}/${project_id}/blueprints/${item_id}`;
+    if (IS_PUBLIC) return `${linkRoot}/${project_id}/blueprints/${item_id}`;
     return `${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "images") {
@@ -34,16 +28,9 @@ export function getLinkToItem(project_id: string, type: string, id: string, is_f
   return `/projects/${project_id}/${type}/${is_folder ? "folder/" : ""}${id}`;
 }
 
-export function getMentionLink(
-  id: string,
-  type: string,
-  project_id: string,
-  is_public: boolean,
-  isPublic?: boolean,
-  parent_id?: string
-) {
-  if (isPublic && !is_public) return "#";
-  return getEntityLink(project_id, type, id, parent_id, isPublic);
+export function getMentionLink(id: string, type: string, project_id: string, is_public: boolean, parent_id?: string) {
+  if (IS_PUBLIC && !is_public) return "#";
+  return getEntityLink(project_id, type, id, parent_id);
 }
 
 export function getSidebarLink(link: string, project_id: string, isDisabled?: boolean): string {

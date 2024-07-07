@@ -112,7 +112,6 @@ function DayNumber({
 function CalendarRangeEvents({
   events,
   setDrawer,
-  isPublic,
   deleteEvent,
   months,
   calendar_id,
@@ -122,7 +121,6 @@ function CalendarRangeEvents({
 }: {
   events: EventType[];
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
-  isPublic: boolean;
   deleteEvent: any;
   calendar_id: string;
   months: MonthType[];
@@ -247,7 +245,7 @@ function CalendarRangeEvents({
                   <Dropdown
                     allowedPlacements={["left", "left-end", "left-start"]}
                     items={
-                      isPublic
+                      IS_PUBLIC
                         ? [
                             {
                               id: "1",
@@ -332,14 +330,12 @@ function CalendarRangeEvents({
 export function CalendarView({
   id,
   data,
-  isPublic,
   event_id,
   isCharacterCalendar,
 }: {
   id?: string;
   data?: CalendarType;
   event_id?: string;
-  isPublic?: boolean;
   isCharacterCalendar?: boolean;
 }) {
   const user = useAtomValue(userAtom);
@@ -391,7 +387,6 @@ export function CalendarView({
     },
     {
       enabled: !data && !!user,
-      isPublic,
     }
   );
 
@@ -463,7 +458,6 @@ export function CalendarView({
       enabled: !!calendar && !!(item_id || id) && !!queryKey.length,
       queryKeyOverwrite: queryKey,
       staleTime: 5 * 60 * 1000,
-      isPublic,
     }
   );
   const { data: subitemEvent } = useGetSubEntity<EventType>(
@@ -473,7 +467,7 @@ export function CalendarView({
       data: { parent_id: item_id || id },
       fields: ["start_month", "start_year", "is_public"],
     },
-    { enabled: event_id ? !!event_id : !!subitem_id, isPublic }
+    { enabled: event_id ? !!event_id : !!subitem_id }
   );
   const { mutate: deleteEvent } = useDeleteSubEntity("events", project_id as string, item_id);
   useNavbarTitle(`Calendars | ${calendar?.title}`, !!calendar);
@@ -549,10 +543,10 @@ export function CalendarView({
   if (!calendar) return <Alert label="Calendar not found." variant="error" />;
 
   return (
-    <div className={`flex flex-col pb-4 ${isPublic && view === "calendar" ? "h-[calc(100%-10rem)]" : "h-[calc(100%-2rem)]"}`}>
+    <div className={`flex flex-col pb-4 ${IS_PUBLIC && view === "calendar" ? "h-[calc(100%-10rem)]" : "h-[calc(100%-2rem)]"}`}>
       <div className="sticky top-0 mb-2 flex w-full items-center justify-end gap-x-2">
         <div className="mr-auto flex items-center gap-x-2 self-end">
-          {isPublic ? null : (
+          {IS_PUBLIC ? null : (
             <div className="h-11 w-11">
               <Button
                 icon={IconEnum.filter}
@@ -571,7 +565,7 @@ export function CalendarView({
               />
             </div>
           )}
-          {hasFiltersEnabled && !isPublic ? (
+          {hasFiltersEnabled && !IS_PUBLIC ? (
             <div>
               <Button
                 icon={IconEnum.close}
@@ -583,7 +577,7 @@ export function CalendarView({
               />
             </div>
           ) : null}
-          {hasFiltersEnabled && filterBadges.fields.length && !isPublic
+          {hasFiltersEnabled && filterBadges.fields.length && !IS_PUBLIC
             ? filterBadges.fields.map((badge) => (
                 <Tooltip
                   content={getFilterTooltip({
@@ -597,7 +591,7 @@ export function CalendarView({
                 </Tooltip>
               ))
             : null}
-          {hasFiltersEnabled && filterBadges.relationFields.length && !isPublic
+          {hasFiltersEnabled && filterBadges.relationFields.length && !IS_PUBLIC
             ? filterBadges.relationFields.map((badge) => {
                 return (
                   <Tooltip
@@ -691,7 +685,7 @@ export function CalendarView({
             value={view}
           />
         </div>
-        {id || isPublic ? null : (
+        {id || IS_PUBLIC ? null : (
           <div className="w-fit self-end">
             <Button
               icon={IconEnum.add}
@@ -739,7 +733,7 @@ export function CalendarView({
                   dayNumber={getFillerDayNumber(calendar?.months, date.month, day, previousMonthLeapDayCount)}
                   event_ids={[]}
                   isFiller
-                  isReadOnly={isPublic}
+                  isReadOnly={IS_PUBLIC}
                   key={day}
                   monthNumber={date.month}
                   year={date.year}
@@ -773,7 +767,7 @@ export function CalendarView({
                 <DayNumber
                   dayNumber={day}
                   event_ids={filteredEvents.map((e) => e.id)}
-                  isReadOnly={isPublic}
+                  isReadOnly={IS_PUBLIC}
                   key={day}
                   monthNumber={date.month}
                   year={date.year}
@@ -801,7 +795,7 @@ export function CalendarView({
                         className={updatePermission ? "cursor-pointer" : "cursor-not-allowed"}
                         key={event.id}
                         onClick={() => {
-                          if ((id && readPermission) || isPublic) {
+                          if ((id && readPermission) || IS_PUBLIC) {
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Preview event",
@@ -809,7 +803,7 @@ export function CalendarView({
                               data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
                               size: "lg",
                             }));
-                          } else if (!isPublic && updatePermission) {
+                          } else if (!IS_PUBLIC && updatePermission) {
                             setDrawer((prev) => ({
                               ...prev,
                               title: "Edit event",
@@ -824,7 +818,7 @@ export function CalendarView({
                           setContextMenu({
                             event: e,
                             items:
-                              (id && readPermission) || isPublic
+                              (id && readPermission) || IS_PUBLIC
                                 ? [
                                     {
                                       id: "1",
@@ -933,7 +927,7 @@ export function CalendarView({
                                   className={updatePermission ? "" : "cursor-not-allowed"}
                                   key={event.id}
                                   onClick={() => {
-                                    if ((id && readPermission) || isPublic) {
+                                    if ((id && readPermission) || IS_PUBLIC) {
                                       setDrawer((prev) => ({
                                         ...prev,
                                         title: "Preview event",
@@ -941,7 +935,7 @@ export function CalendarView({
                                         data: { id: event.id, parent_id: calendar.id, entity_type: "events" },
                                         size: "lg",
                                       }));
-                                    } else if (!isPublic && updatePermission) {
+                                    } else if (!IS_PUBLIC && updatePermission) {
                                       setDrawer((prev) => ({
                                         ...prev,
                                         title: "Edit event",
@@ -956,7 +950,7 @@ export function CalendarView({
                                     setContextMenu({
                                       event: evt,
                                       items:
-                                        id || isPublic
+                                        id || IS_PUBLIC
                                           ? [
                                               {
                                                 id: "1",
@@ -1057,7 +1051,7 @@ export function CalendarView({
                   dayNumber={idx}
                   event_ids={[]}
                   isFiller
-                  isReadOnly={isPublic}
+                  isReadOnly={IS_PUBLIC}
                   key={day}
                   monthNumber={date.month}
                   year={date.year}
@@ -1074,7 +1068,6 @@ export function CalendarView({
             deleteEvent={deleteEvent}
             events={events?.data || []}
             isProjectOwner={isProjectOwner}
-            isPublic={!!isPublic}
             months={calendar?.months || []}
             permissions={permissions}
             setDrawer={setDrawer}
@@ -1089,7 +1082,6 @@ export function CalendarView({
           events={events?.data || []}
           id={id}
           isProjectOwner={isProjectOwner}
-          isPublic={isPublic}
           months={calendar?.months || []}
           permissions={permissions}
           user={user}
@@ -1098,3 +1090,4 @@ export function CalendarView({
     </div>
   );
 }
+

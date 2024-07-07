@@ -56,7 +56,6 @@ export function PublicCharacter() {
     },
     {
       staleTime: 60 * 1000,
-      isPublic: true,
     }
   );
 
@@ -77,7 +76,7 @@ export function PublicCharacter() {
       },
     },
     "character_fields_templates",
-    { enabled: !!character?.data?.tags?.length, staleTime: 5 * 60 * 1000, isPublic: true }
+    { enabled: !!character?.data?.tags?.length, staleTime: 5 * 60 * 1000 }
   );
 
   if (!character?.data) return <Skeleton type="character_profile_main" />;
@@ -93,7 +92,7 @@ export function PublicCharacter() {
         <Collapsible icon={IconEnum.biography} initialOpen={!!character?.data?.biography} label="Biography">
           <div className="h-fit max-h-96 overflow-auto">
             {character?.data?.biography ? (
-              <StaticRender content={character?.data?.biography ?? undefined} isPublicView />
+              <StaticRender content={character?.data?.biography ?? undefined} />
             ) : (
               <Alert label="Nothing has been written yet." />
             )}
@@ -116,7 +115,6 @@ export function PublicCharacter() {
                           character_field={template_field}
                           character_field_data={characterField ?? null}
                           isPreview={false}
-                          isPublic
                           key={template_field.id}
                         />
                       );
@@ -133,7 +131,7 @@ export function PublicCharacter() {
         </Collapsible>
         <Collapsible icon={IconEnum.family_tree} label="Relationships">
           <div className="h-96 max-h-96 p-2">
-            {character?.data?.id ? <FamilyTreeDialog data={{ id: character.data.id, isPublic: true }} /> : null}
+            {character?.data?.id ? <FamilyTreeDialog data={{ id: character.data.id }} /> : null}
           </div>
         </Collapsible>
         <Collapsible icon={IconEnum.image} label="Images">
@@ -158,8 +156,7 @@ export function PublicCharacter() {
                       project_id as string,
                       relatedEntities.type,
                       d.id,
-                      "parent_id" in d ? d.parent_id : null,
-                      true
+                      "parent_id" in d ? d.parent_id : null
                     )}
                     title={d.title}
                     type={relatedEntities.type}

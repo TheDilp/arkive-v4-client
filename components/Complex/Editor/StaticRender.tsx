@@ -14,7 +14,7 @@ import { TableOfContents, TOCHeadingType } from "./Extensions/TableOfContentsExt
 
 type MarkMap = Partial<Record<string, string | ComponentType<any>>>;
 
-function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }) {
+function StaticRenderImage({ data }: { data: any }) {
   const setDialog = useSetAtom(dialogAtom);
   const { project_id } = useParams();
   const { data: imageData, isInitialLoading } = useGetImage(
@@ -24,11 +24,11 @@ function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }
     {
       fields: ["is_public"],
     },
-    { enabled: isPublic, isPublic }
+    { enabled: IS_PUBLIC }
   );
 
   if (isInitialLoading) return null;
-  if (!imageData?.data?.is_public && isPublic) return null;
+  if (!imageData?.data?.is_public && IS_PUBLIC) return null;
   if (data?.node?.attrs)
     return (
       <div className="inline-block max-w-full">
@@ -49,7 +49,7 @@ function StaticRenderImage({ data, isPublic }: { data: any; isPublic?: boolean }
   return null;
 }
 
-function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boolean) {
+function typeMap(project_id: string, content: RemirrorJSON) {
   return {
     bulletList: "ul",
     taskList: (args: any) => <ul data-task-list>{args?.children}</ul>,
@@ -122,7 +122,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       return <TableOfContents headings={headings} />;
     },
     secret: (data: any) => {
-      if (isPublicView) return null;
+      if (IS_PUBLIC) return null;
       return (
         <Collapsible icon={IconEnum.eye} initialOpen={false} label="Secret">
           {data?.children || null}
@@ -130,7 +130,7 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
       );
     },
 
-    image: (data: any) => StaticRenderImage({ data, isPublic: isPublicView }),
+    image: (data: any) => StaticRenderImage({ data }),
     table: (...props: any) => {
       return (
         <div className="h-min w-full">
@@ -164,48 +164,21 @@ function typeMap(project_id: string, content: RemirrorJSON, isPublicView?: boole
         const { attrs } = props[0].node;
         if (attrs) {
           const { id, label, alterid, icon, name: type, parentid } = attrs;
-          if (type === "characters")
-            return <CharacterMention id={id} isPublic={isPublicView} label={label} project_id={project_id} title={label} />;
+          if (type === "characters") return <CharacterMention id={id} label={label} project_id={project_id} title={label} />;
           if (type === "blueprint_instances")
             return (
-              <BlueprintMention
-                icon={icon}
-                id={id}
-                isPublic={isPublicView}
-                label={label}
-                parent_id={parentid}
-                project_id={project_id}
-                title={label}
-              />
+              <BlueprintMention icon={icon} id={id} label={label} parent_id={parentid} project_id={project_id} title={label} />
             );
           if (type === "documents")
-            return (
-              <DocumentMention
-                alterId={alterid}
-                id={id}
-                isPublic={isPublicView}
-                label={label}
-                project_id={project_id}
-                title={label}
-              />
-            );
+            return <DocumentMention alterId={alterid} id={id} label={label} project_id={project_id} title={label} />;
 
-          if (type === "maps") return <MapMention id={id} isPublic={isPublicView} label={label} project_id={project_id} />;
-          if (type === "graphs") return <GraphMention id={id} isPublic={isPublicView} label={label} project_id={project_id} />;
-          if (type === "words") return <WordMention id={id} isPublic={isPublicView} label={label} title={label} />;
+          if (type === "maps") return <MapMention id={id} label={label} project_id={project_id} />;
+          if (type === "graphs") return <GraphMention id={id} label={label} project_id={project_id} />;
+          if (type === "words") return <WordMention id={id} label={label} title={label} />;
           if (type === "events")
-            return (
-              <EventMention
-                id={id}
-                isPublic={isPublicView}
-                label={label}
-                parent_id={parentid}
-                project_id={project_id}
-                title={label}
-              />
-            );
+            return <EventMention id={id} label={label} parent_id={parentid} project_id={project_id} title={label} />;
 
-          return isPublicView ? (
+          return IS_PUBLIC ? (
             <span className="font-lato">{label}</span>
           ) : (
             <Link className="font-lato text-sm font-bold text-white underline" to={`../../${type}/${id}`}>
@@ -233,7 +206,7 @@ function markMap(): MarkMap {
     },
   };
 }
-export function StaticRender({ content, isPublicView }: { content: RemirrorJSON | undefined; isPublicView?: boolean }) {
+export function StaticRender({ content }: { content: RemirrorJSON | undefined }) {
   const { project_id } = useParams();
   const createNotification = useNotifications();
   if (!content) return null;
@@ -246,8 +219,8 @@ export function StaticRender({ content, isPublicView }: { content: RemirrorJSON 
       <RemirrorRenderer
         json={parsedContent as RemirrorJSON}
         // @ts-ignore
-        markMap={markMap(createNotification, isPublicView ?? true)}
-        typeMap={typeMap(project_id as string, content, isPublicView)}
+        markMap={markMap(createNotification)}
+        typeMap={typeMap(project_id as string, content)}
       />
     </div>
   );

@@ -113,7 +113,6 @@ function PublicCharacterList() {
     {
       staleTime: 5 * 60 * 1000,
       prefetch: true,
-      isPublic: true,
     }
   );
 
@@ -163,7 +162,7 @@ function PublicCharacterList() {
         config={{
           orderBy,
           filters,
-          getLink: (rowData: any) => getEntityLink(project_id as string, "characters", rowData.id, null, true),
+          getLink: (rowData: any) => getEntityLink(project_id as string, "characters", rowData.id, null),
         }}
         data={data?.data || []}
         dispatch={dispatch}
@@ -202,7 +201,6 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
     },
     type as AvailableEntityType,
     {
-      isPublic: true,
       staleTime: 5 * 60 * 1000,
     }
   );
@@ -252,7 +250,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
           project_id as string
         )}
         config={{
-          getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null, true),
+          getLink: (rowData: any) => getEntityLink(project_id as string, type, rowData.id, null),
         }}
         data={base?.data || []}
         dispatch={dispatch}

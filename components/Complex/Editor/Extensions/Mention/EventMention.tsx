@@ -12,9 +12,8 @@ type Props = {
   label: string;
   project_id: string | undefined;
   parent_id?: string;
-  isPublic?: boolean;
 };
-export function EventMention({ id, project_id, title, label, isPublic, parent_id }: Props) {
+export function EventMention({ id, project_id, title, label, parent_id }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isPaused, isFetched, refetch } = useGetSubEntity<EventType>(
     id,
@@ -22,7 +21,7 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
     {
       fields: ["id", "title", "parent_id", "is_public"],
     },
-    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic },
+    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
         root: null,
         rootMargin: "0px",
         threshold: 1, // 100% of target visible
-      },
+      }
     );
 
     if (mentionRef.current) {
@@ -48,7 +47,7 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
     };
   }, []);
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline" ref={mentionRef}>
@@ -63,15 +62,8 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
       );
     return (
       <Link
-        className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
-        to={getMentionLink(
-          id as string,
-          "calendars",
-          project_id as string,
-          !!data?.data?.is_public,
-          isPublic,
-          parent_id as string,
-        )}>
+        className="font-lato mt-0 box-border inline-block h-full items-center border-none text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+        to={getMentionLink(id as string, "calendars", project_id as string, !!data?.data?.is_public, parent_id as string)}>
         <div className="top-[0.025rem] flex items-start" ref={mentionRef}>
           <span className="relative top-0.5">
             <Icon fontSize={14} icon={IconEnum.event} />
@@ -82,3 +74,4 @@ export function EventMention({ id, project_id, title, label, isPublic, parent_id
     );
   }
 }
+

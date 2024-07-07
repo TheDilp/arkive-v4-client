@@ -86,7 +86,7 @@ const DrawerClasses = tv({
   },
 });
 
-export function Drawer({ isPublic }: { isPublic?: boolean }) {
+export function Drawer() {
   const drawer = useAtomValue(drawerAtom);
   const [hasChangedData, setHasChangedData] = useAtom(hasChangedDataAtom);
   const resetDrawer = useResetAtom(drawerAtom);
@@ -182,8 +182,8 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
         </h3>
         {renderContent ? (
           <div className="flex h-[calc(100%-6rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
-            {isPublic ? (
-              <span>{drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic /> : null}</span>
+            {IS_PUBLIC ? (
+              <span>{drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}</span>
             ) : (
               <>
                 {drawer.type === "project" ? <ProjectDrawer /> : null}
@@ -233,7 +233,7 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
                 {drawer.type === "webhooks" ? <WebhookDrawer data={drawer?.data} /> : null}
                 {drawer.type === "character_filter" ? <CharacterFilterDrawer data={drawer.data} /> : null}
                 {drawer.type === "calendar_filter" ? <CalendarFilterDrawer data={drawer.data} /> : null}
-                {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} isPublic={isPublic} /> : null}
+                {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_tags" ? <BulkTagsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_folder" ? <BulkFolderDrawer data={drawer?.data} /> : null}
                 {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
@@ -251,3 +251,4 @@ export function Drawer({ isPublic }: { isPublic?: boolean }) {
     );
   return null;
 }
+

@@ -24,7 +24,6 @@ export function PublicGraph() {
     },
     {
       queryKeyConcat: ["public"],
-      isPublic: true,
       retry: false,
     }
   );
@@ -36,7 +35,7 @@ export function PublicGraph() {
   }
   return (
     <PublicEntityLayout title={graph?.data?.title}>
-      <Graph data={graph?.data} isPublic isReadOnly isViewOnly />
+      <Graph data={graph?.data} isReadOnly isViewOnly />
     </PublicEntityLayout>
   );
 }

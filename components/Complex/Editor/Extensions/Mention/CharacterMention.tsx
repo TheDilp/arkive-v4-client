@@ -16,23 +16,20 @@ type Props = {
   id: string | undefined;
   label: string;
   project_id: string | undefined;
-  isPublic?: boolean;
 };
 
-function CharacterMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "title" | "isPublic">) {
+function CharacterMentionTooltip({ title, id }: Pick<Props, "id" | "title">) {
   const { project_id } = useParams();
   const { data, isLoading } = useGetEntity<CharacterType>(
     id as string,
     "characters",
     { data: { id }, fields: ["biography", "is_public", "portrait_id"] },
-    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"], isPublic }
+    { enabled: !!id, staleTime: 5 * 60 * 1000, queryKeyConcat: ["mention", "tooltip"] }
   );
   return (
     <Card avatar={getImageURL(project_id as string, "images", data?.data.portrait_id)} title={title || ""}>
       <div className="h-96 min-h-[24rem] w-96 min-w-[24rem] overflow-y-auto overflow-x-hidden whitespace-pre-line">
-        {data?.data?.biography && !isLoading ? (
-          <StaticRender content={data.data.biography as RemirrorJSON} isPublicView={isPublic} />
-        ) : null}
+        {data?.data?.biography && !isLoading ? <StaticRender content={data.data.biography as RemirrorJSON} /> : null}
         {isLoading ? (
           <div className="flex max-h-[24rem] max-w-[24rem] items-center justify-center">
             <Spinner />
@@ -43,7 +40,7 @@ function CharacterMentionTooltip({ title, id, isPublic }: Pick<Props, "id" | "ti
   );
 }
 
-export function CharacterMention({ id, project_id, title, label, isPublic }: Props) {
+export function CharacterMention({ id, project_id, title, label }: Props) {
   const mentionRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { data, isPaused, isFetched, refetch } = useGetEntity<CharacterType>(
     id,
@@ -51,7 +48,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     {
       fields: ["id", "full_name", "is_public", "portrait_id"],
     },
-    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false, isPublic }
+    { enabled: false, staleTime: 20 * 60 * 1000, queryKeyConcat: ["mention"], retry: false }
   );
 
   useEffect(() => {
@@ -78,7 +75,7 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
   }, []);
 
   if (id) {
-    if (!data?.data?.is_public && isPublic) return <span ref={mentionRef}>{label}</span>;
+    if (!data?.data?.is_public && IS_PUBLIC) return <span ref={mentionRef}>{label}</span>;
     if (!data?.data && !isPaused && isFetched)
       return (
         <span className="font-lato underline" ref={mentionRef}>
@@ -94,13 +91,13 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     return (
       <Tooltip
         arrowColor="#3f3f46"
-        content={<CharacterMentionTooltip id={id} isPublic={isPublic} title={data?.data?.full_name || title || label} />}
+        content={<CharacterMentionTooltip id={id} title={data?.data?.full_name || title || label} />}
         delay={{ openDelay: 500, closeDelay: 200 }}
-        isDisabled={(isPublic && !data?.data?.is_public) ?? false}
+        isDisabled={(IS_PUBLIC && !data?.data?.is_public) ?? false}
         isPortal={false}>
         <Link
-          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
-          to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false, isPublic)}>
+          className="font-lato inline-flex items-center text-sm font-bold transition-colors"
+          to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false)}>
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.portrait_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
@@ -116,3 +113,4 @@ export function CharacterMention({ id, project_id, title, label, isPublic }: Pro
     );
   }
 }
+
