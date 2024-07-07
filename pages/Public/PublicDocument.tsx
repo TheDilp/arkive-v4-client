@@ -30,7 +30,7 @@ export function PublicDocument() {
   if (!document?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
-    return <Navigate to={`/public/${project_id}/documents`} />;
+    return <Navigate to={`/${project_id}/documents`} />;
   }
   return (
     <PublicEntityLayout title={subitem_id ? "" : document?.data?.title}>
@@ -40,3 +40,4 @@ export function PublicDocument() {
     </PublicEntityLayout>
   );
 }
+

@@ -71,6 +71,7 @@ import {
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
+  openPublicPage,
   PublicEntities,
   useNotifications,
   userAtom,
@@ -310,7 +311,7 @@ function getColumns(
               id: "view_public",
               title: "View public page",
               icon: IconEnum.public,
-              onClick: () => window.open(`/public/${project_id}/${entityType}/${row.original.id}`, "_blank"),
+              onClick: () => openPublicPage(`/${project_id}/${entityType}/${row.original.id}`),
               isDisabled: !row.original.is_public,
             },
             {

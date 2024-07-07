@@ -258,13 +258,13 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
   if ((isPublic && !data?.data?.is_public) || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
-    return <Navigate to={`/public/${project_id}/dictionaries`} />;
+    return <Navigate to={`/${project_id}/dictionaries`} />;
   }
 
   return (
     <>
       <div className="sticky top-0 flex w-full items-center justify-end gap-x-2">
-        {isPublic ? <h2 className="flex-1 font-lato text-3xl">{data?.data?.title || ""}</h2> : null}
+        {isPublic ? <h2 className="font-lato flex-1 text-3xl">{data?.data?.title || ""}</h2> : null}
         <div className="w-48">
           <Input
             isClearable
@@ -389,3 +389,4 @@ export function DictionaryView({ id, isPublic }: { id?: string; isPublic?: boole
     </>
   );
 }
+

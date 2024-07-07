@@ -84,7 +84,7 @@ export function PublicCharacter() {
   if (!character?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
 
-    return <Navigate to={`/public/${project_id}/characters`} />;
+    return <Navigate to={`/${project_id}/characters`} />;
   }
   const relatedEntities = getRelatedEntities(character, selectedTab);
   return (
@@ -100,7 +100,7 @@ export function PublicCharacter() {
           </div>
         </Collapsible>
         <Collapsible icon={IconEnum.additional_fields} label="Additional fields">
-          <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
+          <div className="animate-in fade-in fill-mode-both flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
             {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
             {(existingTemplates?.data || []).map((t) => {
               return (
@@ -171,3 +171,4 @@ export function PublicCharacter() {
     </PublicEntityLayout>
   );
 }
+

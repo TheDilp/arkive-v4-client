@@ -48,6 +48,7 @@ import {
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
+  openPublicPage,
   rollDiceWithNotification,
   TextFilters,
   useNotifications,
@@ -389,7 +390,7 @@ function createColumns(
                       id: "2",
                       title: "View public page",
                       icon: IconEnum.public,
-                      onClick: () => window.open(`/public/${project_id}/blueprints/${row.original.id}`, "_blank"),
+                      onClick: () => openPublicPage(`/${project_id}/blueprints/${row.original.id}`),
                       isDisabled: !row.original.is_public,
                     },
                     {
@@ -778,3 +779,4 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     </div>
   );
 }
+

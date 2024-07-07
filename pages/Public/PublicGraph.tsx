@@ -32,7 +32,7 @@ export function PublicGraph() {
   if (!graph?.data) return <Skeleton type="editor" />;
   if (!graph?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
-    return <Navigate to={`/public/${project_id}/graphs`} />;
+    return <Navigate to={`/${project_id}/graphs`} />;
   }
   return (
     <PublicEntityLayout title={graph?.data?.title}>
@@ -40,3 +40,4 @@ export function PublicGraph() {
     </PublicEntityLayout>
   );
 }
+

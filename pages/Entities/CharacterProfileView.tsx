@@ -65,6 +65,7 @@ import {
   hasActionPermission,
   IconEnum,
   isProjectOwnerAtom,
+  openPublicPage,
   sortCharactersByName,
   userAtom,
 } from "../../utils";
@@ -938,7 +939,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 icon={IconEnum.public}
                 isDisabled={!existingCharacter?.data?.is_public}
                 isIconOnly
-                onClick={() => navigate(`/public/${project_id}/characters/${existingCharacter?.data?.id}`)}
+                onClick={() => openPublicPage(`/${project_id}/characters/${existingCharacter?.data?.id}`)}
                 tooltip="View public page"
                 variant="info"
               />
@@ -990,11 +991,11 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             />
 
             <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="text-center font-merriweather text-lg">
+              <h2 className="font-merriweather text-center text-lg">
                 {`${existingCharacter?.data?.full_name || ""}`.trimEnd()}
               </h2>
               {existingCharacter?.data?.nickname ? (
-                <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
+                <h3 className="font-lato text-center">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
             </div>
 
@@ -1029,7 +1030,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
           </div>
         ) : null}
         <div className="flex max-h-full flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
-          <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
+          <h2 className="font-merriweather mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 text-2xl">
             <span className="flex">
               {type === "conversations" && subitem_id ? (
                 <div className="ml-auto flex w-min items-center pr-2 text-sm">
@@ -1099,7 +1100,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
             </div>
           ) : null}
           {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
-            <ul className="flex flex-col gap-y-2 overflow-y-auto animate-in fade-in fill-mode-both">
+            <ul className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto">
               {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
               {(existingTemplates?.data || []).map((t) => {
                 return (
@@ -1146,7 +1147,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 initialOpen={false}
                 label="Documents">
                 {existingCharacter?.data?.documents?.length ? (
-                  <div className="mt-2 animate-in fade-in fill-mode-both">
+                  <div className="animate-in fade-in fill-mode-both mt-2">
                     <Table
                       columns={documentsTableColumns(
                         removeItem,
@@ -1174,7 +1175,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
               </Collapsible>
 
               <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                <div className="mt-2 animate-in fade-in fill-mode-both">
+                <div className="animate-in fade-in fill-mode-both mt-2">
                   {existingCharacter?.data?.locations?.length ? (
                     <Table
                       columns={locationsTableColumns(project_id as string)}
@@ -1196,7 +1197,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 </div>
               </Collapsible>
               <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
-                <div className="mt-2 animate-in fade-in fill-mode-both">
+                <div className="animate-in fade-in fill-mode-both mt-2">
                   {existingCharacter?.data?.events?.length ? (
                     <Table
                       columns={eventsTableColumns(
@@ -1252,7 +1253,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 initialOpen={false}
                 label="Assets">
                 {existingCharacter?.data?.images?.length ? (
-                  <div className="mt-2 animate-in fade-in fill-mode-both">
+                  <div className="animate-in fade-in fill-mode-both mt-2">
                     {assetView === "table" ? (
                       <Table
                         columns={assetTableColumns(
@@ -1298,7 +1299,7 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
                 initialOpen={false}
                 label="Tags">
                 {existingCharacter?.data?.tags?.length ? (
-                  <div className="mt-2 flex flex-wrap gap-2 animate-in fade-in fill-mode-both">
+                  <div className="animate-in fade-in fill-mode-both mt-2 flex flex-wrap gap-2">
                     {existingCharacter.data.tags.map((tag) => (
                       <div key={tag.id}>
                         <Badge customColor={tag.color} label={tag.title} />
@@ -1350,3 +1351,4 @@ export function CharacterProfileView({ id, isPreview, isPublic }: { id?: string;
     </div>
   );
 }
+

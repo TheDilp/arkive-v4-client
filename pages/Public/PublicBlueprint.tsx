@@ -46,13 +46,13 @@ export function PublicBlueprint() {
   if (!blueprint_instance?.data) return <Skeleton type="character_profile_main" />;
   if (!blueprint_instance?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
-    return <Navigate to={`/public/${project_id}/blueprints`} />;
+    return <Navigate to={`/${project_id}/blueprints`} />;
   }
   return (
     <PublicEntityLayout title={blueprint_instance?.data?.title || ""}>
       <div className="flex flex-col px-2">
         <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
-          <div className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2 animate-in fade-in fill-mode-both">
+          <div className="animate-in fade-in fill-mode-both flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">
             {blueprint_instance?.data
               ? blueprint_instance?.data?.blueprint_fields
                   ?.toSorted((a, b) => a.sort - b.sort)
@@ -76,3 +76,4 @@ export function PublicBlueprint() {
     </PublicEntityLayout>
   );
 }
+

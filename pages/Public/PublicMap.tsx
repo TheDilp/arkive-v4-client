@@ -37,7 +37,7 @@ export function PublicMap() {
   if (!map?.data) return <Skeleton type="project_view" />;
   if (!map?.data?.is_public || error) {
     createNotification({ title: "This entity is not public.", variant: "error", icon: IconEnum.error, timer: 3 });
-    return <Navigate to={`/public/${project_id}/maps`} />;
+    return <Navigate to={`/${project_id}/maps`} />;
   }
 
   return (
@@ -50,3 +50,4 @@ export function PublicMap() {
     </PublicEntityLayout>
   );
 }
+

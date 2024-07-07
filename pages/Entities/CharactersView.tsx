@@ -53,6 +53,7 @@ import {
   IconEnum,
   isProjectOwnerAtom,
   NumberFilters,
+  openPublicPage,
   TextFilters,
   userAtom,
 } from "../../utils";
@@ -308,7 +309,7 @@ function createColumns(
                       id: "view_public",
                       title: "View public page",
                       icon: IconEnum.public,
-                      onClick: () => window.open(`/public/${project_id}/characters/${row.original.id}`, "_blank"),
+                      onClick: () => openPublicPage(`/${project_id}/characters/${row.original.id}`),
                       isDisabled: !row.original.is_public,
                     },
                     {
@@ -883,3 +884,4 @@ export function CharactersView() {
     </TablePageLayout>
   );
 }
+

@@ -52,3 +52,7 @@ export function getSidebarLink(link: string, project_id: string, isDisabled?: bo
   return link === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${link}`;
 }
 
+export function openPublicPage(link: string) {
+  window.open(`https://wiki.thearkive.app${link}`, "_blank");
+}
+

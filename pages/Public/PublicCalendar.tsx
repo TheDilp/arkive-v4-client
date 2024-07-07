@@ -34,7 +34,7 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
   if (!calendar?.data) return <Skeleton type="editor" />;
   if (!calendar?.data?.is_public) {
     createNotiifcation({ title: "This entity is not public.", timer: 3, variant: "error", icon: IconEnum.error });
-    return <Navigate to={`/public/${project_id}/calendars`} />;
+    return <Navigate to={`/${project_id}/calendars`} />;
   }
   return (
     <PublicEntityLayout title={calendar?.data?.title}>
@@ -42,3 +42,4 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
     </PublicEntityLayout>
   );
 }
+
