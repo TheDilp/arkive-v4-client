@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { capitalCase } from "remirror";
 
@@ -27,6 +27,13 @@ export function PublicNavbar() {
       queryKeyConcat: ["public"],
     }
   );
+
+  useLayoutEffect(() => {
+    if (project?.data) {
+      document.title = `${project?.data?.title || "The Arkive"} wiki`;
+    }
+  }, [project]);
+
   const navigate = useNavigate();
 
   return (
