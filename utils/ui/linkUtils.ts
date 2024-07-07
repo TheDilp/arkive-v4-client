@@ -3,19 +3,19 @@ export function getEntityLink(
   name: string,
   item_id: string,
   parent_id?: string | null,
-  isPublic?: boolean,
+  isPublic?: boolean
 ) {
   if (name === "") return "#";
-  const linkRoot = isPublic ? "public" : "projects";
+  const linkRoot = isPublic ? "../" : "/projects";
   if (name === "characters") {
-    return `/${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/biography`;
+    return `${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/biography`;
   }
   if (name === "blueprint_instances") {
-    if (isPublic) return `/${linkRoot}/${project_id}/blueprints/${item_id}`;
-    return `/${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
+    if (isPublic) return `${linkRoot}/${project_id}/blueprints/${item_id}`;
+    return `${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "images") {
-    return `/${linkRoot}/${project_id}/assets`;
+    return `${linkRoot}/${project_id}/assets`;
   }
 
   let link_type = "";
@@ -26,7 +26,7 @@ export function getEntityLink(
   if (name === "events") link_type = "calendars";
   if (name === "documents" || name === "maps" || name === "calendars" || name === "dictionaries" || name === "blueprints")
     link_type = name;
-  if (link_type) return `/${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
+  if (link_type) return `${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
   return "#";
 }
 
@@ -40,7 +40,7 @@ export function getMentionLink(
   project_id: string,
   is_public: boolean,
   isPublic?: boolean,
-  parent_id?: string,
+  parent_id?: string
 ) {
   if (isPublic && !is_public) return "#";
   return getEntityLink(project_id, type, id, parent_id, isPublic);
@@ -51,3 +51,4 @@ export function getSidebarLink(link: string, project_id: string, isDisabled?: bo
   if (link === "/user_settings/webhooks") return link;
   return link === "/" ? `/projects/${project_id}` : `/projects/${project_id}/${link}`;
 }
+
