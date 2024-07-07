@@ -376,10 +376,10 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:w-[60%]">
+    <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:max-w-5xl">
       {mentionPosition ? (
         <div
-          className={`absolute fade-in-30 ${
+          className={`fade-in-30 absolute ${
             mentionPosition === "above" ? "top-48" : "bottom-10"
           } left-1/2 animate-bounce text-green-400 duration-700`}>
           <Icon
@@ -444,3 +444,4 @@ function DocumentViewEditor({
     </div>
   );
 }
+
