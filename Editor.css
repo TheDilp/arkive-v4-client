@@ -21,7 +21,7 @@
 
 .remirror-editor,
 .staticRendererContainer {
-  @apply max-w-full p-4 font-lato focus-visible:outline-none;
+  @apply font-lato max-w-full p-4 focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;
@@ -116,7 +116,7 @@
     }
   }
   blockquote > * {
-    @apply border-l-[3px] pl-2 font-merriweather text-2xl font-normal text-zinc-300 !important;
+    @apply font-merriweather border-l-[3px] pl-2 text-2xl font-normal text-zinc-300 !important;
   }
 
   blockquote p {
@@ -276,7 +276,7 @@
   @apply h-full w-full;
 
   :is(h1, h2, h3, h4, h5, h6) {
-    @apply text-zinc-300 !important;
+    @apply text-zinc-100 !important;
   }
 
   p:not(.ProseMirror-staticTrailingBreak) {
@@ -523,3 +523,4 @@
   background-image: url("https://api.iconify.design/ph/eye-slash.svg?color=white");
   background-size: 100% 100%;
 }
+
