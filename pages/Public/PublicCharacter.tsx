@@ -90,7 +90,7 @@ export function PublicCharacter() {
   return (
     <PublicEntityLayout image_id={character?.data?.portrait_id} title={character?.data?.full_name || ""}>
       <div className="flex h-full flex-1 flex-col gap-y-2 overflow-auto px-2">
-        <Collapsible icon={IconEnum.biography} initialOpen label="Biography">
+        <Collapsible icon={IconEnum.biography} initialOpen={!!character?.data?.biography} label="Biography">
           <div className="h-fit max-h-96 overflow-auto">
             {character?.data?.biography ? (
               <StaticRender content={character?.data?.biography ?? undefined} isPublicView />

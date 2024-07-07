@@ -4,6 +4,12 @@ import App from "./App";
 import "../../index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ErrorPage } from "../../pages/index";
+import cytoscape from "cytoscape";
+import dagre from "cytoscape-dagre";
+import gridguide from "cytoscape-grid-guide";
+
+cytoscape.use(dagre);
+gridguide(cytoscape);
 
 const router = createBrowserRouter([
   {
