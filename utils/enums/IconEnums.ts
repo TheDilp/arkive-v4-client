@@ -90,6 +90,7 @@ export const IconEnum = {
   map: "ph:map-trifold" as const,
   map_layers: "et:layers" as const,
   map_pin: "ph:map-pin-light" as const,
+  manuscripts: "ph:books" as const,
   menu: "mdi:menu" as const,
   menu_open: "mdi:menu-open" as const,
   mention: "ph:at" as const,
