@@ -1048,7 +1048,7 @@ export function FolderView() {
                   items={[
                     {
                       id: "1",
-                      title: `Create new ${entityName}`,
+                      title: "Create new",
                       icon: getDefaultEntityIcon(type as AvailableEntityType),
                       onClick: () => {
                         setDrawer((prev) => ({
@@ -1090,6 +1090,20 @@ export function FolderView() {
                                   createTemplate: true,
                                 },
                                 size: "half",
+                              }));
+                            },
+                          },
+                          {
+                            id: "4",
+                            title: "Create new manuscript",
+                            icon: IconEnum.manuscripts,
+                            onClick: () => {
+                              setDrawer((prev) => ({
+                                ...prev,
+                                data: { project_id: project_id as string },
+                                title: "Create new manuscript",
+                                type: "manuscripts",
+                                size: "xl",
                               }));
                             },
                           },
@@ -1232,4 +1246,3 @@ export function FolderView() {
     </TablePageLayout>
   );
 }
-

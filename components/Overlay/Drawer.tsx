@@ -34,7 +34,9 @@ import {
   EventDrawer,
   EventManagementDrawer,
   FieldTemplateDrawer,
+  GameDrawer,
   ImageDrawer,
+  ManuscriptDrawer,
   ManyEdgesDrawer,
   ManyNodesDrawer,
   MapDrawer,
@@ -56,7 +58,6 @@ import {
   WebhookDrawer,
   WordDrawer,
 } from "./DrawerContent";
-import GameDrawer from "./DrawerContent/GameDrawer";
 
 const DrawerClasses = tv({
   slots: {
@@ -191,6 +192,7 @@ export function Drawer() {
                 {drawer.type === "character_fields_templates" ? <FieldTemplateDrawer data={drawer?.data} /> : null}
                 {drawer.type === "folder" ? <FolderDrawer data={drawer.data} /> : null}
                 {drawer.type === "documents" ? <DocumentDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
+                {drawer.type === "manuscripts" ? <ManuscriptDrawer data={drawer?.data} /> : null}
                 {drawer.type === "from_template" ? <DocumentFromTemplate data={drawer?.data} /> : null}
                 {drawer.type === "maps" ? <MapDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "map_pins" ? <MapPinDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
@@ -251,4 +253,3 @@ export function Drawer() {
     );
   return null;
 }
-

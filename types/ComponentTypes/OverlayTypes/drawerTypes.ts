@@ -58,7 +58,8 @@ export type DrawerAtomType = {
         | "random_table_option"
         | "character_relationship_types"
         | "map_pin_types"
-        | "questionnaires";
+        | "questionnaires"
+        | "manuscripts";
       data: { id?: string; project_id?: string; preselectedTab?: number; title?: string };
     }
   | { type: "document_template" | "games"; data: { id?: string } }

@@ -14,7 +14,7 @@ type Props = {
   };
 };
 
-export default function GameDrawer({ data }: Props) {
+export function GameDrawer({ data }: Props) {
   const [project, setProject] = useState({ id: "", title: "" });
   const [game, setGame] = useState<Partial<GameType>>({});
   const { handleChange } = useHandleChange({ data: game, setData: setGame });
