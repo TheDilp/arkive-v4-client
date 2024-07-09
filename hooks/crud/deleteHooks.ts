@@ -20,6 +20,7 @@ export function useDeleteEntity(type: AvailableEntityType, project_id: string, a
       return FetchFunction({
         url: `${baseURLS.baseServer}/${type.toLowerCase()}${arkive ? "/arkive" : ""}/${vars.data.id}`,
         method: "DELETE",
+        body: JSON.stringify({}),
       });
     },
     {
