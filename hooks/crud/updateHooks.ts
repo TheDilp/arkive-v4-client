@@ -65,7 +65,6 @@ export function useUpdateEntity<
       },
       onError: (_, vars, context) => {
         queryClient.setQueryData([type, vars.data.id], context?.old);
-
         createNotification({
           title: "There was an error updating this item.",
           variant: "error",
@@ -864,4 +863,3 @@ export function useSignout() {
   );
 }
 // #endregion misc
-

@@ -23,7 +23,6 @@ import {
   userAtom,
   userStatusAtom,
 } from "../../utils";
-import { Skeleton } from "../Misc";
 import { Dialog, Drawer, Dropdown } from "../Overlay";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -189,11 +188,7 @@ export function ProjectLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser || isLoading || isInitialLoadingPermissions ? (
-            <Skeleton isFullWidth limit={10} type="table" />
-          ) : (
-            <Outlet />
-          )}
+          {isInitialLoading || isInitialLoadingUser || isLoading || isInitialLoadingPermissions ? null : <Outlet />}
         </div>
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
@@ -214,4 +209,3 @@ export function AuthLayout({ children }: { children: JSX.Element | JSX.Element[]
     </div>
   );
 }
-

@@ -37,8 +37,9 @@ export async function FetchFunction({
     throw new Error("No public access");
   } else if (data.message === "NO_ROLE_ACCESS") {
     return { role_access: false, ok: false };
+  } else if (data.ok === false) {
+    throw new Error(data.message);
   }
 
   return data;
 }
-

@@ -2,13 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cloneDeep from "lodash.clonedeep";
 import set from "lodash.set";
 
-import {
-  AllAvailableEntities,
-  AvailableEntityType,
-  AvailableSubEntityType,
-  ConversationType,
-  MessageType,
-} from "../../types";
+import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType, ConversationType, MessageType } from "../../types";
 import {
   baseURLS,
   FetchFunction,
@@ -68,6 +62,7 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
       return FetchFunction({
         url: `${baseURLS.baseServer}/${type.toLowerCase()}/${vars.data.id}`,
         method: "DELETE",
+        body: JSON.stringify({}),
       });
     },
     {
@@ -108,8 +103,14 @@ export function useDeleteSubEntity(type: AvailableSubEntityType, project_id: str
           timer: 5,
         });
       },
-      onError: (_, vars, context) => {
+      onError: (error: Error, vars, context) => {
         queryClient.setQueryData(["dictionaries", vars.data.parent_id], context?.old);
+        createNotification({
+          title: error.message,
+          variant: "error",
+          icon: IconEnum.error,
+          timer: 5,
+        });
       },
     }
   );
