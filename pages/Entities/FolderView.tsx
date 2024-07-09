@@ -81,6 +81,7 @@ import { ProjectSettingsView } from "../Projects";
 import { AssetView } from "./AssetView";
 import { BlueprintView } from "./BlueprintView";
 import { CharactersView } from "./CharactersView";
+import { ManuscriptView } from "./ManuscriptView";
 import { TagView } from "./TagView";
 import { CharacterTemplatesView } from "./TemplatesView";
 
@@ -97,6 +98,7 @@ const noFetchTypes = [
   "character_fields_templates",
   "settings",
   "assets",
+  "manuscripts",
 ];
 
 const documentTypes = [
@@ -926,7 +928,7 @@ export function FolderView() {
 
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
-
+  if (!item_id && type === "manuscripts") return <ManuscriptView />;
   if (type === "tags") return <TagView />;
   if (type === "character_fields_templates") return <CharacterTemplatesView />;
 

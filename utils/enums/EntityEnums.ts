@@ -231,4 +231,8 @@ export const RolePermissionCodes = [
   "read_assets",
   "update_assets",
   "delete_assets",
+  "create_manuscripts",
+  "read_manuscripts",
+  "update_manuscripts",
+  "delete_manuscripts",
 ] as const;
