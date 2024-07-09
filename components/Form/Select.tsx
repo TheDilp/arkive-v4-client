@@ -175,9 +175,9 @@ const SelectOption = tv({
       "4xs": "h-8",
       "3xs": "h-8",
       "2xs": "h-8",
-      xs: "h-8",
+      xs: "h-6",
       sm: "h-8",
-      md: "h-8",
+      md: "h-10",
       lg: "h-8",
       xl: "h-8",
       "2xl": "h-8",
@@ -574,4 +574,3 @@ export function Select({
     </div>
   );
 }
-
