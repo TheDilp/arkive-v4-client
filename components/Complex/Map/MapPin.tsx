@@ -39,7 +39,10 @@ export function MapPin({
     is_public,
   } = markerData;
   const { project_id } = useParams();
-  const { mutate: updateMapPin } = useUpdateMapSubEntity<{ data: Partial<MapPinType> }>("map_pins", map_id);
+  const { mutateAsync: updateMapPin, isLoading: isUpdating } = useUpdateMapSubEntity<{ data: Partial<MapPinType> }>(
+    "map_pins",
+    map_id
+  );
   const [position, setPosition] = useState<LatLngExpression>([lat, lng]);
   const setContextMenu = useSetAtom(contextMenuAtom);
   const setDrawer = useSetAtom(drawerAtom);
@@ -156,10 +159,10 @@ export function MapPin({
         });
       }
     },
-    dragend(e: any) {
+    async dragend(e: any) {
       if (!isReadOnly && !isViewOnly) {
         setPosition(e.target._latlng);
-        updateMapPin({
+        await updateMapPin({
           data: {
             id,
             lat: e.target._latlng.lat,
@@ -175,7 +178,7 @@ export function MapPin({
   }.svg?color=%23${color ? color.replace("#", "") : ""}') no-repeat`;
   return (
     <Marker
-      draggable={!isReadOnly && !isViewOnly}
+      draggable={(!isReadOnly && !isViewOnly) || isUpdating}
       eventHandlers={eventHandlers}
       icon={divIcon({
         className: "relative",
