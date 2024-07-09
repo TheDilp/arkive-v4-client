@@ -134,6 +134,7 @@ export const UserNotificationEntities = [
   "blueprints",
   "blueprint_instances",
   "documents",
+  "manuscripts",
   "maps",
   "map_pins",
   "graphs",
@@ -148,6 +149,7 @@ export const UserNotificationEntities = [
 export const UserSidebarEntitiesEnabled = [
   "characters",
   "blueprints",
+  "manuscripts",
   "documents",
   "maps",
   "graphs",

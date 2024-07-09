@@ -63,7 +63,6 @@ export function ProjectLayout() {
     },
     { enabled: !!userStatus?.user_id && !!project_id }
   );
-
   const { data: permissions, isInitialLoading: isInitialLoadingPermissions } = useGetEntities<PermissionType>(
     {
       fields: ["id", "title", "code"],
@@ -106,13 +105,11 @@ export function ProjectLayout() {
       ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
     }
   }, [projectData?.data]);
-
   useEffect(() => {
     if (permissions?.data) {
       setPermissions(permissions?.data);
     }
   }, [permissions]);
-
   useEffect(() => {
     const parsedTitle = (title?.split("|")?.at(-1) || "The Arkive").trim();
     if (parsedTitle === "undefined") return;

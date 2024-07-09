@@ -33,6 +33,7 @@ export function getProjectsViewNavItems(
 export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.character, navigate: "characters", tooltip: "Characters" },
   { icon: IconEnum.blueprint, navigate: "blueprints", tooltip: "Blueprints" },
+  { icon: IconEnum.manuscripts, navigate: "manuscripts", tooltip: "Manuscripts" },
   { icon: IconEnum.document, navigate: "documents", tooltip: "Documents" },
   { icon: IconEnum.map, navigate: "maps", tooltip: "Maps" },
   { icon: IconEnum.graph, navigate: "graphs", tooltip: "Graphs" },
