@@ -64,6 +64,33 @@ function createColumns(
   if (!IS_PUBLIC)
     columns.push(
       columnHelper.display({
+        id: "is_public",
+        header: "",
+        meta: {
+          centered: true,
+          noLink: true,
+          filterOptions: BooleanFilters,
+        },
+        cell: ({ row }) => (
+          <Button
+            hasNoBackground
+            icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+            isDisabled={!!row.original.deleted_at}
+            isIconOnly
+            onClick={async () => {
+              await updatePublicMany({
+                data: {
+                  ids: [row.original.id],
+                  is_public: !row.original.is_public,
+                },
+              });
+            }}
+          />
+        ),
+        minSize: 3.25,
+        maxSize: 3.25,
+      }),
+      columnHelper.display({
         id: "action",
         header: "Actions",
         meta: {
@@ -138,33 +165,6 @@ function createColumns(
             </Dropdown>
           </div>
         ),
-      }),
-      columnHelper.display({
-        id: "is_public",
-        header: "",
-        meta: {
-          centered: true,
-          noLink: true,
-          filterOptions: BooleanFilters,
-        },
-        cell: ({ row }) => (
-          <Button
-            hasNoBackground
-            icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-            isDisabled={!!row.original.deleted_at}
-            isIconOnly
-            onClick={async () => {
-              await updatePublicMany({
-                data: {
-                  ids: [row.original.id],
-                  is_public: !row.original.is_public,
-                },
-              });
-            }}
-          />
-        ),
-        minSize: 3.25,
-        maxSize: 3.25,
       })
     );
 
@@ -426,4 +426,3 @@ export function DictionaryView({ id }: { id?: string }) {
     </>
   );
 }
-
