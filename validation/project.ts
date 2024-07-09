@@ -3,7 +3,7 @@ import { z } from "zod";
 export const InsertProjectSchema = z.object({
   data: z.object({
     owner_id: z.string(),
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     image_id: z.string().optional().nullable(),
   }),
 });
@@ -11,7 +11,10 @@ export const InsertProjectSchema = z.object({
 export const UpdateProjectSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     image_id: z.string().optional().nullable(),
     default_dice_color: z.string().optional().nullable(),
   }),

@@ -5,7 +5,7 @@ import { InsertMapLayerSchema, UpdateMapLayerSchema } from "./map_layers";
 
 export const InsertMapSchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
     cluster_pins: z.boolean().nullable().optional(),
@@ -20,7 +20,7 @@ export const InsertMapSchema = z.object({
       map_layers: z
         .object({
           data: z.object({
-            title: z.string(),
+            title: z.string().transform((value) => value.trim()),
             is_public: z.boolean().nullable().optional(),
             image_id: z.string(),
           }),
@@ -35,7 +35,10 @@ export const InsertMapSchema = z.object({
 export const UpdateMapSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
     cluster_pins: z.boolean().nullable().optional(),

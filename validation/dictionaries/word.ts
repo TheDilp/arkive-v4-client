@@ -4,9 +4,13 @@ import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../p
 
 export const InsertWordSchema = z.object({
   data: z.object({
-    title: z.string(),
-    translation: z.string(),
-    description: z.string().nullable().optional(),
+    title: z.string().transform((value) => value.trim()),
+    translation: z.string().transform((value) => value.trim()),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     parent_id: z.string(),
   }),
   permissions: InsertEntityPermissionSchema,
@@ -14,10 +18,20 @@ export const InsertWordSchema = z.object({
 export const UpdateWordSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
-    translation: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
+    translation: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     owner_id: z.string().optional(),
-    description: z.string().nullable().optional(),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
   }),
   permissions: UpdateEntityPermissionSchema,
 });

@@ -4,12 +4,24 @@ import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../p
 
 export const InsertEventSchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     parent_id: z.string(),
-    description: z.string().optional().nullable(),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
     is_public: z.boolean().optional().nullable(),
-    background_color: z.string().optional().nullable(),
-    text_color: z.string().optional().nullable(),
+    background_color: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
+    text_color: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
     start_day: z.number(),
     start_month: z.number(),
     start_month_id: z.string(),
@@ -39,11 +51,26 @@ export const InsertEventSchema = z.object({
 export const UpdateEventSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
-    description: z.string().optional().nullable(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
     is_public: z.boolean().optional().nullable(),
-    background_color: z.string().optional().nullable(),
-    text_color: z.string().optional().nullable(),
+    background_color: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
+    text_color: z
+      .string()
+      .transform((value) => value.trim())
+      .optional()
+      .nullable(),
     start_day: z.number().optional(),
     start_month: z.number().optional(),
     start_month_id: z.string(),

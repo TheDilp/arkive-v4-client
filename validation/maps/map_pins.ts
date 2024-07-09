@@ -8,7 +8,11 @@ export const InsertMapPinSchema = z.object({
     parent_id: z.string(),
     lat: z.number(),
     lng: z.number(),
-    title: z.string().nullable().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     color: z.string().nullable().optional(),
     border_color: z.string().nullable().optional(),
     background_color: z.string().nullable().optional(),
@@ -29,7 +33,11 @@ export const UpdateMapPinSchema = z.object({
     id: z.string(),
     lat: z.number().optional(),
     lng: z.number().optional(),
-    title: z.string().nullable().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     color: z.string().nullable().optional(),
     border_color: z.string().nullable().optional(),
     background_color: z.string().nullable().optional(),

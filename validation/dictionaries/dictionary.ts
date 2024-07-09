@@ -4,7 +4,7 @@ import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "../p
 
 export const InsertDictionarySchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     project_id: z.string(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
@@ -16,7 +16,10 @@ export const InsertDictionarySchema = z.object({
 export const UpdateDictionarySchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),

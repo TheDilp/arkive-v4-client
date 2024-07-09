@@ -5,8 +5,15 @@ import { InsertEntityPermissionSchema, UpdateEntityPermissionSchema } from "./pe
 export const UpdateRandomTableSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
-    description: z.string().nullable().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     parent_id: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
@@ -19,8 +26,12 @@ export const UpdateRandomTableSchema = z.object({
         .object({
           data: z.object({
             id: z.string(),
-            title: z.string(),
-            description: z.string().nullable().optional(),
+            title: z.string().transform((value) => value.trim()),
+            description: z
+              .string()
+              .transform((value) => value.trim())
+              .nullable()
+              .optional(),
             icon: z.string().nullable().optional(),
             icon_color: z.string().nullable().optional(),
           }),
@@ -35,8 +46,12 @@ export const UpdateRandomTableSchema = z.object({
 
 export const InsertRandomTableOptionSchema = z.object({
   data: z.object({
-    title: z.string(),
-    description: z.string().nullable().optional(),
+    title: z.string().transform((value) => value.trim()),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     parent_id: z.string(),
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
@@ -45,8 +60,15 @@ export const InsertRandomTableOptionSchema = z.object({
 export const UpdateRandomTableOptionSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
-    description: z.string().nullable().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     icon: z.string().nullable().optional(),
     icon_color: z.string().nullable().optional(),
   }),
@@ -56,8 +78,12 @@ export const UpdateRandomTableOptionSchema = z.object({
         data: z.object({
           id: z.string(),
           parent_id: z.string(),
-          title: z.string(),
-          description: z.string().optional().nullable(),
+          title: z.string().transform((value) => value.trim()),
+          description: z
+            .string()
+            .transform((value) => value.trim())
+            .optional()
+            .nullable(),
         }),
       })
       .array()
@@ -67,8 +93,12 @@ export const UpdateRandomTableOptionSchema = z.object({
 
 export const InsertRandomTableSchema = z.object({
   data: z.object({
-    title: z.string(),
-    description: z.string().nullable().optional(),
+    title: z.string().transform((value) => value.trim()),
+    description: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     project_id: z.string(),
     parent_id: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
@@ -80,8 +110,12 @@ export const InsertRandomTableSchema = z.object({
       random_table_options: z
         .object({
           data: z.object({
-            title: z.string(),
-            description: z.string().nullable().optional(),
+            title: z.string().transform((value) => value.trim()),
+            description: z
+              .string()
+              .transform((value) => value.trim())
+              .nullable()
+              .optional(),
             icon: z.string().nullable().optional(),
             icon_color: z.string().nullable().optional(),
           }),

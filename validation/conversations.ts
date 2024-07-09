@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const InsertConversationSchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     project_id: z.string(),
   }),
   relations: z.object({
@@ -10,7 +10,7 @@ export const InsertConversationSchema = z.object({
       .array(
         z.object({
           id: z.string(),
-        }),
+        })
       )
       .min(1),
   }),
@@ -19,14 +19,17 @@ export const InsertConversationSchema = z.object({
 export const UpdateConversationSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
   }),
   relations: z.object({
     characters: z
       .array(
         z.object({
           id: z.string(),
-        }),
+        })
       )
       .optional(),
   }),

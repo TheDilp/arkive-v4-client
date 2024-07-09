@@ -23,8 +23,14 @@ const RandomCountOptions = z
 export const InsertDocumentTemplateFieldSchema = z.object({
   key: z.string(),
   entity_type: z.string(),
-  value: z.string().nullable(),
-  formula: z.string().nullable(),
+  value: z
+    .string()
+    .transform((value) => value.trim())
+    .nullable(),
+  formula: z
+    .string()
+    .transform((value) => value.trim())
+    .nullable(),
   derive_from: z.string().nullable(),
   derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
@@ -34,10 +40,16 @@ export const InsertDocumentTemplateFieldSchema = z.object({
 });
 export const UpdateDocumentTemplateFieldSchema = z.object({
   id: z.string(),
-  key: z.string(),
+  key: z.string().transform((value) => value.trim()),
   entity_type: z.string(),
-  value: z.string().nullable(),
-  formula: z.string().nullable(),
+  value: z
+    .string()
+    .transform((value) => value.trim())
+    .nullable(),
+  formula: z
+    .string()
+    .transform((value) => value.trim())
+    .nullable(),
   derive_from: z.string().nullable(),
   derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
@@ -50,7 +62,7 @@ export const InsertDocumentSchema = z.object({
   data: z.object({
     id: z.string().optional(),
     project_id: z.string(),
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     content: z.object({}).nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
@@ -63,7 +75,10 @@ export const InsertDocumentSchema = z.object({
   relations: z
     .object({
       tags: z.object({ id: z.string() }).array().optional(),
-      alter_names: z.object({ title: z.string() }).array().optional(),
+      alter_names: z
+        .object({ title: z.string().transform((value) => value.trim()) })
+        .array()
+        .optional(),
       template_fields: InsertDocumentTemplateFieldSchema.array().optional().nullable(),
     })
     .optional(),
@@ -72,7 +87,10 @@ export const InsertDocumentSchema = z.object({
 export const UpdateDocumentSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     content: z.object({}).nullable().optional(),
     icon: z.string().nullable().optional(),
     is_folder: z.boolean().nullable().optional(),
@@ -85,7 +103,13 @@ export const UpdateDocumentSchema = z.object({
   }),
   relations: z
     .object({
-      alter_names: z.object({ title: z.string(), project_id: z.string() }).array().optional(),
+      alter_names: z
+        .object({
+          title: z.string().transform((value) => value.trim()),
+          project_id: z.string(),
+        })
+        .array()
+        .optional(),
       tags: z.object({ id: z.string() }).array().optional(),
       template_fields: UpdateDocumentTemplateFieldSchema.array().optional().nullable(),
     })

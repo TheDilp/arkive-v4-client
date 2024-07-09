@@ -4,14 +4,22 @@ const InsertNodeSchema = z.object({
   data: z.object({
     id: z.string(),
     parent_id: z.string(),
-    label: z.string().nullable().optional(),
+    label: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     type: z.string().nullable().optional(),
     width: z.number().optional(),
     height: z.number().optional(),
     x: z.number(),
     y: z.number(),
     font_size: z.number().nullable().optional(),
-    font_color: z.string().nullable().optional(),
+    font_color: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     font_family: z.string().nullable().optional(),
     text_v_align: z.string().nullable().optional(),
     text_h_align: z.string().nullable().optional(),
@@ -68,7 +76,11 @@ export const UpdateNodeSchema = z.object({
     x: z.number().optional(),
     y: z.number().optional(),
     font_size: z.number().nullable().optional(),
-    font_color: z.string().nullable().optional(),
+    font_color: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     font_family: z.string().nullable().optional(),
     text_v_align: z.string().nullable().optional(),
     text_h_align: z.string().nullable().optional(),

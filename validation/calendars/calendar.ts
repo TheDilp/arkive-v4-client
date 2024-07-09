@@ -6,13 +6,14 @@ import { InsertMonthSchema, UpdateMonthSchema } from "./month";
 
 export const InsertCalendarSchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
     icon: z.string().nullable().optional(),
     project_id: z.string(),
     starts_on_day: z
       .string()
+      .transform((value) => value.trim())
       .or(z.number())
       .optional()
       .nullable()
@@ -24,7 +25,11 @@ export const InsertCalendarSchema = z.object({
     hours: z.number().optional().nullable(),
     minutes: z.number().optional().nullable(),
     parent_id: z.string().nullable().optional(),
-    days: z.string().array().min(1),
+    days: z
+      .string()
+      .transform((value) => value.trim())
+      .array()
+      .min(1),
   }),
   relations: z.object({
     eras: InsertEraSchema.array().optional(),
@@ -51,12 +56,20 @@ export const InsertCalendarSchema = z.object({
 export const UpdateCalendarSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     is_folder: z.boolean().nullable().optional(),
     is_public: z.boolean().nullable().optional(),
     icon: z.string().nullable().optional(),
     parent_id: z.string().nullable().optional(),
-    days: z.string().array().min(1).optional(),
+    days: z
+      .string()
+      .transform((value) => value.trim())
+      .array()
+      .min(1)
+      .optional(),
     hours: z.number().optional().nullable(),
     minutes: z.number().optional().nullable(),
     starts_on_day: z

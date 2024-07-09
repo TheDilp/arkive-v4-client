@@ -29,17 +29,24 @@ const FieldTypeSchema = z.union([
 export const InsertTemplateSchema = z.object({
   data: z.object({
     project_id: z.string(),
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     sort: z.number().optional(),
   }),
   relations: z.object({
     character_fields: z
       .object({
-        title: z.string(),
+        title: z.string().transform((value) => value.trim()),
         field_type: FieldTypeSchema,
         sort: z.number().optional(),
-        formula: z.string().optional().nullable(),
-        options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+        formula: z
+          .string()
+          .transform((value) => value.trim())
+          .optional()
+          .nullable(),
+        options: z
+          .object({ id: z.string(), value: z.string().transform((value) => value.trim()) })
+          .array()
+          .optional(),
         random_table_id: z.string().optional().nullable(),
         calendar_id: z.string().optional().nullable(),
         blueprint_id: z.string().optional().nullable(),
@@ -56,17 +63,30 @@ export const UpdateTemplateSchema = z
       id: z.string(),
       sort: z.number().optional(),
       owner_id: z.string().optional(),
-      title: z.string().optional(),
+      title: z
+        .string()
+        .transform((value) => value.trim())
+        .optional(),
     }),
     relations: z.object({
       character_fields: z
         .object({
           id: z.string(),
-          title: z.string().optional(),
+          title: z
+            .string()
+            .transform((value) => value.trim())
+            .optional(),
           field_type: FieldTypeSchema.optional(),
           sort: z.number().optional(),
-          formula: z.string().optional().nullable(),
-          options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+          formula: z
+            .string()
+            .transform((value) => value.trim())
+            .optional()
+            .nullable(),
+          options: z
+            .object({ id: z.string(), value: z.string().transform((value) => value.trim()) })
+            .array()
+            .optional(),
           random_table_id: z.string().optional().nullable(),
           calendar_id: z.string().optional().nullable(),
           blueprint_id: z.string().optional().nullable(),

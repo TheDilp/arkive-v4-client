@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const InsertEraSchema = z.object({
   data: z.object({
-    title: z.string(),
+    title: z.string().transform((value) => value.trim()),
     parent_id: z.string(),
-    color: z.string(),
+    color: z.string().transform((value) => value.trim()),
     start_day: z.number(),
     start_month: z.number(),
     start_month_id: z.string(),
@@ -19,8 +19,14 @@ export const InsertEraSchema = z.object({
 export const UpdateEraSchema = z.object({
   data: z.object({
     id: z.string(),
-    title: z.string().optional(),
-    color: z.string().optional(),
+    title: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
+    color: z
+      .string()
+      .transform((value) => value.trim())
+      .optional(),
     start_day: z.number().optional(),
     start_month: z.number().optional(),
     start_month_id: z.string(),

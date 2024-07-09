@@ -29,18 +29,25 @@ const BlueprintFieldTypeSchema = z.union([
 export const InsertBlueprintSchema = z.object({
   data: z.object({
     project_id: z.string(),
-    title: z.string(),
-    title_name: z.string(),
+    title: z.string().transform((value) => value.trim()),
+    title_name: z.string().transform((value) => value.trim()),
     icon: z.string().optional().nullable(),
   }),
   relations: z.object({
     blueprint_fields: z
       .object({
-        title: z.string(),
+        title: z.string().transform((value) => value.trim()),
         field_type: BlueprintFieldTypeSchema,
         sort: z.number().optional(),
-        formula: z.string().optional().nullable(),
-        options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+        formula: z
+          .string()
+          .transform((value) => value.trim())
+          .optional()
+          .nullable(),
+        options: z
+          .object({ id: z.string(), value: z.string().transform((value) => value.trim()) })
+          .array()
+          .optional(),
         random_table_id: z.string().optional().nullable(),
         calendar_id: z.string().optional().nullable(),
         blueprint_id: z.string().optional().nullable(),
@@ -54,8 +61,14 @@ export const UpdateBlueprintSchema = z
   .object({
     data: z.object({
       id: z.string(),
-      title: z.string().optional(),
-      title_name: z.string().optional(),
+      title: z
+        .string()
+        .transform((value) => value.trim())
+        .optional(),
+      title_name: z
+        .string()
+        .transform((value) => value.trim())
+        .optional(),
       owner_id: z.string().optional(),
       icon: z.string().optional().nullable(),
     }),
@@ -63,11 +76,17 @@ export const UpdateBlueprintSchema = z
       blueprint_fields: z
         .object({
           id: z.string(),
-          title: z.string().optional(),
+          title: z
+            .string()
+            .transform((value) => value.trim())
+            .optional(),
           field_type: BlueprintFieldTypeSchema.optional(),
           sort: z.number().optional(),
           formula: z.string().optional().nullable(),
-          options: z.object({ id: z.string(), value: z.string() }).array().optional(),
+          options: z
+            .object({ id: z.string(), value: z.string().transform((value) => value.trim()) })
+            .array()
+            .optional(),
           random_table_id: z.string().optional().nullable(),
           calendar_id: z.string().optional().nullable(),
           blueprint_id: z.string().optional().nullable(),

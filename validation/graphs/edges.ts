@@ -19,7 +19,11 @@ const InsertEdgeSchema = z.object({
   data: z.object({
     id: z.string(),
     parent_id: z.string(),
-    label: z.string().nullable().optional(),
+    label: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     curve_style: z.string().nullable().optional(),
     line_style: z.string().nullable().optional(),
     line_color: z.string().nullable().optional(),
@@ -46,7 +50,11 @@ const InsertEdgeSchema = z.object({
     mid_source_arrow_color: z.string().nullable().optional(),
 
     font_size: z.number().nullable().optional(),
-    font_color: z.string().nullable().optional(),
+    font_color: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     font_family: z.string().nullable().optional(),
     z_index: z.number().nullable().optional(),
   }),
@@ -60,7 +68,11 @@ const InsertEdgeSchema = z.object({
 export const UpdateEdgeSchema = z.object({
   data: z.object({
     id: z.string(),
-    label: z.string().nullable().optional(),
+    label: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     curve_style: z.string().nullable().optional(),
     line_style: z.string().nullable().optional(),
     line_color: z.string().nullable().optional(),
@@ -72,7 +84,6 @@ export const UpdateEdgeSchema = z.object({
     taxi_direction: z.string().nullable().optional(),
     taxi_turn: z.number().nullable().optional(),
     arrow_scale: z.number().nullable().optional(),
-
     target_arrow_shape: ArrowShapeEnum.nullable().optional(),
     target_arrow_fill: ArrowFillEnum.nullable().optional(),
     target_arrow_color: z.string().nullable().optional(),
@@ -85,9 +96,12 @@ export const UpdateEdgeSchema = z.object({
     mid_source_arrow_shape: ArrowShapeEnum.nullable().optional(),
     mid_source_arrow_fill: ArrowFillEnum.nullable().optional(),
     mid_source_arrow_color: z.string().nullable().optional(),
-
     font_size: z.number().nullable().optional(),
-    font_color: z.string().nullable().optional(),
+    font_color: z
+      .string()
+      .transform((value) => value.trim())
+      .nullable()
+      .optional(),
     font_family: z.string().nullable().optional(),
     z_index: z.number().nullable().optional(),
   }),

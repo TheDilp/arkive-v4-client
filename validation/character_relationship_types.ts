@@ -6,6 +6,7 @@ export const InsertCharacterRelationshipSchema = z.object({
     project_id: z.string(),
     ascendant_title: z
       .string()
+      .transform((value) => value.trim())
       .optional()
       .nullable()
       .transform((val) => {
@@ -14,6 +15,7 @@ export const InsertCharacterRelationshipSchema = z.object({
       }),
     descendant_title: z
       .string()
+      .transform((value) => value.trim())
       .optional()
       .nullable()
       .transform((val) => {
