@@ -53,7 +53,7 @@ export type AvailableEntityType =
   | "images"
   | "roles"
   | "permissions"
-  | "questionnaires";
+  | "manuscripts";
 
 export type AvailableSubEntityType =
   | "alter_names"

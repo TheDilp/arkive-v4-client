@@ -43,7 +43,7 @@ export function useUpdateEntity<
     {
       mutationKey: options?.mutationKey,
       onMutate: (vars) => {
-        if (type !== "projects" && type !== "questionnaires" && type !== "documents") {
+        if (type !== "projects" && type !== "documents") {
           const old = queryClient.getQueryData([type, vars.data.id]);
 
           queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
