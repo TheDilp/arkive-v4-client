@@ -32,11 +32,12 @@ function isSaveDisabled(blueprint: BlueprintStateType) {
       (field) =>
         !field.title ||
         !field.field_type ||
-        ((field.field_type === "select_multiple" || field.field_type === "select") && !field?.options?.length) ||
+        ((field.field_type === "select_multiple" || field.field_type === "select") &&
+          (!field?.options?.length || (field.options || [])?.some((opt) => !opt.value))) ||
         (field.field_type === "dice_roll" && !field?.formula) ||
         (field.field_type === "random_table" && !field.random_table_id) ||
         (field.field_type === "date" && !field?.calendar_id) ||
-        ((field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") && !field.blueprint_id),
+        ((field.field_type === "blueprints_single" || field.field_type === "blueprints_multiple") && !field.blueprint_id)
     )
   )
     return true;
@@ -167,6 +168,7 @@ function FieldRow({
                             name={`blueprint_fields[${index}].options[${optIndex}].value`}
                             onChange={changeField}
                             value={opt.value}
+                            variant={!opt.value ? "error" : "primary"}
                           />
                         </div>
 
@@ -269,7 +271,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertBlueprintType>("blueprints");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateBlueprintType>(
     "blueprints",
-    project_id as string,
+    project_id as string
   );
 
   const {
@@ -292,14 +294,14 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
     {
       enabled: !!data?.id,
       queryKeyConcat: ["drawer"],
-    },
+    }
   );
   const permissions = useHasPermissions(["create_blueprints", "update_blueprints"], existingBlueprint?.data?.owner_id);
   const canCreateOrEdit = createOrEditPermission(
     permissions?.create_blueprints,
     permissions?.update_blueprints,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
   const tabs = getTabs(permissions, data?.id);
   const [blueprint, setBlueprint] = useState<BlueprintStateType>({
