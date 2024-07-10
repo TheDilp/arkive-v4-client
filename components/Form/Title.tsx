@@ -1,9 +1,13 @@
 import { tv } from "tailwind-variants";
 
 import { TitleType } from "../../types/ComponentTypes/FormTypes/titleTypes";
+import { Button } from "./Button";
 
 const TitleClasses = tv({
-  base: "font-lato text-white",
+  slots: {
+    base: "font-lato text-white flex flex-nowrap justify-between",
+    actions: "flex flex-nowrap gap-x-1",
+  },
   variants: {
     size: {
       "4xs": "text-xs",
@@ -38,8 +42,33 @@ const TitleClasses = tv({
   },
 });
 
-export function Title({ label, size = "md", variant = "primary", isDrawerTitle }: TitleType) {
-  const classes = TitleClasses({ size, isDrawerTitle, variant });
-  return <div className={classes}>{label}</div>;
+export function Title({ label, size = "md", actions, variant = "primary", isDrawerTitle }: TitleType) {
+  const { base, actions: actionsClasses } = TitleClasses({ size, isDrawerTitle, variant });
+  return (
+    <div className={base()}>
+      <span>{label}</span>
+      <div className={actionsClasses()}>
+        {actions?.length
+          ? actions.map((act) => (
+              <div
+                key={act.label || act.icon}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}>
+                <Button
+                  hasNoBackground
+                  icon={act?.icon}
+                  isDisabled={act?.isDisabled}
+                  label={act?.label}
+                  onClick={act.onClick}
+                  tooltip={act?.tooltip}
+                  variant={act?.variant}
+                />
+              </div>
+            ))
+          : null}
+      </div>
+    </div>
+  );
 }
-
