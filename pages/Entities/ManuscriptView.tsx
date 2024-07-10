@@ -154,7 +154,7 @@ function createColumns(
                           ...prev,
                           data: row.original,
                           title: "Edit manuscript",
-                          size: "lg",
+                          size: "2xl",
                           type: "manuscripts",
                         }));
                       },
@@ -407,7 +407,7 @@ export function ManuscriptView() {
                 data: { project_id: project_id as string },
                 title: "Create new manuscript",
                 type: "manuscripts",
-                size: "lg",
+                size: "2xl",
               }))
             }
             tooltip={isMd ? undefined : "Create new manuscript"}
