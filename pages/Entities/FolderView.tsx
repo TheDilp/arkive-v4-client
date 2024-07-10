@@ -713,7 +713,7 @@ export function FolderView() {
     pagination: { page: 0, limit: 10 },
   });
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState<"table" | "folders">(ls.get(`${entityName}-table`) || "table");
+  const [view, setView] = useState<"table" | "grid">(ls.get(`${entityName}-table`) || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get(`${entityName}-table-active`) || "active");
   const [documentType, setDocumentType] = useState<"documents" | "templates">(ls.get("documentType") ?? "documents");
   const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
@@ -1005,11 +1005,11 @@ export function FolderView() {
                 <Select
                   name="view"
                   onChange={({ value }) => {
-                    setView(value as "folders" | "table");
+                    setView(value as "grid" | "table");
                     ls.set(`${entityName}-table`, value);
                   }}
                   options={[
-                    { label: "Folders", value: "folders", icon: IconEnum.folder },
+                    { label: "Grid", value: "grid", icon: IconEnum.grid },
                     { label: "Table", value: "table", icon: IconEnum.table },
                   ]}
                   placeholder="View"
@@ -1113,13 +1113,13 @@ export function FolderView() {
           ) : null}
         </div>
 
-        {(isInitialLoading || isInitialLoadingFolder) && view === "folders" ? (
+        {(isInitialLoading || isInitialLoadingFolder) && view === "grid" ? (
           <div className="mt-72 w-full">
             <Skeleton entity_type={type as AvailableEntityType} type="folder_view" />
           </div>
         ) : null}
       </div>
-      {!isInitialLoading && !isInitialLoadingFolder && view === "folders" ? (
+      {!isInitialLoading && !isInitialLoadingFolder && view === "grid" ? (
         <div className="grid h-full w-full grid-cols-2 content-start gap-8 md:grid-cols-4 lg:grid-cols-10">
           {(base?.data?.length && (!item_id || isFolder) ? base.data : []).map((item) => (
             <EntityItem
