@@ -1,9 +1,11 @@
 import cloneDeep from "lodash.clonedeep";
 import React, { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { useHandleChange } from "../../../hooks";
+import { useCreateEntity, useHandleChange } from "../../../hooks";
 import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
 import { IconEnum } from "../../../utils";
+import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
 import { Button, Input, Search, Title } from "../../Form";
 import { Collapsible, DrawerLayout } from "../../Layout";
 
@@ -177,7 +179,7 @@ function ManuscriptItem({ doc, parentIndex }: { doc: ManuscriptDocumentType; par
 
 function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptType["documents"]; parentIndex: number }) {
   return (
-    <div className={`${parentIndex <= 1 ? "p-2" : ""}`}>
+    <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 p-2" : ""}`}>
       {documents.map((doc) => (
         <ManuscriptItem doc={doc} key={doc.id} parentIndex={parentIndex} />
       ))}
@@ -185,33 +187,13 @@ function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptType[
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ManuscriptDrawer({ data }: Props) {
+  const { project_id } = useParams();
   const [manuscript, setManuscript] = useState({ title: "" });
-  const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([
-    {
-      id: "1",
-      title: "Document title A",
-      sort: 0,
-      children: [
-        {
-          id: "2",
-          title: "Document title B",
-          sort: 0,
-          children: [
-            {
-              id: "3",
-              title: "C",
-              sort: 0,
-              children: [{ id: "5", title: "The trials and tribulations of Taryon Darrington", children: [], sort: 0 }],
-            },
-          ],
-        },
-        { id: "4", title: "D", sort: 1, children: [] },
-      ],
-    },
-  ]);
+  const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([]);
   const { handleChange } = useHandleChange({ data: manuscript, setData: setManuscript });
+
+  const { mutate: create } = useCreateEntity<InsertManuscriptType>("manuscripts");
 
   return (
     <DrawerLayout>
@@ -235,6 +217,26 @@ export function ManuscriptDrawer({ data }: Props) {
       <ManuscriptContext.Provider value={{ documents, setDocuments }}>
         <ManuscriptTree documents={documents} parentIndex={0} />
       </ManuscriptContext.Provider>
+
+      <div>
+        <Button
+          label={data?.id ? "Update" : "Create"}
+          onClick={() => {
+            if (data?.id) {
+              //
+            } else {
+              const parsed = InsertManuscriptSchema.parse({
+                data: { title: manuscript.title, project_id },
+                relations: {
+                  documents,
+                },
+              });
+              create(parsed);
+            }
+          }}
+          variant="success"
+        />
+      </div>
     </DrawerLayout>
   );
 }
