@@ -159,14 +159,9 @@ function createColumns(
                         }));
                       },
                     },
+
                     {
-                      id: "expand",
-                      icon: IconEnum.tags,
-                      title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities with this manuscript`,
-                      onClick: row.getToggleExpandedHandler(),
-                    },
-                    {
-                      id: "3",
+                      id: "2",
                       title: "Arkive manuscript",
                       icon: IconEnum.archive,
                       isDisabled: !hasActionPermission(
