@@ -1095,20 +1095,6 @@ export function FolderView() {
                               }));
                             },
                           },
-                          {
-                            id: "4",
-                            title: "Create new manuscript",
-                            icon: IconEnum.manuscripts,
-                            onClick: () => {
-                              setDrawer((prev) => ({
-                                ...prev,
-                                data: { project_id: project_id as string },
-                                title: "Create new manuscript",
-                                type: "manuscripts",
-                                size: "xl",
-                              }));
-                            },
-                          },
                         ]
                       : []),
                   ]}>
