@@ -20,6 +20,7 @@
 }
 
 .remirror-editor,
+.Prosemirror,
 .staticRendererContainer {
   @apply font-lato max-w-full p-4 focus-visible:outline-none;
 
@@ -108,19 +109,17 @@
     }
   }
   blockquote {
-    @apply my-2 border-0 px-0 italic;
+    @apply my-2 border-0 px-0 text-3xl italic !important;
+
+    * {
+      @apply text-zinc-200;
+    }
   }
+
   :not(.characterMentionImage >) {
     img {
       @apply p-1 !important;
     }
-  }
-  blockquote > * {
-    @apply font-merriweather border-l-[3px] pl-2 text-2xl font-normal text-zinc-300 !important;
-  }
-
-  blockquote p {
-    @apply block !important;
   }
 
   table {
@@ -348,7 +347,7 @@
   @apply max-w-full overflow-hidden !important;
   &.ProseMirror {
     blockquote {
-      @apply p-0 !important;
+      @apply p-0 text-zinc-100 !important;
     }
   }
   .spoiler {
@@ -524,3 +523,13 @@
   background-size: 100% 100%;
 }
 
+.staticRendererContainer blockquote .ProseMirror-staticTrailingBreak {
+  @apply h-1;
+}
+
+.remirror-editor,
+.staticRendererContainer {
+  blockquote[nodetextalignment="center"] {
+    @apply flex justify-center text-center !important;
+  }
+}
