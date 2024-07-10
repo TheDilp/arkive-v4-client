@@ -8,7 +8,7 @@ export type ManuscriptType = {
   title: string;
   project_id: string;
   tags: TagType[];
-  documents: ManuscriptDocumentType[];
+  documents: FlatManuscriptDocumentType[];
   permissions: EntityPermissionType[];
 };
 
@@ -17,4 +17,11 @@ export type ManuscriptDocumentType = {
   title: string;
   sort: number;
   children: ManuscriptDocumentType[];
+};
+
+export type FlatManuscriptDocumentType = {
+  id: string;
+  parent_id: string | null;
+  title: string;
+  sort: number;
 };

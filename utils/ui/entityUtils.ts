@@ -14,6 +14,7 @@ import {
   RandomTableOptionType,
   SearchableEntities,
 } from "../../types";
+import { FlatManuscriptDocumentType, ManuscriptDocumentType } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
@@ -415,3 +416,25 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
   return { tooltip: "", isSoonToBeDeleted: false };
 }
 
+export function buildManuscript(flatArray: FlatManuscriptDocumentType[]) {
+  const idMap: Record<string, ManuscriptDocumentType> = {};
+  const root: ManuscriptDocumentType[] = [];
+
+  // Create a map of all nodes by their id
+  flatArray.forEach((node) => {
+    idMap[node.id] = { ...node, children: [] };
+  });
+
+  // Iterate through the flat array to build the hierarchy
+  flatArray.forEach((node) => {
+    if (node.parent_id === null) {
+      // If parent_id is null, it's a root element
+      root.push(idMap[node.id]);
+    } else {
+      // Otherwise, add the node to its parent's children
+      idMap[node.parent_id].children.push(idMap[node.id]);
+    }
+  });
+
+  return root;
+}

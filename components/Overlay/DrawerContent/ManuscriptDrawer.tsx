@@ -1,13 +1,15 @@
 import cloneDeep from "lodash.clonedeep";
-import React, { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
+import React, { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useHandleChange } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions } from "../../../hooks";
+import { TabType, TagType, UserHasPermissionsType } from "../../../types";
 import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
-import { IconEnum } from "../../../utils";
+import { buildManuscript, createOrEditPermission, IconEnum } from "../../../utils";
 import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
-import { Button, Input, Search, Title } from "../../Form";
-import { Collapsible, DrawerLayout } from "../../Layout";
+import { Button, Input, Search, TagInput, Title } from "../../Form";
+import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -148,36 +150,38 @@ function ManuscriptItem({ doc, parentIndex }: { doc: ManuscriptDocumentType; par
     );
 
   return (
-    <Collapsible
-      actions={[
-        {
-          variant: "info",
-          icon: IconEnum.add,
-          tooltip: "Add",
-          onClick: () =>
-            setDocuments((prev) =>
-              addById(prev, doc.id, { id: crypto.randomUUID(), title: "", sort: doc.children.length, children: [] })
-            ),
-        },
-        {
-          variant: "error",
-          icon: IconEnum.trash,
-          tooltip: "Remove",
-          onClick: () => setDocuments((prev) => removeById(prev, doc.id)),
-        },
-      ]}
-      initialOpen
-      key={doc.id}
-      label={doc.title}
-      size="lg">
-      <div className="my-2 flex flex-col" style={{ paddingLeft: parentIndex * 10 }}>
-        {doc.children.length === 0 ? null : <ManuscriptTree documents={doc.children} parentIndex={parentIndex + 1} />}
-      </div>
-    </Collapsible>
+    <div className="[&>*>div]:bg-transparent">
+      <Collapsible
+        actions={[
+          {
+            variant: "info",
+            icon: IconEnum.add,
+            tooltip: "Add",
+            onClick: () =>
+              setDocuments((prev) =>
+                addById(prev, doc.id, { id: crypto.randomUUID(), title: "", sort: doc.children.length, children: [] })
+              ),
+          },
+          {
+            variant: "error",
+            icon: IconEnum.trash,
+            tooltip: "Remove",
+            onClick: () => setDocuments((prev) => removeById(prev, doc.id)),
+          },
+        ]}
+        initialOpen
+        key={doc.id}
+        label={doc.title}
+        size="lg">
+        <div className="flex flex-col" style={{ paddingLeft: parentIndex * 10 }}>
+          {doc.children.length === 0 ? null : <ManuscriptTree documents={doc.children} parentIndex={parentIndex + 1} />}
+        </div>
+      </Collapsible>
+    </div>
   );
 }
 
-function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptType["documents"]; parentIndex: number }) {
+function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptDocumentType[]; parentIndex: number }) {
   return (
     <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 p-2" : ""}`}>
       {documents.map((doc) => (
@@ -187,39 +191,92 @@ function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptType[
   );
 }
 
+function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
+  const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
+
+  if (permissions?.read_tags) {
+    tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
+  }
+  if (permissions?.is_owner || !id) {
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
+  }
+  return tabs;
+}
+
 export function ManuscriptDrawer({ data }: Props) {
   const { project_id } = useParams();
-  const [manuscript, setManuscript] = useState({ title: "" });
+  const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
+
+  const [manuscript, setManuscript] = useState<{ title: string; tags: TagType[] }>({ title: "", tags: [] });
   const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([]);
+  const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
+    data?.id,
+    "manuscripts",
+    {
+      fields: ["id", "title", "owner_id"],
+      relations: { documents: true, permissions: true, tags: true },
+    },
+    { enabled: !!data?.id }
+  );
+  const permissions = useHasPermissions(
+    ["create_manuscripts", "update_manuscripts", "read_tags"],
+    existingManuscript?.data?.owner_id
+  );
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_manuscripts,
+    permissions?.update_manuscripts,
+    permissions?.is_owner,
+    data?.id
+  );
+
   const { handleChange } = useHandleChange({ data: manuscript, setData: setManuscript });
 
-  const { mutate: create } = useCreateEntity<InsertManuscriptType>("manuscripts");
+  const tabs = getTabs(permissions, data?.id);
+  const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertManuscriptType>("manuscripts");
+
+  useLayoutEffect(() => {
+    if (existingManuscript?.data) {
+      setManuscript(existingManuscript?.data);
+
+      setDocuments(buildManuscript(existingManuscript?.data?.documents || []));
+    }
+  }, [existingManuscript]);
+
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
-      <Input
-        label="Title (required)"
-        name="title"
-        onChange={handleChange}
-        placeholder="Title"
-        value={manuscript.title}
-        variant={!manuscript.title ? "error" : "primary"}
-      />
+      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
+      {selectedTab === 0 ? (
+        <>
+          <Input
+            isDisabled={!canCreateOrEdit || isCreating}
+            label="Title (required)"
+            name="title"
+            onChange={handleChange}
+            placeholder="Title"
+            value={manuscript.title}
+            variant={!manuscript.title ? "error" : "primary"}
+          />
 
-      <Search
-        label="Add root documents"
-        name="documents"
-        onChange={({ value: id, label: title }) => {
-          if (title) setDocuments((prev) => [...prev, { id, title: title, sort: documents.length, children: [] }]);
-        }}
-        searchEntity="documents"
-      />
-      <ManuscriptContext.Provider value={{ documents, setDocuments }}>
-        <ManuscriptTree documents={documents} parentIndex={0} />
-      </ManuscriptContext.Provider>
-
+          <Search
+            isDisabled={!canCreateOrEdit}
+            label="Add root documents"
+            name="documents"
+            onChange={({ value: id, label: title }) => {
+              if (title) setDocuments((prev) => [...prev, { id, title: title, sort: documents.length, children: [] }]);
+            }}
+            searchEntity="documents"
+          />
+          <ManuscriptContext.Provider value={{ documents, setDocuments }}>
+            <ManuscriptTree documents={documents} parentIndex={0} />
+          </ManuscriptContext.Provider>
+        </>
+      ) : null}
+      {selectedTab === 1 ? <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} /> : null}
       <div>
         <Button
+          isDisabled={!documents.length}
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
             if (data?.id) {
@@ -229,6 +286,7 @@ export function ManuscriptDrawer({ data }: Props) {
                 data: { title: manuscript.title, project_id },
                 relations: {
                   documents,
+                  tags: manuscript.tags.map((t) => ({ id: t.id })),
                 },
               });
               create(parsed);
