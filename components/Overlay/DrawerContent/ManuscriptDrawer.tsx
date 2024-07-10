@@ -183,7 +183,7 @@ function ManuscriptItem({ doc, parentIndex }: { doc: ManuscriptDocumentType; par
 
 function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptDocumentType[]; parentIndex: number }) {
   return (
-    <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 p-2" : ""}`}>
+    <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 pl-2" : ""}`}>
       {documents.map((doc) => (
         <ManuscriptItem doc={doc} key={doc.id} parentIndex={parentIndex} />
       ))}
