@@ -194,7 +194,7 @@ function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptDocum
 
 function ManuscriptPreview({ ids }: { ids: string[] }) {
   const { project_id } = useParams();
-  const { data } = useGetEntities(
+  const { data, isInitialLoading } = useGetEntities(
     {
       data: {
         project_id,
@@ -212,6 +212,9 @@ function ManuscriptPreview({ ids }: { ids: string[] }) {
     "documents",
     { enabled: ids.length > 0 }
   );
+
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
+
   return (
     <div className="flex flex-col">
       <div className="mb-4">
