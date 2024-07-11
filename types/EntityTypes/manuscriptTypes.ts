@@ -6,6 +6,7 @@ export type ManuscriptType = {
   deleted_at: string;
   owner_id: string;
   title: string;
+  is_public: boolean | null;
   project_id: string;
   tags: TagType[];
   documents: FlatManuscriptDocumentType[];
