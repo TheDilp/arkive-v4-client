@@ -7,7 +7,7 @@ import { TabType, TagType, UserHasPermissionsType } from "../../../types";
 import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
 import { buildManuscript, createOrEditPermission, IconEnum } from "../../../utils";
 import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
-import { Button, Input, Search, TagInput, Title } from "../../Form";
+import { Button, Checkbox, Input, Search, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
 
@@ -249,13 +249,17 @@ export function ManuscriptDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
 
-  const [manuscript, setManuscript] = useState<{ title: string; tags: TagType[] }>({ title: "", tags: [] });
+  const [manuscript, setManuscript] = useState<{ title: string; is_public: boolean | null; tags: TagType[] }>({
+    title: "",
+    is_public: null,
+    tags: [],
+  });
   const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
     "manuscripts",
     {
-      fields: ["id", "title", "owner_id"],
+      fields: ["id", "title", "owner_id", "is_public"],
       relations: { documents: true, permissions: true, tags: true },
     },
     { enabled: !!data?.id }
@@ -300,6 +304,15 @@ export function ManuscriptDrawer({ data }: Props) {
             value={manuscript.title}
             variant={!manuscript.title ? "error" : "primary"}
           />
+          <div className="flex w-full items-center justify-between">
+            <span>Is public:</span>
+            <Checkbox
+              isDisabled={!canCreateOrEdit}
+              name="is_public"
+              onChange={handleChange}
+              value={manuscript?.is_public ?? false}
+            />
+          </div>
 
           <Search
             isDisabled={!canCreateOrEdit}
