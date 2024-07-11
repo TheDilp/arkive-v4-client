@@ -2,15 +2,14 @@ import cloneDeep from "lodash.clonedeep";
 import React, { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntities, useGetEntity, useHandleChange, useHasPermissions } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions } from "../../../hooks";
 import { TabType, TagType, UserHasPermissionsType } from "../../../types";
 import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
 import { buildManuscript, createOrEditPermission, IconEnum } from "../../../utils";
 import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
-import { StaticRender } from "../../Complex";
 import { Button, Input, Search, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Alert, Skeleton } from "../../Misc";
+import { Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -192,49 +191,49 @@ function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptDocum
   );
 }
 
-function ManuscriptPreview({ ids }: { ids: string[] }) {
-  const { project_id } = useParams();
-  const { data, isInitialLoading } = useGetEntities(
-    {
-      data: {
-        project_id,
-      },
-      pagination: { limit: 100 },
-      fields: ["id", "content", "title"],
-      filters: {
-        and: [
-          { id: "preview_docs", value: ids, operator: "in", field: "id", header_name: "Documents" },
+// function ManuscriptPreview({ ids }: { ids: string[] }) {
+//   const { project_id } = useParams();
+//   const { data, isInitialLoading } = useGetEntities(
+//     {
+//       data: {
+//         project_id,
+//       },
+//       pagination: { limit: 100 },
+//       fields: ["id", "content", "title"],
+//       filters: {
+//         and: [
+//           { id: "preview_docs", value: ids, operator: "in", field: "id", header_name: "Documents" },
 
-          { id: "preview_docs", value: null, operator: "is not", field: "content", header_name: "Document content" },
-        ],
-      },
-    },
-    "documents",
-    { enabled: ids.length > 0 }
-  );
+//           { id: "preview_docs", value: null, operator: "is not", field: "content", header_name: "Document content" },
+//         ],
+//       },
+//     },
+//     "documents",
+//     { enabled: ids.length > 0 }
+//   );
 
-  if (isInitialLoading) return <Skeleton type="drawer_form" />;
+//   if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
-  return (
-    <div className="flex flex-col">
-      <div className="mb-4">
-        <Alert label="Note: documents without content will not be displayed." variant="info-bordered" />
-      </div>
-      {data?.data?.map((doc, index) => (
-        <div key={doc.id}>
-          {index === 0 ? null : <hr className="border-zinc-600 py-2" />}
-          <h2 className="text-3xl">{doc.title}</h2>
-          <StaticRender content={doc.content} />
-        </div>
-      ))}
-    </div>
-  );
-}
+//   return (
+//     <div className="flex flex-col">
+//       <div className="mb-4">
+//         <Alert label="Note: documents without content will not be displayed." variant="info-bordered" />
+//       </div>
+//       {data?.data?.map((doc, index) => (
+//         <div key={doc.id}>
+//           {index === 0 ? null : <hr className="border-zinc-600 py-2" />}
+//           <h2 className="text-3xl">{doc.title}</h2>
+//           <StaticRender content={doc.content} />
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-    { id: "2", label: "Preview", icon: IconEnum.document },
+    // { id: "2", label: "Preview", icon: IconEnum.document },
   ];
 
   if (permissions?.read_tags) {
@@ -316,8 +315,8 @@ export function ManuscriptDrawer({ data }: Props) {
           </ManuscriptContext.Provider>
         </>
       ) : null}
-      {selectedTab === 1 ? <ManuscriptPreview ids={(existingManuscript?.data?.documents || []).map((doc) => doc.id)} /> : null}
-      {selectedTab === 2 ? <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} /> : null}
+      {/* {selectedTab === 1 ? <ManuscriptPreview ids={(existingManuscript?.data?.documents || []).map((doc) => doc.id)} /> : null} */}
+      {selectedTab === 1 ? <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} /> : null}
       <div>
         <Button
           isDisabled={!documents.length}
