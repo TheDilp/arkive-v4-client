@@ -3,10 +3,11 @@ import React, { createContext, Dispatch, SetStateAction, useContext, useLayoutEf
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions } from "../../../hooks";
-import { TabType, TagType, UserHasPermissionsType } from "../../../types";
+import { TabType, UserHasPermissionsType } from "../../../types";
 import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
 import { buildManuscript, createOrEditPermission, IconEnum } from "../../../utils";
 import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
+import { EntityPermission } from "../../Complex";
 import { Button, Checkbox, Input, Search, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Skeleton } from "../../Misc";
@@ -237,10 +238,10 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   ];
 
   if (permissions?.read_tags) {
-    tabs.push({ id: "3", label: "Tags", icon: IconEnum.tags });
+    tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
   }
   if (permissions?.is_owner || !id) {
-    tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
+    tabs.push({ id: "3", label: "Access", icon: IconEnum.permissions });
   }
   return tabs;
 }
@@ -249,9 +250,14 @@ export function ManuscriptDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
 
-  const [manuscript, setManuscript] = useState<{ title: string; is_public: boolean | null; tags: TagType[] }>({
+  const [manuscript, setManuscript] = useState<
+    Pick<ManuscriptType, "id" | "title" | "is_public" | "owner_id" | "permissions" | "tags">
+  >({
+    id: "",
     title: "",
     is_public: null,
+    permissions: [],
+    owner_id: "",
     tags: [],
   });
   const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([]);
@@ -293,7 +299,7 @@ export function ManuscriptDrawer({ data }: Props) {
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {selectedTab === 0 ? (
+      {tabs[selectedTab].id === "1" ? (
         <>
           <Input
             isDisabled={!canCreateOrEdit || isCreating}
@@ -314,6 +320,8 @@ export function ManuscriptDrawer({ data }: Props) {
             />
           </div>
 
+          <hr className="border-zinc-700" />
+
           <Search
             isDisabled={!canCreateOrEdit}
             label="Add root documents"
@@ -329,7 +337,18 @@ export function ManuscriptDrawer({ data }: Props) {
         </>
       ) : null}
       {/* {selectedTab === 1 ? <ManuscriptPreview ids={(existingManuscript?.data?.documents || []).map((doc) => doc.id)} /> : null} */}
-      {selectedTab === 1 ? <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} /> : null}
+      {tabs[selectedTab].id === "2" ? (
+        <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} />
+      ) : null}
+      {tabs[selectedTab].id === "3" && (permissions?.is_owner || !data?.id) ? (
+        <EntityPermission
+          handleChange={handleChange}
+          owner_id={manuscript?.owner_id}
+          permissions={manuscript?.permissions || []}
+          related_id={manuscript?.id || null}
+          selectablePermissions={["read_manuscripts", "update_manuscripts", "delete_manuscripts"]}
+        />
+      ) : null}
       <div>
         <Button
           isDisabled={!documents.length}
