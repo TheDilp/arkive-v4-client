@@ -189,7 +189,7 @@ function createColumns(
                           FetchFunction({
                             url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
                             body: JSON.stringify({
-                              data: { id: row.original.id, type: "characters" },
+                              data: { id: row.original.id, type: "manuscripts" },
                             }),
                             method: "POST",
                           }),
