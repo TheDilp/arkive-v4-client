@@ -218,8 +218,9 @@ export function ManuscriptView() {
   const { data, isLoading } = useGetEntities<ManuscriptType>(
     {
       data: { project_id },
-      fields: ["id", "deleted_at", "title", "project_id"],
+      fields: ["id", "deleted_at", "title"],
       relations: {
+        tags: true,
         documents: true,
       },
       filters,
