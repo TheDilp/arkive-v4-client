@@ -15,9 +15,19 @@ import {
   useTable,
   useUpdateManyPublic,
 } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, UpdatePublicManyType, UserHasPermissionsType } from "../../types";
+import { DialogAtomType, DrawerAtomType, UpdatePublicManyType, UserHasPermissionsType, WebhookType } from "../../types";
 import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
-import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
+import {
+  baseURLS,
+  dialogAtom,
+  drawerAtom,
+  FetchFunction,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  TextFilters,
+  userAtom,
+} from "../../utils";
 
 const columnHelper = createColumnHelper<ManuscriptType>();
 
@@ -25,6 +35,7 @@ function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
   updateMany: UpdatePublicManyType,
+  webhooks: WebhookType[],
   isProjectOwner: boolean,
   permissions: UserHasPermissionsType,
   user_id: string,
@@ -166,7 +177,24 @@ function createColumns(
                         }));
                       },
                     },
-
+                    {
+                      id: "send_to_discord",
+                      title: "Send to Discord",
+                      icon: IconEnum.discord,
+                      isDisabled: !row.original.is_public,
+                      subItems: webhooks.map((webhook) => ({
+                        id: webhook.id,
+                        title: webhook.title,
+                        onClick: () =>
+                          FetchFunction({
+                            url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                            body: JSON.stringify({
+                              data: { id: row.original.id, type: "characters" },
+                            }),
+                            method: "POST",
+                          }),
+                      })),
+                    },
                     {
                       id: "2",
                       title: "Arkive manuscript",
@@ -222,6 +250,7 @@ export function ManuscriptView() {
     setDrawer,
     setDialog,
     updatePublicMany,
+    user?.webhooks || [],
     isProjectOwner,
     permissions,
     user?.id as string,
