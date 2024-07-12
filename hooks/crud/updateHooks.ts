@@ -28,7 +28,7 @@ export function useUpdateEntity<
     data: { id?: string; parent_id?: string | null };
     relations?: { [key: string]: any };
   },
->(type: AvailableEntityType, project_id: string, options?: MutationOptions) {
+>(type: AvailableEntityType, project_id: string | undefined, options?: MutationOptions) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
