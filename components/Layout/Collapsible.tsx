@@ -7,9 +7,13 @@ import { Button, Icon } from "..";
 
 const CollapsibleClasses = tv({
   slots: {
+    details: "cursor-default select-none",
     label: "flex select-none items-center gap-x-2 text-white",
     summary:
       "cursor-pointer flex items-center gap-x-2 border-b pb-1 font-lato outline-none focus:border-blue-400 focus:border-zinc-400",
+    actions: "ml-auto flex flex-nowrap gap-x-1",
+    icon: "no-rotate",
+    children: "rounded-b bg-zinc-950",
   },
   variants: {
     variant: {
@@ -79,7 +83,14 @@ export function Collapsible({
   size = "xl",
   variant = "primary",
 }: CollapsibleType) {
-  const { label: labelClasses, summary: summaryClasses } = CollapsibleClasses({
+  const {
+    details,
+    label: labelClasses,
+    summary: summaryClasses,
+    actions: actionsClasses,
+    children: childrenClasses,
+    icon: iconClasses,
+  } = CollapsibleClasses({
     variant,
     size,
     isDisabled,
@@ -87,7 +98,7 @@ export function Collapsible({
   const [open, setOpen] = useState<boolean>(initialOpen ?? false);
   return (
     <details
-      className="cursor-default select-none"
+      className={details()}
       onClick={(e) => {
         e.preventDefault();
         if (isDisabled) return;
@@ -97,13 +108,13 @@ export function Collapsible({
       <summary className={summaryClasses()}>
         <span className={labelClasses()}>
           {icon ? (
-            <span className="no-rotate">
+            <span className={iconClasses()}>
               <Icon icon={icon as AvailableIcons} />
             </span>
           ) : null}
           {label}
         </span>
-        <span className="ml-auto flex flex-nowrap gap-x-1">
+        <span className={actionsClasses()}>
           {actions?.length
             ? actions.map((act) => (
                 <div
@@ -128,11 +139,10 @@ export function Collapsible({
         </span>
       </summary>
       {open ? (
-        <div className="rounded-b bg-zinc-950" onClick={(e) => e.stopPropagation()}>
+        <div className={childrenClasses()} onClick={(e) => e.stopPropagation()}>
           {children}
         </div>
       ) : null}
     </details>
   );
 }
-
