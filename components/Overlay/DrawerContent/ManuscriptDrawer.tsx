@@ -350,16 +350,10 @@ export function ManuscriptDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
 
-  const [manuscript, setManuscript] = useState<
-    Pick<ManuscriptType, "id" | "title" | "is_public" | "owner_id" | "permissions" | "tags">
-  >({
-    id: "",
-    title: "",
-    is_public: null,
-    permissions: [],
-    owner_id: "",
-    tags: [],
-  });
+  const [manuscript, setManuscript] = useState<Pick<
+    ManuscriptType,
+    "id" | "title" | "is_public" | "owner_id" | "permissions" | "tags"
+  > | null>(null);
   const [entities, setEntities] = useState<ManuscriptEntityType[]>([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
@@ -392,7 +386,7 @@ export function ManuscriptDrawer({ data }: Props) {
       setManuscript(existingManuscript?.data);
 
       setEntities(buildManuscript(existingManuscript?.data?.entities || []));
-    } else {
+    } else if (!existingManuscript?.data && !manuscript) {
       setEntities([{ id: crypto.randomUUID(), title: "", sort: 0, children: [], ...base }]);
     }
   }, [existingManuscript]);
@@ -409,8 +403,8 @@ export function ManuscriptDrawer({ data }: Props) {
             name="title"
             onChange={handleChange}
             placeholder="Title"
-            value={manuscript.title}
-            variant={!manuscript.title ? "error" : "primary"}
+            value={manuscript?.title || ""}
+            variant={!manuscript?.title ? "error" : "primary"}
           />
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
@@ -447,24 +441,26 @@ export function ManuscriptDrawer({ data }: Props) {
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
-            if (data?.id) {
-              const parsed = UpdateManuscriptSchema.parse({
-                data: { id: data.id, title: manuscript.title },
-                relations: {
-                  entities: flattenManuscriptEntities(entities),
-                  tags: manuscript.tags.map((t) => ({ id: t.id })),
-                },
-              });
-              update(parsed);
-            } else {
-              const parsed = InsertManuscriptSchema.parse({
-                data: { title: manuscript.title, project_id },
-                relations: {
-                  entities: flattenManuscriptEntities(entities),
-                  tags: manuscript.tags.map((t) => ({ id: t.id })),
-                },
-              });
-              create(parsed);
+            if (manuscript) {
+              if (data?.id) {
+                const parsed = UpdateManuscriptSchema.parse({
+                  data: { id: data.id, title: manuscript.title },
+                  relations: {
+                    entities: flattenManuscriptEntities(entities),
+                    tags: manuscript.tags.map((t) => ({ id: t.id })),
+                  },
+                });
+                update(parsed);
+              } else {
+                const parsed = InsertManuscriptSchema.parse({
+                  data: { title: manuscript.title, project_id },
+                  relations: {
+                    entities: flattenManuscriptEntities(entities),
+                    tags: manuscript.tags.map((t) => ({ id: t.id })),
+                  },
+                });
+                create(parsed);
+              }
             }
           }}
           variant="success"
