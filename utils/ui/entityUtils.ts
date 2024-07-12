@@ -14,7 +14,7 @@ import {
   RandomTableOptionType,
   SearchableEntities,
 } from "../../types";
-import { FlatManuscriptDocumentType, ManuscriptDocumentType } from "../../types/EntityTypes/manuscriptTypes";
+import { FlatManuscriptEntityType, ManuscriptEntityType } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
@@ -416,9 +416,9 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
   return { tooltip: "", isSoonToBeDeleted: false };
 }
 
-export function buildManuscript(flatArray: FlatManuscriptDocumentType[]) {
-  const idMap: Record<string, ManuscriptDocumentType> = {};
-  const root: ManuscriptDocumentType[] = [];
+export function buildManuscript(flatArray: FlatManuscriptEntityType[]) {
+  const idMap: Record<string, ManuscriptEntityType> = {};
+  const root: ManuscriptEntityType[] = [];
 
   // Create a map of all nodes by their id
   flatArray.forEach((node) => {

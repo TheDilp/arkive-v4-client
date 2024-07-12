@@ -1,4 +1,5 @@
 import { PermissionType } from "../../types";
+import { FlatManuscriptEntityType, ManuscriptEntityType } from "../../types/EntityTypes/manuscriptTypes";
 
 export function deleteObjectProps(obj: { [key: string]: any }, keys: string[]) {
   return Object.fromEntries(Object.entries(obj).filter(([k]) => !keys.includes(k)));
@@ -46,8 +47,27 @@ export function permissionsByEntity(permissions: PermissionType[]) {
       accumulator[entity].permissions.push(permission);
       return accumulator;
     },
-    {},
+    {}
   );
 
   return Object.values(formatted);
+}
+
+export function flattenManuscriptEntities(
+  state: ManuscriptEntityType[],
+  parent_id: string | null = null
+): FlatManuscriptEntityType[] {
+  let flatArray: FlatManuscriptEntityType[] = [];
+
+  state.forEach((element) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, sort, children, type, ...rest } = element;
+    flatArray.push({ id, sort, ...rest, parent_id, manuscript_id: "" });
+
+    if (children && children.length > 0) {
+      flatArray = flatArray.concat(flattenManuscriptEntities(children, id));
+    }
+  });
+
+  return flatArray;
 }

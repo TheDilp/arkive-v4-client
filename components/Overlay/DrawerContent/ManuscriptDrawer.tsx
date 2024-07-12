@@ -2,15 +2,32 @@ import cloneDeep from "lodash.clonedeep";
 import React, { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions } from "../../../hooks";
+import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
 import { TabType, UserHasPermissionsType } from "../../../types";
-import { ManuscriptDocumentType, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
-import { buildManuscript, createOrEditPermission, IconEnum } from "../../../utils";
-import { InsertManuscriptSchema, InsertManuscriptType } from "../../../validation/manuscripts";
+import {
+  AvailableManuscriptEntityTypes,
+  ManuscriptEntityType,
+  ManuscriptType,
+} from "../../../types/EntityTypes/manuscriptTypes";
+import {
+  AvailableManuscriptEntityTypesEnum,
+  buildManuscript,
+  createOrEditPermission,
+  flattenManuscriptEntities,
+  getDefaultEntityIcon,
+  getSingularEntityType,
+  IconEnum,
+} from "../../../utils";
+import {
+  InsertManuscriptSchema,
+  InsertManuscriptType,
+  UpdateManuscriptSchema,
+  UpdateManuscriptType,
+} from "../../../validation/manuscripts";
 import { EntityPermission } from "../../Complex";
-import { Button, Checkbox, Input, Search, TagInput, Title } from "../../Form";
+import { Button, Checkbox, Input, Search, Select, TagInput, Title } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
-import { Skeleton } from "../../Misc";
+import { Icon, Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -19,7 +36,49 @@ type Props = {
   };
 };
 
-function addById(state: ManuscriptDocumentType[], id: string, newElement: ManuscriptDocumentType) {
+const base: Pick<
+  ManuscriptEntityType,
+  | "character_id"
+  | "blueprint_instance_id"
+  | "document_id"
+  | "map_id"
+  | "map_pin_id"
+  | "graph_id"
+  | "event_id"
+  | "image_id"
+  | "type"
+> = {
+  character_id: null,
+  blueprint_instance_id: null,
+  document_id: null,
+  map_id: null,
+  map_pin_id: null,
+  graph_id: null,
+  event_id: null,
+  image_id: null,
+  type: "documents",
+};
+function getEntityIdFields(type: AvailableManuscriptEntityTypes, value: string) {
+  const newEntity = { ...base };
+
+  newEntity[
+    `${getSingularEntityType(type).replaceAll(" ", "_")}_id`.toLowerCase() as
+      | "character_id"
+      | "blueprint_instance_id"
+      | "document_id"
+      | "map_id"
+      | "map_pin_id"
+      | "graph_id"
+      | "event_id"
+      | "image_id"
+  ] = value;
+
+  newEntity.type = type;
+
+  return newEntity;
+}
+
+function addById(state: ManuscriptEntityType[], id: string, newElement: ManuscriptEntityType) {
   // Base case: return state if it's not an array
   if (!Array.isArray(state)) return state;
   const temp = cloneDeep(state);
@@ -43,7 +102,12 @@ function addById(state: ManuscriptDocumentType[], id: string, newElement: Manusc
 
   return temp;
 }
-function updateById(state: ManuscriptDocumentType[], id: string, updatedElement: ManuscriptDocumentType) {
+function updateById(
+  state: ManuscriptEntityType[],
+  id: string,
+  updatedElement: ManuscriptEntityType,
+  type: AvailableManuscriptEntityTypes
+) {
   // Base case: return state if it's not an array
   if (!Array.isArray(state)) return state;
   const temp = cloneDeep(state);
@@ -57,8 +121,7 @@ function updateById(state: ManuscriptDocumentType[], id: string, updatedElement:
     }
     // If the current element has children, recursively check them
     if (temp[i].children && temp[i].children.length > 0) {
-      console.log(id, temp[i].id);
-      temp[i].children = updateById(temp[i].children, id, updatedElement);
+      temp[i].children = updateById(temp[i].children, id, updatedElement, type);
       // Return early if the element was updated in the children
       if (temp[i].children.some((child) => child.id === updatedElement.id)) {
         return temp;
@@ -68,7 +131,7 @@ function updateById(state: ManuscriptDocumentType[], id: string, updatedElement:
 
   return temp;
 }
-function removeById(state: ManuscriptDocumentType[], id: string) {
+function removeById(state: ManuscriptEntityType[], id: string) {
   if (!Array.isArray(state)) return state;
   const temp = cloneDeep(state);
   for (let i = 0; i < temp.length; i++) {
@@ -90,152 +153,189 @@ function removeById(state: ManuscriptDocumentType[], id: string) {
 }
 
 const ManuscriptContext = createContext<{
-  documents: ManuscriptDocumentType[];
-  setDocuments: Dispatch<SetStateAction<ManuscriptDocumentType[]>>;
-}>({ documents: [], setDocuments: () => {} });
+  entities: ManuscriptEntityType[];
+  setEntities: Dispatch<SetStateAction<ManuscriptEntityType[]>>;
+}>({ entities: [], setEntities: () => {} });
 
-function ManuscriptItem({ doc, parentIndex }: { doc: ManuscriptDocumentType; parentIndex: number }) {
-  const { documents, setDocuments } = useContext(ManuscriptContext);
-
-  if (!doc.title)
+function ManuscriptItem({ entity, parentIndex }: { entity: ManuscriptEntityType; parentIndex: number }) {
+  const { entities, setEntities } = useContext(ManuscriptContext);
+  const [type, setType] = useState<AvailableManuscriptEntityTypes>("documents");
+  if (!entity.title)
     return (
-      <div className="flex items-center gap-x-2">
+      <div className="flex min-h-10 items-center gap-x-2">
         <Search
-          label="Add document"
+          label={`Add ${getSingularEntityType(type)}`}
           name="documents"
           onChange={({ value: id, label: title }) => {
             if (title)
-              setDocuments(updateById(documents, doc.id, { id, title: title || "", sort: doc.sort, children: doc.children }));
+              setEntities(
+                updateById(
+                  entities,
+                  entity.id,
+                  {
+                    id: entity.id,
+                    title: title || "",
+                    sort: entity.sort,
+                    children: entity.children,
+                    ...getEntityIdFields(type, id),
+                  },
+                  type
+                )
+              );
           }}
-          searchEntity="documents"
+          searchEntity={type}
           variant="secondary"
         />
+        <div className="min-w-36">
+          <Select
+            label="Entity type"
+            name="type"
+            onChange={(e) => setType(e.value as AvailableManuscriptEntityTypes)}
+            options={AvailableManuscriptEntityTypesEnum}
+            value={type}
+          />
+        </div>
         <div className="w-min self-end pb-2">
           <Button
             hasNoBackground
             icon={IconEnum.trash}
             isIconOnly
-            onClick={() => setDocuments((prev) => removeById(prev, doc.id))}
+            onClick={() => setEntities((prev) => removeById(prev, entity.id))}
             tooltip="Remove"
             variant="error"
           />
         </div>
       </div>
     );
-  if (doc.children.length === 0)
+  if (entity.children.length === 0)
     return (
-      <div className="w-full" key={doc.id}>
-        <Title
-          actions={[
-            {
-              variant: "info",
-              icon: IconEnum.add,
-              tooltip: "Add",
-              onClick: () =>
-                setDocuments((prev) =>
-                  addById(prev, doc.id, { id: crypto.randomUUID(), title: "", sort: doc.children.length, children: [] })
-                ),
-            },
-            {
-              variant: "error",
-              icon: IconEnum.trash,
-              tooltip: "Remove",
-              onClick: () => setDocuments((prev) => removeById(prev, doc.id)),
-            },
-          ]}
-          isDrawerTitle
-          label={doc.title}
-          size="lg"
-        />
+      <div className="flex min-h-10 w-full items-end gap-x-2 border-b border-zinc-700" key={entity.id}>
+        <span className="pb-1">
+          <Icon fontSize={22} icon={getDefaultEntityIcon(entity.type)} />
+        </span>
+        <span className="w-full">
+          <Title
+            actions={[
+              {
+                variant: "primary",
+                icon: IconEnum.add,
+                tooltip: "Add",
+                onClick: () =>
+                  setEntities((prev) =>
+                    addById(prev, entity.id, {
+                      id: crypto.randomUUID(),
+                      title: "",
+                      sort: entity.children.length,
+                      children: [],
+                      ...base,
+                    })
+                  ),
+              },
+              {
+                variant: "primary",
+                icon: IconEnum.close,
+                tooltip: "Clear",
+                onClick: () =>
+                  setEntities((prev) =>
+                    updateById(
+                      prev,
+                      entity.id,
+                      {
+                        id: entity.id,
+                        title: "",
+                        sort: entity.sort,
+                        children: entity.children,
+                        ...base,
+                      },
+                      type
+                    )
+                  ),
+              },
+              {
+                variant: "error",
+                icon: IconEnum.trash,
+                tooltip: "Remove",
+                onClick: () => setEntities((prev) => removeById(prev, entity.id)),
+              },
+            ]}
+            label={entity.title}
+            size="lg"
+          />
+        </span>
       </div>
     );
 
   return (
-    <div className="[&>*>div]:bg-transparent">
+    <div className="[&>*>div]:bg-transparent [&>details>summary>span>span>svg]:text-[22px] [&>details>summary]:min-h-10">
       <Collapsible
         actions={[
           {
-            variant: "info",
+            variant: "primary",
             icon: IconEnum.add,
             tooltip: "Add",
             onClick: () =>
-              setDocuments((prev) =>
-                addById(prev, doc.id, { id: crypto.randomUUID(), title: "", sort: doc.children.length, children: [] })
+              setEntities((prev) =>
+                addById(prev, entity.id, {
+                  id: crypto.randomUUID(),
+                  title: "",
+                  sort: entity.children.length,
+                  children: [],
+                  ...base,
+                })
+              ),
+          },
+          {
+            variant: "primary",
+            icon: IconEnum.close,
+            tooltip: "Clear",
+            onClick: () =>
+              setEntities((prev) =>
+                updateById(
+                  prev,
+                  entity.id,
+                  {
+                    id: entity.id,
+                    title: "",
+                    sort: entity.sort,
+                    children: entity.children,
+                    ...base,
+                  },
+                  type
+                )
               ),
           },
           {
             variant: "error",
             icon: IconEnum.trash,
             tooltip: "Remove",
-            onClick: () => setDocuments((prev) => removeById(prev, doc.id)),
+            onClick: () => setEntities((prev) => removeById(prev, entity.id)),
           },
         ]}
+        icon={getDefaultEntityIcon(entity.type)}
         initialOpen
-        key={doc.id}
-        label={doc.title}
+        key={entity.id}
+        label={entity.title}
         size="lg">
         <div className="flex flex-col" style={{ paddingLeft: parentIndex * 10 }}>
-          {doc.children.length === 0 ? null : <ManuscriptTree documents={doc.children} parentIndex={parentIndex + 1} />}
+          {entity.children.length === 0 ? null : <ManuscriptTree entities={entity.children} parentIndex={parentIndex + 1} />}
         </div>
       </Collapsible>
     </div>
   );
 }
 
-function ManuscriptTree({ documents, parentIndex }: { documents: ManuscriptDocumentType[]; parentIndex: number }) {
+function ManuscriptTree({ entities, parentIndex }: { entities: ManuscriptEntityType[]; parentIndex: number }) {
   return (
     <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 pl-2" : ""}`}>
-      {documents.map((doc) => (
-        <ManuscriptItem doc={doc} key={doc.id} parentIndex={parentIndex} />
+      {entities.map((entity) => (
+        <ManuscriptItem entity={entity} key={entity.id} parentIndex={parentIndex} />
       ))}
     </div>
   );
 }
 
-// function ManuscriptPreview({ ids }: { ids: string[] }) {
-//   const { project_id } = useParams();
-//   const { data, isInitialLoading } = useGetEntities(
-//     {
-//       data: {
-//         project_id,
-//       },
-//       pagination: { limit: 100 },
-//       fields: ["id", "content", "title"],
-//       filters: {
-//         and: [
-//           { id: "preview_docs", value: ids, operator: "in", field: "id", header_name: "Documents" },
-
-//           { id: "preview_docs", value: null, operator: "is not", field: "content", header_name: "Document content" },
-//         ],
-//       },
-//     },
-//     "documents",
-//     { enabled: ids.length > 0 }
-//   );
-
-//   if (isInitialLoading) return <Skeleton type="drawer_form" />;
-
-//   return (
-//     <div className="flex flex-col">
-//       <div className="mb-4">
-//         <Alert label="Note: documents without content will not be displayed." variant="info-bordered" />
-//       </div>
-//       {data?.data?.map((doc, index) => (
-//         <div key={doc.id}>
-//           {index === 0 ? null : <hr className="border-zinc-600 py-2" />}
-//           <h2 className="text-3xl">{doc.title}</h2>
-//           <StaticRender content={doc.content} />
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
-
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
-  const tabs: TabType[] = [
-    { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-    // { id: "2", label: "Preview", icon: IconEnum.document },
-  ];
+  const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 
   if (permissions?.read_tags) {
     tabs.push({ id: "2", label: "Tags", icon: IconEnum.tags });
@@ -260,13 +360,13 @@ export function ManuscriptDrawer({ data }: Props) {
     owner_id: "",
     tags: [],
   });
-  const [documents, setDocuments] = useState<ManuscriptDocumentType[]>([]);
+  const [entities, setEntities] = useState<ManuscriptEntityType[]>([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
     "manuscripts",
     {
       fields: ["id", "title", "owner_id", "is_public"],
-      relations: { documents: true, permissions: true, tags: true },
+      relations: { entities: true, permissions: true, tags: true },
     },
     { enabled: !!data?.id }
   );
@@ -285,17 +385,19 @@ export function ManuscriptDrawer({ data }: Props) {
 
   const tabs = getTabs(permissions, data?.id);
   const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertManuscriptType>("manuscripts");
+  const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateManuscriptType>("manuscripts", project_id);
 
   useLayoutEffect(() => {
-    if (existingManuscript?.data) {
+    if (existingManuscript?.data && !manuscript) {
       setManuscript(existingManuscript?.data);
 
-      setDocuments(buildManuscript(existingManuscript?.data?.documents || []));
+      setEntities(buildManuscript(existingManuscript?.data?.entities || []));
+    } else {
+      setEntities([{ id: crypto.randomUUID(), title: "", sort: 0, children: [], ...base }]);
     }
   }, [existingManuscript]);
 
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
-
   return (
     <DrawerLayout>
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
@@ -322,21 +424,11 @@ export function ManuscriptDrawer({ data }: Props) {
 
           <hr className="border-zinc-700" />
 
-          <Search
-            isDisabled={!canCreateOrEdit}
-            label="Add root documents"
-            name="documents"
-            onChange={({ value: id, label: title }) => {
-              if (title) setDocuments((prev) => [...prev, { id, title: title, sort: documents.length, children: [] }]);
-            }}
-            searchEntity="documents"
-          />
-          <ManuscriptContext.Provider value={{ documents, setDocuments }}>
-            <ManuscriptTree documents={documents} parentIndex={0} />
+          <ManuscriptContext.Provider value={{ entities: entities, setEntities: setEntities }}>
+            <ManuscriptTree entities={entities} parentIndex={0} />
           </ManuscriptContext.Provider>
         </>
       ) : null}
-      {/* {selectedTab === 1 ? <ManuscriptPreview ids={(existingManuscript?.data?.documents || []).map((doc) => doc.id)} /> : null} */}
       {tabs[selectedTab].id === "2" ? (
         <TagInput handleChange={handleChange} isAutofocused tags={manuscript?.tags || []} />
       ) : null}
@@ -351,16 +443,24 @@ export function ManuscriptDrawer({ data }: Props) {
       ) : null}
       <div>
         <Button
-          isDisabled={!documents.length}
+          isDisabled={!entities.length || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
             if (data?.id) {
-              //
+              const parsed = UpdateManuscriptSchema.parse({
+                data: { id: data.id, title: manuscript.title },
+                relations: {
+                  entities: flattenManuscriptEntities(entities),
+                  tags: manuscript.tags.map((t) => ({ id: t.id })),
+                },
+              });
+              update(parsed);
             } else {
               const parsed = InsertManuscriptSchema.parse({
                 data: { title: manuscript.title, project_id },
                 relations: {
-                  documents,
+                  entities: flattenManuscriptEntities(entities),
                   tags: manuscript.tags.map((t) => ({ id: t.id })),
                 },
               });
