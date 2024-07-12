@@ -236,3 +236,38 @@ export const RolePermissionCodes = [
   "update_manuscripts",
   "delete_manuscripts",
 ] as const;
+
+export const AvailableManuscriptEntityTypesEnum = [
+  {
+    label: "Characters",
+    value: "characters",
+  },
+  {
+    label: "Blueprint instances",
+    value: "blueprint_instances",
+  },
+  {
+    label: "Documents",
+    value: "documents",
+  },
+  {
+    label: "Maps",
+    value: "maps",
+  },
+  {
+    label: "Map pins",
+    value: "map_pins",
+  },
+  {
+    label: "Graphs",
+    value: "graphs",
+  },
+  {
+    label: "Events",
+    value: "events",
+  },
+  {
+    label: "Images",
+    value: "images",
+  },
+];
