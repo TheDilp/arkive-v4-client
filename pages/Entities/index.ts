@@ -10,6 +10,7 @@ export * from "./DictionaryView";
 export * from "./DocumentView";
 export * from "./EntitiesView";
 export * from "./FolderView";
+export * from "./ManuscriptProfileView";
 export * from "./ManuscriptView";
 export * from "./MapView";
 export * from "./RandomTableView";

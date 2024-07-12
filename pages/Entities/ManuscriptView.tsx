@@ -468,6 +468,7 @@ export function ManuscriptView() {
             filters,
             selection,
             selectedActions,
+            getLink: (rowData: any) => (arkived === "active" ? `/projects/${project_id}/manuscripts/${rowData.id}` : "#"),
           }}
           data={data?.data || []}
           dispatch={dispatch}

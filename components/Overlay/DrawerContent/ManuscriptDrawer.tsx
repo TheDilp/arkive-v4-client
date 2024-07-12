@@ -447,7 +447,7 @@ export function ManuscriptDrawer({ data }: Props) {
                   data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public },
                   relations: {
                     entities: flattenManuscriptEntities(entities),
-                    tags: manuscript.tags.map((t) => ({ id: t.id })),
+                    tags: (manuscript?.tags || []).map((t) => ({ id: t.id })),
                   },
                 });
                 update(parsed);
