@@ -13,8 +13,9 @@ import {
   useHasPermissions,
   useNavbarTitle,
   useTable,
+  useUpdateManyPublic,
 } from "../../hooks";
-import { DialogAtomType, DrawerAtomType, UserHasPermissionsType } from "../../types";
+import { DialogAtomType, DrawerAtomType, UpdatePublicManyType, UserHasPermissionsType } from "../../types";
 import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import { dialogAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, TextFilters, userAtom } from "../../utils";
 
@@ -23,6 +24,7 @@ const columnHelper = createColumnHelper<ManuscriptType>();
 function createColumns(
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
+  updateMany: UpdatePublicManyType,
   isProjectOwner: boolean,
   permissions: UserHasPermissionsType,
   user_id: string,
@@ -38,37 +40,42 @@ function createColumns(
         filterOptions: TextFilters,
       },
     }),
-    // columnHelper.display({
-    //   id: "is_public",
-    //   header: "",
-    //   meta: {
-    //     centered: true,
-    //     noLink: true,
-    //   },
-    //   cell: ({ row }) => (
-    //     <Button
-    //       hasNoBackground
-    //       icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-    //       isDisabled={
-    //         !!row.original.deleted_at ||
-    //         !hasActionPermission(
-    //           isProjectOwner,
-    //           user_id === row.original.owner_id,
-    //           permissions,
-    //           row.original?.permissions || [],
-    //           "update_manuscripts",
-    //           user_role_id
-    //         )
-    //       }
-    //       isIconOnly
-    //       onClick={() => {
-    //         updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });
-    //       }}
-    //     />
-    //   ),
-    //   minSize: 3.25,
-    //   maxSize: 3.25,
-    // }),
+    columnHelper.display({
+      id: "is_public",
+      header: "",
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+      cell: ({ row }) => (
+        <Button
+          hasNoBackground
+          icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+          isDisabled={
+            !!row.original.deleted_at ||
+            !hasActionPermission(
+              isProjectOwner,
+              user_id === row.original.owner_id,
+              permissions,
+              row.original?.permissions || [],
+              "update_manuscripts",
+              user_role_id
+            )
+          }
+          isIconOnly
+          onClick={() => {
+            updateMany({
+              data: {
+                ids: [row.original.id],
+                is_public: !row.original.is_public,
+              },
+            });
+          }}
+        />
+      ),
+      minSize: 3.25,
+      maxSize: 3.25,
+    }),
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -209,7 +216,17 @@ export function ManuscriptView() {
   const user = useAtomValue(userAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["create_manuscripts", "update_manuscripts", "delete_manuscripts"], undefined);
-  const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
+  const { mutateAsync: updatePublicMany } = useUpdateManyPublic("manuscripts", project_id as string);
+
+  const columns = createColumns(
+    setDrawer,
+    setDialog,
+    updatePublicMany,
+    isProjectOwner,
+    permissions,
+    user?.id as string,
+    user?.role?.id
+  );
   const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
@@ -218,7 +235,7 @@ export function ManuscriptView() {
   const { data, isLoading } = useGetEntities<ManuscriptType>(
     {
       data: { project_id },
-      fields: ["id", "deleted_at", "title"],
+      fields: ["id", "deleted_at", "title", "is_public"],
       relations: {
         tags: true,
         documents: true,

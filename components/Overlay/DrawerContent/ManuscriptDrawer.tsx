@@ -444,7 +444,7 @@ export function ManuscriptDrawer({ data }: Props) {
             if (manuscript) {
               if (data?.id) {
                 const parsed = UpdateManuscriptSchema.parse({
-                  data: { id: data.id, title: manuscript.title },
+                  data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public },
                   relations: {
                     entities: flattenManuscriptEntities(entities),
                     tags: manuscript.tags.map((t) => ({ id: t.id })),
@@ -453,7 +453,7 @@ export function ManuscriptDrawer({ data }: Props) {
                 update(parsed);
               } else {
                 const parsed = InsertManuscriptSchema.parse({
-                  data: { title: manuscript.title, project_id },
+                  data: { title: manuscript.title, project_id, is_public: manuscript.is_public },
                   relations: {
                     entities: flattenManuscriptEntities(entities),
                     tags: manuscript.tags.map((t) => ({ id: t.id })),
