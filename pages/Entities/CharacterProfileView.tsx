@@ -1,7 +1,6 @@
 import { QueryClient, UseMutateAsyncFunction, useQueryClient } from "@tanstack/react-query";
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
-import omit from "lodash.omit";
 import { Dispatch, useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
@@ -761,7 +760,15 @@ function conversationTableColumns(
   ];
 }
 
-export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview?: boolean }) {
+export function CharacterProfileView({
+  id,
+  isPreview,
+  isViewOnly,
+}: {
+  id?: string;
+  isPreview?: boolean;
+  isViewOnly?: boolean;
+}) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
   const { isLg } = useBreakpoint();
@@ -881,17 +888,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
       }));
     }
   }
-  function openEditTagDrawer() {
-    if (existingCharacter?.data?.id) {
-      setDrawer((prev) => ({
-        ...prev,
-        type: "edit_tags",
-        title: "Edit tags",
-        size: "md",
-        data: { tags: existingCharacter?.data?.tags || [], entity: { type: "characters", id: existingCharacter?.data?.id } },
-      }));
-    }
-  }
+
   function openConversationDrawer() {
     if (existingCharacter?.data?.full_name)
       setDrawer({
@@ -923,12 +920,7 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
   });
 
   return (
-    <div
-      className={`flex flex-col gap-y-2 overflow-y-auto ${
-        isPreview
-          ? "max-h-[calc(100vh-20rem)] min-h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-10rem)] lg:min-h-[calc(100vh-10rem)]"
-          : "max-h-[calc(100vh-10rem)] min-h-[calc(100vh-10rem)] lg:max-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]"
-      }`}>
+    <div className={"flex h-full max-h-full flex-col gap-y-2 overflow-hidden"}>
       {isPreview ? null : (
         <div className="flex h-12 min-h-[3rem] items-center justify-between gap-x-2">
           <Breadcrumbs />
@@ -973,48 +965,11 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
           ) : null}
         </div>
       )}
-      <div className="w-full content-start gap-4 overflow-auto pt-0 lg:grid lg:flex-1 lg:grid-cols-5 lg:content-stretch">
+      <div className="h-full w-full flex-1 flex-col content-start gap-4 overflow-hidden pt-0">
         {isLoading ? <Skeleton type="character_profile" /> : null}
-        {!isLoading && isLg ? (
-          <div className="flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 p-4 lg:col-span-1">
-            <Avatar
-              hasShowImage
-              image={
-                existingCharacter?.data?.portrait
-                  ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
-                  : undefined
-              }
-              initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
-              isTooltipDisabled
-              size="4xl"
-            />
 
-            <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="font-merriweather text-center text-lg">
-                {`${existingCharacter?.data?.full_name || ""}`.trimEnd()}
-              </h2>
-              {existingCharacter?.data?.nickname ? (
-                <h3 className="font-lato text-center">{existingCharacter?.data?.nickname || ""}</h3>
-              ) : null}
-            </div>
-
-            <div className="w-full">
-              <Tabs
-                isVertical
-                onChange={(tab, index) => {
-                  if (!isPreview) {
-                    navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
-                  }
-                  setSelectedTab(index);
-                }}
-                selectedTab={selectedTab}
-                tabs={IS_PUBLIC ? tabs.slice(0, 4) : tabs.map((t) => (isPreview ? omit(t, ["icon"]) : t))}
-              />
-            </div>
-          </div>
-        ) : null}
-        {!isLoading && !isLg ? (
-          <div className="mb-2 w-full [&>div>ul>li>button]:bg-black">
+        {!isLoading ? (
+          <div className={`mb-2 w-full ${isViewOnly ? "" : "[&>div>ul>li>button]:bg-black"}`}>
             <Tabs
               hasArrowNav
               onChange={(tab, index) => {
@@ -1028,326 +983,329 @@ export function CharacterProfileView({ id, isPreview }: { id?: string; isPreview
             />
           </div>
         ) : null}
-        <div className="flex max-h-full flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
-          <h2 className="font-merriweather mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 text-2xl">
-            <span className="flex">
-              {type === "conversations" && subitem_id ? (
-                <div className="ml-auto flex w-min items-center pr-2 text-sm">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.chevron_left}
-                    isIconOnly
-                    onClick={() => {
-                      navigate(`/projects/${project_id}/characters/${item_id}/conversations`);
-                    }}
-                    size="sm"
-                  />
-                </div>
-              ) : null}
-              {tabs[selectedTab].label} {subitem_id && tabs[selectedTab].label === "conversations" ? "-" : ""}
-              {existingConversations?.data?.find((convo) => convo?.id === subitem_id)?.title}
-            </span>
-            {type === "relationships" ? (
-              <div className="ml-auto w-min">
-                <Button
-                  icon={IconEnum.family_tree}
-                  isDisabled={disableShowRelationshipTree(existingCharacter?.data)}
-                  label="Show relationship tree"
-                  onClick={showRelationshipTree}
-                  size="sm"
-                  variant="info"
-                />
-              </div>
-            ) : null}
-            {type === "conversations" && !subitem_id ? (
-              <div className="ml-auto w-min">
-                <Button
-                  icon={IconEnum.conversation}
-                  label="New conversation"
-                  onClick={openConversationDrawer}
-                  size="sm"
-                  variant="info"
-                />
-              </div>
-            ) : null}
-          </h2>
-          {(isPreview ? selectedTab === 0 : type === "biography") ? (
-            <div className="[&>.staticRendererContainer]:p-0">
-              <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
-            </div>
-          ) : null}
-          {(isPreview ? selectedTab === 1 : type === "relationships") ? (
-            <div className="h-full">
-              {isFetching ? (
-                <div className="pt-10">
-                  <Skeleton limit={5} type="table" />
-                </div>
-              ) : (
-                <div className="h-fit w-full">
-                  <Table
-                    columns={columns}
-                    config={{
-                      getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
-                      expandable: true,
-                    }}
-                    data={formattedRelationships.toSorted(sortCharactersByName)}
-                    dispatch={dispatch}
-                    type="relationships"
-                  />
-                </div>
-              )}
-            </div>
-          ) : null}
-          {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
-            <ul className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto">
-              {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
-              {(existingTemplates?.data || []).map((t) => {
-                return (
-                  <Collapsible key={t.id} label={t.title}>
-                    <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
-                      {t.character_fields.map((template_field) => {
-                        const characterField = existingCharacter?.data?.character_fields?.find(
-                          (f) => f.id === template_field.id
-                        );
-                        return (
-                          <AdditionalFieldDisplay
-                            character_field={template_field}
-                            character_field_data={characterField ?? null}
-                            isPreview={!!id}
-                            key={template_field.id}
-                          />
-                        );
-                      })}
-                    </div>
-                  </Collapsible>
-                );
-              })}
-
-              {!isFetchingTemplates && !existingTemplates?.data?.length ? (
-                <Alert label="There are no templates available." variant="info" />
-              ) : null}
-            </ul>
-          ) : null}
-          {(isPreview ? selectedTab === 3 : type === "resources") ? (
-            <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto">
-              <Collapsible
-                actions={
-                  IS_PUBLIC
-                    ? []
-                    : [
-                        {
-                          icon: IconEnum.add,
-                          tooltip: "Add document",
-                          onClick: openAddDocumentDrawer,
-                        },
-                      ]
+        <div className="grid h-full grid-cols-6 items-center rounded-lg bg-zinc-950">
+          {!isLoading && isLg ? (
+            <div className="col-span-1 flex h-full flex-col items-center gap-y-2 border-r border-zinc-900 p-4 pr-4">
+              <Avatar
+                hasShowImage
+                image={
+                  existingCharacter?.data?.portrait
+                    ? getImageURL(project_id as string, "images", existingCharacter?.data?.portrait?.id)
+                    : undefined
                 }
-                icon={IconEnum.document}
-                initialOpen={false}
-                label="Documents">
-                {existingCharacter?.data?.documents?.length ? (
-                  <div className="animate-in fade-in fill-mode-both mt-2">
-                    <Table
-                      columns={documentsTableColumns(
-                        removeItem,
-                        updateDocumentsPublic,
-                        setDrawer,
-                        queryClient,
-                        project_id as string,
-                        item_id as string
-                      )}
-                      config={{
-                        expandable: true,
-                        hasNoHeaderGap: true,
-                        getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
+                initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
+                isTooltipDisabled
+                size="4xl"
+              />
+
+              <h2 className="text-center font-merriweather text-2xl">
+                {`${existingCharacter?.data?.full_name || ""}`.trimEnd()}
+              </h2>
+              {existingCharacter?.data?.nickname ? (
+                <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
+              ) : null}
+              {existingCharacter?.data?.tags?.length ? (
+                <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap gap-2">
+                  {existingCharacter.data.tags.map((tag) => (
+                    <div key={tag.id}>
+                      <Badge customColor={tag.color} label={tag.title} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="col-span-5 flex h-full flex-1 flex-col overflow-auto py-4 lg:col-span-5">
+            <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 pl-4 font-merriweather text-2xl">
+              <span className="flex">
+                {type === "conversations" && subitem_id ? (
+                  <div className="ml-auto flex w-min items-center pr-2 text-sm">
+                    <Button
+                      hasNoBackground
+                      icon={IconEnum.chevron_left}
+                      isIconOnly
+                      onClick={() => {
+                        navigate(`/projects/${project_id}/characters/${item_id}/conversations`);
                       }}
-                      data={existingCharacter?.data?.documents || []}
-                      dispatch={dispatch}
-                      type="documents"
+                      size="sm"
                     />
+                  </div>
+                ) : null}
+                {tabs[selectedTab].label} {subitem_id && tabs[selectedTab].label === "conversations" ? "-" : ""}
+                {existingConversations?.data?.find((convo) => convo?.id === subitem_id)?.title}
+              </span>
+              {type === "relationships" ? (
+                <div className="ml-auto w-min">
+                  <Button
+                    icon={IconEnum.family_tree}
+                    isDisabled={disableShowRelationshipTree(existingCharacter?.data)}
+                    label="Show relationship tree"
+                    onClick={showRelationshipTree}
+                    size="sm"
+                    variant="info"
+                  />
+                </div>
+              ) : null}
+              {type === "conversations" && !subitem_id ? (
+                <div className="ml-auto w-min">
+                  <Button
+                    icon={IconEnum.conversation}
+                    label="New conversation"
+                    onClick={openConversationDrawer}
+                    size="sm"
+                    variant="info"
+                  />
+                </div>
+              ) : null}
+            </h2>
+            {(isPreview ? selectedTab === 0 : type === "biography") ? (
+              <div className="flex h-full items-start gap-x-4 p-4">
+                <div className="overflow-auto [&>.staticRendererContainer]:p-0">
+                  <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
+                </div>
+              </div>
+            ) : null}
+            {(isPreview ? selectedTab === 1 : type === "relationships") ? (
+              <div className="h-full p-4">
+                {isFetching ? (
+                  <div className="pt-10">
+                    <Skeleton limit={5} type="table" />
                   </div>
                 ) : (
-                  <div className="mt-2 w-full">
-                    <Alert label="There is no content." variant="info" />
+                  <div className="h-fit w-full">
+                    <Table
+                      columns={columns}
+                      config={{
+                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
+                        expandable: true,
+                      }}
+                      data={formattedRelationships.toSorted(sortCharactersByName)}
+                      dispatch={dispatch}
+                      type="relationships"
+                    />
                   </div>
                 )}
-              </Collapsible>
+              </div>
+            ) : null}
+            {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
+              <ul className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto p-4">
+                {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
+                {(existingTemplates?.data || []).map((t) => {
+                  return (
+                    <Collapsible key={t.id} label={t.title}>
+                      <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
+                        {t.character_fields.map((template_field) => {
+                          const characterField = existingCharacter?.data?.character_fields?.find(
+                            (f) => f.id === template_field.id
+                          );
+                          return (
+                            <AdditionalFieldDisplay
+                              character_field={template_field}
+                              character_field_data={characterField ?? null}
+                              isPreview={!!id}
+                              key={template_field.id}
+                            />
+                          );
+                        })}
+                      </div>
+                    </Collapsible>
+                  );
+                })}
 
-              <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                <div className="animate-in fade-in fill-mode-both mt-2">
-                  {existingCharacter?.data?.locations?.length ? (
-                    <Table
-                      columns={locationsTableColumns(project_id as string)}
-                      config={{
-                        expandable: true,
-                        hasNoHeaderGap: true,
-                        getLink: (rowData: CharacterLocationType) =>
-                          `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
-                      }}
-                      data={existingCharacter?.data?.locations || []}
-                      dispatch={dispatch}
-                      type="documents"
-                    />
-                  ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
-                  )}
-                </div>
-              </Collapsible>
-              <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
-                <div className="animate-in fade-in fill-mode-both mt-2">
-                  {existingCharacter?.data?.events?.length ? (
-                    <Table
-                      columns={eventsTableColumns(
-                        updateEventsPublic,
-                        setDrawer,
-                        queryClient,
-                        project_id as string,
-                        item_id as string
-                      )}
-                      config={{
-                        expandable: true,
-                        hasNoHeaderGap: true,
-                        getLink: (rowData: EventType) =>
-                          getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id),
-                      }}
-                      data={existingCharacter?.data?.events || []}
-                      dispatch={dispatch}
-                      type="events"
-                    />
-                  ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
-                  )}
-                </div>
-              </Collapsible>
-              <Collapsible
-                actions={
-                  IS_PUBLIC
-                    ? []
-                    : [
-                        {
-                          icon: assetView === "card" ? IconEnum.card : IconEnum.table,
-                          tooltip: "Change view",
-                          onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
-                        },
-                        {
-                          icon: IconEnum.download,
-                          tooltip: "Download all",
-                          onClick: () =>
-                            downloadImages({
-                              data: (existingCharacter?.data?.images || []).map((img) => ({ id: img.id, title: img.title })),
-                            }),
-                        },
-                        {
-                          icon: IconEnum.add,
-                          tooltip: "Add assets",
-                          onClick: openAddImageDrawer,
-                        },
-                      ]
-                }
-                icon={IconEnum.image}
-                initialOpen={false}
-                label="Assets">
-                {existingCharacter?.data?.images?.length ? (
-                  <div className="animate-in fade-in fill-mode-both mt-2">
-                    {assetView === "table" ? (
+                {!isFetchingTemplates && !existingTemplates?.data?.length ? (
+                  <Alert label="There are no templates available." variant="info" />
+                ) : null}
+              </ul>
+            ) : null}
+            {(isPreview ? selectedTab === 3 : type === "resources") ? (
+              <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto p-4">
+                <Collapsible
+                  actions={
+                    IS_PUBLIC
+                      ? []
+                      : [
+                          {
+                            icon: IconEnum.add,
+                            tooltip: "Add document",
+                            onClick: openAddDocumentDrawer,
+                          },
+                        ]
+                  }
+                  icon={IconEnum.document}
+                  initialOpen={false}
+                  label="Documents">
+                  {existingCharacter?.data?.documents?.length ? (
+                    <div className="animate-in fade-in fill-mode-both mt-2">
                       <Table
-                        columns={assetTableColumns(
-                          downloadImages,
-                          project_id,
+                        columns={documentsTableColumns(
                           removeItem,
-                          user?.webhooks || [],
-                          updateImagesPublic,
+                          updateDocumentsPublic,
+                          setDrawer,
                           queryClient,
-                          existingCharacter?.data?.id
+                          project_id as string,
+                          item_id as string
                         )}
                         config={{
+                          expandable: true,
                           hasNoHeaderGap: true,
+                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
                         }}
-                        data={existingCharacter?.data?.images || []}
+                        data={existingCharacter?.data?.documents || []}
                         dispatch={dispatch}
-                        type="images"
+                        type="documents"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  )}
+                </Collapsible>
+
+                <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+                  <div className="animate-in fade-in fill-mode-both mt-2">
+                    {existingCharacter?.data?.locations?.length ? (
+                      <Table
+                        columns={locationsTableColumns(project_id as string)}
+                        config={{
+                          expandable: true,
+                          hasNoHeaderGap: true,
+                          getLink: (rowData: CharacterLocationType) =>
+                            `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
+                        }}
+                        data={existingCharacter?.data?.locations || []}
+                        dispatch={dispatch}
+                        type="documents"
                       />
                     ) : (
-                      <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable size="2xl" type="images" />
-                    )}
-                  </div>
-                ) : (
-                  <div className="mt-2 w-full">
-                    <Alert label="There is no content." variant="info" />
-                  </div>
-                )}
-              </Collapsible>
-
-              <Collapsible
-                actions={
-                  IS_PUBLIC
-                    ? []
-                    : [
-                        {
-                          icon: IconEnum.edit,
-                          tooltip: "Edit tags",
-                          onClick: openEditTagDrawer,
-                        },
-                      ]
-                }
-                icon={IconEnum.tags}
-                initialOpen={false}
-                label="Tags">
-                {existingCharacter?.data?.tags?.length ? (
-                  <div className="animate-in fade-in fill-mode-both mt-2 flex flex-wrap gap-2">
-                    {existingCharacter.data.tags.map((tag) => (
-                      <div key={tag.id}>
-                        <Badge customColor={tag.color} label={tag.title} />
+                      <div className="mt-2 w-full">
+                        <Alert label="There is no content." variant="info" />
                       </div>
-                    ))}
+                    )}
                   </div>
-                ) : (
-                  <div className="mt-2 w-full">
-                    <Alert label="There is no content." variant="info" />
+                </Collapsible>
+                <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
+                  <div className="animate-in fade-in fill-mode-both mt-2">
+                    {existingCharacter?.data?.events?.length ? (
+                      <Table
+                        columns={eventsTableColumns(
+                          updateEventsPublic,
+                          setDrawer,
+                          queryClient,
+                          project_id as string,
+                          item_id as string
+                        )}
+                        config={{
+                          expandable: true,
+                          hasNoHeaderGap: true,
+                          getLink: (rowData: EventType) =>
+                            getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id),
+                        }}
+                        data={existingCharacter?.data?.events || []}
+                        dispatch={dispatch}
+                        type="events"
+                      />
+                    ) : (
+                      <div className="mt-2 w-full">
+                        <Alert label="There is no content." variant="info" />
+                      </div>
+                    )}
+                  </div>
+                </Collapsible>
+                <Collapsible
+                  actions={
+                    IS_PUBLIC
+                      ? []
+                      : [
+                          {
+                            icon: assetView === "card" ? IconEnum.card : IconEnum.table,
+                            tooltip: "Change view",
+                            onClick: () => setAssetView(assetView === "card" ? "table" : "card"),
+                          },
+                          {
+                            icon: IconEnum.download,
+                            tooltip: "Download all",
+                            onClick: () =>
+                              downloadImages({
+                                data: (existingCharacter?.data?.images || []).map((img) => ({ id: img.id, title: img.title })),
+                              }),
+                          },
+                          {
+                            icon: IconEnum.add,
+                            tooltip: "Add assets",
+                            onClick: openAddImageDrawer,
+                          },
+                        ]
+                  }
+                  icon={IconEnum.image}
+                  initialOpen={false}
+                  label="Assets">
+                  {existingCharacter?.data?.images?.length ? (
+                    <div className="animate-in fade-in fill-mode-both mt-2">
+                      {assetView === "table" ? (
+                        <Table
+                          columns={assetTableColumns(
+                            downloadImages,
+                            project_id,
+                            removeItem,
+                            user?.webhooks || [],
+                            updateImagesPublic,
+                            queryClient,
+                            existingCharacter?.data?.id
+                          )}
+                          config={{
+                            hasNoHeaderGap: true,
+                          }}
+                          data={existingCharacter?.data?.images || []}
+                          dispatch={dispatch}
+                          type="images"
+                        />
+                      ) : (
+                        <Gallery columns={4} images={existingCharacter?.data?.images} isOpenable size="2xl" type="images" />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-2 w-full">
+                      <Alert label="There is no content." variant="info" />
+                    </div>
+                  )}
+                </Collapsible>
+              </div>
+            ) : null}
+            {(isPreview ? selectedTab === 4 : type === "conversations") ? (
+              <div className="p-4">
+                {subitem_id && !isPreview ? null : (
+                  <div className="col-span-3 flex flex-col">
+                    <Table
+                      columns={conversationTableColumns(
+                        project_id as string,
+                        item_id as string,
+                        setDialog,
+                        setDrawer,
+                        generateDocument
+                      )}
+                      config={{
+                        onRowClick: isPreview
+                          ? undefined
+                          : (rowData: ConversationType) => {
+                              navigate(`/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`);
+                            },
+                      }}
+                      data={existingConversations?.data || []}
+                      dispatch={dispatch}
+                      isLoading={isLoadingConversations}
+                      type="conversations"
+                    />
                   </div>
                 )}
-              </Collapsible>
-            </div>
-          ) : null}
-
-          {(isPreview ? selectedTab === 4 : type === "conversations") ? (
-            <div className="flex-1">
-              {subitem_id && !isPreview ? null : (
-                <div className="col-span-3 flex max-h-full flex-col overflow-y-auto">
-                  <Table
-                    columns={conversationTableColumns(
-                      project_id as string,
-                      item_id as string,
-                      setDialog,
-                      setDrawer,
-                      generateDocument
-                    )}
-                    config={{
-                      onRowClick: isPreview
-                        ? undefined
-                        : (rowData: ConversationType) => {
-                            navigate(`/projects/${project_id}/characters/${item_id}/conversations/${rowData.id}`);
-                          },
-                    }}
-                    data={existingConversations?.data || []}
-                    dispatch={dispatch}
-                    isLoading={isLoadingConversations}
-                    type="conversations"
-                  />
+                <div className="h-full max-h-[100%] overflow-hidden">
+                  {subitem_id && !isPreview ? <ConversationView id={subitem_id} /> : null}
                 </div>
-              )}
-              <div className="h-full max-h-[100%] overflow-hidden">
-                {subitem_id && !isPreview ? <ConversationView id={subitem_id} /> : null}
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
