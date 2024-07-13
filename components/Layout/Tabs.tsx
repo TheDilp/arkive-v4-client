@@ -54,7 +54,12 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
               if (onChange && selectedTab !== index) onChange(tab, index);
               e.currentTarget.scrollIntoView({ behavior: "smooth" });
             }}
-            onKeyDown={() => {}}
+            onKeyDown={(e) => {
+              if (e.key === " " || e.key === "Enter") {
+                if (onChange && selectedTab !== index) onChange(tab, index);
+                e.currentTarget.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
             role="tab"
             tabIndex={0}>
             <span className="truncate">{tab.label}</span>
