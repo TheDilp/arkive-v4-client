@@ -20,6 +20,7 @@ function BlueprintPreviewDrawer({ id, parent_id }: { id: string; parent_id?: str
   return <BlueprintProfileView id={id} parent_id={parent_id} />;
 }
 function DocumentPreviewDrawer({ id }: { id: string }) {
+  console.log(id);
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
@@ -171,4 +172,3 @@ export function EntityPreviewDrawer({
     </DrawerLayout>
   );
 }
-
