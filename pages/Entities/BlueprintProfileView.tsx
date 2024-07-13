@@ -40,6 +40,21 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     undefined
   );
   const user = useAtomValue(userAtom);
+
+  const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
+    id || subitem_id,
+    "blueprint_instances",
+    {
+      data: { id: id || subitem_id },
+      fields: ["id", "title", "is_public", "parent_id", "owner_id"],
+      relations: {
+        blueprint_fields: true,
+        tags: true,
+      },
+      permissions: true,
+    },
+    { staleTime: 3 * 60 * 1000 }
+  );
   const { data: blueprint } = useGetEntity<BlueprintType>(
     parent_id || item_id,
     "blueprints",
@@ -54,22 +69,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
       },
       permissions: true,
     },
-    { staleTime: 3 * 60 * 1000 }
-  );
-
-  const { data: blueprintInstance, isLoading } = useGetSubEntity<BlueprintInstanceType>(
-    id || subitem_id,
-    "blueprint_instances",
-    {
-      data: { id: id || subitem_id },
-      fields: ["id", "title", "is_public", "parent_id", "owner_id"],
-      relations: {
-        blueprint_fields: true,
-        tags: true,
-      },
-      permissions: true,
-    },
-    { enabled: !!blueprint?.data, staleTime: 3 * 60 * 1000 }
+    { enabled: isViewOnly ? !!blueprintInstance?.data?.parent_id : true, staleTime: 3 * 60 * 1000 }
   );
 
   function openEditTagDrawer() {
