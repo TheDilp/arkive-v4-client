@@ -76,7 +76,7 @@ const DialogClasses = tv({
     isOverlay: {
       true: {
         container: "w-screen h-screen lg:w-screen bg-black top-0 left-0 translate-x-0 translate-y-0 bg-opacity-80",
-        base: "h-[40rem] w-[50rem] absolute z-[1000] top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] relative",
+        base: "h-[40rem] w-[50rem] absolute z-[1000] top-[50%] -translate-y-[50%] mx-auto relative",
         titleContainer: "mb-4",
       },
       false: {
@@ -149,8 +149,8 @@ export function Dialog() {
         {dialog.type === "export_graph" ? <ExportGraphDialog /> : null}
         {dialog.type === "insert_image" ? <InsertEditorImageDialog data={dialog.data} /> : null}
         {dialog.type === "automention" ? <AutomentionDrawer data={dialog.data} /> : null}
-        {dialog?.description ? <p className="font-lato text-center text-lg">{dialog.description}</p> : null}
-        {dialog?.warning ? <span className="font-lato py-1 text-center text-base text-red-400">{dialog.warning}</span> : null}
+        {dialog?.description ? <p className="text-center font-lato text-lg">{dialog.description}</p> : null}
+        {dialog?.warning ? <span className="py-1 text-center font-lato text-base text-red-400">{dialog.warning}</span> : null}
         {dialog?.type === "delete_many" ? (
           <p className="text-center text-red-500">
             <span className="text-red-600">WARNING: </span>
@@ -191,4 +191,3 @@ export function Dialog() {
     </div>
   );
 }
-
