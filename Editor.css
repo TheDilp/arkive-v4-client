@@ -22,7 +22,7 @@
 .remirror-editor,
 .Prosemirror,
 .staticRendererContainer {
-  @apply font-lato max-w-full p-4 focus-visible:outline-none;
+  @apply max-w-full p-4 font-lato focus-visible:outline-none;
 
   a[rel] {
     @apply text-sky-300 underline !important;
@@ -297,22 +297,6 @@
       @apply text-zinc-700;
     }
 
-    &:hover {
-      @apply bg-transparent text-white;
-
-      .mention-atom-node-view-wrapper {
-        @apply text-white transition-none;
-      }
-      .characterMentionImage {
-        div {
-          @apply bg-zinc-600 transition-none;
-        }
-        img {
-          @apply opacity-100;
-        }
-      }
-    }
-
     .mention-atom-node-view-wrapper {
       @apply text-transparent;
 
@@ -331,6 +315,21 @@
       }
       img {
         @apply opacity-0 transition-none;
+      }
+    }
+  }
+  .spoiler:hover {
+    @apply bg-transparent text-white !important;
+
+    .mention-atom-node-view-wrapper {
+      @apply text-white transition-none;
+    }
+    .characterMentionImage {
+      div {
+        @apply bg-zinc-600 transition-none;
+      }
+      img {
+        @apply opacity-100;
       }
     }
   }
