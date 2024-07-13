@@ -18,9 +18,9 @@ import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOw
 
 const tabs = [{ id: "1", label: "Basic info", icon: IS_PUBLIC ? null : IconEnum.info_circle }];
 
-export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id?: string }) {
+export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: string; parent_id?: string; isViewOnly?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
-  const { isMd, isLg } = useBreakpoint();
+  const { isMd } = useBreakpoint();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
@@ -102,7 +102,7 @@ export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id
 
   return (
     <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2">
-      {item_id && !IS_PUBLIC ? (
+      {item_id && !IS_PUBLIC && !isViewOnly ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
           <div className="flex flex-nowrap gap-x-2">
@@ -161,30 +161,10 @@ export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id
           </div>
         </div>
       ) : null}
-      <div className="w-full flex-1 content-start gap-4 pt-0 lg:grid lg:grid-cols-5 lg:content-stretch">
+      <div className="w-full flex-1 flex-col content-start gap-4 pt-0">
         {isLoading ? <Skeleton type="character_profile" /> : null}
-        {!isLoading && isLg ? (
-          <div
-            className={`${id ? "" : "p-4"} flex max-h-full flex-col items-center gap-y-2 rounded-lg bg-zinc-800 lg:col-span-1`}>
-            <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="font-merriweather text-center text-lg">{`${blueprintInstance?.data?.title || ""}`.trimEnd()}</h2>
-            </div>
-            <div className="w-full">
-              <Tabs
-                isVertical
-                onChange={(tab, index) => {
-                  navigate(
-                    `/projects/${project_id}/blueprints/${parent_id || item_id}/${id || subitem_id}/${tab.label.toLowerCase()}`
-                  );
-                  setSelectedTab(index);
-                }}
-                selectedTab={selectedTab}
-                tabs={tabs}
-              />
-            </div>
-          </div>
-        ) : null}
-        {!isLoading && !isLg ? (
+
+        {!isLoading ? (
           <div className="mb-2 w-full">
             <Tabs
               onChange={(tab, index) => {
@@ -197,9 +177,6 @@ export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id
           </div>
         ) : null}
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
-          <h2 className="font-merriweather mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 text-2xl">
-            <span className="flex">{tabs[selectedTab].label}</span>
-          </h2>
           <div className="flex flex-col gap-y-2">
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
               <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
@@ -255,4 +232,3 @@ export function BlueprintProfileView({ id, parent_id }: { id?: string; parent_id
     </div>
   );
 }
-
