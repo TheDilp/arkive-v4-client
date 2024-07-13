@@ -1,10 +1,20 @@
-import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { EntityPreviewDrawer, Icon } from "../../components";
-import { useGetEntity } from "../../hooks";
+import { Breadcrumbs, Button, EntityPreviewDrawer, Icon } from "../../components";
+import { useBreakpoint, useGetEntity, useHasPermissions } from "../../hooks";
 import { AvailableManuscriptEntityTypes, ManuscriptEntityType, ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
-import { buildManuscript, getDefaultEntityIcon } from "../../utils";
+import {
+  breadcrumbsAtom,
+  buildManuscript,
+  drawerAtom,
+  getDefaultEntityIcon,
+  hasActionPermission,
+  IconEnum,
+  isProjectOwnerAtom,
+  userAtom,
+} from "../../utils";
 
 function getEntityId(entity: ManuscriptEntityType) {
   return (
@@ -29,7 +39,6 @@ function ManuscriptEntityPreview({ type }: { type: AvailableManuscriptEntityType
 
   return <EntityPreviewDrawer data={{ id: subitem_id as string, parent_id: undefined, entity_type: type, isViewOnly: true }} />;
 }
-
 function ManuscriptEntityLink({ entity, index }: { entity: ManuscriptEntityType; index: number }) {
   const { project_id, item_id, subitem_id } = useParams();
   const navigate = useNavigate();
@@ -53,7 +62,6 @@ function ManuscriptEntityLink({ entity, index }: { entity: ManuscriptEntityType;
     </li>
   );
 }
-
 function ManuscriptEntityTree({ entities, parentIndex }: { entities: ManuscriptEntityType[]; parentIndex: number }) {
   if (entities.length === 0) return null;
   return (
@@ -66,31 +74,85 @@ function ManuscriptEntityTree({ entities, parentIndex }: { entities: ManuscriptE
 }
 
 export function ManuscriptProfileView() {
-  const { item_id } = useParams();
+  const { isMd } = useBreakpoint();
+  const { project_id, item_id } = useParams();
   const [type, setType] = useState<AvailableManuscriptEntityTypes | null>(null);
   const { data: existingManuscript } = useGetEntity<ManuscriptType>(item_id, "manuscripts", {
     fields: ["id", "owner_id", "title"],
     relations: { entities: true },
   });
+  const setDrawer = useSetAtom(drawerAtom);
+  const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
+  const isProjectOwner = useAtomValue(isProjectOwnerAtom);
+  const permissions = useHasPermissions(
+    ["read_manuscripts", "create_manuscripts", "update_manuscripts", "delete_manuscripts"],
+    undefined
+  );
+  const user = useAtomValue(userAtom);
+
+  useLayoutEffect(() => {
+    if (existingManuscript?.data) {
+      setBreadcrumbs({
+        items: [{ id: existingManuscript.data.id, title: existingManuscript.data.title, is_folder: false, parent_id: null }],
+        type: "manuscripts",
+      });
+    }
+  }, [existingManuscript?.data]);
+
   const manuscriptTree = buildManuscript(existingManuscript?.data?.entities || []);
 
   return (
-    <div className="grid h-[calc(100vh-6rem)] grid-cols-12 gap-x-2 overflow-hidden rounded-b">
-      <div className="col-span-3 flex h-full flex-col rounded bg-zinc-800 p-2">
-        <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>
-        <TypeContext.Provider value={{ type, setType }}>
-          <ul>
-            {manuscriptTree?.length
-              ? manuscriptTree?.map((entity, index) => {
-                  return <ManuscriptEntityLink entity={entity} index={index} key={entity.id} />;
-                })
-              : null}
-          </ul>
-        </TypeContext.Provider>
+    <>
+      {item_id && !IS_PUBLIC ? (
+        <div className="flex h-12 min-h-[3rem] items-center justify-between">
+          <Breadcrumbs />
+          <div className="flex flex-nowrap gap-x-2">
+            <div className="max-w-[208px] lg:w-52">
+              <Button
+                icon={IconEnum.edit}
+                isDisabled={
+                  !hasActionPermission(
+                    isProjectOwner,
+                    user?.id === existingManuscript?.data?.owner_id,
+                    permissions,
+                    existingManuscript?.data?.permissions || [],
+                    "update_manuscripts",
+                    user?.role?.id
+                  )
+                }
+                label="Edit current manuscript"
+                onClick={() => {
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "lg",
+                    title: "Edit manuscript",
+                    type: "manuscripts",
+                    data: { id: item_id as string, project_id: project_id as string },
+                  }));
+                }}
+                tooltip={isMd ? undefined : "Edit current manuscript"}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <div className="grid h-[calc(100vh-6rem)] grid-cols-12 gap-x-2 overflow-hidden rounded-b">
+        <div className="col-span-3 flex h-full flex-col rounded bg-zinc-800 p-2">
+          <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>
+          <TypeContext.Provider value={{ type, setType }}>
+            <ul>
+              {manuscriptTree?.length
+                ? manuscriptTree?.map((entity, index) => {
+                    return <ManuscriptEntityLink entity={entity} index={index} key={entity.id} />;
+                  })
+                : null}
+            </ul>
+          </TypeContext.Provider>
+        </div>
+        <div className="col-span-9 flex h-full max-h-full flex-col rounded bg-zinc-950 p-2">
+          {type ? <ManuscriptEntityPreview type={type} /> : null}
+        </div>
       </div>
-      <div className="col-span-9 flex h-full max-h-full flex-col rounded bg-zinc-950 p-2">
-        {type ? <ManuscriptEntityPreview type={type} /> : null}
-      </div>
-    </div>
+    </>
   );
 }
