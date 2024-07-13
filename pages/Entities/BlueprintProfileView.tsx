@@ -56,11 +56,11 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     { staleTime: 3 * 60 * 1000 }
   );
   const { data: blueprint } = useGetEntity<BlueprintType>(
-    parent_id || item_id,
+    isViewOnly ? (blueprintInstance?.data?.parent_id as string) : parent_id || item_id,
     "blueprints",
     {
       data: {
-        id: parent_id || item_id,
+        id: isViewOnly ? blueprintInstance?.data?.parent_id : parent_id || item_id,
       },
       fields: ["id", "title", "title_name", "icon", "owner_id"],
       relations: {
@@ -99,6 +99,8 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
     `Blueprints | ${blueprint?.data?.title} | ${blueprintInstance?.data?.title}`,
     !!blueprint?.data && !!blueprintInstance?.data
   );
+
+  if (isLoading) return <Skeleton type="character_profile" />;
 
   return (
     <div className="flex max-h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col gap-y-2">
