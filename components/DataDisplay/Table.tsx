@@ -3,7 +3,7 @@ import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { useHandleChange } from "../../hooks";
+import { useBreakpoint, useHandleChange } from "../../hooks";
 import {
   AvailableEntityType,
   BlueprintFieldTypes,
@@ -96,7 +96,6 @@ const TableClasses = tv({
     },
   ],
 });
-
 const TableFilterClasses = tv({
   slots: {
     base: "rounded shadow bg-zinc-800 px-4 py-2",
@@ -108,7 +107,6 @@ const TableFilterClasses = tv({
     columnFilterDivider: "border-zinc-800",
   },
 });
-
 function TableColumnFilterList({
   colId,
   applyFilter: applyFilterFn,
@@ -267,7 +265,6 @@ function TableColumnFilterList({
     </>
   );
 }
-
 function TableColumnFilter({
   columnId,
   columnHeader,
@@ -449,7 +446,6 @@ function TableColumnFilter({
     </div>
   );
 }
-
 function TableSubheaderFilterBadges({
   filters,
   relationFilters,
@@ -518,7 +514,6 @@ function TableSubheaderFilterBadges({
     </div>
   );
 }
-
 function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orderBy?: RequestOrderByType<any>; id?: string }) {
   return (
     <div className="w-min">
@@ -533,6 +528,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
   );
 }
 export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
+  const { isLg } = useBreakpoint();
   const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, selection, selectedActions, getLink, onRowClick } =
     config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -639,7 +635,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
             return (
               <Fragment key={hdr.id}>
                 <div
-                  className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""} ${(meta as MetaType)?.centered ? centeredContent() : ""} ${(meta as MetaType)?.pinned ? "sticky z-10" : ""} ${hdr.column.getCanSort() ? sortableHeader() : ""} ${hdr.id === "select" ? "sticky left-0" : ""} bg-zinc-950 first:border-l`}
+                  className={`${contentClasses()} ${hdr.id === "select" ? selectClasses() : ""} ${(meta as MetaType)?.centered ? centeredContent() : ""} ${(meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${hdr.column.getCanSort() ? sortableHeader() : ""} ${hdr.id === "select" ? "sticky left-0" : ""} bg-zinc-950 first:border-l`}
                   style={{
                     ...getTableColumnWidths(hdr.column.id, {
                       minSize: hdr.column.columnDef.minSize,
@@ -809,11 +805,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       <div
                         className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                        } ${cell.column.id === "select" ? "sticky left-0 z-10" : "z-0"} ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
+                        } ${cell.column.id === "select" && isLg ? "sticky left-0 z-10" : "z-0"} ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
                           config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
                             ? "bg-blue-400"
                             : "bg-zinc-950"
-                        } ${(cell.column.columnDef.meta as MetaType)?.pinned ? "sticky z-10" : ""} ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
+                        } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
                         key={cell.id}
                         onClick={(e) => {
                           if (
@@ -932,4 +928,3 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     </>
   );
 }
-
