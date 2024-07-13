@@ -23,7 +23,6 @@ import {
   Tabs,
 } from "../../components";
 import {
-  useBreakpoint,
   useDownloadImages,
   useGenerateDocument,
   useGetEntities,
@@ -745,6 +744,7 @@ function conversationTableColumns(
                     },
                     title: "Delete conversation",
                     size: "sm",
+                    isOverlay: true,
                     type: "delete_entity",
                   }));
                 },
@@ -771,7 +771,6 @@ export function CharacterProfileView({
 }) {
   const { project_id, item_id, type, subitem_id } = useParams();
   const navigate = useNavigate();
-  const { isLg } = useBreakpoint();
   const [selectedTab, setSelectedTab] = useState(getCharacterProfileTabFromType(type));
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
@@ -866,6 +865,7 @@ export function CharacterProfileView({
         title: `Family tree of ${existingCharacter?.data.full_name || ""}`,
         data: { id: existingCharacter?.data.id },
         size: "lg",
+        isOverlay: true,
       });
   }
   function openAddDocumentDrawer() {
@@ -983,9 +983,9 @@ export function CharacterProfileView({
             />
           </div>
         ) : null}
-        <div className="grid h-full grid-cols-6 items-center rounded-lg bg-zinc-950">
-          {!isLoading && isLg ? (
-            <div className="col-span-1 flex h-full flex-col items-center gap-y-2 border-r border-zinc-900 p-4 pr-4">
+        <div className="grid h-full grid-cols-6 content-start rounded-lg bg-zinc-950 lg:items-center">
+          {!isLoading ? (
+            <div className="col-span-6 flex h-fit flex-col items-center gap-y-2 border-r border-zinc-900 p-4 lg:col-span-1 lg:h-full">
               <Avatar
                 hasShowImage
                 image={
@@ -1015,7 +1015,7 @@ export function CharacterProfileView({
               ) : null}
             </div>
           ) : null}
-          <div className="col-span-5 flex h-full flex-1 flex-col overflow-auto py-4 lg:col-span-5">
+          <div className="col-span-6 flex h-full flex-1 flex-col overflow-auto py-4 lg:col-span-5">
             <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 pl-4 font-merriweather text-2xl">
               <span className="flex">
                 {type === "conversations" && subitem_id ? (
