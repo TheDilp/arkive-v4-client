@@ -5,7 +5,7 @@ import { Dispatch, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-import { useGetNotifications, useHasPermissions, useReadNotification, useSignout } from "../../hooks";
+import { useBreakpoint, useGetNotifications, useHasPermissions, useReadNotification, useSignout } from "../../hooks";
 import {
   AllAvailableEntities,
   DrawerAtomType,
@@ -432,6 +432,7 @@ function NotificationList({
 
 export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   const { project_id, subitem_id } = useParams();
+  const { isLg } = useBreakpoint();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isMutating = useIsMutating();
@@ -575,9 +576,9 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
   //   }
   // }, [versionMessage]);
   return (
-    <div className="flex h-16 max-h-16 min-h-[4rem] flex-1 border-b border-zinc-800 bg-zinc-900 shadow">
+    <div className="flex h-16 max-h-16 min-h-[4rem] max-w-full flex-1 overflow-hidden border-b border-zinc-800 bg-zinc-900 shadow">
       {isMutating && !isMutatingDocument ? <IndeterminateProgressBar /> : null}
-      <h1 className="font-merriweather flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 text-2xl text-white">
+      <h1 className="flex h-full min-h-[64px] max-w-[50%] select-none items-center pl-4 font-merriweather text-2xl text-white">
         <span className="truncate">{navbarTitle || "The Arkive"}</span>
       </h1>
       <div className="ml-auto flex items-center gap-x-2 pr-4">
@@ -597,25 +598,33 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
                 </div>
               </>
             ) : null}
-            <div className="w-fit">
-              <Tooltip arrowColor="#27272a" content={<DiceRoller />} customOffset={{ mainAxis: 25, crossAxis: 50 }} isClickable>
-                <div className="h-full">
-                  <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
-                </div>
-              </Tooltip>
-            </div>
+            {isLg ? (
+              <div className="w-fit">
+                <Tooltip
+                  arrowColor="#27272a"
+                  content={<DiceRoller />}
+                  customOffset={{ mainAxis: 25, crossAxis: 50 }}
+                  isClickable>
+                  <div className="h-full">
+                    <Button hasNoBackground icon={IconEnum.d20} iconSize={24} isIconOnly onClick={undefined} />
+                  </div>
+                </Tooltip>
+              </div>
+            ) : null}
             <div className="w-fit">
               <div className="h-full">
                 <Button hasNoBackground icon={IconEnum.search} iconSize={24} isIconOnly onClick={openSearchDrawer} />
               </div>
             </div>
-            <div className="w-fit">
-              <Tooltip arrowColor="#3f3f46" content={<HistoryList history={history} />} isClickable isInline passCloseTooltip>
-                <div className="h-full">
-                  <Button hasNoBackground icon={IconEnum.history} iconSize={24} isIconOnly onClick={undefined} />
-                </div>
-              </Tooltip>
-            </div>
+            {isLg ? (
+              <div className="w-fit">
+                <Tooltip arrowColor="#3f3f46" content={<HistoryList history={history} />} isClickable isInline passCloseTooltip>
+                  <div className="h-full">
+                    <Button hasNoBackground icon={IconEnum.history} iconSize={24} isIconOnly onClick={undefined} />
+                  </div>
+                </Tooltip>
+              </div>
+            ) : null}
             <div className="w-fit">
               <Tooltip
                 allowedPlacements={["bottom-end"]}
@@ -657,4 +666,3 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     </div>
   );
 }
-
