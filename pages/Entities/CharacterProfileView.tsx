@@ -888,7 +888,6 @@ export function CharacterProfileView({
       }));
     }
   }
-
   function openConversationDrawer() {
     if (existingCharacter?.data?.full_name)
       setDrawer({
@@ -983,7 +982,7 @@ export function CharacterProfileView({
             />
           </div>
         ) : null}
-        <div className="grid h-full grid-cols-6 content-start rounded-lg bg-zinc-950 lg:items-center">
+        <div className="grid h-full grid-cols-6 content-start rounded-lg bg-zinc-950 lg:content-stretch lg:items-center">
           {!isLoading ? (
             <div className="col-span-6 flex h-fit flex-col items-center gap-y-2 border-r border-zinc-900 p-4 lg:col-span-1 lg:h-full">
               <Avatar
