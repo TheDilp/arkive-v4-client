@@ -13,14 +13,13 @@ import { DrawerLayout } from "../../Layout";
 import { Alert, Skeleton } from "../../Misc";
 import { EventDrawer } from "./EventDrawer";
 
-function CharacterPreviewDrawer({ id }: { id: string }) {
-  return <CharacterProfileView id={id} isPreview />;
+function CharacterPreviewDrawer({ id, isViewOnly }: { id: string; isViewOnly?: boolean }) {
+  return <CharacterProfileView id={id} isPreview isViewOnly={isViewOnly} />;
 }
-function BlueprintPreviewDrawer({ id, parent_id }: { id: string; parent_id?: string }) {
-  return <BlueprintProfileView id={id} parent_id={parent_id} />;
+function BlueprintPreviewDrawer({ id, parent_id, isViewOnly }: { id: string; parent_id?: string; isViewOnly?: boolean }) {
+  return <BlueprintProfileView id={id} isViewOnly={isViewOnly} parent_id={parent_id} />;
 }
 function DocumentPreviewDrawer({ id }: { id: string }) {
-  console.log(id);
   const { data: existingDocument, isLoading } = useGetEntity<DocumentType>(
     id,
     "documents",
@@ -119,11 +118,17 @@ export function EntityPreviewDrawer({
   data,
 }: {
   data:
-    | { id: string; parent_id?: string; entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType }
+    | {
+        id: string;
+        parent_id?: string;
+        entity_type: Omit<AvailableEntityType, "images"> | AvailableSubEntityType;
+        isViewOnly?: boolean;
+      }
     | {
         id: string;
         entity_type: "images";
         image_type?: AssetType;
+        isViewOnly?: boolean;
       };
 }) {
   const { project_id } = useParams();
@@ -131,9 +136,9 @@ export function EntityPreviewDrawer({
   return (
     <DrawerLayout>
       <div className="flex-1 overflow-y-auto">
-        {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} /> : null}
+        {data.entity_type === "characters" ? <CharacterPreviewDrawer id={data.id} isViewOnly={data?.isViewOnly} /> : null}
         {data.entity_type === "blueprint_instances" && "parent_id" in data ? (
-          <BlueprintPreviewDrawer id={data.id} parent_id={data.parent_id} />
+          <BlueprintPreviewDrawer id={data.id} isViewOnly={data?.isViewOnly} parent_id={data.parent_id} />
         ) : null}
         {data.entity_type === "documents" ? <DocumentPreviewDrawer id={data.id} /> : null}
         {data.entity_type === "maps" ? <MapPreviewDrawer id={data.id} /> : null}
@@ -150,7 +155,7 @@ export function EntityPreviewDrawer({
           <ImagePreviewDrawer id={data.id} project_id={project_id as string} type={data.image_type} />
         ) : null}
       </div>
-      {IS_PUBLIC ? null : (
+      {IS_PUBLIC || data?.isViewOnly ? null : (
         <div className="">
           <Button
             icon={IconEnum.edit}
