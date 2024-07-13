@@ -653,7 +653,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
   }, [boardState.draw_mode, cyRef?.current?._cy, ehRef?.current]);
   useEffect(() => {
     if (cyRef?.current?._cy) {
-      cyRef?.current?._cy?.gridGuide?.({ ...cytoscapeGridOptions, drawGrid: !IS_PUBLIC });
+      cyRef?.current?._cy?.gridGuide?.({ ...cytoscapeGridOptions, drawGrid: !IS_PUBLIC && !isFamilyTreeView });
     }
   }, [boardState.grid, cyRef?.current?._cy]);
   useEffect(() => {
@@ -794,4 +794,3 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
     </div>
   );
 }
-
