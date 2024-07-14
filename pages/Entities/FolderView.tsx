@@ -335,6 +335,24 @@ function getColumns(
               })),
             }
           );
+        } else if (entityType === "random_tables") {
+          actions.push({
+            id: "send_to_discord",
+            title: "Send roll button to Discord",
+            icon: IconEnum.discord,
+            subItems: webhooks.map((webhook) => ({
+              id: webhook.id,
+              title: webhook.title,
+              onClick: () =>
+                FetchFunction({
+                  url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
+                  body: JSON.stringify({
+                    data: { id: row.original.id, type: "roll_btn" },
+                  }),
+                  method: "POST",
+                }),
+            })),
+          });
         }
 
         // if (entityType === "dictionaries") {
@@ -466,7 +484,7 @@ function EntityItem({
             <Icon fontSize={100} icon={is_folder ? IconEnum.folder : (icon as AvailableIcons) || getDefaultEntityIcon(type)} />
           )}
         </div>
-        <span className="font-lato max-w-full truncate text-white hover:text-white">{title}</span>
+        <span className="max-w-full truncate font-lato text-white hover:text-white">{title}</span>
       </div>
     </Link>
   );

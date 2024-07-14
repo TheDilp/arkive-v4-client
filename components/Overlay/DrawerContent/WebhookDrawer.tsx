@@ -24,9 +24,9 @@ export function WebhookDrawer({ data }: Props) {
       data: {
         id: data.id,
       },
-      fields: ["id", "title", "url", "user_id"],
+      fields: ["id", "title", "user_id"],
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id }
   );
   const { mutateAsync, isLoading: isCreating } = useMutateWebhook(data?.id ? "update" : "create", data?.id);
   const [webhook, setWebhook] = useState<WebhookType | null>();
@@ -36,7 +36,7 @@ export function WebhookDrawer({ data }: Props) {
     if (existingWebhook?.data) {
       setWebhook(existingWebhook?.data);
     } else {
-      setWebhook({ title: "New webhook", user_id: user?.id || "", url: "", id: crypto.randomUUID() });
+      setWebhook({ title: "New webhook", user_id: user?.id || "", channel_id: "", id: crypto.randomUUID() });
     }
   }, [existingWebhook?.data]);
 
@@ -51,11 +51,17 @@ export function WebhookDrawer({ data }: Props) {
         placeholder="E.g. DnD group server"
         value={webhook?.title || ""}
       />
-      <Input isDisabled={!!data?.id} label="Webhook url" name="url" onChange={handleChange} value={webhook?.url || ""} />
+      <Input
+        isDisabled={!!data?.id}
+        label="Webhook channel ID"
+        name="channel_id"
+        onChange={handleChange}
+        value={webhook?.channel_id || ""}
+      />
       <div>
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isCreating || !webhook?.title || !webhook?.url}
+          isDisabled={isCreating || !webhook?.title || !webhook?.channel_id}
           isLoading={isCreating}
           label={data?.id ? "Update" : "Create"}
           onClick={async () => {
