@@ -42,6 +42,7 @@ export type FlatManuscriptEntityType = {
   map_pin_id: string | null;
   graph_id: string | null;
   event_id: string | null;
+  image_id: string | null;
   type: AvailableManuscriptEntityTypes;
 };
 

@@ -62,7 +62,7 @@ export function flattenManuscriptEntities(
   state.forEach((element) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, sort, children, type, ...rest } = element;
-    flatArray.push({ id, sort, ...rest, parent_id, manuscript_id: "" });
+    flatArray.push({ id, sort, ...rest, parent_id, manuscript_id: "", type: "documents" });
 
     if (children && children.length > 0) {
       flatArray = flatArray.concat(flattenManuscriptEntities(children, id));
