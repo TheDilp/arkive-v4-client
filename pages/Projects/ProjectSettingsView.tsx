@@ -500,7 +500,7 @@ export function ProjectSettingsView() {
             />
 
             <div className="mt-2 flex flex-col gap-y-1">
-              <h2 className="font-merriweather text-center text-lg">{`${projectData?.data?.title || ""}`.trimEnd()}</h2>
+              <h2 className="text-center font-merriweather text-lg">{`${projectData?.data?.title || ""}`.trimEnd()}</h2>
             </div>
 
             <div className="w-full">
@@ -515,7 +515,7 @@ export function ProjectSettingsView() {
         ) : null}
 
         <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]">
-          <h2 className="font-merriweather mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 text-2xl">
+          <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex items-center gap-x-2">
               <Icon icon={finalTabs[selectedTab].icon} /> {finalTabs[selectedTab].label}
             </span>
@@ -792,7 +792,7 @@ export function ProjectSettingsView() {
                       ),
                   },
                 ]}
-                label="Sidebar settings">
+                label="Entity settings">
                 <div className="bg-zinc-900">
                   {UserSidebarEntitiesEnabled.map((entity) => (
                     <div
