@@ -37,7 +37,7 @@ export function AuthWrapper() {
   useEffect(() => {
     if (!isInitialLoading && !isFetching) {
       if (!loggedIn && !pathname.endsWith("/auth/login")) {
-        navigate("/auth/login");
+        document.location = `${import.meta.env.VITE_HOME}/signin/editor`;
       } else if (loggedIn && (pathname.includes("auth/") || pathname === "/")) {
         navigate("/projects");
       }

@@ -347,7 +347,7 @@ function getColumns(
                 FetchFunction({
                   url: `${baseURLS.baseServer}/webhooks/send/${webhook.id}`,
                   body: JSON.stringify({
-                    data: { id: row.original.id, type: "roll_btn" },
+                    data: { id: row.original.id, title: row.original.title, type: "roll_btn" },
                   }),
                   method: "POST",
                 }),

@@ -21,17 +21,34 @@ import {
   UserSettingsFeatureFlags,
   UserSettingsWebhooks,
 } from "../../pages";
-import { moduleAtom } from "../../utils";
+import { loggedInAtom, moduleAtom } from "../../utils";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 export default function App() {
   const setModule = useSetAtom(moduleAtom);
+  const setLoggedIn = useSetAtom(loggedInAtom);
+
+  queryClient.setDefaultOptions({
+    queries: {
+      retry: (failureCount, error: any) => {
+        if (error.message === "UNAUTHORIZED") {
+          setLoggedIn(false);
+          return false;
+        }
+        if (failureCount <= 2) return true;
+        {
+          setLoggedIn(false);
+          return false;
+        }
+      },
+      refetchOnWindowFocus: false,
+      onError: (error: any) => {
+        if (error.message === "UNAUTHORIZED") {
+          setLoggedIn(false);
+        }
+      },
+    },
+  });
 
   useLayoutEffect(() => {
     setModule("arkive");

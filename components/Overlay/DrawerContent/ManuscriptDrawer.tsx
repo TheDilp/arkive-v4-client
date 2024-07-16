@@ -1,3 +1,4 @@
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import cloneDeep from "lodash.clonedeep";
 import React, { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -209,128 +210,163 @@ function ManuscriptItem({ entity, parentIndex }: { entity: ManuscriptEntityType;
     );
   if (entity.children.length === 0)
     return (
-      <div className="flex min-h-10 w-full items-end gap-x-2 border-b border-zinc-700" key={entity.id}>
-        <span className="pb-1">
-          <Icon fontSize={22} icon={getDefaultEntityIcon(entity.type)} />
-        </span>
-        <span className="w-full">
-          <Title
-            actions={[
-              {
-                variant: "primary",
-                icon: IconEnum.add,
-                tooltip: "Add",
-                onClick: () =>
-                  setEntities((prev) =>
-                    addById(prev, entity.id, {
-                      id: crypto.randomUUID(),
-                      title: "",
-                      sort: entity.children.length,
-                      children: [],
-                      ...base,
-                    })
-                  ),
-              },
-              {
-                variant: "primary",
-                icon: IconEnum.close,
-                tooltip: "Clear",
-                onClick: () =>
-                  setEntities((prev) =>
-                    updateById(
-                      prev,
-                      entity.id,
-                      {
-                        id: entity.id,
-                        title: "",
-                        sort: entity.sort,
-                        children: entity.children,
-                        ...base,
-                      },
-                      type
-                    )
-                  ),
-              },
-              {
-                variant: "error",
-                icon: IconEnum.trash,
-                tooltip: "Remove",
-                onClick: () => setEntities((prev) => removeById(prev, entity.id)),
-              },
-            ]}
-            label={entity.title}
-            size="lg"
-          />
-        </span>
-      </div>
+      <Draggable draggableId={entity.id} index={0}>
+        {(providedDraggable, props) => (
+          <div
+            ref={providedDraggable.innerRef}
+            {...providedDraggable.draggableProps}
+            className={`flex min-h-10 w-full items-end gap-x-2 border-b border-zinc-700 ${props.isDragging ? "relative left-0 z-10" : ""}`}
+            key={entity.id}>
+            <span {...providedDraggable.dragHandleProps}>
+              <Icon fontSize={24} icon={IconEnum.menu} />
+            </span>
+            <span className="pb-1">
+              <Icon fontSize={22} icon={getDefaultEntityIcon(entity.type)} />
+            </span>
+            <span className="w-full">
+              <Title
+                actions={[
+                  {
+                    variant: "primary",
+                    icon: IconEnum.add,
+                    tooltip: "Add",
+                    onClick: () =>
+                      setEntities((prev) =>
+                        addById(prev, entity.id, {
+                          id: crypto.randomUUID(),
+                          title: "",
+                          sort: entity.children.length,
+                          children: [],
+                          ...base,
+                        })
+                      ),
+                  },
+                  {
+                    variant: "primary",
+                    icon: IconEnum.close,
+                    tooltip: "Clear",
+                    onClick: () =>
+                      setEntities((prev) =>
+                        updateById(
+                          prev,
+                          entity.id,
+                          {
+                            id: entity.id,
+                            title: "",
+                            sort: entity.sort,
+                            children: entity.children,
+                            ...base,
+                          },
+                          type
+                        )
+                      ),
+                  },
+                  {
+                    variant: "error",
+                    icon: IconEnum.trash,
+                    tooltip: "Remove",
+                    onClick: () => setEntities((prev) => removeById(prev, entity.id)),
+                  },
+                ]}
+                label={entity.title}
+                size="lg"
+              />
+            </span>
+          </div>
+        )}
+      </Draggable>
     );
 
   return (
-    <div className="[&>*>div]:bg-transparent [&>details>summary>span>span>svg]:text-[22px] [&>details>summary]:min-h-10">
-      <Collapsible
-        actions={[
-          {
-            variant: "primary",
-            icon: IconEnum.add,
-            tooltip: "Add",
-            onClick: () =>
-              setEntities((prev) =>
-                addById(prev, entity.id, {
-                  id: crypto.randomUUID(),
-                  title: "",
-                  sort: entity.children.length,
-                  children: [],
-                  ...base,
-                })
-              ),
-          },
-          {
-            variant: "primary",
-            icon: IconEnum.close,
-            tooltip: "Clear",
-            onClick: () =>
-              setEntities((prev) =>
-                updateById(
-                  prev,
-                  entity.id,
-                  {
-                    id: entity.id,
-                    title: "",
-                    sort: entity.sort,
-                    children: entity.children,
-                    ...base,
-                  },
-                  type
-                )
-              ),
-          },
-          {
-            variant: "error",
-            icon: IconEnum.trash,
-            tooltip: "Remove",
-            onClick: () => setEntities((prev) => removeById(prev, entity.id)),
-          },
-        ]}
-        icon={getDefaultEntityIcon(entity.type)}
-        initialOpen
-        key={entity.id}
-        label={entity.title}
-        size="lg">
-        <div className="flex flex-col" style={{ paddingLeft: parentIndex * 10 }}>
-          {entity.children.length === 0 ? null : <ManuscriptTree entities={entity.children} parentIndex={parentIndex + 1} />}
+    <Draggable draggableId={entity.id} index={0}>
+      {(providedDraggable) => (
+        <div className="flex w-full flex-1 items-start gap-x-2">
+          <span {...providedDraggable.dragHandleProps} className="pt-1.5">
+            <Icon fontSize={24} icon={IconEnum.menu} />
+          </span>
+          <div
+            ref={providedDraggable.innerRef}
+            {...providedDraggable.draggableProps}
+            className="w-full [&>*>div]:bg-transparent [&>details>summary>span>span>svg]:text-[22px] [&>details>summary]:min-h-10">
+            <Collapsible
+              actions={[
+                {
+                  variant: "primary",
+                  icon: IconEnum.add,
+                  tooltip: "Add",
+                  onClick: () =>
+                    setEntities((prev) =>
+                      addById(prev, entity.id, {
+                        id: crypto.randomUUID(),
+                        title: "",
+                        sort: entity.children.length,
+                        children: [],
+                        ...base,
+                      })
+                    ),
+                },
+                {
+                  variant: "primary",
+                  icon: IconEnum.close,
+                  tooltip: "Clear",
+                  onClick: () =>
+                    setEntities((prev) =>
+                      updateById(
+                        prev,
+                        entity.id,
+                        {
+                          id: entity.id,
+                          title: "",
+                          sort: entity.sort,
+                          children: entity.children,
+                          ...base,
+                        },
+                        type
+                      )
+                    ),
+                },
+                {
+                  variant: "error",
+                  icon: IconEnum.trash,
+                  tooltip: "Remove",
+                  onClick: () => setEntities((prev) => removeById(prev, entity.id)),
+                },
+              ]}
+              icon={getDefaultEntityIcon(entity.type)}
+              initialOpen
+              key={entity.id}
+              label={entity.title}
+              size="lg">
+              <div className="flex flex-col" style={{ paddingLeft: parentIndex * 10 }}>
+                {entity.children.length === 0 ? null : (
+                  <ManuscriptTree entities={entity.children} id={entity.id} parentIndex={parentIndex + 1} />
+                )}
+              </div>
+            </Collapsible>
+          </div>
         </div>
-      </Collapsible>
-    </div>
+      )}
+    </Draggable>
   );
 }
 
-function ManuscriptTree({ entities, parentIndex }: { entities: ManuscriptEntityType[]; parentIndex: number }) {
+function ManuscriptTree({ id, entities, parentIndex }: { id: string; entities: ManuscriptEntityType[]; parentIndex: number }) {
   return (
-    <div className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 pl-2" : ""}`}>
-      {entities.map((entity) => (
-        <ManuscriptItem entity={entity} key={entity.id} parentIndex={parentIndex} />
-      ))}
-    </div>
+    <Droppable droppableId={id}>
+      {(providedDroppable) => (
+        <div className="w-full">
+          <div
+            {...providedDroppable.droppableProps}
+            className={`${parentIndex <= 1 ? "flex flex-col gap-y-2 pl-2" : ""} w-full`}
+            ref={providedDroppable.innerRef}>
+            {entities.map((entity) => (
+              <ManuscriptItem entity={entity} key={entity.id} parentIndex={parentIndex} />
+            ))}
+          </div>
+          {providedDroppable.placeholder}
+        </div>
+      )}
+    </Droppable>
   );
 }
 
@@ -419,7 +455,9 @@ export function ManuscriptDrawer({ data }: Props) {
           <hr className="border-zinc-700" />
 
           <ManuscriptContext.Provider value={{ entities: entities, setEntities: setEntities }}>
-            <ManuscriptTree entities={entities} parentIndex={0} />
+            <DragDropContext onDragEnd={() => {}}>
+              <ManuscriptTree entities={entities} id="base" parentIndex={0} />
+            </DragDropContext>
           </ManuscriptContext.Provider>
         </>
       ) : null}

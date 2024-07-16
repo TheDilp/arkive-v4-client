@@ -45,18 +45,20 @@ export function WebhookDrawer({ data }: Props) {
   return (
     <DrawerLayout>
       <Input
-        label="Webhook title"
+        label="Webhook title (required)"
         name="title"
         onChange={handleChange}
         placeholder="E.g. DnD group server"
         value={webhook?.title || ""}
+        variant={webhook?.title ? "primary" : "error"}
       />
       <Input
         isDisabled={!!data?.id}
-        label="Webhook channel ID"
+        label="Webhook channel ID (required)"
         name="channel_id"
         onChange={handleChange}
         value={webhook?.channel_id || ""}
+        variant={webhook?.channel_id ? "primary" : "error"}
       />
       <div>
         <Button
