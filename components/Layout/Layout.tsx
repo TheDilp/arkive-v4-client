@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
 import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom, useUpdateAuthStatus } from "../../hooks";
@@ -37,8 +37,8 @@ projectSidebarItems.unshift({
 export function ProjectLayout() {
   const { project_id } = useParams();
   const { isLg } = useBreakpoint();
-  const userStatus = useAtomValue(userStatusAtom);
   const { pathname } = useLocation();
+  const userStatus = useAtomValue(userStatusAtom);
   const { mutate: updateAuthStatus, isLoading: isUpdatingStatus } = useUpdateAuthStatus();
   const { data: projectData, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
@@ -77,6 +77,7 @@ export function ProjectLayout() {
       staleTime: Infinity,
     }
   );
+  const firstRender = useRef(true);
   const title = useAtomValue(navbarTitleAtom);
   const [history, setHistory] = useAtom(historyAtom);
   const setProjectAtom = useSetAtom(projectAtom);
@@ -101,7 +102,10 @@ export function ProjectLayout() {
 
   useEffect(() => {
     if (projectData?.data) {
-      updateAuthStatus(projectData?.data?.id);
+      if (firstRender.current) {
+        updateAuthStatus(projectData?.data?.id);
+        firstRender.current = false;
+      }
       setProjectAtom(projectData.data);
       ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
     }

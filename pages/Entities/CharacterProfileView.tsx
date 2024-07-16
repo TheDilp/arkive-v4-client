@@ -1004,7 +1004,7 @@ export function CharacterProfileView({
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
               {existingCharacter?.data?.tags?.length ? (
-                <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap gap-2">
+                <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap justify-center gap-2">
                   {existingCharacter.data.tags.map((tag) => (
                     <div key={tag.id}>
                       <Badge customColor={tag.color} label={tag.title} />
