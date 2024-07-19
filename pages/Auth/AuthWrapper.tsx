@@ -52,14 +52,16 @@ export function AuthWrapper() {
     updateAuthStatus(project_id ?? null);
   }, [project_id]);
 
-  if ((!data && (isInitialLoading || isFetching)) || (isUpdatingStatus && !isIdle && !!project_id))
+  if (
+    (!data && (isInitialLoading || isFetching)) ||
+    (isUpdatingStatus && !isIdle && !!project_id) ||
+    (project_id && !userStatus?.project_id)
+  )
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-black">
         <Spinner />
       </div>
     );
-  console.log(userStatus);
-  if (project_id && !userStatus?.project_id) return "OOOPS";
 
   return <Outlet />;
 }
