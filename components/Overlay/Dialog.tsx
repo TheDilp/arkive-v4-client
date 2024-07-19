@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { dialogAtom, IconEnum } from "../../utils";
@@ -93,6 +93,7 @@ const DialogClasses = tv({
 
 export function Dialog() {
   const { item_id } = useParams();
+  const { pathname } = useLocation();
   const dialog = useAtomValue(dialogAtom);
 
   const { base, container, title, titleContainer } = DialogClasses({
@@ -116,7 +117,7 @@ export function Dialog() {
 
   useEffect(() => {
     resetDialogAtom();
-  }, [item_id]);
+  }, [item_id, pathname]);
 
   if (dialog?.type === "image_view")
     return (
