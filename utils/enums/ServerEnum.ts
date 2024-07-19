@@ -1,11 +1,9 @@
 export const baseURLS = {
   baseServer: `${
-    import.meta.env.DEV
-      ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}`
-      : "https://arkive-v4-auth-service-production.up.railway.app"
+    import.meta.env.DEV ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}` : import.meta.env.VITE_ARKIVE_EDITOR_SERVER
   }/api/v1`,
   basePublicServer: `${
-    import.meta.env.DEV ? import.meta.env.VITE_PUBLIC_SERVER : "https://arkive-v4-auth-service-production.up.railway.app"
+    import.meta.env.DEV ? import.meta.env.VITE_PUBLIC_SERVER : import.meta.env.VITE_ARKIVE_EDITOR_SERVER
   }/public`,
 
   baseThumbnailServer: "https://arkive-v4-thumbnail-service.up.railway.app",
@@ -15,4 +13,3 @@ export const baseURLS = {
       : "wss://arkive-v4-server-production.up.railway.app"
   }`,
 };
-
