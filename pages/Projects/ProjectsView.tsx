@@ -111,10 +111,15 @@ export function ProjectsView() {
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useNavbarTitle("The Arkive", true);
 
-  const { data, isLoading } = useGetAllProjects({
-    data: { auth_id: user?.user_id },
-    fields: ["id", "title", "image_id"],
-  });
+  const { data, isLoading } = useGetAllProjects(
+    {
+      data: { auth_id: user?.user_id },
+      fields: ["id", "title", "image_id"],
+    },
+    {
+      enabled: !!user?.user_id,
+    }
+  );
 
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {

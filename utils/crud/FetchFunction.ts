@@ -1,4 +1,10 @@
 type AllowedMethodsType = "GET" | "POST" | "DELETE";
+
+function getContentType(url: string, body: string | FormData | undefined): { "Content-Type": string } | {} {
+  if (typeof body === "string") return { "Content-Type": "application/json" };
+  return {};
+}
+
 export async function FetchFunction({
   url,
   method,
@@ -18,7 +24,7 @@ export async function FetchFunction({
     body,
     headers: {
       module: "editor",
-      ...(typeof body === "string" ? { "Content-Type": "application/json" } : {}),
+      ...getContentType(url, body),
     },
   };
 
@@ -33,8 +39,8 @@ export async function FetchFunction({
   }
 
   const data = await res.json();
-  if ((data.message === "NO_PUBLIC_ACCESS" || data.message === "UNAUTHORIZED") && res.status === 401) {
-    throw new Error("No public access");
+  if (data.message === "NO_PUBLIC_ACCESS") {
+    throw new Error("NO_PUBLIC_ACCESS");
   } else if (data.message === "NO_ROLE_ACCESS") {
     return { role_access: false, ok: false };
   } else if (data.ok === false) {

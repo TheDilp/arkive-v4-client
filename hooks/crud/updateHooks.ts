@@ -829,7 +829,7 @@ export function useReadNotification(project_id: string, isReadAll: boolean) {
 export function useUpdateAuthStatus() {
   const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
 
-  return useMutation(async (project_id: string) => {
+  return useMutation(async (project_id: string | null) => {
     const res = await fetch(`${baseAuthUrl}/auth/status/update`, {
       headers: {
         "Content-Type": "application/json",

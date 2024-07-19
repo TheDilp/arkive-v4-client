@@ -1,16 +1,19 @@
 import { useAtomValue } from "jotai";
 import ls from "localstorage-slim";
-import { useEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useLayoutEffect } from "react";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Spinner } from "../../components";
-import { useGetAuthStatus } from "../../hooks";
+import { useGetAuthStatus, useUpdateAuthStatus } from "../../hooks";
 import { IconEnum, loggedInAtom, semverCompare, useNotifications } from "../../utils";
 
 export function AuthWrapper() {
+  const { project_id } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const createNotification = useNotifications();
+  const { mutate: updateAuthStatus, isLoading: isUpdatingStatus, isIdle } = useUpdateAuthStatus();
+
   const loggedIn = useAtomValue(loggedInAtom);
 
   const { data, isInitialLoading, isFetching } = useGetAuthStatus();
@@ -44,7 +47,11 @@ export function AuthWrapper() {
     }
   }, [loggedIn, pathname]);
 
-  if (!data && (isInitialLoading || isFetching))
+  useLayoutEffect(() => {
+    updateAuthStatus(project_id ?? null);
+  }, [project_id]);
+
+  if ((!data && (isInitialLoading || isFetching)) || (isUpdatingStatus && !isIdle && !!project_id))
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-black">
         <Spinner />

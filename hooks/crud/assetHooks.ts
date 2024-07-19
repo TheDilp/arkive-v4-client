@@ -313,4 +313,3 @@ export function useDeleteAsset<InsertType extends { data: { id: string } }>(proj
     }
   );
 }
-

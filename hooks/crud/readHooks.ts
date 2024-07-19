@@ -461,6 +461,7 @@ export function useGetAuthStatus() {
       },
       onSuccess: (data) => {
         if (data.status === "authenticated") {
+          console.log(data);
           setLoggedIn(true);
           setUserStatus(data);
         } else {

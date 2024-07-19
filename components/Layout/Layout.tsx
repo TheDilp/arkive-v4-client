@@ -1,10 +1,10 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 import { Navigate, Outlet, useBlocker, useLocation, useParams } from "react-router-dom";
 
-import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom, useUpdateAuthStatus } from "../../hooks";
+import { useBreakpoint, useGetEntities, useGetEntity, useGetUser, useToggledResetAtom } from "../../hooks";
 import { PermissionType, ProjectType } from "../../types";
 import {
   contextMenuAtom,
@@ -39,7 +39,6 @@ export function ProjectLayout() {
   const { isLg } = useBreakpoint();
   const { pathname } = useLocation();
   const userStatus = useAtomValue(userStatusAtom);
-  const { mutate: updateAuthStatus, isLoading: isUpdatingStatus } = useUpdateAuthStatus();
   const { data: projectData, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
@@ -61,7 +60,7 @@ export function ProjectLayout() {
       },
       fields: ["id", "feature_flags", "email"],
     },
-    { enabled: !!userStatus?.user_id && !!project_id && !isUpdatingStatus }
+    { enabled: !!userStatus?.user_id && !!project_id }
   );
   const { data: permissions, isInitialLoading: isInitialLoadingPermissions } = useGetEntities<PermissionType>(
     {
@@ -73,11 +72,10 @@ export function ProjectLayout() {
     },
     "permissions",
     {
-      enabled: !isUpdatingStatus,
+      enabled: !!userStatus?.user_id && !!project_id,
       staleTime: Infinity,
     }
   );
-  const firstRender = useRef(true);
   const title = useAtomValue(navbarTitleAtom);
   const [history, setHistory] = useAtom(historyAtom);
   const setProjectAtom = useSetAtom(projectAtom);
@@ -102,10 +100,6 @@ export function ProjectLayout() {
 
   useEffect(() => {
     if (projectData?.data) {
-      if (firstRender.current) {
-        updateAuthStatus(projectData?.data?.id);
-        firstRender.current = false;
-      }
       setProjectAtom(projectData.data);
       ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
     }
@@ -176,7 +170,6 @@ export function ProjectLayout() {
     });
     return <Navigate to="/" />;
   }
-  if (isUpdatingStatus) return null;
   return (
     <div className="flex h-screen w-screen flex-1 flex-col overflow-hidden lg:flex-row">
       <Dialog />
@@ -190,7 +183,7 @@ export function ProjectLayout() {
         <Navbar isDisabled={isInitialLoading || isInitialLoadingUser} />
         <div className="h-[calc(100%-6rem)] max-w-full overflow-hidden p-4 lg:h-[calc(100%-2rem)]">
           <Drawer />
-          {isInitialLoading || isInitialLoadingUser || isUpdatingStatus || isInitialLoadingPermissions ? null : <Outlet />}
+          {isInitialLoading || isInitialLoadingUser || isInitialLoadingPermissions ? null : <Outlet />}
         </div>
         {!isLg ? (
           <Sidebar isLoading={isInitialLoading || isInitialLoadingUser} isUsingPermissions items={projectSidebarItems} />
