@@ -5,7 +5,7 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Spinner } from "../../components";
 import { useGetAuthStatus, useUpdateAuthStatus } from "../../hooks";
-import { IconEnum, loggedInAtom, semverCompare, useNotifications } from "../../utils";
+import { IconEnum, loggedInAtom, semverCompare, useNotifications, userStatusAtom } from "../../utils";
 
 export function AuthWrapper() {
   const { project_id } = useParams();
@@ -15,6 +15,7 @@ export function AuthWrapper() {
   const { mutate: updateAuthStatus, isLoading: isUpdatingStatus, isIdle } = useUpdateAuthStatus();
 
   const loggedIn = useAtomValue(loggedInAtom);
+  const userStatus = useAtomValue(userStatusAtom);
 
   const { data, isInitialLoading, isFetching } = useGetAuthStatus();
 
@@ -57,6 +58,8 @@ export function AuthWrapper() {
         <Spinner />
       </div>
     );
+  console.log(userStatus);
+  if (project_id && !userStatus?.project_id) return "OOOPS";
 
   return <Outlet />;
 }

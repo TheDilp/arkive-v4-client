@@ -1,4 +1,5 @@
 import { MutationOptions, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import { RemirrorJSON } from "remirror";
 
 import {
@@ -10,6 +11,7 @@ import {
   GraphType,
   MapType,
   MessagePlaceContentType,
+  UserStatusType,
   UserType,
 } from "../../types";
 import {
@@ -21,6 +23,7 @@ import {
   IconEnum,
   MentionableEntites,
   useNotifications,
+  userStatusAtom,
 } from "../../utils";
 
 export function useUpdateEntity<
@@ -827,6 +830,8 @@ export function useReadNotification(project_id: string, isReadAll: boolean) {
   );
 }
 export function useUpdateAuthStatus() {
+  const setUserStatus = useSetAtom(userStatusAtom);
+
   const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
 
   return useMutation(async (project_id: string | null) => {
@@ -838,8 +843,9 @@ export function useUpdateAuthStatus() {
       body: JSON.stringify({ project_id }),
       method: "POST",
     });
-    const data = await res.text();
-    if (data !== "UPDATED") throw new Error("STATUS_NOT_UPDATED");
+    const data = (await res.json()) as UserStatusType;
+    if (data.status !== "authenticated") throw new Error("STATUS_NOT_UPDATED");
+    setUserStatus(data);
     return data;
   });
 }
@@ -850,7 +856,7 @@ export function useSignout() {
 
   return useMutation(
     async () => {
-      await fetch(`${baseAuthUrl}/auth/sign-out`, {
+      await fetch(`${baseAuthUrl}/auth/signout`, {
         credentials: "include",
         method: "GET",
       });
