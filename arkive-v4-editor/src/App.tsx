@@ -14,9 +14,6 @@ import {
   FolderView,
   ManuscriptProfileView,
   ProjectsView,
-  PublicEntitiesView,
-  PublicLayout,
-  PublicListView,
   UserSettings,
   UserSettingsFeatureFlags,
   UserSettingsWebhooks,
@@ -80,16 +77,6 @@ export default function App() {
                 <Route element={<FolderView />} path=":type/folder/:item_id/*" />
                 <Route element={<Dashboard />} path="*" />
               </Route>
-            </Route>
-          </Route>
-        </Routes>
-
-        <Routes>
-          <Route path="public/*">
-            <Route element={<PublicLayout />} path=":project_id/*">
-              <Route element={<PublicListView />} path=":type" />
-              <Route element={<PublicEntitiesView />} path=":type/:item_id/*" />
-              <Route element={<PublicEntitiesView />} path=":type/:item_id/:subitem_id" />
             </Route>
           </Route>
         </Routes>
