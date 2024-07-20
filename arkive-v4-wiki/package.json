@@ -1,7 +1,7 @@
 {
   "name": "arkive-v4-wiki",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "start": "vite --port 5177 --config ../vite.config.ts",
@@ -31,4 +31,3 @@
     "vite-plugin-node-polyfills": "^0.22.0"
   }
 }
-
