@@ -33,10 +33,7 @@ export default function App() {
           return false;
         }
         if (failureCount <= 2) return true;
-        {
-          setLoggedIn(false);
-          return false;
-        }
+        return false;
       },
       refetchOnWindowFocus: false,
       onError: (error: any) => {
@@ -84,3 +81,4 @@ export default function App() {
     </main>
   );
 }
+
