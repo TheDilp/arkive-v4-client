@@ -1,10 +1,10 @@
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, createColumnHelper, Icon, Input, Table } from "../../components";
-import { useGetEntities, useTable } from "../../hooks";
-import { AvailableEntityType, BaseEntityType, CharacterType } from "../../types";
-import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getImageURL, IconEnum } from "../../utils";
+import { Avatar, createColumnHelper, Icon, Input, Table } from "../../../components";
+import { useGetEntities, useTable } from "../../../hooks";
+import { AvailableEntityType, BaseEntityType, CharacterType } from "../../../types";
+import { getAvatarInitials, getDefaultEntityIcon, getEntityFields, getEntityLink, getImageURL, IconEnum } from "../../../utils";
 
 const characterColumnHelper = createColumnHelper<CharacterType>();
 const columnHelper = createColumnHelper<BaseEntityType>();
@@ -268,4 +268,3 @@ export function PublicListView() {
   if (type === "characters") return <PublicCharacterList />;
   return <PublicEntitiesList type={type as "documents"} />;
 }
-

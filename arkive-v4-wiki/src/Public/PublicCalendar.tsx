@@ -1,10 +1,10 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { Skeleton } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { CalendarType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
-import { CalendarView } from "../Entities";
+import { Skeleton } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { CalendarType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
+import { CalendarView } from "../../../pages";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: boolean }) {
@@ -45,4 +45,3 @@ export function PublicCalendar({ isCharacterCalendar }: { isCharacterCalendar?: 
     </PublicEntityLayout>
   );
 }
-

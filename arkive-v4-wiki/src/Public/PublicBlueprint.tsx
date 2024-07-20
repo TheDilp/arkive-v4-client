@@ -1,9 +1,9 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../components";
-import { useGetEntity, useGetSubEntity } from "../../hooks";
-import { BlueprintInstanceType, BlueprintType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { AdditionalBlueprintFieldDisplay, Collapsible, Skeleton } from "../../../components";
+import { useGetEntity, useGetSubEntity } from "../../../hooks";
+import { BlueprintInstanceType, BlueprintType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicBlueprint() {
@@ -79,4 +79,3 @@ export function PublicBlueprint() {
     </PublicEntityLayout>
   );
 }
-

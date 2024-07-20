@@ -12,10 +12,10 @@ import {
   StaticRender,
   Tabs,
   Title,
-} from "../../components";
-import { useGetEntities, useGetEntity } from "../../hooks";
-import { CharacterFieldTemplateType, CharacterType } from "../../types";
-import { getEntityLink, IconEnum, useNotifications } from "../../utils";
+} from "../../../components";
+import { useGetEntities, useGetEntity } from "../../../hooks";
+import { CharacterFieldTemplateType, CharacterType } from "../../../types";
+import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 const tabs = [
@@ -171,4 +171,3 @@ export function PublicCharacter() {
     </PublicEntityLayout>
   );
 }
-

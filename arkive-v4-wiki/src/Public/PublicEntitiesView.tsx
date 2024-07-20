@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { DictionaryView } from "../Entities";
+import { DictionaryView } from "../../../pages/Entities";
 import { PublicDocument, PublicGraph, PublicMap } from ".";
 import { PublicBlueprint } from "./PublicBlueprint";
 import { PublicCalendar } from "./PublicCalendar";
@@ -27,4 +27,3 @@ export function PublicEntitiesView() {
     );
   return null;
 }
-

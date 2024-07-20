@@ -1,10 +1,10 @@
 import { Navigate, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { Skeleton, StaticRender } from "../../components";
-import { useGetEntity } from "../../hooks";
-import { DocumentType } from "../../types";
-import { IconEnum, useNotifications } from "../../utils";
+import { Skeleton, StaticRender } from "../../../components";
+import { useGetEntity } from "../../../hooks";
+import { DocumentType } from "../../../types";
+import { IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 export function PublicDocument() {
