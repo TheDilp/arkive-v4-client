@@ -406,8 +406,6 @@ export function AssetView() {
   const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
-    relationFilters: {},
-    filters: {},
   });
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["read_assets", "create_assets", "update_assets", "delete_assets"], undefined);
@@ -576,7 +574,7 @@ export function AssetView() {
           {(infiniteAssets?.pages || [])?.map((page) =>
             page.data.map((img: ImageType) => (
               <div
-                className="relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500 animate-in fade-in"
+                className="animate-in fade-in relative col-span-1 flex h-[25rem] flex-col items-center justify-center overflow-hidden rounded bg-cover shadow transition-all duration-500"
                 key={img.id}>
                 <Image hasTitle image={img} isLazyLoading isOpenable type={type} />
               </div>

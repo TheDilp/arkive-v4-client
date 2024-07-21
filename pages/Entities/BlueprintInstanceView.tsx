@@ -652,8 +652,6 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
-    filters: {},
-    relationFilters: {},
   });
 
   const { data: blueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
@@ -779,4 +777,3 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     </div>
   );
 }
-

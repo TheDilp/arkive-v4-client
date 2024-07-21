@@ -201,8 +201,6 @@ export function CharacterTemplatesView() {
 
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "sort", sort: "desc" }],
-    filters: {},
-    relationFilters: {},
     pagination: { limit: 10, page: 0 },
     selection: {},
   });
