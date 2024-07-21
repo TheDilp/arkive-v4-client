@@ -217,7 +217,12 @@ export function useGetEntities<ReturnType>(
     ...options,
   });
 
-  if (options?.prefetch && configuredOptions?.enabled && res.data?.data.length === request.pagination?.limit) {
+  if (
+    options?.prefetch &&
+    configuredOptions?.enabled &&
+    res.data?.data.length === request.pagination?.limit &&
+    !res.isFetching
+  ) {
     queryClient.prefetchQuery({
       queryKey:
         typeof request?.pagination?.page === "number"
