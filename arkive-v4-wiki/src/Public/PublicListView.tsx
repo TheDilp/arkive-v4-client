@@ -182,10 +182,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
 
   const { data: base, isInitialLoading } = useGetEntities<BaseEntityType & { image_id?: string }>(
     {
-      pagination: {
-        limit: 10,
-        page: 0,
-      },
+      pagination,
       data: {
         project_id,
       },
