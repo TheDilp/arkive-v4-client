@@ -111,7 +111,11 @@ export function ProjectsView() {
   const [view, setView] = useState<boolean | null>(ls.get("projects_view"));
   useNavbarTitle("The Arkive", true);
 
-  const { data, isLoading } = useGetAllProjects(
+  const {
+    data,
+    isLoading,
+    isFetching: isFetchingProjects,
+  } = useGetAllProjects(
     {
       data: { auth_id: user?.user_id },
       fields: ["id", "title", "image_id"],
@@ -129,7 +133,7 @@ export function ProjectsView() {
       },
       fields: ["id"],
     },
-    { enabled: !!user?.user_id }
+    { enabled: !!user?.user_id && !isFetchingProjects && !!user?.project_id }
   );
   const setUserAtom = useSetAtom(userAtom);
   const resetProjectAtom = useResetAtom(projectAtom);

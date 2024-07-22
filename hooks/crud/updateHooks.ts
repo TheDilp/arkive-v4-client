@@ -21,6 +21,7 @@ import {
   getParentEntityType,
   getSingularEntityType,
   IconEnum,
+  loggedInAtom,
   MentionableEntites,
   useNotifications,
   userStatusAtom,
@@ -830,6 +831,7 @@ export function useReadNotification(project_id: string, isReadAll: boolean) {
   );
 }
 export function useUpdateAuthStatus() {
+  const setLoggedIn = useSetAtom(loggedInAtom);
   const setUserStatus = useSetAtom(userStatusAtom);
 
   return useMutation(async (project_id: string | null) => {
@@ -843,6 +845,7 @@ export function useUpdateAuthStatus() {
     });
     const data = (await res.json()) as UserStatusType;
     if (data.status !== "authenticated") throw new Error("STATUS_NOT_UPDATED");
+    setLoggedIn(true);
     setUserStatus(data);
     return data;
   });
