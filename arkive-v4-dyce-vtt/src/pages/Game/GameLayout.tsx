@@ -10,6 +10,7 @@ export function GameLayout() {
   useNavbarTitle("", true);
   const { game_id } = useParams();
   const user = useAtomValue(userStatusAtom);
+
   const { isLg } = useBreakpoint();
   const { data: userData, isInitialLoading: isInitialLoadingUser } = useGetUser(
     {

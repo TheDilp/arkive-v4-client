@@ -13,14 +13,7 @@ import {
   useToggledResetAtom,
   useUpdateEntity,
 } from "../../../hooks";
-import {
-  DocumentType,
-  DrawerAtomType,
-  InsertDocumentType,
-  TabType,
-  UpdateDocumentType,
-  UserHasPermissionsType,
-} from "../../../types";
+import { DocumentType, DrawerAtomType, InsertDocumentType, TabType, UserHasPermissionsType } from "../../../types";
 import {
   AvailableIcons,
   createOrEditPermission,
@@ -31,7 +24,7 @@ import {
   useNotifications,
   userAtom,
 } from "../../../utils";
-import { InsertDocumentSchema, UpdateDocumentSchema } from "../../../validation";
+import { InsertDocumentSchema, UpdateDocumentSchema, UpdateDocumentType } from "../../../validation";
 import { FolderSelect, ImageSelect, MatchField } from "../../Complex";
 import { EntityPermission } from "../../Complex/EntityPermission";
 import { ImagePreview } from "../../DataDisplay";
@@ -123,9 +116,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
     relations?: documentRelationsType;
   }>("documents", exceptions?.createTemplate);
 
-  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<{
-    data: UpdateDocumentType;
-  }>("documents", project_id as string);
+  const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateDocumentType>("documents", project_id as string);
 
   const [alterNameInput, setAlterNameInput] = useState("");
   const tabs = getTabs(permissions, document?.is_template || exceptions?.createTemplate, data?.id);
@@ -282,7 +273,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                       formula: null,
                       derive_formula: null,
                       derive_from: null,
-                      entity_type: null,
+                      entity_type: "documents",
                       related_id: null,
                       is_randomized: null,
                       random_count: "single",
@@ -422,7 +413,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                     }))
                   );
                 }
-
+                console.log(dataToParse);
                 const parsedData = UpdateDocumentSchema.parse(dataToParse);
                 await update(
                   {
@@ -432,6 +423,8 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                       icon: parsedData.data.icon as AvailableIcons | null,
                       content: parsedData.data.content as RemirrorJSON,
                     },
+                    relations: dataToParse.relations || {},
+                    permissions: document?.permissions,
                   },
                   {
                     onSuccess: resetDrawerAtom,
@@ -441,7 +434,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                 const dataToParse = {
                   data: { ...document, image_id: document?.image?.id },
                   relations: {
-                    alter_names: document?.alter_names,
+                    alter_names: (document?.alter_names || [])?.map((alter) => ({ title: alter?.title })),
                     tags: document?.tags,
                     template_fields: (document?.template_fields || []).map((f) => ({ ...f, key: f.key.trim() })),
                   },

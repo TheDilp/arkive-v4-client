@@ -13,12 +13,12 @@ export type MatchType = SearchableEntities | "random_tables" | "dice_roll" | "de
 export type DocumentTemplateFieldType = {
   id: string;
   key: string;
-  entity_type: MatchType | null;
+  entity_type: MatchType;
   parent_id: string;
   value: string | null;
   formula: string | null;
   derive_from: string | null;
-  derive_formula: string | null;
+  derive_formula: "dnd_5e_ability_bonus" | null;
   related_id: string | null;
   is_randomized: boolean | null;
   random_count:
@@ -32,15 +32,7 @@ export type DocumentTemplateFieldType = {
     | "max_8"
     | "max_9"
     | "max_10"
-    | "max_11"
-    | "max_12"
-    | "max_13"
-    | "max_14"
     | "max_15"
-    | "max_16"
-    | "max_17"
-    | "max_18"
-    | "max_19"
     | "max_20"
     | null;
   sort: number;
@@ -60,5 +52,3 @@ export interface DocumentType extends BaseEntityType {
 export interface InsertDocumentType extends Omit<DocumentType, "alter_names"> {
   alter_names: { title: string }[];
 }
-
-export type UpdateDocumentType = Partial<DocumentType>;
