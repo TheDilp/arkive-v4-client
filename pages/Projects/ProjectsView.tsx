@@ -117,7 +117,7 @@ export function ProjectsView() {
     isFetching: isFetchingProjects,
   } = useGetAllProjects(
     {
-      data: { auth_id: user?.user_id },
+      data: {},
       fields: ["id", "title", "image_id"],
     },
     {
