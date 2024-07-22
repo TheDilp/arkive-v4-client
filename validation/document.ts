@@ -106,7 +106,6 @@ export const UpdateDocumentSchema = z.object({
       alter_names: z
         .object({
           title: z.string().transform((value) => value.trim()),
-          project_id: z.string(),
         })
         .array()
         .optional(),
@@ -116,3 +115,6 @@ export const UpdateDocumentSchema = z.object({
     .optional(),
   permissions: UpdateEntityPermissionSchema,
 });
+
+export type InsertDocumentType = z.infer<typeof InsertDocumentSchema>;
+export type UpdateDocumentType = z.infer<typeof UpdateDocumentSchema>;

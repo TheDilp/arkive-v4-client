@@ -58,7 +58,6 @@ import {
   contextMenuAtom,
   dialogAtom,
   drawerAtom,
-  EntitiesWithFoldersEnum,
   EntitiesWithTags,
   FetchFunction,
   getDefaultEntityIcon,
@@ -73,7 +72,6 @@ import {
   isProjectOwnerAtom,
   openPublicPage,
   PublicEntities,
-  useNotifications,
   userAtom,
   userSettingsAtom,
 } from "../../utils";
@@ -719,7 +717,6 @@ export function FolderView() {
   const entityName = getSingularEntityType(type as AvailableEntityType);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const isFolder = pathname.includes("/folder/");
-  const createNotification = useNotifications();
   const permissions = useHasPermissions(
     getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
     undefined
@@ -890,28 +887,6 @@ export function FolderView() {
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (arkived === "arkive") navigate(`/projects/${project_id}/${type}`);
   }, [item_id, arkived]);
-  useEffect(() => {
-    if (
-      EntitiesWithFoldersEnum.includes(type as AvailableEntityType) &&
-      Object.keys(permissions).length > 1 &&
-      !permissions?.[`read_${type}` as PermissionCodeType] &&
-      user &&
-      typeof isProjectOwner !== "undefined" &&
-      isProjectOwner !== null &&
-      !isInitialLoading &&
-      !isInitialLoadingFolder
-    ) {
-      createNotification({
-        title: `Your current role in this project does not have permission to view ${getPluralEntityType(
-          type as AvailableEntityType
-        )}.`,
-        timer: 5,
-        hasNoTruncate: true,
-        variant: "error",
-        icon: IconEnum.forbidden,
-      });
-    }
-  }, [permissions]);
 
   useEffect(() => {
     if (!filter) {
