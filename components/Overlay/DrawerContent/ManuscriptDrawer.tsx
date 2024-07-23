@@ -9,7 +9,13 @@ import {
   FlatManuscriptEntityType,
   ManuscriptType,
 } from "../../../types/EntityTypes/manuscriptTypes";
-import { AvailableManuscriptEntityTypesEnum, createOrEditPermission, getDefaultEntityIcon, IconEnum } from "../../../utils";
+import {
+  AvailableManuscriptEntityTypesEnum,
+  buildManuscript,
+  createOrEditPermission,
+  getDefaultEntityIcon,
+  IconEnum,
+} from "../../../utils";
 import {
   InsertManuscriptSchema,
   InsertManuscriptType,
@@ -47,7 +53,14 @@ export function ManuscriptDrawer({ data }: Props) {
 
   const [manuscript, setManuscript] = useState<Partial<ManuscriptType>>({});
   const [entities, setEntities] = useState<
-    { id: string; image_id: string; title: string; related_id: string; sort: number; type: AvailableManuscriptEntityTypes }[]
+    {
+      id: string;
+      image_id?: string | null;
+      title: string;
+      related_id: string;
+      sort: number;
+      type: AvailableManuscriptEntityTypes;
+    }[]
   >([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
@@ -76,8 +89,10 @@ export function ManuscriptDrawer({ data }: Props) {
   const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateManuscriptType>("manuscripts", project_id);
 
   useLayoutEffect(() => {
-    if (existingManuscript?.data && !manuscript) {
+    if (existingManuscript?.data && !manuscript?.id) {
       setManuscript(existingManuscript?.data);
+
+      setEntities(buildManuscript(existingManuscript?.data));
     }
   }, [existingManuscript]);
 
@@ -234,47 +249,37 @@ export function ManuscriptDrawer({ data }: Props) {
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
             if (manuscript) {
+              const relations = entities.reduce(
+                (prev, curr, currIndex) => {
+                  const formatted = { related_id: curr.related_id, sort: currIndex, id: curr.id };
+                  console.log(formatted);
+                  prev[curr.type].push(formatted);
+
+                  return prev;
+                },
+                {
+                  characters: [],
+                  blueprint_instances: [],
+                  documents: [],
+                  maps: [],
+                  map_pins: [],
+                  graphs: [],
+                  events: [],
+                  images: [],
+                  tags: [],
+                } as Record<string, FlatManuscriptEntityType[]> & { tags: TagType[] }
+              );
+
+              if (manuscript.tags) {
+                relations.tags = manuscript.tags;
+              }
               if (data?.id) {
                 const parsed = UpdateManuscriptSchema.parse({
                   data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public },
-                  relations: {
-                    characters: manuscript?.characters,
-                    blueprint_instances: manuscript?.blueprint_instances,
-                    documents: manuscript?.documents,
-                    maps: manuscript?.maps,
-                    map_pins: manuscript?.map_pins,
-                    graphs: manuscript?.graphs,
-                    events: manuscript?.events,
-                    images: manuscript?.images,
-                    tags: (manuscript?.tags || []).map((t) => ({ id: t.id })),
-                  },
+                  relations,
                 });
                 update(parsed);
               } else {
-                const relations = entities.reduce(
-                  (prev, curr, currIndex) => {
-                    const formatted = { related_id: curr.related_id, sort: currIndex, id: curr.id };
-                    prev[curr.type].push(formatted);
-
-                    return prev;
-                  },
-                  {
-                    characters: [],
-                    blueprint_instances: [],
-                    documents: [],
-                    maps: [],
-                    map_pins: [],
-                    graphs: [],
-                    events: [],
-                    images: [],
-                    tags: [],
-                  } as Record<string, FlatManuscriptEntityType[]> & { tags: TagType[] }
-                );
-
-                if (manuscript.tags) {
-                  relations.tags = manuscript.tags;
-                }
-
                 const parsed = InsertManuscriptSchema.parse({
                   data: { title: manuscript.title, project_id },
                   relations,

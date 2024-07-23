@@ -23,6 +23,7 @@ export type ManuscriptType = {
 export type ManuscriptEntityType = {
   id: string;
   title: string;
+  image_id?: string | null;
   related_id: string;
   type: AvailableManuscriptEntityTypes;
   sort: number;
