@@ -48,7 +48,7 @@ function ManuscriptEntityLink({ entity }: { entity: ManuscriptEntityType }) {
 
 export function ManuscriptProfileView() {
   const { isMd } = useBreakpoint();
-  const { project_id, item_id } = useParams();
+  const { project_id, item_id, subitem_id } = useParams();
   const [type, setType] = useState<AvailableManuscriptEntityTypes | null>(null);
   const { data: existingManuscript } = useGetEntity<ManuscriptType>(item_id, "manuscripts", {
     fields: ["id", "owner_id", "title"],
@@ -63,6 +63,8 @@ export function ManuscriptProfileView() {
   );
   const user = useAtomValue(userAtom);
 
+  const manuscriptTree = buildManuscript(existingManuscript?.data);
+
   useLayoutEffect(() => {
     if (existingManuscript?.data) {
       setBreadcrumbs({
@@ -72,7 +74,12 @@ export function ManuscriptProfileView() {
     }
   }, [existingManuscript?.data]);
 
-  const manuscriptTree = buildManuscript(existingManuscript?.data);
+  useLayoutEffect(() => {
+    if (manuscriptTree.length && subitem_id) {
+      const item = manuscriptTree.find((item) => item.related_id === subitem_id);
+      if (item) setType(item.type);
+    }
+  }, [subitem_id, manuscriptTree]);
 
   return (
     <>
