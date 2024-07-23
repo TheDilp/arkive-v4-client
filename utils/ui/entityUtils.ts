@@ -446,5 +446,5 @@ export function buildManuscript(manuscript: ManuscriptType | undefined) {
     }
   }
 
-  return base.flat();
+  return base.flat().sort((a, b) => a.sort - b.sort);
 }
