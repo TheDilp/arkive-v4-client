@@ -1065,7 +1065,7 @@ export function CharacterProfileView({
               </div>
             ) : null}
             {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") ? (
-              <ul className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto p-4">
+              <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto p-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
                 {(existingTemplates?.data || []).map((t) => {
                   return (

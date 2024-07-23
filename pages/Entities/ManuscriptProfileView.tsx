@@ -116,7 +116,7 @@ export function ManuscriptProfileView() {
           </div>
         </div>
       ) : null}
-      <div className="grid h-[calc(100vh-6rem)] grid-cols-12 gap-x-2 overflow-hidden rounded-b">
+      <div className="grid h-full max-h-[95%] grid-cols-12 gap-x-2 overflow-hidden rounded-b">
         <div className="col-span-3 flex h-full flex-col rounded bg-zinc-800 p-2">
           <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>
           <TypeContext.Provider value={{ type, setType }}>
@@ -129,7 +129,7 @@ export function ManuscriptProfileView() {
             </ul>
           </TypeContext.Provider>
         </div>
-        <div className="col-span-9 flex h-full max-h-full flex-col rounded bg-zinc-950 p-2">
+        <div className="col-span-9 flex h-full flex-col rounded bg-zinc-950 p-2">
           {type ? <ManuscriptEntityPreview type={type} /> : null}
         </div>
       </div>
