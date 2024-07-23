@@ -842,7 +842,7 @@ export function CharacterProfileView({
       },
     },
     "character_fields_templates",
-    { enabled: selectedTab === 1 && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 }
+    { enabled: tabs[selectedTab].id === "1" && !!existingCharacter?.data?.tags?.length, staleTime: 5 * 60 * 1000 }
   );
   const { data: existingConversations, isFetching: isLoadingConversations } = useGetEntities<ConversationType>(
     {
@@ -1057,37 +1057,15 @@ export function CharacterProfileView({
                 </div>
               ) : null}
             </h2>
-            {(isPreview ? selectedTab === 0 : type === "biography") ? (
+            {(isPreview ? tabs[selectedTab].id === "0" : type === "biography") ? (
               <div className="flex h-full items-start gap-x-4 p-4">
                 <div className="overflow-auto [&>.staticRendererContainer]:p-0">
                   <StaticRender content={(existingCharacter?.data?.biography as RemirrorJSON | null) ?? undefined} />
                 </div>
               </div>
             ) : null}
-            {(isPreview ? selectedTab === 1 : type === "relationships") ? (
-              <div className="h-full p-4">
-                {isFetching ? (
-                  <div className="pt-10">
-                    <Skeleton limit={5} type="table" />
-                  </div>
-                ) : (
-                  <div className="h-fit w-full">
-                    <Table
-                      columns={columns}
-                      config={{
-                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
-                        expandable: true,
-                      }}
-                      data={formattedRelationships.toSorted(sortCharactersByName)}
-                      dispatch={dispatch}
-                      type="relationships"
-                    />
-                  </div>
-                )}
-              </div>
-            ) : null}
-            {(isPreview ? selectedTab === 2 : type === "additional fields") ? (
-              <ul className="animate-in fade-in fill-mode-both flex flex-col gap-y-2 overflow-y-auto p-4">
+            {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") ? (
+              <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto p-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
                 {(existingTemplates?.data || []).map((t) => {
                   return (
@@ -1116,7 +1094,30 @@ export function CharacterProfileView({
                 ) : null}
               </ul>
             ) : null}
-            {(isPreview ? selectedTab === 3 : type === "resources") ? (
+            {(isPreview ? tabs[selectedTab].id === "2" : type === "relationships") ? (
+              <div className="h-full p-4">
+                {isFetching ? (
+                  <div className="pt-10">
+                    <Skeleton limit={5} type="table" />
+                  </div>
+                ) : (
+                  <div className="h-fit w-full">
+                    <Table
+                      columns={columns}
+                      config={{
+                        getLink: (rowData: any) => `/projects/${project_id}/characters/${rowData.id}/relationships`,
+                        expandable: true,
+                      }}
+                      data={formattedRelationships.toSorted(sortCharactersByName)}
+                      dispatch={dispatch}
+                      type="relationships"
+                    />
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {(isPreview ? tabs[selectedTab].id === "3" : type === "resources") ? (
               <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto p-4">
                 <Collapsible
                   actions={
@@ -1271,7 +1272,7 @@ export function CharacterProfileView({
                 </Collapsible>
               </div>
             ) : null}
-            {(isPreview ? selectedTab === 4 : type === "conversations") ? (
+            {(isPreview ? tabs[selectedTab].id === "4" : type === "conversations") ? (
               <div className="p-4">
                 {subitem_id && !isPreview ? null : (
                   <div className="col-span-3 flex flex-col">
