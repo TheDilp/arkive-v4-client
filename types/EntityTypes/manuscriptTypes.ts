@@ -9,41 +9,29 @@ export type ManuscriptType = {
   is_public: boolean | null;
   project_id: string;
   tags: TagType[];
-  entities: FlatManuscriptEntityType[];
+  characters: FlatManuscriptEntityType[];
+  blueprint_instances: FlatManuscriptEntityType[];
+  documents: FlatManuscriptEntityType[];
+  maps: FlatManuscriptEntityType[];
+  map_pins: FlatManuscriptEntityType[];
+  graphs: FlatManuscriptEntityType[];
+  events: FlatManuscriptEntityType[];
+  images: FlatManuscriptEntityType[];
   permissions: EntityPermissionType[];
 };
 
 export type ManuscriptEntityType = {
   id: string;
   title: string;
-  document_id: string | null;
-  character_id: string | null;
-  blueprint_instance_id: string | null;
-  map_id: string | null;
-  map_pin_id: string | null;
-  graph_id: string | null;
-  event_id: string | null;
-  image_id: string | null;
+  related_id: string;
   type: AvailableManuscriptEntityTypes;
   sort: number;
-  children: ManuscriptEntityType[];
 };
 
 export type FlatManuscriptEntityType = {
   id: string;
-  parent_id: string | null;
-  manuscript_id: string;
-  title: string;
+  related_id: string;
   sort: number;
-  document_id: string | null;
-  character_id: string | null;
-  blueprint_instance_id: string | null;
-  map_id: string | null;
-  map_pin_id: string | null;
-  graph_id: string | null;
-  event_id: string | null;
-  image_id: string | null;
-  type: AvailableManuscriptEntityTypes;
 };
 
 export type AvailableManuscriptEntityTypes =

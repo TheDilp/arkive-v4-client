@@ -2,16 +2,7 @@ import { z } from "zod";
 
 const ManuscriptEntitySchema = z.object({
   id: z.string(),
-  manuscript_id: z.string(),
-  parent_id: z.string().nullable(),
-  document_id: z.string().nullable(),
-  character_id: z.string().nullable(),
-  blueprint_instance_id: z.string().nullable(),
-  map_id: z.string().nullable(),
-  map_pin_id: z.string().nullable(),
-  graph_id: z.string().nullable(),
-  event_id: z.string().nullable(),
-  image_id: z.string().nullable(),
+  related_id: z.string(),
   sort: z.number(),
 });
 
@@ -19,12 +10,19 @@ export const InsertManuscriptSchema = z.object({
   data: z.object({
     title: z.string().transform((value) => value.trim()),
     project_id: z.string(),
-    icon: z.string().optional().nullable(),
-    is_public: z.boolean().optional().nullable(),
+    // icon: z.string().optional().nullable(),
+    // is_public: z.boolean().optional().nullable(),
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),
-    entities: ManuscriptEntitySchema.array().min(1),
+    characters: ManuscriptEntitySchema.array().optional().nullable(),
+    blueprint_instances: ManuscriptEntitySchema.array().optional().nullable(),
+    documents: ManuscriptEntitySchema.array().optional().nullable(),
+    maps: ManuscriptEntitySchema.array().optional().nullable(),
+    map_pins: ManuscriptEntitySchema.array().optional().nullable(),
+    graphs: ManuscriptEntitySchema.array().optional().nullable(),
+    events: ManuscriptEntitySchema.array().optional().nullable(),
+    images: ManuscriptEntitySchema.array().optional().nullable(),
   }),
 });
 export const UpdateManuscriptSchema = z.object({
@@ -39,7 +37,14 @@ export const UpdateManuscriptSchema = z.object({
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),
-    entities: ManuscriptEntitySchema.array().min(1),
+    characters: ManuscriptEntitySchema.array().optional().nullable(),
+    blueprint_instances: ManuscriptEntitySchema.array().optional().nullable(),
+    documents: ManuscriptEntitySchema.array().optional().nullable(),
+    maps: ManuscriptEntitySchema.array().optional().nullable(),
+    map_pins: ManuscriptEntitySchema.array().optional().nullable(),
+    graphs: ManuscriptEntitySchema.array().optional().nullable(),
+    events: ManuscriptEntitySchema.array().optional().nullable(),
+    images: ManuscriptEntitySchema.array().optional().nullable(),
   }),
 });
 
