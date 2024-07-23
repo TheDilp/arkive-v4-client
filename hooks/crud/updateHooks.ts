@@ -843,8 +843,15 @@ export function useUpdateAuthStatus() {
       body: JSON.stringify({ project_id }),
       method: "POST",
     });
+
+    if (res.status >= 400) {
+      setLoggedIn(false);
+      setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, name: null, image_url: null });
+      throw new Error("UNAUTHORIZED");
+    }
+
     const data = (await res.json()) as UserStatusType;
-    if (data.status !== "authenticated") throw new Error("STATUS_NOT_UPDATED");
+    if (data.status !== "authenticated") throw new Error("UNAUTHORIZED");
     setLoggedIn(true);
     setUserStatus(data);
     return data;

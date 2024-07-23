@@ -49,7 +49,11 @@ export function AuthWrapper() {
   useLayoutEffect(() => {
     updateAuthStatus(project_id ?? null);
   }, [project_id]);
-  if (userStatus?.status !== "authenticated" || (isUpdatingStatus && !isIdle) || (project_id && !userStatus?.project_id))
+  if (
+    (userStatus?.status !== "authenticated" && userStatus?.status !== undefined) ||
+    (isUpdatingStatus && !isIdle) ||
+    (project_id && !userStatus?.project_id)
+  )
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-black">
         <Spinner />
