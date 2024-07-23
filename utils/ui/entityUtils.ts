@@ -14,7 +14,7 @@ import {
   RandomTableOptionType,
   SearchableEntities,
 } from "../../types";
-import { FlatManuscriptEntityType, ManuscriptEntityType } from "../../types/EntityTypes/manuscriptTypes";
+import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import { AvailableIcons, getDayOrdinal, IconEnum } from "..";
 
 export function getDefaultEntityIcon(
@@ -416,25 +416,35 @@ export function getDeletedAtParams(deleted_at: BaseEntityType["deleted_at"]): { 
   return { tooltip: "", isSoonToBeDeleted: false };
 }
 
-export function buildManuscript(flatArray: FlatManuscriptEntityType[]) {
-  const idMap: Record<string, ManuscriptEntityType> = {};
-  const root: ManuscriptEntityType[] = [];
+export function buildManuscript(manuscript: ManuscriptType | undefined) {
+  const base = [];
 
-  // Create a map of all nodes by their id
-  flatArray.forEach((node) => {
-    idMap[node.id] = { ...node, children: [] };
-  });
-
-  // Iterate through the flat array to build the hierarchy
-  flatArray.forEach((node) => {
-    if (node.parent_id === null) {
-      // If parent_id is null, it's a root element
-      root.push(idMap[node.id]);
-    } else {
-      // Otherwise, add the node to its parent's children
-      idMap[node.parent_id].children.push(idMap[node.id]);
+  if (manuscript) {
+    if (manuscript.characters.length) {
+      base.push(manuscript.characters);
     }
-  });
+    if (manuscript.blueprint_instances.length) {
+      base.push(manuscript.blueprint_instances);
+    }
+    if (manuscript.documents.length) {
+      base.push(manuscript.documents);
+    }
+    if (manuscript.maps.length) {
+      base.push(manuscript.maps);
+    }
+    if (manuscript.map_pins.length) {
+      base.push(manuscript.map_pins);
+    }
+    if (manuscript.graphs.length) {
+      base.push(manuscript.graphs);
+    }
+    if (manuscript.events.length) {
+      base.push(manuscript.events);
+    }
+    if (manuscript.images.length) {
+      base.push(manuscript.images);
+    }
+  }
 
-  return root;
+  return base.flat();
 }

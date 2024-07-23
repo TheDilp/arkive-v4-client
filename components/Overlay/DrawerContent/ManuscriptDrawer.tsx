@@ -3,8 +3,12 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
-import { TabType, UserHasPermissionsType } from "../../../types";
-import { AvailableManuscriptEntityTypes, ManuscriptType } from "../../../types/EntityTypes/manuscriptTypes";
+import { TabType, TagType, UserHasPermissionsType } from "../../../types";
+import {
+  AvailableManuscriptEntityTypes,
+  FlatManuscriptEntityType,
+  ManuscriptType,
+} from "../../../types/EntityTypes/manuscriptTypes";
 import { AvailableManuscriptEntityTypesEnum, createOrEditPermission, getDefaultEntityIcon, IconEnum } from "../../../utils";
 import {
   InsertManuscriptSchema,
@@ -264,19 +268,13 @@ export function ManuscriptDrawer({ data }: Props) {
                     events: [],
                     images: [],
                     tags: [],
-                  } as Pick<
-                    ManuscriptType,
-                    | "characters"
-                    | "blueprint_instances"
-                    | "documents"
-                    | "maps"
-                    | "map_pins"
-                    | "graphs"
-                    | "events"
-                    | "images"
-                    | "tags"
-                  >
+                  } as Record<string, FlatManuscriptEntityType[]> & { tags: TagType[] }
                 );
+
+                if (manuscript.tags) {
+                  relations.tags = manuscript.tags;
+                }
+
                 const parsed = InsertManuscriptSchema.parse({
                   data: { title: manuscript.title, project_id },
                   relations,

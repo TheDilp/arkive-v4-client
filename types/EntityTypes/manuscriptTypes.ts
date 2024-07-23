@@ -9,14 +9,14 @@ export type ManuscriptType = {
   is_public: boolean | null;
   project_id: string;
   tags: TagType[];
-  characters: FlatManuscriptEntityType[];
-  blueprint_instances: FlatManuscriptEntityType[];
-  documents: FlatManuscriptEntityType[];
-  maps: FlatManuscriptEntityType[];
-  map_pins: FlatManuscriptEntityType[];
-  graphs: FlatManuscriptEntityType[];
-  events: FlatManuscriptEntityType[];
-  images: FlatManuscriptEntityType[];
+  characters: ManuscriptEntityType[];
+  blueprint_instances: ManuscriptEntityType[];
+  documents: ManuscriptEntityType[];
+  maps: ManuscriptEntityType[];
+  map_pins: ManuscriptEntityType[];
+  graphs: ManuscriptEntityType[];
+  events: ManuscriptEntityType[];
+  images: ManuscriptEntityType[];
   permissions: EntityPermissionType[];
 };
 
