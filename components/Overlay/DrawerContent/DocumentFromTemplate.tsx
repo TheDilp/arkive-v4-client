@@ -1,5 +1,3 @@
- 
- 
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -88,7 +86,7 @@ export function DocumentFromTemplate({ data }: Props) {
     },
     {
       enabled: !!data?.id,
-    },
+    }
   );
 
   const [previewContext, setPreviewContext] = useState<ReactFrameworkOutput<Remirror.Extensions> | undefined>(undefined);
@@ -97,7 +95,7 @@ export function DocumentFromTemplate({ data }: Props) {
   const { handleChange } = useHandleChange({ data: template, setData: setTemplate });
   const { mutateAsync: generatePreview, isLoading: isGeneratingPreview } = useCreateFromTemplate(
     existingTemplate?.data?.id as string,
-    project_id as string,
+    project_id as string
   );
 
   const { mutate, isLoading: isCreating } = useCreateEntity<{
@@ -122,7 +120,7 @@ export function DocumentFromTemplate({ data }: Props) {
               value: "",
               formula: null,
               parent_id: "",
-              entity_type: null,
+              entity_type: "documents",
               is_randomized: null,
               derive_formula: null,
               derive_from: null,
@@ -223,7 +221,7 @@ export function DocumentFromTemplate({ data }: Props) {
           isDisabled={
             !template?.template_fields?.length ||
             (template?.template_fields || []).some(
-              (f) => !f.value && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived",
+              (f) => !f.value && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived"
             ) ||
             isCreating ||
             isGeneratingPreview
@@ -258,7 +256,7 @@ export function DocumentFromTemplate({ data }: Props) {
                     setSelectedTab(1);
                   }
                 },
-              },
+              }
             );
           }}
           variant="info"
@@ -269,7 +267,7 @@ export function DocumentFromTemplate({ data }: Props) {
             !template?.title ||
             !template?.template_fields?.length ||
             (template?.template_fields || []).some(
-              (f) => !f.value && !f.is_randomized && (f.entity_type === "blueprint_instances" ? !f.related_id : false),
+              (f) => !f.value && !f.is_randomized && (f.entity_type === "blueprint_instances" ? !f.related_id : false)
             ) ||
             isCreating ||
             isGeneratingPreview
@@ -292,7 +290,7 @@ export function DocumentFromTemplate({ data }: Props) {
                     setSelectedTab(1);
                   }
                 },
-              },
+              }
             )
           }
           variant="success"
