@@ -23,6 +23,7 @@ import {
   Tabs,
 } from "../../components";
 import {
+  useBreakpoint,
   useDownloadImages,
   useGenerateDocument,
   useGetEntities,
@@ -775,6 +776,7 @@ export function CharacterProfileView({
   const [assetView, setAssetView] = useState<"table" | "card">("table");
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(
     ["read_characters", "create_characters", "update_characters", "delete_characters"],
@@ -936,7 +938,7 @@ export function CharacterProfileView({
             </div>
           ) : null}
           {item_id ? (
-            <div className="w-52">
+            <div className="lg:w-52">
               <Button
                 icon={IconEnum.edit}
                 isDisabled={
@@ -984,7 +986,7 @@ export function CharacterProfileView({
         ) : null}
         <div className="grid h-full grid-cols-6 content-start rounded-lg bg-zinc-950 lg:content-stretch lg:items-center">
           {!isLoading ? (
-            <div className="col-span-6 flex h-fit flex-col items-center gap-y-2 border-r border-zinc-900 p-4 lg:col-span-1 lg:h-full">
+            <div className="col-span-6 flex h-fit flex-col items-center gap-y-0.5 border-r border-zinc-900 p-4 lg:col-span-1 lg:h-full lg:gap-y-2">
               <Avatar
                 hasShowImage
                 image={
@@ -994,7 +996,7 @@ export function CharacterProfileView({
                 }
                 initials={getFirstLetters(existingCharacter?.data?.full_name || "") || ""}
                 isTooltipDisabled
-                size="4xl"
+                size={isLg ? "4xl" : "xl"}
               />
 
               <h2 className="text-center font-merriweather text-2xl">
@@ -1004,7 +1006,7 @@ export function CharacterProfileView({
                 <h3 className="text-center font-lato">{existingCharacter?.data?.nickname || ""}</h3>
               ) : null}
               {existingCharacter?.data?.tags?.length ? (
-                <div className="animate-in fade-in fill-mode-both mt-2 flex w-full flex-wrap justify-center gap-2">
+                <div className="animate-in fade-in fill-mode-both flex w-full flex-wrap justify-center gap-2 lg:mt-2">
                   {existingCharacter.data.tags.map((tag) => (
                     <div key={tag.id}>
                       <Badge customColor={tag.color} label={tag.title} />
@@ -1014,7 +1016,7 @@ export function CharacterProfileView({
               ) : null}
             </div>
           ) : null}
-          <div className="col-span-6 flex h-full flex-1 flex-col overflow-auto py-4 lg:col-span-5">
+          <div className="col-span-6 flex h-full flex-1 flex-col overflow-auto lg:col-span-5 lg:py-4">
             <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 pl-4 font-merriweather text-2xl">
               <span className="flex">
                 {type === "conversations" && subitem_id ? (

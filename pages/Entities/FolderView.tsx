@@ -709,7 +709,22 @@ function getSelectedActions(
   return selectedActions;
 }
 
-export function FolderView() {
+export function MainView() {
+  const { type, item_id } = useParams();
+
+  if (!item_id && type === "characters") return <CharactersView />;
+  if (!item_id && type === "blueprints") return <BlueprintView />;
+  if (!item_id && type === "manuscripts") return <ManuscriptView />;
+  if (type === "tags") return <TagView />;
+  if (type === "character_fields_templates") return <CharacterTemplatesView />;
+
+  if (type === "assets") return <AssetView />;
+  if (type === "settings") return <ProjectSettingsView />;
+
+  return <FolderView />;
+}
+
+function FolderView() {
   const { project_id, type, item_id } = useParams();
   const { pathname } = useLocation();
   const breakpoints = useBreakpoint();
@@ -919,14 +934,6 @@ export function FolderView() {
     return () => {};
   }, [filter, dispatch, documentType, arkived]);
 
-  if (!item_id && type === "characters") return <CharactersView />;
-  if (!item_id && type === "blueprints") return <BlueprintView />;
-  if (!item_id && type === "manuscripts") return <ManuscriptView />;
-  if (type === "tags") return <TagView />;
-  if (type === "character_fields_templates") return <CharacterTemplatesView />;
-
-  if (type === "assets") return <AssetView />;
-  if (type === "settings") return <ProjectSettingsView />;
   return (
     <TablePageLayout>
       <div className="flex h-fit flex-col items-start justify-start gap-y-2">

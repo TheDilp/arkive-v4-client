@@ -5,6 +5,7 @@ export type ManuscriptType = {
   id: string;
   deleted_at: string;
   owner_id: string;
+  icon: string | null;
   title: string;
   is_public: boolean | null;
   project_id: string;

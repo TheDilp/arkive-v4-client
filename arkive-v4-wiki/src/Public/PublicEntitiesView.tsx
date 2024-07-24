@@ -5,9 +5,11 @@ import { PublicDocument, PublicGraph, PublicMap } from ".";
 import { PublicBlueprint } from "./PublicBlueprint";
 import { PublicCalendar } from "./PublicCalendar";
 import { PublicCharacter } from "./PublicCharacter";
+import PublicManuscript from "./PublicManuscript";
 
 export function PublicEntitiesView() {
   const { type } = useParams();
+  if (type === "manuscripts") return <PublicManuscript />;
   if (type === "characters") return <PublicCharacter />;
   if (type === "blueprints") return <PublicBlueprint />;
   if (type === "documents") return <PublicDocument />;

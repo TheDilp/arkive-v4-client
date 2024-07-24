@@ -18,7 +18,14 @@ export function getEntityLink(project_id: string, name: string, item_id: string,
   if (name === "map_pins" || name === "character_map_pins") link_type = "maps";
   if (name === "nodes" || name === "edges" || name === "graphs") link_type = "graphs";
   if (name === "events") link_type = "calendars";
-  if (name === "documents" || name === "maps" || name === "calendars" || name === "dictionaries" || name === "blueprints")
+  if (
+    name === "documents" ||
+    name === "maps" ||
+    name === "calendars" ||
+    name === "dictionaries" ||
+    name === "blueprints" ||
+    name === "manuscripts"
+  )
     link_type = name;
   if (link_type) return `${linkRoot}/${project_id}/${link_type}/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}`;
   return "#";
@@ -42,4 +49,3 @@ export function getSidebarLink(link: string, project_id: string, isDisabled?: bo
 export function openPublicPage(link: string) {
   window.open(`https://wiki.thearkive.app${link}`, "_blank");
 }
-

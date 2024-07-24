@@ -2,8 +2,9 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { createContext, Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Breadcrumbs, Button, EntityPreviewDrawer, Icon } from "../../components";
+import { Breadcrumbs, Button, EntityPreviewDrawer, Icon, Tabs } from "../../components";
 import { useBreakpoint, useGetEntity, useHasPermissions } from "../../hooks";
+import { TabType } from "../../types";
 import { AvailableManuscriptEntityTypes, ManuscriptEntityType, ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import {
   breadcrumbsAtom,
@@ -36,19 +37,29 @@ function ManuscriptEntityLink({ entity }: { entity: ManuscriptEntityType }) {
         className={`flex w-full cursor-pointer items-center gap-x-2 hover:text-blue-300 active:text-blue-500 ${entity.related_id === subitem_id ? "text-blue-400" : ""}`}
         onClick={(e) => {
           e.preventDefault();
-          navigate(`/projects/${project_id}/manuscripts/${item_id}/${entity.related_id}`);
+          navigate(`${IS_PUBLIC ? "" : "/projects"}/${project_id}/manuscripts/${item_id}/${entity.related_id}`);
           setType(entity.type);
         }}>
         <Icon icon={getDefaultEntityIcon(entity?.type)} />
-        {entity?.title}
+        <div className="line-clamp-1">{entity?.title}</div>
       </span>
     </li>
   );
 }
 
+function getTabs(entities: ManuscriptEntityType[]): TabType[] {
+  return entities.map((entity) => ({
+    id: `${entity.id}___${entity.related_id}`,
+    icon: getDefaultEntityIcon(entity.type),
+    label: entity.title,
+  }));
+}
+
 export function ManuscriptProfileView() {
   const { isMd } = useBreakpoint();
   const { project_id, item_id, subitem_id } = useParams();
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState(0);
   const [type, setType] = useState<AvailableManuscriptEntityTypes | null>(null);
   const { data: existingManuscript } = useGetEntity<ManuscriptType>(item_id, "manuscripts", {
     fields: ["id", "owner_id", "title"],
@@ -76,13 +87,16 @@ export function ManuscriptProfileView() {
 
   useLayoutEffect(() => {
     if (manuscriptTree.length && subitem_id) {
-      const item = manuscriptTree.find((item) => item.related_id === subitem_id);
-      if (item) setType(item.type);
+      const idx = manuscriptTree.findIndex((item) => item.related_id === subitem_id);
+      if (idx > -1) {
+        setType(manuscriptTree[idx].type);
+        setSelectedTab(idx);
+      }
     }
   }, [subitem_id, manuscriptTree]);
 
   return (
-    <>
+    <div className={"flex h-full flex-col gap-y-2 lg:flex-row lg:gap-y-0"}>
       {item_id && !IS_PUBLIC ? (
         <div className="flex h-12 min-h-[3rem] items-center justify-between">
           <Breadcrumbs />
@@ -116,9 +130,22 @@ export function ManuscriptProfileView() {
           </div>
         </div>
       ) : null}
-      <div className="grid h-full max-h-[95%] grid-cols-12 gap-x-2 overflow-hidden rounded-b">
-        <div className="col-span-3 flex h-full flex-col rounded bg-zinc-800 p-2">
-          <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>
+      <div className="lg:hidden">
+        <Tabs
+          hasArrowNav
+          onChange={(tab) => {
+            const related_id = tab.id.split("___");
+            console.log(related_id);
+            if (related_id?.[1])
+              navigate(`${IS_PUBLIC ? "" : "/projects"}/${project_id}/manuscripts/${item_id}/${related_id[1]}`);
+          }}
+          selectedTab={selectedTab}
+          tabs={getTabs(manuscriptTree)}
+        />
+      </div>
+      <div className="grid h-full grid-cols-12 gap-x-2 gap-y-2 overflow-hidden rounded-b lg:content-stretch lg:gap-y-0">
+        <div className="col-span-3 hidden h-full flex-col rounded bg-zinc-800 p-2 lg:flex">
+          {IS_PUBLIC ? null : <h2 className="text-center text-2xl font-bold">{existingManuscript?.data?.title}</h2>}
           <TypeContext.Provider value={{ type, setType }}>
             <ul>
               {manuscriptTree?.length
@@ -129,10 +156,10 @@ export function ManuscriptProfileView() {
             </ul>
           </TypeContext.Provider>
         </div>
-        <div className="col-span-9 flex h-full flex-col rounded bg-zinc-950 p-2">
+        <div className="col-span-12 flex h-full flex-col rounded bg-zinc-950 p-2 lg:col-span-9">
           {type ? <ManuscriptEntityPreview type={type} /> : null}
         </div>
       </div>
-    </>
+    </div>
   );
 }
