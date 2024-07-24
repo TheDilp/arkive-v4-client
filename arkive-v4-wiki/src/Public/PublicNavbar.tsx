@@ -47,7 +47,7 @@ export function PublicNavbar() {
 
   return (
     <div className="mb-4 flex max-h-24 flex-col items-center justify-between gap-x-2 text-lg lg:flex-row">
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 self-start">
         <div className="max-w-20 overflow-hidden lg:max-w-14">
           <img
             alt="Logo"
