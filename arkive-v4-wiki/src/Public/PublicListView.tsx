@@ -235,7 +235,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
           isClearable
           name="quick_filter"
           onChange={({ value }) => setFilter(value as string)}
-          placeholder="Quick search by first name"
+          placeholder="Quick search by title"
           type="search"
           value={filter}
         />
