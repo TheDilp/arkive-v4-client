@@ -102,7 +102,6 @@ function PublicCharacterList() {
       data: { project_id: project_id as string },
       relations: {
         portrait: true,
-        tags: true,
       },
       orderBy,
       filters,
@@ -111,7 +110,7 @@ function PublicCharacterList() {
     },
     "characters",
     {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
       prefetch: true,
     }
   );
@@ -147,7 +146,7 @@ function PublicCharacterList() {
 
   return (
     <div className="flex flex-col gap-y-2 p-2">
-      <div className="ml-auto w-52">
+      <div className="w-full lg:ml-auto lg:w-52">
         <Input
           isClearable
           name="quick_filter"
@@ -198,7 +197,8 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
     },
     type as AvailableEntityType,
     {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
+      prefetch: true,
     }
   );
   useLayoutEffect(() => {
@@ -231,12 +231,12 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
   }, [filter, dispatch]);
   return (
     <div className="flex h-full w-full flex-col gap-y-2 p-2">
-      <div className="ml-auto w-52">
+      <div className="w-full lg:ml-auto lg:w-52">
         <Input
           isClearable
           name="quick_filter"
           onChange={({ value }) => setFilter(value as string)}
-          placeholder="Quick search by first name"
+          placeholder="Quick search by title"
           type="search"
           value={filter}
         />

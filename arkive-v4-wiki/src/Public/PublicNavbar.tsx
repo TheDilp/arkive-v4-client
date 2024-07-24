@@ -7,7 +7,7 @@ import { useGetEntity } from "../../../hooks";
 import { AllAvailableEntities, AvailableEntityType, ProjectType } from "../../../types";
 import { getDefaultEntityIcon, getEntityLink, getImageURL, getThumbnailUrl, IconEnum } from "../../../utils";
 
-const navItems = ["characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
+const navItems = ["manuscripts", "characters", "blueprints", "documents", "maps", "graphs", "calendars", "dictionaries"];
 
 export function PublicNavbar() {
   const [search, setSearch] = useState<string | null>("");
@@ -46,9 +46,9 @@ export function PublicNavbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="mb-2 flex h-16 max-h-16 items-center justify-between gap-x-2 text-lg">
-      <div className="flex gap-x-2">
-        <div className="max max-w-14 overflow-hidden">
+    <div className="mb-4 flex max-h-24 flex-col items-center justify-between gap-x-2 text-lg lg:flex-row">
+      <div className="flex items-center gap-x-2">
+        <div className="max-w-20 overflow-hidden lg:max-w-14">
           <img
             alt="Logo"
             className="relative -left-1 min-w-14 object-contain"
@@ -63,7 +63,7 @@ export function PublicNavbar() {
           />
         </div>
         <div className="flex flex-col items-start">
-          <h2 className="flex-1 font-merriweather text-xl font-bold">{project?.data?.title}</h2>
+          <h2 className="line-clamp-1 flex-1 font-merriweather text-2xl font-bold lg:text-xl">{project?.data?.title}</h2>
           <nav className="hidden text-base md:block">
             <ul className="flex flex-nowrap gap-x-2">
               {navItems.map((item) => (
@@ -77,7 +77,7 @@ export function PublicNavbar() {
           </nav>
         </div>
       </div>
-      <div className="relative mb-2 mt-auto h-8 min-h-[2rem] w-56">
+      <div className="relative mb-2 ml-8 mr-8 mt-auto h-8 min-h-[2rem] w-full lg:mr-0 lg:flex-1">
         {typeof search === "string" ? (
           <Search
             hasNoBackground
