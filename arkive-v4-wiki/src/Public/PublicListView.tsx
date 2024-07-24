@@ -146,7 +146,7 @@ function PublicCharacterList() {
 
   return (
     <div className="flex flex-col gap-y-2 p-2">
-      <div className="ml-auto w-52">
+      <div className="w-full lg:ml-auto lg:w-52">
         <Input
           isClearable
           name="quick_filter"
@@ -230,7 +230,7 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
   }, [filter, dispatch]);
   return (
     <div className="flex h-full w-full flex-col gap-y-2 p-2">
-      <div className="ml-auto w-52">
+      <div className="w-full lg:ml-auto lg:w-52">
         <Input
           isClearable
           name="quick_filter"
