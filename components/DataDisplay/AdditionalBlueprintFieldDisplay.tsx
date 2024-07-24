@@ -117,9 +117,11 @@ export function AdditionalBlueprintFieldDisplay({
   return (
     <Tooltip
       allowedPlacements={["top", "bottom"]}
-      content={
-        blueprint_field_data.field_type === "select_multiple" ? selectMultipleFormatted : (blueprint_field_data.value as string)
-      }
+      content={(
+        (blueprint_field_data.field_type === "select_multiple"
+          ? selectMultipleFormatted
+          : (blueprint_field_data.value as string)) || ""
+      ).toString()}
       isDisabled={!tooltipFields.includes(blueprint_field.field_type)}
       variant="secondary">
       <div className={fieldClasses}>
