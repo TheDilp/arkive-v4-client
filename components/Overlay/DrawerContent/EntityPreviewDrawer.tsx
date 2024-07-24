@@ -25,7 +25,7 @@ function DocumentPreviewDrawer({ id }: { id: string }) {
     "documents",
     {
       data: { id },
-      fields: ["title", "content", "project_id"],
+      fields: ["title", "content", "project_id", "is_public"],
     },
     {
       enabled: !!id,
