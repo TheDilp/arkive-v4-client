@@ -191,7 +191,7 @@ export function ManuscriptDrawer({ data }: Props) {
                                     searchEntity={entity.type}
                                   />
                                 </div>
-                                <div className="w-1/3">
+                                <div className="flex w-1/3 items-center gap-x-1">
                                   <Select
                                     name="type"
                                     onChange={({ value }) =>
@@ -204,6 +204,21 @@ export function ManuscriptDrawer({ data }: Props) {
                                     options={AvailableManuscriptEntityTypesEnum}
                                     value={entity.type}
                                   />
+                                  <div>
+                                    <Button
+                                      hasNoBackground
+                                      icon={IconEnum.trash}
+                                      iconSize={24}
+                                      isIconOnly
+                                      onClick={() =>
+                                        setEntities((prev) => {
+                                          return prev.toSpliced(index, 1);
+                                        })
+                                      }
+                                      size="lg"
+                                      variant="error"
+                                    />
+                                  </div>
                                 </div>
                               </>
                             ) : (
@@ -252,7 +267,7 @@ export function ManuscriptDrawer({ data }: Props) {
               const relations = entities.reduce(
                 (prev, curr, currIndex) => {
                   const formatted = { related_id: curr.related_id, sort: currIndex, id: curr.id };
-                  console.log(formatted);
+
                   prev[curr.type].push(formatted);
 
                   return prev;
@@ -275,13 +290,13 @@ export function ManuscriptDrawer({ data }: Props) {
               }
               if (data?.id) {
                 const parsed = UpdateManuscriptSchema.parse({
-                  data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public },
+                  data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public ?? null },
                   relations,
                 });
                 update(parsed);
               } else {
                 const parsed = InsertManuscriptSchema.parse({
-                  data: { title: manuscript.title, project_id },
+                  data: { title: manuscript.title, project_id, is_public: manuscript?.is_public ?? null },
                   relations,
                 });
                 create(parsed);
