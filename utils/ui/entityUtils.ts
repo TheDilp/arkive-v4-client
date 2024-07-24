@@ -57,7 +57,7 @@ export function getParentEntityType(type: AvailableSubEntityType): AvailableEnti
 }
 
 export function getEntityFields(type: AvailableEntityType): string[] {
-  const fields: string[] = ["id", "deleted_at", "title", "icon", "is_folder", "parent_id", "owner_id"];
+  const fields: string[] = ["id", "deleted_at", "title", "icon", "parent_id", "owner_id"];
 
   if (
     type === "documents" ||
@@ -65,7 +65,8 @@ export function getEntityFields(type: AvailableEntityType): string[] {
     type === "graphs" ||
     type === "calendars" ||
     type === "dictionaries" ||
-    type === "random_tables"
+    type === "random_tables" ||
+    type === "manuscripts"
   )
     fields.push("is_public");
 
