@@ -102,7 +102,6 @@ function PublicCharacterList() {
       data: { project_id: project_id as string },
       relations: {
         portrait: true,
-        tags: true,
       },
       orderBy,
       filters,
