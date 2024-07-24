@@ -110,7 +110,7 @@ function PublicCharacterList() {
     },
     "characters",
     {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
       prefetch: true,
     }
   );
@@ -197,7 +197,8 @@ function PublicEntitiesList({ type }: { type: "documents" | "maps" | "graphs" | 
     },
     type as AvailableEntityType,
     {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 60 * 1000,
+      prefetch: true,
     }
   );
   useLayoutEffect(() => {
