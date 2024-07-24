@@ -936,7 +936,7 @@ export function CharacterProfileView({
             </div>
           ) : null}
           {item_id ? (
-            <div className="w-52">
+            <div className="lg:w-52">
               <Button
                 icon={IconEnum.edit}
                 isDisabled={
