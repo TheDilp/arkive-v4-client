@@ -181,7 +181,7 @@ export function useGetEntities<ReturnType>(
       body: JSON.stringify(finalRequest),
       url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
     });
-    if (!data?.role_access) {
+    if (!data?.role_access && !IS_PUBLIC) {
       createNotification({
         title: `Your current role in this project does not have permission to view ${getPluralEntityType(type)}.`,
         timer: 5,
@@ -480,4 +480,3 @@ export function useGetAuthStatus() {
   );
 }
 // #endregion misc
-
