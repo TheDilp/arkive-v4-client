@@ -471,7 +471,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: { project_id: project_id as string },
-      fields: ["id", "title", "sort", "owner_id"],
+      fields: ["id", "title", "sort"],
       relations: { character_fields: true },
       relationFilters: {
         or: (character?.tags || [])?.map((t) => ({
@@ -960,4 +960,3 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     </DrawerLayout>
   );
 }
-
