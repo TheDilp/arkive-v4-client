@@ -441,11 +441,11 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     {
       enabled: !!data?.id,
       queryKeyConcat: ["drawer"],
-    },
+    }
   );
   const permissions = useHasPermissions(
     ["read_characters", "create_characters", "update_characters", "read_tags", "read_character_fields_templates"],
-    existingCharacter?.data?.owner_id,
+    existingCharacter?.data?.owner_id
   );
   const tabs = getTabs(permissions, data?.id);
   const [character, setCharacter] = useState<Partial<CharacterType> | null>(
@@ -455,23 +455,23 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           first_name: data.title.split(" ")[0],
           last_name: data.title.split(" ")[1],
         }
-      : null,
+      : null
   );
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertCharacterType>("characters");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateCharacterType>(
     "characters",
-    project_id as string,
+    project_id as string
   );
   const hasCreateOrEdit = createOrEditPermission(
     permissions?.create_characters,
     permissions?.update_characters,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: { project_id: project_id as string },
-      fields: ["id", "title", "sort"],
+      fields: ["id", "title", "sort", "owner_id"],
       relations: { character_fields: true },
       relationFilters: {
         or: (character?.tags || [])?.map((t) => ({
@@ -496,7 +496,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         // tabs[selectedTab].id === "5" &&
         !!character?.tags?.length && permissions?.read_character_fields_templates && permissions?.read_tags,
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
   const { data: relationshipTypes, isFetching: isFetchingRelationshipTypes } = useGetEntities<CharacterRelationshipType>(
     {
@@ -507,7 +507,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     {
       // enabled: tabs[selectedTab].id === "3",
       staleTime: 5 * 60 * 1000,
-    },
+    }
   );
 
   const [relationGroupIds, setRelationGroupIds] = useState<string[]>([]);
@@ -525,7 +525,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
         (existingCharacter?.data?.related_from || [])
           .concat(existingCharacter?.data?.related_to || [])
           .concat(existingCharacter?.data?.related_other || [])
-          .map((relation: CharacterRelatedType) => relation.relation_type_id),
+          .map((relation: CharacterRelatedType) => relation.relation_type_id)
       );
     } else if (!data?.id && !character) {
       setCharacter({
@@ -960,3 +960,4 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     </DrawerLayout>
   );
 }
+

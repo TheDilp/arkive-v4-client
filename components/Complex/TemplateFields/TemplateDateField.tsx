@@ -54,6 +54,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+      <span className="block min-h-[20px] truncate border-b border-zinc-700 text-sm text-zinc-300">{title}</span>
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center justify-between gap-x-2">
           <Input
@@ -162,3 +163,4 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
     </TemplateFieldContainer>
   );
 }
+

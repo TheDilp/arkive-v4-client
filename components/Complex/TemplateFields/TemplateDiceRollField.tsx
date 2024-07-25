@@ -34,6 +34,7 @@ export function TemplateDiceRollField({
       <div className="flex flex-nowrap items-center gap-x-2">
         <Input
           isDisabled={isDisabled}
+          label={title}
           name={name}
           onChange={({ value }) =>
             handleChange([
@@ -94,3 +95,4 @@ export function TemplateDiceRollField({
     </TemplateFieldContainer>
   );
 }
+
