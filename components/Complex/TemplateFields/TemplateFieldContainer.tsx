@@ -12,6 +12,10 @@ export function TemplateFieldContainer({ isCollapsible, children, label }: Props
       <div className="p-2">{children}</div>
     </Collapsible>
   ) : (
-    children
+    <div className="flex flex-col">
+      <span className="block min-h-[20px] truncate text-sm text-zinc-300">{label}</span>
+      {children}
+    </div>
   );
 }
+
