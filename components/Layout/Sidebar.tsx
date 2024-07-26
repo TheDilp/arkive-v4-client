@@ -7,6 +7,7 @@ import { useBreakpoint } from "../../hooks";
 import { PermissionCodeType, SidebarType } from "../../types";
 import {
   currentUserPermissionsAtom,
+  enabledEntitiesAtom,
   getSidebarLink,
   isProjectOwnerAtom,
   moduleAtom,
@@ -51,11 +52,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
   const { isLg } = useBreakpoint();
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
   const userPermissions = useAtomValue(currentUserPermissionsAtom);
-  const enabledEntities = Object.entries(featureFlags || [])
-    .filter(([key, value]) => {
-      return key.includes("_enabled") && value;
-    })
-    .map(([key]) => key);
+  const enabledEntities = useAtomValue(enabledEntitiesAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
 
   const finalSidebarItems = useMemo(() => {
@@ -63,7 +60,7 @@ export function Sidebar({ isLoading, items, isUsingPermissions }: SidebarType) {
       ? items
           .filter((item) =>
             featureFlags
-              ? enabledEntities.includes(`${item.navigate}_enabled`) || alwaysEnabledItems.includes(item.navigate)
+              ? enabledEntities.includes(`${item.navigate}`) || alwaysEnabledItems.includes(item.navigate)
               : alwaysEnabledItems.includes(item.navigate)
           )
           .map((item) => ({

@@ -18,3 +18,14 @@ export const hasChangedDataAtom = atomWithReset<boolean>(false);
 export const projectFeatureFlagsAtom = atom((get) => get(projectAtom)?.feature_flags);
 export const hasEntityUpdatePermissionForEntityView = atom<boolean>(false);
 export const historyAtom = atom<{ label: string; link: string }[]>([]);
+
+export const enabledEntitiesAtom = atom((get) => {
+  const feature_flags = get(projectFeatureFlagsAtom);
+  const enabledEntities = Object.entries(feature_flags || [])
+    .filter(([key, value]) => {
+      return key.includes("_enabled") && value;
+    })
+    .map(([key]) => key.replace("_enabled", ""));
+
+  return enabledEntities;
+});
