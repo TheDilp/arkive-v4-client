@@ -52,6 +52,7 @@ import {
   baseURLS,
   dialogAtom,
   drawerAtom,
+  enabledEntitiesAtom,
   FetchFunction,
   getAvatarInitials,
   getCharacterFullName,
@@ -103,6 +104,12 @@ const tabs = [
   { id: "3", label: "Resources", icon: IS_PUBLIC ? null : IconEnum.document },
   { id: "4", label: "Conversations", icon: IS_PUBLIC ? null : IconEnum.conversation },
 ];
+
+function getTabs(enabledEntities: string[]) {
+  if (IS_PUBLIC) return tabs.slice(0, 4);
+  if (!enabledEntities.includes("character_fields_templates")) return tabs.toSpliced(1, 1);
+  return tabs;
+}
 
 function relationshipTableColumns(
   project_id: string,
@@ -771,6 +778,7 @@ export function CharacterProfileView({
   isViewOnly?: boolean;
 }) {
   const { project_id, item_id, type, subitem_id } = useParams();
+  const enabledEntities = useAtomValue(enabledEntitiesAtom);
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(getCharacterProfileTabFromType(type));
   const [assetView, setAssetView] = useState<"table" | "card">("table");
@@ -794,13 +802,13 @@ export function CharacterProfileView({
     {
       relations: {
         tags: true,
-        character_fields: true,
-        locations: true,
+        character_fields: enabledEntities.includes("character_fields_templates"),
+        locations: enabledEntities.includes("maps"),
         relationships: true,
         character_relationship_types: true,
-        documents: true,
+        documents: enabledEntities.includes("documents"),
         images: true,
-        events: true,
+        events: enabledEntities.includes("calendars"),
         portrait: true,
       },
       fields: ["id", "full_name", "nickname", "age", "biography", "is_public", "owner_id"],
@@ -980,7 +988,7 @@ export function CharacterProfileView({
                 setSelectedTab(index);
               }}
               selectedTab={selectedTab}
-              tabs={IS_PUBLIC ? tabs.slice(0, 4) : tabs}
+              tabs={getTabs(enabledEntities)}
             />
           </div>
         ) : null}
@@ -1066,7 +1074,8 @@ export function CharacterProfileView({
                 </div>
               </div>
             ) : null}
-            {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") ? (
+            {(isPreview ? tabs[selectedTab].id === "1" : type === "additional fields") &&
+            enabledEntities.includes("character_fields_templates") ? (
               <ul className="animate-in fade-in fill-mode-both flex max-h-[80%] flex-col gap-y-2 overflow-y-auto p-4">
                 {isFetchingTemplates ? <Skeleton type="character_profile_main" /> : null}
                 {(existingTemplates?.data || []).map((t) => {
@@ -1121,99 +1130,105 @@ export function CharacterProfileView({
 
             {(isPreview ? tabs[selectedTab].id === "3" : type === "resources") ? (
               <div className="flex h-[calc(100%-3rem)] max-h-[calc(100%-3rem)] flex-col gap-y-2 overflow-auto p-4">
-                <Collapsible
-                  actions={
-                    IS_PUBLIC
-                      ? []
-                      : [
-                          {
-                            icon: IconEnum.add,
-                            tooltip: "Add document",
-                            onClick: openAddDocumentDrawer,
-                          },
-                        ]
-                  }
-                  icon={IconEnum.document}
-                  initialOpen={false}
-                  label="Documents">
-                  {existingCharacter?.data?.documents?.length ? (
-                    <div className="animate-in fade-in fill-mode-both mt-2">
-                      <Table
-                        columns={documentsTableColumns(
-                          removeItem,
-                          updateDocumentsPublic,
-                          setDrawer,
-                          queryClient,
-                          project_id as string,
-                          item_id as string
-                        )}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
-                        }}
-                        data={existingCharacter?.data?.documents || []}
-                        dispatch={dispatch}
-                        type="documents"
-                      />
-                    </div>
-                  ) : (
-                    <div className="mt-2 w-full">
-                      <Alert label="There is no content." variant="info" />
-                    </div>
-                  )}
-                </Collapsible>
+                {enabledEntities.includes("documents") ? (
+                  <Collapsible
+                    actions={
+                      IS_PUBLIC
+                        ? []
+                        : [
+                            {
+                              icon: IconEnum.add,
+                              tooltip: "Add document",
+                              onClick: openAddDocumentDrawer,
+                            },
+                          ]
+                    }
+                    icon={IconEnum.document}
+                    initialOpen={false}
+                    label="Documents">
+                    {existingCharacter?.data?.documents?.length ? (
+                      <div className="animate-in fade-in fill-mode-both mt-2">
+                        <Table
+                          columns={documentsTableColumns(
+                            removeItem,
+                            updateDocumentsPublic,
+                            setDrawer,
+                            queryClient,
+                            project_id as string,
+                            item_id as string
+                          )}
+                          config={{
+                            expandable: true,
+                            hasNoHeaderGap: true,
+                            getLink: (rowData: DocumentType) => `/projects/${project_id}/documents/${rowData.id}`,
+                          }}
+                          data={existingCharacter?.data?.documents || []}
+                          dispatch={dispatch}
+                          type="documents"
+                        />
+                      </div>
+                    ) : (
+                      <div className="mt-2 w-full">
+                        <Alert label="There is no content." variant="info" />
+                      </div>
+                    )}
+                  </Collapsible>
+                ) : null}
 
-                <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
-                  <div className="animate-in fade-in fill-mode-both mt-2">
-                    {existingCharacter?.data?.locations?.length ? (
-                      <Table
-                        columns={locationsTableColumns(project_id as string)}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: CharacterLocationType) =>
-                            `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
-                        }}
-                        data={existingCharacter?.data?.locations || []}
-                        dispatch={dispatch}
-                        type="documents"
-                      />
-                    ) : (
-                      <div className="mt-2 w-full">
-                        <Alert label="There is no content." variant="info" />
-                      </div>
-                    )}
-                  </div>
-                </Collapsible>
-                <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
-                  <div className="animate-in fade-in fill-mode-both mt-2">
-                    {existingCharacter?.data?.events?.length ? (
-                      <Table
-                        columns={eventsTableColumns(
-                          updateEventsPublic,
-                          setDrawer,
-                          queryClient,
-                          project_id as string,
-                          item_id as string
-                        )}
-                        config={{
-                          expandable: true,
-                          hasNoHeaderGap: true,
-                          getLink: (rowData: EventType) =>
-                            getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id),
-                        }}
-                        data={existingCharacter?.data?.events || []}
-                        dispatch={dispatch}
-                        type="events"
-                      />
-                    ) : (
-                      <div className="mt-2 w-full">
-                        <Alert label="There is no content." variant="info" />
-                      </div>
-                    )}
-                  </div>
-                </Collapsible>
+                {enabledEntities.includes("maps") ? (
+                  <Collapsible icon={IconEnum.map_pin} initialOpen={false} label="Locations">
+                    <div className="animate-in fade-in fill-mode-both mt-2">
+                      {existingCharacter?.data?.locations?.length ? (
+                        <Table
+                          columns={locationsTableColumns(project_id as string)}
+                          config={{
+                            expandable: true,
+                            hasNoHeaderGap: true,
+                            getLink: (rowData: CharacterLocationType) =>
+                              `/projects/${project_id}/maps/${rowData.id}/${rowData.map_pin_id}`,
+                          }}
+                          data={existingCharacter?.data?.locations || []}
+                          dispatch={dispatch}
+                          type="documents"
+                        />
+                      ) : (
+                        <div className="mt-2 w-full">
+                          <Alert label="There is no content." variant="info" />
+                        </div>
+                      )}
+                    </div>
+                  </Collapsible>
+                ) : null}
+                {enabledEntities.includes("calendars") ? (
+                  <Collapsible icon={IconEnum.event} initialOpen={false} label="Events">
+                    <div className="animate-in fade-in fill-mode-both mt-2">
+                      {existingCharacter?.data?.events?.length ? (
+                        <Table
+                          columns={eventsTableColumns(
+                            updateEventsPublic,
+                            setDrawer,
+                            queryClient,
+                            project_id as string,
+                            item_id as string
+                          )}
+                          config={{
+                            expandable: true,
+                            hasNoHeaderGap: true,
+                            getLink: (rowData: EventType) =>
+                              getEntityLink(project_id as string, "events", rowData.id, rowData.parent_id),
+                          }}
+                          data={existingCharacter?.data?.events || []}
+                          dispatch={dispatch}
+                          type="events"
+                        />
+                      ) : (
+                        <div className="mt-2 w-full">
+                          <Alert label="There is no content." variant="info" />
+                        </div>
+                      )}
+                    </div>
+                  </Collapsible>
+                ) : null}
                 <Collapsible
                   actions={
                     IS_PUBLIC

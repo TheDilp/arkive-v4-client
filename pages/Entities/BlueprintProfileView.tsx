@@ -1,28 +1,15 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { useLayoutEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { useParams } from "react-router-dom";
 
-import {
-  AdditionalBlueprintFieldDisplay,
-  Alert,
-  Badge,
-  Breadcrumbs,
-  Button,
-  Collapsible,
-  Skeleton,
-  Tabs,
-} from "../../components";
+import { AdditionalBlueprintFieldDisplay, Alert, Badge, Breadcrumbs, Button, Collapsible, Skeleton } from "../../components";
 import { useBreakpoint, useGetEntity, useGetSubEntity, useHasPermissions, useNavbarTitle } from "../../hooks";
 import { BlueprintInstanceType, BlueprintType } from "../../types";
 import { breadcrumbsAtom, drawerAtom, hasActionPermission, IconEnum, isProjectOwnerAtom, userAtom } from "../../utils";
 
-const tabs = [{ id: "1", label: "Basic info", icon: IS_PUBLIC ? null : IconEnum.info_circle }];
-
 export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: string; parent_id?: string; isViewOnly?: boolean }) {
   const { project_id, item_id, subitem_id } = useParams();
   const { isMd } = useBreakpoint();
-  const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState(0);
   const setDrawer = useSetAtom(drawerAtom);
   const setBreadcrumbs = useSetAtom(breadcrumbsAtom);
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
@@ -166,18 +153,6 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
       <div className="w-full flex-1 flex-col content-start gap-4 pt-0">
         {isLoading ? <Skeleton type="character_profile" /> : null}
 
-        {!isLoading ? (
-          <div className="mb-2 w-full">
-            <Tabs
-              onChange={(tab, index) => {
-                navigate(`/projects/${project_id}/characters/${item_id}/${tab.label.toLowerCase()}`);
-                setSelectedTab(index);
-              }}
-              selectedTab={selectedTab}
-              tabs={tabs}
-            />
-          </div>
-        ) : null}
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <div className="flex flex-col gap-y-2">
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
