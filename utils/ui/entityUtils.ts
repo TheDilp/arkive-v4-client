@@ -445,3 +445,22 @@ export function buildManuscript(manuscript: ManuscriptType | undefined) {
 
   return base.flat().sort((a, b) => a.sort - b.sort);
 }
+
+export function checkIfFieldHasValue(field: CharacterCharacterFieldType): boolean {
+  if (field.value) return true;
+  if (
+    field.characters.length ||
+    field.blueprint_instances.length ||
+    field.documents.length ||
+    field.events.length ||
+    field.map_pins.length ||
+    field.images.length
+  )
+    return true;
+
+  if (field.calendar.start_year) return true;
+
+  if (field.random_table.option_id) return true;
+
+  return false;
+}
