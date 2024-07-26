@@ -18,6 +18,7 @@ export const IconEnum = {
   card: "ph:cards" as const,
   center: "streamline:interface-layout-border-center-border-cell-format-formatting-horizontal-vertical" as const,
   character: "ph:user" as const,
+  character_gateway: "ph:identification-badge" as const,
   chevron_double_left: "ph:caret-double-left" as const,
   chevron_double_right: "ph:caret-double-right" as const,
   chevron_down: "ph:caret-down" as const,

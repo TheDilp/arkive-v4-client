@@ -90,7 +90,8 @@ const tabs = [
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
-  { id: "6", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
+  // { id: "6", label: "Character gateway", icon: IconEnum.character_gateway, isOwner: false },
+  { id: "7", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -702,7 +703,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "6" ? (
+          {finalTabs[selectedTab].id === "7" ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible
                 actions={[
