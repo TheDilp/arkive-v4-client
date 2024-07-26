@@ -10,4 +10,5 @@ export const baseURLS = {
       ? `ws://localhost:${import.meta.env.VITE_SERVER_PORT}`
       : "wss://arkive-v4-server-production.up.railway.app"
   }`,
+  basePublicClient: import.meta.env.VITE_WIKI_CLIENT_URL,
 };
