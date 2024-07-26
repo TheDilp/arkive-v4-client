@@ -15,7 +15,7 @@ import {
 } from "../../../components";
 import { useGetEntities, useGetEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterType } from "../../../types";
-import { getEntityLink, IconEnum, useNotifications } from "../../../utils";
+import { checkIfFieldHasValue, getEntityLink, IconEnum, useNotifications } from "../../../utils";
 import { PublicEntityLayout } from "./PublicLayout";
 
 const tabs = [
@@ -106,19 +106,21 @@ export function PublicCharacter() {
               return (
                 <div className="grid h-full grid-cols-6 flex-col content-start gap-y-2" key={t.id}>
                   <div className="col-span-6">
-                    <Title isDrawerTitle label={t.title} size="lg" variant="secondary" />
+                    <Title isDrawerTitle label={t.title} size="lg" variant="primary" />
                   </div>
                   {t.character_fields.map((template_field) => {
                     const characterField = character?.data?.character_fields?.find((f) => f.id === template_field.id);
-                    if (characterField)
-                      return (
-                        <AdditionalFieldDisplay
-                          character_field={template_field}
-                          character_field_data={characterField ?? null}
-                          isPreview={false}
-                          key={template_field.id}
-                        />
-                      );
+                    if (characterField) {
+                      if (checkIfFieldHasValue(characterField))
+                        return (
+                          <AdditionalFieldDisplay
+                            character_field={template_field}
+                            character_field_data={characterField ?? null}
+                            isPreview={false}
+                            key={template_field.id}
+                          />
+                        );
+                    }
                     return null;
                   })}
                 </div>
