@@ -44,13 +44,14 @@ export function useGetAllProjects(request: RequestBodyType<ProjectType>, options
   );
 }
 
-export function useGetProjectDashboard(project_id: string, options?: UseQueryOptions) {
+export function useGetProjectDashboard(project_id: string, enabledEntities: string[], options?: UseQueryOptions) {
   return useQuery<{ data: ProjectDashboardType }>(
-    ["allEntities", "project", "dashboard", project_id],
+    ["allEntities", "project", "dashboard", enabledEntities, project_id],
     async () =>
       FetchFunction({
-        method: "GET",
+        method: "POST",
         url: `${baseURLS.baseServer}/projects/${project_id}/dashboard`,
+        body: JSON.stringify({ data: { enabled_entities: enabledEntities } }),
       }),
     {
       enabled: options?.enabled,

@@ -9,6 +9,7 @@ import { AllAvailableEntities, AvailableEntityType, AvailableSubEntityType } fro
 import {
   capitalizeFirstLetter,
   drawerAtom,
+  enabledEntitiesAtom,
   getDefaultEntityIcon,
   getEntityLink,
   getParentEntityType,
@@ -19,6 +20,7 @@ import {
 } from "../../utils";
 
 const graphEntityOptions = [
+  "manuscripts",
   "characters",
   "blueprints",
   "blueprint_instances",
@@ -37,6 +39,7 @@ const graphEntityOptions = [
 ];
 
 function getBarColor(i: AllAvailableEntities) {
+  if (i === "manuscripts") return "fill-zinc-400";
   if (i === "characters") return "fill-yellow-400";
   if (i === "blueprints") return "fill-blue-400";
   if (i === "blueprint_instances") return "fill-blue-600";
@@ -257,27 +260,13 @@ function createTagColorStats(reff: MutableRefObject<HTMLDivElement>, data: Recor
 }
 
 export function Dashboard() {
-  const [selectedEntities, setSelectedEntities] = useState([
-    "characters",
-    "blueprints",
-    "blueprint_instances",
-    "documents",
-    "maps",
-    "graphs",
-    "calendars",
-    "events",
-    "dictionaries",
-    "random_tables",
-    "tags",
-    "images",
-    "map_pins",
-    "nodes",
-    "words",
-  ]);
+  const [selectedEntities, setSelectedEntities] = useState(graphEntityOptions);
   const user = useAtomValue(userAtom);
   const { project_id } = useParams();
-  const { data: dashboard, isFetching } = useGetProjectDashboard(project_id as string);
-
+  const enabledEntities = useAtomValue(enabledEntitiesAtom);
+  const { data: dashboard, isFetching } = useGetProjectDashboard(project_id as string, enabledEntities, {
+    enabled: !!enabledEntities.length,
+  });
   const characterStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const tagEntityStatRef = useRef() as MutableRefObject<HTMLDivElement>;
   const tagColorStatRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -304,7 +293,7 @@ export function Dashboard() {
 
   return (
     <div className="flex max-h-full flex-col gap-y-2 overflow-auto">
-      <h2 className="font-merriweather pb-2 text-xl">Continue working on...</h2>
+      <h2 className="pb-2 font-merriweather text-xl">Continue working on...</h2>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         {(dashboard?.data || []).map((d, i, arr) => (
           <div
@@ -312,7 +301,7 @@ export function Dashboard() {
               i === arr.length - 1 ? "col-span-1 md:col-span-2 lg:col-span-1" : "col-span-1"
             } flex min-h-[18rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md`}
             key={d.name}>
-            <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+            <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
               <Icon icon={getDefaultEntityIcon(d.name as AvailableEntityType)} />
               <Link
                 className="transition-all duration-150 hover:text-blue-300"
@@ -367,10 +356,10 @@ export function Dashboard() {
       </div>
       {stats?.data ? (
         <>
-          <h2 className="font-merriweather pb-2 text-xl">Statistics</h2>
+          <h2 className="pb-2 font-merriweather text-xl">Statistics</h2>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
             <div className="col-span-1 flex min-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-              <h3 className="font-lato relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 <span>Entity stats</span>
                 <div className="absolute right-0 max-w-48 text-base font-normal">
                   <Select
@@ -385,19 +374,19 @@ export function Dashboard() {
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={characterStatRef} />
             </div>
             <div className="col-span-1 flex h-[48rem] max-h-[48rem] flex-col items-center justify-start rounded bg-zinc-900 p-2 shadow-md md:col-span-2 lg:col-span-4">
-              <h3 className="font-lato relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+              <h3 className="relative flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 <span>Tag stats</span>
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-auto" ref={tagEntityStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
-              <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 Tags by color
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2" ref={tagColorStatRef} />
             </div>
             <div className="col-span-1 flex min-h-[24rem] flex-col items-center justify-start rounded bg-zinc-900 px-2 shadow-md md:col-span-2 lg:col-span-2 lg:min-h-[48rem]">
-              <h3 className="font-lato flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 text-2xl font-bold">
+              <h3 className="flex w-full items-center justify-center gap-x-0.5 self-start border-b border-zinc-700 pb-2 font-lato text-2xl font-bold">
                 Mentioned entities in documents
               </h3>
               <div className="h-full max-h-full w-full max-w-full overflow-hidden p-2">
@@ -439,4 +428,3 @@ export function Dashboard() {
     </div>
   );
 }
-
