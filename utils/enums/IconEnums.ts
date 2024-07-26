@@ -7,6 +7,7 @@ export const IconEnum = {
   add: "ph:plus" as const,
   add_calendar: "ph:calendar-plus-light" as const,
   additional_fields: "ph:textbox" as const,
+  additional_fields_sections: "ph:intersect" as const,
   archive: "ph:archive" as const,
   biography: "ph:identification-card" as const,
   blueprint: "ph:compass-tool" as const,

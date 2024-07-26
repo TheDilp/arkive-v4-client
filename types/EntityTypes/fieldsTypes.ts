@@ -62,6 +62,13 @@ export interface CharacterFieldType {
   random_table_options?: RandomTableOptionType[];
   random_table?: { id: string; title: string; random_table_options: RandomTableOptionType[] };
   calendar?: { id: string; title: string; days: string[]; months: { id: string; title: string; days: number }[] };
+  section_id: string | null;
+}
+
+export interface CharacterSectionType {
+  id: string;
+  title: string;
+  sort: number;
 }
 export interface CharacterFieldTemplateType {
   id: string;
@@ -69,6 +76,7 @@ export interface CharacterFieldTemplateType {
   title: string;
   project_id: string;
   character_fields: CharacterFieldType[];
+  character_fields_sections: CharacterSectionType[];
   permissions: EntityPermissionType[];
   owner_id: string;
   sort: number;
