@@ -35,6 +35,24 @@ type Props = {
   };
 };
 
+type EntityType = {
+  id: string;
+  image_id?: string | null;
+  title: string;
+  related_id: string;
+  sort: number;
+  type: AvailableManuscriptEntityTypes;
+};
+
+function isSaveDisabled(manuscript: Partial<ManuscriptType>, entities: EntityType[]) {
+  if (!manuscript.title) return true;
+  if (!entities.length) return true;
+
+  if (entities.some((ent) => !ent.related_id || !ent.type)) return true;
+
+  return false;
+}
+
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
 
@@ -52,16 +70,7 @@ export function ManuscriptDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
 
   const [manuscript, setManuscript] = useState<Partial<ManuscriptType>>({});
-  const [entities, setEntities] = useState<
-    {
-      id: string;
-      image_id?: string | null;
-      title: string;
-      related_id: string;
-      sort: number;
-      type: AvailableManuscriptEntityTypes;
-    }[]
-  >([]);
+  const [entities, setEntities] = useState<EntityType[]>([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
     "manuscripts",
@@ -189,6 +198,7 @@ export function ManuscriptDrawer({ data }: Props) {
                                       });
                                     }}
                                     searchEntity={entity.type}
+                                    variant={entity.related_id ? "primary" : "error"}
                                   />
                                 </div>
                                 <div className="flex w-1/3 items-center gap-x-1">
@@ -259,7 +269,7 @@ export function ManuscriptDrawer({ data }: Props) {
       ) : null}
       <div>
         <Button
-          isDisabled={isCreating || isUpdating}
+          isDisabled={isCreating || isUpdating || isSaveDisabled(manuscript, entities)}
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
