@@ -4,7 +4,7 @@ import ls from "localstorage-slim";
 import React, { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, createColumnHelper, Dropdown, Input, Select, Table, TablePageLayout } from "../../components";
+import { Button, createColumnHelper, Dropdown, Icon, Input, Select, Table, TablePageLayout } from "../../components";
 import {
   useBreakpoint,
   useBulkUpdate,
@@ -18,6 +18,7 @@ import {
 import { DialogAtomType, DrawerAtomType, UpdatePublicManyType, UserHasPermissionsType, WebhookType } from "../../types";
 import { ManuscriptType } from "../../types/EntityTypes/manuscriptTypes";
 import {
+  AvailableIcons,
   baseURLS,
   dialogAtom,
   drawerAtom,
@@ -42,6 +43,19 @@ function createColumns(
   user_role_id: string | undefined
 ) {
   return [
+    columnHelper.display({
+      id: "icon",
+      header: "",
+      cell: ({ row }) => (
+        <Icon fontSize={24} icon={(row.original.icon as AvailableIcons | undefined) || IconEnum.manuscripts} />
+      ),
+      maxSize: 3.25,
+      minSize: 3.25,
+      meta: {
+        centered: true,
+        noLink: true,
+      },
+    }),
     columnHelper.accessor("title", {
       id: "title",
       header: "Title",
@@ -264,7 +278,7 @@ export function ManuscriptView() {
   const { data, isLoading } = useGetEntities<ManuscriptType>(
     {
       data: { project_id },
-      fields: ["id", "deleted_at", "title", "is_public"],
+      fields: ["id", "deleted_at", "title", "is_public", "icon"],
       relations: {
         tags: true,
         documents: true,

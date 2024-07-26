@@ -33,6 +33,7 @@ export const InsertTemplateSchema = z.object({
     sort: z.number().optional(),
   }),
   relations: z.object({
+    character_fields_sections: z.object({ id: z.string(), title: z.string(), sort: z.number() }).array().optional().nullable(),
     character_fields: z
       .object({
         title: z.string().transform((value) => value.trim()),
@@ -50,6 +51,7 @@ export const InsertTemplateSchema = z.object({
         random_table_id: z.string().optional().nullable(),
         calendar_id: z.string().optional().nullable(),
         blueprint_id: z.string().optional().nullable(),
+        section_id: z.string().optional().nullable(),
       })
       .array(),
     tags: z.object({ id: z.string() }).array().min(1),
@@ -69,6 +71,11 @@ export const UpdateTemplateSchema = z
         .optional(),
     }),
     relations: z.object({
+      character_fields_sections: z
+        .object({ id: z.string(), title: z.string(), sort: z.number() })
+        .array()
+        .optional()
+        .nullable(),
       character_fields: z
         .object({
           id: z.string(),
@@ -90,6 +97,7 @@ export const UpdateTemplateSchema = z
           random_table_id: z.string().optional().nullable(),
           calendar_id: z.string().optional().nullable(),
           blueprint_id: z.string().optional().nullable(),
+          section_id: z.string().optional().nullable(),
         })
         .array()
         .optional(),

@@ -859,19 +859,26 @@ export function useUpdateAuthStatus() {
 }
 
 export function useSignout() {
-  const queryClient = useQueryClient();
-  const baseAuthUrl = baseURLS.baseServer.replaceAll("/api/v1", "");
+  const setLoggedIn = useSetAtom(loggedInAtom);
+  const setUserStatus = useSetAtom(userStatusAtom);
 
+  const queryClient = useQueryClient();
   return useMutation(
     async () => {
-      await fetch(`${baseAuthUrl}/auth/signout`, {
+      const res = await fetch(`${baseURLS.baseAuthServer}/auth/signout`, {
         credentials: "include",
         method: "GET",
       });
+      const text = await res.text();
+      if (res.status >= 400 || text === "UNAUTHORIZED") {
+        setLoggedIn(false);
+        setUserStatus({ status: "unauthenticated", user_id: "", project_id: null, name: null, image_url: null });
+        return;
+      }
     },
     {
       onSettled: () => {
-        queryClient.invalidateQueries(["auth_status"]);
+        queryClient.refetchQueries(["auth_status"]);
       },
     }
   );

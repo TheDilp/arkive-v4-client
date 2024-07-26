@@ -1,4 +1,5 @@
 export const AllEntities = [
+  "manuscripts",
   "characters",
   "blueprints",
   "blueprint_instances",

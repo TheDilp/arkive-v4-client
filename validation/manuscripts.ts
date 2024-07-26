@@ -10,8 +10,8 @@ export const InsertManuscriptSchema = z.object({
   data: z.object({
     title: z.string().transform((value) => value.trim()),
     project_id: z.string(),
-    // icon: z.string().optional().nullable(),
-    // is_public: z.boolean().optional().nullable(),
+    icon: z.string().optional().nullable(),
+    is_public: z.boolean().optional().nullable(),
   }),
   relations: z.object({
     tags: z.object({ id: z.string() }).array().optional(),

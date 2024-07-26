@@ -10,6 +10,7 @@ import {
   ManuscriptType,
 } from "../../../types/EntityTypes/manuscriptTypes";
 import {
+  AvailableIcons,
   AvailableManuscriptEntityTypesEnum,
   buildManuscript,
   createOrEditPermission,
@@ -27,6 +28,7 @@ import { EntityPreview } from "../../DataDisplay";
 import { Button, Checkbox, Input, Search, Select, TagInput } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
+import { IconPicker } from "../IconPicker";
 
 type Props = {
   data: {
@@ -34,6 +36,24 @@ type Props = {
     preselectedTab?: number;
   };
 };
+
+type EntityType = {
+  id: string;
+  image_id?: string | null;
+  title: string;
+  related_id: string;
+  sort: number;
+  type: AvailableManuscriptEntityTypes;
+};
+
+function isSaveDisabled(manuscript: Partial<ManuscriptType>, entities: EntityType[]) {
+  if (!manuscript.title) return true;
+  if (!entities.length) return true;
+
+  if (entities.some((ent) => !ent.related_id || !ent.type)) return true;
+
+  return false;
+}
 
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
   const tabs: TabType[] = [{ id: "1", label: "Basic info", icon: IconEnum.info_circle }];
@@ -52,21 +72,12 @@ export function ManuscriptDrawer({ data }: Props) {
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
 
   const [manuscript, setManuscript] = useState<Partial<ManuscriptType>>({});
-  const [entities, setEntities] = useState<
-    {
-      id: string;
-      image_id?: string | null;
-      title: string;
-      related_id: string;
-      sort: number;
-      type: AvailableManuscriptEntityTypes;
-    }[]
-  >([]);
+  const [entities, setEntities] = useState<EntityType[]>([]);
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
     "manuscripts",
     {
-      fields: ["id", "title", "owner_id", "is_public"],
+      fields: ["id", "icon", "title", "owner_id", "is_public"],
       relations: { entities: true, permissions: true, tags: true },
     },
     { enabled: !!data?.id }
@@ -102,15 +113,25 @@ export function ManuscriptDrawer({ data }: Props) {
       <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
       {tabs[selectedTab].id === "1" ? (
         <>
-          <Input
-            isDisabled={!canCreateOrEdit || isCreating}
-            label="Title (required)"
-            name="title"
-            onChange={handleChange}
-            placeholder="Title"
-            value={manuscript?.title || ""}
-            variant={!manuscript?.title ? "error" : "primary"}
-          />
+          <div className="flex items-center justify-between gap-x-2">
+            <Input
+              isDisabled={!canCreateOrEdit || isCreating}
+              label="Title (required)"
+              name="title"
+              onChange={handleChange}
+              placeholder="Title"
+              value={manuscript?.title || ""}
+              variant={!manuscript?.title ? "error" : "primary"}
+            />
+            <div className="self-end pb-1.5">
+              <IconPicker
+                icon={(manuscript?.icon as AvailableIcons | undefined) || IconEnum.manuscripts}
+                isDisabled={!canCreateOrEdit}
+                name="icon"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
           <div className="flex w-full items-center justify-between">
             <span>Is public:</span>
             <Checkbox
@@ -189,6 +210,7 @@ export function ManuscriptDrawer({ data }: Props) {
                                       });
                                     }}
                                     searchEntity={entity.type}
+                                    variant={entity.related_id ? "primary" : "error"}
                                   />
                                 </div>
                                 <div className="flex w-1/3 items-center gap-x-1">
@@ -259,7 +281,7 @@ export function ManuscriptDrawer({ data }: Props) {
       ) : null}
       <div>
         <Button
-          isDisabled={isCreating || isUpdating}
+          isDisabled={isCreating || isUpdating || isSaveDisabled(manuscript, entities)}
           isLoading={isCreating || isUpdating}
           label={data?.id ? "Update" : "Create"}
           onClick={() => {
@@ -290,13 +312,23 @@ export function ManuscriptDrawer({ data }: Props) {
               }
               if (data?.id) {
                 const parsed = UpdateManuscriptSchema.parse({
-                  data: { id: data.id, title: manuscript.title, is_public: manuscript.is_public ?? null },
+                  data: {
+                    id: data.id,
+                    icon: manuscript.icon,
+                    title: manuscript.title,
+                    is_public: manuscript.is_public ?? null,
+                  },
                   relations,
                 });
                 update(parsed);
               } else {
                 const parsed = InsertManuscriptSchema.parse({
-                  data: { title: manuscript.title, project_id, is_public: manuscript?.is_public ?? null },
+                  data: {
+                    title: manuscript.title,
+                    project_id,
+                    is_public: manuscript?.is_public ?? null,
+                    icon: manuscript.icon,
+                  },
                   relations,
                 });
                 create(parsed);
