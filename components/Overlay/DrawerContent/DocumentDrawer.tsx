@@ -413,7 +413,6 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                     }))
                   );
                 }
-                console.log(dataToParse);
                 const parsedData = UpdateDocumentSchema.parse(dataToParse);
                 await update(
                   {
