@@ -90,7 +90,16 @@ export interface TableType {
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => void;
   };
-  type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships" | "roles";
+  type:
+    | AvailableEntityType
+    | AssetType
+    | AvailableSubEntityType
+    | "icons"
+    | "words"
+    | "context"
+    | "relationships"
+    | "roles"
+    | "gateway_configurations";
   skeletonLimit?: number;
 }
 

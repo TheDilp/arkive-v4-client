@@ -308,7 +308,7 @@ function createColumns(
                     {
                       id: "gateway_access",
                       title: "Grant gateway access",
-                      icon: IconEnum.character_gateway,
+                      icon: IconEnum.gateway,
                       subItems: [
                         {
                           id: "create_access",
@@ -331,9 +331,8 @@ function createColumns(
                               size: "half",
                               title: "Grant create access",
                               data: {
-                                id: row.original.id,
+                                entity_id: row.original.id,
                                 type: "characters",
-                                email: "mihailo.dilparic@gmail.com",
                               },
                               type: "gateway_access",
                             })),
@@ -356,9 +355,8 @@ function createColumns(
                               size: "half",
                               title: "Grant edit access",
                               data: {
-                                id: row.original.id,
+                                entity_id: row.original.id,
                                 type: "characters",
-                                email: "mihailo.dilparic@gmail.com",
                               },
                               type: "gateway_access",
                             })),

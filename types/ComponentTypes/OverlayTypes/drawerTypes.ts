@@ -35,6 +35,7 @@ type DrawerExceptions = {
   characterPin?: boolean;
   isReadOnly?: boolean;
   globalCreate?: boolean;
+  gatewayConfiguration?: boolean;
 };
 
 export type DrawerAtomType = {
@@ -167,7 +168,10 @@ export type DrawerAtomType = {
       };
     }
   | { type: "edit_tag"; data: { id: string } }
-  | { type: "gateway_access"; data: { id: string; type: "characters" | "blueprint_instances" } }
+  | {
+      type: "gateway_access";
+      data: { entity_id?: string; configuration_id?: string; type: "characters" | "blueprint_instances" };
+    }
 );
 
 export interface ContextMenuAtomType {

@@ -243,7 +243,9 @@ export function Drawer() {
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
                 {drawer.type === "games" ? <GameDrawer data={drawer?.data} /> : null}
-                {drawer.type === "gateway_access" ? <GatewayAccessDrawer data={drawer?.data} /> : null}
+                {drawer.type === "gateway_access" ? (
+                  <GatewayAccessDrawer data={drawer?.data} exceptions={drawer?.exceptions} />
+                ) : null}
                 {drawer.type === "nodes_from_characters" || drawer.type === "nodes_from_images" ? (
                   <NodeFromDrawer data={{ type: drawer?.type }} />
                 ) : null}

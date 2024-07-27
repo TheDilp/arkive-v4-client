@@ -32,6 +32,7 @@ export interface BaseEntityType {
 }
 
 export type AvailableEntityType =
+  | "manuscripts"
   | "projects"
   | "characters"
   | "documents"
@@ -53,7 +54,7 @@ export type AvailableEntityType =
   | "images"
   | "roles"
   | "permissions"
-  | "manuscripts";
+  | "gateway_configurations";
 
 export type AvailableSubEntityType =
   | "alter_names"

@@ -13,6 +13,7 @@ export const AllEntities = [
   "conversations",
   "random_tables",
   "tags",
+  "gateway_configurations",
 ];
 
 export const SubEntityEnum = [
