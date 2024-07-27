@@ -84,19 +84,12 @@ export interface TableType {
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     selectedActions?: TableSelectedAction[];
+    columnVisibility?: Record<string, boolean>;
     getLink?: (rowData: any) => string;
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => void;
   };
-  type:
-    | AvailableEntityType
-    | AssetType
-    | AvailableSubEntityType
-    | "icons"
-    | "words"
-    | "context"
-    | "relationships"
-    | "roles";
+  type: AvailableEntityType | AssetType | AvailableSubEntityType | "icons" | "words" | "context" | "relationships" | "roles";
   skeletonLimit?: number;
 }
 

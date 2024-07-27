@@ -529,8 +529,18 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
 }
 export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
   const { isLg } = useBreakpoint();
-  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, selection, selectedActions, getLink, onRowClick } =
-    config || {};
+  const {
+    filters,
+    relationFilters,
+    orderBy,
+    expandable,
+    hasNoHeaderGap,
+    selection,
+    columnVisibility,
+    selectedActions,
+    getLink,
+    onRowClick,
+  } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const isSubheaderEnabled =
     !!filters?.and?.length || !!filters?.or?.length || !!relationFilters?.and?.length || !!relationFilters?.or?.length;
@@ -576,6 +586,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     },
     meta: config,
     state: {
+      columnVisibility,
       expanded,
     },
     onExpandedChange: setExpanded,
