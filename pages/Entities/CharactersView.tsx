@@ -1,7 +1,7 @@
 import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import ls from "localstorage-slim";
-import { Dispatch, useLayoutEffect, useState } from "react";
+import { Dispatch, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -306,6 +306,66 @@ function createColumns(
                       })),
                     },
                     {
+                      id: "gateway_access",
+                      title: "Grant gateway access",
+                      icon: IconEnum.character_gateway,
+                      subItems: [
+                        {
+                          id: "create_access",
+                          title: "Create character access",
+                          icon: IconEnum.add,
+                          isDisabled: true,
+
+                          // !hasActionPermission(
+                          //   isProjectOwner,
+                          //   user_id === row.original.owner_id,
+                          //   permissions,
+                          //   row.original?.permissions || [],
+                          //   "create_characters",
+                          //   user_role_id
+                          // )
+
+                          onClick: () =>
+                            setDrawer((prev) => ({
+                              ...prev,
+                              size: "half",
+                              title: "Grant create access",
+                              data: {
+                                id: row.original.id,
+                                type: "characters",
+                                email: "mihailo.dilparic@gmail.com",
+                              },
+                              type: "gateway_access",
+                            })),
+                        },
+                        {
+                          id: "edit_access",
+                          title: "Edit character access",
+                          icon: IconEnum.edit,
+                          isDisabled: !hasActionPermission(
+                            isProjectOwner,
+                            user_id === row.original.owner_id,
+                            permissions,
+                            row.original?.permissions || [],
+                            "update_characters",
+                            user_role_id
+                          ),
+                          onClick: () =>
+                            setDrawer((prev) => ({
+                              ...prev,
+                              size: "half",
+                              title: "Grant edit access",
+                              data: {
+                                id: row.original.id,
+                                type: "characters",
+                                email: "mihailo.dilparic@gmail.com",
+                              },
+                              type: "gateway_access",
+                            })),
+                        },
+                      ],
+                    },
+                    {
                       id: "view_public",
                       title: "View public page",
                       icon: IconEnum.public,
@@ -550,6 +610,7 @@ function CharacterViewHeader({
   view,
   permissions,
   isMd,
+  areActionsAndFiltersDisabled,
 }: {
   isMd: boolean;
   setView: any;
@@ -560,6 +621,7 @@ function CharacterViewHeader({
   dispatch: TableDispatch;
   view: "card" | "table";
   permissions: UserHasPermissionsType;
+  areActionsAndFiltersDisabled?: boolean;
 }) {
   const { project_id } = useParams();
   const [localFilter, setLocalFilter] = useState("");
@@ -576,24 +638,26 @@ function CharacterViewHeader({
 
   return (
     <div className="sticky top-0 flex h-12 max-h-12 min-h-[3rem] w-full items-center justify-end gap-x-2">
-      <div className="mr-auto">
-        <div className="h-11 w-11">
-          <Button
-            icon={IconEnum.filter}
-            isIconOnly
-            onClick={() =>
-              setDrawer((prev) => ({
-                ...prev,
-                type: "character_filter",
-                data: { dispatch },
-                size: "xl",
-                title: "Character filter",
-              }))
-            }
-            tooltip="Filter characters"
-          />
+      {areActionsAndFiltersDisabled ? null : (
+        <div className="mr-auto">
+          <div className="h-11 w-11">
+            <Button
+              icon={IconEnum.filter}
+              isIconOnly
+              onClick={() =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  type: "character_filter",
+                  data: { dispatch },
+                  size: "xl",
+                  title: "Character filter",
+                }))
+              }
+              tooltip="Filter characters"
+            />
+          </div>
         </div>
-      </div>
+      )}
       <div className="w-52">
         <Input
           isClearable
@@ -604,58 +668,72 @@ function CharacterViewHeader({
           value={localFilter}
         />
       </div>
-      <div className="w-32">
-        <Select
-          name="view"
-          onChange={({ value }) => {
-            setArkived(value as "active" | "arkive");
-            ls.set("characters-table-active", value);
-          }}
-          options={[
-            { label: "Active", value: "active", icon: IconEnum.eye },
-            { label: "Arkived", value: "arkive", icon: IconEnum.archive },
-          ]}
-          placeholder="Active or arkived"
-          value={arkived}
-        />
-      </div>
-      <div className="w-32">
-        <Select
-          name="view"
-          onChange={({ value }) => {
-            setView(value as "card" | "table");
-            ls.set("characters_view", value);
-          }}
-          options={[
-            { label: "Card", value: "card", icon: IconEnum.card },
-            { label: "Table", value: "table", icon: IconEnum.table },
-          ]}
-          placeholder="View"
-          value={view}
-        />
-      </div>
-      <div className="lg:w-52">
-        <Button
-          icon={IconEnum.add}
-          isDisabled={!permissions?.create_characters}
-          label="Create new character"
-          onClick={() =>
-            setDrawer((prev) => ({
-              ...prev,
-              data: { project_id },
-              title: "Create new character",
-              type: "characters",
-              size: "2xl",
-            }))
-          }
-          tooltip={isMd ? undefined : "Create new character"}
-        />
-      </div>
+      {areActionsAndFiltersDisabled ? null : (
+        <>
+          <div className="w-32">
+            <Select
+              name="view"
+              onChange={({ value }) => {
+                setArkived(value as "active" | "arkive");
+                ls.set("characters-table-active", value);
+              }}
+              options={[
+                { label: "Active", value: "active", icon: IconEnum.eye },
+                { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+              ]}
+              placeholder="Active or arkived"
+              value={arkived}
+            />
+          </div>
+          <div className="w-32">
+            <Select
+              name="view"
+              onChange={({ value }) => {
+                setView(value as "card" | "table");
+                ls.set("characters_view", value);
+              }}
+              options={[
+                { label: "Card", value: "card", icon: IconEnum.card },
+                { label: "Table", value: "table", icon: IconEnum.table },
+              ]}
+              placeholder="View"
+              value={view}
+            />
+          </div>
+          <div className="lg:w-52">
+            <Button
+              icon={IconEnum.add}
+              isDisabled={!permissions?.create_characters}
+              label="Create new character"
+              onClick={() =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { project_id },
+                  title: "Create new character",
+                  type: "characters",
+                  size: "2xl",
+                }))
+              }
+              tooltip={isMd ? undefined : "Create new character"}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-export function CharactersView() {
+export function CharactersView({
+  columnVisibility,
+  areActionsAndFiltersDisabled,
+  manualSelection,
+  setManualSelection,
+}: {
+  columnVisibility?: Record<string, boolean>;
+  areActionsAndFiltersDisabled?: boolean;
+  manualSelection?: TableSelectionType;
+  setManualSelection?: (prop: TableSelectionType) => void;
+}) {
   useNavbarTitle("Characters", true);
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
@@ -671,7 +749,7 @@ export function CharactersView() {
   const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
-    selection: {},
+    selection: manualSelection || {},
   });
   const { data, isLoading } = useGetEntities<CharacterType>(
     {
@@ -729,7 +807,7 @@ export function CharactersView() {
     },
     "characters",
     {
-      enabled: view === "card" && permissions?.read_characters,
+      enabled: view === "card" && permissions?.read_characters && !areActionsAndFiltersDisabled,
       keepPreviousData: true,
       getNextPageParam: (_, allPages) => {
         if (allPages[allPages.length - 1]?.data?.length < 10) return undefined;
@@ -764,7 +842,8 @@ export function CharactersView() {
         type: "clearAllFilters",
       });
     }
-    dispatch({ type: "clearSelection" });
+
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
@@ -797,9 +876,23 @@ export function CharactersView() {
     return () => {};
   }, [filter, dispatch, view, arkived]);
 
+  useEffect(() => {
+    const hasSelected = Object.keys(selection || {}).length;
+    if (setManualSelection) {
+      if (hasSelected) {
+        setManualSelection(selection || {});
+      } else if (!hasSelected && selection === undefined && manualSelection) {
+        dispatch({ type: "setManualSelection", payload: manualSelection });
+      } else if (!hasSelected && selection !== undefined && manualSelection) {
+        setManualSelection({});
+      }
+    }
+  }, [selection]);
+
   return (
     <TablePageLayout>
       <CharacterViewHeader
+        areActionsAndFiltersDisabled={areActionsAndFiltersDisabled}
         arkived={arkived}
         dispatch={dispatch}
         isMd={isMd}
@@ -861,6 +954,7 @@ export function CharactersView() {
               filters,
               relationFilters,
               selection,
+              columnVisibility,
               getLink: (rowData: any) =>
                 arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
               setFavorite: (rowData: any) => {
@@ -884,4 +978,3 @@ export function CharactersView() {
     </TablePageLayout>
   );
 }
-

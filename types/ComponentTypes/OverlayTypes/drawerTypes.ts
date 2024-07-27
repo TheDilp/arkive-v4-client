@@ -167,6 +167,7 @@ export type DrawerAtomType = {
       };
     }
   | { type: "edit_tag"; data: { id: string } }
+  | { type: "gateway_access"; data: { id: string; type: "characters" | "blueprint_instances" } }
 );
 
 export interface ContextMenuAtomType {
