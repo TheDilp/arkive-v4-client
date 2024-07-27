@@ -23,7 +23,7 @@ import {
 } from "../../../utils";
 import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, Tooltip } from "../..";
 
-export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType): ColumnDef<any> {
+export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType, selected?: string[]): ColumnDef<any> {
   return {
     id: "select",
     header: ({ table }) => (
@@ -73,7 +73,7 @@ export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPagina
               dispatch({ type: "setSelection", payload: { row: row.original.id } });
             }
           }}
-          value={((table.options.meta as MetaType)?.selection?.[pagination?.page || 0] || []).includes(row.original.id)}
+          value={selected ? selected.includes(row.original.id) : false}
         />
       );
     },
