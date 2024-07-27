@@ -839,9 +839,10 @@ export function FolderView({
       staleTime: 5 * 60 * 1000,
     }
   );
+
   const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
-    (manualType || type) as AvailableEntityType,
+    type as AvailableEntityType,
     {
       data: {
         project_id,
@@ -950,7 +951,11 @@ export function FolderView({
     <TablePageLayout>
       <div className="flex h-fit flex-col items-start justify-start gap-y-2">
         <div className="flex w-full flex-col items-end">
-          {areActionsAndFiltersDisabled ? null : <Breadcrumbs />}
+          {areActionsAndFiltersDisabled ? null : (
+            <div className="mr-auto">
+              <Breadcrumbs />
+            </div>
+          )}
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
               <div className="w-52">

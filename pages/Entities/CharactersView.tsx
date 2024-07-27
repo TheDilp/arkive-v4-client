@@ -732,7 +732,7 @@ export function CharactersView({
   manualSelection?: TableSelectionType;
   setManualSelection?: (prop: TableSelectionType) => void;
 }) {
-  useNavbarTitle("Characters", true);
+  useNavbarTitle("Characters", !manualSelection);
   const { isMd } = useBreakpoint();
   const [view, setView] = useState<"card" | "table">(ls.get("characters_view") || "table");
   const [arkived, setArkived] = useState<"active" | "arkive">(ls.get("characters-table-active") || "active");

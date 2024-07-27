@@ -66,7 +66,7 @@ function EntitiesAccess({
   const [selectedTab, setSelectedTab] = useState(0);
   const [blueprintFilter, setBlueprintFilter] = useState("");
   return (
-    <>
+    <div className="overflow-hidde flex max-h-[90%] flex-1 flex-col gap-y-2">
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={entityTabs} />
       {entityTabs[selectedTab].id === "characters" ? (
         <CharactersView
@@ -118,7 +118,7 @@ function EntitiesAccess({
       {EntitiesWithFoldersEnum.includes(entityTabs[selectedTab].id) ? (
         <FolderView areActionsAndFiltersDisabled manualType={entityTabs[selectedTab].id as FolderTypes} />
       ) : null}
-    </>
+    </div>
   );
 }
 
@@ -158,7 +158,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
       ) : null}
 
       {tabs[selectedTab].id === "entities" ? (
-        <>
+        <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
           <Title isDrawerTitle label="Grant access to" size="xl" />
 
           {data?.entity_id ? (
@@ -173,7 +173,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
           ) : null}
 
           <EntitiesAccess selection={selection} setSelection={setSelection} />
-        </>
+        </div>
       ) : null}
       <div>
         <Button
