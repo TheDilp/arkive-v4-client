@@ -624,6 +624,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const { rows } = table.getRowModel();
 
   const pinned = columns.filter((col) => col?.meta?.pinned);
+  const selectedOnPage = table.getPaginationRowModel().flatRows.filter((row) => selected.includes(row.id));
+
   return (
     <>
       <div className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800" ref={bodyRef}>
@@ -753,17 +755,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
               </Fragment>
             );
           })}
-          {Object.entries(selection || {}).some(([, selectedRows]) => selectedRows.length) ? (
+          {selected?.length ? (
             <div className="absolute left-[2.75rem] z-20 flex h-full w-[calc(100%-2.75rem)] items-center gap-x-1 bg-zinc-800 px-2">
               <span>Selected:</span>
-              <b>
-                {Object.values(selection || {}).reduce((accumulator, curr) => {
-                  // eslint-disable-next-line no-param-reassign
-                  accumulator += curr.length;
-                  return accumulator;
-                }, 0)}
-              </b>
-              <span className="border-r border-zinc-500 pr-2">rows </span>
+              <b>{selected.length} </b>
+              <span className="border-r border-zinc-500 pr-2">rows ({selectedOnPage.length} on this page) </span>
               <span className="mx-2 flex items-center gap-x-4">
                 {selectedActions?.length
                   ? selectedActions.map((action) => (
