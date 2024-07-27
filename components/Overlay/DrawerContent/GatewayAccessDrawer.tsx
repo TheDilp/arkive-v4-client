@@ -2,9 +2,9 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useCreateEntity } from "../../../hooks";
-import { CharactersView } from "../../../pages/Entities";
+import { BlueprintInstanceView, CharactersView, FolderView } from "../../../pages/Entities";
 import { DrawerAtomType, TableSelectionType, TabType } from "../../../types";
-import { IconEnum } from "../../../utils";
+import { EntitiesWithFoldersEnum, IconEnum } from "../../../utils";
 import { InsertGatewayConfigurationSchema, InsertGatewayConfigurationType } from "../../../validation/gateway_configuration";
 import { Button, Input, Select, Title } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
@@ -55,7 +55,7 @@ function getRelationsForGatewayConfig(relations: Record<string, TableSelectionTy
 
   return final;
 }
-
+type FolderTypes = "documents" | "maps" | "random_tables";
 function EntitiesAccess({
   selection,
   setSelection,
@@ -64,7 +64,7 @@ function EntitiesAccess({
   setSelection: Dispatch<SetStateAction<Record<string, TableSelectionType>>>;
 }) {
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const [blueprintFilter, setBlueprintFilter] = useState("");
   return (
     <>
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={entityTabs} />
@@ -83,6 +83,40 @@ function EntitiesAccess({
             setSelection((prev) => ({ ...prev, [entityTabs[selectedTab].id]: newSelection }));
           }}
         />
+      ) : null}
+      {entityTabs[selectedTab].id === "blueprints" ? (
+        <>
+          <div>
+            <Input
+              isClearable
+              name="quick_filter"
+              onChange={({ value }) => setBlueprintFilter(value as string)}
+              placeholder="Quick search by title"
+              type="search"
+              value={blueprintFilter}
+            />
+          </div>
+          <BlueprintInstanceView
+            areActionsAndFiltersDisabled
+            arkived="active"
+            columnVisibility={{
+              tags: false,
+              age: false,
+              is_public: false,
+              action: false,
+              is_favorite: false,
+            }}
+            filter={blueprintFilter}
+            isAllInstances
+            manualSelection={selection[entityTabs[selectedTab].id]}
+            setManualSelection={(newSelection) => {
+              setSelection((prev) => ({ ...prev, [entityTabs[selectedTab].id]: newSelection }));
+            }}
+          />
+        </>
+      ) : null}
+      {EntitiesWithFoldersEnum.includes(entityTabs[selectedTab].id) ? (
+        <FolderView areActionsAndFiltersDisabled manualType={entityTabs[selectedTab].id as FolderTypes} />
       ) : null}
     </>
   );

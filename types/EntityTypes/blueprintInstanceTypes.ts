@@ -1,4 +1,3 @@
- 
 import { EntityPermissionType } from "./baseEntityTypes";
 import { BlueprintType } from "./blueprintTypes";
 import { EventType } from "./calendarTypes";

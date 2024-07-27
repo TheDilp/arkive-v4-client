@@ -5,7 +5,11 @@ import { useParams } from "react-router-dom";
 import { PermissionCodeType, UserHasPermissionsType } from "../../types";
 import { currentUserPermissionsAtom, isProjectOwnerAtom, userAtom } from "../../utils";
 
-export function useHasPermissions(requiredPermissions: PermissionCodeType[], owner_id: string | undefined) {
+export function useHasPermissions(
+  requiredPermissions: PermissionCodeType[],
+  owner_id: string | undefined,
+  manualType?: string
+) {
   const { type } = useParams();
   const [permissions, setPermissions] = useState<UserHasPermissionsType>({});
 
@@ -23,6 +27,6 @@ export function useHasPermissions(requiredPermissions: PermissionCodeType[], own
       }
       setPermissions(finalPermissions);
     }
-  }, [owner_id, user, type, userPermissions, isProjectOwner]);
+  }, [owner_id, user, manualType, type, userPermissions, isProjectOwner]);
   return permissions;
 }

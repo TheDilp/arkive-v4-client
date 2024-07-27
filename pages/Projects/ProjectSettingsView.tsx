@@ -424,7 +424,7 @@ function gatewayColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
               {
                 id: "expand",
                 title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities`,
-                icon: IconEnum.permissions,
+                icon: IconEnum.gateway,
                 onClick: row.getToggleExpandedHandler(),
               },
               { id: "3", title: "Delete configuration", icon: IconEnum.trash },

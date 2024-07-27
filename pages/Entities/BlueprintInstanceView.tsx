@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Icon, Table } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -76,7 +76,7 @@ const noLinkColumns = [
 ];
 
 function createColumns(
-  blueprint: BlueprintType,
+  blueprint_fields: BlueprintType["blueprint_fields"],
   title_name: string,
   project_id: string,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -87,23 +87,32 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
-  user_role_id: string | undefined
+  user_role_id: string | undefined,
+  isAllInstances?: boolean
 ) {
   const fieldColumns: ColumnDef<BlueprintInstanceType, any>[] = [
     columnHelper.accessor("title", {
       id: "title",
-      header: title_name,
+      header: title_name || "Title",
       meta: {
         pinned: true,
         sortable: true,
         filterOptions: TextFilters,
       },
-      cell: ({ row }) => row.original?.title || "",
+      cell: ({ row }) =>
+        isAllInstances ? (
+          <span className="flex items-center gap-x-2">
+            <Icon fontSize={24} icon={row?.original?.blueprint?.icon || IconEnum.blueprint} />
+            {`${row.original?.title || ""} ${row.original?.blueprint?.title ? `(${row.original?.blueprint?.title})` : ""}`}
+          </span>
+        ) : (
+          row?.original?.title || ""
+        ),
       minSize: 15,
     }),
   ];
 
-  blueprint.blueprint_fields
+  blueprint_fields
     ?.filter((field) => field.field_type !== "textarea")
     ?.forEach((field) => {
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
@@ -635,7 +644,22 @@ function getSelectedActions(
   return selectedActions;
 }
 
-export function BlueprintInstanceView({ filter, arkived }: { filter: string; arkived: "active" | "arkive" }) {
+export function BlueprintInstanceView({
+  columnVisibility,
+  manualSelection,
+  setManualSelection,
+  isAllInstances,
+  filter,
+  arkived,
+}: {
+  filter: string;
+  arkived: "active" | "arkive";
+  isAllInstances?: boolean;
+  columnVisibility?: Record<string, boolean>;
+  areActionsAndFiltersDisabled?: boolean;
+  manualSelection?: TableSelectionType;
+  setManualSelection?: (prop: TableSelectionType) => void;
+}) {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -654,15 +678,22 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     pagination: { page: 0, limit: 10 },
   });
 
-  const { data: blueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
-    data: {
-      id: item_id,
+  const { data: blueprint } = useGetEntity<BlueprintType>(
+    item_id,
+    "blueprints",
+    {
+      data: {
+        id: item_id,
+      },
+      relations: {
+        blueprint_fields: true,
+      },
+      fields: ["id", "title", "title_name"],
     },
-    relations: {
-      blueprint_fields: true,
-    },
-    fields: ["id", "title", "title_name"],
-  });
+    {
+      enabled: !isAllInstances,
+    }
+  );
   useNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprint_instances");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
@@ -671,11 +702,12 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     {
       data: {
         project_id,
-        parent_id: item_id,
+        parent_id: isAllInstances ? undefined : item_id,
       },
       relations: {
-        blueprint_fields: true,
-        tags: true,
+        blueprint: !!isAllInstances,
+        blueprint_fields: !isAllInstances,
+        tags: !isAllInstances,
       },
       permissions: true,
       filters,
@@ -687,7 +719,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     },
     "blueprint_instances",
     {
-      enabled: !!blueprint?.data,
+      enabled: !!blueprint?.data || !!isAllInstances,
     }
   );
 
@@ -727,12 +759,25 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     return () => {};
   }, [filter, dispatch, arkived]);
 
+  useEffect(() => {
+    const hasSelected = Object.keys(selection || {}).length;
+    if (setManualSelection) {
+      if (hasSelected) {
+        setManualSelection(selection || {});
+      } else if (!hasSelected && selection === undefined && manualSelection) {
+        dispatch({ type: "setManualSelection", payload: manualSelection });
+      } else if (!hasSelected && selection !== undefined && manualSelection) {
+        setManualSelection({});
+      }
+    }
+  }, [selection]);
+
   return (
     <div className="overflow-hidden">
-      {blueprint?.data ? (
+      {blueprint?.data || isAllInstances ? (
         <Table
           columns={createColumns(
-            blueprint?.data,
+            isAllInstances ? [] : blueprint?.data?.blueprint_fields || [],
             blueprint?.data?.title_name || "",
             project_id as string,
             setDrawer,
@@ -743,9 +788,11 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
             permissions,
             isProjectOwner,
             user?.id as string,
-            user?.role?.id
+            user?.role?.id,
+            isAllInstances
           )}
           config={{
+            columnVisibility,
             hasSelect: true,
             hasArkived: arkived === "arkive",
             hasTags: true,

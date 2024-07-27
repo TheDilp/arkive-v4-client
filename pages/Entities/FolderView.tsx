@@ -724,7 +724,13 @@ export function MainView() {
   return <FolderView />;
 }
 
-function FolderView() {
+export function FolderView({
+  manualType,
+  areActionsAndFiltersDisabled,
+}: {
+  manualType?: "documents" | "maps" | "events" | "images" | "random_tables";
+  areActionsAndFiltersDisabled?: boolean;
+}) {
   const { project_id, type, item_id } = useParams();
   const { pathname } = useLocation();
   const breakpoints = useBreakpoint();
@@ -733,8 +739,9 @@ function FolderView() {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const isFolder = pathname.includes("/folder/");
   const permissions = useHasPermissions(
-    getPermissionsForTypeView(type as AvailableEntityType | AvailableSubEntityType),
-    undefined
+    getPermissionsForTypeView((manualType || type) as AvailableEntityType | AvailableSubEntityType),
+    undefined,
+    manualType
   );
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
@@ -778,6 +785,9 @@ function FolderView() {
                 },
               ]
             : []),
+          ...(manualType
+            ? [{ id: "is_folder", header_name: "Is Folder", field: "is_folder", operator: "is not" as const, value: true }]
+            : []),
         ],
         or:
           documentType !== "templates" && type === "documents"
@@ -819,40 +829,42 @@ function FolderView() {
         },
       ],
     },
-    type as AvailableEntityType,
+    (manualType || type) as AvailableEntityType,
     {
       enabled:
-        (!item_id || isFolder) &&
-        !!type &&
-        !noFetchTypes.includes(type) &&
-        !!permissions?.[`read_${type}` as PermissionCodeType],
+        (!item_id || isFolder || !!manualType) &&
+        ((!!type && !noFetchTypes.includes(type)) || (!!manualType && !noFetchTypes.includes(manualType))) &&
+        !!permissions?.[`read_${manualType || type}` as PermissionCodeType],
+
       staleTime: 5 * 60 * 1000,
     }
   );
   const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
-    type as AvailableEntityType,
+    (manualType || type) as AvailableEntityType,
     {
       data: {
         project_id,
       },
       pagination,
       permissions: true,
-      arkived: arkived === "arkive",
+      arkived: !manualType ? arkived === "arkive" : false,
       // @ts-ignore
-      fields: getEntityFields(type as AvailableEntityType),
+      fields: getEntityFields((type || manualType) as AvailableEntityType),
       relations: {
-        parents: arkived === "active",
-        tags: EntitiesWithTags.includes(type as string),
+        parents: !manualType ? arkived === "active" : false,
+        tags: !manualType && !!type ? EntitiesWithTags.includes(type as string) : false,
       },
     },
     {
       enabled:
+        !manualType &&
         !!item_id &&
         !!type &&
         !noFetchTypes.includes(type) &&
         isFolder &&
         !!permissions?.[`read_${type}` as PermissionCodeType],
+
       staleTime: 5 * 60 * 1000,
       queryKeyConcat: [item_id as string],
     }
@@ -938,7 +950,7 @@ function FolderView() {
     <TablePageLayout>
       <div className="flex h-fit flex-col items-start justify-start gap-y-2">
         <div className="flex w-full flex-col items-end">
-          <Breadcrumbs />
+          {areActionsAndFiltersDisabled ? null : <Breadcrumbs />}
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
               <div className="w-52">
@@ -951,164 +963,168 @@ function FolderView() {
                   value={filter}
                 />
               </div>
-              {type === "documents" ? (
+              {areActionsAndFiltersDisabled ? null : (
                 <>
-                  <div className="w-10">
-                    <Button
-                      icon={IconEnum.graph}
-                      isDisabled={!permissions?.read_documents}
-                      isIconOnly
-                      onClick={() =>
-                        setDrawer((prev) => ({
-                          ...prev,
-                          size: "half",
-                          type: "mentioned_in",
-                          title: "All document mentions",
-                          data: { id: "", title: "", icon: undefined, isAll: true },
-                        }))
-                      }
-                      tooltip="View all document connections"
-                    />
-                  </div>
+                  {type === "documents" ? (
+                    <>
+                      <div className="w-10">
+                        <Button
+                          icon={IconEnum.graph}
+                          isDisabled={!permissions?.read_documents}
+                          isIconOnly
+                          onClick={() =>
+                            setDrawer((prev) => ({
+                              ...prev,
+                              size: "half",
+                              type: "mentioned_in",
+                              title: "All document mentions",
+                              data: { id: "", title: "", icon: undefined, isAll: true },
+                            }))
+                          }
+                          tooltip="View all document connections"
+                        />
+                      </div>
+                      <div className="w-fit max-w-32">
+                        <Select
+                          isDisabled={!permissions?.read_documents}
+                          name="documentType"
+                          onChange={({ value }) => {
+                            setDocumentType(value as "documents" | "templates");
+                            ls.set("documentType", value);
+                          }}
+                          options={documentTypes}
+                          value={documentType}
+                        />
+                      </div>
+                    </>
+                  ) : null}
+
                   <div className="w-fit max-w-32">
                     <Select
-                      isDisabled={!permissions?.read_documents}
-                      name="documentType"
+                      name="active"
                       onChange={({ value }) => {
-                        setDocumentType(value as "documents" | "templates");
-                        ls.set("documentType", value);
+                        setArkived(value as "active" | "arkive");
+                        ls.set(`${entityName}-table-active`, value);
                       }}
-                      options={documentTypes}
-                      value={documentType}
+                      options={[
+                        { label: "Active", value: "active", icon: IconEnum.eye },
+                        { label: "Arkived", value: "arkive", icon: IconEnum.archive },
+                      ]}
+                      placeholder="Active"
+                      value={arkived}
                     />
+                  </div>
+
+                  <div className="w-fit max-w-32">
+                    <Select
+                      name="view"
+                      onChange={({ value }) => {
+                        setView(value as "grid" | "table");
+                        ls.set(`${entityName}-table`, value);
+                      }}
+                      options={[
+                        { label: "Grid", value: "grid", icon: IconEnum.grid },
+                        { label: "Table", value: "table", icon: IconEnum.table },
+                      ]}
+                      placeholder="View"
+                      value={view}
+                    />
+                  </div>
+                  {isFolder && !isInitialLoadingFolder ? (
+                    <div className="w-fit max-w-[208px] lg:w-52">
+                      <Button
+                        icon={IconEnum.edit}
+                        isDisabled={
+                          !hasActionPermission(
+                            isProjectOwner,
+                            user?.id === data?.data?.id,
+                            permissions,
+                            data?.data?.permissions || [],
+                            `update_${type}` as PermissionCodeType,
+                            user?.role?.id
+                          )
+                        }
+                        label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
+                        onClick={() => {
+                          setDrawer((prev) => ({
+                            ...prev,
+                            size: type === "documents" && documentType === "templates" ? "half" : "lg",
+                            title: `Edit ${entityName}`,
+                            type: type as DrawerContentCreateNewType,
+                            data: { id: item_id as string, project_id: project_id as string },
+                          }));
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                  <div className="w-fit lg:w-52">
+                    <Dropdown
+                      allowedPlacements={["bottom-end"]}
+                      isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
+                      items={[
+                        {
+                          id: "1",
+                          title: "Create new",
+                          icon: getDefaultEntityIcon(type as AvailableEntityType),
+                          onClick: () => {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              data: { project_id: project_id as string },
+                              title: `Create new ${entityName}`,
+                              type: type as DrawerContentCreateNewType,
+                              size: "lg",
+                            }));
+                          },
+                        },
+                        {
+                          id: "2",
+                          title: "Create new folder",
+                          icon: IconEnum.folder,
+                          onClick: () => {
+                            setDrawer((prev) => ({
+                              ...prev,
+                              title: `Create new ${entityName} folder`,
+                              data: { project_id, type: type as EntitiesWithFolders },
+                              type: "folder",
+                              size: "sm",
+                            }));
+                          },
+                        },
+                        ...(type === "documents"
+                          ? [
+                              {
+                                id: "3",
+                                title: "Create new template",
+                                icon: IconEnum.document_templates,
+                                onClick: () => {
+                                  setDrawer((prev) => ({
+                                    ...prev,
+                                    data: { project_id: project_id as string },
+                                    title: "Create new template",
+                                    type: "documents",
+                                    exceptions: {
+                                      createTemplate: true,
+                                    },
+                                    size: "half",
+                                  }));
+                                },
+                              },
+                            ]
+                          : []),
+                      ]}>
+                      <div className="w-fit lg:w-52">
+                        <Button
+                          icon={IconEnum.add}
+                          isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
+                          label={`Create new ${entityName}`}
+                          onClick={undefined}
+                          tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
+                        />
+                      </div>
+                    </Dropdown>
                   </div>
                 </>
-              ) : null}
-
-              <div className="w-fit max-w-32">
-                <Select
-                  name="active"
-                  onChange={({ value }) => {
-                    setArkived(value as "active" | "arkive");
-                    ls.set(`${entityName}-table-active`, value);
-                  }}
-                  options={[
-                    { label: "Active", value: "active", icon: IconEnum.eye },
-                    { label: "Arkived", value: "arkive", icon: IconEnum.archive },
-                  ]}
-                  placeholder="Active"
-                  value={arkived}
-                />
-              </div>
-
-              <div className="w-fit max-w-32">
-                <Select
-                  name="view"
-                  onChange={({ value }) => {
-                    setView(value as "grid" | "table");
-                    ls.set(`${entityName}-table`, value);
-                  }}
-                  options={[
-                    { label: "Grid", value: "grid", icon: IconEnum.grid },
-                    { label: "Table", value: "table", icon: IconEnum.table },
-                  ]}
-                  placeholder="View"
-                  value={view}
-                />
-              </div>
-              {isFolder && !isInitialLoadingFolder ? (
-                <div className="w-fit max-w-[208px] lg:w-52">
-                  <Button
-                    icon={IconEnum.edit}
-                    isDisabled={
-                      !hasActionPermission(
-                        isProjectOwner,
-                        user?.id === data?.data?.id,
-                        permissions,
-                        data?.data?.permissions || [],
-                        `update_${type}` as PermissionCodeType,
-                        user?.role?.id
-                      )
-                    }
-                    label={`Edit current ${data?.data?.is_folder ? "folder" : entityName}`}
-                    onClick={() => {
-                      setDrawer((prev) => ({
-                        ...prev,
-                        size: type === "documents" && documentType === "templates" ? "half" : "lg",
-                        title: `Edit ${entityName}`,
-                        type: type as DrawerContentCreateNewType,
-                        data: { id: item_id as string, project_id: project_id as string },
-                      }));
-                    }}
-                  />
-                </div>
-              ) : null}
-              <div className="w-fit lg:w-52">
-                <Dropdown
-                  allowedPlacements={["bottom-end"]}
-                  isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
-                  items={[
-                    {
-                      id: "1",
-                      title: "Create new",
-                      icon: getDefaultEntityIcon(type as AvailableEntityType),
-                      onClick: () => {
-                        setDrawer((prev) => ({
-                          ...prev,
-                          data: { project_id: project_id as string },
-                          title: `Create new ${entityName}`,
-                          type: type as DrawerContentCreateNewType,
-                          size: "lg",
-                        }));
-                      },
-                    },
-                    {
-                      id: "2",
-                      title: "Create new folder",
-                      icon: IconEnum.folder,
-                      onClick: () => {
-                        setDrawer((prev) => ({
-                          ...prev,
-                          title: `Create new ${entityName} folder`,
-                          data: { project_id, type: type as EntitiesWithFolders },
-                          type: "folder",
-                          size: "sm",
-                        }));
-                      },
-                    },
-                    ...(type === "documents"
-                      ? [
-                          {
-                            id: "3",
-                            title: "Create new template",
-                            icon: IconEnum.document_templates,
-                            onClick: () => {
-                              setDrawer((prev) => ({
-                                ...prev,
-                                data: { project_id: project_id as string },
-                                title: "Create new template",
-                                type: "documents",
-                                exceptions: {
-                                  createTemplate: true,
-                                },
-                                size: "half",
-                              }));
-                            },
-                          },
-                        ]
-                      : []),
-                  ]}>
-                  <div className="w-fit lg:w-52">
-                    <Button
-                      icon={IconEnum.add}
-                      isDisabled={!permissions?.[`create_${type}` as PermissionCodeType]}
-                      label={`Create new ${entityName}`}
-                      onClick={undefined}
-                      tooltip={breakpoints.isMd ? undefined : `Create new ${entityName}`}
-                    />
-                  </div>
-                </Dropdown>
-              </div>
+              )}
             </div>
           ) : null}
         </div>
@@ -1198,7 +1214,7 @@ function FolderView() {
               setDrawer,
               setDialog,
               entityName,
-              type as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
+              (manualType || type) as "documents" | "maps" | "graphs" | "calendars" | "dictionaries" | "random_tables",
               project_id as string,
               documentType === "templates" && type === "documents",
               user?.webhooks || [],
