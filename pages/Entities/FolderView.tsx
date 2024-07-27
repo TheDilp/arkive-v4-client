@@ -727,9 +727,15 @@ export function MainView() {
 export function FolderView({
   manualType,
   areActionsAndFiltersDisabled,
+  columnVisibility,
+  manualSelection,
+  setManualSelection,
 }: {
   manualType?: "documents" | "maps" | "events" | "images" | "random_tables";
   areActionsAndFiltersDisabled?: boolean;
+  columnVisibility?: Record<string, boolean>;
+  manualSelection?: TableSelectionType;
+  setManualSelection?: (prop: TableSelectionType) => void;
 }) {
   const { project_id, type, item_id } = useParams();
   const { pathname } = useLocation();
@@ -746,7 +752,7 @@ export function FolderView({
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
   const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable({
-    selection: [],
+    selection: manualSelection || {},
     pagination: { page: 0, limit: 10 },
   });
   const [filter, setFilter] = useState("");
@@ -839,7 +845,6 @@ export function FolderView({
       staleTime: 5 * 60 * 1000,
     }
   );
-
   const { data, isInitialLoading: isInitialLoadingFolder } = useGetEntity<BaseEntityType & { image_id?: string }>(
     item_id,
     type as AvailableEntityType,
@@ -911,7 +916,7 @@ export function FolderView({
   }, [data, type, setBreadcrumbs, item_id]);
 
   useEffect(() => {
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (arkived === "arkive") navigate(`/projects/${project_id}/${type}`);
   }, [item_id, arkived]);
@@ -922,7 +927,7 @@ export function FolderView({
         type: "clearAllFilters",
       });
     }
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
@@ -946,6 +951,19 @@ export function FolderView({
     }
     return () => {};
   }, [filter, dispatch, documentType, arkived]);
+
+  useEffect(() => {
+    const hasSelected = Object.keys(selection || {}).length;
+    if (setManualSelection) {
+      if (hasSelected) {
+        setManualSelection(selection || {});
+      } else if (!hasSelected && selection === undefined && manualSelection) {
+        dispatch({ type: "setManualSelection", payload: manualSelection });
+      } else if (!hasSelected && selection !== undefined && manualSelection) {
+        setManualSelection({});
+      }
+    }
+  }, [selection]);
 
   return (
     <TablePageLayout>
@@ -1232,6 +1250,7 @@ export function FolderView({
             )}
             config={{
               selectedActions,
+              columnVisibility,
               filters,
               relationFilters,
               hasSelect: true,
@@ -1239,7 +1258,7 @@ export function FolderView({
               hasTags: EntitiesWithTags.includes(type as string),
               selection,
               getLink: (rowData: any) =>
-                arkived === "active"
+                arkived === "active" && !manualSelection
                   ? `/projects/${project_id}/${type}${rowData.is_folder ? "/folder" : ""}/${rowData.id}`
                   : "#",
             }}

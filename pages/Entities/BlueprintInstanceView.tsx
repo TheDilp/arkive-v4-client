@@ -673,8 +673,13 @@ export function BlueprintInstanceView({
   );
   const createNotification = useNotifications();
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
-    selection: {},
-    orderBy: [{ field: "title", sort: "asc" }],
+    selection: manualSelection || {},
+    orderBy: manualSelection
+      ? [
+          { field: "parent_id", sort: "asc" },
+          { field: "title", sort: "asc" },
+        ]
+      : [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
   });
 
@@ -713,7 +718,7 @@ export function BlueprintInstanceView({
       filters,
       fields: ["id", "deleted_at", "is_public", "title"],
       relationFilters,
-      orderBy,
+      orderBy: manualSelection ? [{ field: "parent_id", sort: "asc" }, ...(orderBy || [])] : orderBy,
       pagination,
       arkived: arkived === "arkive",
     },
@@ -724,7 +729,7 @@ export function BlueprintInstanceView({
   );
 
   useEffect(() => {
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
   }, [arkived]);
 
@@ -734,7 +739,7 @@ export function BlueprintInstanceView({
         type: "clearAllFilters",
       });
     }
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
@@ -758,7 +763,6 @@ export function BlueprintInstanceView({
     }
     return () => {};
   }, [filter, dispatch, arkived]);
-
   useEffect(() => {
     const hasSelected = Object.keys(selection || {}).length;
     if (setManualSelection) {
@@ -812,7 +816,9 @@ export function BlueprintInstanceView({
               setDrawer,
             }),
             getLink: (rowData: BlueprintInstanceType) =>
-              arkived === "active" ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources` : "#",
+              arkived === "active" && !manualSelection
+                ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`
+                : "#",
           }}
           data={instances?.data || []}
           dispatch={dispatch}

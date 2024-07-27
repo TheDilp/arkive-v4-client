@@ -954,7 +954,7 @@ export function CharactersView({
               selection,
               columnVisibility,
               getLink: (rowData: any) =>
-                arkived === "active" ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
+                arkived === "active" && !manualSelection ? `/projects/${project_id}/characters/${rowData.id}/biography` : "#",
               setFavorite: (rowData: any) => {
                 mutate({
                   data: { id: rowData.id },
