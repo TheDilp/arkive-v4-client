@@ -50,7 +50,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
         if (tempFilters?.and) {
           const newFilters = tempFilters.and.filter(
             (filt) =>
-              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field
           );
           tempFilters = {
             ...tempFilters,
@@ -68,7 +68,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
               ...tempFilters,
               and: tempFilters.and.filter(
                 (filt) =>
-                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field
               ),
             }
           : tempFilters;
@@ -77,7 +77,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
         if (tempFilters?.or) {
           const newFilters = tempFilters.or.filter(
             (filt) =>
-              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+              (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field
           );
           tempFilters = { ...tempFilters, or: uniqueBy(newFilters.concat(action.payload.or), "id") };
         } else {
@@ -89,7 +89,7 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
               ...tempFilters,
               or: tempFilters.or.filter(
                 (filt) =>
-                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field,
+                  (filt.relationalData?.character_field_id || filt.relationalData?.blueprint_field_id || filt.field) !== field
               ),
             }
           : tempFilters;
@@ -116,10 +116,10 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
           filters: {
             ...state.filters,
             and: (state.filters?.and || []).filter(
-              (filt) => filt.field !== action.payload && filt.header_name !== action.payload,
+              (filt) => filt.field !== action.payload && filt.header_name !== action.payload
             ),
             or: (state.filters?.or || []).filter(
-              (filt) => filt.field !== action.payload && filt.header_name !== action.payload,
+              (filt) => filt.field !== action.payload && filt.header_name !== action.payload
             ),
           },
         };
@@ -223,6 +223,10 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
           0: [...(state.selection?.[0] || []), action.payload.row],
         },
       };
+    }
+
+    case "setManualSelection": {
+      return { ...state, selection: action.payload || {} };
     }
 
     case "selectAll": {

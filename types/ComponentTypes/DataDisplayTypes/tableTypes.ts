@@ -58,6 +58,7 @@ export type TableActionType =
       payload: { field: string; sort: SortType };
     }
   | { type: "setSelection"; payload: { row: string } }
+  | { type: "setManualSelection"; payload: { [key: number]: string[] } }
   | { type: "selectAll"; payload: { rows: string[] } }
   | { type: "clearSelection" };
 
