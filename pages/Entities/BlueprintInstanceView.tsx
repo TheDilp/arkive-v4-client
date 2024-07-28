@@ -87,8 +87,7 @@ function createColumns(
   permissions: UserHasPermissionsType,
   isProjectOwner: boolean,
   user_id: string,
-  user_role_id: string | undefined,
-  isAllInstances?: boolean
+  user_role_id: string | undefined
 ) {
   const fieldColumns: ColumnDef<BlueprintInstanceType, any>[] = [
     columnHelper.accessor("title", {
@@ -99,15 +98,12 @@ function createColumns(
         sortable: true,
         filterOptions: TextFilters,
       },
-      cell: ({ row }) =>
-        isAllInstances ? (
-          <span className="flex items-center gap-x-2">
-            <Icon fontSize={24} icon={row?.original?.blueprint?.icon || IconEnum.blueprint} />
-            {`${row.original?.title || ""} ${row.original?.blueprint?.title ? `(${row.original?.blueprint?.title})` : ""}`}
-          </span>
-        ) : (
-          row?.original?.title || ""
-        ),
+      cell: ({ row }) => (
+        <span className="flex items-center gap-x-2">
+          <Icon fontSize={24} icon={row?.original?.blueprint?.icon || IconEnum.blueprint} />
+          {`${row.original?.title || ""} ${row.original?.blueprint?.title ? `(${row.original?.blueprint?.title})` : ""}`}
+        </span>
+      ),
       minSize: 15,
     }),
   ];
@@ -644,22 +640,7 @@ function getSelectedActions(
   return selectedActions;
 }
 
-export function BlueprintInstanceView({
-  columnVisibility,
-  manualSelection,
-  setManualSelection,
-  isAllInstances,
-  filter,
-  arkived,
-}: {
-  filter: string;
-  arkived: "active" | "arkive";
-  isAllInstances?: boolean;
-  columnVisibility?: Record<string, boolean>;
-  areActionsAndFiltersDisabled?: boolean;
-  manualSelection?: TableSelectionType;
-  setManualSelection?: (prop: TableSelectionType) => void;
-}) {
+export function BlueprintInstanceView({ filter, arkived }: { filter: string; arkived: "active" | "arkive" }) {
   const { project_id, item_id } = useParams();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -673,32 +654,20 @@ export function BlueprintInstanceView({
   );
   const createNotification = useNotifications();
   const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
-    selection: manualSelection || {},
-    orderBy: manualSelection
-      ? [
-          { field: "parent_id", sort: "asc" },
-          { field: "title", sort: "asc" },
-        ]
-      : [{ field: "title", sort: "asc" }],
+    selection: {},
+    orderBy: [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
   });
 
-  const { data: blueprint } = useGetEntity<BlueprintType>(
-    item_id,
-    "blueprints",
-    {
-      data: {
-        id: item_id,
-      },
-      relations: {
-        blueprint_fields: true,
-      },
-      fields: ["id", "title", "title_name"],
+  const { data: blueprint } = useGetEntity<BlueprintType>(item_id, "blueprints", {
+    data: {
+      id: item_id,
     },
-    {
-      enabled: !isAllInstances,
-    }
-  );
+    relations: {
+      blueprint_fields: true,
+    },
+    fields: ["id", "title", "title_name"],
+  });
   useNavbarTitle(`Blueprints | ${blueprint?.data?.title || ""}`, !!blueprint?.data?.title);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprint_instances");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprint_instances", arkived === "active", project_id);
@@ -707,24 +676,19 @@ export function BlueprintInstanceView({
     {
       data: {
         project_id,
-        parent_id: isAllInstances ? undefined : item_id,
-      },
-      relations: {
-        blueprint: !!isAllInstances,
-        blueprint_fields: !isAllInstances,
-        tags: !isAllInstances,
+        parent_id: item_id,
       },
       permissions: true,
       filters,
       fields: ["id", "deleted_at", "is_public", "title"],
       relationFilters,
-      orderBy: manualSelection ? [{ field: "parent_id", sort: "asc" }, ...(orderBy || [])] : orderBy,
+      orderBy: orderBy,
       pagination,
       arkived: arkived === "arkive",
     },
     "blueprint_instances",
     {
-      enabled: !!blueprint?.data || !!isAllInstances,
+      enabled: !!blueprint?.data,
     }
   );
 
@@ -763,25 +727,13 @@ export function BlueprintInstanceView({
     }
     return () => {};
   }, [filter, dispatch, arkived]);
-  useEffect(() => {
-    const hasSelected = Object.keys(selection || {}).length;
-    if (setManualSelection) {
-      if (hasSelected) {
-        setManualSelection(selection || {});
-      } else if (!hasSelected && selection === undefined && manualSelection) {
-        dispatch({ type: "setManualSelection", payload: manualSelection });
-      } else if (!hasSelected && selection !== undefined && manualSelection) {
-        setManualSelection({});
-      }
-    }
-  }, [selection]);
 
   return (
     <div className="overflow-hidden">
-      {blueprint?.data || isAllInstances ? (
+      {blueprint?.data ? (
         <Table
           columns={createColumns(
-            isAllInstances ? [] : blueprint?.data?.blueprint_fields || [],
+            blueprint?.data?.blueprint_fields || [],
             blueprint?.data?.title_name || "",
             project_id as string,
             setDrawer,
@@ -792,11 +744,9 @@ export function BlueprintInstanceView({
             permissions,
             isProjectOwner,
             user?.id as string,
-            user?.role?.id,
-            isAllInstances
+            user?.role?.id
           )}
           config={{
-            columnVisibility,
             hasSelect: true,
             hasArkived: arkived === "arkive",
             hasTags: true,
@@ -816,9 +766,7 @@ export function BlueprintInstanceView({
               setDrawer,
             }),
             getLink: (rowData: BlueprintInstanceType) =>
-              arkived === "active" && !manualSelection
-                ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources`
-                : "#",
+              arkived === "active" ? `/projects/${project_id}/blueprints/${item_id}/${rowData.id}/resources` : "#",
           }}
           data={instances?.data || []}
           dispatch={dispatch}
