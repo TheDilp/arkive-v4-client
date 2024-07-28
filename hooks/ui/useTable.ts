@@ -162,7 +162,11 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
       return newState;
     }
     case "setPagination":
-      return { ...state, pagination: { ...state.pagination, ...action.payload } };
+      if (state.pagination?.limit !== action.payload.limit) {
+        return { ...state, pagination: { page: 0, limit: action.payload.limit } };
+      }
+      return { ...state, pagination: action.payload };
+
     case "setSort": {
       if (action.payload?.field && action.payload?.sort) {
         if (state.orderBy?.length) {
