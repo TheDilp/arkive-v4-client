@@ -89,7 +89,7 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
 }
 export function getFieldValueFromType(
   type: BlueprintFieldTypes | FieldTypes
-): "characters" | "documents" | "map_pins" | "images" | "random_tables" | "blueprint_instances" | "events" | "value" | null {
+): "characters" | "documents" | "map_pins" | "images" | "random_table" | "blueprint_instances" | "events" | "value" | null {
   if (
     type === "text" ||
     type === "number" ||
@@ -108,7 +108,7 @@ export function getFieldValueFromType(
   if (type === "images_single" || type === "images_multiple") return "images";
   if (type === "blueprints_single" || type === "blueprints_multiple") return "blueprint_instances";
   if (type === "events_single" || type === "events_multiple") return "events";
-  if (type === "random_table") return "random_tables";
+  if (type === "random_table") return "random_table";
   return null;
 }
 

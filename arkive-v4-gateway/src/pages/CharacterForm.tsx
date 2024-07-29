@@ -1,9 +1,8 @@
-import groupBy from "lodash.groupby";
 import { ReactNode, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { AvatarUpload, Editor, Input, Skeleton } from "../../../components";
+import { AvatarUpload, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
 import { useGetEntities, useGetEntity, useHandleChange } from "../../../hooks";
-import { CharacterFieldTemplateType, CharacterType, HandleChangePropsType } from "../../../types";
+import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
 
 const baseCharacterSections = [{ id: "name", title: "Basic info" }];
 
@@ -43,6 +42,7 @@ function NameSection({ first_name, last_name, nickname, age, project_id, biograp
 export function CharacterForm() {
   const { type, access_id, entity_id, section_id } = useParams();
   const [sections, setSections] = useState(baseCharacterSections);
+  const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
   const [character, setCharacter] = useState<Partial<CharacterType>>({ first_name: "", last_name: "" });
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
 
@@ -95,20 +95,29 @@ export function CharacterForm() {
     }
   }, [existingCharacter]);
   useLayoutEffect(() => {
-    let additionalSections: { id: string; title: string }[] = [];
+    const additionalSections: { id: string; title: string }[] = [];
+    const tempFields: Record<string, CharacterFieldType[]> = { other: [] };
     if (templates?.data) {
-      const temp = (templates?.data || []).map((template) => ({
-        sections: template.character_fields_sections,
-        grouped_fields: groupBy(template.character_fields, "section_id"),
-      }));
-
-      additionalSections = temp.flatMap((template) => template.sections);
+      (templates?.data || []).forEach((template) => {
+        additionalSections.push(...template.character_fields_sections);
+        template.character_fields.forEach((field) => {
+          if (!field.section_id) tempFields["other"].push(field);
+          if (field.section_id) {
+            if (tempFields?.[field.section_id]) tempFields[field.section_id].push(field);
+            tempFields[field.section_id] = [field];
+          }
+        });
+      });
     }
-    setSections(baseCharacterSections.concat(additionalSections));
+    setSections(
+      baseCharacterSections
+        .concat(additionalSections.filter((section) => tempFields?.[section.id] && !!tempFields[section.id].length))
+        .concat({ id: "other", title: "Other" })
+    );
+    setFields(tempFields);
   }, [templates]);
 
   if (isFetchingCharacter || isFetchingTemplates) return <Skeleton type="character_profile" />;
-
   return (
     <>
       <div className="col-span-2 overflow-hidden rounded-l-md bg-zinc-800">
@@ -126,17 +135,45 @@ export function CharacterForm() {
         </ul>
       </div>
       <div className="col-span-10 overflow-hidden rounded-r-md bg-zinc-900 p-4">
-        {section_id === "name" ? (
-          <NameSection
-            first_name={character.first_name}
-            portrait_id={character.portrait_id}
-            project_id={character.project_id}
-            last_name={character.last_name}
-            biography={character.biography}
-            age={character.age}
-            handleChange={handleChange}
-          />
-        ) : null}
+        {(sections || []).map((section) => {
+          if (section.id !== section_id) return null;
+
+          return (
+            <div key={section.id} className="">
+              {section.id === "name" ? (
+                <NameSection
+                  first_name={character.first_name}
+                  portrait_id={character.portrait_id}
+                  project_id={character.project_id}
+                  last_name={character.last_name}
+                  biography={character.biography}
+                  age={character.age}
+                  handleChange={handleChange}
+                />
+              ) : null}
+
+              {section.id === "other" && !!fields?.["other"]?.length ? (
+                <FieldTemplateRows
+                  character_fields={fields?.["other"] || []}
+                  isDrawer={false}
+                  character_fields_data={character?.character_fields || []}
+                  handleChange={handleChange}
+                  hasCreateOrEdit={true}
+                />
+              ) : null}
+
+              {section.id !== "name" && section.id !== "other" && !!fields?.[section.id].length ? (
+                <FieldTemplateRows
+                  character_fields={fields?.[section.id] || []}
+                  character_fields_data={character?.character_fields || []}
+                  handleChange={handleChange}
+                  hasCreateOrEdit={true}
+                  isDrawer={false}
+                />
+              ) : null}
+            </div>
+          );
+        })}
       </div>
     </>
   );

@@ -105,20 +105,24 @@ function RelationshipRow({
   );
 }
 
-function FieldTemplateRows({
+export function FieldTemplateRows({
   character_fields = [],
   character_fields_data = [],
   handleChange,
   hasCreateOrEdit,
+  isDrawer = true,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   hasCreateOrEdit: boolean;
+  isDrawer?: boolean;
 }) {
+  if (!character_fields.length) return null;
   return (
     <li className="flex flex-col first:mt-0">
-      <div className="flex select-none flex-col gap-y-2 pt-2">
+      <div
+        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-1 [&>*>*>.text-sm]:mb-2 [&>*>*>.text-sm]:border-b [&>*>*>.text-sm]:border-zinc-700 [&>*>.text-sm]:mb-2 [&>*>.text-sm]:border-b [&>*>.text-sm]:border-zinc-700"} select-none`}>
         {character_fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
