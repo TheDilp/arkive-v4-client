@@ -3,7 +3,14 @@ import uniqBy from "lodash.uniqby";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntities, useGetImages, useTable, useToggledResetAtom } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntities,
+  useGetImages,
+  useGrantGatewayAccess,
+  useTable,
+  useToggledResetAtom,
+} from "../../../hooks";
 import { CharacterType, DrawerAtomType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getImageURL, IconEnum, TextFilters } from "../../../utils";
@@ -339,7 +346,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     random_tables: [],
   });
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const { mutate: grantAccess } = useGrantGatewayAccess();
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
@@ -381,8 +388,8 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
 
   return (
     <DrawerLayout>
-      <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />
-      {tabs[selectedTab].id === "basic_info" ? (
+      {data?.entity_id ? null : <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />}
+      {tabs[selectedTab].id === "basic_info" || data?.entity_id ? (
         <Input
           helperText={titleOrEmail && !isEmailValid && data?.entity_id ? "Email is not valid" : ""}
           label={data?.entity_id ? "Grant access to (email, required)" : "Title (required)"}
@@ -394,7 +401,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         />
       ) : null}
 
-      {tabs[selectedTab].id === "entities" ? (
+      {tabs[selectedTab].id === "entities" || data?.entity_id ? (
         <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
           <Title isDrawerTitle label="Grant access to" size="xl" />
           {data?.entity_id && gatewayConfigurations?.data?.length ? (
@@ -429,6 +436,15 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                 relations: getRelationsForGatewayConfig(selection || {}),
               });
               create(parsed);
+            } else if (saveButtonLabel === "Grant access") {
+              if (data?.entity_id)
+                grantAccess({
+                  data: {
+                    email: titleOrEmail,
+                    type: data.type,
+                    id: data?.entity_id,
+                  },
+                });
             }
             resetDrawerAtom();
           }}
