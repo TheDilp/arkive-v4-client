@@ -1,5 +1,6 @@
+import { useUploadAvatar } from "../../hooks";
 import { ImageUploadType } from "../../types";
-import { changeImagesForUpload, IconEnum, useNotifications } from "../../utils";
+import { changeImagesForUpload, getImageURL, IconEnum, useNotifications } from "../../utils";
 
 export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }: ImageUploadType) {
   const createNotification = useNotifications();
@@ -83,6 +84,67 @@ export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }:
               }
               const existingFileNames = images.map((f) => f.name);
               changeImagesForUpload(onChange, existingFileNames, files);
+            }
+          }}
+          type="file"
+        />
+      </label>
+    </div>
+  );
+}
+
+export function AvatarUpload({
+  id,
+  isDisabled,
+  image_id,
+  project_id,
+}: {
+  project_id: string;
+  image_id?: string | null | undefined;
+  isDisabled?: boolean;
+  id: string;
+}) {
+  const createNotification = useNotifications();
+
+  const { mutate: upload } = useUploadAvatar(id);
+
+  return (
+    <div
+      className="h-12 w-12 cursor-pointer select-none rounded-full border-2 border-dashed border-zinc-400 hover:bg-zinc-700"
+      id="dropzone-container"
+      onDragOver={(e) => e.preventDefault()}
+      style={{
+        backgroundImage: image_id ? `url(${getImageURL(project_id, "images", image_id)})` : "",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+      }}>
+      <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center" htmlFor="dropzone-file">
+        <input
+          accept="image/*"
+          className="hidden"
+          disabled={isDisabled}
+          id="dropzone-file"
+          onChange={(e) => {
+            if (e.target.files?.length) {
+              const files = Array.from(e.target.files);
+              let count = 0;
+              for (let index = 0; index < files.length; index += 1) {
+                if (files[index].size > 100 * 1024 * 1024) {
+                  files.splice(index, 1);
+                  count += 1;
+                }
+              }
+              if (count > 0) {
+                createNotification({
+                  title: `${count} ${count === 1 ? "image" : "images"} cannot be uploaded due to size (max 100 MB).`,
+                  hasNoTruncate: true,
+                  variant: "warning",
+                  icon: IconEnum.warning,
+                  timer: 5,
+                });
+              }
+              upload(files);
             }
           }}
           type="file"
