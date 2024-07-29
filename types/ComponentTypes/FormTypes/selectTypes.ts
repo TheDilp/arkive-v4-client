@@ -20,6 +20,6 @@ export interface SelectType extends BaseFormComponentType {
   isExpandingToNewRow?: boolean;
   value: string | string[] | number | null | undefined;
   options: SelectOptionType[];
-  onChange: ({ name, value }: onChangeValue) => void;
+  onChange: ({ name, value, label, icon }: onChangeValue) => void;
   isReadOnly?: boolean;
 }

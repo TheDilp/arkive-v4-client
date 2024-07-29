@@ -24,6 +24,7 @@ import {
   TagType,
   UserHasPermissionsType,
 } from "../../../types";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
 import {
   createOrEditPermission,
   getDifferenceForCharacterFields,
@@ -111,12 +112,14 @@ export function FieldTemplateRows({
   handleChange,
   hasCreateOrEdit,
   isDrawer = true,
+  options,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   hasCreateOrEdit: boolean;
   isDrawer?: boolean;
+  options?: GatewayConfigOptionType[] | null;
 }) {
   if (!character_fields.length) return null;
   return (
@@ -126,6 +129,13 @@ export function FieldTemplateRows({
         {character_fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
+          const presetOptions =
+            options && templateValueKey
+              ? options?.filter((opt) => opt.entity_type === templateValueKey && opt.parent_id === template_field.blueprint_id)
+              : null;
+
+          console.log(options);
+
           const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
 
           const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
@@ -277,6 +287,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions}
                 title={template_field.title}
               />
             );

@@ -263,7 +263,7 @@ function onClick({
     } else {
       const selectedItem = options.find((opt) => opt?.value === options[index].value);
       if (selectedItem) {
-        onChange({ name, value: selectedItem?.value });
+        onChange({ name, value: selectedItem?.value, label: selectedItem.label, icon: selectedItem.icon });
         setIsOpen(false);
         // @ts-ignore
         ref.current.focus();

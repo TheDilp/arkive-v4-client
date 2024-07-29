@@ -219,7 +219,7 @@ function getRelationsForGatewayConfig(relations: Record<string, string[]>) {
   for (let index = 0; index < keys.length; index++) {
     const values = Object.values(relations[keys[index]]).flat();
 
-    final[keys[index]] = uniqBy(values, (o) => o.toLowerCase());
+    final[keys[index]] = uniqBy(values || [], (o) => o.toLowerCase());
   }
 
   return final;
@@ -443,6 +443,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                     email: titleOrEmail,
                     type: data.type,
                     id: data?.entity_id,
+                    config: getRelationsForGatewayConfig(selection || {}),
                   },
                 });
             }

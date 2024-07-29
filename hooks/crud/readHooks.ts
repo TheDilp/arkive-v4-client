@@ -15,6 +15,7 @@ import {
   UserStatusType,
   UserType,
 } from "../../types";
+import { GatewayConfigOptionType } from "../../types/EntityTypes/gatewayTypes";
 import { ProjectDashboardType, ProjectType } from "../../types/EntityTypes/projectTypes";
 import {
   baseURLS,
@@ -334,9 +335,8 @@ export function useSearch<ReturnType>(
     ["search", type].concat(options?.queryKeyConcat || []),
     async () => {
       if (type) {
-        const baseUrl = IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer;
         return FetchFunction({
-          url: `${baseUrl}/search/${
+          url: `${getServerUrl()}/search/${
             isGlobal ? "global/" : `${project_id}/`
           }${getSearchURL(type)}${options?.isFolders ? "/folder" : ""}${type === "projects" ? `/${type}` : ""}`,
           method: "POST",
@@ -480,5 +480,27 @@ export function useGetAuthStatus() {
       staleTime: Infinity,
     }
   );
+}
+export function useGetGatewayOptions(
+  request: {
+    data: { access_id: string; entity_type: "characters" | "blueprint_instances" };
+  },
+  type: "characters" | "",
+  options?: UseQueryOptions<any> & {
+    queryKeyConcat?: string[];
+  }
+) {
+  return useQuery<{
+    data: GatewayConfigOptionType[];
+  }>(["gateway", "options", type].concat(options?.queryKeyConcat || []), async () => {
+    if (type) {
+      return FetchFunction({
+        url: `${getServerUrl()}/options/${type}`,
+        method: "POST",
+        body: JSON.stringify(request),
+      });
+    }
+    return { data: [], ok: false, role_access: true };
+  });
 }
 // #endregion misc

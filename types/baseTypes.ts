@@ -43,6 +43,8 @@ export type ImagePreviewType = {
 export type onChangeValue = {
   name: string;
   value: string | string[] | undefined;
+  label?: string;
+  icon?: string;
 };
 export interface BaseComponentType {
   size?: Size;

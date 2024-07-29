@@ -1,3 +1,5 @@
+import { AvailableIcons } from "../../utils";
+
 export type GatewayEntityType = "characters" | "blueprint_instances";
 
 export interface GatewayConfigType {
@@ -12,4 +14,13 @@ export interface GatewayConfigType {
   events: { related_id: string }[];
   images: { related_id: string }[];
   random_tables: { related_id: string }[];
+}
+
+export interface GatewayConfigOptionType {
+  value: string;
+  label: string;
+  parent_id: string | null;
+  image: string | null;
+  icon: AvailableIcons | undefined;
+  entity_type: "characters" | "blueprint_instances" | "documents" | "maps" | "map_pins" | "events" | "images" | "random_tables";
 }

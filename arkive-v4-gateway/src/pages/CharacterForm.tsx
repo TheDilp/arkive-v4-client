@@ -1,7 +1,7 @@
 import { ReactNode, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
-import { useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
+import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
 import { getDifferenceForCharacterFields, IconEnum } from "../../../utils";
 import { UpdateCharacterSchema } from "../../../validation";
@@ -106,8 +106,13 @@ export function CharacterForm() {
     }
   );
 
-  const { mutate: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id);
+  const { mutateAsync: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id);
 
+  const { data } = useGetGatewayOptions(
+    { data: { entity_type: type as "characters", access_id: access_id as string } },
+    "characters"
+  );
+  console.log(data?.data);
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
@@ -136,7 +141,12 @@ export function CharacterForm() {
     setFields(tempFields);
   }, [templates]);
 
-  if (isFetchingCharacter || isFetchingTemplates) return <Skeleton type="character_profile" />;
+  if (isFetchingCharacter || isFetchingTemplates)
+    return (
+      <div className="col-span-12">
+        <Skeleton type="character_profile" />
+      </div>
+    );
   return (
     <>
       <div className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2">
@@ -144,7 +154,7 @@ export function CharacterForm() {
         <ul className="h-full overflow-y-auto">
           {sections.map((section) => (
             <li
-              className={`border-b border-zinc-700 text-lg first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}
+              className={`border-b border-zinc-700 text-lg transition-all first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}
               key={section.id}>
               <Link to={`/${type}/${access_id}/${entity_id}/${section.id}`} className="block h-full w-full px-4 py-2">
                 {section.title}
@@ -179,6 +189,7 @@ export function CharacterForm() {
                   character_fields_data={character?.character_fields || []}
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
+                  options={data?.data || null}
                 />
               ) : null}
 
@@ -189,6 +200,7 @@ export function CharacterForm() {
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
                   isDrawer={false}
+                  options={data?.data || null}
                 />
               ) : null}
             </div>
@@ -202,7 +214,7 @@ export function CharacterForm() {
                 icon={IconEnum.check_circle}
                 variant="success"
                 isDisabled={!character.first_name}
-                onClick={() => {
+                onClick={async () => {
                   if (existingCharacter?.data) {
                     const dataToParse = {
                       data: character,
@@ -215,7 +227,7 @@ export function CharacterForm() {
                       dataToParse.data.portrait_id = dataToParse.data.portrait.id;
                     }
                     const parsedData = UpdateCharacterSchema.parse(dataToParse);
-                    update(parsedData);
+                    await update(parsedData);
                   }
                 }}
               />

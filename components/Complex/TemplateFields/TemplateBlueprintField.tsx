@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getEntityLink } from "../../../utils";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
+import { getEntityLink, getImageURL } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
-import { Search } from "../../Form";
+import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "blueprints_single" | "blueprints_multiple";
+  presetOptions?: GatewayConfigOptionType[] | null;
   isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
   blueprint_id: string | null | undefined;
@@ -30,12 +32,13 @@ export function TemplateBlueprintField({
   isDisabled,
   isGlobal,
   isCollapsible,
+  presetOptions,
 }: Props) {
   const { project_id } = useParams();
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled ? null : (
+        {isDisabled || presetOptions || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}
@@ -72,6 +75,43 @@ export function TemplateBlueprintField({
             placeholder="Type at least 2 characters"
             searchEntity="blueprint_instances"
             value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
+          />
+        )}
+        {isDisabled || !presetOptions ? null : (
+          <Select
+            label={title}
+            name={name}
+            onChange={({ value, label, icon }) => {
+              if ((currentValue || [])?.some((bpi) => bpi.related_id === value)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.blueprint_instances`,
+                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                  },
+                ]);
+                return;
+              }
+              handleChange([
+                { name: `${name}.id`, value: id },
+                {
+                  name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
+                  value: {
+                    related_id: value,
+                    blueprint_instance: {
+                      id: value,
+                      title: label,
+                      icon,
+                    },
+                  },
+                },
+              ]);
+            }}
+            options={presetOptions.map((opt) => ({
+              ...opt,
+              image: opt.image ? { link: getImageURL(project_id as string, "images", opt.image), shape: "circle" } : undefined,
+            }))}
+            value={undefined}
           />
         )}
         {(currentValue || [])?.map((val) => {
