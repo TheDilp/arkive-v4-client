@@ -65,7 +65,7 @@ export function TemplateDocumentField({
                 },
               ]);
             }}
-            placeholder="Press enter to search."
+            placeholder="Type at least 2 characters"
             searchEntity="documents"
             value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
@@ -98,4 +98,3 @@ export function TemplateDocumentField({
     </TemplateFieldContainer>
   );
 }
-

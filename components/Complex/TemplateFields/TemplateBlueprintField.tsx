@@ -69,7 +69,7 @@ export function TemplateBlueprintField({
               ]);
             }}
             parent_id={blueprint_id || undefined}
-            placeholder="Press enter to search."
+            placeholder="Type at least 2 characters"
             searchEntity="blueprint_instances"
             value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
@@ -107,4 +107,3 @@ export function TemplateBlueprintField({
     </TemplateFieldContainer>
   );
 }
-

@@ -65,7 +65,7 @@ export function TemplateLocationsField({
                 },
               ]);
             }}
-            placeholder="Press enter to search."
+            placeholder="Type at least 2 characters"
             searchEntity="map_pins"
             value={fieldType === "locations_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
@@ -98,4 +98,3 @@ export function TemplateLocationsField({
     </TemplateFieldContainer>
   );
 }
-

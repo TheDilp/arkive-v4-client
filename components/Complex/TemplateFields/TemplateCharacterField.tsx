@@ -66,7 +66,7 @@ export function TemplateCharacterField({
               },
             ]);
           }}
-          placeholder="Press enter to search."
+          placeholder="Type at least 2 characters"
           searchEntity="characters"
           value={fieldType === "characters_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
         />
@@ -94,4 +94,3 @@ export function TemplateCharacterField({
     </TemplateFieldContainer>
   );
 }
-
