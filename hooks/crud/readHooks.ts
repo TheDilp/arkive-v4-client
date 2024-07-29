@@ -21,6 +21,7 @@ import {
   FetchFunction,
   getPluralEntityType,
   getSearchURL,
+  getServerUrl,
   getSingularEntityType,
   IconEnum,
   loggedInAtom,
@@ -104,7 +105,7 @@ export function useGetEntity<EntityType>(
       const data = await FetchFunction({
         method: "POST",
         body: JSON.stringify(body),
-        url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}/${id}`,
+        url: `${getServerUrl()}/${type.toLowerCase()}/${id}`,
       });
       if (!data?.role_access && !IS_PUBLIC) {
         createNotification({
@@ -180,7 +181,7 @@ export function useGetEntities<ReturnType>(
     } = await FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${IS_PUBLIC ? baseURLS.basePublicServer : baseURLS.baseServer}/${type.toLowerCase()}`,
+      url: `${getServerUrl()}/${type.toLowerCase()}`,
     });
     if (!data?.role_access && !IS_PUBLIC) {
       createNotification({

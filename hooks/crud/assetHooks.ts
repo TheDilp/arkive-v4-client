@@ -45,6 +45,44 @@ export function useUploadAsset(type: AssetType, project_id: string) {
   );
 }
 
+export function useUploadAvatar(id: string) {
+  const createNotification = useNotifications();
+  return useMutation(
+    async (images: File[]) => {
+      const formData = new FormData();
+
+      for (let index = 0; index < images.length; index += 1) {
+        formData.append(images[index].name, images[index], images[index].name);
+      }
+
+      return FetchFunction({
+        url: `${IS_GATEWAY ? baseURLS.baseGatewayServer : baseURLS.baseServer}/assets/upload/${id}`,
+        body: formData,
+        method: "POST",
+      });
+    },
+    {
+      onSettled: (data) => {
+        if (data?.ok) {
+          createNotification({
+            title: data?.message || "Images uploaded successfully.",
+            variant: "success",
+            icon: IconEnum.check_circle,
+            timer: 5,
+          });
+        } else {
+          createNotification({
+            title: "There was an error uploading the image(s).",
+            variant: "error",
+            icon: IconEnum.error,
+            timer: 5,
+          });
+        }
+      },
+    }
+  );
+}
+
 export function useGetImages<InsertType>(
   project_id: string,
   type: AssetType,

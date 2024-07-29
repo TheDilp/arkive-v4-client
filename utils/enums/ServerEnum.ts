@@ -11,4 +11,15 @@ export const baseURLS = {
       : "wss://arkive-v4-server-production.up.railway.app"
   }`,
   basePublicClient: import.meta.env.VITE_WIKI_CLIENT_URL,
+  baseGatewayServer: `${
+    import.meta.env.DEV
+      ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}/gateway`
+      : import.meta.env.VITE_ARKIVE_EDITOR_SERVER
+  }`,
 };
+
+export function getServerUrl() {
+  if (IS_PUBLIC) return baseURLS.basePublicServer;
+  if (IS_GATEWAY) return baseURLS.baseGatewayServer;
+  return baseURLS.baseServer;
+}
