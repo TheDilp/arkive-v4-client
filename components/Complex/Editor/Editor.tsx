@@ -54,7 +54,7 @@ export function Editor({
       }}>
       <div
         className={`editor-component flex w-full max-w-full flex-col rounded-md border border-zinc-700 ${
-          isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-900"
+          isDisabled ? "cursor-not-allowed bg-zinc-600" : "bg-zinc-950"
         } ${isReadOnly ? "cursor-not-allowed" : ""} ${isFullHeight ? "h-full" : "max-h-[30rem]"}`}>
         {isReadOnly || isDisabled ? null : (
           <Menubar hasChanges={false} isEditorMenubar isMutating={false} isTemplate={false} size={menubarSize} />
