@@ -1,15 +1,17 @@
 import { ReactNode, useLayoutEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { AvatarUpload, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
-import { useGetEntities, useGetEntity, useHandleChange } from "../../../hooks";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
+import { useGetEntities, useGetEntity, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
+import { getDifferenceForCharacterFields, IconEnum } from "../../../utils";
+import { UpdateCharacterSchema } from "../../../validation";
 
 const baseCharacterSections = [{ id: "name", title: "Basic info" }];
 
 type SectionType = Partial<CharacterType> & { handleChange: (props: HandleChangePropsType) => void };
 
 function SectionLayout({ children }: { children: ReactNode | ReactNode[] }) {
-  return <section className="grid grid-cols-4 gap-2"> {children} </section>;
+  return <section className="grid grid-cols-4 gap-x-2 gap-y-4"> {children} </section>;
 }
 
 function NameSection({ first_name, last_name, nickname, age, project_id, biography, portrait_id, handleChange }: SectionType) {
@@ -39,18 +41,33 @@ function NameSection({ first_name, last_name, nickname, age, project_id, biograp
   );
 }
 
+function getPreviousSection(sections: { id: string; title: string }[], section_id: string) {
+  const idx = sections.findIndex((s) => s.id === section_id);
+
+  if (idx > 0) return idx - 1;
+
+  return idx;
+}
+function geNextSection(sections: { id: string; title: string }[], section_id: string) {
+  const idx = sections.findIndex((s) => s.id === section_id);
+
+  if (idx < sections.length - 1) return idx + 1;
+
+  return idx;
+}
+
 export function CharacterForm() {
   const { type, access_id, entity_id, section_id } = useParams();
   const [sections, setSections] = useState(baseCharacterSections);
   const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
   const [character, setCharacter] = useState<Partial<CharacterType>>({ first_name: "", last_name: "" });
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
-
+  const navigate = useNavigate();
   const { data: existingCharacter, isFetching: isFetchingCharacter } = useGetEntity<CharacterType>(
     entity_id,
     type as "characters",
     {
-      fields: ["id", "project_id", "first_name", "portrait_id", "last_name", "biography", "age"],
+      fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
       relations: {
         character_fields: true,
         tags: true,
@@ -78,7 +95,7 @@ export function CharacterForm() {
       orderBy: [
         {
           field: "sort",
-          sort: "desc",
+          sort: "asc",
         },
       ],
     },
@@ -88,6 +105,8 @@ export function CharacterForm() {
       staleTime: 5 * 60 * 1000,
     }
   );
+
+  const { mutate: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id);
 
   useLayoutEffect(() => {
     if (existingCharacter?.data) {
@@ -120,7 +139,7 @@ export function CharacterForm() {
   if (isFetchingCharacter || isFetchingTemplates) return <Skeleton type="character_profile" />;
   return (
     <>
-      <div className="col-span-2 overflow-hidden rounded-l-md bg-zinc-800">
+      <div className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2">
         <h3 className="py-2 text-center font-merriweather text-xl font-bold">Sections</h3>
         <ul className="h-full overflow-y-auto">
           {sections.map((section) => (
@@ -134,7 +153,7 @@ export function CharacterForm() {
           ))}
         </ul>
       </div>
-      <div className="col-span-10 overflow-hidden rounded-r-md bg-zinc-900 p-4">
+      <div className="col-span-10 flex h-full flex-col overflow-hidden rounded-r-md bg-zinc-900 p-4">
         {(sections || []).map((section) => {
           if (section.id !== section_id) return null;
 
@@ -145,6 +164,7 @@ export function CharacterForm() {
                   first_name={character.first_name}
                   portrait_id={character.portrait_id}
                   project_id={character.project_id}
+                  nickname={character.nickname}
                   last_name={character.last_name}
                   biography={character.biography}
                   age={character.age}
@@ -174,6 +194,57 @@ export function CharacterForm() {
             </div>
           );
         })}
+        <div className="mt-auto flex flex-col gap-y-2">
+          {section_id === "other" ? (
+            <div>
+              <Button
+                label="Complete"
+                icon={IconEnum.check_circle}
+                variant="success"
+                isDisabled={!character.first_name}
+                onClick={() => {
+                  if (existingCharacter?.data) {
+                    const dataToParse = {
+                      data: character,
+                      permissions: character?.permissions,
+                      relations: {
+                        character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
+                      },
+                    };
+                    if (dataToParse?.data?.portrait?.id) {
+                      dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+                    }
+                    const parsedData = UpdateCharacterSchema.parse(dataToParse);
+                    update(parsedData);
+                  }
+                }}
+              />
+            </div>
+          ) : null}
+          <div className="flex flex-nowrap content-end gap-x-2">
+            <Button
+              label="Previous section"
+              iconPos="left"
+              icon={IconEnum.chevron_left}
+              variant="info"
+              isDisabled={sections[0].id === section_id}
+              onClick={() =>
+                navigate(
+                  `/${type}/${access_id}/${entity_id}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
+                )
+              }
+            />
+            <Button
+              label="Next section"
+              icon={IconEnum.chevron_right}
+              variant="info"
+              isDisabled={sections?.at(-1)?.id === section_id}
+              onClick={() =>
+                navigate(`/${type}/${access_id}/${entity_id}/${sections[geNextSection(sections, section_id as string)]?.id}`)
+              }
+            />
+          </div>
+        </div>
       </div>
     </>
   );

@@ -21,6 +21,7 @@ import {
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
+  getServerUrl,
   getSingularEntityType,
   IconEnum,
   loggedInAtom,
@@ -41,7 +42,7 @@ export function useUpdateEntity<
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
+        url: `${getServerUrl()}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
