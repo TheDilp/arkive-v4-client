@@ -1,6 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import uniqBy from "lodash.uniqby";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -11,7 +11,7 @@ import {
   useTable,
   useToggledResetAtom,
 } from "../../../hooks";
-import { CharacterType, DrawerAtomType, RequestOrderByType, TabType } from "../../../types";
+import { CharacterType, DrawerAtomType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getImageURL, IconEnum, TextFilters } from "../../../utils";
 import { InsertGatewayConfigurationSchema, InsertGatewayConfigurationType } from "../../../validation/gateway_configuration";
@@ -186,6 +186,26 @@ function getOrderBy(type: AvailableGatewayEntites, orderBy: RequestOrderByType<a
 
   return orderBy || [{ field: "title", sort: "asc" }];
 }
+function getFilters(type: AvailableGatewayEntites, filter: string) {
+  const filters = { and: [], or: [] } as { and: RequestFilterType[]; or: RequestFilterType[] };
+  if (filter) {
+    if (type === "characters") {
+      filters.and.push({ id: "full_name", header_name: "full name", field: "full_name", operator: "ilike", value: filter });
+    } else {
+      filters.and.push({ id: "title_filter", header_name: "title", field: "title", operator: "ilike", value: filter });
+    }
+  }
+  if (type === "map_pins") {
+    filters.and.push({
+      id: "map_pin_title_filter",
+      header_name: "Map pin title",
+      field: "title",
+      operator: "is not",
+      value: null,
+    });
+  }
+  return filters;
+}
 
 const entityTabs: TabType[] = [
   { id: "characters" as const, label: "Characters", icon: IconEnum.character },
@@ -234,8 +254,8 @@ function EntitiesAccess({
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
   const entityType = entityTabs[selectedTab].id as AvailableGatewayEntites;
-
-  const [{ pagination, selection: tableSelection, orderBy }, dispatch] = useTable({
+  const [filter, setFilter] = useState("");
+  const [{ pagination, selection: tableSelection, orderBy, filters }, dispatch] = useTable({
     selection: {},
     pagination: { page: 0, limit: 10 },
   });
@@ -248,14 +268,7 @@ function EntitiesAccess({
       relations: {
         blueprint: entityType === "blueprint_instances",
       },
-      filters:
-        entityType === "map_pins"
-          ? {
-              and: [
-                { id: "map_pin_title_filter", header_name: "Map pin title", field: "title", operator: "is not", value: null },
-              ],
-            }
-          : {},
+      filters,
       orderBy: getOrderBy(entityType, orderBy) as RequestOrderByType<any>[],
       pagination,
       fields: getEntityFields(entityType as AvailableGatewayEntites),
@@ -271,6 +284,7 @@ function EntitiesAccess({
     project_id as string,
     "images",
     {
+      filters,
       orderBy,
       fields: ["id", "title"],
       pagination,
@@ -285,10 +299,54 @@ function EntitiesAccess({
     setSelection((prev) => ({ ...prev, [entityType]: values }));
   }, [tableSelection]);
 
+  useLayoutEffect(() => {
+    dispatch({
+      type: "clearAllFilters",
+    });
+    dispatch({ type: "setPagination", payload: { page: 0 } });
+    if (filter.length >= 3) {
+      const timeout = setTimeout(() => {
+        if (filter) {
+          dispatch({
+            type: "clearAllFilters",
+          });
+          dispatch({
+            type: "setFilter",
+            payload: getFilters(entityType, filter),
+          });
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    if (entityType === "map_pins" && filter.length < 3) {
+      dispatch({
+        type: "clearAllFilters",
+      });
+      dispatch({
+        type: "setFilter",
+        payload: {
+          and: [
+            {
+              id: "map_pin_title_filter",
+              header_name: "Map pin title",
+              field: "title",
+              operator: "is not",
+              value: null,
+            },
+          ],
+        },
+      });
+    }
+    return () => {};
+  }, [filter, dispatch, entityType]);
+
   return (
     <div className="flex max-h-[90%] flex-1 flex-col gap-y-2 [&>div>ul>li>button]:bg-zinc-900">
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={entityTabs} />
-
+      <Input isClearable label="Filter" name="filter" onChange={({ value }) => setFilter(value as string)} value={filter} />
       <Table
         columns={getColumns(
           entityType as AvailableGatewayEntites,
