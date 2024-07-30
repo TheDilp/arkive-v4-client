@@ -78,7 +78,7 @@ function FieldRow({
           <Input
             isDisabled={isLoading}
             label="Field title"
-            name={`character_fields[${index}].title`}
+            name={`[${field.section_id || null}][${index}].title`}
             onChange={changeField}
             placeholder="Eg. Location"
             value={field.title}
@@ -90,7 +90,7 @@ function FieldRow({
             hasSearch
             isDisabled={isLoading}
             label="Field type"
-            name={`character_fields[${index}].field_type`}
+            name={`${field.section_id || null}[${index}].field_type`}
             onChange={changeField}
             options={CharacterFieldTypesEnum}
             placeholder="Field type"
@@ -105,7 +105,7 @@ function FieldRow({
               isDisabled={isLoading}
               onClick={() =>
                 changeField({
-                  name: `character_fields[${index}].options`,
+                  name: `${field.section_id || null}[${index}].options`,
                   value: (field.options || []).concat({
                     id: crypto.randomUUID(),
                     value: `New option ${(field.options?.length || 0) + 1}`,
@@ -127,7 +127,7 @@ function FieldRow({
 
             const newData = reorder(field.options || [], result.source.index, result.destination.index);
             changeField({
-              name: `character_fields[${index}].options`,
+              name: `${field.section_id || null}[${index}].options`,
               // Saving sort field is not required
               // As the order is preserved in JSON
               value: newData,
@@ -148,7 +148,7 @@ function FieldRow({
                         style={{
                           ...provided.draggableProps.style,
                           left: "calc(100%-3px)",
-                          right: 24,
+                          right: 30,
                         }}>
                         <div {...provided.dragHandleProps} className="self-end pb-2">
                           <Icon fontSize={24} icon={IconEnum.menu} />
@@ -156,7 +156,7 @@ function FieldRow({
                         <div className="w-full">
                           <Input
                             isDisabled={isLoading}
-                            name={`character_fields[${index}].options[${optIndex}].value`}
+                            name={`${field.section_id || null}[${index}].options[${optIndex}].value`}
                             onChange={changeField}
                             value={opt.value}
                           />
@@ -169,7 +169,7 @@ function FieldRow({
                               isDisabled={isLoading}
                               onClick={() =>
                                 changeField({
-                                  name: `character_fields[${index}].options`,
+                                  name: `${field.section_id || null}[${index}].options`,
                                   value: (field.options || []).filter((o) => o.id !== opt.id),
                                 })
                               }
@@ -194,7 +194,7 @@ function FieldRow({
               helperText={field.formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
               isDisabled={isLoading}
               label="Dice formula"
-              name={`character_fields[${index}].formula`}
+              name={`${field.section_id || null}[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={field.formula || ""}
@@ -210,7 +210,7 @@ function FieldRow({
             initialDisplayValue={field.random_table?.title || ""}
             isDisabled={isLoading}
             label="Random table"
-            name={`character_fields[${index}].random_table_id`}
+            name={`${field.section_id || null}[${index}].random_table_id`}
             onChange={changeField}
             searchEntity="random_tables"
             value={field.random_table_id || ""}
@@ -224,7 +224,7 @@ function FieldRow({
             initialDisplayValue={field.calendar?.title || ""}
             isDisabled={isLoading}
             label="Calendar"
-            name={`character_fields[${index}].calendar_id`}
+            name={`${field.section_id || null}[${index}].calendar_id`}
             onChange={changeField}
             searchEntity="calendars"
             value={field.calendar_id || ""}
@@ -238,7 +238,7 @@ function FieldRow({
             initialDisplayValue={field.blueprint?.title || ""}
             isDisabled={isLoading}
             label="Blueprint"
-            name={`character_fields[${index}].blueprint_id`}
+            name={`${field.section_id || null}[${index}].blueprint_id`}
             onChange={changeField}
             searchEntity="blueprints"
             value={field.blueprint_id || ""}
@@ -276,13 +276,13 @@ function CharacterFieldSection({
           tooltip: "Add new field",
           onClick: () => {
             handleChange({
-              name: "character_fields",
+              name: id === "other" ? "null" : id,
               value: (character_fields || []).concat({
                 id: crypto.randomUUID(),
                 title: "New field",
                 field_type: "text",
                 sort: character_fields?.length ?? 0,
-                section_id: id,
+                section_id: id === "other" ? null : id,
               }),
             });
             fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
@@ -336,13 +336,13 @@ function CharacterFieldSection({
                                           label: "Delete",
                                           action: () =>
                                             handleChange({
-                                              name: "character_fields",
+                                              name: id,
                                               value: character_fields?.filter((f) => f.id !== field.id),
                                             }),
                                         },
                                       }))
                                     : handleChange({
-                                        name: "character_fields",
+                                        name: id,
                                         value: character_fields?.filter((f) => f.id !== field.id),
                                       }),
                               },
@@ -439,6 +439,9 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
   const isLoading = isFetching || isCreating || isUpdating;
   const [groupedFields, setGroupedFields] = useState<Record<string, CharacterFieldType[]>>({});
+
+  const { handleChange: handleCustomFieldsChange } = useHandleChange({ data: groupedFields, setData: setGroupedFields });
+
   useLayoutEffect(() => {
     if (existingTemplate?.data && !template?.title) {
       setTemplate(existingTemplate?.data);
@@ -513,13 +516,12 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 sort: index,
               }));
 
-              handleChange({ name: "character_fields", value: Object.values(temp).flat() });
               setGroupedFields(temp);
             }}>
             {(template.character_fields_sections || [])?.map((section) => (
               <CharacterFieldSection
                 character_fields={groupedFields?.[section.id] || []}
-                handleChange={handleChange}
+                handleChange={handleCustomFieldsChange}
                 id={section.id}
                 isInitialOpen={false}
                 isLoading={isFetching}
@@ -530,7 +532,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
             <CharacterFieldSection
               character_fields={groupedFields["null"] || []}
-              handleChange={handleChange}
+              handleChange={handleCustomFieldsChange}
               id="other"
               isInitialOpen={!template?.id || !groupedFields?.["null"]?.length || !template.character_fields_sections?.length}
               isLoading={isFetching}
