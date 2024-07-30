@@ -547,7 +547,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 character_fields={groupedFields["null"] || []}
                 handleChange={handleChange}
                 id="other"
-                isInitialOpen={!template?.id || !groupedFields?.["null"]?.length}
+                isInitialOpen={!template?.id || !groupedFields?.["null"]?.length || !template.character_fields_sections?.length}
                 isLoading={isFetching}
                 title="Other"
               />
