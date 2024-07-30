@@ -18,6 +18,19 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "commitlint.config.js", "components", "hooks", "types", "utils", "validation", "vite.config.ts"],
-  "exclude": ["components/modules.d.ts"]
+  "include": [
+    "src",
+    "commitlint.config.js",
+    "components",
+    "hooks",
+    "types",
+    "utils",
+    "validation",
+    "vite.config.ts",
+    "arkive-v4-editor/src",
+    "arkive-v4-wiki/src",
+    "arkive-v4-gateway/src",
+    "arkive-v4-dyce-vtt/src"
+  ],
+  "exclude": ["components/modules.d.ts", "*/**/node_modules"]
 }
