@@ -126,7 +126,7 @@ export function Collapsible({
                   <Button
                     hasNoBackground
                     icon={act?.icon}
-                    isDisabled={act?.isDisabled}
+                    isDisabled={act?.isDisabled || isDisabled}
                     label={act?.label}
                     onClick={act.onClick}
                     tooltip={act?.tooltip}
