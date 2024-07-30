@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { compression } from "vite-plugin-compression2";
 // https://vitejs.dev/config/
-export default ({ mode }) =>
+export default ({ mode }: { mode: any }) =>
   defineConfig({
     define: {
       APP_VERSION: JSON.stringify(process.env.npm_package_version),

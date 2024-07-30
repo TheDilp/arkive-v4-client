@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ESNext",
+    "types": ["vite/client"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -17,7 +18,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "commitlint.config.js", "components", "hooks", "types", "utils", "validation"],
+  "include": ["src", "commitlint.config.js", "components", "hooks", "types", "utils", "validation", "vite.config.ts"],
   "exclude": ["components/modules.d.ts"]
 }
-

@@ -5,7 +5,7 @@ import { AvatarShape } from "../MiscTypes";
 export interface SelectOptionType {
   label: string;
   value: string;
-  image?: { id: string; link: string; shape?: AvatarShape };
+  image?: { id: string | undefined; link: string; shape?: AvatarShape };
   icon?: AvailableIcons;
   isDisabled?: boolean;
 }
