@@ -41,6 +41,7 @@ import {
   RoleType,
   UserType,
 } from "../../types";
+import { GatewayConfigType, GatewayEntityType } from "../../types/EntityTypes/gatewayTypes";
 import {
   capitalizeFirstLetter,
   DefaultTagColor,
@@ -90,7 +91,8 @@ const tabs = [
   { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
-  { id: "6", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
+  { id: "6", label: "Gateway configuration", icon: IconEnum.gateway || IconEnum.character, isOwner: true },
+  { id: "7", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -387,13 +389,61 @@ function rolesColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
     }),
   ];
 }
+
+function gatewayColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
+  return [
+    rolesColumnHelper.display({
+      id: "title",
+      header: "Title",
+      cell: ({ row }) => row.original.title,
+    }),
+    rolesColumnHelper.display({
+      id: "action",
+      header: "Actions",
+      meta: {
+        centered: true,
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Dropdown
+            allowedPlacements={["left", "left-start", "left-end"]}
+            items={[
+              {
+                id: "1",
+                title: "Edit configuration",
+                icon: IconEnum.edit,
+                onClick: () =>
+                  setDrawer((prev) => ({
+                    ...prev,
+                    size: "xl",
+                    title: "Edit configuration",
+                    data: { id: row.original.id },
+                    type: "roles",
+                  })),
+              },
+              {
+                id: "expand",
+                title: `${!row.getIsExpanded() ? "Show" : "Hide"} entities`,
+                icon: IconEnum.gateway,
+                onClick: row.getToggleExpandedHandler(),
+              },
+              { id: "3", title: "Delete configuration", icon: IconEnum.trash },
+            ]}>
+            <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
+          </Dropdown>
+        </div>
+      ),
+    }),
+  ];
+}
+
 export function ProjectSettingsView() {
   const { project_id } = useParams();
   const queryClient = useQueryClient();
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(5);
   const { mutate: kickUser } = useKickMember();
 
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
@@ -437,7 +487,12 @@ export function ProjectSettingsView() {
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
     "roles",
-    { enabled: !!user?.id && isProjectOwner && (finalTabs[selectedTab].id === "4" || finalTabs[selectedTab].id === "5") }
+    { enabled: !!user?.id && isProjectOwner && (finalTabs?.[selectedTab]?.id === "4" || finalTabs?.[selectedTab]?.id === "5") }
+  );
+  const { data: gateway_configurations } = useGetEntities<GatewayConfigType>(
+    { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
+    "gateway_configurations",
+    { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "6" }
   );
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
@@ -467,7 +522,6 @@ export function ProjectSettingsView() {
       data: { project_id },
     }));
   }
-
   function handleOpenInviteToProjectDrawer() {
     setDrawer((prev) => ({
       ...prev,
@@ -483,6 +537,16 @@ export function ProjectSettingsView() {
       type: "roles",
       size: "xl",
       data: {},
+    }));
+  }
+  function handleOpenGatewayConfigDrawer(type: GatewayEntityType = "characters") {
+    setDrawer((prev) => ({
+      ...prev,
+      title: "Create gateway configuration",
+      type: "gateway_access",
+      size: "half",
+      data: { type },
+      exceptions: { gatewayConfiguration: true },
     }));
   }
   return (
@@ -517,9 +581,9 @@ export function ProjectSettingsView() {
         <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
             <span className="flex items-center gap-x-2">
-              <Icon icon={finalTabs[selectedTab].icon} /> {finalTabs[selectedTab].label}
+              <Icon icon={finalTabs?.[selectedTab]?.icon} /> {finalTabs?.[selectedTab]?.label}
             </span>
-            {finalTabs[selectedTab].id === "1" ? (
+            {finalTabs?.[selectedTab]?.id === "1" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.save}
@@ -532,12 +596,12 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs[selectedTab].id === "2" ? (
+            {finalTabs?.[selectedTab]?.id === "2" ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewMapPinTypeDrawer} size="sm" variant="info" />
               </div>
             ) : null}
-            {finalTabs[selectedTab].id === "3" ? (
+            {finalTabs?.[selectedTab]?.id === "3" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.add}
@@ -548,7 +612,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs[selectedTab].id === "4" && isProjectOwner ? (
+            {finalTabs?.[selectedTab]?.id === "4" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.user_invite}
@@ -559,13 +623,18 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
+            {finalTabs?.[selectedTab]?.id === "5" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenRolesDrawer} size="sm" variant="info" />
               </div>
             ) : null}
+            {finalTabs?.[selectedTab]?.id === "6" && isProjectOwner ? (
+              <div className="ml-auto w-min">
+                <Button icon={IconEnum.add} label="Create" onClick={handleOpenGatewayConfigDrawer} size="sm" variant="info" />
+              </div>
+            ) : null}
           </h2>
-          {finalTabs[selectedTab].id === "1" ? (
+          {finalTabs?.[selectedTab]?.id === "1" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
               <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-12 lg:col-span-8">
@@ -653,7 +722,7 @@ export function ProjectSettingsView() {
               )}
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "2" ? (
+          {finalTabs?.[selectedTab]?.id === "2" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -665,7 +734,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "3" ? (
+          {finalTabs?.[selectedTab]?.id === "3" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -677,7 +746,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "4" && isProjectOwner ? (
+          {finalTabs?.[selectedTab]?.id === "4" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -689,7 +758,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "5" && isProjectOwner ? (
+          {finalTabs?.[selectedTab]?.id === "5" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -702,7 +771,22 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs[selectedTab].id === "6" ? (
+
+          {finalTabs?.[selectedTab]?.id === "6" && isProjectOwner ? (
+            <div className="h-full">
+              <div className="h-fit w-full">
+                <Table
+                  columns={gatewayColumns(setDrawer)}
+                  config={{ expandable: true }}
+                  data={gateway_configurations?.data || []}
+                  dispatch={dispatch}
+                  type="gateway_configurations"
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {finalTabs?.[selectedTab]?.id === "7" ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible
                 actions={[

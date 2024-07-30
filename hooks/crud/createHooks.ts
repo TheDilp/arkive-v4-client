@@ -13,6 +13,7 @@ import {
   GraphType,
   NodeType,
 } from "../../types";
+import { GatewayEntityType } from "../../types/EntityTypes/gatewayTypes";
 import {
   baseURLS,
   edgesAtom,
@@ -365,6 +366,36 @@ export function useInviteUserToProject() {
       onError: (error: { message: string }) => {
         createNotification({
           title: error?.message || "There was an error sending this invite.",
+          variant: "error",
+          timer: 3,
+          icon: IconEnum.error,
+        });
+      },
+    }
+  );
+}
+export function useGrantGatewayAccess() {
+  const createNotification = useNotifications();
+  return useMutation(
+    async (accessData: { data: { email: string; id: string; type: GatewayEntityType; config: Record<string, string[]> } }) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer}/users/gateway/invite`,
+        method: "POST",
+        body: JSON.stringify(accessData),
+      }),
+
+    {
+      onSuccess: () => {
+        createNotification({
+          title: "Gateway access granted.",
+          variant: "success",
+          timer: 3,
+          icon: IconEnum.send,
+        });
+      },
+      onError: (error: { message: string }) => {
+        createNotification({
+          title: error?.message || "There was an error granting gateway access.",
           variant: "error",
           timer: 3,
           icon: IconEnum.error,

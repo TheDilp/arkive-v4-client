@@ -60,7 +60,7 @@ export function TemplateImageField({
                 },
               ]);
             }}
-            placeholder="Press enter to search."
+            placeholder="Type at least 2 characters"
             searchEntity="images"
             value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
           />

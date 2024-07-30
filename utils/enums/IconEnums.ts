@@ -65,6 +65,7 @@ export const IconEnum = {
   flow_arrow: "ph:flow-arrow" as const,
   folder: "ph:folder-light" as const,
   forbidden: "ph:prohibit" as const,
+  gateway: "ph:identification-badge" as const,
   google: "ph:google-logo-fill" as const,
   graph: "ph:graph-light" as const,
   grid: "ph:grid-four" as const,

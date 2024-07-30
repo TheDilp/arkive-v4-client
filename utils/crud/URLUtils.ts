@@ -38,4 +38,3 @@ export function getThumbnailUrl(url: string, dimensions?: { width: number; heigh
     .replace(/\//g, "_");
   return `${baseURLS.baseThumbnailServer}/${hash}/${sizedUrl}`;
 }
-

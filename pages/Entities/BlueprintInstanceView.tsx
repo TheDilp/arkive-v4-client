@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Icon, Table } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -76,7 +76,7 @@ const noLinkColumns = [
 ];
 
 function createColumns(
-  blueprint: BlueprintType,
+  blueprint_fields: BlueprintType["blueprint_fields"],
   title_name: string,
   project_id: string,
   setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
@@ -92,18 +92,23 @@ function createColumns(
   const fieldColumns: ColumnDef<BlueprintInstanceType, any>[] = [
     columnHelper.accessor("title", {
       id: "title",
-      header: title_name,
+      header: title_name || "Title",
       meta: {
         pinned: true,
         sortable: true,
         filterOptions: TextFilters,
       },
-      cell: ({ row }) => row.original?.title || "",
+      cell: ({ row }) => (
+        <span className="flex items-center gap-x-2">
+          <Icon fontSize={24} icon={row?.original?.blueprint?.icon || IconEnum.blueprint} />
+          {`${row.original?.title || ""} ${row.original?.blueprint?.title ? `(${row.original?.blueprint?.title})` : ""}`}
+        </span>
+      ),
       minSize: 15,
     }),
   ];
 
-  blueprint.blueprint_fields
+  blueprint_fields
     ?.filter((field) => field.field_type !== "textarea")
     ?.forEach((field) => {
       const { minSize, maxSize } = getBlueprintInstanceColumnWidth(field.field_type);
@@ -673,15 +678,11 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
         project_id,
         parent_id: item_id,
       },
-      relations: {
-        blueprint_fields: true,
-        tags: true,
-      },
       permissions: true,
       filters,
       fields: ["id", "deleted_at", "is_public", "title"],
       relationFilters,
-      orderBy,
+      orderBy: orderBy,
       pagination,
       arkived: arkived === "arkive",
     },
@@ -692,7 +693,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
   );
 
   useEffect(() => {
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
   }, [arkived]);
 
@@ -702,7 +703,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
         type: "clearAllFilters",
       });
     }
-    dispatch({ type: "clearSelection" });
+    // dispatch({ type: "clearSelection" });
     dispatch({ type: "setPagination", payload: { page: 0 } });
     if (filter.length >= 3) {
       const timeout = setTimeout(() => {
@@ -732,7 +733,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
       {blueprint?.data ? (
         <Table
           columns={createColumns(
-            blueprint?.data,
+            blueprint?.data?.blueprint_fields || [],
             blueprint?.data?.title_name || "",
             project_id as string,
             setDrawer,

@@ -1,4 +1,7 @@
+import { baseURLS } from "../enums";
+
 export function getEntityLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
+  if (IS_GATEWAY) return "#";
   if (name === "") return "#";
   const linkRoot = IS_PUBLIC ? "../" : "/projects";
   if (name === "characters") {
@@ -47,5 +50,5 @@ export function getSidebarLink(link: string, project_id: string, isDisabled?: bo
 }
 
 export function openPublicPage(link: string) {
-  window.open(`https://wiki.thearkive.app${link}`, "_blank");
+  window.open(`${baseURLS.basePublicClient}${link}`, "_blank");
 }

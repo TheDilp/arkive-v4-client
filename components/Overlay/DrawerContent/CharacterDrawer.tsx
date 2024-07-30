@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import groupBy from "lodash.groupby";
 import omit from "lodash.omit";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -24,6 +25,7 @@ import {
   TagType,
   UserHasPermissionsType,
 } from "../../../types";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
 import {
   createOrEditPermission,
   getDifferenceForCharacterFields,
@@ -105,23 +107,33 @@ function RelationshipRow({
   );
 }
 
-function FieldTemplateRows({
+export function FieldTemplateRows({
   character_fields = [],
   character_fields_data = [],
   handleChange,
   hasCreateOrEdit,
+  isDrawer = true,
+  options,
 }: {
   character_fields?: CharacterFieldType[] | undefined;
   character_fields_data: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   hasCreateOrEdit: boolean;
+  isDrawer?: boolean;
+  options?: GatewayConfigOptionType[] | null;
 }) {
+  if (!character_fields.length) return null;
   return (
     <li className="flex flex-col first:mt-0">
-      <div className="flex select-none flex-col gap-y-2 pt-2">
+      <div
+        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-8 [&>*>*>.text-sm]:mb-2 [&>*>*>.text-sm]:border-b [&>*>*>.text-sm]:border-zinc-700 [&>*>.text-sm]:mb-2 [&>*>.text-sm]:border-b [&>*>.text-sm]:border-zinc-700"} select-none`}>
         {character_fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
+          const presetOptions =
+            options && templateValueKey
+              ? options?.filter((opt) => opt.entity_type === templateValueKey && opt.parent_id === template_field.blueprint_id)
+              : null;
           const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
 
           const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
@@ -254,6 +266,7 @@ function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions}
                 title={template_field.title}
               />
             );
@@ -273,6 +286,7 @@ function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions}
                 title={template_field.title}
               />
             );
@@ -364,11 +378,7 @@ function AdditionalFieldsTab({
   tags,
   hasCreateOrEdit,
 }: {
-  templates:
-    | {
-        data: CharacterFieldTemplateType[];
-      }
-    | undefined;
+  templates: CharacterFieldTemplateType[] | undefined;
   character_fields?: CharacterCharacterFieldType[];
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
@@ -379,18 +389,39 @@ function AdditionalFieldsTab({
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
       {!tags?.length ? <Alert label="Please select tags first." variant="info" /> : null}
-      {!templates?.data?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
+      {!templates?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
 
-      {(templates?.data || []).map((t) => {
+      {(templates || []).map((t) => {
+        const otherFields = t.character_fields.filter((f) => !f.section_id);
         return (
           <Collapsible key={t.id} label={t.title}>
-            <div className="p-2">
-              <FieldTemplateRows
-                character_fields={t.character_fields}
-                character_fields_data={character_fields || []}
-                handleChange={handleChange}
-                hasCreateOrEdit={hasCreateOrEdit}
-              />
+            <div className="flex flex-col gap-y-2 p-1.5">
+              {t.character_fields_sections.map((section) => {
+                return (
+                  <Collapsible key={section.id} label={section.title}>
+                    <div className="min-h-8 p-2">
+                      <FieldTemplateRows
+                        character_fields={t.character_fields.filter((f) => f.section_id === section.id)}
+                        character_fields_data={character_fields || []}
+                        handleChange={handleChange}
+                        hasCreateOrEdit={hasCreateOrEdit}
+                      />
+                    </div>
+                  </Collapsible>
+                );
+              })}
+              {otherFields.length ? (
+                <Collapsible label={"Other"}>
+                  <div className="min-h-8 p-2">
+                    <FieldTemplateRows
+                      character_fields={otherFields}
+                      character_fields_data={character_fields || []}
+                      handleChange={handleChange}
+                      hasCreateOrEdit={hasCreateOrEdit}
+                    />
+                  </div>
+                </Collapsible>
+              ) : null}
             </div>
           </Collapsible>
         );
@@ -472,7 +503,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     {
       data: { project_id: project_id as string },
       fields: ["id", "title", "sort"],
-      relations: { character_fields: true },
+      relations: { character_fields: true, character_fields_sections: true },
       relationFilters: {
         or: (character?.tags || [])?.map((t) => ({
           operator: "in",
@@ -486,7 +517,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
       orderBy: [
         {
           field: "sort",
-          sort: "desc",
+          sort: "asc",
         },
       ],
     },
@@ -505,12 +536,12 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
     },
     "character_relationship_types",
     {
-      // enabled: tabs[selectedTab].id === "3",
       staleTime: 5 * 60 * 1000,
     }
   );
 
   const [relationGroupIds, setRelationGroupIds] = useState<string[]>([]);
+  const [groupedFields, setGroupedFields] = useState<Record<string, CharacterCharacterFieldType[]>>({});
 
   const relationGroups = (relationshipTypes?.data || [])?.filter((rt) => relationGroupIds.includes(rt.id));
 
@@ -527,6 +558,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           .concat(existingCharacter?.data?.related_other || [])
           .map((relation: CharacterRelatedType) => relation.relation_type_id)
       );
+      setGroupedFields(groupBy(existingCharacter?.data?.character_fields || [], "section_id"));
     } else if (!data?.id && !character) {
       setCharacter({
         id: "",
@@ -878,7 +910,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
           hasCreateOrEdit={hasCreateOrEdit && permissions?.read_character_fields_templates}
           isLoading={isFetching || isFetchingTemplates}
           tags={character?.tags}
-          templates={{ data: templates?.data || [] }}
+          templates={templates?.data || []}
         />
       ) : null}
       {tabs[selectedTab].id === "6" && (permissions?.is_owner || !data?.id) ? (
@@ -930,7 +962,7 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
                   permissions: character?.permissions,
                   relations: {
                     tags: character?.tags?.map((t) => ({ id: t.id })),
-                    character_fields: character?.character_fields || [],
+                    character_fields: Object.values(groupedFields).flat() || [],
                     related_from: character?.related_from?.map(formatRelationship),
                     related_to: character?.related_to?.map(formatRelationship),
                     related_other: character?.related_other?.map(formatRelationship),

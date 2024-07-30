@@ -67,7 +67,7 @@ export function TemplateEventField({
                 },
               ]);
             }}
-            placeholder="Press enter to search."
+            placeholder="Type at least 2 characters"
             searchEntity="events"
             value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
@@ -99,4 +99,3 @@ export function TemplateEventField({
     </TemplateFieldContainer>
   );
 }
-

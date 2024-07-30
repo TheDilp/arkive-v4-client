@@ -58,6 +58,7 @@ export type TableActionType =
       payload: { field: string; sort: SortType };
     }
   | { type: "setSelection"; payload: { row: string } }
+  | { type: "setManualSelection"; payload: { [key: number]: string[] } }
   | { type: "selectAll"; payload: { rows: string[] } }
   | { type: "clearSelection" };
 
@@ -84,6 +85,7 @@ export interface TableType {
     filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
     selectedActions?: TableSelectedAction[];
+    columnVisibility?: Record<string, boolean>;
     getLink?: (rowData: any) => string;
     onRowClick?: (rowData: any) => void;
     setFavorite?: (rowData: any) => void;
@@ -96,7 +98,8 @@ export interface TableType {
     | "words"
     | "context"
     | "relationships"
-    | "roles";
+    | "roles"
+    | "gateway_configurations";
   skeletonLimit?: number;
 }
 

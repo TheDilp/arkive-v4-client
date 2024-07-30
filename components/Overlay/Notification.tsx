@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
 import { DiceRollType, NotificationType } from "../../types";
-import { getImageURL, IconEnum, loggedInAtom, notificationsAtom, removeNotification } from "../../utils";
+import { getImageURL, IconEnum, notificationsAtom, removeNotification } from "../../utils";
 import { getCritColor } from "../../utils/ui/diceRollerUtils";
 import { Button } from "../Form";
 import { Avatar, Icon } from "../Misc";
@@ -269,8 +269,6 @@ export function Notification({
 
 export function NotificationContainer() {
   const notifications = useAtomValue(notificationsAtom);
-  const loggedIn = useAtomValue(loggedInAtom);
-  if (!loggedIn) return null;
   return (
     <div className="scrollbar-hidden pointer-events-none absolute z-[999999] flex h-full w-full flex-col gap-y-4 overflow-y-auto">
       {notifications.map((n) => (

@@ -1,5 +1,7 @@
 import { MutationOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
+import ls from "localstorage-slim";
+import { useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import {
@@ -19,6 +21,7 @@ import {
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
+  getServerUrl,
   getSingularEntityType,
   IconEnum,
   loggedInAtom,
@@ -39,7 +42,7 @@ export function useUpdateEntity<
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
+        url: `${getServerUrl()}/${type.toLowerCase()}/update/${updateValues?.data?.id}`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
@@ -857,7 +860,6 @@ export function useUpdateAuthStatus() {
     return data;
   });
 }
-
 export function useSignout() {
   const setLoggedIn = useSetAtom(loggedInAtom);
   const setUserStatus = useSetAtom(userStatusAtom);
@@ -879,6 +881,41 @@ export function useSignout() {
     {
       onSettled: () => {
         queryClient.refetchQueries(["auth_status"]);
+      },
+    }
+  );
+}
+export function useAccessGateway() {
+  const { type, access_id } = useParams();
+  const createNotification = useNotifications();
+  return useMutation(
+    async (code: string) =>
+      FetchFunction({
+        url: `${baseURLS.baseServer.replace("/api/v1", "")}/gateway/access/${type}/${access_id}/${code}`,
+        method: "GET",
+      }),
+
+    {
+      onSuccess: ({ ok }, code) => {
+        if (ok) {
+          ls.set("code", code, { encrypt: true });
+        }
+        // createNotification({
+        //   title: "Gateway access granted.",
+        //   variant: "success",
+        //   timer: 3,
+        //   icon: IconEnum.send,
+        // });
+      },
+      onError: (error: { message: string }) => {
+        console.log(error.message);
+        createNotification({
+          hasNoTruncate: true,
+          title: error?.message || "There was an error.",
+          variant: "error",
+          timer: 3,
+          icon: IconEnum.error,
+        });
       },
     }
   );

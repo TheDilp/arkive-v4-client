@@ -2,7 +2,14 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useCreateEntity, useGetEntity, useHandleChange, useHasPermissions, useUpdateEntity } from "../../../hooks";
+import {
+  useCreateEntity,
+  useGetEntity,
+  useHandleChange,
+  useHasPermissions,
+  useToggledResetAtom,
+  useUpdateEntity,
+} from "../../../hooks";
 import { TabType, TagType, UserHasPermissionsType } from "../../../types";
 import {
   AvailableManuscriptEntityTypes,
@@ -70,9 +77,9 @@ function getTabs(permissions: UserHasPermissionsType, id: string | undefined) {
 export function ManuscriptDrawer({ data }: Props) {
   const { project_id } = useParams();
   const [selectedTab, setSelectedTab] = useState(data?.preselectedTab || 0);
-
   const [manuscript, setManuscript] = useState<Partial<ManuscriptType>>({});
   const [entities, setEntities] = useState<EntityType[]>([]);
+  const resetDrawer = useToggledResetAtom();
   const { data: existingManuscript, isInitialLoading } = useGetEntity<ManuscriptType>(
     data?.id,
     "manuscripts",
@@ -334,6 +341,7 @@ export function ManuscriptDrawer({ data }: Props) {
                 create(parsed);
               }
             }
+            resetDrawer();
           }}
           variant="success"
         />

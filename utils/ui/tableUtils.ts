@@ -36,6 +36,7 @@ export function getTableColumns(
     setFavorite,
     dispatch,
     pagination,
+    selected,
     config,
   }: {
     hasSelect?: boolean;
@@ -45,10 +46,11 @@ export function getTableColumns(
     setFavorite?: (data: SetFavoriteType) => void;
     dispatch?: TableDispatch;
     pagination?: RequestPaginationType;
+    selected?: string[];
     config?: {
       hasTagsWarning?: boolean;
     };
-  },
+  }
 ) {
   const finalColumns = [...columns];
 
@@ -56,7 +58,7 @@ export function getTableColumns(
     finalColumns.unshift(FavoriteColumn(setFavorite));
   }
   if (hasSelect && dispatch) {
-    finalColumns.unshift(SelectColumn(dispatch, pagination));
+    finalColumns.unshift(SelectColumn(dispatch, pagination, selected));
   }
   if (hasTags) {
     if (finalColumns.some((c) => c.id === "is_public")) {
@@ -76,7 +78,7 @@ export function getTableColumns(
 
 export function getTableColumnWidths(
   id: string,
-  { minSize, maxSize }: { minSize?: number; maxSize?: number },
+  { minSize, maxSize }: { minSize?: number; maxSize?: number }
 ): {
   minWidth: string;
   maxWidth?: string;
@@ -103,7 +105,7 @@ export function getTableColumnWidths(
 export function removeColumnFilter(
   id: string,
   type: "and" | "or",
-  setColumnFilters: Dispatch<SetStateAction<{ and?: TableColumnFilterType[]; or?: TableColumnFilterType[] }>>,
+  setColumnFilters: Dispatch<SetStateAction<{ and?: TableColumnFilterType[]; or?: TableColumnFilterType[] }>>
 ) {
   setColumnFilters((prev) => ({
     ...prev,
@@ -123,7 +125,7 @@ function getFilterBadgeLabel(filter: Pick<TableColumnFilterType, "operator" | "v
 }
 
 export function groupFiltersByHeader(
-  items: TableColumnFilterType[],
+  items: TableColumnFilterType[]
 ): Record<string, Pick<TableColumnFilterType, "id" | "operator" | "value">[]> {
   return items.reduce((accumulator: Record<any, any>, item) => {
     const { header_name, ...rest } = item;
@@ -139,20 +141,20 @@ export function getAreColumnFiltersActive(
   header: string,
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
   relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] },
-  id?: string,
+  id?: string
 ): boolean {
   if (id) {
     if (filters?.and?.some((filt) => filt.field === id)) return true;
     if (filters?.or?.some((filt) => filt.field === id)) return true;
     if (
       relationFilters?.and?.some(
-        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id,
+        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id
       )
     )
       return true;
     if (
       relationFilters?.or?.some(
-        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id,
+        (filt) => filt.field === id || header === filt.header_name || filt?.relationalData?.blueprint_field_id === id
       )
     )
       return true;
@@ -210,7 +212,7 @@ export function applyFilter(
     or?: TableColumnFilterType[] | undefined;
   },
   dispatch: TableDispatch,
-  isRelationFilter: boolean,
+  isRelationFilter: boolean
 ) {
   dispatch({ type: isRelationFilter ? "setRelationFilter" : "setFilter", payload: { ...columnFilters, field: columnId } });
 }

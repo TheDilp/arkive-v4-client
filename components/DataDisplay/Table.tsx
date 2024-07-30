@@ -1,5 +1,5 @@
 import { ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
-import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, Fragment, MutableRefObject, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
@@ -529,11 +529,25 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
 }
 export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
   const { isLg } = useBreakpoint();
-  const { filters, relationFilters, orderBy, expandable, hasNoHeaderGap, selection, selectedActions, getLink, onRowClick } =
-    config || {};
+  const {
+    filters,
+    relationFilters,
+    orderBy,
+    expandable,
+    hasNoHeaderGap,
+    selection,
+    columnVisibility,
+    selectedActions,
+    getLink,
+    onRowClick,
+  } = config || {};
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const isSubheaderEnabled =
     !!filters?.and?.length || !!filters?.or?.length || !!relationFilters?.and?.length || !!relationFilters?.or?.length;
+
+  const selected = useMemo(() => {
+    return Object.values(selection || {}).flat();
+  }, [selection]);
 
   const {
     head,
@@ -576,6 +590,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     },
     meta: config,
     state: {
+      columnVisibility,
       expanded,
     },
     onExpandedChange: setExpanded,
@@ -587,6 +602,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
       hasArkived: config?.hasArkived,
       setFavorite: config?.setFavorite,
       dispatch,
+      selected,
       pagination,
       config: {
         hasTagsWarning: config?.hasTagsWarning,
@@ -595,6 +611,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
     getCoreRowModel: getCoreRowModel(),
     getRowCanExpand: () => !!expandable,
     getExpandedRowModel: getExpandedRowModel(),
+    getRowId: (row) => row.id,
   });
 
   useEffect(() => {
@@ -607,6 +624,8 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
   const { rows } = table.getRowModel();
 
   const pinned = columns.filter((col) => col?.meta?.pinned);
+  const selectedOnPage = table.getPaginationRowModel().flatRows.filter((row) => selected.includes(row.id));
+
   return (
     <>
       <div className="max-h-[calc(100%-2.5rem)] overflow-auto border-zinc-800" ref={bodyRef}>
@@ -736,17 +755,11 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
               </Fragment>
             );
           })}
-          {Object.entries(selection || {}).some(([, selectedRows]) => selectedRows.length) ? (
+          {selected?.length ? (
             <div className="absolute left-[2.75rem] z-20 flex h-full w-[calc(100%-2.75rem)] items-center gap-x-1 bg-zinc-800 px-2">
               <span>Selected:</span>
-              <b>
-                {Object.values(selection || {}).reduce((accumulator, curr) => {
-                  // eslint-disable-next-line no-param-reassign
-                  accumulator += curr.length;
-                  return accumulator;
-                }, 0)}
-              </b>
-              <span className="border-r border-zinc-500 pr-2">rows </span>
+              <b>{selected.length} </b>
+              <span className="border-r border-zinc-500 pr-2">rows ({selectedOnPage.length} on this page) </span>
               <span className="mx-2 flex items-center gap-x-4">
                 {selectedActions?.length
                   ? selectedActions.map((action) => (
@@ -805,11 +818,9 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                       <div
                         className={`${contentClasses()} ${cell.column.id === "select" ? selectClasses() : ""} ${
                           (cell.column.columnDef.meta as MetaType)?.centered ? centeredContent() : ""
-                        } ${cell.column.id === "select" && isLg ? "sticky left-0 z-10" : "z-0"} ${config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
-                          config?.selection && config?.selection[pagination?.page || 0]?.includes(row.original.id)
-                            ? "bg-blue-400"
-                            : "bg-zinc-950"
-                        } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !config?.selection?.[pagination?.page || 0]?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
+                        } ${cell.column.id === "select" && isLg ? "sticky left-0 z-10" : "z-0"} ${selected?.includes(row.original.id) ? "group-hover:bg-blue-300" : ""} ${
+                          config?.selection && selected?.includes(row.original.id) ? "bg-blue-400" : "bg-zinc-950"
+                        } ${(cell.column.columnDef.meta as MetaType)?.pinned && isLg ? "sticky z-10" : ""} ${getLink && !selected?.includes(row.original.id) ? hasLinkRow() : ""} ${cell.column.columnDef.id === "tags" ? "" : "cursor-default"} `}
                         key={cell.id}
                         onClick={(e) => {
                           if (

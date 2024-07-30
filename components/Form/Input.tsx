@@ -71,10 +71,10 @@ const InputClasses = tv({
       },
       md: { inputContainer: "h-10" },
       lg: {
-        inputContainer: "h-12",
+        inputContainer: "h-12 text-2xl",
       },
-      xl: {},
-      "2xl": {},
+      xl: { inputContainer: "h-14" },
+      "2xl": { inputContainer: "h-16" },
       "3xl": {},
       "4xl": {},
     },
@@ -161,11 +161,12 @@ export function Input({
         {prefix ? <span className="pr-1">{prefix}</span> : null}
 
         <input
-          autoComplete="new-password"
+          autoComplete="one-time-code"
           autoFocus={isAutofocused}
           className={input()}
           disabled={isDisabled || isReadOnly}
           max={max}
+          maxLength={type === "code" ? 6 : undefined}
           min={min}
           name={name}
           onBlur={onBlur}

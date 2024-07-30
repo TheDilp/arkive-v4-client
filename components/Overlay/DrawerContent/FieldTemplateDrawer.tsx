@@ -72,13 +72,13 @@ function FieldRow({
   isLoading: boolean;
 }) {
   return (
-    <div className="flex w-full flex-col gap-y-2">
+    <div className="top-0 flex w-full flex-col gap-y-2">
       <div className="flex w-full items-center justify-between gap-x-2">
         <div className="h-full flex-1">
           <Input
             isDisabled={isLoading}
             label="Field title"
-            name={`character_fields[${index}].title`}
+            name={`[${field.section_id || null}][${index}].title`}
             onChange={changeField}
             placeholder="Eg. Location"
             value={field.title}
@@ -90,7 +90,7 @@ function FieldRow({
             hasSearch
             isDisabled={isLoading}
             label="Field type"
-            name={`character_fields[${index}].field_type`}
+            name={`${field.section_id || null}[${index}].field_type`}
             onChange={changeField}
             options={CharacterFieldTypesEnum}
             placeholder="Field type"
@@ -105,7 +105,7 @@ function FieldRow({
               isDisabled={isLoading}
               onClick={() =>
                 changeField({
-                  name: `character_fields[${index}].options`,
+                  name: `${field.section_id || null}[${index}].options`,
                   value: (field.options || []).concat({
                     id: crypto.randomUUID(),
                     value: `New option ${(field.options?.length || 0) + 1}`,
@@ -127,13 +127,13 @@ function FieldRow({
 
             const newData = reorder(field.options || [], result.source.index, result.destination.index);
             changeField({
-              name: `character_fields[${index}].options`,
+              name: `${field.section_id || null}[${index}].options`,
               // Saving sort field is not required
               // As the order is preserved in JSON
               value: newData,
             });
           }}>
-          <Droppable droppableId={`droppable_${index}_${field.field_type}`}>
+          <Droppable droppableId={`droppable_${index}_${field.field_type}`} type="FIELD_ROW">
             {(providedDroppable) => (
               <div className="flex flex-col" {...providedDroppable.droppableProps} ref={providedDroppable.innerRef}>
                 {field.options?.map((opt, optIndex) => (
@@ -148,7 +148,7 @@ function FieldRow({
                         style={{
                           ...provided.draggableProps.style,
                           left: "calc(100%-3px)",
-                          right: 24,
+                          right: 30,
                         }}>
                         <div {...provided.dragHandleProps} className="self-end pb-2">
                           <Icon fontSize={24} icon={IconEnum.menu} />
@@ -156,7 +156,7 @@ function FieldRow({
                         <div className="w-full">
                           <Input
                             isDisabled={isLoading}
-                            name={`character_fields[${index}].options[${optIndex}].value`}
+                            name={`${field.section_id || null}[${index}].options[${optIndex}].value`}
                             onChange={changeField}
                             value={opt.value}
                           />
@@ -169,7 +169,7 @@ function FieldRow({
                               isDisabled={isLoading}
                               onClick={() =>
                                 changeField({
-                                  name: `character_fields[${index}].options`,
+                                  name: `${field.section_id || null}[${index}].options`,
                                   value: (field.options || []).filter((o) => o.id !== opt.id),
                                 })
                               }
@@ -194,7 +194,7 @@ function FieldRow({
               helperText={field.formula?.match?.(DiceRollRegex) ? "" : MessageEnum.dice_notation_not_valid}
               isDisabled={isLoading}
               label="Dice formula"
-              name={`character_fields[${index}].formula`}
+              name={`${field.section_id || null}[${index}].formula`}
               onChange={changeField}
               placeholder="E.g. 4d6dl1"
               value={field.formula || ""}
@@ -210,7 +210,7 @@ function FieldRow({
             initialDisplayValue={field.random_table?.title || ""}
             isDisabled={isLoading}
             label="Random table"
-            name={`character_fields[${index}].random_table_id`}
+            name={`${field.section_id || null}[${index}].random_table_id`}
             onChange={changeField}
             searchEntity="random_tables"
             value={field.random_table_id || ""}
@@ -224,7 +224,7 @@ function FieldRow({
             initialDisplayValue={field.calendar?.title || ""}
             isDisabled={isLoading}
             label="Calendar"
-            name={`character_fields[${index}].calendar_id`}
+            name={`${field.section_id || null}[${index}].calendar_id`}
             onChange={changeField}
             searchEntity="calendars"
             value={field.calendar_id || ""}
@@ -238,7 +238,7 @@ function FieldRow({
             initialDisplayValue={field.blueprint?.title || ""}
             isDisabled={isLoading}
             label="Blueprint"
-            name={`character_fields[${index}].blueprint_id`}
+            name={`${field.section_id || null}[${index}].blueprint_id`}
             onChange={changeField}
             searchEntity="blueprints"
             value={field.blueprint_id || ""}
@@ -265,19 +265,42 @@ function CharacterFieldSection({
   isInitialOpen: boolean;
 }) {
   const setDialog = useSetAtom(dialogAtom);
+  const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   return (
-    <Collapsible initialOpen={isInitialOpen} label={title}>
-      {character_fields.length ? <span /> : <div className="w-full">Drop fields here</div>}
-      <Droppable direction="vertical" droppableId={id} type="CHARACTER_FIELDS">
+    <Collapsible
+      actions={[
+        {
+          icon: IconEnum.add,
+          variant: "info",
+          tooltip: "Add new field",
+          onClick: () => {
+            handleChange({
+              name: id === "other" ? "null" : id,
+              value: (character_fields || []).concat({
+                id: crypto.randomUUID(),
+                title: "New field",
+                field_type: "text",
+                sort: character_fields?.length ?? 0,
+                section_id: id === "other" ? null : id,
+              }),
+            });
+            fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+          },
+        },
+      ]}
+      initialOpen={isInitialOpen}
+      label={title}>
+      {character_fields.length ? <span /> : <div className="w-full p-2">Drop fields here</div>}
+      <Droppable direction="vertical" droppableId={id} key={id} type="CHARACTER_FIELDS">
         {(providedDroppable) => (
           <div
-            className={`relative flex min-h-8 flex-col rounded-md bg-zinc-800 p-1.5 ${character_fields.length ? "" : "border border-dashed border-zinc-600"}`}
+            className={`flex min-h-8 flex-col rounded-md p-1.5 ${character_fields.length ? "" : "border border-dashed border-zinc-600"}`}
             {...providedDroppable.droppableProps}
             ref={providedDroppable.innerRef}>
             {character_fields?.length
               ? character_fields.map((field, index) => (
-                  <Draggable draggableId={field.id || field.title + index} index={index} key={field.id}>
+                  <Draggable draggableId={field.id} index={index} key={field.id}>
                     {(provided, draggableSnapshot) => (
                       <div
                         className={`my-1 flex flex-nowrap items-center gap-x-2 ${
@@ -286,14 +309,11 @@ function CharacterFieldSection({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         key={field.id}
-                        style={{
-                          ...provided.draggableProps.style,
-                          right: 16,
-                        }}>
+                        style={provided.draggableProps.style}>
                         <div {...provided.dragHandleProps} className="mt-1 self-start">
                           <Icon fontSize={24} icon={IconEnum.menu} />
                         </div>
-                        <div className="w-full">
+                        <div className="z-20 w-full">
                           <Collapsible
                             actions={[
                               {
@@ -316,13 +336,13 @@ function CharacterFieldSection({
                                           label: "Delete",
                                           action: () =>
                                             handleChange({
-                                              name: "character_fields",
+                                              name: id,
                                               value: character_fields?.filter((f) => f.id !== field.id),
                                             }),
                                         },
                                       }))
                                     : handleChange({
-                                        name: "character_fields",
+                                        name: id,
                                         value: character_fields?.filter((f) => f.id !== field.id),
                                       }),
                               },
@@ -337,16 +357,7 @@ function CharacterFieldSection({
                             <div
                               className={`my-1 flex flex-nowrap items-center gap-x-2 bg-zinc-950 p-2 ${
                                 draggableSnapshot.isDragging ? "rounded shadow-sm" : ""
-                              }`}
-                              {...provided.draggableProps}
-                              style={{
-                                ...provided.draggableProps.style,
-                                right: 0,
-                              }}>
-                              <div {...provided.dragHandleProps} className="mt-7 self-start">
-                                <Icon fontSize={24} icon={IconEnum.menu} />
-                              </div>
-
+                              }`}>
                               <FieldRow changeField={handleChange} field={field} index={index} isLoading={isLoading} />
                             </div>
                           </Collapsible>
@@ -357,6 +368,7 @@ function CharacterFieldSection({
                 ))
               : null}
             {providedDroppable.placeholder}
+            <div ref={fieldContainerRef} />
           </div>
         )}
       </Droppable>
@@ -367,8 +379,8 @@ function CharacterFieldSection({
 function getTabs(permissions: UserHasPermissionsType, id: string | undefined): TabType[] {
   const tabs: TabType[] = [
     { id: "1", label: "Basic info", icon: IconEnum.info_circle },
-    { id: "2", label: "Fields", icon: IconEnum.additional_fields },
     { id: "3", label: "Sections", icon: IconEnum.additional_fields_sections },
+    { id: "2", label: "Fields", icon: IconEnum.additional_fields },
   ];
   if (permissions?.is_owner || !id) {
     tabs.push({ id: "4", label: "Access", icon: IconEnum.permissions });
@@ -380,7 +392,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState(0);
   const { project_id } = useParams();
-  const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
   const resetDrawerAtom = useToggledResetAtom();
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertTemplateType>("character_fields_templates");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateTemplateType>(
@@ -428,18 +439,15 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
 
   const isLoading = isFetching || isCreating || isUpdating;
   const [groupedFields, setGroupedFields] = useState<Record<string, CharacterFieldType[]>>({});
+
+  const { handleChange: handleCustomFieldsChange } = useHandleChange({ data: groupedFields, setData: setGroupedFields });
+
   useLayoutEffect(() => {
     if (existingTemplate?.data && !template?.title) {
       setTemplate(existingTemplate?.data);
       setGroupedFields(groupBy(existingTemplate?.data?.character_fields || [], "section_id"));
     }
   }, [existingTemplate]);
-
-  useLayoutEffect(() => {
-    if (template?.character_fields) {
-      setGroupedFields(groupBy(template?.character_fields || [], "section_id"));
-    }
-  }, [template?.character_fields]);
 
   if (isInitialLoading) return <Skeleton type="drawer_form" />;
   return (
@@ -480,79 +488,57 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         </>
       ) : null}
       {tabs[selectedTab].id === "2" ? (
-        <div className="flex max-h-[90%] flex-col content-start gap-y-2 overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span>Insert new field:</span>
-            <div className="h-8 w-8">
-              <Button
-                icon={IconEnum.add}
-                isDisabled={isLoading}
-                onClick={() => {
-                  handleChange({
-                    name: "character_fields",
-                    value: (template.character_fields || []).concat({
-                      id: crypto.randomUUID(),
-                      title: "New field",
-                      field_type: "text",
-                      sort: template?.character_fields?.length ?? 0,
-                      section_id: null,
-                    }),
-                  });
-                  setTimeout(() => {
-                    fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
-                }}
-                variant="info"
-              />
-            </div>
-          </div>
-          <div className="flex h-[calc(100%)] max-h-[calc(100%)] flex-col gap-y-2 overflow-y-auto">
-            <DragDropContext
-              onDragEnd={(result) => {
-                if (!result.destination) {
-                  return;
-                }
-                const temp = structuredClone(groupedFields);
-                const [removed] = temp[result.source.droppableId === "other" ? "null" : result.source.droppableId].splice(
-                  result.source.index,
-                  1
-                );
+        <div className="flex h-[90%] max-h-[90%] flex-col gap-y-2 overflow-y-auto">
+          <DragDropContext
+            onDragEnd={(result) => {
+              if (!result.destination) {
+                return;
+              }
+              const temp = structuredClone(groupedFields);
+              const [removed] = temp[result.source.droppableId === "other" ? "null" : result.source.droppableId].splice(
+                result.source.index,
+                1
+              );
 
-                if (!temp?.[result.destination.droppableId === "other" ? "null" : result.destination.droppableId]) {
-                  temp[result.destination.droppableId === "other" ? "null" : result.destination.droppableId] = [];
-                }
+              if (!temp?.[result.destination.droppableId === "other" ? "null" : result.destination.droppableId]) {
+                temp[result.destination.droppableId === "other" ? "null" : result.destination.droppableId] = [];
+              }
 
-                removed.section_id = result.destination.droppableId;
+              removed.section_id = result.destination.droppableId;
 
-                temp[result.destination.droppableId === "other" ? "null" : result.destination.droppableId].splice(
-                  result.destination.index,
-                  0,
-                  removed
-                );
-                setGroupedFields(temp);
-              }}>
-              {(template.character_fields_sections || [])?.map((section) => (
-                <CharacterFieldSection
-                  character_fields={groupedFields?.[section.id] || []}
-                  handleChange={handleChange}
-                  id={section.id}
-                  isInitialOpen={false}
-                  isLoading={isFetching}
-                  key={section.id}
-                  title={section.title}
-                />
-              ))}
+              temp[result.destination.droppableId === "other" ? "null" : result.destination.droppableId].splice(
+                result.destination.index,
+                0,
+                removed
+              );
+              temp[result.destination.droppableId === "other" ? "null" : result.destination.droppableId].map((item, index) => ({
+                ...item,
+                sort: index,
+              }));
 
+              setGroupedFields(temp);
+            }}>
+            {(template.character_fields_sections || [])?.map((section) => (
               <CharacterFieldSection
-                character_fields={groupedFields["null"] || []}
-                handleChange={handleChange}
-                id="other"
-                isInitialOpen={!template?.id || !groupedFields?.["null"]?.length}
+                character_fields={groupedFields?.[section.id] || []}
+                handleChange={handleCustomFieldsChange}
+                id={section.id}
+                isInitialOpen={false}
                 isLoading={isFetching}
-                title="Other"
+                key={section.id}
+                title={section.title}
               />
-            </DragDropContext>
-          </div>
+            ))}
+
+            <CharacterFieldSection
+              character_fields={groupedFields["null"] || []}
+              handleChange={handleCustomFieldsChange}
+              id="other"
+              isInitialOpen={!template?.id || !groupedFields?.["null"]?.length || !template.character_fields_sections?.length}
+              isLoading={isFetching}
+              title="Other"
+            />
+          </DragDropContext>
         </div>
       ) : null}
 
@@ -573,9 +559,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                       sort: template?.character_fields_sections?.length ?? 0,
                     }),
                   });
-                  setTimeout(() => {
-                    fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
                 }}
                 variant="info"
               />
@@ -660,7 +643,6 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                       ))
                     : null}
                   {providedDroppable.placeholder}
-                  <div ref={fieldContainerRef} />
                 </div>
               )}
             </Droppable>

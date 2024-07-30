@@ -25,6 +25,7 @@ export * from "./EventManagementDrawer";
 export * from "./FieldTemplateDrawer";
 export * from "./FolderDrawer";
 export * from "./GameDrawer";
+export * from "./GatewayAccessDrawer";
 export * from "./GraphDrawer";
 export * from "./ImageDrawer";
 export * from "./ManuscriptDrawer";

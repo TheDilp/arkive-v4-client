@@ -17,7 +17,7 @@ type Props = {
 export function TemplateTextareaField({ isDisabled, title, name, currentValue, handleChange, id, isCollapsible }: Props) {
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
-      <div className="flex max-h-[30rem] min-h-fit flex-col">
+      <div className="col-span-1 flex max-h-[30rem] min-h-fit flex-col gap-x-2 gap-y-4 md:col-span-2 lg:col-span-4">
         <span className="text-sm text-zinc-300">{title}</span>
         <Editor
           initialContent={currentValue as any}

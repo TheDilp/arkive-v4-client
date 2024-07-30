@@ -10,6 +10,7 @@ export default ({ mode }) =>
       IS_PUBLIC: JSON.stringify(
         process.env.npm_package_name === "arkive-v4-wiki" && loadEnv(mode, process.cwd()).VITE_IS_PUBLIC === "true"
       ),
+      IS_GATEWAY: process.env.npm_package_name === "arkive-v4-gateway",
     },
 
     plugins: [
@@ -61,4 +62,3 @@ export default ({ mode }) =>
       },
     },
   });
-

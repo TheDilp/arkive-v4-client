@@ -25,6 +25,7 @@
   "globals": {
     "JSX": true,
     "IS_PUBLIC": "readonly",
+    "IS_GATEWAY": "readonly",
     "APP_VERSION": "readonly"
   },
   "root": true,
@@ -79,4 +80,3 @@
     "object-curly-newline": "off"
   }
 }
-

@@ -1,5 +1,6 @@
 import { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
 
+import { SelectOptionType } from "./ComponentTypes";
 import { AllAvailableEntities } from "./EntityTypes";
 
 export type Size = "4xl" | "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
@@ -43,6 +44,9 @@ export type ImagePreviewType = {
 export type onChangeValue = {
   name: string;
   value: string | string[] | undefined;
+  label?: string;
+  icon?: string;
+  image?: SelectOptionType["image"];
 };
 export interface BaseComponentType {
   size?: Size;
