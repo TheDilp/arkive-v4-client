@@ -22,5 +22,6 @@ export interface GatewayConfigOptionType {
   parent_id: string | null;
   image: string | null;
   icon: AvailableIcons | undefined;
+  project_id: string;
   entity_type: "characters" | "blueprint_instances" | "documents" | "maps" | "map_pins" | "events" | "images" | "random_tables";
 }

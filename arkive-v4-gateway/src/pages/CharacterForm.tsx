@@ -60,7 +60,7 @@ export function CharacterForm() {
   const { type, access_id, entity_id, section_id } = useParams();
   const [sections, setSections] = useState(baseCharacterSections);
   const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
-  const [character, setCharacter] = useState<Partial<CharacterType>>({ first_name: "", last_name: "" });
+  const [character, setCharacter] = useState<Partial<CharacterType>>();
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
   const navigate = useNavigate();
   const { data: existingCharacter, isFetching: isFetchingCharacter } = useGetEntity<CharacterType>(
@@ -112,11 +112,11 @@ export function CharacterForm() {
     { data: { entity_type: type as "characters", access_id: access_id as string } },
     "characters"
   );
-  console.log(data?.data);
   useLayoutEffect(() => {
-    if (existingCharacter?.data) {
+    if (existingCharacter?.data && !character) {
       setCharacter(existingCharacter?.data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingCharacter]);
   useLayoutEffect(() => {
     const additionalSections: { id: string; title: string }[] = [];
@@ -126,9 +126,9 @@ export function CharacterForm() {
         additionalSections.push(...template.character_fields_sections);
         template.character_fields.forEach((field) => {
           if (!field.section_id) tempFields["other"].push(field);
-          if (field.section_id) {
+          else {
             if (tempFields?.[field.section_id]) tempFields[field.section_id].push(field);
-            tempFields[field.section_id] = [field];
+            else tempFields[field.section_id] = [field];
           }
         });
       });
@@ -171,13 +171,13 @@ export function CharacterForm() {
             <div key={section.id} className="">
               {section.id === "name" ? (
                 <NameSection
-                  first_name={character.first_name}
-                  portrait_id={character.portrait_id}
-                  project_id={character.project_id}
-                  nickname={character.nickname}
-                  last_name={character.last_name}
-                  biography={character.biography}
-                  age={character.age}
+                  first_name={character?.first_name || ""}
+                  portrait_id={character?.portrait_id || ""}
+                  project_id={character?.project_id || ""}
+                  nickname={character?.nickname || ""}
+                  last_name={character?.last_name || ""}
+                  biography={character?.biography || undefined}
+                  age={character?.age || undefined}
                   handleChange={handleChange}
                 />
               ) : null}
@@ -193,7 +193,7 @@ export function CharacterForm() {
                 />
               ) : null}
 
-              {section.id !== "name" && section.id !== "other" && !!fields?.[section.id].length ? (
+              {section.id !== "name" && section.id !== "other" && !!fields?.[section.id]?.length ? (
                 <FieldTemplateRows
                   character_fields={fields?.[section.id] || []}
                   character_fields_data={character?.character_fields || []}
@@ -213,14 +213,17 @@ export function CharacterForm() {
                 label="Complete"
                 icon={IconEnum.check_circle}
                 variant="success"
-                isDisabled={!character.first_name}
+                isDisabled={!character?.first_name}
                 onClick={async () => {
                   if (existingCharacter?.data) {
                     const dataToParse = {
                       data: character,
                       permissions: character?.permissions,
                       relations: {
-                        character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character),
+                        character_fields: getDifferenceForCharacterFields(
+                          existingCharacter?.data,
+                          character || { character_fields: [] }
+                        ),
                       },
                     };
                     if (dataToParse?.data?.portrait?.id) {

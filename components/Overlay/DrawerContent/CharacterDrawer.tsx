@@ -126,7 +126,7 @@ export function FieldTemplateRows({
   return (
     <li className="flex flex-col first:mt-0">
       <div
-        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-1 [&>*>*>.text-sm]:mb-2 [&>*>*>.text-sm]:border-b [&>*>*>.text-sm]:border-zinc-700 [&>*>.text-sm]:mb-2 [&>*>.text-sm]:border-b [&>*>.text-sm]:border-zinc-700"} select-none`}>
+        className={`${isDrawer ? "flex flex-col gap-y-2 pt-2" : "grid grid-cols-1 gap-x-2 gap-y-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-8 [&>*>*>.text-sm]:mb-2 [&>*>*>.text-sm]:border-b [&>*>*>.text-sm]:border-zinc-700 [&>*>.text-sm]:mb-2 [&>*>.text-sm]:border-b [&>*>.text-sm]:border-zinc-700"} select-none`}>
         {character_fields.map((template_field) => {
           const templateValueKey = getFieldValueFromType(template_field.field_type);
           if (!templateValueKey) return null;
@@ -134,7 +134,6 @@ export function FieldTemplateRows({
             options && templateValueKey
               ? options?.filter((opt) => opt.entity_type === templateValueKey && opt.parent_id === template_field.blueprint_id)
               : null;
-
           const templateValueIndex = character_fields_data.findIndex((f) => f.id === template_field.id);
 
           const baseName = `character_fields[${templateValueIndex < 0 ? character_fields_data.length : templateValueIndex}]`;
@@ -267,6 +266,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions}
                 title={template_field.title}
               />
             );

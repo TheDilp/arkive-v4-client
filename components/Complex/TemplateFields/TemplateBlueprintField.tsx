@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
 import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
-import { getEntityLink, getImageURL } from "../../../utils";
+import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
 import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
@@ -35,6 +35,7 @@ export function TemplateBlueprintField({
   presetOptions,
 }: Props) {
   const { project_id } = useParams();
+  const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
@@ -109,9 +110,9 @@ export function TemplateBlueprintField({
             }}
             options={presetOptions.map((opt) => ({
               ...opt,
-              image: opt.image ? { link: getImageURL(project_id as string, "images", opt.image), shape: "circle" } : undefined,
+              image: undefined,
             }))}
-            value={undefined}
+            value={(currentValue || []).map((c) => c.related_id)}
           />
         )}
         {(currentValue || [])?.map((val) => {
@@ -132,12 +133,8 @@ export function TemplateBlueprintField({
               icon={val?.blueprint_instance?.icon}
               id={val?.blueprint_instance?.id}
               key={val?.blueprint_instance?.id}
-              link={getEntityLink(
-                val?.blueprint_instance?.project_id || project_id || "",
-                "blueprint_instances",
-                id,
-                val?.blueprint_instance?.parent_id
-              )}
+              link={getEntityLink(projectId || "", "blueprint_instances", id, val?.blueprint_instance?.parent_id)}
+              manual_project_id={projectId}
               title={val?.blueprint_instance?.title}
               type="blueprint_instances"
             />
