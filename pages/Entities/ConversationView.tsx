@@ -359,6 +359,7 @@ export function ConversationView({ id }: { id: string }) {
               onChange={({ value }) => setSelectedCharacter(value as string)}
               options={(existingConversation?.data?.characters || []).map((char) => ({
                 image: {
+                  id: char.portrait_id || undefined,
                   link: getImageURL(project_id as string, "images", char.portrait_id),
                   shape: "circle",
                 },
