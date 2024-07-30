@@ -1,6 +1,7 @@
 import { baseURLS } from "../enums";
 
 export function getEntityLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
+  if (IS_GATEWAY) return "#";
   if (name === "") return "#";
   const linkRoot = IS_PUBLIC ? "../" : "/projects";
   if (name === "characters") {
