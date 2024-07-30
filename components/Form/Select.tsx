@@ -29,7 +29,7 @@ const SelectClasses = tv({
     label: "text-sm font-medium truncate block w-full font-lato",
     helperText: "text-xs block mt-0.5",
     optionsContainer:
-      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-[12.5rem] bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
+      "overflow-y-auto z-[99999] border-zinc-700 border-b border-x max-h-[12.5rem] md:max-h-[15rem] lg:max-h-[25rem] bg-zinc-700 text-white rounded shadow-lg focus-visible:ring-0 focus-visible:outline-none focus:outline-none",
     placeholder: "text-zinc-500 font-lato opacity-40",
     displayItem: "truncate",
     search:
