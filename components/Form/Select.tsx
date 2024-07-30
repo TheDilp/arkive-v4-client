@@ -263,7 +263,13 @@ function onClick({
     } else {
       const selectedItem = options.find((opt) => opt?.value === options[index].value);
       if (selectedItem) {
-        onChange({ name, value: selectedItem?.value, label: selectedItem.label, icon: selectedItem.icon });
+        onChange({
+          name,
+          value: selectedItem?.value,
+          label: selectedItem.label,
+          icon: selectedItem.icon,
+          image: selectedItem.image,
+        });
         setIsOpen(false);
         // @ts-ignore
         ref.current.focus();
@@ -556,6 +562,7 @@ export function Select({
                       <Avatar
                         image={opt?.image?.link}
                         imageLoading="lazy"
+                        isPreview
                         isTooltipDisabled
                         label={label || ""}
                         shape={opt?.image?.shape}

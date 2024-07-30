@@ -5,7 +5,7 @@ import { AvatarShape } from "../MiscTypes";
 export interface SelectOptionType {
   label: string;
   value: string;
-  image?: { link: string; shape?: AvatarShape };
+  image?: { id: string; link: string; shape?: AvatarShape };
   icon?: AvailableIcons;
   isDisabled?: boolean;
 }
@@ -20,6 +20,6 @@ export interface SelectType extends BaseFormComponentType {
   isExpandingToNewRow?: boolean;
   value: string | string[] | number | null | undefined;
   options: SelectOptionType[];
-  onChange: ({ name, value, label, icon }: onChangeValue) => void;
+  onChange: ({ name, value, label, image, icon }: onChangeValue) => void;
   isReadOnly?: boolean;
 }
