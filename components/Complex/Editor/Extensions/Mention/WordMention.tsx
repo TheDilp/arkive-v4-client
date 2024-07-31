@@ -25,7 +25,7 @@ function WordMentionTooltip({ id }: Pick<Props, "id">) {
   );
   return (
     <div className="h-fit min-h-[4rem] w-fit min-w-[10rem] rounded border border-zinc-600 bg-zinc-700 p-2 shadow-lg">
-      <div className="font-lato flex flex-col whitespace-pre-line font-light">
+      <div className="flex flex-col whitespace-pre-line font-lato font-light">
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Spinner />
@@ -101,4 +101,3 @@ export function WordMention({ title, id, label, isDisabledTooltip }: Props) {
     );
   }
 }
-

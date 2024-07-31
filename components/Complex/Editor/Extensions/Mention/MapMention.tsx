@@ -86,10 +86,10 @@ export function MapMention({ title, id, label, project_id }: Props) {
         arrowColor="#3f3f46"
         content={<MapMentionTooltip id={id} project_id={project_id} />}
         delay={{ openDelay: 500, closeDelay: 200 }}
-        isDisabled={(IS_PUBLIC && !data?.data?.is_public) ?? false}
+        isDisabled={((IS_PUBLIC && !data?.data?.is_public) || IS_GATEWAY) ?? false}
         isPortal={false}>
         <Link
-          className="font-lato mt-0 box-border inline-block h-full items-center border-none text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
+          className="mt-0 box-border inline-block h-full items-center border-none font-lato text-sm font-bold underline hover:text-sky-400 focus:outline-none focus-visible:outline-none active:outline-none"
           to={getMentionLink(id as string, "maps", project_id as string, !!data?.data?.is_public)}>
           <div className="flex items-start" ref={mentionRef}>
             <span className="relative top-0.5">
@@ -102,4 +102,3 @@ export function MapMention({ title, id, label, project_id }: Props) {
     );
   }
 }
-

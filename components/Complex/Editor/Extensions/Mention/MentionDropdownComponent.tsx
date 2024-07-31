@@ -5,11 +5,11 @@ import { useParams } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useMentionAtom } from "../../../../../hooks";
-import { baseURLS, FetchFunction, getImageURL, mentionDropdownAtom } from "../../../../../utils";
+import { FetchFunction, getImageURL, getServerUrl, mentionDropdownAtom } from "../../../../../utils";
 import { Avatar, Spinner } from "../../../../Misc";
 
 export function MentionDropdownComponent() {
-  const { project_id } = useParams();
+  const { access_id, type, project_id } = useParams();
   const setMentionDropdownAtom = useSetAtom(mentionDropdownAtom);
   const [options, setOptions] = useState<
     {
@@ -19,7 +19,8 @@ export function MentionDropdownComponent() {
       label: string;
       displayLabel?: string;
       portrait_id?: string;
-      parent_id?: string;
+      projectId?: string;
+      parentId?: string;
     }[]
   >([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -42,16 +43,24 @@ export function MentionDropdownComponent() {
         portrait_id?: string;
         icon?: string;
         parent_id?: string;
+        project_id?: string;
       }[];
     } = state?.query?.full?.length
       ? await FetchFunction({
-          url: `${baseURLS.baseServer}/search/${project_id}/${state?.name}/mentions`,
+          url: IS_GATEWAY
+            ? `${getServerUrl()}/search/${state?.name}/mentions`
+            : `${getServerUrl()}/search/${project_id}/${state?.name}/mentions`,
           method: "POST",
           body: JSON.stringify({
-            data: {
-              search_term: state?.query?.full,
-            },
-            limit: 5,
+            data: IS_GATEWAY
+              ? {
+                  search_term: state?.query?.full,
+                  access_id,
+                  entity_type: type,
+                }
+              : {
+                  search_term: state?.query?.full,
+                },
           }),
         })
       : [];
@@ -69,7 +78,7 @@ export function MentionDropdownComponent() {
               alterId: null,
               icon: item?.icon,
               displayLabel: `${item.title} (${item.translation})`,
-              projectId: project_id,
+              projectId: project_id || item.project_id,
               parentId: item?.parent_id,
             };
           return {
@@ -78,12 +87,12 @@ export function MentionDropdownComponent() {
             alterId: item?.alterId || null,
             label: item.title,
             icon: item?.icon,
-            projectId: project_id,
+            projectId: project_id || item.project_id,
             parentId: item?.parent_id,
             portrait_id: item?.portrait_id,
           };
         })
-        .slice(0, 10),
+        .slice(0, 10)
     );
   }, 700);
 
@@ -122,7 +131,11 @@ export function MentionDropdownComponent() {
                 })}
                 key={`${item.key}_${item.alterId || "NO_ALTER_ID"}`}>
                 {item?.portrait_id ? (
-                  <Avatar image={getImageURL(project_id as string, "images", item.portrait_id)} label={item.label} size="xs" />
+                  <Avatar
+                    image={getImageURL((project_id || item.projectId) as string, "images", item.portrait_id)}
+                    label={item.label}
+                    size="xs"
+                  />
                 ) : null}
                 <span className="truncate">{item?.displayLabel || item.label}</span>
               </li>
