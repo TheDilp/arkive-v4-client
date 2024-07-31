@@ -6,7 +6,7 @@ import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { findElementAtPosition, FromToProps } from "remirror";
+import { findElementAtPosition, FromToProps, ProsemirrorNode } from "remirror";
 
 import { SearchableMentionEntities } from "../../../types";
 import {
@@ -139,7 +139,7 @@ export function AutomentionDrawer({ data }: Props) {
 
   useEffect(() => {
     if (links?.data && selectedEntity) {
-      setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity, "automention"));
+      setRanges(getRanges(data.getContext.getState().doc as ProsemirrorNode, links.data, selectedEntity, "automention"));
     }
   }, [links?.data, selectedEntity]);
   return (
@@ -260,7 +260,9 @@ export function AutomentionDrawer({ data }: Props) {
             );
 
             if (links?.data) {
-              setRanges(getRanges(data.getContext.getState().doc, links.data, selectedEntity, "automention"));
+              setRanges(
+                getRanges(data.getContext.getState().doc as ProsemirrorNode, links.data, selectedEntity, "automention")
+              );
               setSelectedLinks([]);
             }
 

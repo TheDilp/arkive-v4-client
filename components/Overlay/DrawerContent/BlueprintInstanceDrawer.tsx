@@ -114,7 +114,7 @@ function FieldTemplateRows({
       "read_assets",
       "read_random_tables",
     ],
-    undefined,
+    undefined
   );
   return (
     <li className="flex flex-col first:mt-0">
@@ -262,6 +262,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -285,6 +286,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -306,6 +308,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -327,6 +330,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -348,6 +352,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -369,6 +374,7 @@ function FieldTemplateRows({
                 isDisabled={isDisabled}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={[]}
                 title={template_field.title}
               />
             );
@@ -422,7 +428,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
     {
       enabled: data?.title ? !!instance?.parent_id : true,
       queryKeyConcat: ["instance_drawer"],
-    },
+    }
   );
 
   const { mutateAsync: create, isLoading: isCreating } = useCreateSubEntity("blueprint_instances", project_id);
@@ -444,7 +450,7 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
       },
       permissions: true,
     },
-    { enabled: !!data?.id && !!blueprint?.data, queryKeyConcat: ["drawer"] },
+    { enabled: !!data?.id && !!blueprint?.data, queryKeyConcat: ["drawer"] }
   );
   useLayoutEffect(() => {
     if (existingInstance?.data && !!data?.id) {
@@ -471,13 +477,13 @@ export function BlueprintInstanceDrawer({ data, exceptions }: Props) {
 
   const permissions = useHasPermissions(
     ["create_blueprint_instances", "update_blueprint_instances", "read_tags"],
-    existingInstance?.data?.owner_id,
+    existingInstance?.data?.owner_id
   );
   const canCreateOrEdit = createOrEditPermission(
     permissions?.create_blueprint_instances,
     permissions?.update_blueprint_instances,
     permissions?.is_owner,
-    data?.id,
+    data?.id
   );
   const tabs = getTabs(permissions, data?.id);
 

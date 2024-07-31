@@ -1,8 +1,7 @@
- 
+import type { CommandFunction } from "@remirror/core";
 import {
   ApplySchemaAttributes,
   command,
-  CommandFunction,
   extension,
   ExtensionTag,
   InputRule,
@@ -74,15 +73,15 @@ class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
 
       contentDOM.setAttribute(
         "style",
-        `background-color: ${getCalloutColor(type, customColor)}${type === "custom" ? "50" : ""}; 
+        `background-color: ${getCalloutColor(type, customColor)}${type === "custom" ? "50" : ""};
         border-style: solid;
         border-color:${getCalloutBorderColor(type, customColor)};
         border-width: 0 0 0 4px;
         padding: 8px;
-        border-top-left-radius: 0.25rem; 
+        border-top-left-radius: 0.25rem;
         border-bottom-left-radius: 0.25rem;
         color: ${type === "custom" ? "white" : "black"}
-        `,
+        `
       );
       dom.append(contentDOM);
 
@@ -198,11 +197,13 @@ class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
     ];
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   toggleCallout(attributes?: { type: CalloutType; customColor?: string | null }): CommandFunction {
     return toggleWrap(this.type, attributes);
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   clearCallout(): any {
     return toggleWrap("");

@@ -1,7 +1,6 @@
- 
 import { Node } from "@remirror/pm/model";
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
-import { FromToProps } from "remirror";
+import { FromToProps, ProsemirrorNode } from "remirror";
 
 import { DocumentType, SearchableMentionEntities, Variant } from "../../types";
 import { DiceRollRegex } from "./diceRollerUtils";
@@ -22,7 +21,7 @@ export function getRanges(
   doc: Node,
   potentialMatches: matchItem[],
   selectedEntity: SearchableMentionEntities | null,
-  type: matchType,
+  type: matchType
 ): matchResult[] {
   const matchWords = potentialMatches.flatMap((res) => res.title.trim()).join("|");
   if (!matchWords || !selectedEntity) {
@@ -58,7 +57,7 @@ export function getRanges(
       const matchedItem = potentialMatches.find((item) =>
         selectedEntity === "characters"
           ? item.title.toLowerCase().includes(match[0].toLowerCase())
-          : item.title.toLowerCase() === match[0].toLowerCase(),
+          : item.title.toLowerCase() === match[0].toLowerCase()
       );
       if (matchedItem)
         ranges.push({
@@ -94,7 +93,7 @@ export function createMentions(
   getContext: ReactFrameworkOutput<Remirror.Extensions>,
   selectedEntity: SearchableMentionEntities | null,
   project_id: string,
-  links: matchItem[],
+  links: matchItem[]
 ) {
   if (!selectedEntity) return;
 
@@ -122,9 +121,9 @@ export function createMentions(
         icon: range.icon,
         projectId: project_id,
         parent_id: range.parent_id,
-      },
+      }
     );
-    newRanges = getRanges(getContext.getState().doc, links, selectedEntity, "automention");
+    newRanges = getRanges(getContext.getState().doc as ProsemirrorNode, links, selectedEntity, "automention");
   }
 }
 

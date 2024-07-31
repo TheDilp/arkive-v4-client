@@ -1,9 +1,7 @@
- 
- 
+import type { CommandFunction, FromToProps } from "@remirror/core";
 import {
   ApplySchemaAttributes,
   command,
-  CommandFunction,
   composeTransactionSteps,
   CreateExtensionPlugin,
   EditorState,
@@ -11,7 +9,6 @@ import {
   ExtensionPriority,
   ExtensionTag,
   findMatches,
-  FromToProps,
   getChangedRanges,
   GetMarkRange,
   getMarkRange,
@@ -189,7 +186,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
       const onUpdateCallbacks: Array<Pick<EventMeta, "range" | "attrs"> & { text: string }> = [];
       const { updateDiceRoll } = this.store.chain(props.tr);
 
-      const matches = this.findAllAutoRolls(props.state.doc);
+      const matches = this.findAllAutoRolls(props.state.doc as ProsemirrorNode);
 
       for (let index = 0; index < matches.length; index += 1) {
         updateDiceRoll({ auto: true }, { from: matches[index].from, to: matches[index].to }).tr();
@@ -215,6 +212,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     this._autoLinkRegexNonGlobal = new RegExp(`^${autoLinkRegex.source}$`, autoLinkRegex.flags.replace("g", ""));
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   updateDiceRoll(attrs: DiceRollAttributes, range?: FromToProps): CommandFunction {
     return (props) => {
@@ -234,6 +232,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     };
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   removeDiceRoll(range?: FromToProps): CommandFunction {
     return (props) => {
@@ -280,7 +279,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
           const isNodeSeparated = to - from === 2;
 
           // Get previous links
-          const prevMarks = this.getDiceRollMarksInRange(prevState.doc, prevFrom, prevTo, true)
+          const prevMarks = this.getDiceRollMarksInRange(prevState.doc as ProsemirrorNode, prevFrom, prevTo, true)
             .filter((item) => item.mark.type === this.type)
             .map(({ from: f, to: t, text }) => ({
               mappedFrom: mapping.map(f),
@@ -294,7 +293,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
 
           // Check if links need to be removed or updated.
           prevMarks.forEach(({ mappedFrom: newFrom, mappedTo: newTo, from: prevMarkFrom, to: prevMarkTo }, i) =>
-            this.getDiceRollMarksInRange(doc, newFrom, newTo, true)
+            this.getDiceRollMarksInRange(doc as ProsemirrorNode, newFrom, newTo, true)
               .filter((item) => item.mark.type === this.type)
               .forEach((newMark) => {
                 const prevLinkText = prevState.doc.textBetween(prevMarkFrom, prevMarkTo, undefined, " ");
@@ -336,7 +335,7 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
           );
 
           // Find text that can be auto linked
-          this.findTextBlocksInRange(doc, { from, to }).forEach(({ text, positionStart }) => {
+          this.findTextBlocksInRange(doc as ProsemirrorNode, { from, to }).forEach(({ text, positionStart }) => {
             // Match links in text node
             this.findAutoRolls(text)
               .map((link) =>
@@ -355,7 +354,9 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
                 return fromIsInRange || toIsInRange || isNodeSeparated;
               })
               // Avoid overwriting manually created links.
-              .filter(({ range }) => this.getDiceRollMarksInRange(tr.doc, range.from, range.to, false).length === 0)
+              .filter(
+                ({ range }) => this.getDiceRollMarksInRange(tr.doc as ProsemirrorNode, range.from, range.to, false).length === 0
+              )
               // Prevent updating existing auto links
               .filter(
                 ({ range: { from: f }, text: txt }) =>
@@ -453,11 +454,9 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
       const text = getMatchString(match);
 
       if (!text) {
-         
         continue;
       }
       if (!this.isValidDiceRoll(text)) {
-         
         continue;
       }
       toAutoLink.push({
