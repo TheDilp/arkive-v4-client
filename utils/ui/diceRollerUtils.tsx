@@ -20,15 +20,16 @@ export const Dice = IS_PUBLIC
         assetPath: "/assets/dice-box/",
         themeColor: DefaultTagColor,
         scale: 4,
-        throwForce: 10,
+        throwForce: 15,
+        onRollComplete: () => {
+          setTimeout(() => {
+            Dice?.clear();
+          }, 1500);
+        },
       }
     );
 
-Dice?.init()?.then(() => {
-  document.addEventListener("mousedown", () => {
-    Dice.clear();
-  });
-});
+Dice?.init();
 
 export function getCritColor(critical: "success" | "failure" | null | undefined) {
   if (!critical) return "";
@@ -99,4 +100,3 @@ export async function rollDiceWithNotification(
     }
   }
 }
-
