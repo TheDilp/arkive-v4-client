@@ -170,6 +170,7 @@ export function DefaultEditorExtensions(
       extraAttributes: {
         id: {
           default: "",
+          validate: () => true,
           toDOM: () => ["data-id"],
         },
       },
