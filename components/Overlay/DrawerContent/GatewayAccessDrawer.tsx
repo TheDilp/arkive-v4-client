@@ -172,7 +172,6 @@ function getEntityFields(type: AvailableGatewayEntites) {
   if (type === "events" || type === "random_tables") return ["id", "title"];
   return ["id", "title", "icon"];
 }
-
 function getOrderBy(type: AvailableGatewayEntites, orderBy: RequestOrderByType<any>[] | undefined) {
   if (type === "characters") return orderBy || [{ field: "full_name", sort: "asc" }];
 

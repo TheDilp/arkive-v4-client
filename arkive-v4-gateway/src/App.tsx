@@ -43,7 +43,6 @@ function CodeInput() {
   const navigate = useNavigate();
   useEffect(() => {
     if (code && codeState && Number(code) === Number(codeState)) {
-      console.log("TEST");
       setAccessState((prev) => ({ ...prev, access: true }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

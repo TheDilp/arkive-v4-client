@@ -93,15 +93,15 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
         arrowColor="#3f3f46"
         content={<CharacterMentionTooltip id={id} title={data?.data?.full_name || title || label} />}
         delay={{ openDelay: 500, closeDelay: 200 }}
-        isDisabled={(IS_PUBLIC && !data?.data?.is_public) ?? false}
+        isDisabled={((IS_PUBLIC && !data?.data?.is_public) || IS_GATEWAY) ?? false}
         isPortal={false}>
         <Link
-          className="font-lato inline-flex items-center text-sm font-bold transition-colors"
+          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
           to={getMentionLink(id as string, "characters", project_id as string, data?.data?.is_public ?? false)}>
           <div className="flex items-start" ref={mentionRef}>
-            {data?.data?.portrait_id ? (
+            {data?.data?.portrait_id && project_id ? (
               <span className="characterMentionImage" onClick={(e) => e.preventDefault()}>
-                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="3xs" />
+                <Avatar hasShowImage image={getImageURL(project_id as string, "images", data?.data?.portrait_id)} size="2xs" />
               </span>
             ) : (
               <Icon fontSize={14} icon={IconEnum.character} />
@@ -113,4 +113,3 @@ export function CharacterMention({ id, project_id, title, label }: Props) {
     );
   }
 }
-

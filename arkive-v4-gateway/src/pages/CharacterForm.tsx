@@ -1,5 +1,6 @@
 import { ReactNode, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+
 import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
 import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
@@ -20,19 +21,19 @@ function NameSection({ first_name, last_name, nickname, age, project_id, biograp
     <SectionLayout>
       <div className="flex items-end gap-x-2">
         <div className="w-12 max-w-12">
-          <AvatarUpload image_id={portrait_id} project_id={project_id as string} id={entity_id as string} />
+          <AvatarUpload id={entity_id as string} image_id={portrait_id} project_id={project_id as string} />
         </div>
         <Input
-          value={first_name}
+          label="First name (required)"
           name="first_name"
           onChange={handleChange}
-          label="First name (required)"
+          value={first_name}
           variant={first_name ? "primary" : "error"}
         />
       </div>
-      <Input value={nickname || ""} name="nickname" onChange={handleChange} label="Nickname" />
-      <Input value={last_name || ""} name="last_name" onChange={handleChange} label="Last name" />
-      <Input type="number" value={age || ""} name="age" onChange={handleChange} label="Age" />
+      <Input label="Nickname" name="nickname" onChange={handleChange} value={nickname || ""} />
+      <Input label="Last name" name="last_name" onChange={handleChange} value={last_name || ""} />
+      <Input label="Age" name="age" onChange={handleChange} type="number" value={age || ""} />
       <div className="col-span-4 flex h-[30rem] flex-col">
         <span className="text-sm text-zinc-300">Biography</span>
         <Editor initialContent={biography || undefined} isFullHeight name="biography" onChange={handleChange} />
@@ -102,7 +103,9 @@ export function CharacterForm() {
     }
   );
 
-  const { mutateAsync: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id);
+  const { mutateAsync: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
+    successNotification: false,
+  });
 
   const { data } = useGetGatewayOptions(
     { data: { entity_type: type as "characters", access_id: access_id as string } },
@@ -143,13 +146,31 @@ export function CharacterForm() {
         <Skeleton type="character_profile" />
       </div>
     );
+
+  async function save() {
+    if (existingCharacter?.data) {
+      const dataToParse = {
+        data: character,
+        permissions: character?.permissions,
+        relations: {
+          character_fields: getDifferenceForCharacterFields(existingCharacter?.data, character || { character_fields: [] }),
+        },
+      };
+      if (dataToParse?.data?.portrait?.id) {
+        dataToParse.data.portrait_id = dataToParse.data.portrait.id;
+      }
+      const parsedData = UpdateCharacterSchema.parse(dataToParse);
+      await update(parsedData);
+    }
+  }
+
   return (
     <>
       <div
+        className="col-span-12 pb-2 text-4xl font-bold"
         style={{
           gridRow: "1 / 2",
-        }}
-        className="col-span-12 pb-2 text-4xl font-bold">
+        }}>
         <h1 className="flex items-center gap-x-4">
           {character?.portrait_id ? (
             <Avatar image={getImageURL(character.project_id as string, "images", character?.portrait_id)} />
@@ -158,17 +179,17 @@ export function CharacterForm() {
         </h1>
       </div>
       <div
+        className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2"
         style={{
           gridRow: "span 1",
-        }}
-        className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2">
+        }}>
         <h3 className="py-2 text-center font-merriweather text-xl font-bold">Sections</h3>
         <ul className="h-full overflow-y-auto">
           {sections.map((section) => (
             <li
               className={`border-b border-zinc-700 text-lg transition-all first:border-t ${section_id === section.id ? "bg-zinc-700" : ""}`}
               key={section.id}>
-              <Link to={`/${type}/${access_id}/${entity_id}/${section.id}`} className="block h-full w-full px-4 py-2">
+              <Link className="block h-full w-full px-4 py-2" to={`/${type}/${access_id}/${entity_id}/${section.id}`}>
                 {section.title}
               </Link>
             </li>
@@ -176,35 +197,35 @@ export function CharacterForm() {
         </ul>
       </div>
       <div
+        className="col-span-10 flex h-full flex-col overflow-hidden rounded-r-md bg-zinc-900 p-4"
         style={{
           gridRow: "span 1",
-        }}
-        className="col-span-10 flex h-full flex-col overflow-hidden rounded-r-md bg-zinc-900 p-4">
+        }}>
         {(sections || []).map((section) => {
           if (section.id !== section_id) return null;
 
           return (
-            <div key={section.id} className="">
+            <div className="" key={section.id}>
               {section.id === "name" ? (
                 <NameSection
+                  age={character?.age || undefined}
+                  biography={character?.biography || undefined}
                   first_name={character?.first_name || ""}
+                  handleChange={handleChange}
+                  last_name={character?.last_name || ""}
+                  nickname={character?.nickname || ""}
                   portrait_id={character?.portrait_id || ""}
                   project_id={character?.project_id || ""}
-                  nickname={character?.nickname || ""}
-                  last_name={character?.last_name || ""}
-                  biography={character?.biography || undefined}
-                  age={character?.age || undefined}
-                  handleChange={handleChange}
                 />
               ) : null}
 
               {section.id === "other" && !!fields?.["other"]?.length ? (
                 <FieldTemplateRows
                   character_fields={fields?.["other"] || []}
-                  isDrawer={false}
                   character_fields_data={character?.character_fields || []}
                   handleChange={handleChange}
                   hasCreateOrEdit={true}
+                  isDrawer={false}
                   options={data?.data || null}
                 />
               ) : null}
@@ -226,53 +247,37 @@ export function CharacterForm() {
           {section_id === "other" ? (
             <div>
               <Button
-                label="Complete"
                 icon={IconEnum.check_circle}
-                variant="success"
                 isDisabled={!character?.first_name}
-                onClick={async () => {
-                  if (existingCharacter?.data) {
-                    const dataToParse = {
-                      data: character,
-                      permissions: character?.permissions,
-                      relations: {
-                        character_fields: getDifferenceForCharacterFields(
-                          existingCharacter?.data,
-                          character || { character_fields: [] }
-                        ),
-                      },
-                    };
-                    if (dataToParse?.data?.portrait?.id) {
-                      dataToParse.data.portrait_id = dataToParse.data.portrait.id;
-                    }
-                    const parsedData = UpdateCharacterSchema.parse(dataToParse);
-                    await update(parsedData);
-                  }
-                }}
+                label="Complete"
+                onClick={save}
+                variant="success"
               />
             </div>
           ) : null}
           <div className="flex flex-nowrap content-end gap-x-2">
             <Button
-              label="Previous section"
-              iconPos="left"
               icon={IconEnum.chevron_left}
-              variant="info"
+              iconPos="left"
               isDisabled={sections[0].id === section_id}
-              onClick={() =>
+              label="Previous section"
+              onClick={async () => {
                 navigate(
                   `/${type}/${access_id}/${entity_id}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
-                )
-              }
+                );
+                await save();
+              }}
+              variant="info"
             />
             <Button
-              label="Next section"
               icon={IconEnum.chevron_right}
-              variant="info"
               isDisabled={sections?.at(-1)?.id === section_id}
-              onClick={() =>
-                navigate(`/${type}/${access_id}/${entity_id}/${sections[geNextSection(sections, section_id as string)]?.id}`)
-              }
+              label="Next section"
+              onClick={async () => {
+                navigate(`/${type}/${access_id}/${entity_id}/${sections[geNextSection(sections, section_id as string)]?.id}`);
+                await save();
+              }}
+              variant="info"
             />
           </div>
         </div>

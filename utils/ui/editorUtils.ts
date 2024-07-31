@@ -40,57 +40,58 @@ import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
 
+const defaultMatchers = [
+  {
+    char: "@",
+    name: "characters",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+    matchOffset: 1,
+  },
+  {
+    char: "@b:",
+    name: "blueprint_instances",
+
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+  {
+    char: "@d:",
+    name: "documents",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
+  },
+  {
+    char: "@m:",
+    name: "maps",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+  {
+    char: "@mp:",
+    name: "map_pins",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+  {
+    char: "@g:",
+    name: "graphs",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+  {
+    char: "@w:",
+    name: "words",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+  {
+    char: "@e:",
+    name: "events",
+    supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
+  },
+];
+
+const matchers = IS_GATEWAY ? defaultMatchers.filter((m) => m.name !== "words") : defaultMatchers;
 export function DefaultEditorExtensions(
   createNotification?: (notification: Omit<NotificationType, "id">) => void,
   customPlaceholder?: string
 ): AnyExtension[] {
   const CME = new CustomMentionExtension({
-    priority: 10,
-
-    matchers: [
-      {
-        char: "@",
-        name: "characters",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-        matchOffset: 1,
-      },
-      {
-        char: "@b:",
-        name: "blueprint_instances",
-
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "@d:",
-        name: "documents",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0,2}/g,
-      },
-      {
-        char: "@m:",
-        name: "maps",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "@mp:",
-        name: "map_pins",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "@g:",
-        name: "graphs",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "@w:",
-        name: "words",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-      {
-        char: "@e:",
-        name: "events",
-        supportedCharacters: /[\w\d_]+( [\w\d_]+){0}/g,
-      },
-    ],
+    matchers,
   });
 
   const DiceRollerExtension = new DiceFormulaExtension({

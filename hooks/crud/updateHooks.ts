@@ -35,7 +35,7 @@ export function useUpdateEntity<
     data: { id?: string; parent_id?: string | null };
     relations?: { [key: string]: any };
   },
->(type: AvailableEntityType, project_id: string | undefined, options?: MutationOptions) {
+>(type: AvailableEntityType, project_id: string | undefined, options?: MutationOptions & { successNotification?: boolean }) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -112,7 +112,7 @@ export function useUpdateEntity<
           if (MentionableEntites.includes(type)) {
             queryClient.invalidateQueries([type, vars.data.id, "mention"]);
           }
-          if (type !== "documents") {
+          if (type !== "documents" && (options?.successNotification === undefined || options?.successNotification === true)) {
             createNotification({
               title: getEntityCRUDNotification(type, "update"),
               variant: "success",

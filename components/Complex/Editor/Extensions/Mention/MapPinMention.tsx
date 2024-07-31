@@ -89,9 +89,12 @@ export function MapPinMention({ title, id, label, project_id, parent_id }: Props
       );
 
     return (
-      <Tooltip arrowColor="#3f3f46" content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}>
+      <Tooltip
+        arrowColor="#3f3f46"
+        content={<MapPinMentionTooltip id={id} parent_id={parent_id} project_id={project_id} />}
+        isDisabled={((IS_PUBLIC && !data?.data?.is_public) || IS_GATEWAY) ?? false}>
         <Link
-          className="font-lato inline-flex items-center text-sm font-bold transition-colors"
+          className="inline-flex items-center font-lato text-sm font-bold transition-colors"
           to={getMentionLink(id as string, "map_pins", project_id as string, data?.data?.is_public ?? false, parent_id)}>
           <div className="flex items-start" ref={mentionRef}>
             {data?.data?.image_id ? (
@@ -110,4 +113,3 @@ export function MapPinMention({ title, id, label, project_id, parent_id }: Props
     );
   }
 }
-

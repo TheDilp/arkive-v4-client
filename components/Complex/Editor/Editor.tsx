@@ -35,7 +35,7 @@ export function Editor({
   return (
     // @ts-ignore
     <Remirror
-      editable={!isReadOnly && !isDisabled}
+      editable={!isReadOnly && !isDisabled && !IS_PUBLIC}
       hooks={hooks ?? []}
       initialContent={state}
       manager={manager}
