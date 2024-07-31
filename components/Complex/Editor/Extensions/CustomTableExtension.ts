@@ -1,4 +1,5 @@
-import type { keyBinding, KeyBindingProps } from "remirror";
+import type { KeyBindingProps } from "@remirror/core";
+import { keyBinding } from "@remirror/core";
 import { TableExtension } from "remirror/extensions";
 
 export class CustomTableExtension extends TableExtension {
