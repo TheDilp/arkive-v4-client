@@ -42,11 +42,12 @@ function CodeInput() {
   const { mutate: accessGateway, isLoading: isMutating } = useAccessGateway();
   const navigate = useNavigate();
   useEffect(() => {
-    if (code && codeState && code === codeState) {
+    if (code && codeState && Number(code) === Number(codeState)) {
+      console.log("TEST");
       setAccessState((prev) => ({ ...prev, access: true }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, codeState]);
+  }, [code, codeState, isMutating]);
 
   useEffect(() => {
     if (access && type && access_id && entity_id) {
