@@ -70,7 +70,7 @@ function CodeInput() {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     // @ts-expect-error has value prop
-                    setAccessState((prev) => ({ ...prev, code: e.currentTarget.value as number }));
+                    setAccessState((prev) => ({ ...prev, code: e?.currentTarget?.value || undefined }));
                   }
                 }}
                 size="lg"
