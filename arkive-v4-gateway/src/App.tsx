@@ -66,6 +66,13 @@ function CodeInput() {
                 onChange={({ value }) => {
                   setAccessState((prev) => ({ ...prev, code: value as number }));
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    // @ts-expect-error has value prop
+                    setAccessState((prev) => ({ ...prev, code: e.currentTarget.value as number }));
+                  }
+                }}
                 name="code"
               />
               <Button
@@ -106,4 +113,3 @@ function App() {
 }
 
 export default App;
-
