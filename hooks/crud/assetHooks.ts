@@ -47,6 +47,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
 
 export function useUploadAvatar(id: string) {
   const createNotification = useNotifications();
+  const queryClient = useQueryClient();
   return useMutation(
     async (images: File[]) => {
       const formData = new FormData();
@@ -64,6 +65,10 @@ export function useUploadAvatar(id: string) {
     {
       onSettled: (data) => {
         if (data?.ok) {
+          if (IS_GATEWAY) {
+            queryClient.invalidateQueries(["characters"]);
+          }
+
           createNotification({
             title: data?.message || "Images uploaded successfully.",
             variant: "success",
