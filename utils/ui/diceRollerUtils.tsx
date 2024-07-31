@@ -21,15 +21,14 @@ export const Dice = IS_PUBLIC
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
-        onRollComplete: () => {
-          setTimeout(() => {
-            Dice?.clear();
-          }, 1500);
-        },
       }
     );
 
-Dice?.init();
+Dice?.init().then(() => {
+  document.addEventListener("mousedown", () => {
+    Dice?.clear();
+  });
+});
 
 export function getCritColor(critical: "success" | "failure" | null | undefined) {
   if (!critical) return "";
