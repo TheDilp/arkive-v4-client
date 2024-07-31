@@ -1,36 +1,17 @@
-import type { KeyBindingProps } from "@remirror/core";
-import { keyBinding } from "@remirror/core";
+import type { PrioritizedKeyBindings } from "@remirror/core";
 import { TableExtension } from "remirror/extensions";
 
 export class CustomTableExtension extends TableExtension {
-  // @ts-expect-error remirror types are not updated
-  @keyBinding({ shortcut: "Shift-Mod-Delete", command: "deleteTable" })
-  delTableShortcut(props: KeyBindingProps): boolean {
-    return this.deleteTable()(props);
-  }
-
-  // @ts-expect-error remirror types are not updated
-  @keyBinding({ shortcut: "Mod-Delete", command: "deleteCol" })
-  delColShortcut(props: KeyBindingProps): boolean {
-    return this.deleteTableColumn()(props);
-  }
-
-  // @ts-expect-error remirror types are not updated
-  @keyBinding({ shortcut: "Shift-Delete", command: "deleteRow" })
-  delRowShortcut(props: KeyBindingProps): boolean {
-    return this.deleteTableRow()(props);
-  }
-
-  // @ts-expect-error remirror types are not updated
-  @keyBinding({ shortcut: "Shift-Mod-Insert", command: "addCol" })
-  addColShortcut(props: KeyBindingProps): boolean {
-    return this.addTableColumnAfter()(props);
-  }
-
-  // @ts-expect-error remirror types are not updated
-  @keyBinding({ shortcut: "Mod-Insert", command: "addRow" })
-  addRowShortcut(props: KeyBindingProps): boolean {
-    this.setTableCellAttribute("selected", true);
-    return this.addTableRowAfter()(props);
+  createKeymap(): PrioritizedKeyBindings {
+    return {
+      "Shift-Mod-Delete": (props) => this.deleteTable()(props),
+      "Mod-Delete": (props) => this.deleteTableColumn()(props),
+      "Mod-Insert": (props) => {
+        this.setTableCellAttribute("selected", true);
+        return this.addTableRowAfter()(props);
+      },
+      "Shift-Delete": (props) => this.deleteTableRow()(props),
+      "Shift-Mod-Insert": (props) => this.addTableColumnAfter()(props),
+    };
   }
 }
