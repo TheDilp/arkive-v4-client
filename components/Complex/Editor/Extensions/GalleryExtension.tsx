@@ -93,7 +93,6 @@ class GalleryExtension extends NodeExtension<GalleryOptions> {
 
   ReactComponent: any = EditorGallery;
 
-  // @ts-expect-error remirror types are not updated
   @command()
   toggleGallery(attributes?: { classNames: string }): CommandFunction {
     return toggleWrap(this.type, attributes);

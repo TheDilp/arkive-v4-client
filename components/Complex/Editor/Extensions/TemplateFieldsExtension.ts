@@ -185,7 +185,6 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
     this._autoLinkRegexNonGlobal = new RegExp(`^${autoLinkRegex.source}$`, autoLinkRegex.flags.replace("g", ""));
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   updateTemplateField(attrs: TemplateFieldAttributes, range?: FromToProps): CommandFunction {
     return (props) => {
@@ -205,7 +204,6 @@ export class TemplateFieldExtension extends MarkExtension<TemplateFieldOptions> 
     };
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   removeTemplateField(range?: FromToProps): CommandFunction {
     return (props) => {

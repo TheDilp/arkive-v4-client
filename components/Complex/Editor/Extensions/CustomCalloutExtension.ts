@@ -197,13 +197,11 @@ class CustomCalloutExtension extends NodeExtension<CustomCalloutOptions> {
     ];
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   toggleCallout(attributes?: { type: CalloutType; customColor?: string | null }): CommandFunction {
     return toggleWrap(this.type, attributes);
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   clearCallout(): any {
     return toggleWrap("");

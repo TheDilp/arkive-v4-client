@@ -123,13 +123,11 @@ class SecretExtension extends NodeExtension<SecretOptions> {
     ];
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   toggleSecret(attributes?: { secret: boolean; classNames: string }): CommandFunction {
     return toggleWrap(this.type, attributes);
   }
 
-  // @ts-expect-error remirror types are not updated
   @keyBinding({ shortcut: "Mod-g", command: "toggleSecret" })
   shortcut(props: KeyBindingProps): boolean {
     return this.toggleSecret()(props);
