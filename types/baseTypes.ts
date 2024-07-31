@@ -47,6 +47,7 @@ export type onChangeValue = {
   label?: string;
   icon?: string;
   image?: SelectOptionType["image"];
+  parent_id?: string | null;
 };
 export interface BaseComponentType {
   size?: Size;
