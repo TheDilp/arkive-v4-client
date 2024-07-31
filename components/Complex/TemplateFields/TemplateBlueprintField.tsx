@@ -13,7 +13,7 @@ type Props = {
   handleChange: (params: HandleChangePropsType) => void;
   id: string;
   fieldType: "blueprints_single" | "blueprints_multiple";
-  presetOptions?: GatewayConfigOptionType[] | null;
+  presetOptions: GatewayConfigOptionType[];
   isCollapsible?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
   blueprint_id: string | null | undefined;
@@ -32,13 +32,13 @@ export function TemplateBlueprintField({
   isDisabled,
   isGlobal,
   isCollapsible,
-  presetOptions,
+  presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
-      <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
+      <div className="col-span-4 flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || presetOptions || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
@@ -78,35 +78,84 @@ export function TemplateBlueprintField({
             value={fieldType === "blueprints_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
         )}
-        {isDisabled || !presetOptions ? null : (
+        {!IS_GATEWAY ? null : (
           <Select
+            hasSearch
+            isClearable
+            isMultiple={fieldType === "blueprints_multiple"}
             label={title}
             name={name}
             onChange={({ value, label, icon }) => {
-              if ((currentValue || [])?.some((bpi) => bpi.related_id === value)) {
+              if (fieldType === "blueprints_multiple" && (!value || value?.length === 0)) {
                 handleChange([
                   { name: `${name}.id`, value: id },
                   {
                     name: `${name}.blueprint_instances`,
-                    value: (currentValue || []).filter((t) => t.related_id !== value),
+                    value: [],
                   },
                 ]);
                 return;
               }
-              handleChange([
-                { name: `${name}.id`, value: id },
-                {
-                  name: `${name}.blueprint_instances[${fieldType.includes("single") ? 0 : currentValue?.length || 0}]`,
-                  value: {
-                    related_id: value,
-                    blueprint_instance: {
-                      id: value,
-                      title: label,
-                      icon,
+              if (
+                (currentValue || [])?.some((bpi) => {
+                  if (fieldType === "blueprints_multiple") {
+                    return value?.includes(bpi.related_id);
+                  }
+                  return bpi.related_id === value;
+                })
+              ) {
+                if (fieldType === "blueprints_multiple") {
+                  const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.blueprint_instances`,
+                      value: selectedValues.map((opt) => ({
+                        related_id: opt.value,
+                        blueprint_instance: {
+                          id: opt.value,
+                          title: opt.label,
+                          icon: opt?.icon,
+                        },
+                      })),
                     },
+                  ]);
+                } else {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.blueprint_instances[0]`,
+                      value: {
+                        related_id: value,
+                        blueprint_instance: {
+                          id: value,
+                          title: label,
+                          icon,
+                        },
+                      },
+                    },
+                  ]);
+                }
+                return;
+              }
+              if (fieldType === "blueprints_multiple") {
+                const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.blueprint_instances`,
+                    value: selectedValues.map((opt) => ({
+                      related_id: opt.value,
+                      blueprint_instance: {
+                        id: opt.value,
+                        title: opt.label,
+                        icon: opt?.icon,
+                      },
+                    })),
                   },
-                },
-              ]);
+                ]);
+              }
             }}
             options={presetOptions.map((opt) => ({
               ...opt,
@@ -115,31 +164,33 @@ export function TemplateBlueprintField({
             value={(currentValue || []).map((c) => c.related_id)}
           />
         )}
-        {(currentValue || [])?.map((val) => {
-          return (
-            <EntityPreview
-              clearAction={
-                isDisabled
-                  ? undefined
-                  : (instance_id) => {
-                      handleChange([
-                        {
-                          name: `${name}.blueprint_instances`,
-                          value: currentValue.filter((c) => c.related_id !== instance_id),
-                        },
-                      ]);
-                    }
-              }
-              icon={val?.blueprint_instance?.icon}
-              id={val?.blueprint_instance?.id}
-              key={val?.blueprint_instance?.id}
-              link={getEntityLink(projectId || "", "blueprint_instances", id, val?.blueprint_instance?.parent_id)}
-              manual_project_id={projectId}
-              title={val?.blueprint_instance?.title}
-              type="blueprint_instances"
-            />
-          );
-        })}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : ""}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={
+                  isDisabled
+                    ? undefined
+                    : (instance_id) => {
+                        handleChange([
+                          {
+                            name: `${name}.blueprint_instances`,
+                            value: currentValue.filter((c) => c.related_id !== instance_id),
+                          },
+                        ]);
+                      }
+                }
+                icon={val?.blueprint_instance?.icon}
+                id={val?.blueprint_instance?.id}
+                key={val?.blueprint_instance?.id}
+                link={getEntityLink(projectId || "", "blueprint_instances", id, val?.blueprint_instance?.parent_id)}
+                manual_project_id={projectId}
+                title={val?.blueprint_instance?.title}
+                type="blueprint_instances"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );

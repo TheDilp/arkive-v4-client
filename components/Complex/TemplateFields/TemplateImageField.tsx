@@ -1,6 +1,10 @@
+import { useParams } from "react-router-dom";
+
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
+import { getImageURL } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
-import { Search } from "../../Form";
+import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
 type Props = {
@@ -13,6 +17,7 @@ type Props = {
   isDisabled?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
+  presetOptions: GatewayConfigOptionType[];
 };
 
 export function TemplateImageField({
@@ -24,12 +29,15 @@ export function TemplateImageField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  presetOptions,
   currentValue,
 }: Props) {
+  const { project_id } = useParams();
+  const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled ? null : (
+        {isDisabled || IS_GATEWAY ? null : (
           <Search
             isGlobal={isGlobal}
             isMultiple={fieldType === "images_multiple"}
@@ -65,29 +73,124 @@ export function TemplateImageField({
             value={fieldType === "images_multiple" ? (currentValue || [])?.map((t) => t.related_id) : undefined}
           />
         )}
-        {(currentValue || [])?.map((val) => {
-          return (
-            <EntityPreview
-              clearAction={
-                isDisabled
-                  ? undefined
-                  : (char_id) => {
-                      handleChange([
-                        {
-                          name: `${name}.images`,
-                          value: currentValue.filter((c) => c.related_id !== char_id),
-                        },
-                      ]);
-                    }
+
+        {!IS_GATEWAY ? null : (
+          <Select
+            isClearable
+            isMultiple={fieldType === "images_multiple"}
+            label={title}
+            name={name}
+            onChange={({ value, label, icon }) => {
+              if (fieldType === "images_multiple" && (!value || value?.length === 0)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.images`,
+                    value: [],
+                  },
+                ]);
+                return;
               }
-              id={val.image?.id}
-              image_id={val.image?.id}
-              key={val.image.id}
-              title={val.image?.title}
-              type="images"
-            />
-          );
-        })}
+
+              if (
+                (currentValue || [])?.some((doc) => {
+                  if (fieldType === "images_multiple") {
+                    return value?.includes(doc.related_id);
+                  }
+                  return doc.related_id === value;
+                })
+              ) {
+                if (fieldType === "images_multiple") {
+                  const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.images`,
+                      value: selectedValues.map((opt) => ({
+                        related_id: opt.value,
+                        image: {
+                          id: opt.value,
+                          title: opt.label,
+                          icon: opt?.icon,
+                        },
+                      })),
+                    },
+                  ]);
+                } else {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.images[0]`,
+                      value: {
+                        related_id: value,
+                        image: {
+                          id: value,
+                          title: label,
+                          icon,
+                        },
+                      },
+                    },
+                  ]);
+                }
+                return;
+              }
+              if (fieldType === "images_multiple") {
+                const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.images`,
+                    value: selectedValues.map((opt) => ({
+                      related_id: opt.value,
+                      image: {
+                        id: opt.value,
+                        title: opt.label,
+                        icon: opt?.icon,
+                      },
+                    })),
+                  },
+                ]);
+              }
+            }}
+            options={presetOptions.map((opt) => ({
+              ...opt,
+              image:
+                projectId && opt.value
+                  ? { id: opt.value, shape: "circle", link: getImageURL(projectId, "images", opt.value) }
+                  : undefined,
+            }))}
+            value={(currentValue || []).map((c) => c.related_id)}
+          />
+        )}
+
+        {IS_GATEWAY ? null : (
+          <>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (char_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.images`,
+                              value: currentValue.filter((c) => c.related_id !== char_id),
+                            },
+                          ]);
+                        }
+                  }
+                  id={val.image?.id}
+                  image_id={val.image?.id}
+                  key={val.image.id}
+                  title={val.image?.title}
+                  type="images"
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </TemplateFieldContainer>
   );

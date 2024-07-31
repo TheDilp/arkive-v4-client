@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
-import { getEntityLink } from "../../../utils";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
+import { getEntityLink, getImageURL } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
-import { Search } from "../../Form";
+import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   isDisabled?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["documents"];
+  presetOptions: GatewayConfigOptionType[];
 };
 
 export function TemplateDocumentField({
@@ -28,12 +30,14 @@ export function TemplateDocumentField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
+  const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled ? null : (
+        {isDisabled || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}
@@ -65,35 +69,128 @@ export function TemplateDocumentField({
                 },
               ]);
             }}
-            placeholder="Type at least 2 characters"
+            placeholder="Type at least 2 documents"
             searchEntity="documents"
             value={fieldType === "documents_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
         )}
-        {(currentValue || [])?.map((val) => {
-          return (
-            <EntityPreview
-              clearAction={
-                isDisabled
-                  ? undefined
-                  : (doc_id) => {
-                      handleChange([
-                        {
-                          name: `${name}.documents`,
-                          value: currentValue.filter((c) => c.related_id !== doc_id),
-                        },
-                      ]);
-                    }
+        {!IS_GATEWAY ? null : (
+          <Select
+            isClearable
+            isMultiple={fieldType === "documents_multiple"}
+            label={title}
+            name={name}
+            onChange={({ value, label, icon }) => {
+              if (fieldType === "documents_multiple" && (!value || value?.length === 0)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.documents`,
+                    value: [],
+                  },
+                ]);
+                return;
               }
-              icon={val?.document?.icon || ""}
-              id={val?.document?.id}
-              key={val.document.id}
-              link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
-              title={val.document?.title}
-              type="documents"
-            />
-          );
-        })}
+
+              if (
+                (currentValue || [])?.some((doc) => {
+                  if (fieldType === "documents_multiple") {
+                    return value?.includes(doc.related_id);
+                  }
+                  return doc.related_id === value;
+                })
+              ) {
+                if (fieldType === "documents_multiple") {
+                  const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.documents`,
+                      value: selectedValues.map((opt) => ({
+                        related_id: opt.value,
+                        document: {
+                          id: opt.value,
+                          title: opt.label,
+                          icon: opt?.icon,
+                        },
+                      })),
+                    },
+                  ]);
+                } else {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.documents[0]`,
+                      value: {
+                        related_id: value,
+                        document: {
+                          id: value,
+                          title: label,
+                          icon,
+                        },
+                      },
+                    },
+                  ]);
+                }
+                return;
+              }
+              if (fieldType === "documents_multiple") {
+                const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.documents`,
+                    value: selectedValues.map((opt) => ({
+                      related_id: opt.value,
+                      document: {
+                        id: opt.value,
+                        title: opt.label,
+                        icon: opt?.icon,
+                      },
+                    })),
+                  },
+                ]);
+              }
+            }}
+            options={presetOptions.map((opt) => ({
+              ...opt,
+              image:
+                projectId && opt.image
+                  ? { id: opt.image, shape: "circle", link: getImageURL(projectId, "images", opt.image) }
+                  : undefined,
+            }))}
+            value={(currentValue || []).map((c) => c.related_id)}
+          />
+        )}
+        {IS_GATEWAY ? null : (
+          <>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (doc_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.documents`,
+                              value: currentValue.filter((c) => c.related_id !== doc_id),
+                            },
+                          ]);
+                        }
+                  }
+                  icon={val?.document?.icon || ""}
+                  id={val?.document?.id}
+                  key={val.document.id}
+                  link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
+                  title={val.document?.title}
+                  type="documents"
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </TemplateFieldContainer>
   );

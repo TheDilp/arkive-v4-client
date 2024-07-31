@@ -266,7 +266,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
-                presetOptions={presetOptions}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -286,7 +286,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
-                presetOptions={presetOptions}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -304,6 +304,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -321,6 +322,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -337,6 +339,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -353,6 +356,7 @@ export function FieldTemplateRows({
                 isDisabled={!hasCreateOrEdit}
                 key={template_field.id}
                 name={baseName}
+                presetOptions={presetOptions || []}
                 title={template_field.title}
               />
             );
@@ -624,7 +628,16 @@ export function CharacterDrawer({ data }: { data: { id?: string; preselectedTab?
               />
             ) : (
               <ImagePreview
-                clearAction={permissions?.update_characters ? () => handleChange({ name: "portrait", value: null }) : undefined}
+                clearAction={
+                  permissions?.update_characters
+                    ? () => {
+                        handleChange([
+                          { name: "portrait", value: null },
+                          { name: "portrait_id", value: null },
+                        ]);
+                      }
+                    : undefined
+                }
                 id={character?.portrait?.id}
                 title={character?.portrait?.title}
               />

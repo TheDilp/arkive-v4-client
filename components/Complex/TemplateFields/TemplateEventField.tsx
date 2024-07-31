@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 
 import { BlueprintInstanceBlueprintFieldType, HandleChangePropsType } from "../../../types";
+import { GatewayConfigOptionType } from "../../../types/EntityTypes/gatewayTypes";
 import { getEntityLink } from "../../../utils";
 import { EntityPreview } from "../../DataDisplay";
-import { Search } from "../../Form";
+import { Search, Select } from "../../Form";
 import { TemplateFieldContainer } from ".";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   isDisabled?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["events"];
+  presetOptions: GatewayConfigOptionType[];
 };
 
 export function TemplateEventField({
@@ -28,12 +30,15 @@ export function TemplateEventField({
   isCollapsible,
   isDisabled,
   isGlobal,
+  presetOptions,
 }: Props) {
   const { project_id } = useParams();
+  const projectId = project_id || presetOptions?.[0]?.project_id;
+
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled ? null : (
+        {isDisabled || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}
@@ -72,29 +77,125 @@ export function TemplateEventField({
             value={fieldType === "events_multiple" ? currentValue?.map((c) => c.related_id) : undefined}
           />
         )}
-        {(currentValue || [])?.map((val) => {
-          return (
-            <EntityPreview
-              clearAction={
-                isDisabled
-                  ? undefined
-                  : (instance_id) => {
-                      handleChange([
-                        {
-                          name: `${name}.events`,
-                          value: currentValue.filter((c) => c.related_id !== instance_id),
-                        },
-                      ]);
-                    }
+
+        {!IS_GATEWAY ? null : (
+          <Select
+            isClearable
+            isMultiple={fieldType === "events_multiple"}
+            label={title}
+            name={name}
+            onChange={({ value, label, icon, parent_id }) => {
+              if (fieldType === "events_multiple" && (!value || value?.length === 0)) {
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.events`,
+                    value: [],
+                  },
+                ]);
+                return;
               }
-              id={val?.event?.id}
-              key={val?.event.id}
-              link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
-              title={val?.event.title}
-              type="events"
-            />
-          );
-        })}
+
+              if (
+                (currentValue || [])?.some((doc) => {
+                  if (fieldType === "events_multiple") {
+                    return value?.includes(doc.related_id);
+                  }
+                  return doc.related_id === value;
+                })
+              ) {
+                if (fieldType === "events_multiple") {
+                  const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.events`,
+                      value: selectedValues.map((opt) => ({
+                        related_id: opt.value,
+                        event: {
+                          id: opt.value,
+                          title: opt.label,
+                          icon: opt?.icon,
+                        },
+                      })),
+                    },
+                  ]);
+                } else {
+                  handleChange([
+                    { name: `${name}.id`, value: id },
+                    {
+                      name: `${name}.events[0]`,
+                      value: {
+                        related_id: value,
+                        event: {
+                          id: value,
+                          title: label,
+                          parent_id,
+                          icon,
+                          project_id: project_id,
+                        },
+                      },
+                    },
+                  ]);
+                }
+                return;
+              }
+              if (fieldType === "events_multiple") {
+                const selectedValues = presetOptions.filter((opt) => value?.includes(opt?.value));
+                handleChange([
+                  { name: `${name}.id`, value: id },
+                  {
+                    name: `${name}.events`,
+                    value: selectedValues.map((opt) => ({
+                      related_id: opt.value,
+                      event: {
+                        id: opt.value,
+                        title: opt.label,
+                        icon: opt?.icon,
+                        parent_id: opt?.parent_id,
+                        project_id: projectId,
+                      },
+                    })),
+                  },
+                ]);
+              }
+            }}
+            options={presetOptions.map((opt) => ({
+              ...opt,
+              image: undefined,
+            }))}
+            value={(currentValue || []).map((c) => c.related_id)}
+          />
+        )}
+
+        {IS_GATEWAY ? null : (
+          <>
+            {(currentValue || [])?.map((val) => {
+              return (
+                <EntityPreview
+                  clearAction={
+                    isDisabled
+                      ? undefined
+                      : (instance_id) => {
+                          handleChange([
+                            {
+                              name: `${name}.events`,
+                              value: currentValue.filter((c) => c.related_id !== instance_id),
+                            },
+                          ]);
+                        }
+                  }
+                  id={val?.event?.id}
+                  key={val?.event.id}
+                  link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
+                  title={val?.event.title}
+                  type="events"
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </TemplateFieldContainer>
   );

@@ -176,6 +176,19 @@ export function Input({
               : onChange(e.target)
           }
           onKeyDown={(e) => {
+            if (type === "number") {
+              if (e.ctrlKey && (e.key === "v" || e.key === "V")) {
+                e.preventDefault();
+                navigator.clipboard.readText().then((res) => {
+                  const numbered = Number(res);
+                  if (isNaN(numbered)) return;
+                  else {
+                    onChange({ name, value: numbered });
+                  }
+                });
+              }
+            }
+
             if ((e.key === "e" || e.key === "E" || e.key === "+") && type === "number") {
               e.preventDefault();
             } else if (e.key === "-" && type === "number" && !!value) {

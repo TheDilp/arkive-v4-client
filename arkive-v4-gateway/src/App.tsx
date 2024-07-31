@@ -1,13 +1,15 @@
-import { Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
-import GatewayForm from "./pages/GatewayForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Card } from "../../components/Layout/Card";
-import ls from "localstorage-slim";
-import { Button, Input, NotificationContainer } from "../../components";
-import { createContext, Dispatch, ReactNode, useContext, useEffect, useState } from "react";
-import { IconEnum } from "../../utils";
 import { SetStateAction } from "jotai";
+import ls from "localstorage-slim";
+import { createContext, Dispatch, ReactNode, useContext, useEffect, useState } from "react";
+import { Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
+
+import { Button, Input, NotificationContainer } from "../../components";
+import { Card } from "../../components/Layout/Card";
 import { useAccessGateway } from "../../hooks";
+import { IconEnum } from "../../utils";
+import GatewayForm from "./pages/GatewayForm";
+
 type AccessStateType = { access: boolean; code: number | undefined };
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,11 +42,12 @@ function CodeInput() {
   const { mutate: accessGateway, isLoading: isMutating } = useAccessGateway();
   const navigate = useNavigate();
   useEffect(() => {
-    if (code && codeState && code === codeState) {
+    if (code && codeState && Number(code) === Number(codeState)) {
+      console.log("TEST");
       setAccessState((prev) => ({ ...prev, access: true }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, codeState]);
+  }, [code, codeState, isMutating]);
 
   useEffect(() => {
     if (access && type && access_id && entity_id) {
@@ -59,24 +62,31 @@ function CodeInput() {
           <Card title="Please input the access code you recieved in your email">
             <div className="mt-auto flex flex-col gap-y-10 [&>div>div>input::-webkit-inner-spin-button]:appearance-none [&>div>div>input]:text-center">
               <Input
-                type="code"
                 max={999999}
-                size="lg"
-                value={codeState || undefined}
+                name="code"
                 onChange={({ value }) => {
                   setAccessState((prev) => ({ ...prev, code: value as number }));
                 }}
-                name="code"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    // @ts-expect-error has value prop
+                    setAccessState((prev) => ({ ...prev, code: e.currentTarget.value as number }));
+                  }
+                }}
+                size="lg"
+                type="code"
+                value={codeState || undefined}
               />
               <Button
+                icon={IconEnum.login}
                 isDisabled={!codeState || (!!codeState && codeState.toString().length < 6) || isMutating}
-                variant="info"
+                isLoading={isMutating}
                 label="Access"
                 onClick={() => {
                   if (codeState) accessGateway(codeState.toString());
                 }}
-                isLoading={isMutating}
-                icon={IconEnum.login}
+                variant="info"
               />
             </div>
           </Card>
@@ -94,8 +104,8 @@ function App() {
         <AccessContextWrapper>
           <Routes>
             <Route element={<CodeInput />}>
-              <Route path=":type/:access_id/:entity_id" element={<GatewayForm />} />
-              <Route path=":type/:access_id/:entity_id/:section_id" element={<GatewayForm />} />
+              <Route element={<GatewayForm />} path=":type/:access_id/:entity_id" />
+              <Route element={<GatewayForm />} path=":type/:access_id/:entity_id/:section_id" />
             </Route>
             {/* <Route path="*" element={<Navigate to={"https://google.com"} />} /> */}
           </Routes>
@@ -106,4 +116,3 @@ function App() {
 }
 
 export default App;
-

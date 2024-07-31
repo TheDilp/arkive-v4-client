@@ -1,17 +1,15 @@
- 
+import type { CommandFunction, KeyBindingProps, PrimitiveSelection } from "@remirror/core";
 import {
   ApplySchemaAttributes,
   command,
-  CommandFunction,
   extension,
   ExtensionTag,
   getTextSelection,
   keyBinding,
-  KeyBindingProps,
   MarkExtension,
   MarkExtensionSpec,
   MarkSpecOverride,
-  PrimitiveSelection,
+  ProsemirrorNode,
   toggleMark,
 } from "remirror";
 
@@ -20,7 +18,6 @@ import {
   defaultOptions: {},
   handlerKeys: [],
 })
- 
 export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
   get name() {
     return "spoiler" as const;
@@ -49,29 +46,35 @@ export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
     };
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   toggleSpoiler(selection?: PrimitiveSelection): CommandFunction {
     return toggleMark({ type: this.type, selection });
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   setSpoiler(selection?: PrimitiveSelection): CommandFunction {
     return ({ tr, dispatch }) => {
-      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc);
-      dispatch?.(tr.addMark(from, to, this.type.create()));
+      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc as ProsemirrorNode);
+      dispatch?.(tr.addMark(from, to, this.type.create() as any));
 
       return true;
     };
   }
 
+  // @ts-expect-error remirror types are not updated
   @command()
   removeSpoiler(selection?: PrimitiveSelection): CommandFunction {
     return ({ tr, dispatch }) => {
-      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc);
+      const { from, to } = getTextSelection(selection ?? tr.selection, tr.doc as ProsemirrorNode);
 
+      // @ts-expect-error remirror types are not up to date
       if (!tr.doc.rangeHasMark(from, to, this.type)) {
         return false;
       }
+
+      // @ts-expect-error remirror types are not up to date
 
       dispatch?.(tr.removeMark(from, to, this.type));
 
@@ -79,6 +82,7 @@ export class SpoilerExtension extends MarkExtension<SpoilerOptions> {
     };
   }
 
+  // @ts-expect-error remirror types are not updated
   @keyBinding({ shortcut: "Mod-Shift-s", command: "toggleSpoiler" })
   shortcut(props: KeyBindingProps): boolean {
     return this.toggleSpoiler()(props);

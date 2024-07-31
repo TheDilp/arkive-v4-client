@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import groupBy from "lodash.groupby";
 import { useParams } from "react-router-dom";
-import { findChildren, findElementAtPosition } from "remirror";
+import { findChildren, findElementAtPosition, ProsemirrorNode } from "remirror";
 
 import {
   baseURLS,
@@ -34,7 +34,11 @@ type MatchedMentionItem = {
 export function MentionedInDocumentDrawer({ data }: Props) {
   const { project_id } = useParams();
   const { doc } = data.getContext.getState();
-  const mentions = findChildren({ node: doc, predicate: (child) => child.node.type.name === "mentionAtom", descend: true });
+  const mentions = findChildren({
+    node: doc as ProsemirrorNode,
+    predicate: (child) => child.node.type.name === "mentionAtom",
+    descend: true,
+  });
   const setMentionPosition = useSetAtom(mentionPositionAtom);
   const formattedMentions = mentions.map((mention) => ({
     id: mention.node.attrs.id,
