@@ -1,9 +1,9 @@
 import { ReactNode, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
+import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
 import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
-import { getDifferenceForCharacterFields, IconEnum } from "../../../utils";
+import { getCharacterFullName, getDifferenceForCharacterFields, getImageURL, IconEnum } from "../../../utils";
 import { UpdateCharacterSchema } from "../../../validation";
 
 const baseCharacterSections = [{ id: "name", title: "Basic info" }];
@@ -63,17 +63,13 @@ export function CharacterForm() {
   const [character, setCharacter] = useState<Partial<CharacterType>>();
   const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
   const navigate = useNavigate();
-  const { data: existingCharacter, isFetching: isFetchingCharacter } = useGetEntity<CharacterType>(
-    entity_id,
-    type as "characters",
-    {
-      fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
-      relations: {
-        character_fields: true,
-        tags: true,
-      },
-    }
-  );
+  const { data: existingCharacter, isInitialLoading } = useGetEntity<CharacterType>(entity_id, type as "characters", {
+    fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
+    relations: {
+      character_fields: true,
+      tags: true,
+    },
+  });
   const { data: templates, isFetching: isFetchingTemplates } = useGetEntities<CharacterFieldTemplateType>(
     {
       data: { project_id: existingCharacter?.data?.project_id },
@@ -113,7 +109,7 @@ export function CharacterForm() {
     "characters"
   );
   useLayoutEffect(() => {
-    if (existingCharacter?.data && !character) {
+    if (existingCharacter?.data) {
       setCharacter(existingCharacter?.data);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,7 +137,7 @@ export function CharacterForm() {
     setFields(tempFields);
   }, [templates]);
 
-  if (isFetchingCharacter || isFetchingTemplates)
+  if (isInitialLoading || isFetchingTemplates)
     return (
       <div className="col-span-12">
         <Skeleton type="character_profile" />
@@ -149,7 +145,23 @@ export function CharacterForm() {
     );
   return (
     <>
-      <div className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2">
+      <div
+        style={{
+          gridRow: "1 / 2",
+        }}
+        className="col-span-12 pb-2 text-4xl font-bold">
+        <h1 className="flex items-center gap-x-4">
+          {character?.portrait_id ? (
+            <Avatar image={getImageURL(character.project_id as string, "images", character?.portrait_id)} />
+          ) : null}
+          {getCharacterFullName(character?.first_name || "", null, character?.last_name)}
+        </h1>
+      </div>
+      <div
+        style={{
+          gridRow: "span 1",
+        }}
+        className="col-span-1 overflow-hidden rounded-l-md bg-zinc-800 lg:col-span-2">
         <h3 className="py-2 text-center font-merriweather text-xl font-bold">Sections</h3>
         <ul className="h-full overflow-y-auto">
           {sections.map((section) => (
@@ -163,7 +175,11 @@ export function CharacterForm() {
           ))}
         </ul>
       </div>
-      <div className="col-span-10 flex h-full flex-col overflow-hidden rounded-r-md bg-zinc-900 p-4">
+      <div
+        style={{
+          gridRow: "span 1",
+        }}
+        className="col-span-10 flex h-full flex-col overflow-hidden rounded-r-md bg-zinc-900 p-4">
         {(sections || []).map((section) => {
           if (section.id !== section_id) return null;
 
