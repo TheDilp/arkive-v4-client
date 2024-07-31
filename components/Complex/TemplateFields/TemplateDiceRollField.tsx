@@ -55,7 +55,10 @@ export function TemplateDiceRollField({
               setIsRolling(true);
               try {
                 const parsedNotation = DiceRollParser.parseNotation(formula);
-                Dice.updateConfig({ themeColor: defaultDiceColor || DefaultTagColor, suspendSimulation: true });
+                Dice.updateConfig({
+                  themeColor: defaultDiceColor || DefaultTagColor,
+                  suspendSimulation: IS_GATEWAY ? false : true,
+                });
 
                 Dice.roll(parsedNotation)
                   .then((r: any) => {
@@ -95,4 +98,3 @@ export function TemplateDiceRollField({
     </TemplateFieldContainer>
   );
 }
-
