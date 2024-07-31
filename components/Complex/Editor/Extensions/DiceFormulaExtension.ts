@@ -212,7 +212,6 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     this._autoLinkRegexNonGlobal = new RegExp(`^${autoLinkRegex.source}$`, autoLinkRegex.flags.replace("g", ""));
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   updateDiceRoll(attrs: DiceRollAttributes, range?: FromToProps): CommandFunction {
     return (props) => {
@@ -232,7 +231,6 @@ export class DiceFormulaExtension extends MarkExtension<DiceFormulaOptions> {
     };
   }
 
-  // @ts-expect-error remirror types are not updated
   @command()
   removeDiceRoll(range?: FromToProps): CommandFunction {
     return (props) => {
