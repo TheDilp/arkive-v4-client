@@ -32,12 +32,15 @@ import { Button, Input, Search, Select, TagInput } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
 
-function isSaveDisabled(template: TemplateStateType) {
+function isSaveDisabled(template: TemplateStateType, fields: Record<string, CharacterFieldType[]>) {
   if (!template?.title) return true;
-  if (!template?.character_fields?.length) return true;
   if (!template?.tags?.length) return true;
+
+  const flatFields = Object.values(fields).flat();
+
+  if (!flatFields?.length) return true;
   if (
-    template.character_fields.some(
+    flatFields.some(
       (field) =>
         !field.title ||
         !field.field_type ||
@@ -51,7 +54,7 @@ function isSaveDisabled(template: TemplateStateType) {
 
   if (template.character_fields_sections?.length) {
     const unique_sections = new Set(template.character_fields_sections.map((section) => section.title) || []);
-    if (unique_sections.size !== template.character_fields_sections?.length) return true;
+    if (unique_sections.size !== template.character_fields_sections?.length && template.id) return true;
   }
 
   return false;
@@ -667,7 +670,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
         <Button
           icon={data?.id ? IconEnum.save : IconEnum.add}
           isDisabled={
-            isSaveDisabled(template) ||
+            isSaveDisabled(template, groupedFields) ||
             isLoading ||
             (data?.id && !permissions?.update_character_fields_templates) ||
             (!data?.id && !permissions?.create_character_fields_templates)
