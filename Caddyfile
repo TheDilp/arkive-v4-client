@@ -26,11 +26,6 @@
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
 	root * {$BUILD_PATH}
 
-	encode gzip zstd
-
-	file_server {
-		precompressed br gzip
-		index index.html
-	}
+	file_server
 
 }
