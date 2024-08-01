@@ -69,8 +69,7 @@ function CodeInput() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    // @ts-expect-error has value prop
-                    setAccessState((prev) => ({ ...prev, code: e?.currentTarget?.value || undefined }));
+                    if (codeState) accessGateway(codeState.toString());
                   }
                 }}
                 size="lg"
