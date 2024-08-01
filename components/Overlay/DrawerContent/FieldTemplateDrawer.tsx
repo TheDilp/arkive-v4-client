@@ -280,7 +280,7 @@ function CharacterFieldSection({
         },
       ]}
       dropdown={{
-        allowedPlacements: ["left"],
+        allowedPlacements: ["left-start"],
         items: [
           {
             id: "add_text_field",
