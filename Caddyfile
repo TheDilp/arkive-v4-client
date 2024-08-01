@@ -26,13 +26,18 @@
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
 	root * {$BUILD_PATH}
 
-	# enable gzipping responses
-	encode gzip
+	encode gzip zstd
 
-	# serve files from 'dist'
-	file_server {
-		 precompressed br
-	}
+	@brotli {
+        file {
+            try_files {path}.br
+        }
+    }
+
+	handle @brotli {
+        header Content-Encoding br
+        rewrite * {http.matchers.file.relative}
+    }
 
 	# if path doesn't exist, redirect it to 'index.html' for client side routing
 	try_files {path} /index.html
