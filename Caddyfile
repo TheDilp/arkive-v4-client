@@ -30,7 +30,8 @@
 
 	file_server {
 		precompressed br gzip
-		root * /dist
+		root * /
+		index index.html.br
 	}
 
 }
