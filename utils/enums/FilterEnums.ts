@@ -1,4 +1,4 @@
-import { BlueprintFieldTypes, FilterEnumType, RequestFilterTypes, SearchableEntities } from "../../types";
+import { FieldTypes, FilterEnumType, RequestFilterTypes, SearchableEntities } from "../../types";
 
 export const FilterNamesEnum: Record<RequestFilterTypes, string> = {
   eq: "Equals",
@@ -93,8 +93,8 @@ export function getSearchType(type: string) {
 }
 
 export function CharacterBlueprintRelationFilter(
-  type: BlueprintFieldTypes,
-  selectOptions?: { label: string; value: string }[],
+  type: FieldTypes,
+  selectOptions?: { label: string; value: string }[]
 ): FilterEnumType[] {
   if (type === "text") return TextFilters;
   if (type === "number") return NumberFilters;

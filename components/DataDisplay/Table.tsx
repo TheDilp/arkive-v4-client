@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 import { useBreakpoint, useHandleChange } from "../../hooks";
 import {
   AvailableEntityType,
-  BlueprintFieldTypes,
+  FieldTypes,
   FilterEnumType,
   HandleChangePropsType,
   MetaType,
@@ -310,7 +310,7 @@ function TableColumnFilter({
                       and: [...(prev.and || [])].concat({
                         id: crypto.randomUUID(),
                         field: relationType
-                          ? getFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                          ? getFieldValueFromType((meta as MetaType)?.relationType as FieldTypes) || ""
                           : columnId,
                         value: relationType === "boolean" ? false : "",
                         operator: filterOptions[0].value as RequestFilterTypes,
@@ -362,7 +362,7 @@ function TableColumnFilter({
                         : {
                             id: crypto.randomUUID(),
                             field: relationType
-                              ? getFieldValueFromType((meta as MetaType)?.relationType as BlueprintFieldTypes) || ""
+                              ? getFieldValueFromType((meta as MetaType)?.relationType as FieldTypes) || ""
                               : columnId,
                             value: relationType === "boolean" ? false : "",
                             operator: filterOptions[0].value as RequestFilterTypes,

@@ -1,14 +1,14 @@
 import { AvailableIcons } from "../../utils";
 import { EntityPermissionType } from "./baseEntityTypes";
 import { BlueprintInstanceType } from "./blueprintInstanceTypes";
-import { BlueprintFieldTypes } from "./fieldsTypes";
+import { FieldTypes } from "./fieldsTypes";
 import { RandomTableOptionType } from "./randomTableTypes";
 
 export interface BlueprintFieldType {
   id: string;
   sort: number;
   title: string;
-  field_type: BlueprintFieldTypes;
+  field_type: FieldTypes;
   // width: FieldWidthType;
   formula?: string | null;
   random_table_id?: string | null;

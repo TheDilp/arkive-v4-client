@@ -3,7 +3,7 @@ import { BlueprintType } from "./blueprintTypes";
 import { EventType } from "./calendarTypes";
 import { CharacterType } from "./characterTypes";
 import { DocumentType } from "./documentTypes";
-import { BlueprintFieldTypes } from "./fieldsTypes";
+import { FieldTypes } from "./fieldsTypes";
 import { ImageType } from "./imageTypes";
 import { MapPinType } from "./mapTypes";
 import { RandomTableType } from "./randomTableTypes";
@@ -14,7 +14,7 @@ export interface BlueprintInstanceBlueprintFieldType {
   title: string;
   sort: number;
   parent_id: string;
-  field_type: BlueprintFieldTypes;
+  field_type: FieldTypes;
   characters: {
     related_id: string;
     character: Pick<CharacterType, "id" | "full_name" | "portrait_id" | "project_id">;
