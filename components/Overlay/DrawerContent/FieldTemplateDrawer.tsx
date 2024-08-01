@@ -413,7 +413,6 @@ function CharacterFieldSection({
               fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
             },
           },
-
           {
             id: "add_character_fields",
             title: "Add character field",
@@ -745,13 +744,13 @@ function CharacterFieldSection({
                                           label: "Delete",
                                           action: () =>
                                             handleChange({
-                                              name: id,
+                                              name: id === "other" ? "null" : id,
                                               value: character_fields?.filter((f) => f.id !== field.id),
                                             }),
                                         },
                                       }))
                                     : handleChange({
-                                        name: id,
+                                        name: id === "other" ? "null" : id,
                                         value: character_fields?.filter((f) => f.id !== field.id),
                                       }),
                               },
