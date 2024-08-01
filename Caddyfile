@@ -26,42 +26,14 @@
 	# serve from the 'dist' folder (Vite builds into the 'dist' folder)
 	root * {$BUILD_PATH}
 
+	# enable gzipping responses
+	encode gzip
+
 	# serve files from 'dist'
 	file_server {
 		 precompressed br
 	}
 
-	# set content types and encodings
-	header {
-		# Set content type and encoding for Brotli-compressed JavaScript files
-		/*.js.br$ {
-			Content-Type application/javascript
-			Content-Encoding br
-		}
-		# Set content type and encoding for Brotli-compressed HTML files
-		/*.html.br$ {
-			Content-Type text/html
-			Content-Encoding br
-		}
-		# Set content type and encoding for Brotli-compressed CSS files
-		/*.css.br$ {
-			Content-Type text/css
-			Content-Encoding br
-		}
-		# Set content type for uncompressed JavaScript files
-		/*.js$ {
-			Content-Type application/javascript
-		}
-		# Set content type for uncompressed HTML files
-		/*.html$ {
-			Content-Type text/html
-		}
-		# Set content type for uncompressed CSS files
-		/*.css$ {
-			Content-Type text/css
-		}
-	}
-
 	# if path doesn't exist, redirect it to 'index.html' for client side routing
-	try_files {path}.br {path} /index.html.br /index.html
+	try_files {path} /index.html
 }
