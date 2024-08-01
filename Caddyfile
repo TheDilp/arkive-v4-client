@@ -30,7 +30,7 @@
 
 	file_server {
 		precompressed br gzip
-		root * {$BUILD_PATH}
+		root * /dist
 	}
 
 }
