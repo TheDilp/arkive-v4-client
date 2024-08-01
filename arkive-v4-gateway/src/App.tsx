@@ -74,7 +74,7 @@ function CodeInput() {
                 }}
                 size="lg"
                 type="code"
-                value={codeState || undefined}
+                value={codeState || ""}
               />
               <Button
                 icon={IconEnum.login}
