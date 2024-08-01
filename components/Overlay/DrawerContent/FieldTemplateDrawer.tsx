@@ -24,7 +24,7 @@ import {
   TemplateStateType,
   UserHasPermissionsType,
 } from "../../../types";
-import { CharacterFieldTypesEnum, dialogAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
+import { CharacterFieldTypesEnum, createOrEditPermission, dialogAtom, IconEnum, MessageEnum, reorder } from "../../../utils";
 import { DiceRollRegex } from "../../../utils/ui/diceRollerUtils";
 import { InsertTemplateSchema, InsertTemplateType, UpdateTemplateSchema, UpdateTemplateType } from "../../../validation";
 import { EntityPermission } from "../../Complex/EntityPermission";
@@ -259,6 +259,7 @@ function CharacterFieldSection({
   handleChange,
   isLoading,
   isInitialOpen,
+  canCreateOrEdit,
 }: {
   id: string;
   title: string;
@@ -266,6 +267,7 @@ function CharacterFieldSection({
   handleChange: (props: HandleChangePropsType) => void;
   isLoading: boolean;
   isInitialOpen: boolean;
+  canCreateOrEdit: boolean;
 }) {
   const setDialog = useSetAtom(dialogAtom);
   const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -698,6 +700,7 @@ function CharacterFieldSection({
         ],
       }}
       initialOpen={isInitialOpen}
+      isDisabled={canCreateOrEdit}
       label={title}>
       {character_fields.length ? <span /> : <div className="w-full p-2">Drop fields here</div>}
       <Droppable direction="vertical" droppableId={id} key={id} type="CHARACTER_FIELDS">
@@ -834,6 +837,14 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     ["read_character_fields_templates", "create_character_fields_templates", "update_character_fields_templates"],
     existingTemplate?.data?.owner_id
   );
+
+  const canCreateOrEdit = createOrEditPermission(
+    permissions?.create_character_fields_templates,
+    permissions?.update_calendars,
+    permissions?.is_owner,
+    data?.id
+  );
+
   const tabs = getTabs(permissions, existingTemplate?.data?.id);
 
   const [template, setTemplate] = useState<TemplateStateType>({
@@ -928,6 +939,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             }}>
             {(template.character_fields_sections || [])?.map((section) => (
               <CharacterFieldSection
+                canCreateOrEdit={canCreateOrEdit}
                 character_fields={groupedFields?.[section.id] || []}
                 handleChange={handleCustomFieldsChange}
                 id={section.id}
@@ -939,6 +951,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
             ))}
 
             <CharacterFieldSection
+              canCreateOrEdit={canCreateOrEdit}
               character_fields={groupedFields["null"] || []}
               handleChange={handleCustomFieldsChange}
               id="other"
