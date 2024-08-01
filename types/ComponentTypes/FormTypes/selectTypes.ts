@@ -6,6 +6,7 @@ export interface SelectOptionType {
   label: string;
   value: string;
   parent_id?: string | null;
+  project_id?: string | null;
   image?: { id: string | undefined; link: string; shape?: AvatarShape };
   icon?: AvailableIcons;
   isDisabled?: boolean;
