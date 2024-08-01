@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 
 import { CollapsibleType, Size } from "../../types";
 import { AvailableIcons, IconEnum } from "../../utils";
-import { Button, Icon } from "..";
+import { Button, Dropdown, Icon } from "..";
 
 const CollapsibleClasses = tv({
   slots: {
@@ -80,6 +80,7 @@ export function Collapsible({
   isDisabled,
   children,
   actions,
+  dropdown,
   size = "xl",
   variant = "primary",
 }: CollapsibleType) {
@@ -115,7 +116,7 @@ export function Collapsible({
           {label}
         </span>
         <span className={actionsClasses()}>
-          {actions?.length
+          {actions?.length && !dropdown
             ? actions.map((act) => (
                 <div
                   key={act.label || act.icon}
@@ -135,6 +136,22 @@ export function Collapsible({
                 </div>
               ))
             : null}
+          {dropdown ? (
+            <Dropdown allowedPlacements={dropdown.allowedPlacements || []} items={dropdown?.items || []}>
+              <Button
+                hasNoBackground
+                icon={actions?.[0]?.icon}
+                isDisabled={actions?.[0]?.isDisabled || isDisabled}
+                label={actions?.[0]?.label}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                tooltip={actions?.[0]?.tooltip}
+                variant={actions?.[0]?.variant}
+              />
+            </Dropdown>
+          ) : null}
           <Icon fontSize={getIconSize(size)} icon={IconEnum.chevron_up} />
         </span>
       </summary>
