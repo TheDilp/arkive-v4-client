@@ -427,7 +427,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialogAtom: () => unknown;
     data: CharacterType[];
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<CharacterType>;
   }
 ) {
   const selectedActions: TableSelectedAction[] = [];
@@ -615,7 +615,7 @@ function CharacterViewHeader({
   setFilter: Dispatch<SetStateAction<string>>;
   setArkived: Dispatch<SetStateAction<"active" | "arkive">>;
   arkived: "active" | "arkive";
-  dispatch: TableDispatch;
+  dispatch: TableDispatch<CharacterType>;
   view: "card" | "table";
   permissions: UserHasPermissionsType;
 }) {
@@ -726,7 +726,7 @@ export function CharactersView() {
     ["read_characters", "create_characters", "update_characters", "delete_characters"],
     undefined
   );
-  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable<CharacterType>({
     orderBy: [{ field: "first_name", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},

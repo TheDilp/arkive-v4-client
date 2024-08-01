@@ -510,7 +510,7 @@ function getSelectedActions(
     resetDialogAtom: () => unknown;
     data: any[];
     arkived: "active" | "arkive";
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<{ id: string; title: string }>;
     type: AvailableEntityType | AvailableSubEntityType;
   }
 ) {
@@ -738,7 +738,7 @@ function FolderView() {
   );
 
   const { show_image_folder_view, show_image_table_view } = useAtomValue(userSettingsAtom);
-  const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable({
+  const [{ selection, pagination, filters, relationFilters }, dispatch] = useTable<{ id: string; title: string }>({
     selection: [],
     pagination: { page: 0, limit: 10 },
   });

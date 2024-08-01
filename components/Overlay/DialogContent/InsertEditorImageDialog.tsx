@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useGetImages } from "../../../hooks";
+import { ImageType } from "../../../types";
 import { getImageURL, IconEnum } from "../../../utils";
 import { ImagePreview } from "../../DataDisplay";
 import { Button, Search, Select, Title } from "../../Form";
@@ -16,7 +17,7 @@ type Props = {
 export function InsertEditorImageDialog({ data }: Props) {
   const { type, access_id, project_id } = useParams();
   const [selectedImages, setSelectedImages] = useState<{ project_id?: string; label: string; value: string }[]>([]);
-  const { data: images } = useGetImages(
+  const { data: images } = useGetImages<ImageType>(
     "",
     "images",
     {

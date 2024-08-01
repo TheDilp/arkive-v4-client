@@ -257,7 +257,7 @@ function getSelectedActions(
     resetDialog: () => unknown;
     data: ImageType[];
     downloadImages: downloadImageMutationType;
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<ImageType>;
   }
 ) {
   const selectedActions: TableSelectedAction[] = [];
@@ -403,7 +403,7 @@ export function AssetView() {
 
   const [filter, setFilter] = useState("");
   const [view, setView] = useState<"card" | "table">(ls.get("assets_view") || "table");
-  const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, selection, pagination }, dispatch] = useTable<ImageType>({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
   });
@@ -412,7 +412,7 @@ export function AssetView() {
 
   const user = useAtomValue(userAtom);
 
-  const { data: assets, isLoading } = useGetImages(
+  const { data: assets, isLoading } = useGetImages<ImageType>(
     project_id as string,
     type,
     {
