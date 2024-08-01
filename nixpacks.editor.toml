@@ -20,6 +20,11 @@
     dependsOn = ['caddy'] # make sure this phase runs after the 'caddy' phase so that we know we have caddy downloaded
     cmds = ['caddy fmt --overwrite Caddyfile'] # format the Caddyfile to fix any formatting inconsistencies
 
+# log files in the dist folder
+[phases.log_dist]
+    dependsOn = ['fmt'] # make sure this phase runs after the 'fmt' phase
+    cmds = ['ls -la arkive-v4-editor/dist'] # list files in the 'dist' folder
+
 # copy caddy and build artifacts to a new image and start the caddy web server
 [start]
     runImage = 'ubuntu:20.04' # use a new ubuntu image to run the caddy server in
