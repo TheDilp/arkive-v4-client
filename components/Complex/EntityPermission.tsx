@@ -59,13 +59,15 @@ export function EntityPermission({ related_id, permissions, handleChange, select
   return (
     <div className="flex flex-col gap-y-4">
       <OwnerDisplay members={members} owner_id={owner_id} user={user} />
-      <Select
-        label="Transfer ownership"
-        name="owner_id"
-        onChange={handleChange}
-        options={members.concat(user).map((m) => ({ label: m.nickname || m.email, value: m.id }))}
-        value={owner_id}
-      />
+      {related_id ? (
+        <Select
+          label="Transfer ownership"
+          name="owner_id"
+          onChange={handleChange}
+          options={members.concat(user).map((m) => ({ label: m.nickname || m.email, value: m.id }))}
+          value={owner_id}
+        />
+      ) : null}
       {/* {isProjectOwner ? (
         <Collapsible icon={IconEnum.permissions} initialOpen label="Role access">
           <ul className="flex max-h-96 flex-col gap-y-2 overflow-y-auto p-2">

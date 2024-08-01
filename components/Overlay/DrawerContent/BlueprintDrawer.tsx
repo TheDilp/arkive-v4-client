@@ -387,6 +387,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
               <span>Insert new field:</span>
               <Dropdown
                 allowedPlacements={["left-start"]}
+                isDisabled={canCreateOrEdit}
                 items={[
                   {
                     id: "add_text_field",
