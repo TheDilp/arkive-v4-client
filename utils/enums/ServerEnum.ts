@@ -14,7 +14,7 @@ export const baseURLS = {
   baseGatewayServer: `${
     import.meta.env.DEV
       ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}/gateway`
-      : import.meta.env.VITE_ARKIVE_EDITOR_SERVER
+      : `${import.meta.env.VITE_ARKIVE_EDITOR_SERVER}/gateway`
   }`,
 };
 
