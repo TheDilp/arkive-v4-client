@@ -21,6 +21,7 @@ import { EntityPermission } from "../../Complex/EntityPermission";
 import { Button, Input, Search, Select } from "../../Form";
 import { Collapsible, DrawerLayout, Tabs } from "../../Layout";
 import { Icon, Skeleton } from "../../Misc";
+import { Dropdown } from "../Dropdown";
 import { IconPicker } from "../IconPicker";
 
 function isSaveDisabled(blueprint: BlueprintStateType) {
@@ -384,28 +385,409 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
           {canCreateOrEdit ? (
             <div className="flex items-center justify-between">
               <span>Insert new field:</span>
-              <div className="h-8 w-8">
-                <Button
-                  icon={IconEnum.add}
-                  isDisabled={isLoading || !canCreateOrEdit}
-                  onClick={() => {
-                    handleChange({
-                      name: "blueprint_fields",
-                      value: (blueprint.blueprint_fields || []).concat({
-                        id: crypto.randomUUID(),
-                        title: "New field",
-                        field_type: "text",
-                        // width: "half",
-                        sort: blueprint?.blueprint_fields?.length ?? 0,
-                      }),
-                    });
-                    setTimeout(() => {
+              <Dropdown
+                allowedPlacements={["left-start"]}
+                items={[
+                  {
+                    id: "add_text_field",
+                    title: "Add text field",
+                    icon: IconEnum.text_align_center,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "text",
+                          // width: "half",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      setTimeout(() => {
+                        fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
+                    },
+                  },
+                  {
+                    id: "add_textarea_field",
+                    title: "Add textarea field",
+                    icon: IconEnum.document_templates,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "textarea",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
                       fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
-                    }, 100);
-                  }}
-                  variant="info"
-                />
-              </div>
+                    },
+                  },
+                  {
+                    id: "add_number_field",
+                    title: "Add number field",
+                    icon: IconEnum.hash,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "number",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                    },
+                  },
+                  {
+                    id: "add_select_fields",
+                    title: "Add select field",
+                    icon: IconEnum.bullet_list,
+                    subItems: [
+                      {
+                        id: "single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "select",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "select_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_bool_field",
+                    title: "Add boolean field",
+                    icon: IconEnum.check_circle,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "boolean",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                    },
+                  },
+                  {
+                    id: "add_dice_roll",
+                    title: "Add dice roll field",
+                    icon: IconEnum.d20,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "dice_roll",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                    },
+                  },
+                  {
+                    id: "add_blueprint?.blueprint_fields",
+                    title: "Add character field",
+                    icon: IconEnum.character,
+                    subItems: [
+                      {
+                        id: "add_char_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "characters_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_char_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "characters_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_blueprint_instance_fields",
+                    title: "Add blueprint field",
+                    icon: IconEnum.blueprint,
+                    subItems: [
+                      {
+                        id: "add_bp_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "blueprints_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_bp_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "blueprints_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_document_fields",
+                    title: "Add document field",
+                    icon: IconEnum.document,
+                    subItems: [
+                      {
+                        id: "add_doc_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "documents_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_doc_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "documents_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_map_fields",
+                    title: "Add map pin field",
+                    icon: IconEnum.map_pin,
+                    subItems: [
+                      {
+                        id: "add_map_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "locations_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_map_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "locations_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_events_fields",
+                    title: "Add event field",
+                    icon: IconEnum.event,
+                    subItems: [
+                      {
+                        id: "add_events_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "events_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_events_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "events_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_images_fields",
+                    title: "Add image field",
+                    icon: IconEnum.image,
+                    subItems: [
+                      {
+                        id: "add_image_single",
+                        title: "Single",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "images_single",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                      {
+                        id: "add_images_multiple",
+                        title: "Multiple",
+                        onClick: () => {
+                          handleChange({
+                            name: "blueprint_fields",
+                            value: (blueprint?.blueprint_fields || []).concat({
+                              id: crypto.randomUUID(),
+                              title: "New field",
+                              field_type: "images_multiple",
+                              sort: blueprint?.blueprint_fields?.length ?? 0,
+                            }),
+                          });
+                          fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    id: "add_date_field",
+                    title: "Add date field",
+                    icon: IconEnum.calendar,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "date",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                    },
+                  },
+                  {
+                    id: "add_random_field",
+                    title: "Add random table field",
+                    icon: IconEnum.random_table,
+                    onClick: () => {
+                      handleChange({
+                        name: "blueprint_fields",
+                        value: (blueprint?.blueprint_fields || []).concat({
+                          id: crypto.randomUUID(),
+                          title: "New field",
+                          field_type: "random_table",
+                          sort: blueprint?.blueprint_fields?.length ?? 0,
+                        }),
+                      });
+                      fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                    },
+                  },
+                ]}>
+                <div className="h-8 w-8">
+                  <Button icon={IconEnum.add} isDisabled={isLoading || !canCreateOrEdit} onClick={undefined} variant="info" />
+                </div>
+              </Dropdown>
             </div>
           ) : null}
           <DragDropContext

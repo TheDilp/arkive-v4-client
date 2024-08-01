@@ -4,7 +4,15 @@ import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
 import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant } from "../../../types";
-import { AvailableIcons, ColorPresets, dialogAtom, drawerAtom, IconEnum } from "../../../utils";
+import {
+  AvailableIcons,
+  ColorPresets,
+  dialogAtom,
+  drawerAtom,
+  getSavingIcon,
+  getSavingTooltip,
+  IconEnum,
+} from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
@@ -451,18 +459,6 @@ function menuBarItems({
   }
 
   return options;
-}
-
-function getSavingIcon(isMutating: boolean, hasChanges?: boolean) {
-  if (hasChanges && isMutating) return IconEnum.loading;
-  if (hasChanges && !isMutating) return IconEnum.error;
-  if (!hasChanges && !isMutating) return IconEnum.check_double;
-  return IconEnum.check_double;
-}
-function getSavingTooltip(isMutating: boolean, hasChanges?: boolean) {
-  if (hasChanges && isMutating) return "Saving...";
-  if (hasChanges && !isMutating) return "There are unsaved changes.";
-  if (!hasChanges && !isMutating) return "All changes saved.";
 }
 
 export function Menubar({

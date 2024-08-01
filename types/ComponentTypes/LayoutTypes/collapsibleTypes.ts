@@ -1,5 +1,6 @@
 import { Size, Variant } from "../../baseTypes";
 import { ButtonType } from "../FormTypes";
+import { DropdownType } from "../OverlayTypes";
 
 export interface CollapsibleType {
   label: string;
@@ -8,6 +9,7 @@ export interface CollapsibleType {
   isDisabled?: boolean;
   initialOpen?: boolean;
   actions?: ButtonType[];
+  dropdown?: DropdownType;
   size?: Size;
   variant?: Variant;
 }

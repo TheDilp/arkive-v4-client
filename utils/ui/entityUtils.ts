@@ -5,7 +5,6 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   BaseEntityType,
-  BlueprintFieldTypes,
   BlueprintInstanceBlueprintFieldType,
   BlueprintInstanceType,
   CharacterCharacterFieldType,
@@ -77,7 +76,7 @@ export function getEntityFields(type: AvailableEntityType): string[] {
   return fields;
 }
 
-export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { minSize: number; maxSize?: number } {
+export function getBlueprintInstanceColumnWidth(type: FieldTypes): { minSize: number; maxSize?: number } {
   if (type === "text" || type === "date") return { minSize: 15, maxSize: 15 };
   if (type === "images_single" || type === "characters_single" || type === "number" || type === "boolean")
     return { minSize: 7.5, maxSize: 7.5 };
@@ -88,7 +87,7 @@ export function getBlueprintInstanceColumnWidth(type: BlueprintFieldTypes): { mi
   return { minSize: 10, maxSize: 10 };
 }
 export function getFieldValueFromType(
-  type: BlueprintFieldTypes | FieldTypes
+  type: FieldTypes | FieldTypes
 ): "characters" | "documents" | "map_pins" | "images" | "random_table" | "blueprint_instances" | "events" | "value" | null {
   if (
     type === "text" ||

@@ -1,16 +1,18 @@
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import cloneDeep from "lodash.clonedeep";
-import pick from "lodash.pick";
 import set from "lodash.set";
 import { useState } from "react";
 
 import { HandleChangePropsType } from "../../types";
 import { hasChangedDataAtom } from "../../utils";
 
-export function useHandleChange({ data, setData, ignoreDataChange }: { data: any; setData: any; ignoreDataChange?: boolean }) {
-  const setHasChangedDataAtom = useSetAtom(hasChangedDataAtom);
+export function useHandleChange({ data, setData, ignoreDataChange }: { data: any; setData: any; ignoreDataChange?: boolean }): {
+  handleChange: (props: HandleChangePropsType) => void;
+  changedData: boolean;
+  resetChanges: () => void;
+} {
+  const [changedData, setHasChangedData] = useAtom(hasChangedDataAtom);
   const [changedFields, setChangedFields] = useState<any[]>([]);
-  const [changedData, setChangedData] = useState<any>();
   const updatedData = cloneDeep(data);
   function handleChange(newData: HandleChangePropsType) {
     const changedFieldsUpdated = [...changedFields];
@@ -38,21 +40,13 @@ export function useHandleChange({ data, setData, ignoreDataChange }: { data: any
 
     setData(updatedData);
     setChangedFields(changedFieldsUpdated);
-    setChangedData(
-      pick(
-        updatedData,
-        changedFieldsUpdated.map((field) => {
-          if (field.includes("[") || field.includes("]")) return field.split("[")[1];
-          return field;
-        }),
-      ),
-    );
-    if (changedData && !ignoreDataChange) setHasChangedDataAtom(true);
+
+    if (!changedData && !ignoreDataChange) setHasChangedData(true);
   }
 
   function resetChanges() {
     setChangedFields([]);
-    setChangedData(null);
+    setHasChangedData(false);
   }
 
   return { handleChange, changedData, resetChanges };

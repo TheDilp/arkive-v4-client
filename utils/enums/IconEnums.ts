@@ -69,6 +69,7 @@ export const IconEnum = {
   google: "ph:google-logo-fill" as const,
   graph: "ph:graph-light" as const,
   grid: "ph:grid-four" as const,
+  hash: "ph:hash" as const,
   heading: "ph:text-h" as const,
   heading_five: "ph:text-h-five" as const,
   heading_four: "ph:text-h-four" as const,

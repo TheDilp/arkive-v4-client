@@ -275,23 +275,428 @@ function CharacterFieldSection({
       actions={[
         {
           icon: IconEnum.add,
+          onClick: undefined,
           variant: "info",
-          tooltip: "Add new field",
-          onClick: () => {
-            handleChange({
-              name: id === "other" ? "null" : id,
-              value: (character_fields || []).concat({
-                id: crypto.randomUUID(),
-                title: "New field",
-                field_type: "text",
-                sort: character_fields?.length ?? 0,
-                section_id: id === "other" ? null : id,
-              }),
-            });
-            fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
-          },
         },
       ]}
+      dropdown={{
+        allowedPlacements: ["left-start"],
+        items: [
+          {
+            id: "add_text_field",
+            title: "Add text field",
+            icon: IconEnum.text_align_center,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "text",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_textarea_field",
+            title: "Add textarea field",
+            icon: IconEnum.document_templates,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "textarea",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_number_field",
+            title: "Add number field",
+            icon: IconEnum.hash,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "number",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_select_fields",
+            title: "Add select field",
+            icon: IconEnum.bullet_list,
+            subItems: [
+              {
+                id: "single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "select",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "select_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_bool_field",
+            title: "Add boolean field",
+            icon: IconEnum.check_circle,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "boolean",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_dice_roll",
+            title: "Add dice roll field",
+            icon: IconEnum.d20,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "dice_roll",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_character_fields",
+            title: "Add character field",
+            icon: IconEnum.character,
+            subItems: [
+              {
+                id: "add_char_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "characters_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_char_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "characters_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_blueprint_instance_fields",
+            title: "Add blueprint field",
+            icon: IconEnum.blueprint,
+            subItems: [
+              {
+                id: "add_bp_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "blueprints_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_bp_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "blueprints_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_document_fields",
+            title: "Add document field",
+            icon: IconEnum.document,
+            subItems: [
+              {
+                id: "add_doc_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "documents_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_doc_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "documents_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_map_fields",
+            title: "Add map pin field",
+            icon: IconEnum.map_pin,
+            subItems: [
+              {
+                id: "add_map_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "locations_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_map_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "locations_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_events_fields",
+            title: "Add event field",
+            icon: IconEnum.event,
+            subItems: [
+              {
+                id: "add_events_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "events_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_events_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "events_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_images_fields",
+            title: "Add image field",
+            icon: IconEnum.image,
+            subItems: [
+              {
+                id: "add_image_single",
+                title: "Single",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "images_single",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+              {
+                id: "add_images_multiple",
+                title: "Multiple",
+                onClick: () => {
+                  handleChange({
+                    name: id === "other" ? "null" : id,
+                    value: (character_fields || []).concat({
+                      id: crypto.randomUUID(),
+                      title: "New field",
+                      field_type: "images_multiple",
+                      sort: character_fields?.length ?? 0,
+                      section_id: id === "other" ? null : id,
+                    }),
+                  });
+                  fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+                },
+              },
+            ],
+          },
+          {
+            id: "add_date_field",
+            title: "Add date field",
+            icon: IconEnum.calendar,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "date",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+          {
+            id: "add_random_field",
+            title: "Add random table field",
+            icon: IconEnum.random_table,
+            onClick: () => {
+              handleChange({
+                name: id === "other" ? "null" : id,
+                value: (character_fields || []).concat({
+                  id: crypto.randomUUID(),
+                  title: "New field",
+                  field_type: "random_table",
+                  sort: character_fields?.length ?? 0,
+                  section_id: id === "other" ? null : id,
+                }),
+              });
+              fieldContainerRef.current.scrollIntoView({ behavior: "smooth" });
+            },
+          },
+        ],
+      }}
       initialOpen={isInitialOpen}
       label={title}>
       {character_fields.length ? <span /> : <div className="w-full p-2">Drop fields here</div>}
@@ -339,13 +744,13 @@ function CharacterFieldSection({
                                           label: "Delete",
                                           action: () =>
                                             handleChange({
-                                              name: id,
+                                              name: id === "other" ? "null" : id,
                                               value: character_fields?.filter((f) => f.id !== field.id),
                                             }),
                                         },
                                       }))
                                     : handleChange({
-                                        name: id,
+                                        name: id === "other" ? "null" : id,
                                         value: character_fields?.filter((f) => f.id !== field.id),
                                       }),
                               },

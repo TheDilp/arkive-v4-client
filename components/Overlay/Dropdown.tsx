@@ -210,10 +210,10 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                             isDisabled={dropdownItem?.isDisabled}
                             onClick={() => {
                               if (dropdownItem?.isDisabled) return;
-                              tree?.events.emit("click");
                               if (dropdownItem?.onClick) {
                                 dropdownItem.onClick();
                               }
+                              tree?.events.emit("click");
                               setIsOpen(false);
                             }}
                             subItems={dropdownItem.subItems}
@@ -233,10 +233,10 @@ function DropdownComponent({ allowedPlacements = [], children, items, isReferenc
                           key={dropdownItem.id}
                           onClick={() => {
                             if (dropdownItem?.isDisabled) return;
-                            tree?.events.emit("click");
                             if (dropdownItem?.onClick) {
                               dropdownItem.onClick();
                             }
+                            tree?.events.emit("click");
                             setIsOpen(false);
                           }}
                           subItems={dropdownItem.subItems}
@@ -272,7 +272,16 @@ function DropdownItem({
     hasIcon: !!icon,
   });
   return (
-    <div className={dropdownItemClasses} onClick={onClick} onKeyDown={() => {}} role="menuitem" tabIndex={0}>
+    <div
+      className={dropdownItemClasses}
+      onClick={(e) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        if (onClick) onClick();
+      }}
+      onKeyDown={() => {}}
+      role="menuitem"
+      tabIndex={0}>
       {image && !subItems?.length ? <Avatar image={image} size="sm" /> : null}
       {label && !child ? <div className="select-none truncate px-2">{label}</div> : null}
       {child ?? null}
