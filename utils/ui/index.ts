@@ -8,6 +8,7 @@ export * from "./documentUtils";
 export * from "./dragAndDropUtils";
 export * from "./editorUtils";
 export * from "./entityUtils";
+export * from "./generalUtils";
 export * from "./graphUtils";
 export * from "./linkUtils";
 export * from "./notificationUtils";
@@ -16,4 +17,3 @@ export * from "./tableUtils";
 export * from "./tabUtils";
 export * from "./textUtils";
 export * from "./viewportUtils";
-
