@@ -13,7 +13,7 @@ import { Tooltip } from "../Tooltip";
 type Props = {
   data: {
     items: { id: string; title: string }[];
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<{ id: string; title: string }>;
     type: EntitiesWithFolders;
   };
 };

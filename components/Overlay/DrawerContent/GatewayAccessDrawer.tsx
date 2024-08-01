@@ -11,7 +11,7 @@ import {
   useTable,
   useToggledResetAtom,
 } from "../../../hooks";
-import { CharacterType, DrawerAtomType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
+import { CharacterType, DrawerAtomType, ImageType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getImageURL, IconEnum, TextFilters } from "../../../utils";
 import { InsertGatewayConfigurationSchema, InsertGatewayConfigurationType } from "../../../validation/gateway_configuration";
@@ -279,7 +279,7 @@ function EntitiesAccess({
     }
   );
 
-  const { data: images } = useGetImages(
+  const { data: images } = useGetImages<ImageType>(
     project_id as string,
     "images",
     {

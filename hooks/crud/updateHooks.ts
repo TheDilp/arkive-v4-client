@@ -733,7 +733,7 @@ export function useUpdateUser<
       };
     };
   },
->(id: string, auth_id: string) {
+>(id: string) {
   const queryClient = useQueryClient();
   const createNotification = useNotifications();
 
@@ -755,7 +755,7 @@ export function useUpdateUser<
         });
       },
       onSuccess: (data) => {
-        queryClient.invalidateQueries(["user", auth_id]);
+        queryClient.invalidateQueries(["user"]);
         if (data.ok) {
           createNotification({
             title: data?.message || "User succesfully updated.",

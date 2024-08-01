@@ -226,7 +226,7 @@ function getSelectedActions(
     setDrawer: Dispatch<SetStateAction<DrawerAtomType>>;
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialogAtom: () => unknown;
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<BlueprintType>;
   }
 ) {
   const selectedActions: TableSelectedAction[] = [];
@@ -353,7 +353,7 @@ export function BlueprintView() {
   const resetDialogAtom = useResetAtom(dialogAtom);
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "blueprints");
   const { mutateAsync: deleteMany } = useDeleteMany("blueprints", arkived === "active", project_id);
-  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable({
+  const [{ orderBy, filters, pagination, selection }, dispatch] = useTable<BlueprintType>({
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},

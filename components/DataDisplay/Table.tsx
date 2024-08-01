@@ -265,7 +265,7 @@ function TableColumnFilterList({
     </>
   );
 }
-function TableColumnFilter({
+function TableColumnFilter<T>({
   columnId,
   columnHeader,
   filters,
@@ -273,7 +273,7 @@ function TableColumnFilter({
   isOrDisabled,
   dispatch,
   meta,
-}: TableColumnFilterComponentType) {
+}: TableColumnFilterComponentType<T>) {
   const {
     columnFilterContainer,
     columnFilterTitle,
@@ -446,11 +446,11 @@ function TableColumnFilter({
     </div>
   );
 }
-function TableSubheaderFilterBadges({
+function TableSubheaderFilterBadges<T>({
   filters,
   relationFilters,
   dispatch,
-}: Pick<TableParams, "filters" | "relationFilters"> & Pick<TableType, "dispatch">) {
+}: Pick<TableParams<T>, "filters" | "relationFilters"> & Pick<TableType<T>, "dispatch">) {
   const { subheaderFilterBadges } = TableClasses();
   const andFiltersByField = groupFiltersByHeader(filters?.and || []);
   const orFiltersByField = groupFiltersByHeader(filters?.or || []);
@@ -527,7 +527,7 @@ function OrderByHeaderIcon({ onClick, orderBy, id }: { onClick: () => void; orde
     </div>
   );
 }
-export function Table({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType) {
+export function Table<T>({ columns, data = [], config, isLoading, pagination, dispatch, type, skeletonLimit }: TableType<T>) {
   const { isLg } = useBreakpoint();
   const {
     filters,
@@ -730,7 +730,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             dispatch({
                               type: "setSort",
                               payload: {
-                                field: id as string,
+                                field: id as keyof T,
                                 sort: sortValue,
                               },
                             });
@@ -738,7 +738,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                             dispatch({
                               type: "setSort",
                               payload: {
-                                field: id as string,
+                                field: id as keyof T,
                                 sort: "asc",
                               },
                             });
@@ -850,7 +850,7 @@ export function Table({ columns, data = [], config, isLoading, pagination, dispa
                 </Link>
                 {row.getIsExpanded() ? (
                   <div className="max-w-[calc(100vw-2rem)] overflow-x-hidden">
-                    <ExpandedTableRow data={row.original} type={type} />
+                    <ExpandedTableRow<T> data={row.original} type={type} />
                   </div>
                 ) : null}
               </div>

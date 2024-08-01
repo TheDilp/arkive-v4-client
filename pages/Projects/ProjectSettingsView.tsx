@@ -58,7 +58,6 @@ import {
   userAtom,
   UserNotificationEntities,
   UserSidebarEntitiesEnabled,
-  userStatusAtom,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
 
@@ -449,7 +448,6 @@ export function ProjectSettingsView() {
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
 
   const [project, setProject] = useState<ProjectType | null>();
-  const authUser = useAtomValue(userStatusAtom);
   const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
@@ -482,7 +480,7 @@ export function ProjectSettingsView() {
     project_id as string
   );
   const { mutate: assignRole } = useAssignRole();
-  const { mutate: updateUser } = useUpdateUser(user?.id as string, authUser?.user_id as string);
+  const { mutate: updateUser } = useUpdateUser(user?.id as string);
 
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },

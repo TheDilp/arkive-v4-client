@@ -4,7 +4,7 @@ import { deepMerge, uniqueBy } from "remirror";
 import { TableActionType, TableDispatch, TableParams } from "../../types";
 import { deleteObjectProps } from "../../utils";
 
-function tableReducerFn(state: TableParams, action: TableActionType): TableParams {
+function tableReducerFn<T>(state: TableParams<T>, action: TableActionType<T>): TableParams<T> {
   switch (action.type) {
     case "setFilter": {
       let tempFilters = { ...state.filters };
@@ -245,12 +245,20 @@ function tableReducerFn(state: TableParams, action: TableActionType): TableParam
   }
 }
 
-export function useTable({
+export function useTable<T>({
   orderBy,
   selection,
   pagination,
   filters,
-}: TableParams): [state: TableParams, dispatch: TableDispatch] {
-  const [state, dispatch] = useReducer(tableReducerFn, { orderBy, selection, pagination, filters });
+}: TableParams<T>): [state: TableParams<T>, dispatch: TableDispatch<T>] {
+  const [state, dispatch] = useReducer(
+    (state: TableParams<T>, action: TableActionType<T>) => tableReducerFn<T>(state, action),
+    {
+      orderBy,
+      selection,
+      pagination,
+      filters,
+    }
+  );
   return [state, dispatch];
 }

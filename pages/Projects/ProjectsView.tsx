@@ -186,7 +186,7 @@ export function ProjectsView() {
               <TablePageLayout>
                 <Table
                   columns={createColumns(navigate)}
-                  config={{ getLink: (rowData) => `/projects/${rowData.id}` }}
+                  config={{ getLink: (rowData: ProjectType) => `/projects/${rowData.id}` }}
                   data={data?.data || []}
                   dispatch={dispatch}
                   type="projects"

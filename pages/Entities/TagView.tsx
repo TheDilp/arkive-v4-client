@@ -199,7 +199,7 @@ export function TagView() {
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const permissions = useHasPermissions(["create_tags", "update_tags", "delete_tags"], undefined);
   const columns = createColumns(setDrawer, setDialog, isProjectOwner, permissions, user?.id as string, user?.role?.id);
-  const [{ selection, orderBy, filters, pagination }, dispatch] = useTable({
+  const [{ selection, orderBy, filters, pagination }, dispatch] = useTable<TagType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { limit: 10, page: 0 },

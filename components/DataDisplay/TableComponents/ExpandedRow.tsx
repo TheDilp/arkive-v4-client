@@ -130,7 +130,7 @@ function ExpandedTemplateFields({ templateId }: { templateId: string }) {
         },
       ],
     },
-    "character_fields",
+    "character_fields"
   );
   return (
     <div className="flex min-h-[5rem] flex-col divide-y divide-zinc-700">
@@ -205,7 +205,7 @@ function ExpandedTag({ id }: { id: string }) {
     "by_tags",
     project_id as string,
     false,
-    { queryKeyConcat: [id], enabled: true },
+    { queryKeyConcat: [id], enabled: true }
   );
 
   const formatted: FormattedTagEntitiesSearch = (searchByTagsData?.data || []).reduce(
@@ -223,7 +223,7 @@ function ExpandedTag({ id }: { id: string }) {
       edges: [],
       calendars: [],
       dictionaries: [],
-    },
+    }
   );
 
   if (isFetching) return <Skeleton type="expanded_tag" />;
@@ -271,7 +271,7 @@ function ExpandedWord({ id }: { id: string }) {
     },
     {
       enabled: !!id,
-    },
+    }
   );
   if (isFetching) return <Spinner />;
   return <Textarea hasNoBackground isDisabled name="description" onChange={() => {}} value={data?.data?.description || ""} />;
@@ -295,7 +295,7 @@ function ExpandedRole({ permissions }: { permissions: PermissionType[] }) {
   );
 }
 
-export function ExpandedTableRow({ data, type }: { data: any } & Pick<TableType, "type">) {
+export function ExpandedTableRow<T>({ data, type }: { data: any } & Pick<TableType<T>, "type">) {
   return (
     <div className={ExpandedTableRowClasses()}>
       {/* {type === "documents" ? <ExpandedDocument id={data?.id} /> : null} */}

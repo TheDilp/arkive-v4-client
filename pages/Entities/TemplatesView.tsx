@@ -199,7 +199,7 @@ export function CharacterTemplatesView() {
   const { mutate: updateMany } = useBulkUpdate(project_id as string, "character_fields_templates");
   const { mutateAsync: deleteMany } = useDeleteMany("character_fields_templates", arkived === "active", project_id);
 
-  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable({
+  const [{ orderBy, filters, relationFilters, pagination, selection }, dispatch] = useTable<CharacterFieldTemplateType>({
     orderBy: [{ field: "sort", sort: "desc" }],
     pagination: { limit: 10, page: 0 },
     selection: {},

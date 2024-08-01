@@ -6,6 +6,7 @@ import {
   AvailableEntityType,
   AvailableSubEntityType,
   CharacterFieldTemplateType,
+  CharacterType,
   FieldTypes,
   HandleChangePropsType,
   RequestFilterType,
@@ -498,9 +499,7 @@ function CharacterResourceFiltersList({
           <Collapsible
             actions={[{ onClick: () => removeTemplate(f.id), variant: "error", hasNoBackground: true, icon: IconEnum.trash }]}
             icon={
-              f.id === "maps"
-                ? IconEnum.map_pin
-                : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)
+              f.id === "maps" ? IconEnum.map_pin : getDefaultEntityIcon(f.id as AvailableEntityType | AvailableSubEntityType)
             }
             initialOpen
             label={f.template.title}>
@@ -580,7 +579,7 @@ function CharacterResourceFiltersList({
   });
 }
 
-export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatch } }) {
+export function CharacterFilterDrawer({ data }: { data: { dispatch: TableDispatch<CharacterType> } }) {
   const { project_id } = useParams();
   const { dispatch } = data;
   const [filters, setFilters] = useState<CharacterFilter[]>([]);

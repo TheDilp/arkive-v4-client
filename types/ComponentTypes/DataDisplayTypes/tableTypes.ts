@@ -30,15 +30,15 @@ export type TableColumnFilterType = RequestFilterType & {
   relationalData?: { [key: string]: any };
 };
 
-export interface TableParams {
-  orderBy?: RequestOrderByType<any>[];
+export interface TableParams<T> {
+  orderBy?: RequestOrderByType<T>[];
   filters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   relationFilters?: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
   pagination?: RequestPaginationType;
   selection?: TableSelectionType;
 }
 
-export type TableActionType =
+export type TableActionType<T> =
   | {
       type: "setPagination";
       payload: { limit?: number; page?: number };
@@ -55,7 +55,7 @@ export type TableActionType =
     }
   | {
       type: "setSort";
-      payload: { field: string; sort: SortType };
+      payload: { field: keyof T; sort: SortType };
     }
   | { type: "setSelection"; payload: { row: string } }
   | { type: "setManualSelection"; payload: { [key: number]: string[] } }
@@ -64,11 +64,11 @@ export type TableActionType =
 
 export interface TableSelectedAction extends ButtonType {}
 
-export interface TableDispatch extends Dispatch<TableActionType> {}
-export interface TableType {
+export interface TableDispatch<T> extends Dispatch<TableActionType<T>> {}
+export interface TableType<T> {
   columns: any[];
   data: any[];
-  dispatch: TableDispatch;
+  dispatch: TableDispatch<T>;
   pagination?: RequestPaginationType;
   isLoading?: boolean;
   config?: {
@@ -103,11 +103,11 @@ export interface TableType {
   skeletonLimit?: number;
 }
 
-export interface TableColumnFilterComponentType {
+export interface TableColumnFilterComponentType<T> {
   columnId: string | undefined;
   columnHeader: string;
   filters: { and?: TableColumnFilterType[]; or?: TableColumnFilterType[] };
-  dispatch: TableDispatch;
+  dispatch: TableDispatch<T>;
   isAndDisabled?: boolean;
   isOrDisabled?: boolean;
   meta: MetaType | undefined;

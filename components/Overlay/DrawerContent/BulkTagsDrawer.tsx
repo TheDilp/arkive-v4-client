@@ -10,7 +10,7 @@ import { DrawerLayout } from "../../Layout";
 type Props = {
   data: {
     items: { id: string; tags: string[] }[];
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<any>;
     type: AvailableEntityType | AvailableSubEntityType;
   };
 };

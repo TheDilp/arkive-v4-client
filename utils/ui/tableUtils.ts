@@ -26,7 +26,7 @@ export const relationFiltersList = [
   "value",
 ];
 
-export function getTableColumns(
+export function getTableColumns<T>(
   columns: ColumnDef<any>[],
   {
     hasSelect,
@@ -44,7 +44,7 @@ export function getTableColumns(
     hasTags?: boolean;
     hasArkived?: boolean;
     setFavorite?: (data: SetFavoriteType) => void;
-    dispatch?: TableDispatch;
+    dispatch?: TableDispatch<T>;
     pagination?: RequestPaginationType;
     selected?: string[];
     config?: {
@@ -205,13 +205,13 @@ export function getFilterTooltip({
   return base;
 }
 
-export function applyFilter(
+export function applyFilter<T>(
   columnId: string,
   columnFilters: {
     and?: TableColumnFilterType[] | undefined;
     or?: TableColumnFilterType[] | undefined;
   },
-  dispatch: TableDispatch,
+  dispatch: TableDispatch<T>,
   isRelationFilter: boolean
 ) {
   dispatch({ type: isRelationFilter ? "setRelationFilter" : "setFilter", payload: { ...columnFilters, field: columnId } });

@@ -474,7 +474,7 @@ function getSelectedActions(
     setDialog: Dispatch<SetStateAction<DialogAtomType>>;
     resetDialog: () => unknown;
     data: BlueprintInstanceType[];
-    dispatch: TableDispatch;
+    dispatch: TableDispatch<BlueprintInstanceType>;
   }
 ) {
   const selectedActions: TableSelectedAction[] = [];
@@ -653,7 +653,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     undefined
   );
   const createNotification = useNotifications();
-  const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable({
+  const [{ selection, pagination, orderBy, filters, relationFilters }, dispatch] = useTable<BlueprintInstanceType>({
     selection: {},
     orderBy: [{ field: "title", sort: "asc" }],
     pagination: { page: 0, limit: 10 },
