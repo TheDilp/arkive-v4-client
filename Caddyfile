@@ -31,25 +31,32 @@
 		 precompressed br
 	}
 
+	# set content types and encodings
 	header {
-		# Set content type for JavaScript files
+		# Set content type and encoding for Brotli-compressed JavaScript files
 		/*.js.br$ {
 			Content-Type application/javascript
+			Content-Encoding br
 		}
+		# Set content type and encoding for Brotli-compressed HTML files
+		/*.html.br$ {
+			Content-Type text/html
+			Content-Encoding br
+		}
+		# Set content type and encoding for Brotli-compressed CSS files
+		/*.css.br$ {
+			Content-Type text/css
+			Content-Encoding br
+		}
+		# Set content type for uncompressed JavaScript files
 		/*.js$ {
 			Content-Type application/javascript
 		}
-		# Set content type for HTML files
-		/*.html.br$ {
-			Content-Type text/html
-		}
+		# Set content type for uncompressed HTML files
 		/*.html$ {
 			Content-Type text/html
 		}
-		# Set content type for CSS files
-		/*.css.br$ {
-			Content-Type text/css
-		}
+		# Set content type for uncompressed CSS files
 		/*.css$ {
 			Content-Type text/css
 		}
