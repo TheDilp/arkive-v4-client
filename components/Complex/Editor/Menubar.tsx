@@ -344,7 +344,10 @@ function menuBarItems({
       onClick: () => chain?.toggleSecret({ secret: true, classNames: "secretBlock" })?.run(),
       tooltip: "Secret block",
     },
-    {
+  ];
+
+  if (!IS_GATEWAY) {
+    options.push({
       id: "automention",
       // @ts-ignore
       icon: IconEnum.mention,
@@ -370,9 +373,10 @@ function menuBarItems({
       },
       tooltip: "Automention",
       variant: "primary",
-    },
-  ];
-  if (!isEditorMenubar) {
+    });
+  }
+
+  if (!isEditorMenubar && !IS_GATEWAY) {
     options.push(
       {
         id: "outline",
