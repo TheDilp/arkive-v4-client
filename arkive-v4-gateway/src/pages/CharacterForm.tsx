@@ -1,4 +1,4 @@
-import { ReactNode, useLayoutEffect, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
@@ -103,7 +103,7 @@ export function CharacterForm() {
     }
   );
 
-  const { mutateAsync: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
+  const { mutate: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
     successNotification: false,
   });
 
@@ -140,6 +140,10 @@ export function CharacterForm() {
     setFields(tempFields);
   }, [templates]);
 
+  useEffect(() => {
+    if (character?.first_name) save();
+  }, [section_id]);
+
   if (isInitialLoading || isFetchingTemplates)
     return (
       <div className="col-span-12">
@@ -147,7 +151,7 @@ export function CharacterForm() {
       </div>
     );
 
-  async function save() {
+  function save() {
     if (existingCharacter?.data) {
       const dataToParse = {
         data: character,
@@ -160,7 +164,7 @@ export function CharacterForm() {
         dataToParse.data.portrait_id = dataToParse.data.portrait.id;
       }
       const parsedData = UpdateCharacterSchema.parse(dataToParse);
-      await update(parsedData);
+      update(parsedData);
     }
   }
 
@@ -261,11 +265,10 @@ export function CharacterForm() {
               iconPos="left"
               isDisabled={sections[0].id === section_id}
               label="Previous section"
-              onClick={async () => {
+              onClick={() => {
                 navigate(
                   `/${type}/${access_id}/${entity_id}/${sections[getPreviousSection(sections, section_id as string)]?.id}`
                 );
-                await save();
               }}
               variant="info"
             />
@@ -273,9 +276,8 @@ export function CharacterForm() {
               icon={IconEnum.chevron_right}
               isDisabled={sections?.at(-1)?.id === section_id}
               label="Next section"
-              onClick={async () => {
+              onClick={() => {
                 navigate(`/${type}/${access_id}/${entity_id}/${sections[geNextSection(sections, section_id as string)]?.id}`);
-                await save();
               }}
               variant="info"
             />
