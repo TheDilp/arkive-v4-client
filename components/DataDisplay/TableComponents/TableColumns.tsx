@@ -23,7 +23,11 @@ import {
 } from "../../../utils";
 import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, Tooltip } from "../..";
 
-export function SelectColumn(dispatch: TableDispatch, pagination?: RequestPaginationType, selected?: string[]): ColumnDef<any> {
+export function SelectColumn<T>(
+  dispatch: TableDispatch<T>,
+  pagination?: RequestPaginationType,
+  selected?: string[]
+): ColumnDef<any> {
   return {
     id: "select",
     header: ({ table }) => (
@@ -102,7 +106,7 @@ export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => void): Co
   };
 }
 
-export function TagColumn(hasTagsWarning?: boolean, dispatch?: TableDispatch): ColumnDef<any & { tags: TagType[] }> {
+export function TagColumn<T>(hasTagsWarning?: boolean, dispatch?: TableDispatch<T>): ColumnDef<any & { tags: TagType[] }> {
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
   return {

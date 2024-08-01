@@ -7,6 +7,7 @@ import { RequestFilterType } from "../../CRUD";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
+  CharacterType,
   EntitiesWithFolders,
   ImageType,
   MapPinType,
@@ -75,13 +76,17 @@ export type DrawerAtomType = {
       type: "bulk_tags";
       data: {
         items: { id: string; tags: string[] }[];
-        dispatch: TableDispatch;
+        dispatch: TableDispatch<any>;
         type: AvailableEntityType | AvailableSubEntityType;
       };
     }
   | {
       type: "bulk_folder";
-      data: { items: { id: string; title: string }[]; dispatch: TableDispatch; type: EntitiesWithFolders };
+      data: {
+        items: { id: string; title: string }[];
+        dispatch: TableDispatch<{ id: string; title: string }>;
+        type: EntitiesWithFolders;
+      };
     }
   | {
       type: "bulk_access";
@@ -149,7 +154,7 @@ export type DrawerAtomType = {
     }
   | { type: "project" | "invite_to_project" | "nodes_from_characters" | "nodes_from_images" | null; data: null }
   | { type: "webhooks" | "roles"; data: { id?: string } }
-  | { type: "character_filter"; data: { dispatch: TableDispatch } }
+  | { type: "character_filter"; data: { dispatch: TableDispatch<CharacterType> } }
   | {
       type: "calendar_filter";
       data: {
