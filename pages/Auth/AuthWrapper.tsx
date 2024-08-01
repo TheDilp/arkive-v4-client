@@ -54,11 +54,16 @@ export function AuthWrapper() {
     (isUpdatingStatus && !isIdle) ||
     (project_id && !userStatus?.project_id)
   )
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-black">
-        <Spinner />
-      </div>
-    );
+    if (userStatus?.status === "unauthenticated") {
+      document.location = import.meta.env.VITE_HOME;
+      return;
+    } else {
+      return (
+        <div className="flex h-screen w-screen items-center justify-center bg-black">
+          <Spinner />
+        </div>
+      );
+    }
 
   return <Outlet />;
 }

@@ -16,6 +16,7 @@ import {
   ProjectsView,
   UserSettings,
   UserSettingsFeatureFlags,
+  UserSettingsProfile,
   UserSettingsWebhooks,
 } from "../../pages";
 import { loggedInAtom, moduleAtom } from "../../utils";
@@ -56,6 +57,7 @@ export default function App() {
         <Routes>
           <Route element={<AuthWrapper />} path="/">
             <Route element={<UserSettings />} path="user_settings/*">
+              <Route element={<UserSettingsProfile />} path="profile" />
               <Route element={<UserSettingsWebhooks />} path="webhooks" />
               <Route element={<UserSettingsFeatureFlags />} path="feature_flags" />
             </Route>

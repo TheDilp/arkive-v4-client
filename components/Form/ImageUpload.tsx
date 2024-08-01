@@ -1,3 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { MutableRefObject, useRef } from "react";
+
 import { useUploadAvatar } from "../../hooks";
 import { ImageUploadType } from "../../types";
 import { changeImagesForUpload, getImageURL, IconEnum, useNotifications } from "../../utils";
@@ -96,30 +99,37 @@ export function ImageUpload({ images, onChange, isDisabled, isMultiple = true }:
 export function AvatarUpload({
   id,
   isDisabled,
+  isUserAvatar,
   image_id,
+  image,
   project_id,
 }: {
   project_id: string;
+  image?: string | null | undefined;
   image_id?: string | null | undefined;
   isDisabled?: boolean;
+  isUserAvatar?: boolean;
   id: string;
 }) {
   const createNotification = useNotifications();
-
-  const { mutate: upload } = useUploadAvatar(id);
+  const queryClient = useQueryClient();
+  const ref = useRef() as MutableRefObject<HTMLInputElement>;
+  const { mutate: upload } = useUploadAvatar(id, isUserAvatar);
 
   return (
     <div
-      className="h-12 w-12 cursor-pointer select-none rounded-full border-2 border-dashed border-zinc-400 hover:bg-zinc-700"
+      className="pointer-events-none h-12 w-12 cursor-pointer select-none rounded-full border-2 border-dashed border-zinc-400 hover:bg-zinc-700"
       id="dropzone-container"
       onDragOver={(e) => e.preventDefault()}
       style={{
-        backgroundImage: image_id ? `url(${getImageURL(project_id, "images", image_id)})` : "",
+        backgroundImage: image_id ? `url(${getImageURL(project_id, "images", image_id)})` : `url(${image || ""})`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
         backgroundSize: "cover",
       }}>
-      <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center" htmlFor="dropzone-file">
+      <label
+        className="pointer-events-auto relative z-20 flex h-full w-full cursor-pointer flex-col items-center justify-center"
+        htmlFor="dropzone-file">
         <input
           accept="image/*"
           className="hidden"
@@ -144,9 +154,17 @@ export function AvatarUpload({
                   timer: 5,
                 });
               }
-              upload(files);
+              upload(files, {
+                onSettled: () => {
+                  if (ref?.current) {
+                    ref.current.value = "";
+                  }
+                  queryClient.invalidateQueries(["user"]);
+                },
+              });
             }
           }}
+          ref={ref}
           type="file"
         />
       </label>
