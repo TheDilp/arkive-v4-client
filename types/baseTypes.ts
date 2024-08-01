@@ -40,6 +40,7 @@ export type ImagePreviewType = {
   url?: string;
   clearAction?: (id: string) => void;
   hasShowImage?: boolean;
+  manual_project_id?: string;
 };
 export type onChangeValue = {
   name: string;

@@ -19,7 +19,7 @@ const ImagePreviewClasses = tv({
   },
 });
 
-export function ImagePreview({ id, title, label, url, hasShowImage, clearAction }: ImagePreviewType) {
+export function ImagePreview({ id, title, manual_project_id, label, url, hasShowImage, clearAction }: ImagePreviewType) {
   const { project_id } = useParams();
   const { container, action, title: titleClasses, label: labelClasses, base } = ImagePreviewClasses();
   return (
@@ -28,7 +28,7 @@ export function ImagePreview({ id, title, label, url, hasShowImage, clearAction 
       <span className={base()}>
         <Avatar
           hasShowImage={hasShowImage}
-          image={url || getImageURL(project_id as string, "images", id) || ""}
+          image={url || getImageURL(manual_project_id || (project_id as string), "images", id) || ""}
           isPreview
           label={title}
           size="sm"

@@ -3,7 +3,7 @@ import { saveAs } from "file-saver";
 
 import { AssetType, EntityPermissionType, RequestBodyType } from "../../types";
 import { ImageType } from "../../types/EntityTypes/imageTypes";
-import { baseURLS, FetchFunction, getEntityCRUDNotification, IconEnum, useNotifications } from "../../utils";
+import { baseURLS, FetchFunction, getEntityCRUDNotification, getServerUrl, IconEnum, useNotifications } from "../../utils";
 
 export function useUploadAsset(type: AssetType, project_id: string) {
   const queryClient = useQueryClient();
@@ -112,7 +112,9 @@ export function useGetImages<InsertType>(
     return FetchFunction({
       method: "POST",
       body: JSON.stringify(finalRequest),
-      url: `${baseURLS.baseServer}/assets/${project_id}/${type}`,
+      url: IS_GATEWAY
+        ? `${getServerUrl()}/assets/${request?.data?.entity_type}/${request?.data?.access_id}`
+        : `${getServerUrl()}/assets/${project_id}/${type}`,
     });
   }
   const configuredOptions = {

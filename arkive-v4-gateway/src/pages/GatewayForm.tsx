@@ -1,8 +1,9 @@
+import { useIsMutating } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { useParams } from "react-router-dom";
+
+import { Dialog, IndeterminateProgressBar } from "../../../components";
 import { CharacterForm } from "./CharacterForm";
-import { IndeterminateProgressBar } from "../../../components";
-import { useIsMutating } from "@tanstack/react-query";
 
 function FormLayout({ children }: { children: ReactNode }) {
   const isMutating = useIsMutating();
@@ -24,5 +25,10 @@ function FormLayout({ children }: { children: ReactNode }) {
 export default function GatewayForm() {
   const { type } = useParams();
 
-  return <FormLayout>{type === "characters" ? <CharacterForm /> : <CharacterForm />}</FormLayout>;
+  return (
+    <FormLayout>
+      <Dialog />
+      {type === "characters" ? <CharacterForm /> : <CharacterForm />}
+    </FormLayout>
+  );
 }
