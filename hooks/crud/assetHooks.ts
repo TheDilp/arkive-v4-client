@@ -45,7 +45,7 @@ export function useUploadAsset(type: AssetType, project_id: string) {
   );
 }
 
-export function useUploadAvatar(id: string) {
+export function useUploadAvatar(id: string, isAvatarUpload?: boolean) {
   const createNotification = useNotifications();
   const queryClient = useQueryClient();
   return useMutation(
@@ -57,7 +57,7 @@ export function useUploadAvatar(id: string) {
       }
 
       return FetchFunction({
-        url: `${IS_GATEWAY ? baseURLS.baseGatewayServer : baseURLS.baseServer}/assets/upload/${id}`,
+        url: `${getServerUrl()}/${isAvatarUpload ? "users/update/avatar" : "assets/upload"}/${id}`,
         body: formData,
         method: "POST",
       });

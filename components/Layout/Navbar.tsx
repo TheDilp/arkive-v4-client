@@ -40,14 +40,20 @@ import { Card } from "./Card";
 
 function accountItems(signOut: () => void, navigate: (path: string) => void): DropdownItemType[] {
   return [
+    { id: "user_profile", title: "User profile", icon: IconEnum.user, onClick: () => navigate("/user_settings/profile") },
     {
-      id: "1",
+      id: "user_feature_flags",
       title: "User feature flags",
       icon: IconEnum.feature_flag,
       onClick: () => navigate("/user_settings/feature_flags"),
     },
-    { id: "2", title: "User webhooks", icon: IconEnum.webhooks, onClick: () => navigate("/user_settings/webhooks") },
-    { id: "3", title: "Sign out", icon: IconEnum.logout, onClick: signOut },
+    {
+      id: "user_webhooks",
+      title: "User webhooks",
+      icon: IconEnum.webhooks,
+      onClick: () => navigate("/user_settings/webhooks"),
+    },
+    { id: "sign_out", title: "Sign out", icon: IconEnum.logout, onClick: signOut },
   ];
 }
 
@@ -658,7 +664,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
           <Dropdown allowedPlacements={["bottom-end"]} items={accountItems(signOut, navigate)}>
             <div className="relative ml-auto flex cursor-pointer items-center">
               <div className="absolute z-10 h-full w-full rounded-full bg-zinc-700 opacity-0 transition-all hover:opacity-50 active:opacity-70" />
-              <Avatar image={authUser?.image_url || undefined} isLoading={isSigningOut || !!isGettingStatus} />
+              <Avatar image={user?.image || authUser?.image_url || undefined} isLoading={isSigningOut || !!isGettingStatus} />
             </div>
           </Dropdown>
         ) : null}

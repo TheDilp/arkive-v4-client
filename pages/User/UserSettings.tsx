@@ -17,8 +17,9 @@ export function UserSettings() {
   const user = useAtomValue(userStatusAtom);
 
   const tabs: TabType[] = [
-    { id: "1", label: "Webhooks", icon: IconEnum.webhooks },
-    { id: "2", label: "Feature flags", icon: IconEnum.webhooks },
+    { id: "profile", label: "Profile", icon: IconEnum.user },
+    { id: "webhooks", label: "Webhooks", icon: IconEnum.webhooks },
+    { id: "feature_flags", label: "Feature flags", icon: IconEnum.webhooks },
   ];
 
   const setUserAtom = useSetAtom(userAtom);
@@ -31,7 +32,7 @@ export function UserSettings() {
         webhooks: true,
         roles: true,
       },
-      fields: ["id", "feature_flags", "email"],
+      fields: ["id", "feature_flags", "email", "nickname", "image"],
     },
     { enabled: !!user?.user_id }
   );
@@ -46,14 +47,7 @@ export function UserSettings() {
 
   useEffect(() => {
     if (userData?.data) {
-      if (user)
-        // user?.update({
-        //   unsafeMetadata: {
-        //     user_id: userData?.data?.id,
-        //     project_id: "",
-        //   },
-        // });
-        setUserAtom(userData.data);
+      if (user) setUserAtom(userData.data);
       setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
     }
   }, [userData?.data]);
