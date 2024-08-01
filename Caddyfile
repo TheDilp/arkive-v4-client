@@ -30,7 +30,7 @@
 
 	file_server {
 		precompressed br gzip
-		index index.html.br
+		index index.html
 	}
 
 }
