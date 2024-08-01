@@ -148,7 +148,7 @@ export function CharacterForm() {
   }, [templates]);
 
   useEffect(() => {
-    if (character?.first_name && changedData) {
+    if (character?.first_name) {
       save();
       resetChanges();
     }
