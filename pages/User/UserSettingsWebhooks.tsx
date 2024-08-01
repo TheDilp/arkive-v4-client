@@ -4,9 +4,9 @@ import { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, createColumnHelper, Dropdown, Icon, Table } from "../../components";
-import { useDeleteEntity, useGetEntities, useGetUser, useTable } from "../../hooks";
+import { useDeleteEntity, useGetEntities, useTable } from "../../hooks";
 import { DrawerAtomType, WebhookType } from "../../types";
-import { drawerAtom, getDefaultEntityIcon, IconEnum, userStatusAtom } from "../../utils";
+import { drawerAtom, getDefaultEntityIcon, IconEnum, userAtom } from "../../utils";
 
 const rolesColumnHelper = createColumnHelper<WebhookType>();
 
@@ -77,21 +77,20 @@ function createColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>, muta
   ];
 }
 export function UserSettingsWebhooks() {
-  const authUser = useAtomValue(userStatusAtom);
   const { project_id } = useParams();
-  const { data: user } = useGetUser({ data: { id: authUser?.user_id as string }, fields: ["id"] });
+  const user = useAtomValue(userAtom);
   const setDrawer = useSetAtom(drawerAtom);
   const { mutate } = useDeleteEntity("webhooks", project_id as string, false);
-  const [, dispatch] = useTable({});
+  const [{ orderBy }, dispatch] = useTable({ orderBy: [{ field: "title", sort: "asc" }] });
 
   function handleCreateWebhook() {
     setDrawer((prev) => ({ ...prev, title: "Create webhook", type: "webhooks", data: {} }));
   }
 
   const { data: webhooks, isFetching } = useGetEntities<WebhookType>(
-    { data: { user_id: user?.data?.id }, fields: ["id", "title", "user_id"] },
+    { data: { user_id: user?.id }, fields: ["id", "title", "user_id"], orderBy },
     "webhooks",
-    { enabled: !!user?.data?.id, staleTime: 5 * 60 * 1000 }
+    { enabled: !!user?.id, staleTime: 5 * 60 * 1000 }
   );
   return (
     <div className="flex w-full flex-col gap-y-2">

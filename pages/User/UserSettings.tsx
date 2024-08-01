@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 // import { deepMerge } from "remirror";
@@ -37,11 +37,13 @@ export function UserSettings() {
     { enabled: !!user?.user_id }
   );
 
-  useEffect(() => {
-    if (pathname.endsWith("webhooks")) {
+  useLayoutEffect(() => {
+    if (pathname.endsWith("profile")) {
       setSelectedTab(0);
-    } else if (pathname.endsWith("feature_flags")) {
+    } else if (pathname.endsWith("webhooks")) {
       setSelectedTab(1);
+    } else if (pathname.endsWith("feature_flags")) {
+      setSelectedTab(2);
     }
   }, [pathname]);
 
@@ -62,9 +64,8 @@ export function UserSettings() {
         </div>
         <div className="p-4">
           <Tabs
-            onChange={(tab, index) => {
+            onChange={(tab) => {
               navigate(`/user_settings/${tab.label.toLowerCase().replace(" ", "_")}`);
-              setSelectedTab(index);
             }}
             selectedTab={selectedTab}
             tabs={tabs}

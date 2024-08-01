@@ -2,26 +2,22 @@ import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 
 import { Button, Checkbox } from "../../components";
-import { useGetUser, useHandleChange, useUpdateUser } from "../../hooks";
-import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum, userStatusAtom } from "../../utils";
+import { useHandleChange, useUpdateUser } from "../../hooks";
+import { capitalizeFirstLetter, DefaultUserFeatureFlags, IconEnum, userAtom } from "../../utils";
 
 export function UserSettingsFeatureFlags() {
-  const authUser = useAtomValue(userStatusAtom);
-  const { data: user } = useGetUser(
-    { data: { id: authUser?.user_id as string }, fields: ["id", "feature_flags"] },
-    { queryKey: ["user", authUser?.user_id, "feature_flag_settings"], enabled: !!authUser?.user_id }
-  );
-  const { mutate: updateUser } = useUpdateUser(user?.data?.id as string, authUser?.user_id as string);
+  const user = useAtomValue(userAtom);
+  const { mutate: updateUser } = useUpdateUser(user?.id as string);
 
   const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>({});
 
   const { handleChange } = useHandleChange({ data: featureFlags, setData: setFeatureFlags });
 
   useEffect(() => {
-    if (user?.data) {
-      setFeatureFlags(user?.data?.feature_flags);
+    if (user) {
+      setFeatureFlags(user?.feature_flags);
     }
-  }, [user?.data]);
+  }, [user]);
 
   return (
     <div className="flex flex-col gap-y-2">
