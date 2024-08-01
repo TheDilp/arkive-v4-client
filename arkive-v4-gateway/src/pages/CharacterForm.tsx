@@ -4,7 +4,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Avatar, AvatarUpload, Button, Editor, FieldTemplateRows, Input, Skeleton } from "../../../components";
 import { useGetEntities, useGetEntity, useGetGatewayOptions, useHandleChange, useUpdateEntity } from "../../../hooks";
 import { CharacterFieldTemplateType, CharacterFieldType, CharacterType, HandleChangePropsType } from "../../../types";
-import { getCharacterFullName, getDifferenceForCharacterFields, getImageURL, IconEnum } from "../../../utils";
+import {
+  getCharacterFullName,
+  getDifferenceForCharacterFields,
+  getImageURL,
+  getSavingIcon,
+  getSavingTooltip,
+  IconEnum,
+} from "../../../utils";
 import { UpdateCharacterSchema } from "../../../validation";
 
 const baseCharacterSections = [{ id: "name", title: "Basic info" }];
@@ -62,7 +69,8 @@ export function CharacterForm() {
   const [sections, setSections] = useState(baseCharacterSections);
   const [fields, setFields] = useState<Record<string, CharacterFieldType[]>>({ other: [] });
   const [character, setCharacter] = useState<Partial<CharacterType>>();
-  const { handleChange } = useHandleChange({ data: character, setData: setCharacter });
+  const { handleChange, changedData, resetChanges } = useHandleChange({ data: character, setData: setCharacter });
+
   const navigate = useNavigate();
   const { data: existingCharacter, isInitialLoading } = useGetEntity<CharacterType>(entity_id, type as "characters", {
     fields: ["id", "project_id", "first_name", "nickname", "last_name", "portrait_id", "biography", "age"],
@@ -103,10 +111,9 @@ export function CharacterForm() {
     }
   );
 
-  const { mutate: update } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
+  const { mutate: update, isLoading: isMutating } = useUpdateEntity("characters", existingCharacter?.data?.project_id, {
     successNotification: false,
   });
-
   const { data } = useGetGatewayOptions(
     { data: { entity_type: type as "characters", access_id: access_id as string } },
     "characters"
@@ -141,7 +148,10 @@ export function CharacterForm() {
   }, [templates]);
 
   useEffect(() => {
-    if (character?.first_name) save();
+    if (character?.first_name && changedData) {
+      save();
+      resetChanges();
+    }
   }, [section_id]);
 
   if (isInitialLoading || isFetchingTemplates)
@@ -167,7 +177,6 @@ export function CharacterForm() {
       update(parsedData);
     }
   }
-
   return (
     <>
       <div
@@ -180,6 +189,18 @@ export function CharacterForm() {
             <Avatar image={getImageURL(character.project_id as string, "images", character?.portrait_id)} />
           ) : null}
           {getCharacterFullName(character?.first_name || "", null, character?.last_name)}
+          <div className="ml-auto">
+            <Button
+              hasNoBackground
+              icon={getSavingIcon(isMutating, changedData)}
+              iconSize={48}
+              isIconOnly
+              isLoading={changedData && isMutating}
+              onClick={undefined}
+              tooltip={getSavingTooltip(isMutating, changedData)}
+              variant={changedData ? "warning" : "success"}
+            />
+          </div>
         </h1>
       </div>
       <div
