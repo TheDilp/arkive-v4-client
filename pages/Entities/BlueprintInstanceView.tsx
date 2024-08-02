@@ -4,7 +4,7 @@ import { useResetAtom } from "jotai/utils";
 import { Dispatch, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Icon, Table } from "../../components";
+import { Avatar, Button, Checkbox, createColumnHelper, Dropdown, Table } from "../../components";
 import {
   CharacterColumn,
   EventColumn,
@@ -100,7 +100,6 @@ function createColumns(
       },
       cell: ({ row }) => (
         <span className="flex items-center gap-x-2">
-          <Icon fontSize={24} icon={row?.original?.blueprint?.icon || IconEnum.blueprint} />
           {`${row.original?.title || ""} ${row.original?.blueprint?.title ? `(${row.original?.blueprint?.title})` : ""}`}
         </span>
       ),
