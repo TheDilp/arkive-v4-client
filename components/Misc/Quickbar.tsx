@@ -1,3 +1,4 @@
+import { Core } from "cytoscape";
 import { SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -26,8 +27,8 @@ function changeDrawMode(
       grid: boolean;
       draw_mode: boolean;
       curve_style: "straight" | "taxi" | "unbundled-bezier";
-    }>,
-  ) => void,
+    }>
+  ) => void
 ) {
   setBoardState((prev) => ({ ...prev, draw_mode, add_nodes: false }));
 }
@@ -40,8 +41,8 @@ function changeCurveStyle(
       grid: boolean;
       draw_mode: boolean;
       curve_style: "straight" | "taxi" | "unbundled-bezier";
-    }>,
-  ) => void,
+    }>
+  ) => void
 ) {
   setBoardState((prev) => ({ ...prev, curve_style }));
 }
@@ -50,10 +51,12 @@ export function Quickbar({
   isViewOnly,
   graphTitle,
   hasPermission,
+  cy,
 }: {
   isViewOnly: boolean;
   graphTitle: string;
   hasPermission: boolean;
+  cy: Core;
 }) {
   const { item_id } = useParams();
   const createNotification = useNotifications();
@@ -74,7 +77,7 @@ export function Quickbar({
   const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 
   return (
-    <div className="absolute bottom-0 z-10 flex h-12 w-72 items-center justify-evenly rounded bg-zinc-800 px-2 text-white shadow-md ">
+    <div className="absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md">
       <Button
         hasNoBackground
         icon={IconEnum.add}
@@ -130,7 +133,7 @@ export function Quickbar({
                     setEdges((prev) => prev.filter((e) => !node_ids.includes(e.source_id) && !node_ids.includes(e.target_id)));
                     setNodes((prev) => prev.filter((n) => !node_ids.includes(n.id)));
                   },
-                },
+                }
               );
             if (edges.length)
               deleteManyEdges(
@@ -141,7 +144,7 @@ export function Quickbar({
                   onSuccess: () => {
                     setEdges((prev) => prev.filter((e) => !edge_ids.includes(e.id)));
                   },
-                },
+                }
               );
           }
         }}
@@ -183,6 +186,13 @@ export function Quickbar({
           />
         </span>
       </Tooltip>
+
+      <Button
+        hasNoBackground
+        icon={IconEnum.search}
+        onClick={() => setDrawer((prev) => ({ ...prev, size: "md", data: { cy }, title: "Search nodes", type: "node_search" }))}
+        tooltip="Search nodes"
+      />
       <Button
         hasNoBackground
         icon={IconEnum.download}

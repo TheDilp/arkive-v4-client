@@ -785,6 +785,7 @@ export function Graph({ data, isReadOnly, isViewOnly, center_on, isFamilyTreeVie
       {isViewOnly || isReadOnly ? null : (
         <div className="relative flex w-full justify-center">
           <Quickbar
+            cy={cyRef?.current?._cy as Core}
             graphTitle={existingGraphData?.data?.title || ""}
             hasPermission={updateGraphActionPermission}
             isViewOnly={isViewOnly ?? false}

@@ -40,6 +40,7 @@ export * from "./MentionedInDocumentDrawer";
 export * from "./MentionedInDrawer";
 export * from "./NodeDrawer";
 export * from "./NodeFromDrawer";
+export * from "./NodeSearchDrawer";
 export * from "./ProjectDrawer";
 export * from "./RandomTableDrawer";
 export * from "./RandomTableOptionDrawer";

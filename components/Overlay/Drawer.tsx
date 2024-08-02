@@ -49,6 +49,7 @@ import {
   MentionedInDrawer,
   NodeDrawer,
   NodeFromDrawer,
+  NodeSearchDrawer,
   ProjectDrawer,
   RandomTableDrawer,
   RandomTableOptionDrawer,
@@ -201,6 +202,7 @@ export function Drawer() {
                 {drawer.type === "graphs" ? <GraphDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}
                 {drawer.type === "nodes" ? <NodeDrawer data={drawer?.data} /> : null}
                 {drawer.type === "many_nodes" ? <ManyNodesDrawer data={drawer?.data} /> : null}
+                {drawer.type === "node_search" ? <NodeSearchDrawer data={drawer?.data} /> : null}
                 {drawer.type === "edges" ? <EdgeDrawer data={drawer?.data} /> : null}
                 {drawer.type === "many_edges" ? <ManyEdgesDrawer data={drawer?.data} /> : null}
                 {drawer.type === "calendars" ? <CalendarDrawer data={drawer?.data} exceptions={drawer?.exceptions} /> : null}

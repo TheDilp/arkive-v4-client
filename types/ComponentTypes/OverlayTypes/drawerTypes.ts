@@ -1,4 +1,5 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
+import { Core } from "cytoscape";
 import { Dispatch, MouseEvent, SetStateAction } from "react";
 
 import { AvailableIcons } from "../../../utils";
@@ -177,6 +178,7 @@ export type DrawerAtomType = {
       type: "gateway_access";
       data: { entity_id?: string; configuration_id?: string; type: "characters" | "blueprint_instances" };
     }
+  | { type: "node_search"; data: { cy: Core } }
 );
 
 export interface ContextMenuAtomType {
