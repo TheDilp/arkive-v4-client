@@ -60,7 +60,7 @@ import {
   UserSidebarEntitiesEnabled,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
-import { TagView } from "../Entities";
+import { CharacterTemplatesView, TagView } from "../Entities";
 
 type kickUserMutationType = UseMutateFunction<
   any,
@@ -88,6 +88,7 @@ type assignRoleMutationType = UseMutateFunction<
 const tabs = [
   { id: "project_settings", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "tags", label: "Tags", icon: IconEnum.tags, isOwner: false },
+  { id: "character_fields_templates", label: "Character field templates", icon: IconEnum.additional_fields, isOwner: false },
   { id: "map_pin_types", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
   { id: "custom_relationship_types", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
   { id: "members", label: "Members", icon: IconEnum.users, isOwner: true },
@@ -731,6 +732,11 @@ export function ProjectSettingsView() {
           {finalTabs?.[selectedTab]?.id === "tags" ? (
             <div className="max-h-[95%]">
               <TagView />
+            </div>
+          ) : null}
+          {finalTabs?.[selectedTab]?.id === "character_fields_templates" ? (
+            <div className="max-h-[95%]">
+              <CharacterTemplatesView />
             </div>
           ) : null}
 

@@ -80,8 +80,6 @@ import { AssetView } from "./AssetView";
 import { BlueprintView } from "./BlueprintView";
 import { CharactersView } from "./CharactersView";
 import { ManuscriptView } from "./ManuscriptView";
-import { TagView } from "./TagView";
-import { CharacterTemplatesView } from "./TemplatesView";
 
 function getEditActionTitle(is_document_template: boolean, is_folder: boolean, entityName: string) {
   if (is_document_template) return "Edit document template";
@@ -715,8 +713,6 @@ export function MainView() {
   if (!item_id && type === "characters") return <CharactersView />;
   if (!item_id && type === "blueprints") return <BlueprintView />;
   if (!item_id && type === "manuscripts") return <ManuscriptView />;
-  if (type === "tags") return <TagView />;
-  if (type === "character_fields_templates") return <CharacterTemplatesView />;
 
   if (type === "assets") return <AssetView />;
   if (type === "settings") return <ProjectSettingsView />;
