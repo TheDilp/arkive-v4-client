@@ -677,6 +677,9 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
         project_id,
         parent_id: item_id,
       },
+      relations: {
+        blueprint_fields: true,
+      },
       permissions: true,
       filters,
       fields: ["id", "deleted_at", "is_public", "title"],
