@@ -678,6 +678,7 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
       },
       relations: {
         blueprint_fields: true,
+        tags: true,
       },
       permissions: true,
       filters,
@@ -779,3 +780,4 @@ export function BlueprintInstanceView({ filter, arkived }: { filter: string; ark
     </div>
   );
 }
+
