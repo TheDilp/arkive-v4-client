@@ -389,20 +389,41 @@ function AdditionalFieldsTab({
   tags?: Omit<TagType, "owner_id" | "permissions">[];
   hasCreateOrEdit: boolean;
 }) {
+  const [areAllOpen, setAreAllOpen] = useState(false);
+
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
-      {!tags?.length ? <Alert label="Please select tags first." variant="info" /> : null}
-      {!templates?.length && tags?.length ? <Alert label="There are no templates available." variant="info" /> : null}
+      <li className="flex items-center justify-end">
+        <div className="h-8 w-8">
+          <Button
+            icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+            isIconOnly
+            onClick={() => setAreAllOpen((prev) => !prev)}
+            tooltip={"Open/Close all"}
+            variant="info"
+          />
+        </div>
+      </li>
+      {!tags?.length ? (
+        <li>
+          <Alert label="Please select tags first." variant="info" />
+        </li>
+      ) : null}
+      {!templates?.length && tags?.length ? (
+        <li>
+          <Alert label="There are no templates available." variant="info" />
+        </li>
+      ) : null}
 
       {(templates || []).map((t) => {
         const otherFields = t.character_fields.filter((f) => !f.section_id);
         return (
-          <Collapsible key={t.id} label={t.title}>
+          <Collapsible initialOpen={areAllOpen} key={t.id} label={t.title}>
             <div className="flex flex-col gap-y-2 p-1.5">
               {t.character_fields_sections.map((section) => {
                 return (
-                  <Collapsible key={section.id} label={section.title}>
+                  <Collapsible initialOpen={areAllOpen} key={section.id} label={section.title}>
                     <div className="min-h-8 p-2">
                       <FieldTemplateRows
                         character_fields={t.character_fields.filter((f) => f.section_id === section.id)}
@@ -415,7 +436,7 @@ function AdditionalFieldsTab({
                 );
               })}
               {otherFields.length ? (
-                <Collapsible label={"Other"}>
+                <Collapsible initialOpen={areAllOpen} label={"Other"}>
                   <div className="min-h-8 p-2">
                     <FieldTemplateRows
                       character_fields={otherFields}
