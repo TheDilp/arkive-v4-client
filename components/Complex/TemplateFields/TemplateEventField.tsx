@@ -171,33 +171,31 @@ export function TemplateEventField({
           />
         )}
 
-        {IS_GATEWAY ? null : (
-          <>
-            {(currentValue || [])?.map((val) => {
-              return (
-                <EntityPreview
-                  clearAction={
-                    isDisabled
-                      ? undefined
-                      : (instance_id) => {
-                          handleChange([
-                            {
-                              name: `${name}.events`,
-                              value: currentValue.filter((c) => c.related_id !== instance_id),
-                            },
-                          ]);
-                        }
-                  }
-                  id={val?.event?.id}
-                  key={val?.event.id}
-                  link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
-                  title={val?.event.title}
-                  type="events"
-                />
-              );
-            })}
-          </>
-        )}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={
+                  isDisabled
+                    ? undefined
+                    : (instance_id) => {
+                        handleChange([
+                          {
+                            name: `${name}.events`,
+                            value: currentValue.filter((c) => c.related_id !== instance_id),
+                          },
+                        ]);
+                      }
+                }
+                id={val?.event?.id}
+                key={val?.event.id}
+                link={getEntityLink(project_id as string, "events", id, val?.event.parent_id)}
+                title={val?.event.title}
+                type="events"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );

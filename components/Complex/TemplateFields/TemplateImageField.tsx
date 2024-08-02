@@ -166,33 +166,31 @@ export function TemplateImageField({
           />
         )}
 
-        {IS_GATEWAY ? null : (
-          <>
-            {(currentValue || [])?.map((val) => {
-              return (
-                <EntityPreview
-                  clearAction={
-                    isDisabled
-                      ? undefined
-                      : (char_id) => {
-                          handleChange([
-                            {
-                              name: `${name}.images`,
-                              value: currentValue.filter((c) => c.related_id !== char_id),
-                            },
-                          ]);
-                        }
-                  }
-                  id={val.image?.id}
-                  image_id={val.image?.id}
-                  key={val.image.id}
-                  title={val.image?.title}
-                  type="images"
-                />
-              );
-            })}
-          </>
-        )}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={
+                  isDisabled
+                    ? undefined
+                    : (char_id) => {
+                        handleChange([
+                          {
+                            name: `${name}.images`,
+                            value: currentValue.filter((c) => c.related_id !== char_id),
+                          },
+                        ]);
+                      }
+                }
+                id={val.image?.id}
+                image_id={val.image?.id}
+                key={val.image.id}
+                title={val.image?.title}
+                type="images"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );

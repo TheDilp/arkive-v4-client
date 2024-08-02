@@ -168,34 +168,32 @@ export function TemplateLocationsField({
           />
         )}
 
-        {IS_GATEWAY ? null : (
-          <>
-            {(currentValue || [])?.map((val) => {
-              return (
-                <EntityPreview
-                  clearAction={
-                    isDisabled
-                      ? undefined
-                      : (doc_id) => {
-                          handleChange([
-                            {
-                              name: `${name}.map_pins`,
-                              value: currentValue.filter((c) => c.related_id !== doc_id),
-                            },
-                          ]);
-                        }
-                  }
-                  icon={val?.map_pin?.icon || ""}
-                  id={val?.map_pin?.id}
-                  key={val.map_pin?.id}
-                  link={getEntityLink(project_id as string, "map_pins", id, undefined)}
-                  title={val?.map_pin?.title || ""}
-                  type="map_pins"
-                />
-              );
-            })}
-          </>
-        )}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={
+                  isDisabled
+                    ? undefined
+                    : (doc_id) => {
+                        handleChange([
+                          {
+                            name: `${name}.map_pins`,
+                            value: currentValue.filter((c) => c.related_id !== doc_id),
+                          },
+                        ]);
+                      }
+                }
+                icon={val?.map_pin?.icon || ""}
+                id={val?.map_pin?.id}
+                key={val.map_pin?.id}
+                link={getEntityLink(project_id as string, "map_pins", id, undefined)}
+                title={val?.map_pin?.title || ""}
+                type="map_pins"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );

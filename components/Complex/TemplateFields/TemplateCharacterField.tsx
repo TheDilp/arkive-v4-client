@@ -168,31 +168,29 @@ export function TemplateCharacterField({
           />
         )}
 
-        {IS_GATEWAY ? null : (
-          <>
-            {(currentValue || [])?.map((val) => {
-              return (
-                <EntityPreview
-                  clearAction={(char_id) => {
-                    handleChange([
-                      {
-                        name: `${name}.characters`,
-                        value: currentValue.filter((c) => c.related_id !== char_id),
-                      },
-                    ]);
-                  }}
-                  id={val?.character?.id}
-                  image_id={val?.character?.portrait_id}
-                  key={val?.character?.id}
-                  link={getEntityLink(projectId || "", "characters", id, undefined)}
-                  manual_project_id={projectId}
-                  title={val?.character?.full_name || ""}
-                  type="characters"
-                />
-              );
-            })}
-          </>
-        )}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={(char_id) => {
+                  handleChange([
+                    {
+                      name: `${name}.characters`,
+                      value: currentValue.filter((c) => c.related_id !== char_id),
+                    },
+                  ]);
+                }}
+                id={val?.character?.id}
+                image_id={val?.character?.portrait_id}
+                key={val?.character?.id}
+                link={getEntityLink(projectId || "", "characters", id, undefined)}
+                manual_project_id={projectId}
+                title={val?.character?.full_name || ""}
+                type="characters"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );

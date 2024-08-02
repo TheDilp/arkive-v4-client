@@ -165,34 +165,32 @@ export function TemplateDocumentField({
             value={(currentValue || []).map((c) => c.related_id)}
           />
         )}
-        {IS_GATEWAY ? null : (
-          <>
-            {(currentValue || [])?.map((val) => {
-              return (
-                <EntityPreview
-                  clearAction={
-                    isDisabled
-                      ? undefined
-                      : (doc_id) => {
-                          handleChange([
-                            {
-                              name: `${name}.documents`,
-                              value: currentValue.filter((c) => c.related_id !== doc_id),
-                            },
-                          ]);
-                        }
-                  }
-                  icon={val?.document?.icon || ""}
-                  id={val?.document?.id}
-                  key={val.document.id}
-                  link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
-                  title={val.document?.title}
-                  type="documents"
-                />
-              );
-            })}
-          </>
-        )}
+        <div className={IS_GATEWAY ? "grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4" : "flex flex-col gap-y-2"}>
+          {(currentValue || [])?.map((val) => {
+            return (
+              <EntityPreview
+                clearAction={
+                  isDisabled
+                    ? undefined
+                    : (doc_id) => {
+                        handleChange([
+                          {
+                            name: `${name}.documents`,
+                            value: currentValue.filter((c) => c.related_id !== doc_id),
+                          },
+                        ]);
+                      }
+                }
+                icon={val?.document?.icon || ""}
+                id={val?.document?.id}
+                key={val.document.id}
+                link={getEntityLink(val?.document?.project_id || project_id || "", "documents", val.document?.id, undefined)}
+                title={val.document?.title}
+                type="documents"
+              />
+            );
+          })}
+        </div>
       </div>
     </TemplateFieldContainer>
   );
