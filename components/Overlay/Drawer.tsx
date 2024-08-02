@@ -187,7 +187,10 @@ export function Drawer() {
         {renderContent ? (
           <div className="flex h-[calc(100%-6rem)] w-full flex-1 flex-col gap-y-4 overflow-hidden">
             {IS_PUBLIC ? (
-              <span>{drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}</span>
+              <span>
+                {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
+                {drawer.type === "node_search" ? <NodeSearchDrawer data={drawer?.data} /> : null}
+              </span>
             ) : (
               <>
                 {drawer.type === "project" ? <ProjectDrawer /> : null}

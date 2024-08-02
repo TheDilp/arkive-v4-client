@@ -49,11 +49,13 @@ function changeCurveStyle(
 
 export function Quickbar({
   isViewOnly,
+  isReadOnly,
   graphTitle,
   hasPermission,
   cy,
 }: {
   isViewOnly: boolean;
+  isReadOnly: boolean;
   graphTitle: string;
   hasPermission: boolean;
   cy: Core;
@@ -75,6 +77,20 @@ export function Quickbar({
   const { mutate: updateManyEdges } = useUpdateManySubEntities("edges");
   const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
   const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
+
+  if (isReadOnly)
+    return (
+      <div className="absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md">
+        <Button
+          hasNoBackground
+          icon={IconEnum.search}
+          onClick={() =>
+            setDrawer((prev) => ({ ...prev, size: "md", data: { cy }, title: "Search nodes", type: "node_search" }))
+          }
+          tooltip="Search nodes"
+        />
+      </div>
+    );
 
   return (
     <div className="absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md">
