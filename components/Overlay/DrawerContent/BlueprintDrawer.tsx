@@ -267,7 +267,7 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
   const resetDrawerAtom = useToggledResetAtom();
   const setDialogAtom = useSetAtom(dialogAtom);
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const [areAllOpen, setAreAllOpen] = useState(false);
   const fieldContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
   const { mutateAsync: create, isLoading: isCreating } = useCreateEntity<InsertBlueprintType>("blueprints");
   const { mutateAsync: update, isLoading: isUpdating } = useUpdateEntity<UpdateBlueprintType>(
@@ -383,8 +383,16 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
       {tabs[selectedTab].id === "2" ? (
         <>
           {canCreateOrEdit ? (
-            <div className="flex items-center justify-between">
-              <span>Insert new field:</span>
+            <div className="flex items-center justify-end gap-x-2">
+              <div className="h-8 w-8">
+                <Button
+                  icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+                  isDisabled={isLoading}
+                  onClick={() => setAreAllOpen((prev) => !prev)}
+                  tooltip={"Open/Close all"}
+                  variant="info"
+                />
+              </div>
               <Dropdown
                 allowedPlacements={["left-start"]}
                 isDisabled={canCreateOrEdit}
@@ -871,9 +879,10 @@ export function BlueprintDrawer({ data }: { data: { id?: string } }) {
                                     },
                                   ]}
                                   initialOpen={
-                                    field.title === "New field" &&
-                                    field.field_type === "text" &&
-                                    index === (blueprint?.blueprint_fields?.length || 1) - 1
+                                    (field.title === "New field" &&
+                                      field.field_type === "text" &&
+                                      index === (blueprint?.blueprint_fields?.length || 1) - 1) ||
+                                    areAllOpen
                                   }
                                   label={field?.title}>
                                   <FieldRow
