@@ -66,7 +66,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
   const queryClient = useQueryClient();
   const { data: existingMapPinTypes } = useGetEntities<MapPinTypesType>(
     { data: { project_id }, fields: ["id", "title", "default_icon", "default_icon_color"] },
-    "map_pin_types",
+    "map_pin_types"
   );
 
   const resetDrawerAtom = useToggledResetAtom();
@@ -101,14 +101,14 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       },
       permissions: true,
     },
-    { enabled: !!data?.id },
+    { enabled: !!data?.id }
   );
   const { mutateAsync: createMapPin, isLoading: isCreating } = useCreateSubEntity<
     InsertMapPinType & { character?: MapPinType["character"] | null }
   >("map_pins", item_id as string);
   const { mutateAsync: updateMapPin, isLoading: isUpdating } = useUpdateMapSubEntity<UpdateMapPinType>(
     "map_pins",
-    item_id as string,
+    item_id as string
   );
   const permissions = useHasPermissions(
     [
@@ -121,7 +121,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
       "read_events",
       "read_assets",
     ],
-    existingMapPin?.data?.owner_id,
+    existingMapPin?.data?.owner_id
   );
   const [character, setCharacter] = useState<MapPinType["character"] | null>(null);
   const { handleChange } = useHandleChange({ data: mapPin, setData: setMapPin });
@@ -440,7 +440,7 @@ export function MapPinDrawer({ data, exceptions }: Props) {
           handleChange={handleChange}
           owner_id={mapPin?.owner_id}
           permissions={mapPin?.permissions || []}
-          related_id={mapPin?.id || null}
+          related_id={data?.id || null}
           selectablePermissions={["read_map_pins", "update_map_pins", "delete_map_pins"]}
         />
       ) : null}
