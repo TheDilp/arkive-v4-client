@@ -4,6 +4,8 @@ export type TabType = {
   id: string;
   label: string;
   icon?: AvailableIcons | null;
+  hasDivider?: boolean;
+  isOwner?: boolean;
 };
 export interface TabsTypes {
   selectedTab: number;
@@ -12,4 +14,3 @@ export interface TabsTypes {
   onChange?: (tab: TabType, index: number) => void;
   isVertical?: boolean;
 }
-

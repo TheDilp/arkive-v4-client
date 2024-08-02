@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef } from "react";
+import { Fragment, MutableRefObject, useRef } from "react";
 import { tv } from "tailwind-variants";
 
 import { TabsTypes } from "../../types";
@@ -12,6 +12,7 @@ const TabsClasses = tv({
     tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden relative flex-nowrap overflow-auto text-lg -mb-px",
     tab: "px-2 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
     tabSelected: "inline-block border-blue-500 border-b",
+    tabDivider: "border-b border-zinc-700",
   },
   variants: {
     isVertical: {
@@ -27,7 +28,7 @@ const TabsClasses = tv({
 
 export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: TabsTypes) {
   const tabsContainerRef = useRef() as MutableRefObject<HTMLUListElement>;
-  const { base, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses({ isVertical });
+  const { base, tabDivider, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses({ isVertical });
 
   return (
     <div className={base()}>
@@ -47,24 +48,27 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
           </li>
         ) : null}
         {tabs.map((tab, index) => (
-          <li
-            className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""}`}
-            key={tab.id}
-            onClick={(e) => {
-              if (onChange && selectedTab !== index) onChange(tab, index);
-              e.currentTarget.scrollIntoView({ behavior: "smooth" });
-            }}
-            onKeyDown={(e) => {
-              if (e.key === " " || e.key === "Enter") {
+          <Fragment>
+            <li
+              className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""} `}
+              key={tab.id}
+              onClick={(e) => {
                 if (onChange && selectedTab !== index) onChange(tab, index);
                 e.currentTarget.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            role="tab"
-            tabIndex={0}>
-            <span className="truncate">{tab.label}</span>
-            {tab?.icon ? <Icon icon={tab.icon} /> : null}
-          </li>
+              }}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  if (onChange && selectedTab !== index) onChange(tab, index);
+                  e.currentTarget.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              role="tab"
+              tabIndex={0}>
+              <span className="truncate">{tab.label}</span>
+              {tab?.icon ? <Icon icon={tab.icon} /> : null}
+            </li>
+            {tab.hasDivider ? <hr className={tabDivider()} /> : null}
+          </Fragment>
         ))}
         {hasArrowNav ? (
           <li className="sticky right-0 ml-auto [&>button:active]:opacity-100 [&>button]:w-5 [&>button]:rounded-none [&>button]:shadow-none">
