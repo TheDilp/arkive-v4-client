@@ -14,6 +14,7 @@ type Props = {
   id: string;
   fieldType: "characters_single" | "characters_multiple";
   isCollapsible?: boolean;
+  isOpen?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
   presetOptions: GatewayConfigOptionType[];
@@ -31,11 +32,12 @@ export function TemplateCharacterField({
   isDisabled,
   isGlobal,
   presetOptions = [],
+  isOpen,
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="col-span-1 flex max-h-56 flex-col gap-y-2 overflow-y-auto md:col-span-2 lg:col-span-4">
         {isDisabled || IS_GATEWAY ? null : (
           <Search

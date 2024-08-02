@@ -10,6 +10,7 @@ type Props = {
   id: string;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["random_table"] | null;
   random_table?: BlueprintFieldType["random_table"];
 };
@@ -23,13 +24,14 @@ export function TemplateRandomTableField({
   random_table,
   isCollapsible,
   isDisabled,
+  isOpen,
 }: Props) {
   const availableSuboptions = random_table?.random_table_options?.find(
-    (opt) => opt?.id === currentValue?.option_id,
+    (opt) => opt?.id === currentValue?.option_id
   )?.random_table_suboptions;
 
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex flex-col gap-y-1">
         <div className="flex flex-nowrap items-center gap-x-2">
           <Select

@@ -12,11 +12,21 @@ type Props = {
   currentValue: RemirrorJSON;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
 };
 
-export function TemplateTextareaField({ isDisabled, title, name, currentValue, handleChange, id, isCollapsible }: Props) {
+export function TemplateTextareaField({
+  isDisabled,
+  isOpen,
+  title,
+  name,
+  currentValue,
+  handleChange,
+  id,
+  isCollapsible,
+}: Props) {
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="col-span-1 flex max-h-[30rem] min-h-fit flex-col gap-x-2 gap-y-4 md:col-span-2 lg:col-span-4">
         <span className="text-sm text-zinc-300">{title}</span>
         <Editor

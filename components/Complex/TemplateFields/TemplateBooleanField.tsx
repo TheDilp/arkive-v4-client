@@ -10,11 +10,22 @@ type Props = {
   currentValue: boolean | null;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
 };
 
-export function TemplateBooleanField({ isDisabled, title, name, currentValue, handleChange, id, isCollapsible }: Props) {
+export function TemplateBooleanField({
+  isDisabled,
+
+  isOpen,
+  title,
+  name,
+  currentValue,
+  handleChange,
+  id,
+  isCollapsible,
+}: Props) {
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex flex-nowrap justify-end">
         <Checkbox
           isDisabled={isDisabled}

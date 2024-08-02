@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isGlobal?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["map_pins"];
   presetOptions: GatewayConfigOptionType[];
 };
@@ -29,6 +30,7 @@ export function TemplateLocationsField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isOpen,
   isGlobal,
   presetOptions = [],
 }: Props) {
@@ -36,7 +38,7 @@ export function TemplateLocationsField({
   const projectId = project_id || presetOptions?.[0]?.project_id;
 
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-36 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
           <Search

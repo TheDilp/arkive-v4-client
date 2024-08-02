@@ -12,6 +12,7 @@ type Props = {
   options: { id: string; value: string }[];
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
 };
 
 export function TemplateSelectField({
@@ -24,9 +25,10 @@ export function TemplateSelectField({
   options,
   isCollapsible,
   isDisabled,
+  isOpen,
 }: Props) {
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <Select
         hasSearch
         isClearable

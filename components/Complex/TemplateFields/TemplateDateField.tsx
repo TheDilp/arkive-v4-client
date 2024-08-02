@@ -14,9 +14,20 @@ type Props = {
   calendar?: BlueprintFieldType["calendar"];
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
 };
 
-export function TemplateDateField({ title, name, handleChange, id, currentValue, calendar, isCollapsible, isDisabled }: Props) {
+export function TemplateDateField({
+  isOpen,
+  title,
+  name,
+  handleChange,
+  id,
+  currentValue,
+  calendar,
+  isCollapsible,
+  isDisabled,
+}: Props) {
   const startMonthIdx = currentValue?.start_month_id
     ? calendar?.months?.findIndex((m) => m.id === currentValue?.start_month_id) ?? undefined
     : undefined;
@@ -53,7 +64,7 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
     }
   }, [currentValue?.end_month_id, currentValue?.start_month_id]);
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <span className="block min-h-[20px] truncate border-b border-zinc-700 text-sm text-zinc-300">{title}</span>
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center justify-between gap-x-2">
@@ -163,4 +174,3 @@ export function TemplateDateField({ title, name, handleChange, id, currentValue,
     </TemplateFieldContainer>
   );
 }
-

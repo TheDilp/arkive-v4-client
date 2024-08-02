@@ -18,6 +18,7 @@ type Props = {
   currentValue: BlueprintInstanceBlueprintFieldType["blueprint_instances"];
   blueprint_id: string | null | undefined;
   isDisabled?: boolean;
+  isOpen?: boolean;
   isGlobal?: boolean;
 };
 
@@ -31,13 +32,14 @@ export function TemplateBlueprintField({
   currentValue,
   isDisabled,
   isGlobal,
+  isOpen,
   isCollapsible,
   presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="col-span-4 flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
           <Search

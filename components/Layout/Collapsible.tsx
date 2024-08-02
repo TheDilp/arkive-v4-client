@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
 
 import { CollapsibleType, Size } from "../../types";
@@ -97,6 +97,11 @@ export function Collapsible({
     isDisabled,
   });
   const [open, setOpen] = useState<boolean>(initialOpen ?? false);
+
+  useEffect(() => {
+    setOpen(!!initialOpen);
+  }, [initialOpen]);
+
   return (
     <details
       className={details()}

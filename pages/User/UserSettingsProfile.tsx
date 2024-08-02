@@ -31,6 +31,7 @@ export function UserSettingsProfile() {
           <Button
             icon={IconEnum.save}
             isDisabled={userData?.nickname === user?.nickname || !user?.nickname}
+            isIconOnly
             onClick={undefined}
             variant="success"
           />
@@ -48,6 +49,7 @@ export function UserSettingsProfile() {
           <Button
             icon={IconEnum.save}
             isDisabled={userData?.email === user?.email || !user?.email}
+            isIconOnly
             onClick={undefined}
             variant="success"
           />

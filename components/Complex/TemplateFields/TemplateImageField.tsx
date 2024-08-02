@@ -15,6 +15,7 @@ type Props = {
   fieldType: "images_single" | "images_multiple";
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
   isGlobal?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["images"];
   presetOptions: GatewayConfigOptionType[];
@@ -28,6 +29,7 @@ export function TemplateImageField({
   fieldType,
   isCollapsible,
   isDisabled,
+  isOpen,
   isGlobal,
   currentValue,
   presetOptions = [],
@@ -35,7 +37,7 @@ export function TemplateImageField({
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
           <Search

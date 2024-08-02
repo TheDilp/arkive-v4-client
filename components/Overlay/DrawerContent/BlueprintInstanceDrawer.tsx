@@ -103,6 +103,8 @@ function FieldTemplateRows({
   isDisabled?: boolean;
   handleChange: (props: HandleChangePropsType) => void;
 }) {
+  const [areAllOpen, setAreAllOpen] = useState(false);
+
   const permissions = useHasPermissions(
     [
       "read_characters",
@@ -118,6 +120,17 @@ function FieldTemplateRows({
   );
   return (
     <li className="flex flex-col first:mt-0">
+      <div className="flex items-center justify-end">
+        <div className="h-8 w-8">
+          <Button
+            icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+            isIconOnly
+            onClick={() => setAreAllOpen((prev) => !prev)}
+            tooltip={"Open/Close all"}
+            variant="info"
+          />
+        </div>
+      </div>
       <div className="flex select-none flex-col gap-y-2 pt-2">
         {blueprint_fields.map((template_field) => {
           const blueprintValueKey = getFieldValueFromType(template_field.field_type);
@@ -136,6 +149,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 title={template_field.title}
@@ -154,6 +168,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 options={template_field.options || []}
@@ -171,6 +186,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 title={template_field.title}
@@ -187,6 +203,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 title={template_field.title}
@@ -204,6 +221,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 title={template_field.title}
@@ -221,6 +239,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 title={template_field.title}
@@ -238,6 +257,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 random_table={template_field.random_table}
@@ -260,6 +280,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
@@ -284,6 +305,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
@@ -306,6 +328,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
@@ -328,6 +351,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
@@ -350,6 +374,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}
@@ -372,6 +397,7 @@ function FieldTemplateRows({
                 id={template_field.id}
                 isCollapsible
                 isDisabled={isDisabled}
+                isOpen={areAllOpen}
                 key={template_field.id}
                 name={baseName}
                 presetOptions={[]}

@@ -16,6 +16,7 @@ type Props = {
   isCollapsible?: boolean;
   isDisabled?: boolean;
   isGlobal?: boolean;
+  isOpen?: boolean;
   currentValue: BlueprintInstanceBlueprintFieldType["documents"];
   presetOptions: GatewayConfigOptionType[];
 };
@@ -29,13 +30,14 @@ export function TemplateDocumentField({
   currentValue,
   isCollapsible,
   isDisabled,
+  isOpen,
   isGlobal,
   presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <div className="flex max-h-56 flex-col gap-y-2 overflow-y-auto">
         {isDisabled || IS_GATEWAY ? null : (
           <Search

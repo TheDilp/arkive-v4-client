@@ -11,6 +11,7 @@ type Props = {
   currentValue: string | number | null;
   isCollapsible?: boolean;
   isDisabled?: boolean;
+  isOpen?: boolean;
 };
 
 export function TemplateInputField({
@@ -21,10 +22,11 @@ export function TemplateInputField({
   fieldType,
   currentValue,
   isCollapsible,
+  isOpen,
   isDisabled,
 }: Props) {
   return (
-    <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
+    <TemplateFieldContainer isCollapsible={isCollapsible} isOpen={isOpen} label={title}>
       <Input
         isDisabled={isDisabled}
         label={isCollapsible ? "" : title}
