@@ -30,7 +30,7 @@ export function TemplateEventField({
   isCollapsible,
   isDisabled,
   isGlobal,
-  presetOptions,
+  presetOptions = [],
 }: Props) {
   const { project_id } = useParams();
   const projectId = project_id || presetOptions?.[0]?.project_id;

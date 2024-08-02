@@ -39,7 +39,7 @@ export function TemplateBlueprintField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="col-span-4 flex max-h-56 flex-col gap-y-2 overflow-y-auto">
-        {isDisabled || presetOptions || IS_GATEWAY ? null : (
+        {isDisabled || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}

@@ -37,7 +37,7 @@ export function TemplateCharacterField({
   return (
     <TemplateFieldContainer isCollapsible={isCollapsible} label={title}>
       <div className="col-span-1 flex max-h-56 flex-col gap-y-2 overflow-y-auto md:col-span-2 lg:col-span-4">
-        {isDisabled || presetOptions || IS_GATEWAY ? null : (
+        {isDisabled || IS_GATEWAY ? null : (
           <Search
             isDisabled={isDisabled}
             isGlobal={isGlobal}
