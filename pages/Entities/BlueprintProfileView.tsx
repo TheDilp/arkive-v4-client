@@ -156,7 +156,7 @@ export function BlueprintProfileView({ id, parent_id, isViewOnly }: { id?: strin
         <div className="flex max-h-full flex-1 flex-col overflow-auto rounded-lg bg-zinc-950 p-4 lg:col-span-4">
           <div className="flex flex-col gap-y-2">
             <Collapsible icon={IconEnum.additional_fields} initialOpen label="Fields">
-              <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-y-2 overflow-auto">
+              <div className="grid h-full max-h-[calc(100%-3rem)] grid-cols-6 flex-col content-start gap-2 overflow-auto">
                 {blueprintInstance?.data
                   ? blueprintInstance?.data?.blueprint_fields
                       ?.toSorted((a, b) => a.sort - b.sort)
