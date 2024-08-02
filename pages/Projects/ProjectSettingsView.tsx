@@ -60,6 +60,7 @@ import {
   UserSidebarEntitiesEnabled,
 } from "../../utils";
 import { UpdateProjectSchema, UpdateProjectType } from "../../validation";
+import { TagView } from "../Entities";
 
 type kickUserMutationType = UseMutateFunction<
   any,
@@ -85,13 +86,14 @@ type assignRoleMutationType = UseMutateFunction<
   unknown
 >;
 const tabs = [
-  { id: "1", label: "Project settings", icon: IconEnum.settings, isOwner: false },
-  { id: "2", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
-  { id: "3", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
-  { id: "4", label: "Members", icon: IconEnum.users, isOwner: true },
-  { id: "5", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
-  { id: "6", label: "Gateway configuration", icon: IconEnum.gateway || IconEnum.character, isOwner: true },
-  { id: "7", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
+  { id: "project_settings", label: "Project settings", icon: IconEnum.settings, isOwner: false },
+  { id: "tags", label: "Tags", icon: IconEnum.tags, isOwner: false },
+  { id: "map_pin_types", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
+  { id: "custom_relationship_types", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
+  { id: "members", label: "Members", icon: IconEnum.users, isOwner: true },
+  { id: "roles_permissions", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
+  { id: "gateway_configuration", label: "Gateway configuration", icon: IconEnum.gateway || IconEnum.character, isOwner: true },
+  { id: "feature_settings", label: "Feature settings", icon: IconEnum.feature_flag, isOwner: false },
 ];
 
 const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
@@ -485,12 +487,17 @@ export function ProjectSettingsView() {
   const { data: roles } = useGetEntities<RoleType>(
     { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
     "roles",
-    { enabled: !!user?.id && isProjectOwner && (finalTabs?.[selectedTab]?.id === "4" || finalTabs?.[selectedTab]?.id === "5") }
+    {
+      enabled:
+        !!user?.id &&
+        isProjectOwner &&
+        (finalTabs?.[selectedTab]?.id === "members" || finalTabs?.[selectedTab]?.id === "roles_permissions"),
+    }
   );
   const { data: gateway_configurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
-    { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "6" }
+    { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "gateway_configuration" }
   );
   const { mutateAsync: deleteProject } = useDeleteEntity("projects", project?.id || "", false);
 
@@ -581,7 +588,7 @@ export function ProjectSettingsView() {
             <span className="flex items-center gap-x-2">
               <Icon icon={finalTabs?.[selectedTab]?.icon} /> {finalTabs?.[selectedTab]?.label}
             </span>
-            {finalTabs?.[selectedTab]?.id === "1" ? (
+            {finalTabs?.[selectedTab]?.id === "project_settings" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.save}
@@ -594,12 +601,13 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs?.[selectedTab]?.id === "2" ? (
+
+            {finalTabs?.[selectedTab]?.id === "map_pin_types" ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenNewMapPinTypeDrawer} size="sm" variant="info" />
               </div>
             ) : null}
-            {finalTabs?.[selectedTab]?.id === "3" ? (
+            {finalTabs?.[selectedTab]?.id === "custom_relationship_types" ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.add}
@@ -610,7 +618,7 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs?.[selectedTab]?.id === "4" && isProjectOwner ? (
+            {finalTabs?.[selectedTab]?.id === "members" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button
                   icon={IconEnum.user_invite}
@@ -621,18 +629,18 @@ export function ProjectSettingsView() {
                 />
               </div>
             ) : null}
-            {finalTabs?.[selectedTab]?.id === "5" && isProjectOwner ? (
+            {finalTabs?.[selectedTab]?.id === "roles_permissions" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenRolesDrawer} size="sm" variant="info" />
               </div>
             ) : null}
-            {finalTabs?.[selectedTab]?.id === "6" && isProjectOwner ? (
+            {finalTabs?.[selectedTab]?.id === "gateway_configuration" && isProjectOwner ? (
               <div className="ml-auto w-min">
                 <Button icon={IconEnum.add} label="Create" onClick={handleOpenGatewayConfigDrawer} size="sm" variant="info" />
               </div>
             ) : null}
           </h2>
-          {finalTabs?.[selectedTab]?.id === "1" ? (
+          {finalTabs?.[selectedTab]?.id === "project_settings" ? (
             <div className="flex h-full max-h-[calc(100%-3rem)] flex-col gap-y-4 overflow-auto">
               <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-12 lg:col-span-8">
@@ -720,7 +728,13 @@ export function ProjectSettingsView() {
               )}
             </div>
           ) : null}
-          {finalTabs?.[selectedTab]?.id === "2" ? (
+          {finalTabs?.[selectedTab]?.id === "tags" ? (
+            <div className="max-h-[95%]">
+              <TagView />
+            </div>
+          ) : null}
+
+          {finalTabs?.[selectedTab]?.id === "map_pin_types" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -732,7 +746,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs?.[selectedTab]?.id === "3" ? (
+          {finalTabs?.[selectedTab]?.id === "custom_relationship_types" ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -744,7 +758,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs?.[selectedTab]?.id === "4" && isProjectOwner ? (
+          {finalTabs?.[selectedTab]?.id === "members" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -756,7 +770,7 @@ export function ProjectSettingsView() {
               </div>
             </div>
           ) : null}
-          {finalTabs?.[selectedTab]?.id === "5" && isProjectOwner ? (
+          {finalTabs?.[selectedTab]?.id === "roles_permissions" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -770,7 +784,7 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
 
-          {finalTabs?.[selectedTab]?.id === "6" && isProjectOwner ? (
+          {finalTabs?.[selectedTab]?.id === "gateway_configuration" && isProjectOwner ? (
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
@@ -784,7 +798,7 @@ export function ProjectSettingsView() {
             </div>
           ) : null}
 
-          {finalTabs?.[selectedTab]?.id === "7" ? (
+          {finalTabs?.[selectedTab]?.id === "feature_settings" ? (
             <div className="flex max-h-[90%] flex-col gap-y-2 overflow-y-auto">
               <Collapsible
                 actions={[

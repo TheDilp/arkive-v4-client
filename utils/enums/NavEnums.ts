@@ -40,8 +40,8 @@ export const projectNavItems: SidebarItemType[] = [
   { icon: IconEnum.calendar, navigate: "calendars", tooltip: "Calendars" },
   { icon: IconEnum.dictionary, navigate: "dictionaries", tooltip: "Dictionaries" },
   { icon: IconEnum.random_table, navigate: "random_tables", tooltip: "Random tables" },
-  { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
-  { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
+  // { icon: IconEnum.tags, navigate: "tags", tooltip: "Tags" },
+  // { icon: IconEnum.additional_fields, navigate: "character_fields_templates", tooltip: "Character field templates" },
   { icon: IconEnum.image, navigate: "assets", tooltip: "Assets" },
   { icon: IconEnum.settings, navigate: "settings", tooltip: "Settings" },
 ];
