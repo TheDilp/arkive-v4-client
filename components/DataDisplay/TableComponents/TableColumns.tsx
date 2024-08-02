@@ -21,7 +21,7 @@ import {
   sortTags,
   TagFilters,
 } from "../../../utils";
-import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, Tooltip } from "../..";
+import { Alert, Avatar, Badge, Button, Card, Checkbox, Dropdown, EntityPreview, Tooltip } from "../..";
 
 export function SelectColumn<T>(
   dispatch: TableDispatch<T>,
@@ -86,7 +86,6 @@ export function SelectColumn<T>(
     },
   };
 }
-
 export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => void): ColumnDef<any> {
   return {
     id: "is_favorite",
@@ -105,7 +104,6 @@ export function FavoriteColumn(setFavorite: (data: SetFavoriteType) => void): Co
     },
   };
 }
-
 export function TagColumn<T>(hasTagsWarning?: boolean, dispatch?: TableDispatch<T>): ColumnDef<any & { tags: TagType[] }> {
   const featureFlags = useAtomValue(projectFeatureFlagsAtom);
 
@@ -236,7 +234,6 @@ export function ArkivedAtColumn(): ColumnDef<any & { deleted_at: string | null }
     maxSize: 3.25,
   };
 }
-
 export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]; isMultiple: boolean }) {
   return (
     <div className="flex max-w-full items-center gap-x-2">
@@ -256,7 +253,6 @@ export function ShowMultipleWithBadge({ titles, isMultiple }: { titles: string[]
     </div>
   );
 }
-
 export function CharacterColumn({
   characters,
   isMultiple,
@@ -288,10 +284,23 @@ export function CharacterColumn({
       </div>
       {characters && characters?.length && characters?.length > 5 ? (
         <Tooltip
-          content={characters
-            ?.slice(5)
-            ?.map((char) => char?.character?.full_name || "")
-            ?.join(", ")}>
+          content={
+            <ul className="flex flex-col gap-y-1 rounded-md bg-black p-2">
+              {characters?.slice(5).map((char) => {
+                return (
+                  <li key={char?.related_id}>
+                    <EntityPreview
+                      id={char?.related_id}
+                      image_id={char?.character?.portrait_id}
+                      title={char?.character?.full_name}
+                      type="characters"
+                      variant="primary"
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          }>
           <div className="w-min max-w-min">
             <Badge label={`+${characters.length - 5}`} size="sm" variant="secondary" />
           </div>
@@ -300,7 +309,6 @@ export function CharacterColumn({
     </div>
   );
 }
-
 export function LocationColumn({
   locations,
   isMultiple,
@@ -351,7 +359,6 @@ export function LocationColumn({
     </div>
   );
 }
-
 export function EventColumn({
   isMultiple,
   locations: events,

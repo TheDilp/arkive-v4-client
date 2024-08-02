@@ -115,7 +115,6 @@ function createColumns(
         columnHelper.display({
           id: field.id,
           header: field.title,
-
           cell: ({ row }) => {
             const fieldData = row.original?.blueprint_fields?.find((instanceField) => instanceField?.id === field.id);
 
