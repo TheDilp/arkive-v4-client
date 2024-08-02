@@ -452,7 +452,7 @@ export function ProjectSettingsView() {
   const { isLg } = useBreakpoint();
   const isProjectOwner = useAtomValue(isProjectOwnerAtom);
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState(5);
+  const [selectedTab, setSelectedTab] = useState(0);
   const { mutate: kickUser } = useKickMember();
 
   const finalTabs = isProjectOwner ? tabs : tabs.filter((t) => t.isOwner === false);
