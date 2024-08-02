@@ -39,6 +39,7 @@ import {
   MapPinTypesType,
   ProjectType,
   RoleType,
+  TabType,
   UserType,
 } from "../../types";
 import { GatewayConfigType, GatewayEntityType } from "../../types/EntityTypes/gatewayTypes";
@@ -85,12 +86,18 @@ type assignRoleMutationType = UseMutateFunction<
   },
   unknown
 >;
-const tabs = [
+const tabs: TabType[] = [
   { id: "project_settings", label: "Project settings", icon: IconEnum.settings, isOwner: false },
   { id: "tags", label: "Tags", icon: IconEnum.tags, isOwner: false },
   { id: "character_fields_templates", label: "Character field templates", icon: IconEnum.additional_fields, isOwner: false },
   { id: "map_pin_types", label: "Map pin types", icon: IconEnum.map_pin, isOwner: false },
-  { id: "custom_relationship_types", label: "Custom relationship types", icon: IconEnum.family_tree, isOwner: false },
+  {
+    id: "custom_relationship_types",
+    label: "Custom relationship types",
+    icon: IconEnum.family_tree,
+    isOwner: false,
+    hasDivider: true,
+  },
   { id: "members", label: "Members", icon: IconEnum.users, isOwner: true },
   { id: "roles_permissions", label: "Roles & permissions", icon: IconEnum.permissions, isOwner: true },
   { id: "gateway_configuration", label: "Gateway configuration", icon: IconEnum.gateway || IconEnum.character, isOwner: true },
@@ -586,9 +593,11 @@ export function ProjectSettingsView() {
 
         <div className="flex h-[calc(100vh-12rem)] max-h-[calc(100vh-12rem)] flex-1 flex-col overflow-hidden rounded-lg bg-zinc-950 p-4 lg:col-span-4 lg:h-[calc(100vh-6rem)] lg:max-h-[calc(100vh-6rem)]">
           <h2 className="mb-4 flex h-8 items-center border-b border-zinc-900 pb-2 font-merriweather text-2xl">
-            <span className="flex items-center gap-x-2">
-              <Icon icon={finalTabs?.[selectedTab]?.icon} /> {finalTabs?.[selectedTab]?.label}
-            </span>
+            {finalTabs?.[selectedTab]?.icon ? (
+              <span className="flex items-center gap-x-2">
+                <Icon icon={finalTabs?.[selectedTab]?.icon} /> {finalTabs?.[selectedTab]?.label}
+              </span>
+            ) : null}
             {finalTabs?.[selectedTab]?.id === "project_settings" ? (
               <div className="ml-auto w-min">
                 <Button
