@@ -394,7 +394,7 @@ function AdditionalFieldsTab({
   if (isLoading) return <Skeleton type="drawer_form" />;
   return (
     <ul className="flex flex-col gap-y-2 overflow-y-auto">
-      <li className="flex items-center justify-end">
+      <li className="sticky top-0 z-50 flex items-center justify-end bg-zinc-900">
         <div className="h-8 w-8">
           <Button
             icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}

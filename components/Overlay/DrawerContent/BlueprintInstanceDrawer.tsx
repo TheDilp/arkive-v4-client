@@ -120,7 +120,7 @@ function FieldTemplateRows({
   );
   return (
     <li className="flex flex-col first:mt-0">
-      <div className="flex items-center justify-end">
+      <div className="sticky top-0 z-50 flex items-center justify-end bg-zinc-900">
         <div className="h-8 w-8">
           <Button
             icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}

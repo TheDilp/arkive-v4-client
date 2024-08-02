@@ -700,7 +700,7 @@ function CharacterFieldSection({
         ],
       }}
       initialOpen={isInitialOpen}
-      isDisabled={canCreateOrEdit}
+      isDisabled={!canCreateOrEdit}
       label={title}>
       {character_fields.length ? <span /> : <div className="w-full p-2">Drop fields here</div>}
       <Droppable direction="vertical" droppableId={id} key={id} type="CHARACTER_FIELDS">
@@ -759,9 +759,10 @@ function CharacterFieldSection({
                               },
                             ]}
                             initialOpen={
-                              field.title === "New field" &&
-                              field.field_type === "text" &&
-                              index === (character_fields?.length || 1) - 1
+                              (field.title === "New field" &&
+                                field.field_type === "text" &&
+                                index === (character_fields?.length || 1) - 1) ||
+                              isInitialOpen
                             }
                             label={field?.title}
                             size="lg">
@@ -838,9 +839,11 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
     existingTemplate?.data?.owner_id
   );
 
+  const [areAllOpen, setAreAllOpen] = useState(false);
+
   const canCreateOrEdit = createOrEditPermission(
     permissions?.create_character_fields_templates,
-    permissions?.update_calendars,
+    permissions?.update_character_fields_templates,
     permissions?.is_owner,
     data?.id
   );
@@ -908,6 +911,17 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
       ) : null}
       {tabs[selectedTab].id === "2" ? (
         <div className="flex h-[90%] max-h-[90%] flex-col gap-y-2 overflow-y-auto">
+          <div className="sticky top-0 z-50 flex items-center justify-end bg-zinc-900">
+            <div className="h-8 w-8">
+              <Button
+                icon={areAllOpen ? IconEnum.chevron_down : IconEnum.chevron_up}
+                isIconOnly
+                onClick={() => setAreAllOpen((prev) => !prev)}
+                tooltip={"Open/Close all"}
+                variant="info"
+              />
+            </div>
+          </div>
           <DragDropContext
             onDragEnd={(result) => {
               if (!result.destination) {
@@ -943,7 +957,7 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
                 character_fields={groupedFields?.[section.id] || []}
                 handleChange={handleCustomFieldsChange}
                 id={section.id}
-                isInitialOpen={false}
+                isInitialOpen={areAllOpen}
                 isLoading={isFetching}
                 key={section.id}
                 title={section.title}
@@ -955,7 +969,9 @@ export function FieldTemplateDrawer({ data }: { data: { id?: string } }) {
               character_fields={groupedFields["null"] || []}
               handleChange={handleCustomFieldsChange}
               id="other"
-              isInitialOpen={!template?.id || !groupedFields?.["null"]?.length || !template.character_fields_sections?.length}
+              isInitialOpen={
+                !template?.id || !groupedFields?.["null"]?.length || !template.character_fields_sections?.length || areAllOpen
+              }
               isLoading={isFetching}
               title="Other"
             />
