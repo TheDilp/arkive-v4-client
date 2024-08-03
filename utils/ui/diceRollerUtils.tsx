@@ -17,15 +17,15 @@ export const Dice = IS_PUBLIC
   : new DiceBox(
       "#dice-box", // target DOM element to inject the canvas for rendering
       {
-        assetPath: "/assets/dice-box/",
+        assetPath: "/assets/",
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
       }
     );
 
-Dice?.init().then(() => {
-  document.addEventListener("mousedown", () => {
+Dice?.init()?.then(() => {
+  document?.addEventListener("mousedown", () => {
     Dice?.clear();
   });
 });
