@@ -313,6 +313,7 @@ function DiceRoller() {
           isIconOnly
           label="Roll"
           onClick={async () => {
+            console.log(defaultDiceColor);
             Dice.updateConfig({
               themeColor: defaultDiceColor || DefaultTagColor,
             });

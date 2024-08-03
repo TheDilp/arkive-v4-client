@@ -11,6 +11,7 @@ import {
   currentUserPermissionsAtom,
   DefaultTagColor,
   dialogAtom,
+  Dice,
   drawerAtom,
   hasChangedDataAtom,
   historyAtom,
@@ -39,6 +40,7 @@ export function ProjectLayout() {
   const { isLg } = useBreakpoint();
   const { pathname } = useLocation();
   const userStatus = useAtomValue(userStatusAtom);
+
   const { data: projectData, isInitialLoading } = useGetEntity<ProjectType>(
     project_id as string,
     "projects",
@@ -95,6 +97,9 @@ export function ProjectLayout() {
     if (userData?.data) {
       setUserAtom(userData.data);
       setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
+      Dice.updateConfig({
+        theme: userData?.data?.feature_flags?.dice_theme || "default",
+      });
     }
   }, [userData?.data]);
 
@@ -102,6 +107,9 @@ export function ProjectLayout() {
     if (projectData?.data) {
       setProjectAtom(projectData.data);
       ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
+      Dice.updateConfig({
+        themeColor: projectData.data?.default_dice_color || DefaultTagColor,
+      });
     }
   }, [projectData?.data]);
   useEffect(() => {

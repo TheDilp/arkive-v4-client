@@ -18,6 +18,7 @@ import {
 } from "../../types";
 import {
   baseURLS,
+  Dice,
   FetchFunction,
   getEntityCRUDNotification,
   getParentEntityType,
@@ -754,9 +755,13 @@ export function useUpdateUser<
           timer: 5,
         });
       },
-      onSuccess: (data) => {
+      onSuccess: (data, vars) => {
         queryClient.invalidateQueries(["user"]);
         if (data.ok) {
+          if (vars.data?.feature_flags && vars.data?.feature_flags?.dice_theme) {
+            Dice.updateConfig({ theme: vars.data.feature_flags.dice_theme });
+          }
+
           createNotification({
             title: data?.message || "User succesfully updated.",
             variant: "success",
