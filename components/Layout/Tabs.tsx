@@ -48,10 +48,9 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
           </li>
         ) : null}
         {tabs.map((tab, index) => (
-          <Fragment>
+          <Fragment key={tab.id}>
             <li
               className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""} `}
-              key={tab.id}
               onClick={(e) => {
                 if (onChange && selectedTab !== index) onChange(tab, index);
                 e.currentTarget.scrollIntoView({ behavior: "smooth" });
