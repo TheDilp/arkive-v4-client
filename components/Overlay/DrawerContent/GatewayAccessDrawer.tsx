@@ -15,7 +15,15 @@ import {
 } from "../../../hooks";
 import { CharacterType, DrawerAtomType, ImageType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
-import { AllEntities, AvailableIcons, getAvatarInitials, getImageURL, IconEnum, TextFilters } from "../../../utils";
+import {
+  AllEntities,
+  AvailableIcons,
+  getAvatarInitials,
+  getImageURL,
+  getParentEntityType,
+  IconEnum,
+  TextFilters,
+} from "../../../utils";
 import {
   InsertGatewayConfigurationSchema,
   InsertGatewayConfigurationType,
@@ -253,9 +261,11 @@ function getRelationsForGatewayConfig(relations: Record<string, string[]>) {
   return final;
 }
 function EntitiesAccess({
+  configuration_id,
   selection,
   setSelection,
 }: {
+  configuration_id?: string;
   selection: Record<AvailableGatewayEntites, string[]>;
   setSelection: Dispatch<SetStateAction<Record<AvailableGatewayEntites, string[]>>>;
 }) {
@@ -263,6 +273,14 @@ function EntitiesAccess({
   const [selectedTab, setSelectedTab] = useState(0);
   const entityType = entityTabs[selectedTab].id as AvailableGatewayEntites;
   const [filter, setFilter] = useState("");
+  const [parentId, setParentId] = useState("");
+  const { data: parents, isFetching: isFetchingParent } = useGetEntities<{ id: string; title: string; icon: string }>(
+    { data: { project_id }, fields: ["id", "title", "icon"], orderBy: [{ field: "title", sort: "asc" }] },
+    getParentEntityType(entityType as "blueprint_instances" | "map_pins" | "events") as "blueprints" | "maps" | "calendars",
+    {
+      enabled: entityType === "blueprint_instances" || entityType === "map_pins" || entityType === "events",
+    }
+  );
   const [{ pagination, selection: tableSelection, orderBy, filters }, dispatch] = useTable({
     selection: {},
     pagination: { page: 0, limit: 10 },
@@ -283,7 +301,7 @@ function EntitiesAccess({
     },
     entityType,
     {
-      enabled: entityType !== "images",
+      enabled: entityType !== "images" && !configuration_id,
       prefetch: true,
     }
   );
@@ -351,10 +369,49 @@ function EntitiesAccess({
     return () => {};
   }, [filter, dispatch, entityType]);
 
+  useLayoutEffect(() => {
+    if (entityType === "blueprint_instances" || entityType === "map_pins" || entityType === "events") {
+      if (parentId) {
+        dispatch({
+          type: "setFilter",
+          payload: { and: [{ id: "p-id", header_name: "Blueprint", field: "parent_id", value: parentId, operator: "eq" }] },
+        });
+      } else {
+        dispatch({
+          type: "removeFilterByField",
+          payload: "parent_id",
+        });
+      }
+    }
+  }, [parentId]);
+
+  useLayoutEffect(() => {
+    setParentId("");
+  }, [entityType]);
+
   return (
     <div className="flex max-h-[90%] flex-1 flex-col gap-y-2 [&>div>ul>li>button]:bg-zinc-900">
       <Tabs hasArrowNav onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={entityTabs} />
-      <Input isClearable label="Filter" name="filter" onChange={({ value }) => setFilter(value as string)} value={filter} />
+      <div className="flex items-center gap-x-2">
+        <Input isClearable label="Filter" name="filter" onChange={({ value }) => setFilter(value as string)} value={filter} />
+        {entityType === "blueprint_instances" || entityType === "map_pins" || entityType === "events" ? (
+          <Select
+            hasSearch
+            isClearable
+            isDisabled={isFetchingParent}
+            isLoading={isFetchingParent}
+            label="Filter by parent"
+            name="parent_id"
+            onChange={({ value }) => setParentId(value as string)}
+            options={(parents?.data || []).map((bp) => ({
+              label: bp.title,
+              value: bp.id,
+              icon: bp.icon as AvailableIcons | undefined,
+            }))}
+            value={parentId}
+          />
+        ) : null}
+      </div>
       <Table
         columns={getColumns(
           entityType as AvailableGatewayEntites,
@@ -496,7 +553,7 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         ) : null}
 
         {(configId && selection) || !data?.entity_id ? (
-          <EntitiesAccess selection={selection} setSelection={setSelection} />
+          <EntitiesAccess configuration_id={data?.configuration_id} selection={selection} setSelection={setSelection} />
         ) : null}
       </div>
       <div>
