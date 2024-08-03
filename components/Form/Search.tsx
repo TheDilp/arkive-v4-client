@@ -250,7 +250,7 @@ export function Search({
     isGlobal,
     {
       enabled: false,
-      queryKeyConcat: [searchTerm, name],
+      queryKeyConcat: [searchTerm, name, searchEntity || "all"],
       isFolders,
     }
   );
@@ -309,8 +309,15 @@ export function Search({
       // queryClient.removeQueries(["search", searchEntity]);
       setOpen(false);
     }
+
     return () => {};
   }, [inputValue, refetch]);
+
+  useEffect(() => {
+    if (inputValue.length >= 2) {
+      refetch();
+    }
+  }, [searchEntity]);
 
   useEffect(() => {
     if (document.activeElement !== inputRef.current) setOpen(false);
@@ -543,4 +550,3 @@ export function Search({
     </div>
   );
 }
-
