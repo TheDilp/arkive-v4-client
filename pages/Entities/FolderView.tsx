@@ -422,7 +422,7 @@ function EntityItem({
     any,
     unknown,
     {
-      data: {
+      data?: {
         id?: string | undefined;
         parent_id?: string | null | undefined;
       };
