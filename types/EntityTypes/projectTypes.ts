@@ -19,7 +19,6 @@ export interface ProjectType {
   owner_id: string;
   image_id: string | null;
   images?: ImageType[];
-  default_dice_color?: string;
   character_relationship_types?: CharacterRelationshipType[];
   map_pin_types?: MapPinTypesType[];
   members: UserType[];

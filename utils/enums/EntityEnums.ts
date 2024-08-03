@@ -162,7 +162,7 @@ export const UserSidebarEntitiesEnabled = [
   "document_templates",
 ];
 
-export const DefaultUserFeatureFlags = ["close_drawer_on_save", "dice_theme"];
+export const DefaultUserFeatureFlags = ["close_drawer_on_save", "dice_theme", "default_dice_color"];
 
 export const DiceThemes = [
   { label: "Default", value: "default" },

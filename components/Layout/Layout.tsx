@@ -97,6 +97,8 @@ export function ProjectLayout() {
     if (userData?.data) {
       setUserAtom(userData.data);
       setUserPermissions((userData?.data?.role?.permissions || []).map((p) => p.code));
+      ls.set("default_dice_color", userData?.data?.feature_flags?.default_dice_color || DefaultTagColor);
+
       Dice.updateConfig({
         theme: userData?.data?.feature_flags?.dice_theme || "default",
       });
@@ -106,10 +108,6 @@ export function ProjectLayout() {
   useEffect(() => {
     if (projectData?.data) {
       setProjectAtom(projectData.data);
-      ls.set("default_dice_color", projectData.data?.default_dice_color || DefaultTagColor);
-      Dice.updateConfig({
-        themeColor: projectData.data?.default_dice_color || DefaultTagColor,
-      });
     }
   }, [projectData?.data]);
   useEffect(() => {

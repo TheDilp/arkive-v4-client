@@ -65,7 +65,7 @@ export function UserSettingsFeatureFlags() {
                 <div>
                   <ColorPicker name={"color"} onChange={({ value }) => setColor(value)} value={color} />
                 </div>
-                <div className="flex self-end pb-1.5">
+                <div className="flex pt-0.5">
                   <Button
                     hasNoBackground
                     icon={IconEnum.d20}
@@ -93,7 +93,15 @@ export function UserSettingsFeatureFlags() {
                   />
                 </div>
               </div>
-            ) : (
+            ) : null}
+
+            {entity === "default_dice_color" ? (
+              <div>
+                <ColorPicker name={entity} onChange={handleChange} value={featureFlags?.[entity] as string} />
+              </div>
+            ) : null}
+
+            {entity !== "dice_theme" && entity !== "default_dice_color" ? (
               <div className="flex w-fit flex-1 items-center justify-end gap-x-2 text-center">
                 <Checkbox
                   label="Enabled"
@@ -102,7 +110,7 @@ export function UserSettingsFeatureFlags() {
                   value={typeof featureFlags?.[entity] === "boolean" ? featureFlags?.[entity] : false}
                 />
               </div>
-            )}
+            ) : null}
           </div>
         ))}
       </div>

@@ -8,7 +8,6 @@ import {
   Button,
   Checkbox,
   Collapsible,
-  ColorPicker,
   createColumnHelper,
   Dropdown,
   Icon,
@@ -473,7 +472,7 @@ export function ProjectSettingsView() {
     project_id as string,
     "projects",
     {
-      fields: ["id", "title", "image_id", "default_dice_color", "owner_id"],
+      fields: ["id", "title", "image_id", "owner_id"],
       relations: {
         map_pin_types: true,
         character_relationship_types: true,
@@ -668,17 +667,8 @@ export function ProjectSettingsView() {
                   />
                 </div>
               </div>
-
               <div className="flex flex-col gap-y-2">
-                <div className="flex flex-nowrap items-center justify-between border-zinc-700">
-                  <span>Default dice color:</span>
-                  <ColorPicker
-                    name="default_dice_color"
-                    onChange={handleChange}
-                    value={project?.default_dice_color || DefaultTagColor}
-                  />
-                </div>
-                <div className="flex flex-nowrap items-center justify-between border-t border-zinc-700 pt-2">
+                <div className="flex flex-nowrap items-center justify-between pt-2">
                   <span>Show images in folder view:</span>
                   <Checkbox name="show_image_folder_view" onChange={handleChange} value={false} />
                 </div>
