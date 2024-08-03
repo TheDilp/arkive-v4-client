@@ -162,7 +162,16 @@ export const UserSidebarEntitiesEnabled = [
   "document_templates",
 ];
 
-export const DefaultUserFeatureFlags = ["close_drawer_on_save"];
+export const DefaultUserFeatureFlags = ["close_drawer_on_save", "dice_theme"];
+
+export const DiceThemes = [
+  { label: "Default", value: "default" },
+  { label: "Gemstone (shape)", value: "gemstone" },
+  { label: "Blue/Green metal", value: "blueGreenMetal" },
+  { label: "Rock", value: "rock" },
+  { label: "Smooth", value: "smooth" },
+  { label: "Wooden", value: "wooden" },
+];
 
 export const MiscellaneousSettings = [
   "sort_tags_alphabetically",

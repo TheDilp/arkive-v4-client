@@ -6,9 +6,20 @@ import DiceParser from "@3d-dice/dice-parser-interface";
 import ls from "localstorage-slim";
 
 import { NotificationType } from "../../types";
-import { DefaultTagColor, IconEnum } from "../enums";
+import { DefaultTagColor, DiceThemes, IconEnum } from "../enums";
 
 const defaultDiceColor = ls.get("default_dice_color");
+const diceThemeNames = DiceThemes.map((theme) => theme.value);
+
+const externalThemes = diceThemeNames.reduce(
+  (accumulator, curr) => {
+    accumulator[curr] =
+      `https://${import.meta.env.VITE_DO_SPACES_NAME}.${import.meta.env.VITE_DO_SPACES_CDN_ENDPOINT}/assets/dice/themes/${curr}`;
+    return accumulator;
+  },
+  {} as Record<string, string>
+);
+
 // eslint-disable-next-line no-undef
 export const DiceRollParser = IS_PUBLIC ? null : new DiceParser();
 // eslint-disable-next-line no-undef
@@ -21,7 +32,7 @@ export const Dice = IS_PUBLIC
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
-        theme: "default",
+        externalThemes: externalThemes,
       }
     );
 
