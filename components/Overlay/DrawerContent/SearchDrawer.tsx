@@ -26,8 +26,8 @@ import {
 import { SearchCategories } from "../../../utils/enums/SearchEnums";
 import { getEntityLink } from "../../../utils/ui/linkUtils";
 import { EntityPreview } from "../../DataDisplay";
-import { Search, Select, Title } from "../../Form";
-import { Tabs } from "../../Layout";
+import { Search, Select } from "../../Form";
+import { Collapsible, Tabs } from "../../Layout";
 import { Alert, Badge } from "../../Misc";
 
 const tabs: TabType[] = [
@@ -203,57 +203,58 @@ export function SearchDrawer() {
                 if (result.length === 0) return null;
                 return (
                   <li key={name}>
-                    <Title isDrawerTitle label={getSentenceCase(name)} size="xl" />
-                    <ul className="flex flex-col gap-y-2 py-1">
-                      {result?.length ? (
-                        result.map((result_item) => (
-                          <li key={result_item.id}>
-                            {"full_name" in result_item && (name === "characters" || name === "nodes") ? (
-                              <EntityPreview
-                                icon={IconEnum.character}
-                                id={result_item.id}
-                                image_id={result_item?.portrait_id}
-                                link={getEntityLink(project_id as string, name, result_item.id, undefined)}
-                                title={`${result_item.full_name} ${
-                                  "parent_title" in result_item && result_item?.parent_title
-                                    ? `(${result_item.parent_title})`
-                                    : ""
-                                }`}
-                                type={name}
-                              />
-                            ) : (
-                              <EntityPreview
-                                icon={
-                                  "icon" in result_item
-                                    ? result_item.icon || getDefaultEntityIcon(name)
-                                    : getDefaultEntityIcon(name)
-                                }
-                                id={result_item.id}
-                                image_id={"portrait_id" in result_item ? result_item?.portrait_id : undefined}
-                                link={getEntityLink(
-                                  project_id as string,
-                                  name,
-                                  result_item.id,
-                                  "parent_id" in result_item ? result_item.parent_id : undefined
-                                )}
-                                title={`${"title" in result_item ? result_item.title : ""} ${
-                                  "label" in result_item ? result_item?.label || "(No label)" : ""
-                                }
+                    <Collapsible initialOpen label={`${getSentenceCase(name)} (${result.length})`}>
+                      <ul className="flex flex-col gap-y-2 py-1">
+                        {result?.length ? (
+                          result.map((result_item) => (
+                            <li key={result_item.id}>
+                              {"full_name" in result_item && (name === "characters" || name === "nodes") ? (
+                                <EntityPreview
+                                  icon={IconEnum.character}
+                                  id={result_item.id}
+                                  image_id={result_item?.portrait_id}
+                                  link={getEntityLink(project_id as string, name, result_item.id, undefined)}
+                                  title={`${result_item.full_name} ${
+                                    "parent_title" in result_item && result_item?.parent_title
+                                      ? `(${result_item.parent_title})`
+                                      : ""
+                                  }`}
+                                  type={name}
+                                />
+                              ) : (
+                                <EntityPreview
+                                  icon={
+                                    "icon" in result_item
+                                      ? result_item.icon || getDefaultEntityIcon(name)
+                                      : getDefaultEntityIcon(name)
+                                  }
+                                  id={result_item.id}
+                                  image_id={"portrait_id" in result_item ? result_item?.portrait_id : undefined}
+                                  link={getEntityLink(
+                                    project_id as string,
+                                    name,
+                                    result_item.id,
+                                    "parent_id" in result_item ? result_item.parent_id : undefined
+                                  )}
+                                  title={`${"title" in result_item ? result_item.title : ""} ${
+                                    "label" in result_item ? result_item?.label || "(No label)" : ""
+                                  }
                                 ${
                                   "parent_title" in result_item && result_item?.parent_title
                                     ? `(${result_item.parent_title})`
                                     : ""
                                 }
                                 `}
-                                type={name}
-                              />
-                            )}
-                          </li>
-                        ))
-                      ) : (
-                        <Alert label="There is no content." variant="info" />
-                      )}
-                    </ul>
+                                  type={name}
+                                />
+                              )}
+                            </li>
+                          ))
+                        ) : (
+                          <Alert label="There is no content." variant="info" />
+                        )}
+                      </ul>
+                    </Collapsible>
                   </li>
                 );
               }
