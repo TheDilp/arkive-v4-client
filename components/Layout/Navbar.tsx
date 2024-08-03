@@ -521,7 +521,6 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     !!project_id
   );
   useLayoutEffect(() => {
-    console.log(lastJsonMessage);
     if (lastJsonMessage && !isDisabled) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
