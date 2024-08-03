@@ -21,6 +21,7 @@ export const Dice = IS_PUBLIC
         themeColor: DefaultTagColor,
         scale: 4,
         throwForce: 15,
+        theme: "default",
       }
     );
 
