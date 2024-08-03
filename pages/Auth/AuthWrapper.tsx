@@ -44,7 +44,7 @@ export function AuthWrapper() {
         navigate("/projects");
       }
     }
-  }, [loggedIn, pathname, userStatus?.status]);
+  }, [loggedIn, pathname, userStatus?.status, isUpdatingStatus, isIdle]);
 
   useLayoutEffect(() => {
     updateAuthStatus(project_id ?? null);
