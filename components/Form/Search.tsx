@@ -360,7 +360,7 @@ export function Search({
               setInputValue("");
               setOpen(false);
             }
-            if (e.key === "Enter" && inputValue) {
+            if (e.key === "Enter") {
               e.preventDefault();
 
               if (activeIndex === null && !data?.data.length) {
