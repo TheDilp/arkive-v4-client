@@ -934,7 +934,9 @@ function FolderView() {
     <TablePageLayout>
       <div className="flex h-fit flex-col items-start justify-start gap-y-2">
         <div className="flex w-full flex-col items-end">
-          <Breadcrumbs />
+          <span className="self-start">
+            <Breadcrumbs />
+          </span>
           {!item_id || isFolder ? (
             <div className="flex min-w-fit gap-x-2">
               <div className="w-52">
