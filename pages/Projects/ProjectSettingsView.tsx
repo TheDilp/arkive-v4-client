@@ -262,9 +262,18 @@ function membersColumns(
     membersColumnHelper.display({
       id: "image",
       header: "Image",
-      cell: ({ row }) => <b>{row.original.image}</b>,
+      cell: ({ row }) => (row.original?.image ? <Avatar image={row.original.image} size="sm" /> : null),
+      meta: {
+        centered: true,
+      },
       minSize: 5,
       maxSize: 5,
+    }),
+    membersColumnHelper.display({
+      id: "nickname",
+      header: "Nickname",
+      cell: ({ row }) => row.original.nickname,
+      maxSize: 20,
     }),
     membersColumnHelper.display({
       id: "email",

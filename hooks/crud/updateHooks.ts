@@ -726,7 +726,7 @@ export function useBulkUpdateAccess(project_id: string | undefined, type: Availa
 }
 export function useUpdateUser<
   InsertType extends {
-    data?: Partial<Pick<UserType, "feature_flags">>;
+    data?: Partial<Pick<UserType, "email" | "nickname" | "feature_flags">>;
     relations?: {
       feature_flags?: {
         project_id: string;
@@ -747,9 +747,9 @@ export function useUpdateUser<
       });
     },
     {
-      onError: () => {
+      onError: (err: { message?: string }) => {
         createNotification({
-          title: "There was an error updating this item.",
+          title: err?.message || "There was an error updating this item.",
           variant: "error",
           icon: IconEnum.error,
           timer: 5,

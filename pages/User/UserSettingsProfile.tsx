@@ -2,12 +2,14 @@ import { useAtomValue } from "jotai";
 import { useLayoutEffect, useState } from "react";
 
 import { AvatarUpload, Button, Input } from "../../components";
-import { useHandleChange } from "../../hooks";
+import { useHandleChange, useUpdateUser } from "../../hooks";
 import { IconEnum, userAtom } from "../../utils";
 
 export function UserSettingsProfile() {
   const userData = useAtomValue(userAtom);
   const [user, setUser] = useState(userData);
+  const { mutate: updateUser } = useUpdateUser(user?.id as string);
+
   const { handleChange } = useHandleChange({ data: user, setData: setUser });
 
   useLayoutEffect(() => {
@@ -32,7 +34,7 @@ export function UserSettingsProfile() {
             icon={IconEnum.save}
             isDisabled={userData?.nickname === user?.nickname || !user?.nickname}
             isIconOnly
-            onClick={undefined}
+            onClick={() => updateUser({ data: { nickname: user?.nickname } })}
             variant="success"
           />
         </div>
@@ -50,7 +52,7 @@ export function UserSettingsProfile() {
             icon={IconEnum.save}
             isDisabled={userData?.email === user?.email || !user?.email}
             isIconOnly
-            onClick={undefined}
+            onClick={() => updateUser({ data: { email: user?.email } })}
             variant="success"
           />
         </div>
