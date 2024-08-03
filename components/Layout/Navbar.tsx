@@ -521,6 +521,7 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
     !!project_id
   );
   useLayoutEffect(() => {
+    console.log(lastJsonMessage);
     if (lastJsonMessage && !isDisabled) {
       if (lastJsonMessage.event_type === "NEW_NOTIFICATION") {
         // Don't create a notification if this is a conversation message
@@ -547,11 +548,17 @@ export function Navbar({ isDisabled }: { isDisabled: boolean }) {
             queryClient.invalidateQueries(["allEntities", project_id, entityType]);
           }
         }
-      } else if (lastJsonMessage.event_type === "ROLE_UPDATED") {
-        if (!!lastJsonMessage?.entity_id && user?.role?.id === lastJsonMessage?.entity_id) {
+      } else if (
+        (lastJsonMessage.event_type === "ROLE_UPDATED" && user?.role?.id === lastJsonMessage?.entity_id) ||
+        (lastJsonMessage.event_type === "ROLE_ASSIGNED" && user?.id === lastJsonMessage.entity_id)
+      ) {
+        if (lastJsonMessage?.entity_id) {
           createNotification({
             icon: getDefaultEntityIcon(lastJsonMessage.entity),
-            title: "Your role's permissions have been updated by the project's owner.",
+            title:
+              lastJsonMessage.event_type === "ROLE_ASSIGNED"
+                ? "Your role in this project has been changed by the owner."
+                : "Your role's permissions have been updated by the project's owner.",
             variant: "info",
             timer: 5,
             hasNoTruncate: true,

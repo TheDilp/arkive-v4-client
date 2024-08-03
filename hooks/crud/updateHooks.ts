@@ -786,7 +786,7 @@ export function useAssignRole<InsertType extends { data: { user_id: string; role
   return useMutation(
     async (updateValues: InsertType) => {
       return FetchFunction({
-        url: `${baseURLS.baseServer}/users/assign_role`,
+        url: `${baseURLS.baseServer}/projects/assign_role`,
         body: JSON.stringify(updateValues),
         method: "POST",
       });
