@@ -501,7 +501,12 @@ export function ProjectSettingsView() {
   const { mutate: updateUser } = useUpdateUser(user?.id as string);
 
   const { data: roles } = useGetEntities<RoleType>(
-    { data: { project_id }, fields: ["id", "title", "icon"], relations: { permissions: true } },
+    {
+      data: { project_id },
+      fields: ["id", "title", "icon"],
+      orderBy: [{ field: "title", sort: "asc" }],
+      relations: { permissions: true },
+    },
     "roles",
     {
       enabled:
