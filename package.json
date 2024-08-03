@@ -85,6 +85,7 @@
     "build:dyce": "cd arkive-v4-dyce-vtt && tsc -b && vite build --config ../vite.config.ts",
     "build:wiki": "cd arkive-v4-wiki && tsc -b && vite build --config ../vite.config.ts",
     "build:gateway": "cd arkive-v4-gateway && tsc -b && vite build --config ../vite.config.ts",
+    "build": "concurrently --kill-others \"bun run build:editor\" \"bun run build:wiki\" \"bun run build:gateway\" \"bun run build:dyce\"",
     "start:editor": "cd arkive-v4-editor && vite --port 5173 --config ../vite.config.ts",
     "start:dyce": "cd arkive-v4-dyce-vtt && vite --port 5175 --config ../vite.config.ts",
     "start:wiki": "cd arkive-v4-wiki && vite --port 5177 --config ../vite.config.ts",
@@ -93,6 +94,9 @@
     "lint": "eslint --ext ts,tsx \"src\" --fix --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky install",
     "precommit": "lint-staged"
+  },
+  "husky": {
+    "pre-push": "echo test"
   },
   "lint-staged": {
     "*.{ts,tsx} !(*.config).ts": "eslint --fix --report-unused-disable-directives --max-warnings 0"
