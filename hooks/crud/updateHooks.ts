@@ -33,7 +33,7 @@ import {
 
 export function useUpdateEntity<
   InsertType extends {
-    data: { id?: string; parent_id?: string | null };
+    data?: { id?: string; parent_id?: string | null } | undefined;
     relations?: { [key: string]: any };
   },
 >(type: AvailableEntityType, project_id: string | undefined, options?: MutationOptions & { successNotification?: boolean }) {
@@ -51,7 +51,7 @@ export function useUpdateEntity<
     {
       mutationKey: options?.mutationKey,
       onMutate: (vars) => {
-        if (type !== "projects" && type !== "documents") {
+        if (type !== "projects" && type !== "documents" && vars.data) {
           const old = queryClient.getQueryData([type, vars.data.id]);
 
           queryClient.setQueryData<{ data: any }>([type, vars.data.id], (oldData) => {
@@ -72,7 +72,7 @@ export function useUpdateEntity<
         return {};
       },
       onError: (_, vars, context) => {
-        queryClient.setQueryData([type, vars.data.id], context?.old);
+        if (vars.data) queryClient.setQueryData([type, vars.data.id], context?.old);
         createNotification({
           title: "There was an error updating this item.",
           variant: "error",
@@ -81,7 +81,7 @@ export function useUpdateEntity<
         });
       },
       onSuccess: (data, vars) => {
-        if (data.ok) {
+        if (data.ok && vars.data) {
           queryClient.invalidateQueries(["allEntities", project_id, type]);
 
           // Invalidating a document causes the editor to refetch while open
@@ -91,7 +91,7 @@ export function useUpdateEntity<
               //! Omit -> never allow document content to be changed through query client
 
               {
-                return old
+                return old && vars.data
                   ? {
                       ...old,
                       data: {

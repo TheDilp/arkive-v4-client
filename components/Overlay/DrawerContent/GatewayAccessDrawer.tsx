@@ -6,19 +6,26 @@ import { useParams } from "react-router-dom";
 import {
   useCreateEntity,
   useGetEntities,
+  useGetEntity,
   useGetImages,
   useGrantGatewayAccess,
   useTable,
   useToggledResetAtom,
+  useUpdateEntity,
 } from "../../../hooks";
 import { CharacterType, DrawerAtomType, ImageType, RequestFilterType, RequestOrderByType, TabType } from "../../../types";
 import { GatewayConfigType } from "../../../types/EntityTypes/gatewayTypes";
 import { AllEntities, AvailableIcons, getAvatarInitials, getImageURL, IconEnum, TextFilters } from "../../../utils";
-import { InsertGatewayConfigurationSchema, InsertGatewayConfigurationType } from "../../../validation/gateway_configuration";
+import {
+  InsertGatewayConfigurationSchema,
+  InsertGatewayConfigurationType,
+  UpdateGatewayConfigurationSchema,
+  UpdateGatewayConfigurationType,
+} from "../../../validation/gateway_configuration";
 import { Table } from "../../DataDisplay";
 import { Button, Checkbox, Input, Select, Title } from "../../Form";
 import { DrawerLayout, Tabs } from "../../Layout";
-import { Avatar, Icon } from "../../Misc";
+import { Avatar, Icon, Skeleton } from "../../Misc";
 
 type Props = {
   data: {
@@ -217,17 +224,19 @@ const entityTabs: TabType[] = [
   { id: "random_tables" as const, label: "Random tables", icon: IconEnum.random_table },
 ];
 
-const tabs: TabType[] = [
-  { id: "basic_info", label: "Basic info", icon: IconEnum.info_circle },
-  { id: "entities", label: "Entities", icon: IconEnum.gateway },
-];
-
 function getSaveButtonLabel(config: Props) {
   if (config.exceptions?.gatewayConfiguration) {
     if (config?.data?.configuration_id) return "Save";
     return "Create";
   }
   return "Grant access";
+}
+function getSaveButtonIcon(config: Props) {
+  if (config.exceptions?.gatewayConfiguration) {
+    if (config?.data?.configuration_id) return IconEnum.save;
+    return IconEnum.add;
+  }
+  return IconEnum.gateway;
 }
 
 function getRelationsForGatewayConfig(relations: Record<string, string[]>) {
@@ -402,15 +411,29 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
     images: [],
     random_tables: [],
   });
-  const [selectedTab, setSelectedTab] = useState(0);
   const { mutate: grantAccess } = useGrantGatewayAccess();
   const { data: gatewayConfigurations } = useGetEntities<GatewayConfigType>(
     { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
     "gateway_configurations",
     { enabled: !!data?.entity_id }
   );
-  const [configId, setConfigId] = useState<string>("custom");
+  const { data: existingConfiguration, isInitialLoading } = useGetEntity<GatewayConfigType>(
+    data?.configuration_id,
+    "gateway_configurations",
+    {
+      fields: ["id", "title"],
+      relations: {
+        entities: true,
+      },
+    },
+    { enabled: !!data.configuration_id }
+  );
+  const [configId, setConfigId] = useState<string>(data?.configuration_id || "custom");
   const { mutate: create, isLoading: isCreating } = useCreateEntity<InsertGatewayConfigurationType>("gateway_configurations");
+  const { mutate: update, isLoading: isUpdating } = useUpdateEntity<UpdateGatewayConfigurationType>(
+    "gateway_configurations",
+    project_id
+  );
   const saveButtonLabel = getSaveButtonLabel({ data, exceptions });
   const isEmailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(titleOrEmail);
   const configOptions = (gatewayConfigurations?.data || []).map((conf) => ({ value: conf.id, label: conf.title }));
@@ -418,8 +441,11 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
   const resetDrawerAtom = useToggledResetAtom();
   useEffect(() => {
     if (configId) {
-      const config = (gatewayConfigurations?.data || []).find((config) => config?.id === configId);
-
+      if (existingConfiguration?.data) {
+        setTitleOrEmail(existingConfiguration?.data?.title);
+      }
+      const config =
+        existingConfiguration?.data || (gatewayConfigurations?.data || []).find((config) => config?.id === configId);
       if (config) {
         const keys = Object.keys(config);
         const newSelection: Record<AvailableGatewayEntites, string[]> = {
@@ -441,46 +467,43 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
         setSelection(newSelection);
       }
     }
-  }, [configId]);
+  }, [configId, existingConfiguration?.data]);
+
+  if (isInitialLoading) return <Skeleton type="drawer_form" />;
 
   return (
     <DrawerLayout>
-      {data?.entity_id ? null : <Tabs onChange={(_, index) => setSelectedTab(index)} selectedTab={selectedTab} tabs={tabs} />}
-      {tabs[selectedTab].id === "basic_info" || data?.entity_id ? (
-        <Input
-          helperText={titleOrEmail && !isEmailValid && data?.entity_id ? "Email is not valid" : ""}
-          label={data?.entity_id ? "Grant access to (email, required)" : "Title (required)"}
-          name="titleOrEmail"
-          onChange={({ value }) => setTitleOrEmail(value as string)}
-          type={data?.entity_id ? "email" : "text"}
-          value={titleOrEmail}
-          variant={titleOrEmail && (isEmailValid || !data?.entity_id) ? "primary" : "error"}
-        />
-      ) : null}
+      <Input
+        helperText={titleOrEmail && !isEmailValid && data?.entity_id ? "Email is not valid" : ""}
+        label={data?.entity_id ? "Grant access to (email, required)" : "Title (required)"}
+        name="titleOrEmail"
+        onChange={({ value }) => setTitleOrEmail(value as string)}
+        type={data?.entity_id ? "email" : "text"}
+        value={titleOrEmail}
+        variant={titleOrEmail && (isEmailValid || !data?.entity_id) ? "primary" : "error"}
+      />
+      <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
+        <Title isDrawerTitle label="Grant access to" size="xl" />
+        {data?.entity_id && gatewayConfigurations?.data?.length ? (
+          <Select
+            isClearable
+            label="Select premade configuration (optional)"
+            name="config_id"
+            onChange={({ value }) => setConfigId(value as string)}
+            options={configOptions}
+            value={configId}
+          />
+        ) : null}
 
-      {tabs[selectedTab].id === "entities" || data?.entity_id ? (
-        <div className="flex flex-1 flex-col gap-y-2 overflow-hidden">
-          <Title isDrawerTitle label="Grant access to" size="xl" />
-          {data?.entity_id && gatewayConfigurations?.data?.length ? (
-            <Select
-              isClearable
-              label="Select premade configuration (optional)"
-              name="config_id"
-              onChange={({ value }) => setConfigId(value as string)}
-              options={configOptions}
-              value={configId}
-            />
-          ) : null}
-
-          {(configId && selection) || !data?.entity_id ? (
-            <EntitiesAccess selection={selection} setSelection={setSelection} />
-          ) : null}
-        </div>
-      ) : null}
+        {(configId && selection) || !data?.entity_id ? (
+          <EntitiesAccess selection={selection} setSelection={setSelection} />
+        ) : null}
+      </div>
       <div>
         <Button
-          isDisabled={!titleOrEmail || isCreating}
-          isLoading={isCreating}
+          icon={getSaveButtonIcon({ data, exceptions })}
+          isDisabled={!titleOrEmail || isCreating || isUpdating}
+          isLoading={isCreating || isUpdating}
           label={saveButtonLabel}
           onClick={() => {
             if (saveButtonLabel === "Create") {
@@ -493,6 +516,15 @@ export function GatewayAccessDrawer({ data, exceptions }: Props) {
                 relations: getRelationsForGatewayConfig(selection || {}),
               });
               create(parsed);
+            } else if (saveButtonLabel === "Save") {
+              const parsed = UpdateGatewayConfigurationSchema.parse({
+                data: {
+                  id: existingConfiguration?.data?.id,
+                  title: titleOrEmail,
+                },
+                relations: getRelationsForGatewayConfig(selection || {}),
+              });
+              update(parsed);
             } else if (saveButtonLabel === "Grant access") {
               if (data?.entity_id)
                 grantAccess({

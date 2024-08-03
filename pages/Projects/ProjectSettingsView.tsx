@@ -107,6 +107,7 @@ const mapPinTypesColumnHelper = createColumnHelper<MapPinTypesType>();
 const relationshipTypesColumnHelper = createColumnHelper<CharacterRelationshipType>();
 const membersColumnHelper = createColumnHelper<UserType>();
 const rolesColumnHelper = createColumnHelper<RoleType>();
+const gatewayColumnHelper = createColumnHelper<GatewayConfigType>();
 
 function mapPinTypeTableColumns(
   setDialog: Dispatch<SetStateAction<DialogAtomType>>,
@@ -407,14 +408,17 @@ function rolesColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
   ];
 }
 
-function gatewayColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
+function gatewayColumns(
+  setDrawer: Dispatch<SetStateAction<DrawerAtomType>>,
+  setDialog: Dispatch<SetStateAction<DialogAtomType>>
+) {
   return [
     rolesColumnHelper.display({
       id: "title",
       header: "Title",
       cell: ({ row }) => row.original.title,
     }),
-    rolesColumnHelper.display({
+    gatewayColumnHelper.display({
       id: "action",
       header: "Actions",
       meta: {
@@ -432,10 +436,11 @@ function gatewayColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
                 onClick: () =>
                   setDrawer((prev) => ({
                     ...prev,
-                    size: "xl",
+                    size: "half",
                     title: "Edit configuration",
-                    data: { id: row.original.id },
-                    type: "roles",
+                    data: { configuration_id: row.original.id, type: row.original.gateway_type },
+                    type: "gateway_access",
+                    exceptions: { gatewayConfiguration: true },
                   })),
               },
               {
@@ -444,7 +449,18 @@ function gatewayColumns(setDrawer: Dispatch<SetStateAction<DrawerAtomType>>) {
                 icon: IconEnum.gateway,
                 onClick: row.getToggleExpandedHandler(),
               },
-              { id: "3", title: "Delete configuration", icon: IconEnum.trash },
+              {
+                id: "3",
+                title: "Delete configuration",
+                icon: IconEnum.trash,
+                onClick: () =>
+                  setDialog((prev) => ({
+                    ...prev,
+                    title: "Delete gateway configuration",
+                    data: { entity_title: "gateway_configurations", id: row.original.id, title: row.original.title },
+                    type: "delete_entity",
+                  })),
+              },
             ]}>
             <Button hasNoBackground icon={IconEnum.actions} iconSize={28} onClick={undefined} />
           </Dropdown>
@@ -516,7 +532,7 @@ export function ProjectSettingsView() {
     }
   );
   const { data: gateway_configurations } = useGetEntities<GatewayConfigType>(
-    { data: { project_id }, fields: ["id", "title"], relations: { entities: true } },
+    { data: { project_id }, fields: ["id", "title"] },
     "gateway_configurations",
     { enabled: !!user?.id && isProjectOwner && finalTabs?.[selectedTab]?.id === "gateway_configuration" }
   );
@@ -807,7 +823,7 @@ export function ProjectSettingsView() {
             <div className="h-full">
               <div className="h-fit w-full">
                 <Table
-                  columns={gatewayColumns(setDrawer)}
+                  columns={gatewayColumns(setDrawer, setDialog)}
                   config={{ expandable: true }}
                   data={gateway_configurations?.data || []}
                   dispatch={dispatch}
