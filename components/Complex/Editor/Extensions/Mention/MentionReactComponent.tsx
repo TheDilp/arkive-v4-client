@@ -4,6 +4,7 @@ import { DocumentMention, EventMention, GraphMention, MapMention, WordMention } 
 import { BlueprintMention } from "./BlueprintMention";
 import { CharacterMention } from "./CharacterMention";
 import { MapPinMention } from "./MapPinMention";
+import { SearchableMentionEntities } from "../../../../../types";
 
 type Props = {
   node: any;
@@ -20,6 +21,7 @@ export function MentionReactComponent({ node }: Props) {
       alterId,
       icon,
       projectId,
+      type,
       parentId: parent_id,
     } = node.attrs as {
       id: string;
@@ -29,7 +31,9 @@ export function MentionReactComponent({ node }: Props) {
       icon?: string;
       parentId?: string;
       projectId?: string;
+      type: SearchableMentionEntities;
     };
+
     if (name === "characters") return <CharacterMention id={id} label={label} project_id={projectId || project_id} />;
     if (name === "documents")
       return <DocumentMention alterId={alterId} id={id} label={label} project_id={projectId || project_id} title={label} />;

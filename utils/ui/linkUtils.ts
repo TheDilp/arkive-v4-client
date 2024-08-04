@@ -1,14 +1,21 @@
+import { SearchableMentionEntities } from "../../types";
 import { baseURLS } from "../enums";
 
-export function getEntityLink(project_id: string, name: string, item_id: string, parent_id?: string | null) {
+export function getEntityLink(
+  project_id: string,
+  name: string,
+  item_id: string,
+  parent_id?: string | null,
+  is_public?: boolean
+) {
   if (IS_GATEWAY) return "#";
   if (name === "") return "#";
-  const linkRoot = IS_PUBLIC ? "../" : "/projects";
+  const linkRoot = IS_PUBLIC || is_public ? "../" : "/projects";
   if (name === "characters") {
     return `${linkRoot}/${project_id}/characters/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/biography`;
   }
   if (name === "blueprint_instances") {
-    if (IS_PUBLIC) return `${linkRoot}/${project_id}/blueprints/${item_id}`;
+    if (IS_PUBLIC || is_public) return `${linkRoot}/${project_id}/blueprints/${item_id}`;
     return `${linkRoot}/${project_id}/blueprints/${parent_id || item_id}${parent_id ? `/${item_id}` : ""}/resources`;
   }
   if (name === "images") {
@@ -41,6 +48,10 @@ export function getLinkToItem(project_id: string, type: string, id: string, is_f
 export function getMentionLink(id: string, type: string, project_id: string, is_public: boolean, parent_id?: string) {
   if (IS_PUBLIC && !is_public) return "#";
   return getEntityLink(project_id, type, id, parent_id);
+}
+
+export function getMentionPDFLink(project_id: string, type: SearchableMentionEntities, id: string): string {
+  return `${import.meta.env.VITE_WIKI_CLIENT_URL}/${project_id}/${type}/${id}`;
 }
 
 export function getSidebarLink(link: string, project_id: string, isDisabled?: boolean): string {

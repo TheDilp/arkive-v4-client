@@ -4,6 +4,8 @@ import { ApplySchemaAttributes, ExtensionTag, NodeExtensionSpec, NodeSpecOverrid
 import { CreateEventHandlers, MentionAtomExtension } from "remirror/extensions";
 
 import { MentionReactComponent } from "./MentionReactComponent";
+import { getEntityLink, getLinkToItem, getMentionPDFLink } from "../../../../../utils";
+import { SearchableMentionEntities } from "../../../../../types";
 
 export class CustomMentionExtension extends MentionAtomExtension {
   get name() {
@@ -55,7 +57,6 @@ export class CustomMentionExtension extends MentionAtomExtension {
             const icon = node.getAttribute("data-icon");
             const name = node.getAttribute("data-name");
             const label = node.getAttribute("data-label");
-
             return {
               id,
               alterId,
@@ -69,11 +70,25 @@ export class CustomMentionExtension extends MentionAtomExtension {
         },
       ],
       toDOM: (node) => {
+        if (node.attrs.name === "words") {
+          return [
+            "span",
+            {
+              ...extra.dom(node),
+              class: "mentionAtom",
+            },
+            node.attrs.label,
+          ];
+        }
         return [
           "a",
           {
             ...extra.dom(node),
-            href: `${import.meta.env.VITE_WIKI_CLIENT_URL}/${node.attrs.projectId}/documents/${node.attrs.id}`,
+            href: getMentionPDFLink(
+              node.attrs.projectId as string,
+              node.attrs.name as SearchableMentionEntities,
+              node.attrs.id as string
+            ),
             class: "mentionAtom",
           },
           node.attrs.label,
