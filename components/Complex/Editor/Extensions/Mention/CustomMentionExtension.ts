@@ -1,4 +1,3 @@
- 
 import { NodeViewComponentProps } from "@remirror/react";
 import { ComponentType } from "react";
 import { ApplySchemaAttributes, ExtensionTag, NodeExtensionSpec, NodeSpecOverride } from "remirror";
@@ -26,11 +25,12 @@ export class CustomMentionExtension extends MentionAtomExtension {
         name: { default: "" },
         label: { default: "" },
       },
+
       inline: true,
       atom: true,
-      marks: "",
       selectable: this.options.selectable,
       draggable: this.options.draggable,
+      leafText: (node) => node.attrs.label || "",
       ...override,
       parseDOM: [
         {
@@ -45,6 +45,7 @@ export class CustomMentionExtension extends MentionAtomExtension {
             label: { default: null },
           },
           tag: `${this.options.mentionTag}`,
+
           getAttrs: (dom) => {
             const node = dom as HTMLAnchorElement;
             const id = node.getAttribute("data-id");
@@ -67,7 +68,9 @@ export class CustomMentionExtension extends MentionAtomExtension {
           },
         },
       ],
-      toDOM: (node) => ["span", extra.dom(node), 0],
+      toDOM: (node) => {
+        return ["a", { ...extra.dom(node), href: "https://thearkive.app", class: "mentionAtom" }, node.attrs.label];
+      },
     };
   }
 
