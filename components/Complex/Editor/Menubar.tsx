@@ -1,11 +1,11 @@
 import { ReactFrameworkOutput, Remirror, useActive, useChainedCommands, useRemirrorContext } from "@remirror/react";
 import { UseMutateFunction } from "@tanstack/react-query";
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtomValue, useSetAtom } from "jotai";
 import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
 import { useCreatePDF } from "../../../hooks";
-import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant } from "../../../types";
+import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant, WebhookType } from "../../../types";
 import {
   AvailableIcons,
   ColorPresets,
@@ -14,6 +14,7 @@ import {
   getSavingIcon,
   getSavingTooltip,
   IconEnum,
+  userAtom,
 } from "../../../utils";
 import { Button } from "../../Form";
 import { Icon } from "../../Misc";
@@ -45,6 +46,7 @@ function menuBarItems({
   isEditorMenubar,
   isTemplate,
   createPDF,
+  webhooks,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
@@ -57,6 +59,7 @@ function menuBarItems({
   isEditorMenubar?: boolean;
   isTemplate?: boolean;
   createPDF: CreatePDFType;
+  webhooks: WebhookType[];
 }) {
   const options: (DropdownItemType & { variant?: Variant; tooltip: string })[] = [
     {
@@ -492,6 +495,24 @@ function menuBarItems({
             if (title && htmlString) createPDF({ data: { title, body: htmlString } });
           },
         },
+        {
+          id: "send_pdf_to_discord",
+          title: "Send PDF to Discord",
+          icon: IconEnum.discord,
+          allowedPlacements: ["left-start", "right-start"],
+          subItems: webhooks.map((hook) => ({
+            id: hook.id,
+            title: hook.title,
+            onClick: () => {},
+            // FetchFunction({
+            //   url: `${baseURLS.baseServer}/webhooks/send/${hook.id}`,
+            //   body: JSON.stringify({
+            //     data: { id, body: getContext?.helpers?.getHTML(), type: "document_pdf" },
+            //   }),
+            //   method: "POST",
+            // }),
+          })),
+        },
       ],
     });
   }
@@ -522,6 +543,7 @@ export function Menubar({
   const getContext = useRemirrorContext();
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
+  const user = useAtomValue(userAtom);
   const active = useActive();
 
   const { mutate: createPDF } = useCreatePDF();
@@ -540,6 +562,7 @@ export function Menubar({
         isEditorMenubar,
         isTemplate,
         createPDF,
+        webhooks: user?.webhooks || [],
       }),
     [chain, isEditorMenubar, id, title]
   );
