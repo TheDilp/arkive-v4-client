@@ -1,5 +1,3 @@
- 
- 
 import { TextSelection } from "@remirror/pm/state";
 import {
   ApplySchemaAttributes,
@@ -12,7 +10,6 @@ import {
   NodeExtensionSpec,
   nodeInputRule,
   NodeSpecOverride,
-  omitExtraAttributes,
 } from "remirror";
 
 import { Alert } from "../../../Misc";
@@ -88,13 +85,13 @@ class TableOfContentsExtension extends NodeExtension<TableOfContentsOptions> {
         },
         ...(override.parseDOM ?? []),
       ],
-      toDOM: (node) => {
-        const { ...rest } = omitExtraAttributes(node.attrs, extra);
-        const attributes = {
-          ...extra.dom(node),
-          ...rest,
-        };
-        return ["p", attributes, 0];
+      toDOM: () => {
+        // const { ...rest } = omitExtraAttributes(node.attrs, extra);
+        // const attributes = {
+        //   ...extra.dom(node),
+        //   ...rest,
+        // };
+        return "";
       },
     };
   }

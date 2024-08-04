@@ -3,9 +3,9 @@ import { ComponentType } from "react";
 import { ApplySchemaAttributes, ExtensionTag, NodeExtensionSpec, NodeSpecOverride } from "remirror";
 import { CreateEventHandlers, MentionAtomExtension } from "remirror/extensions";
 
-import { MentionReactComponent } from "./MentionReactComponent";
-import { getEntityLink, getLinkToItem, getMentionPDFLink } from "../../../../../utils";
 import { SearchableMentionEntities } from "../../../../../types";
+import { getMentionPDFLink } from "../../../../../utils";
+import { MentionReactComponent } from "./MentionReactComponent";
 
 export class CustomMentionExtension extends MentionAtomExtension {
   get name() {

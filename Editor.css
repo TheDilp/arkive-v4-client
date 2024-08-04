@@ -56,7 +56,7 @@
   }
 
   hr {
-    @apply border-zinc-700 !important;
+    @apply m-0 border-zinc-700 !important;
   }
   ol {
     @apply ml-1 list-decimal;
