@@ -1,5 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
-import { UseMutateFunction, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -39,20 +39,6 @@ import { ConversationType, DocumentType, MessageKindType, NotificationType, slas
 import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
-
-type CreatePDFType = UseMutateFunction<
-  any,
-  {
-    message?: string;
-  },
-  {
-    data: {
-      title: string;
-      body: string;
-    };
-  },
-  unknown
->;
 
 const defaultMatchers = [
   {
@@ -212,16 +198,10 @@ export function onError({ json, invalidContent, transformers }: InvalidContentHa
   // Automatically remove all invalid nodes and marks.
   return transformers.remove(json, invalidContent);
 }
-export function documentEditorHooks(
-  title: string,
-  changedData: any,
-  resetChanges: () => void,
-  refetch: () => void,
-  createPDF: CreatePDFType
-) {
+export function documentEditorHooks(changedData: any, resetChanges: () => void, refetch: () => void) {
   return [
     () => {
-      const { getJSON, getHTML } = useHelpers();
+      const { getJSON } = useHelpers();
       const { project_id, item_id } = useParams();
       const { mutate } = useUpdateEntity<{ data: Partial<DocumentType> }>("documents", project_id as string);
 
@@ -249,23 +229,11 @@ export function documentEditorHooks(
         }
         return true;
       }, [changedData]);
-      const handleExportShortcut = useCallback(() => {
-        const htmlString = getHTML();
-        createPDF({ data: { title, body: htmlString } });
-        // saveAs(
-        //   new Blob([htmlString], {
-        //     type: "text/html;charset=utf-8",
-        //   }),
-        //   `${`Arkive Document - ${item_id}`}.html`
-        // );
-        return true; // Prevents any further key handlers from being run.
-      }, [getHTML, item_id]);
 
       // "Mod" means platform agnostic modifier key - i.e. Ctrl on Windows, or Cmd on MacOS
 
       useKeymap("Mod-s", handleSaveShortcut);
       useKeymap("Mod-k", handleCancelSaveShortcut);
-      useKeymap("Mod-e", handleExportShortcut);
     },
   ];
 }

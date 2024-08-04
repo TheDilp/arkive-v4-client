@@ -10,15 +10,7 @@ import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
 import { Icon, MentionDropdownComponent, Menubar, Skeleton, SlashMenu } from "../../components";
-import {
-  useCreatePDF,
-  useGetEntities,
-  useGetEntity,
-  useHandleChange,
-  useHasPermissions,
-  useNavbarTitle,
-  useUpdateEntity,
-} from "../../hooks";
+import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
 import {
   AvailableIcons,
@@ -201,7 +193,6 @@ function DocumentViewEditor({
     enabled: !!user?.id && isProjectOwner,
     staleTime: Infinity,
   });
-  const { mutate: createPDF } = useCreatePDF();
   const { mutate: updateDocument, isLoading: isMutating } = useUpdateEntity<{
     data: { id: string; content: string | undefined };
   }>("documents", project_id as string, {
@@ -400,7 +391,7 @@ function DocumentViewEditor({
 
       <Remirror
         editable={can_update}
-        hooks={documentEditorHooks(title, changedData, resetChanges, refetch, createPDF)}
+        hooks={documentEditorHooks(changedData, resetChanges, refetch)}
         initialContent={state}
         manager={manager}
         onChange={(params) => {

@@ -1,8 +1,10 @@
 import { ReactFrameworkOutput, Remirror, useActive, useChainedCommands, useRemirrorContext } from "@remirror/react";
+import { UseMutateFunction } from "@tanstack/react-query";
 import { SetStateAction, useSetAtom } from "jotai";
 import { Dispatch, useMemo } from "react";
 import { ActiveFromExtensions, AnyExtension, ChainedFromExtensions } from "remirror";
 
+import { useCreatePDF } from "../../../hooks";
 import { DialogAtomType, DrawerAtomType, DropdownItemType, Size, Variant } from "../../../types";
 import {
   AvailableIcons,
@@ -17,6 +19,20 @@ import { Button } from "../../Form";
 import { Icon } from "../../Misc";
 import { Dropdown } from "../../Overlay";
 
+type CreatePDFType = UseMutateFunction<
+  any,
+  {
+    message?: string;
+  },
+  {
+    data: {
+      title: string;
+      body: string;
+    };
+  },
+  unknown
+>;
+
 function menuBarItems({
   active,
   chain,
@@ -28,6 +44,7 @@ function menuBarItems({
   icon,
   isEditorMenubar,
   isTemplate,
+  createPDF,
 }: {
   active: ActiveFromExtensions<Remirror.Extensions>;
   chain: ChainedFromExtensions<AnyExtension | Remirror.Extensions>;
@@ -39,6 +56,7 @@ function menuBarItems({
   icon?: AvailableIcons;
   isEditorMenubar?: boolean;
   isTemplate?: boolean;
+  createPDF: CreatePDFType;
 }) {
   const options: (DropdownItemType & { variant?: Variant; tooltip: string })[] = [
     {
@@ -458,6 +476,26 @@ function menuBarItems({
     });
   }
 
+  if (!isTemplate) {
+    options.push({
+      id: "pdf",
+      title: "PDF actions",
+      icon: IconEnum.pdf,
+      tooltip: "PDF actions",
+      subItems: [
+        {
+          id: "download_pdf",
+          title: "Download PDF",
+          icon: IconEnum.pdf_download,
+          onClick: () => {
+            const htmlString = getContext?.helpers?.getHTML();
+            if (title && htmlString) createPDF({ data: { title, body: htmlString } });
+          },
+        },
+      ],
+    });
+  }
+
   return options;
 }
 
@@ -485,8 +523,24 @@ export function Menubar({
   const setDrawer = useSetAtom(drawerAtom);
   const setDialog = useSetAtom(dialogAtom);
   const active = useActive();
+
+  const { mutate: createPDF } = useCreatePDF();
+
   const items = useMemo(
-    () => menuBarItems({ active, chain, setDrawer, setDialog, getContext, title, id, icon, isEditorMenubar, isTemplate }),
+    () =>
+      menuBarItems({
+        active,
+        chain,
+        setDrawer,
+        setDialog,
+        getContext,
+        title,
+        id,
+        icon,
+        isEditorMenubar,
+        isTemplate,
+        createPDF,
+      }),
     [chain, isEditorMenubar, id, title]
   );
 

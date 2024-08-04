@@ -107,6 +107,7 @@ export const IconEnum = {
   project: "ph:planet-light" as const,
   public: "ph:globe" as const,
   pdf: "ph:file-pdf" as const,
+  pdf_download: "carbon:generate-pdf" as const,
   questionnaires: "fluent:person-question-mark-24-regular" as const,
   quote: "ph:quotes" as const,
   random_table: "game-icons:perspective-dice-six-faces-random" as const,
