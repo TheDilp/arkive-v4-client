@@ -78,7 +78,7 @@ export function Quickbar({
   const { mutate: deleteManyNodes } = useDeleteMany("nodes", false);
   const { mutate: deleteManyEdges } = useDeleteMany("edges", false);
 
-  if (isReadOnly)
+  if (isReadOnly || IS_PUBLIC)
     return (
       <div className="absolute bottom-0 z-10 flex h-12 w-80 items-center justify-evenly gap-x-2 rounded bg-zinc-800 px-2 text-white shadow-md">
         <Button
