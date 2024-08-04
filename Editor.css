@@ -397,79 +397,9 @@
     }
   }
 }
-.p-menubar {
-  @apply p-0 !important;
-  .p-menuitem {
-    @apply text-lg;
-    &.menuBarButtonActive {
-      @apply bg-sky-400;
-    }
-  }
-  .p-menubar-end {
-    @apply flex max-h-[2rem] max-w-[2rem] items-center;
 
-    .p-progress-spinner {
-      @apply w-8 !important;
-    }
-  }
-}
 .commandMenu {
   @apply z-[100] !important;
-}
-
-.p-chips {
-  @apply block w-full !important;
-}
-.p-chips-multiple-container {
-  @apply max-w-full rounded-none border-t-0 !important;
-}
-.p-autocomplete {
-  @apply block !important;
-}
-.p-chips-token,
-.p-autocomplete-token {
-  @apply my-0.5 !important;
-}
-.p-chips-token-label {
-  @apply truncate;
-}
-.alterNamesChips {
-  .p-autocomplete-token {
-    @apply max-w-full bg-orange-600 !important;
-  }
-}
-.p-tag {
-  @apply bg-sky-700 text-white !important;
-
-  &.p-tag-warning {
-    @apply bg-orange-400 !important;
-  }
-}
-.edit_permission_tag {
-  @apply bg-green-400 !important;
-}
-.view_permission_tag {
-  @apply bg-orange-400 !important;
-}
-.none_permission_tag {
-  @apply bg-zinc-600 !important;
-}
-.alter_namesTags {
-  .p-tag {
-    @apply bg-orange-600 !important;
-  }
-}
-.documentTagsAutocomplete,
-.mapTagsAutocomplete {
-  ul,
-  input {
-    @apply w-full;
-  }
-}
-.tagsAutocomplete {
-  .p-autocomplete-token {
-    @apply bg-sky-700 !important;
-  }
 }
 
 .arrowSaveButton {
