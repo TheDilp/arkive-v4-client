@@ -1,6 +1,5 @@
 import { PlaceholderExtension, useHelpers, useKeymap, useRemirrorContext } from "@remirror/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { saveAs } from "file-saver";
+import { UseMutateFunction, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useParams } from "react-router-dom";
@@ -40,6 +39,20 @@ import { ConversationType, DocumentType, MessageKindType, NotificationType, slas
 import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
+
+type CreatePDFType = UseMutateFunction<
+  any,
+  {
+    message?: string;
+  },
+  {
+    data: {
+      title: string;
+      body: string;
+    };
+  },
+  unknown
+>;
 
 const defaultMatchers = [
   {
@@ -199,7 +212,13 @@ export function onError({ json, invalidContent, transformers }: InvalidContentHa
   // Automatically remove all invalid nodes and marks.
   return transformers.remove(json, invalidContent);
 }
-export function documentEditorHooks(changedData: any, resetChanges: () => void, refetch: () => void) {
+export function documentEditorHooks(
+  title: string,
+  changedData: any,
+  resetChanges: () => void,
+  refetch: () => void,
+  createPDF: CreatePDFType
+) {
   return [
     () => {
       const { getJSON, getHTML } = useHelpers();
@@ -232,12 +251,13 @@ export function documentEditorHooks(changedData: any, resetChanges: () => void, 
       }, [changedData]);
       const handleExportShortcut = useCallback(() => {
         const htmlString = getHTML();
-        saveAs(
-          new Blob([htmlString], {
-            type: "text/html;charset=utf-8",
-          }),
-          `${`Arkive Document - ${item_id}`}.html`
-        );
+        createPDF({ data: { title, body: htmlString } });
+        // saveAs(
+        //   new Blob([htmlString], {
+        //     type: "text/html;charset=utf-8",
+        //   }),
+        //   `${`Arkive Document - ${item_id}`}.html`
+        // );
         return true; // Prevents any further key handlers from being run.
       }, [getHTML, item_id]);
 

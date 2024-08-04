@@ -69,7 +69,15 @@ export class CustomMentionExtension extends MentionAtomExtension {
         },
       ],
       toDOM: (node) => {
-        return ["a", { ...extra.dom(node), href: "https://thearkive.app", class: "mentionAtom" }, node.attrs.label];
+        return [
+          "a",
+          {
+            ...extra.dom(node),
+            href: `${import.meta.env.VITE_WIKI_CLIENT_URL}/${node.attrs.projectId}/documents/${node.attrs.id}`,
+            class: "mentionAtom",
+          },
+          node.attrs.label,
+        ];
       },
     };
   }

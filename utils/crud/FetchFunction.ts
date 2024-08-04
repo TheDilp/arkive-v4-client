@@ -37,7 +37,25 @@ export async function FetchFunction({
   if (res.status === 401) {
     throw new Error("UNAUTHORIZED");
   }
+  if (res.url.endsWith("/generate/pdf")) {
+    const disposition = res.headers
+      .get("Content-Disposition")
+      ?.replace("attachment; filename=", "")
+      // eslint-disable-next-line quotes
+      ?.replaceAll('"', "")
+      ?.trim();
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = disposition || "Arkive Document.pdf";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
 
+    a.remove();
+    return;
+  }
   const data = await res.json();
   if (data.message === "NO_PUBLIC_ACCESS") {
     throw new Error("NO_PUBLIC_ACCESS");
