@@ -13,7 +13,7 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <main className="h-screen max-h-screen w-screen bg-black">
+    <main className="h-screen max-h-screen w-screen overflow-hidden bg-black">
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route element={<PublicLayout />} path=":project_id/*">
