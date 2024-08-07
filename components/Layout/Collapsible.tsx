@@ -78,6 +78,7 @@ export function Collapsible({
   icon,
   initialOpen,
   isDisabled,
+  isIgnoringOpenChanges,
   children,
   actions,
   dropdown,
@@ -99,7 +100,9 @@ export function Collapsible({
   const [open, setOpen] = useState<boolean>(initialOpen ?? false);
 
   useEffect(() => {
-    setOpen(!!initialOpen);
+    if (!isIgnoringOpenChanges) {
+      setOpen(!!initialOpen);
+    }
   }, [initialOpen]);
 
   return (

@@ -129,9 +129,19 @@ export function createMentions(
 
 export function getMatchFieldVariant(field: DocumentType["template_fields"][number]): Variant {
   if (!field.entity_type) return "error";
+
+  if (field.is_randomized) {
+    if (!field.random_count) return "error";
+    return "primary";
+  }
+
   if (field.entity_type === "custom" && !field.value) return "error";
-  if ((field.entity_type === "blueprint_instances" || field.entity_type === "map_pins") && !field.parent_id) return "error";
-  if (!field.value && !field.is_randomized && field.entity_type !== "dice_roll" && field.entity_type !== "derived")
-    return "error";
+  if (field.entity_type === "dice_roll" && !field.formula) return "error";
+  if (field.entity_type === "derived" && (!field.derive_formula || !field.derive_from)) return "error";
+  if (field.entity_type === "blueprint_instances" && !field.blueprint_id) return "error";
+  if (field.entity_type === "map_pins" && !field.map_id) return "error";
+  if (field.entity_type === "events" && !field.calendar_id) return "error";
+  if (field.entity_type === "words" && !field.dictionary_id) return "error";
+
   return "primary";
 }

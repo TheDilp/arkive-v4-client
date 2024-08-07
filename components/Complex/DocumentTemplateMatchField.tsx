@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
-import { useGetEntity } from "../../hooks";
+import { useGetEntities, useGetEntity } from "../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -10,18 +10,9 @@ import {
   SearchableEntities,
   SelectOptionType,
 } from "../../types";
-import {
-  capitalizeFirstLetter,
-  DefaultTagColor,
-  Dice,
-  DiceRollParser,
-  getParentEntityType,
-  getSingularEntityType,
-  IconEnum,
-  useNotifications,
-} from "../../utils";
+import { capitalizeFirstLetter, getParentEntityType, getSingularEntityType, IconEnum } from "../../utils";
 import { EntityPreview } from "../DataDisplay";
-import { Button, Checkbox, Input, Search, Select } from "../Form";
+import { Checkbox, Input, Search, Select } from "../Form";
 
 const MatchReplacementOptions: SelectOptionType[] = [
   {
@@ -109,14 +100,259 @@ const RandomCountOptions: SelectOptionType[] = [
 const DeriveFromFormulas: { label: string; value: string }[] = [
   { label: "D&D 5e ability bonus", value: "dnd_5e_ability_bonus" as const },
 ];
+const EntitiesWithRelated = [
+  "characters",
+  "blueprint_instances",
+  "documents",
+  "maps",
+  "map_pins",
+  "graphs",
+  "events",
+  "words",
+  "random_tables",
+];
+const EntitiesWithParents = ["blueprint_instances", "map_pins", "events", "words"];
+
+type EntitiesWithRelatedType =
+  | "characters"
+  | "documents"
+  | "blueprint_instances"
+  | "maps"
+  | "map_pins"
+  | "graphs"
+  | "events"
+  | "words"
+  | "random_tables";
+
+function getParentIdField(entity_type: DocumentTemplateFieldType["entity_type"]) {
+  if (entity_type === "blueprint_instances") return "blueprint_id";
+  if (entity_type === "map_pins") return "map_id";
+  if (entity_type === "events") return "calendar_id";
+  if (entity_type === "words") return "dictionary_id";
+  return null;
+}
+
+function EntityWithRelatedRow({
+  isEditable,
+  blueprint_id,
+  map_id,
+  calendar_id,
+  dictionary_id,
+  isRandomized,
+  match,
+  handleChange,
+  related,
+  entity_type,
+  idx,
+  random_count,
+}: {
+  isEditable?: boolean;
+  isRandomized?: boolean | null;
+  match: DocumentTemplateFieldType["key"];
+  handleChange: (props: HandleChangePropsType) => void;
+  entity_type: EntitiesWithRelatedType;
+  idx: number;
+  random_count: string | null;
+} & Pick<DocumentTemplateFieldType, "blueprint_id" | "calendar_id" | "map_id" | "dictionary_id" | "related">) {
+  const [selectedEntities, setSelectedEntities] = useState<
+    {
+      label: string;
+      value: string;
+      image: string | null;
+      icon: string | null;
+    }[]
+  >([]);
+
+  const { data: relatedEntities } = useGetEntities(
+    {
+      data: {},
+      fields:
+        entity_type === "characters"
+          ? ["id as value", "full_name as label", "portrait_id as image"]
+          : ["id as value", "title as label"],
+      filters: { and: [{ field: "id", id: "name", header_name: "Full name", value: related, operator: "in" }] },
+    },
+    entity_type,
+    { enabled: !!related?.length, queryKeyConcat: related }
+  );
+
+  const { data: parent } = useGetEntity(
+    (blueprint_id || map_id || calendar_id || dictionary_id) as string,
+    getParentEntityType(entity_type as AvailableSubEntityType) as AvailableEntityType,
+    {
+      data: { id: blueprint_id || map_id || calendar_id || dictionary_id },
+      fields: ["id", "title", "icon"],
+    },
+    { enabled: !!blueprint_id || !!map_id || !!calendar_id || !!dictionary_id }
+  );
+
+  useLayoutEffect(() => {
+    if (!isRandomized) {
+      if (relatedEntities?.data)
+        setSelectedEntities(
+          // @ts-expect-error ts can't correctly infer this
+          (relatedEntities?.data || []) as {
+            label: string;
+            value: string;
+            image: string | null;
+            icon: string | null;
+          }[]
+        );
+    }
+  }, [relatedEntities, related]);
+
+  return (
+    <div className="flex flex-col gap-y-2">
+      <div className="flex flex-nowrap gap-x-1">
+        <div className="flex-1">
+          <Input
+            isDisabled={!isEditable}
+            label="Key (must be unique)"
+            name={`template_fields[${idx}].key`}
+            onChange={handleChange}
+            value={match}
+            variant={match ? "primary" : "error"}
+          />
+        </div>
+        <div className="w-1/4">
+          <Select
+            hasSearch
+            label="Entity type"
+            name={`template_fields[${idx}].entity_type`}
+            onChange={(e) => {
+              setSelectedEntities([]);
+              const toChange = [
+                e,
+                { name: `template_fields[${idx}].value`, value: null },
+                { name: `template_fields[${idx}].related`, value: [] },
+              ];
+              handleChange(toChange);
+            }}
+            options={MatchReplacementOptions}
+            value={entity_type}
+          />
+        </div>
+        <div className="flex w-16 items-center justify-between px-2">
+          <Checkbox
+            label="Random"
+            name={`template_fields[${idx}].is_randomized`}
+            onChange={(e) => {
+              setSelectedEntities([]);
+              handleChange(e);
+            }}
+            tooltip="Keys will be replaced when generating the document."
+            value={!!isRandomized}
+          />
+        </div>
+      </div>
+      <div className={"flex flex-1 flex-col items-center gap-2"}>
+        {EntitiesWithParents.includes(entity_type) ? (
+          <>
+            <div className="w-full">
+              {parent ? (
+                <div className="w-full">
+                  <EntityPreview
+                    clearAction={() => {
+                      const parent_id = getParentIdField(entity_type);
+                      if (parent_id) handleChange({ name: `template_fields[${idx}].${parent_id}`, value: null });
+                    }}
+                    icon={parent?.data?.icon}
+                    id={parent?.data?.id}
+                    label="Choose from"
+                    title={parent?.data?.title}
+                    type={
+                      getParentEntityType(entity_type as "blueprint_instances" | "map_pins" | "events") as AvailableEntityType
+                    }
+                  />
+                </div>
+              ) : (
+                <Search
+                  label={capitalizeFirstLetter(
+                    getSingularEntityType(
+                      (getParentEntityType(
+                        (entity_type || "blueprint_instances") as "blueprint_instances" | "map_pins" | "events"
+                      ) as AvailableEntityType) || ""
+                    )
+                  )}
+                  name="value"
+                  onChange={({ value: newValue }) => {
+                    const parent_id = getParentIdField(entity_type);
+                    if (parent_id) handleChange({ name: `template_fields[${idx}].${parent_id}`, value: newValue });
+                  }}
+                  searchEntity={
+                    getParentEntityType(entity_type as "blueprint_instances" | "map_pins" | "events") as SearchableEntities
+                  }
+                />
+              )}
+            </div>
+            <div className="w-full flex-col">
+              {isRandomized ? (
+                <div className="flex-1">
+                  <Select
+                    hasSearch
+                    label="Random count"
+                    name={`template_fields[${idx}].random_count`}
+                    onChange={handleChange}
+                    options={RandomCountOptions}
+                    value={random_count}
+                  />
+                </div>
+              ) : null}
+              {!isRandomized ? (
+                <div className="flex-1">
+                  <Search
+                    isAutofocused
+                    isDisabled={!!isRandomized || !parent?.data?.id}
+                    isMultiple
+                    label="Replace with"
+                    name={`template_fields[${idx}].related`}
+                    onChange={({ value: newValue }) => {
+                      if (related.includes(newValue))
+                        handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
+                      else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
+                    }}
+                    parent_id={parent?.data?.id}
+                    searchEntity={entity_type as EntitiesWithRelatedType}
+                    value={related}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+        {isRandomized ? null : (
+          <div className="flex w-full flex-col gap-y-2">
+            {selectedEntities.map((ent) => (
+              <EntityPreview
+                clearAction={() =>
+                  handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== ent.value) })
+                }
+                icon={ent.icon || parent?.data?.icon || ""}
+                id={ent.value}
+                image_id={ent.image}
+                key={ent.value}
+                title={ent.label}
+                type={entity_type as AvailableEntityType}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function MatchField({
+  blueprint_id,
+  map_id,
+  calendar_id,
+  dictionary_id,
   allMatches,
   match,
   value,
   entity_type,
   is_randomized,
-  related_id,
+  related,
   formula,
   idx,
   isEditable,
@@ -132,68 +368,24 @@ export function MatchField({
   handleChange: (props: HandleChangePropsType) => void;
 } & Pick<
   DocumentTemplateFieldType,
-  "entity_type" | "value" | "derive_formula" | "derive_from" | "formula" | "related_id" | "is_randomized" | "random_count"
+  | "blueprint_id"
+  | "map_id"
+  | "calendar_id"
+  | "dictionary_id"
+  | "entity_type"
+  | "value"
+  | "derive_formula"
+  | "derive_from"
+  | "formula"
+  | "related"
+  | "is_randomized"
+  | "random_count"
 >) {
-  const [parent, setParent] = useState<{
-    label: string;
-    value: string;
-    image: string | null;
-    icon: string | null;
-  } | null>();
-  const [selectedEntity, setSelectedEntity] = useState<{
-    label: string;
-    value: string;
-    image: string | null;
-    icon: string | null;
-  } | null>();
-  const createNotification = useNotifications();
-
-  const [isRolling, setIsRolling] = useState(false);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (entity_type) {
-      handleChange({ name: `template_fields[${idx}].related_id`, value: null });
-      setParent(null);
+      handleChange({ name: `template_fields[${idx}].parent_id`, value: null });
     }
   }, [entity_type]);
-
-  useEffect(() => {
-    if (selectedEntity) {
-      if (entity_type === "random_tables") {
-        handleChange([
-          { name: `template_fields[${idx}].value`, value: selectedEntity.label },
-          { name: `template_fields[${idx}].related_id`, value: selectedEntity.value },
-        ]);
-      } else {
-        handleChange({ name: `template_fields[${idx}].value`, value: selectedEntity.label });
-      }
-    }
-  }, [selectedEntity]);
-
-  const { data: relatedBlueprint, isFetching } = useGetEntity<{ id: string; title: string; icon?: string }>(
-    related_id as string | undefined,
-    getParentEntityType(entity_type as AvailableSubEntityType) as AvailableEntityType,
-    {
-      data: {
-        id: related_id,
-      },
-      fields: ["id", "title", "icon"],
-    },
-    {
-      enabled: !!related_id && !!entity_type,
-    }
-  );
-
-  useEffect(() => {
-    if (relatedBlueprint?.data) {
-      setParent({
-        label: relatedBlueprint?.data?.title,
-        value: relatedBlueprint?.data?.id,
-        icon: relatedBlueprint?.data?.icon || null,
-        image: null,
-      });
-    }
-  }, [relatedBlueprint]);
 
   const parentIdx = entity_type === "derived" ? allMatches.findIndex((m) => m?.id === derive_from) : null;
   const derivedParentValue = typeof parentIdx === "number" && parentIdx > -1 ? allMatches[parentIdx].value : null;
@@ -213,240 +405,129 @@ export function MatchField({
       }
     }
   }, [derive_formula, derivedParentValue]);
+  console.log(related);
+  if (EntitiesWithRelated.includes(entity_type))
+    return (
+      <EntityWithRelatedRow
+        blueprint_id={blueprint_id}
+        calendar_id={calendar_id}
+        dictionary_id={dictionary_id}
+        entity_type={entity_type as EntitiesWithRelatedType}
+        handleChange={handleChange}
+        idx={idx}
+        isEditable={isEditable}
+        isRandomized={is_randomized}
+        map_id={map_id}
+        match={match}
+        random_count={random_count}
+        related={related}
+      />
+    );
 
-  return (
-    <div className="flex w-full flex-col gap-y-2 border-b border-zinc-700 pb-1">
-      <div className="grid w-full max-w-full grid-cols-2 items-center gap-x-1 gap-y-2">
-        <div className="col-span-1">
-          <Input
-            isDisabled={!isEditable}
-            label="Key (must be unique)"
-            name={`template_fields[${idx}].key`}
-            onChange={handleChange}
-            value={match}
-          />
-        </div>
-
-        <div className="col-span-1 flex items-center gap-x-1">
-          <Select
-            hasSearch
-            label="Entity type"
-            name={`template_fields[${idx}].entity_type`}
-            onChange={(e) => {
-              const toChange = [e, { name: `template_fields[${idx}].value`, value: null }];
-              if (entity_type === "custom" || entity_type === "derived") {
-                toChange.push({ name: `template_fields[${idx}].is_randomized`, value: null });
-              }
-              handleChange(toChange);
-              if (selectedEntity) setSelectedEntity(null);
-              if (parent) setParent(null);
-
-              handleChange(toChange);
-            }}
-            options={MatchReplacementOptions}
-            value={entity_type}
-          />
-          {entity_type === "derived" && !isEditable && !is_randomized ? (
-            <div>
-              <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
-            </div>
-          ) : null}
-          {entity_type !== "random_tables" ? (
-            <div className="h-full [&>div]:gap-y-4">
-              <Checkbox
-                label="Random"
-                name={`template_fields[${idx}].is_randomized`}
-                onChange={handleChange}
-                tooltip="Keys will be replaced when generating the document."
-                value={!!is_randomized}
-              />
-            </div>
-          ) : null}
-        </div>
-        {entity_type === "custom" ? (
-          <div className="col-span-1 w-full">
-            <Input label="Replace with" name={`template_fields[${idx}].value`} onChange={handleChange} value={value || ""} />
+  if (entity_type === "custom") {
+    return (
+      <div className="flex flex-col gap-y-2">
+        <div className="flex flex-nowrap gap-x-1">
+          <div className="flex-1">
+            <Input
+              isDisabled={!isEditable}
+              label="Key (must be unique)"
+              name={`template_fields[${idx}].key`}
+              onChange={handleChange}
+              value={match}
+              variant={match ? "primary" : "error"}
+            />
           </div>
-        ) : null}
-        {entity_type !== "custom" && entity_type !== "derived" ? (
-          <div className="col-span-2 flex w-full flex-1 gap-x-2">
-            {!!entity_type &&
-            (entity_type === "blueprint_instances" ||
-              entity_type === "events" ||
-              entity_type === "map_pins" ||
-              entity_type === "words") &&
-            !parent ? (
-              <div className="flex-1">
-                <Search
-                  isDisabled={isFetching}
-                  isLoading={isFetching}
-                  label={capitalizeFirstLetter(
-                    getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)
-                  )}
-                  name="value"
-                  onChange={({ label, value: newValue, image, icon }) => {
-                    handleChange({ name: `template_fields[${idx}].related_id`, value: newValue });
-                    setParent({
-                      label: label || "",
-                      value: newValue,
-                      image: image || null,
-                      icon: icon || null,
-                    });
-                  }}
-                  searchEntity={getParentEntityType(entity_type) as SearchableEntities}
-                  value={related_id}
-                />
-              </div>
-            ) : null}
-            {!!entity_type &&
-            (entity_type === "blueprint_instances" ||
-              entity_type === "events" ||
-              entity_type === "map_pins" ||
-              entity_type === "words") &&
-            parent ? (
-              <div className="flex-1">
-                <EntityPreview
-                  clearAction={() => setParent(null)}
-                  icon={parent.icon || ""}
-                  id={parent.value}
-                  image_id={parent.image}
-                  label={getSingularEntityType(getParentEntityType(entity_type) as AvailableEntityType)}
-                  title={parent.label}
-                  type={getParentEntityType(entity_type) as AvailableEntityType}
-                />
-              </div>
-            ) : null}
-            {entity_type !== "dice_roll" &&
-            !is_randomized &&
-            !!entity_type &&
-            !selectedEntity &&
-            (((entity_type === "blueprint_instances" || entity_type === "map_pins" || entity_type === "words") &&
-              parent &&
-              (!is_randomized || !isEditable)) ||
-              (entity_type !== "blueprint_instances" && entity_type !== "map_pins" && entity_type !== "words")) ? (
-              <div className={is_randomized ? "" : "flex w-full flex-nowrap items-center gap-x-2"}>
-                <Search
-                  isDisabled={(entity_type === "blueprint_instances" && !parent) || isFetching}
-                  isLoading={isFetching}
-                  label="Replace with"
-                  name={`template_fields[${idx}].value`}
-                  onChange={({ label, value: newValue, image, icon }) =>
-                    setSelectedEntity({
-                      label: label || "",
-                      value: newValue,
-                      image: image || null,
-                      icon: icon || null,
-                    })
-                  }
-                  parent_id={parent?.value}
-                  searchEntity={entity_type}
-                  value={value}
-                />
-                {is_randomized ? null : (
-                  <div className="w-min self-end pb-2">
-                    <Button hasNoBackground icon={IconEnum.add} isIconOnly onClick={undefined} tooltip="Add" variant="info" />
-                  </div>
-                )}
-              </div>
-            ) : null}
-            {entity_type !== "dice_roll" && !!entity_type && !is_randomized && selectedEntity?.value && entity_type ? (
-              <div className="flex-1">
-                <EntityPreview
-                  clearAction={() => setSelectedEntity(null)}
-                  icon={selectedEntity.icon || ""}
-                  id={selectedEntity.value}
-                  image_id={selectedEntity.image}
-                  label="Replace with"
-                  title={selectedEntity.label}
-                  type={entity_type as AvailableEntityType}
-                />
-              </div>
-            ) : null}
-            {entity_type === "dice_roll" ? (
-              <Input
-                label="Formula"
-                name={`template_fields[${idx}].formula`}
-                onChange={({ value: newValue }) => {
-                  handleChange({
-                    name: `template_fields[${idx}].formula`,
-                    value: newValue && typeof newValue === "string" ? newValue : null,
-                  });
-                }}
-                value={formula || ""}
-              />
-            ) : null}
-            {entity_type === "dice_roll" && !is_randomized && !isEditable ? (
-              <div className="flex gap-x-4">
-                <Input isDisabled label="Result" name="value" onChange={() => {}} value={value || ""} />
-                <div className="flex self-end pb-1.5">
-                  <Button
-                    hasNoBackground
-                    icon={IconEnum.d20}
-                    iconSize={24}
-                    isDisabled={isRolling}
-                    isLoading={isRolling}
-                    onClick={() => {
-                      setIsRolling(true);
-                      try {
-                        const parsedNotation = DiceRollParser.parseNotation(formula);
-                        Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: true });
-
-                        Dice.roll(parsedNotation)
-                          .then((r: any) => {
-                            const rollData = DiceRollParser.parseFinalResults(r);
-                            if (rollData?.valid) {
-                              handleChange({ name: `template_fields[${idx}].value`, value: rollData?.value?.toString() });
-                              // handleChange([
-                              //   { name: `${name}.id`, value: id },
-                              //   { name: `${name}.value`, value: rollData.value },
-                              // ]);
-                            }
-                          })
-                          .catch(() => {
-                            createNotification({
-                              timer: 2,
-                              title: "The dice roll notation is not valid.",
-                              icon: IconEnum.warning,
-                              variant: "error",
-                              position: "top",
-                            });
-                          });
-                        Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: false });
-                      } catch (error) {
-                        createNotification({
-                          timer: 2,
-                          title: "The dice roll notation is not valid.",
-                          icon: IconEnum.warning,
-                          variant: "error",
-                          position: "top",
-                        });
-                      }
-                      setIsRolling(false);
-                    }}
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {entity_type !== "dice_roll" && !!entity_type && (is_randomized || entity_type === "random_tables") ? (
-              <div className={`flex flex-nowrap ${is_randomized && parent ? "w-[49%]" : "flex-1"}`}>
-                <div className="flex-1">
-                  <Select
-                    hasSearch
-                    label="Random count"
-                    name={`template_fields[${idx}].random_count`}
-                    onChange={handleChange}
-                    options={RandomCountOptions}
-                    value={random_count}
-                  />
-                </div>
-              </div>
-            ) : null}
+          <div className="w-1/4">
+            <Select
+              hasSearch
+              label="Entity type"
+              name={`template_fields[${idx}].entity_type`}
+              onChange={(e) => {
+                const toChange = [e, { name: `template_fields[${idx}].value`, value: null }];
+                if (is_randomized) {
+                  toChange.push({ name: `template_fields[${idx}].is_randomized`, value: null });
+                }
+                handleChange(toChange);
+              }}
+              options={MatchReplacementOptions}
+              value={entity_type}
+            />
           </div>
-        ) : null}
+        </div>
       </div>
-      {entity_type === "derived" ? (
-        <div className="flex gap-x-1">
+    );
+  }
+  if (entity_type === "dice_roll") {
+    return (
+      <div className="flex flex-col gap-y-2">
+        <div className="flex flex-nowrap gap-x-1">
+          <div className="flex-1">
+            <Input
+              isDisabled={!isEditable}
+              label="Key (must be unique)"
+              name={`template_fields[${idx}].key`}
+              onChange={handleChange}
+              value={match}
+              variant={match ? "primary" : "error"}
+            />
+          </div>
+          <div className="w-1/4">
+            <Select
+              hasSearch
+              label="Entity type"
+              name={`template_fields[${idx}].entity_type`}
+              onChange={(e) => handleChange([e, { name: `template_fields[${idx}].value`, value: null }])}
+              options={MatchReplacementOptions}
+              value={entity_type}
+            />
+          </div>
+        </div>
+        <Input
+          helperText={!formula ? "This field is required" : ""}
+          label="Formula"
+          name={`template_fields[${idx}].formula`}
+          onChange={({ value: newValue }) => {
+            handleChange({
+              name: `template_fields[${idx}].formula`,
+              value: newValue && typeof newValue === "string" ? newValue : null,
+            });
+          }}
+          value={formula || ""}
+          variant={!formula ? "error" : "primary"}
+        />
+      </div>
+    );
+  }
+  if (entity_type === "derived") {
+    return (
+      <div className="flex flex-col gap-y-2">
+        <div className="flex flex-nowrap gap-x-1">
+          <div className="flex-1">
+            <Input
+              isDisabled={!isEditable}
+              label="Key (must be unique)"
+              name={`template_fields[${idx}].key`}
+              onChange={handleChange}
+              value={match}
+              variant={match ? "primary" : "error"}
+            />
+          </div>
+          <div className="w-1/4">
+            <Select
+              hasSearch
+              label="Entity type"
+              name={`template_fields[${idx}].entity_type`}
+              onChange={(e) => {
+                const toChange = [e, { name: `template_fields[${idx}].value`, value: null }];
+                handleChange(toChange);
+              }}
+              options={MatchReplacementOptions}
+              value={entity_type}
+            />
+          </div>
+        </div>
+        <div className="flex flex-nowrap gap-x-1">
           <div className="flex-1">
             <Select
               label="Derive from"
@@ -468,7 +549,24 @@ export function MatchField({
             />
           </div>
         </div>
-      ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-y-2 border-b border-zinc-700 pb-1">
+      <div className="grid w-full max-w-full grid-cols-2 items-center gap-x-1 gap-y-2">
+        <div className="col-span-1">
+          <Input
+            isDisabled={!isEditable}
+            label="Key (must be unique)"
+            name={`template_fields[${idx}].key`}
+            onChange={handleChange}
+            value={match}
+            variant={match ? "primary" : "error"}
+          />
+        </div>
+      </div>
     </div>
   );
 }

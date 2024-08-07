@@ -21,6 +21,10 @@ const RandomCountOptions = z
   .optional();
 
 export const InsertDocumentTemplateFieldSchema = z.object({
+  blueprint_id: z.string().optional().nullable(),
+  map_id: z.string().optional().nullable(),
+  calendar_id: z.string().optional().nullable(),
+  dictionary_id: z.string().optional().nullable(),
   key: z.string(),
   entity_type: z.string(),
   value: z
@@ -34,12 +38,16 @@ export const InsertDocumentTemplateFieldSchema = z.object({
   derive_from: z.string().nullable(),
   derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
-  related_id: z.string().nullable(),
+  related: z.string().array(),
   random_count: RandomCountOptions.nullable(),
   sort: z.number(),
 });
 export const UpdateDocumentTemplateFieldSchema = z.object({
   id: z.string(),
+  blueprint_id: z.string().optional().nullable(),
+  map_id: z.string().optional().nullable(),
+  calendar_id: z.string().optional().nullable(),
+  dictionary_id: z.string().optional().nullable(),
   key: z.string().transform((value) => value.trim()),
   entity_type: z.string(),
   value: z
@@ -53,7 +61,7 @@ export const UpdateDocumentTemplateFieldSchema = z.object({
   derive_from: z.string().nullable(),
   derive_formula: DeriveFormulas.nullable(),
   is_randomized: z.boolean().nullable(),
-  related_id: z.string().nullable(),
+  related: z.string().array(),
   random_count: RandomCountOptions.nullable(),
   sort: z.number(),
 });

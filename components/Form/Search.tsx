@@ -223,6 +223,7 @@ export function Search({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
+
   const { data, isFetching, refetch } = useSearch<
     {
       label: string;

@@ -11,5 +11,6 @@ export interface CollapsibleType {
   actions?: ButtonType[];
   dropdown?: DropdownType;
   size?: Size;
+  isIgnoringOpenChanges?: boolean;
   variant?: Variant;
 }

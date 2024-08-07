@@ -126,7 +126,7 @@ function getColumns(
   user_role_id: string | undefined,
   show_image?: boolean
 ) {
-  return [
+  const columns = [
     columnHelper.display({
       id: "is_folder",
       header: "",
@@ -165,38 +165,46 @@ function getColumns(
       cell: ({ row }) => <div className="truncate">{row.original.title}</div>,
       size: 15,
     }),
-    columnHelper.display({
-      id: "is_public",
-      header: "",
-      meta: {
-        centered: true,
-        noLink: true,
-      },
-      cell: ({ row }) =>
-        row.original.is_folder ? null : (
-          <Button
-            hasNoBackground
-            icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
-            isDisabled={
-              !!row.original.deleted_at ||
-              !hasActionPermission(
-                isProjectOwner,
-                user_id === row.original.owner_id,
-                permissions,
-                row.original?.permissions || [],
-                `update_${entityType}` as PermissionCodeType,
-                user_role_id
-              )
-            }
-            isIconOnly
-            onClick={() => {
-              updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });
-            }}
-          />
-        ),
-      minSize: 3.25,
-      maxSize: 3.25,
-    }),
+  ];
+
+  if (!is_document_template) {
+    columns.push(
+      columnHelper.display({
+        id: "is_public",
+        header: "",
+        meta: {
+          centered: true,
+          noLink: true,
+        },
+        cell: ({ row }) =>
+          row.original.is_folder ? null : (
+            <Button
+              hasNoBackground
+              icon={row.original.is_public ? IconEnum.eye : IconEnum.eye_slash}
+              isDisabled={
+                !!row.original.deleted_at ||
+                !hasActionPermission(
+                  isProjectOwner,
+                  user_id === row.original.owner_id,
+                  permissions,
+                  row.original?.permissions || [],
+                  `update_${entityType}` as PermissionCodeType,
+                  user_role_id
+                )
+              }
+              isIconOnly
+              onClick={() => {
+                updateMany({ data: [{ data: { id: row.original.id, is_public: !row.original.is_public } }] });
+              }}
+            />
+          ),
+        minSize: 3.25,
+        maxSize: 3.25,
+      })
+    );
+  }
+
+  columns.push(
     columnHelper.display({
       id: "action",
       header: "Actions",
@@ -274,6 +282,7 @@ function getColumns(
                           title: `Edit ${entityName} - ${row.original.title}`,
                           size: entityType === "documents" && is_document_template ? "half" : "lg",
                           type: entityType,
+                          exceptions: { createTemplate: is_document_template },
                         }
                   );
                 },
@@ -401,8 +410,10 @@ function getColumns(
           </div>
         );
       },
-    }),
-  ];
+    })
+  );
+
+  return columns;
 }
 
 function EntityItem({

@@ -1,6 +1,6 @@
 import { RemirrorJSON } from "remirror";
 
-import { BaseEntityType, ImageType, SearchableEntities, TagType } from ".";
+import { BaseEntityType, ImageType, TagType } from ".";
 
 interface AlterNameType {
   id: string;
@@ -9,9 +9,25 @@ interface AlterNameType {
   project_id: string;
 }
 
-export type MatchType = SearchableEntities | "random_tables" | "dice_roll" | "derived" | "custom";
+export type MatchType =
+  | "characters"
+  | "blueprint_instances"
+  | "documents"
+  | "maps"
+  | "map_pins"
+  | "graphs"
+  | "events"
+  | "words"
+  | "random_tables"
+  | "dice_roll"
+  | "derived"
+  | "custom";
 export type DocumentTemplateFieldType = {
   id: string;
+  blueprint_id?: string | undefined | null;
+  map_id?: string | undefined | null;
+  calendar_id?: string | undefined | null;
+  dictionary_id?: string | undefined | null;
   key: string;
   entity_type: MatchType;
   parent_id: string;
@@ -19,7 +35,7 @@ export type DocumentTemplateFieldType = {
   formula: string | null;
   derive_from: string | null;
   derive_formula: "dnd_5e_ability_bonus" | null;
-  related_id: string | null;
+  related: string[];
   is_randomized: boolean | null;
   random_count:
     | "single"

@@ -124,7 +124,7 @@ export function DocumentFromTemplate({ data }: Props) {
               is_randomized: null,
               derive_formula: null,
               derive_from: null,
-              related_id: null,
+              related: [],
               random_count: "single",
               key: matchKey as string,
               sort: tempFields.length,
@@ -178,16 +178,20 @@ export function DocumentFromTemplate({ data }: Props) {
             <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2" key={f.id}>
               <MatchField
                 allMatches={template?.template_fields || []}
+                blueprint_id={f?.blueprint_id}
+                calendar_id={f?.calendar_id}
                 derive_formula={f.derive_formula}
                 derive_from={f.derive_from}
+                dictionary_id={f?.dictionary_id}
                 entity_type={f?.entity_type}
                 formula={f.formula}
                 handleChange={handleChange}
                 idx={idx}
                 is_randomized={f?.is_randomized}
+                map_id={f?.map_id}
                 match={f?.key}
                 random_count={f.random_count}
-                related_id={f?.related_id}
+                related={f?.related}
                 value={f?.value}
               />
             </div>
@@ -221,7 +225,7 @@ export function DocumentFromTemplate({ data }: Props) {
           isDisabled={
             !template?.template_fields?.length ||
             (template?.template_fields || []).some(
-              (f) => !f.value && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived"
+              (f) => !f.related.length && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived"
             ) ||
             isCreating ||
             isGeneratingPreview
@@ -267,7 +271,7 @@ export function DocumentFromTemplate({ data }: Props) {
             !template?.title ||
             !template?.template_fields?.length ||
             (template?.template_fields || []).some(
-              (f) => !f.value && !f.is_randomized && (f.entity_type === "blueprint_instances" ? !f.related_id : false)
+              (f) => !f.value && !f.is_randomized && (f.entity_type === "blueprint_instances" ? !f.related.length : false)
             ) ||
             isCreating ||
             isGeneratingPreview

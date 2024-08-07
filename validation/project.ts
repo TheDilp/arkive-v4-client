@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export const InsertProjectSchema = z.object({
   data: z.object({
-    owner_id: z.string(),
     title: z.string().transform((value) => value.trim()),
-    image_id: z.string().optional().nullable(),
   }),
 });
 

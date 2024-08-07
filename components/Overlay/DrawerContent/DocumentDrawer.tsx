@@ -34,8 +34,35 @@ import { Badge, Icon, Skeleton } from "../../Misc";
 import { ColorPicker } from "../ColorPicker";
 import { IconPicker } from "../IconPicker";
 
-function isSaveDisabled(document: Partial<DocumentType>) {
+function isSaveDisabled(document: Partial<DocumentType | InsertDocumentType>, is_template?: boolean) {
   if (!document.title) return true;
+  if (is_template) {
+    for (let index = 0; index < (document?.template_fields?.length || 0); index++) {
+      if (document.template_fields?.[index]?.entity_type === "custom" && !document.template_fields?.[index]?.value) {
+        return true;
+      }
+      if (document.template_fields?.[index]?.entity_type === "dice_roll" && !document.template_fields?.[index]?.formula) {
+        return true;
+      }
+      if (
+        document.template_fields?.[index]?.entity_type === "derived" &&
+        (!document.template_fields?.[index]?.derive_formula || !document.template_fields?.[index]?.derive_from)
+      ) {
+        return true;
+      }
+      if (
+        document.template_fields?.[index]?.entity_type === "blueprint_instances" &&
+        !document?.template_fields?.[index]?.blueprint_id
+      )
+        return true;
+      if (document.template_fields?.[index]?.entity_type === "map_pins" && !document?.template_fields?.[index]?.map_id)
+        return true;
+      if (document.template_fields?.[index]?.entity_type === "events" && !document?.template_fields?.[index]?.calendar_id)
+        return true;
+      if (document.template_fields?.[index]?.entity_type === "words" && !document?.template_fields?.[index]?.dictionary_id)
+        return true;
+    }
+  }
 
   return false;
 }
@@ -172,35 +199,37 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               title={document?.image?.title}
             />
           )}
-          <Input
-            helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
-            isDisabled={exceptions?.createTemplate || !canCreateOrEdit}
-            label="Alternative names"
-            name="alter_names"
-            onChange={({ value }) => setAlterNameInput(value as string)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && alterNameInput) {
-                if (currentAlterNames?.includes(alterNameInput)) {
-                  createNotification({
-                    title: "Cannot add the same alternative name twice.",
-                    variant: "warning",
-                    icon: IconEnum.info_circle,
-                    timer: 3,
-                  });
-                } else {
-                  handleChange({
-                    name: "alter_names",
-                    value: (document?.alter_names || []).concat({
-                      title: alterNameInput,
-                    }),
-                  });
-                  setAlterNameInput("");
+          {exceptions?.createTemplate ? null : (
+            <Input
+              helperText={exceptions?.createTemplate ? "Templates cannot use alternative names" : ""}
+              isDisabled={exceptions?.createTemplate || !canCreateOrEdit}
+              label="Alternative names"
+              name="alter_names"
+              onChange={({ value }) => setAlterNameInput(value as string)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && alterNameInput) {
+                  if (currentAlterNames?.includes(alterNameInput)) {
+                    createNotification({
+                      title: "Cannot add the same alternative name twice.",
+                      variant: "warning",
+                      icon: IconEnum.info_circle,
+                      timer: 3,
+                    });
+                  } else {
+                    handleChange({
+                      name: "alter_names",
+                      value: (document?.alter_names || []).concat({
+                        title: alterNameInput,
+                      }),
+                    });
+                    setAlterNameInput("");
+                  }
                 }
-              }
-            }}
-            placeholder={exceptions?.createTemplate ? "" : "Press enter to add an alternative name"}
-            value={alterNameInput}
-          />
+              }}
+              placeholder={exceptions?.createTemplate ? "" : "Press enter to add an alternative name"}
+              value={alterNameInput}
+            />
+          )}
 
           <div className="flex flex-wrap gap-2">
             {document?.alter_names?.length
@@ -243,15 +272,17 @@ export function DocumentDrawer({ data, exceptions }: Props) {
             </div>
           </div>
 
-          <div className="flex w-full items-center justify-between">
-            <span>Is public:</span>
-            <Checkbox
-              isDisabled={!canCreateOrEdit}
-              name="is_public"
-              onChange={handleChange}
-              value={document?.is_public ?? false}
-            />
-          </div>
+          {document?.is_template ? null : (
+            <div className="flex w-full items-center justify-between">
+              <span>Is public:</span>
+              <Checkbox
+                isDisabled={!canCreateOrEdit}
+                name="is_public"
+                onChange={handleChange}
+                value={document?.is_public ?? false}
+              />
+            </div>
+          )}
         </div>
       ) : null}
 
@@ -268,13 +299,13 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                     value: (document?.template_fields || []).concat({
                       id: crypto.randomUUID(),
                       key: "",
-                      parent_id: "",
                       value: "",
                       formula: null,
                       derive_formula: null,
                       derive_from: null,
+                      parent_id: "",
                       entity_type: "documents",
-                      related_id: null,
+                      related: [],
                       is_randomized: null,
                       random_count: "single",
                       sort: document?.template_fields?.length || 0,
@@ -285,7 +316,6 @@ export function DocumentDrawer({ data, exceptions }: Props) {
               />
             </div>
           </div>
-
           <DragDropContext
             onDragEnd={(result) => {
               if (!result.destination) {
@@ -312,7 +342,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                           className="my-1 flex w-full flex-nowrap gap-x-2"
                           {...providedDraggable.draggableProps}
                           ref={providedDraggable.innerRef}>
-                          <div {...providedDraggable.dragHandleProps} className="self-center">
+                          <div {...providedDraggable.dragHandleProps} className="mt-1 self-start">
                             <Icon fontSize={24} icon={IconEnum.menu} />
                           </div>
                           <div className="w-full">
@@ -329,23 +359,29 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                   hasNoBackground: true,
                                 },
                               ]}
+                              initialOpen={f.key === "New key" || !f.key}
+                              isIgnoringOpenChanges
                               label={getSentenceCase(f.key) || "New key"}>
                               <div
                                 className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2"
                                 key={f.id}>
                                 <MatchField
                                   allMatches={document?.template_fields || []}
+                                  blueprint_id={f.blueprint_id}
+                                  calendar_id={f.calendar_id}
                                   derive_formula={f.derive_formula}
                                   derive_from={f.derive_from}
+                                  dictionary_id={f.dictionary_id}
                                   entity_type={f?.entity_type}
                                   formula={f.formula}
                                   handleChange={handleChange}
                                   idx={idx}
                                   isEditable
                                   is_randomized={f?.is_randomized}
+                                  map_id={f.map_id}
                                   match={f?.key}
                                   random_count={f.random_count}
-                                  related_id={f.related_id}
+                                  related={f.related}
                                   value={f?.value}
                                 />
                               </div>
@@ -378,7 +414,9 @@ export function DocumentDrawer({ data, exceptions }: Props) {
       <div>
         <Button
           icon={document?.id ? IconEnum.save : IconEnum.add}
-          isDisabled={isSaveDisabled({ title: document?.title }) || !canCreateOrEdit || isFetching || isCreating || isUpdating}
+          isDisabled={
+            isSaveDisabled(document, exceptions?.createTemplate) || !canCreateOrEdit || isFetching || isCreating || isUpdating
+          }
           isLoading={isCreating || isUpdating}
           label={document?.id ? "Update" : "Create"}
           onClick={async () => {
@@ -407,12 +445,10 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   set(
                     dataToParse,
                     "relations.template_fields",
-                    template_fields.map((f) => ({
-                      ...f,
-                      key: f.key.trim(),
-                    }))
+                    (template_fields || []).map((f) => ({ ...f, key: f.key.trim() }))
                   );
                 }
+
                 const parsedData = UpdateDocumentSchema.parse(dataToParse);
                 await update(
                   {
@@ -435,7 +471,9 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                   relations: {
                     alter_names: (document?.alter_names || [])?.map((alter) => ({ title: alter?.title })),
                     tags: document?.tags,
-                    template_fields: (document?.template_fields || []).map((f) => ({ ...f, key: f.key.trim() })),
+                    template_fields: (document?.template_fields || []).map((f) => {
+                      return { ...f, key: f.key.trim() };
+                    }),
                   },
                   permissions: document?.permissions,
                 };
