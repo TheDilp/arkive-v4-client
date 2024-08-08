@@ -143,5 +143,14 @@ export function getMatchFieldVariant(field: DocumentType["template_fields"][numb
   if (field.entity_type === "events" && !field.calendar_id) return "error";
   if (field.entity_type === "words" && !field.dictionary_id) return "error";
 
+  if (
+    field.entity_type !== "custom" &&
+    field.entity_type !== "derived" &&
+    field.entity_type !== "dice_roll" &&
+    !field.related?.length
+  ) {
+    return "error";
+  }
+
   return "primary";
 }
