@@ -11,14 +11,20 @@ export class CustomImageExtension extends ImageExtension {
         ...spec.attrs,
         title: { default: "" },
       },
-      toDOM: (node) => [
-        "figure",
-        {
-          style: "border: 2px solid #479e0c; padding: 8px; margin: 8px; text-align: center;",
-        },
-        spec.toDOM!(node),
-        ["figcaption", { style: "background-color: #3d3d3d; color: #f1f1f1; padding: 8px;" }, node.attrs.figcaptionText],
-      ],
+      toDOM: (node) => {
+        console.log(node);
+
+        return [
+          "img",
+          {
+            alt: node.attrs.alt,
+            title: node.attrs.title,
+            height: node.attrs.height,
+            width: node.attrs.width,
+            src: node.attrs.src,
+          },
+        ];
+      },
     };
   }
 }
