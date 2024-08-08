@@ -6,6 +6,7 @@ export type TabType = {
   icon?: AvailableIcons | null;
   hasDivider?: boolean;
   isOwner?: boolean;
+  isDisabled?: boolean;
 };
 export interface TabsTypes {
   selectedTab: number;

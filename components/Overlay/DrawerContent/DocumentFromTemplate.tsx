@@ -30,11 +30,13 @@ type Props = {
   };
 };
 
-const tabs: TabType[] = [
-  { id: "1", label: "Keys", icon: IconEnum.permissions },
-  { id: "2", label: "Preview", icon: IconEnum.document },
-  { id: "3", label: "Automention", icon: IconEnum.mention },
-];
+function getTabs(isPreviewDisabled: boolean): TabType[] {
+  return [
+    { id: "1", label: "Keys", icon: IconEnum.permissions },
+    { id: "2", label: "Preview", icon: IconEnum.document, isDisabled: isPreviewDisabled },
+    { id: "3", label: "Automention", icon: IconEnum.mention, isDisabled: isPreviewDisabled },
+  ];
+}
 
 async function generateAllDiceRollFields({
   hasDiceRollFields,
@@ -82,6 +84,7 @@ async function generateAllDiceRollFields({
 export function DocumentFromTemplate({ data }: Props) {
   const { project_id } = useParams();
   const user = useAtomValue(userAtom);
+
   const defaultDiceColor = ls.get("default_dice_color");
   const { data: existingTemplate, isLoading } = useGetEntity<DocumentType>(
     data?.id,
@@ -109,19 +112,29 @@ export function DocumentFromTemplate({ data }: Props) {
     relations: { [key: string]: any };
   }>("documents");
 
+  const isPreviewDisabled =
+    !template?.template_fields?.length ||
+    (template?.template_fields || []).some(
+      (f) => !f.related.length && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived"
+    ) ||
+    isCreating ||
+    isGeneratingPreview;
+
+  const tabs = getTabs(isPreviewDisabled);
+
   const hasDiceRollFields = (template?.template_fields || []).some((f) => f.entity_type === "dice_roll");
 
   useEffect(() => {
     if (previewContext?.getState()?.doc && existingTemplate?.data && !template.template_fields) {
       // Replace with existing template
-      const tempFields: DocumentType["template_fields"] = existingTemplate?.data?.template_fields || [];
+      const tempFields: DocumentType["template_fields"] = [];
       const { textContent } = data?.getContext?.getState()?.doc || { textContent: "" };
       if (textContent) {
         for (const match of textContent.matchAll(DocumentTemplateFieldRegex)) {
           const matchKey = match?.at(1) as string;
-          const idx = tempFields?.findIndex((f) => f?.key === matchKey);
+          const idx = existingTemplate?.data?.template_fields?.findIndex((f) => f?.key === matchKey);
           if (idx === -1 && match?.at(1)?.trim()) {
-            tempFields[tempFields.length] = {
+            tempFields.push({
               id: crypto.randomUUID(),
               value: "",
               formula: null,
@@ -131,10 +144,12 @@ export function DocumentFromTemplate({ data }: Props) {
               derive_formula: null,
               derive_from: null,
               related: [],
-              random_count: "single",
+              random_count: null,
               key: matchKey as string,
               sort: tempFields.length,
-            };
+            });
+          } else if (idx > -1 && match?.at(1)?.trim()) {
+            tempFields.push(existingTemplate?.data?.template_fields?.[idx]);
           }
         }
         setTemplate((prev) => ({ ...prev, template_fields: tempFields }));
@@ -232,14 +247,7 @@ export function DocumentFromTemplate({ data }: Props) {
       <div className="flex flex-nowrap gap-x-2">
         <Button
           icon={IconEnum.add}
-          isDisabled={
-            !template?.template_fields?.length ||
-            (template?.template_fields || []).some(
-              (f) => !f.related.length && !f.is_randomized && f.entity_type !== "dice_roll" && f.entity_type !== "derived"
-            ) ||
-            isCreating ||
-            isGeneratingPreview
-          }
+          isDisabled={isPreviewDisabled}
           label="Generate preview"
           onClick={async () => {
             const c = await generateAllDiceRollFields({
