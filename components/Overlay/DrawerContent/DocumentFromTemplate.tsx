@@ -1,4 +1,6 @@
 import { ReactFrameworkOutput, Remirror } from "@remirror/react";
+import { useAtomValue } from "jotai";
+import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -12,6 +14,7 @@ import {
   getMatchFieldVariant,
   getSentenceCase,
   IconEnum,
+  userAtom,
 } from "../../../utils";
 import { Editor, MatchField } from "../../Complex";
 import { Button, Input } from "../../Form";
@@ -48,12 +51,14 @@ async function generateAllDiceRollFields({
     let tempContent = content;
     const tempFields = [...(template_fields || [])];
     Dice.updateConfig({ themeColor: DefaultTagColor, suspendSimulation: true });
-
     for (let index = 0; index < tempFields?.length || 0; index += 1) {
       if (tempFields[index]?.entity_type === "dice_roll" && !!tempFields[index].formula) {
         const parsedNotation = await DiceRollParser.parseNotation(tempFields[index].formula);
-        const r = await Dice.roll(parsedNotation);
+
+        const r = Dice.roll(parsedNotation);
+
         const rollData = await DiceRollParser.parseFinalResults(r);
+
         if (rollData?.valid) {
           tempFields[index].value = rollData?.value?.toString() || "";
           tempContent = tempContent.replaceAll(`%{${tempFields[index].key}}%`, tempFields[index].value || "");
@@ -76,7 +81,8 @@ async function generateAllDiceRollFields({
 
 export function DocumentFromTemplate({ data }: Props) {
   const { project_id } = useParams();
-
+  const user = useAtomValue(userAtom);
+  const defaultDiceColor = ls.get("default_dice_color");
   const { data: existingTemplate, isLoading } = useGetEntity<DocumentType>(
     data?.id,
     "documents",
@@ -172,47 +178,51 @@ export function DocumentFromTemplate({ data }: Props) {
         />
       </div>
       <Tabs onChange={(_, idx) => setSelectedTab(idx)} selectedTab={selectedTab} tabs={tabs} />
-      <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
-        {(template.template_fields || []).map((f, idx) => (
-          <Collapsible key={f.id} label={getSentenceCase(f.key)} variant={getMatchFieldVariant(f)}>
-            <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2" key={f.id}>
-              <MatchField
-                allMatches={template?.template_fields || []}
-                blueprint_id={f?.blueprint_id}
-                calendar_id={f?.calendar_id}
-                derive_formula={f.derive_formula}
-                derive_from={f.derive_from}
-                dictionary_id={f?.dictionary_id}
-                entity_type={f?.entity_type}
-                formula={f.formula}
-                handleChange={handleChange}
-                idx={idx}
-                is_randomized={f?.is_randomized}
-                map_id={f?.map_id}
-                match={f?.key}
-                random_count={f.random_count}
-                related={f?.related}
-                value={f?.value}
-              />
-            </div>
-          </Collapsible>
-        ))}
-      </div>
+      {isGeneratingPreview ? null : (
+        <div className={`flex max-h-[80%] flex-col gap-y-2 overflow-auto ${tabs[selectedTab].id === "1" ? "" : "hidden"}`}>
+          {(template.template_fields || []).map((f, idx) => (
+            <Collapsible key={f.id} label={getSentenceCase(f.key)} variant={getMatchFieldVariant(f)}>
+              <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2" key={f.id}>
+                <MatchField
+                  allMatches={template?.template_fields || []}
+                  blueprint_id={f?.blueprint_id}
+                  calendar_id={f?.calendar_id}
+                  derive_formula={f.derive_formula}
+                  derive_from={f.derive_from}
+                  dictionary_id={f?.dictionary_id}
+                  entity_type={f?.entity_type}
+                  formula={f.formula}
+                  handleChange={handleChange}
+                  idx={idx}
+                  is_randomized={f?.is_randomized}
+                  map_id={f?.map_id}
+                  match={f?.key}
+                  random_count={f.random_count}
+                  related={f?.related}
+                  value={f?.value}
+                />
+              </div>
+            </Collapsible>
+          ))}
+        </div>
+      )}
 
       {isGeneratingPreview ? <Skeleton isFullWidth type="editor" /> : null}
-      <div className={`flex h-full justify-center ${tabs[selectedTab].id === "2" && !isGeneratingPreview ? "" : "hidden"}`}>
-        <div className="w-full [&>.editor-component]:bg-zinc-800">
-          <Editor
-            // @ts-ignore
-            initialContent={previewContext?.getState()?.doc || undefined}
-            isDisabled
-            isFullHeight
-            isOutsideControlled
-            isReadOnly
-            setContext={setPreviewContext}
-          />
+      {isGeneratingPreview ? null : (
+        <div className={`flex h-full justify-center ${tabs[selectedTab].id === "2" && !isGeneratingPreview ? "" : "hidden"}`}>
+          <div className="w-full [&>.editor-component]:bg-zinc-800">
+            <Editor
+              // @ts-ignore
+              initialContent={previewContext?.getState()?.doc || undefined}
+              isDisabled
+              isFullHeight
+              isOutsideControlled
+              isReadOnly
+              setContext={setPreviewContext}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {tabs[selectedTab].id === "3" && previewContext ? (
         <div className="flex h-full justify-center">
@@ -237,6 +247,11 @@ export function DocumentFromTemplate({ data }: Props) {
               template_fields: template?.template_fields || [],
               setTemplate,
               content: JSON.stringify(data.getContext.getState().doc),
+            });
+
+            Dice.updateConfig({
+              themeColor: defaultDiceColor || user?.feature_flags?.default_dice_color || DefaultTagColor,
+              suspendSimulation: true,
             });
             await generatePreview(
               {

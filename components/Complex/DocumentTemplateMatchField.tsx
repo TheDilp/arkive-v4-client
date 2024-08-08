@@ -320,6 +320,22 @@ function EntityWithRelatedRow({
             </div>
           </>
         ) : null}
+        {EntitiesWithRelated.includes(entity_type) && !EntitiesWithParents.includes(entity_type) ? (
+          <Search
+            isAutofocused
+            isDisabled={!!isRandomized}
+            isMultiple
+            label="Replace with"
+            name={`template_fields[${idx}].related`}
+            onChange={({ value: newValue }) => {
+              if (related.includes(newValue))
+                handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
+              else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
+            }}
+            searchEntity={entity_type as EntitiesWithRelatedType}
+            value={related}
+          />
+        ) : null}
         {isRandomized ? null : (
           <div className="flex w-full flex-col gap-y-2">
             {selectedEntities.map((ent) => (
