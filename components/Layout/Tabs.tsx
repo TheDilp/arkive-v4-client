@@ -10,8 +10,9 @@ const TabsClasses = tv({
   slots: {
     base: "border-b border-zinc-500",
     tabsContainer: "h-8 font-lato flex max-w-full scrollbar-hidden relative flex-nowrap overflow-auto text-lg -mb-px",
-    tab: "px-2 cursor-pointer transition-all font-lato flex items-center gap-x-2 text-white select-none",
+    tab: "px-2 transition-all font-lato flex items-center gap-x-2 text-white select-none",
     tabSelected: "inline-block border-blue-500 border-b",
+    tabDisabled: "border-zinc-800 text-zinc-600 cursor-not-allowed",
     tabDivider: "border-b border-zinc-700",
   },
   variants: {
@@ -28,7 +29,7 @@ const TabsClasses = tv({
 
 export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: TabsTypes) {
   const tabsContainerRef = useRef() as MutableRefObject<HTMLUListElement>;
-  const { base, tabDivider, tabsContainer, tab: tabClasses, tabSelected } = TabsClasses({ isVertical });
+  const { base, tabDivider, tabsContainer, tab: tabClasses, tabSelected, tabDisabled } = TabsClasses({ isVertical });
 
   return (
     <div className={base()}>
@@ -50,8 +51,9 @@ export function Tabs({ tabs, selectedTab, onChange, isVertical, hasArrowNav }: T
         {tabs.map((tab, index) => (
           <Fragment key={tab.id}>
             <li
-              className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""} `}
+              className={`${tabClasses()} ${index === selectedTab ? tabSelected() : ""} ${tab.isDisabled ? tabDisabled() : "cursor-pointer"} `}
               onClick={(e) => {
+                if (tab.isDisabled) return;
                 if (onChange && selectedTab !== index) onChange(tab, index);
                 e.currentTarget.scrollIntoView({ behavior: "smooth" });
               }}
