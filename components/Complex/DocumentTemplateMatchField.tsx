@@ -55,6 +55,7 @@ const MatchReplacementOptions: SelectOptionType[] = [
     value: "words",
     icon: IconEnum.word,
   },
+  { label: "Images", value: "images", icon: IconEnum.image },
   {
     label: "Random tables",
     value: "random_tables",
@@ -110,6 +111,7 @@ const EntitiesWithRelated = [
   "events",
   "words",
   "random_tables",
+  "images",
 ];
 const EntitiesWithParents = ["blueprint_instances", "map_pins", "events", "words"];
 
@@ -122,7 +124,8 @@ type EntitiesWithRelatedType =
   | "graphs"
   | "events"
   | "words"
-  | "random_tables";
+  | "random_tables"
+  | "images";
 
 function getParentIdField(entity_type: DocumentTemplateFieldType["entity_type"]) {
   if (entity_type === "blueprint_instances") return "blueprint_id";
@@ -232,18 +235,20 @@ function EntityWithRelatedRow({
             value={entity_type}
           />
         </div>
-        <div className="flex w-16 items-center justify-between px-2">
-          <Checkbox
-            label="Random"
-            name={`template_fields[${idx}].is_randomized`}
-            onChange={(e) => {
-              setSelectedEntities([]);
-              handleChange(e);
-            }}
-            tooltip="Keys will be replaced when generating the document."
-            value={!!isRandomized}
-          />
-        </div>
+        {entity_type === "images" ? null : (
+          <div className="flex w-16 items-center justify-between px-2">
+            <Checkbox
+              label="Random"
+              name={`template_fields[${idx}].is_randomized`}
+              onChange={(e) => {
+                setSelectedEntities([]);
+                handleChange(e);
+              }}
+              tooltip="Keys will be replaced when generating the document."
+              value={!!isRandomized}
+            />
+          </div>
+        )}
       </div>
       <div className={"flex flex-1 flex-col items-center gap-2"}>
         {EntitiesWithParents.includes(entity_type) ? (
@@ -253,7 +258,7 @@ function EntityWithRelatedRow({
                 <div className="w-full">
                   <EntityPreview
                     clearAction={() => {
-                      const parent_id = getParentIdField(entity_type);
+                      const parent_id = getParentIdField(entity_type as "blueprint_instances" | "map_pins" | "events");
                       if (parent_id) handleChange({ name: `template_fields[${idx}].${parent_id}`, value: null });
                     }}
                     icon={parent?.data?.icon}
@@ -276,7 +281,7 @@ function EntityWithRelatedRow({
                   )}
                   name="value"
                   onChange={({ value: newValue }) => {
-                    const parent_id = getParentIdField(entity_type);
+                    const parent_id = getParentIdField(entity_type as "blueprint_instances" | "map_pins" | "events");
                     if (parent_id) handleChange({ name: `template_fields[${idx}].${parent_id}`, value: newValue });
                   }}
                   searchEntity={

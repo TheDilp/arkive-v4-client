@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import ls from "localstorage-slim";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { findChildrenByNode, replaceNodeAtPosition } from "remirror";
 
 import { useCreateEntity, useCreateFromTemplate, useGetEntity, useHandleChange } from "../../../hooks";
 import { DocumentType, InsertDocumentType, TabType } from "../../../types";
@@ -256,11 +257,11 @@ export function DocumentFromTemplate({ data }: Props) {
               setTemplate,
               content: JSON.stringify(data.getContext.getState().doc),
             });
-
             Dice.updateConfig({
               themeColor: defaultDiceColor || user?.feature_flags?.default_dice_color || DefaultTagColor,
               suspendSimulation: true,
             });
+
             await generatePreview(
               {
                 data: {
@@ -279,7 +280,38 @@ export function DocumentFromTemplate({ data }: Props) {
                     });
                     if (state) {
                       previewContext?.manager?.view?.updateState(state);
+                      const textNodeType = previewContext?.getState()?.schema?.nodes?.text;
+                      if (textNodeType) {
+                        const nodes = findChildrenByNode({
+                          node: previewContext?.getState()?.doc,
+                          type: textNodeType,
+                        });
+
+                        nodes
+                          .map((node) => ({ text: node.node.textContent.trim(), pos: node.pos }))
+                          .filter((node) => node.text === "%{image}%")
+                          .forEach((node) => {
+                            const tr = replaceNodeAtPosition({
+                              pos: node.pos,
+                              tr: previewContext?.view?.state?.tr,
+                              content: previewContext?.getState()?.schema?.nodes.image.create({
+                                id: "1d79c292-c34f-46db-9651-673eb771b5bf",
+                                alt: "rothden_emblem.webp",
+                                src: "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
+                                crop: null,
+                                title: "rothden_emblem.webp",
+                                width: 229,
+                                height: 296,
+                                rotate: null,
+                                fileName: null,
+                                resizable: false,
+                              }),
+                            });
+                            previewContext?.view?.dispatch(tr);
+                          });
+                      }
                     }
+
                     setSelectedTab(1);
                   }
                 },
