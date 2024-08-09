@@ -31,6 +31,7 @@
   "root": true,
   "plugins": ["react", "react-hooks", "simple-import-sort", "import", "@typescript-eslint", "eslint-plugin-import"],
   "rules": {
+    "no-console": "warn",
     "no-underscore-dangle": "off",
     "func-style": ["error", "declaration"],
     "camelcase": "off",
