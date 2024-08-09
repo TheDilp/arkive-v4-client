@@ -18,6 +18,7 @@ export type MatchType =
   | "graphs"
   | "events"
   | "words"
+  | "images"
   | "random_tables"
   | "dice_roll"
   | "derived"
@@ -52,6 +53,7 @@ export type DocumentTemplateFieldType = {
     | "max_20"
     | null;
   sort: number;
+  additional_data: Record<string, string | number> | null;
 };
 
 export interface DocumentType extends BaseEntityType {
