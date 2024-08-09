@@ -136,6 +136,15 @@ function getParentIdField(entity_type: DocumentTemplateFieldType["entity_type"])
   return null;
 }
 
+function getMaxEntityCount(random_count: DocumentTemplateFieldType["random_count"]) {
+  if (random_count === "single") return 1;
+  if (random_count) {
+    const count_string = random_count?.replace("max_", "");
+    return Number(count_string);
+  }
+  return 0;
+}
+
 function EntityWithRelatedRow({
   isEditable,
   blueprint_id,
@@ -155,12 +164,10 @@ function EntityWithRelatedRow({
   isRandomized?: boolean | null;
   match: DocumentTemplateFieldType["key"];
   handleChange: (props: HandleChangePropsType) => void;
-  entity_type: EntitiesWithRelatedType;
   idx: number;
-  random_count: string | null;
 } & Pick<
   DocumentTemplateFieldType,
-  "blueprint_id" | "calendar_id" | "map_id" | "dictionary_id" | "related" | "additional_data"
+  "entity_type" | "blueprint_id" | "calendar_id" | "map_id" | "dictionary_id" | "related" | "additional_data" | "random_count"
 >) {
   const { project_id } = useParams();
   const [selectedEntities, setSelectedEntities] = useState<
@@ -181,7 +188,7 @@ function EntityWithRelatedRow({
           : ["id as value", "title as label"],
       filters: { and: [{ field: "id", id: "name", header_name: "Full name", value: related, operator: "in" }] },
     },
-    entity_type,
+    entity_type as "characters" | "blueprint_instances" | "documents" | "maps" | "map_pins" | "events" | "words",
     { enabled: !!related?.length && entity_type !== "images", queryKeyConcat: related }
   );
 
@@ -205,18 +212,16 @@ function EntityWithRelatedRow({
     { enabled: !!blueprint_id || !!map_id || !!calendar_id || !!dictionary_id }
   );
   useLayoutEffect(() => {
-    if (!isRandomized) {
-      if (relatedEntities?.data)
-        setSelectedEntities(
-          // @ts-expect-error ts can't correctly infer this
-          (relatedEntities?.data || []) as {
-            label: string;
-            value: string;
-            image: string | null;
-            icon: string | null;
-          }[]
-        );
-    }
+    if (relatedEntities?.data)
+      setSelectedEntities(
+        // @ts-expect-error ts can't correctly infer this
+        (relatedEntities?.data || []) as {
+          label: string;
+          value: string;
+          image: string | null;
+          icon: string | null;
+        }[]
+      );
   }, [relatedEntities, related]);
   useLayoutEffect(() => {
     if (related.length) {
@@ -321,7 +326,7 @@ function EntityWithRelatedRow({
                 />
               )}
             </div>
-            <div className="w-full flex-col">
+            <div className="flex w-full flex-col gap-y-2">
               {isRandomized ? (
                 <div className="flex-1">
                   <Select
@@ -334,25 +339,25 @@ function EntityWithRelatedRow({
                   />
                 </div>
               ) : null}
-              {!isRandomized ? (
-                <div className="flex flex-1 flex-col gap-y-2">
-                  <Search
-                    isAutofocused
-                    isDisabled={!!isRandomized || !parent?.data?.id}
-                    isMultiple
-                    label="Replace with"
-                    name={`template_fields[${idx}].related`}
-                    onChange={({ value: newValue }) => {
-                      if (related.includes(newValue))
-                        handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
-                      else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
-                    }}
-                    parent_id={parent?.data?.id}
-                    searchEntity={entity_type as EntitiesWithRelatedType}
-                    value={related}
-                  />
-                </div>
-              ) : null}
+              <div className="flex flex-1 flex-col gap-y-2">
+                <Search
+                  isAutofocused
+                  isDisabled={
+                    !parent?.data?.id || (!!isRandomized && !!(selectedEntities.length >= getMaxEntityCount(random_count)))
+                  }
+                  isMultiple
+                  label="Replace with"
+                  name={`template_fields[${idx}].related`}
+                  onChange={({ value: newValue }) => {
+                    if (related.includes(newValue))
+                      handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
+                    else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
+                  }}
+                  parent_id={parent?.data?.id}
+                  searchEntity={entity_type as EntitiesWithRelatedType}
+                  value={related}
+                />
+              </div>
             </div>
           </>
         ) : null}
@@ -423,23 +428,21 @@ function EntityWithRelatedRow({
             />
           </div>
         ) : null}
-        {isRandomized ? null : (
-          <div className="flex w-full flex-col gap-y-2">
-            {selectedEntities.map((ent) => (
-              <EntityPreview
-                clearAction={() =>
-                  handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== ent.value) })
-                }
-                icon={ent.icon || parent?.data?.icon || ""}
-                id={ent.value}
-                image_id={entity_type === "images" ? ent.value : ent.image}
-                key={ent.value}
-                title={ent.label}
-                type={entity_type as AvailableEntityType}
-              />
-            ))}
-          </div>
-        )}
+        <div className="flex w-full flex-col gap-y-2">
+          {selectedEntities.map((ent) => (
+            <EntityPreview
+              clearAction={() =>
+                handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== ent.value) })
+              }
+              icon={ent.icon || parent?.data?.icon || ""}
+              id={ent.value}
+              image_id={entity_type === "images" ? ent.value : ent.image}
+              key={ent.value}
+              title={ent.label}
+              type={entity_type as AvailableEntityType}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
