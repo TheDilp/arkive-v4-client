@@ -41,6 +41,7 @@ export const InsertDocumentTemplateFieldSchema = z.object({
   related: z.string().array(),
   random_count: RandomCountOptions.nullable(),
   sort: z.number(),
+  additional_data: z.record(z.string(), z.string().or(z.number())).optional().nullable(),
 });
 export const UpdateDocumentTemplateFieldSchema = z.object({
   id: z.string(),
@@ -64,6 +65,7 @@ export const UpdateDocumentTemplateFieldSchema = z.object({
   related: z.string().array(),
   random_count: RandomCountOptions.nullable(),
   sort: z.number(),
+  additional_data: z.record(z.string(), z.string().or(z.number())).optional().nullable(),
 });
 
 export const InsertDocumentSchema = z.object({
