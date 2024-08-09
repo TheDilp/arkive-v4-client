@@ -114,8 +114,14 @@ function handleNumberChange({
     onChange({ name, value: null });
     return;
   }
-  if (max && parsed > max) return;
-  if (min && parsed < min) return;
+  if (max && parsed > max) {
+    onChange({ name, value: min });
+    return;
+  }
+  if (min && parsed < min) {
+    onChange({ name, value: min });
+    return;
+  }
   if (step === 1 && (parsed === null || Number.isNaN(parsed))) {
     onChange({ name, value: 1 });
     return;
