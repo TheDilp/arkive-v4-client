@@ -309,6 +309,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                       is_randomized: null,
                       random_count: "single",
                       sort: document?.template_fields?.length || 0,
+                      additional_data: null,
                     }),
                   })
                 }
@@ -366,6 +367,7 @@ export function DocumentDrawer({ data, exceptions }: Props) {
                                 className="flex max-h-[80%] max-w-full flex-col gap-y-2 overflow-auto overflow-x-auto p-2"
                                 key={f.id}>
                                 <MatchField
+                                  additional_data={f.additional_data}
                                   allMatches={document?.template_fields || []}
                                   blueprint_id={f.blueprint_id}
                                   calendar_id={f.calendar_id}

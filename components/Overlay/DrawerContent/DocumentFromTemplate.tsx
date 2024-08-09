@@ -12,6 +12,7 @@ import {
   Dice,
   DiceRollParser,
   DocumentTemplateFieldRegex,
+  getImageURL,
   getMatchFieldVariant,
   getSentenceCase,
   IconEnum,
@@ -87,7 +88,11 @@ export function DocumentFromTemplate({ data }: Props) {
   const user = useAtomValue(userAtom);
 
   const defaultDiceColor = ls.get("default_dice_color");
-  const { data: existingTemplate, isLoading } = useGetEntity<DocumentType>(
+  const {
+    data: existingTemplate,
+    isLoading,
+    isFetching,
+  } = useGetEntity<DocumentType>(
     data?.id,
     "documents",
     {
@@ -145,6 +150,7 @@ export function DocumentFromTemplate({ data }: Props) {
               derive_formula: null,
               derive_from: null,
               related: [],
+              additional_data: null,
               random_count: null,
               key: matchKey as string,
               sort: tempFields.length,
@@ -158,7 +164,8 @@ export function DocumentFromTemplate({ data }: Props) {
         setTemplate((prev) => ({ ...prev, template_fields: existingTemplate?.data?.template_fields || [] }));
       }
     }
-  }, [previewContext?.getState()?.doc, isGeneratingPreview, existingTemplate]);
+  }, [previewContext?.getState()?.doc, isGeneratingPreview, existingTemplate, isFetching]);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       const templateContent = previewContext?.getState().doc;
@@ -181,7 +188,7 @@ export function DocumentFromTemplate({ data }: Props) {
     };
   }, [template]);
 
-  if (isLoading) return <Skeleton type="drawer_form" />;
+  if (isLoading || isFetching) return <Skeleton type="drawer_form" />;
   return (
     <DrawerLayout>
       <div className="flex flex-nowrap gap-x-2">
@@ -200,6 +207,7 @@ export function DocumentFromTemplate({ data }: Props) {
             <Collapsible key={f.id} label={getSentenceCase(f.key)} variant={getMatchFieldVariant(f)}>
               <div className="flex max-h-[80%] flex-col gap-y-2 overflow-auto p-2" key={f.id}>
                 <MatchField
+                  additional_data={f?.additional_data}
                   allMatches={template?.template_fields || []}
                   blueprint_id={f?.blueprint_id}
                   calendar_id={f?.calendar_id}
@@ -280,35 +288,42 @@ export function DocumentFromTemplate({ data }: Props) {
                     });
                     if (state) {
                       previewContext?.manager?.view?.updateState(state);
-                      const textNodeType = previewContext?.getState()?.schema?.nodes?.text;
-                      if (textNodeType) {
-                        const nodes = findChildrenByNode({
-                          node: previewContext?.getState()?.doc,
-                          type: textNodeType,
-                        });
-
-                        nodes
-                          .map((node) => ({ text: node.node.textContent.trim(), pos: node.pos }))
-                          .filter((node) => node.text === "%{image}%")
-                          .forEach((node) => {
-                            const tr = replaceNodeAtPosition({
-                              pos: node.pos,
-                              tr: previewContext?.view?.state?.tr,
-                              content: previewContext?.getState()?.schema?.nodes.image.create({
-                                id: "1d79c292-c34f-46db-9651-673eb771b5bf",
-                                alt: "rothden_emblem.webp",
-                                src: "https://the-arkive-v3.nyc3.cdn.digitaloceanspaces.com/assets/43e1c879-415b-4394-95ad-f9a4c42a43c5/images/94359479-a682-40ec-8b8b-7d65dacf4c2e.webp",
-                                crop: null,
-                                title: "rothden_emblem.webp",
-                                width: 229,
-                                height: 296,
-                                rotate: null,
-                                fileName: null,
-                                resizable: false,
-                              }),
-                            });
-                            previewContext?.view?.dispatch(tr);
+                      const imageFields = (template?.template_fields || []).filter((f) => f.entity_type === "images");
+                      if (imageFields.length) {
+                        const imageKeys = imageFields.map((f) => `%{${f.key}}%`);
+                        const textNodeType = previewContext?.getState()?.schema?.nodes?.text;
+                        if (textNodeType) {
+                          const nodes = findChildrenByNode({
+                            node: previewContext?.getState()?.doc,
+                            type: textNodeType,
                           });
+
+                          nodes
+                            .map((node) => ({ text: node.node.textContent.trim(), pos: node.pos }))
+                            .filter((node) => imageKeys.includes(node.text))
+                            .forEach((node) => {
+                              const nodeField = imageFields.find((field) => `%{${field.key}}%` === node.text.trim());
+                              if (nodeField) {
+                                const tr = replaceNodeAtPosition({
+                                  pos: node.pos,
+                                  tr: previewContext?.view?.state?.tr,
+                                  content: previewContext?.getState()?.schema?.nodes.image.create({
+                                    id: nodeField?.related?.[0],
+                                    alt: nodeField?.additional_data?.title || "template",
+                                    src: getImageURL(project_id as string, "images", nodeField?.related?.[0]),
+                                    crop: null,
+                                    title: nodeField?.additional_data?.title,
+                                    width: nodeField?.additional_data?.width || 250,
+                                    height: nodeField?.additional_data?.height || 250,
+                                    rotate: null,
+                                    fileName: nodeField?.additional_data?.title,
+                                    resizable: false,
+                                  }),
+                                });
+                                previewContext?.view?.dispatch(tr);
+                              }
+                            });
+                        }
                       }
                     }
 

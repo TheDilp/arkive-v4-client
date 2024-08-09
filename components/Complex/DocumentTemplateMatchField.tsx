@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { useGetEntities, useGetEntity } from "../../hooks";
+import { useGetEntities, useGetEntity, useGetImages } from "../../hooks";
 import {
   AvailableEntityType,
   AvailableSubEntityType,
@@ -146,6 +147,7 @@ function EntityWithRelatedRow({
   handleChange,
   related,
   entity_type,
+  additional_data,
   idx,
   random_count,
 }: {
@@ -156,7 +158,11 @@ function EntityWithRelatedRow({
   entity_type: EntitiesWithRelatedType;
   idx: number;
   random_count: string | null;
-} & Pick<DocumentTemplateFieldType, "blueprint_id" | "calendar_id" | "map_id" | "dictionary_id" | "related">) {
+} & Pick<
+  DocumentTemplateFieldType,
+  "blueprint_id" | "calendar_id" | "map_id" | "dictionary_id" | "related" | "additional_data"
+>) {
+  const { project_id } = useParams();
   const [selectedEntities, setSelectedEntities] = useState<
     {
       label: string;
@@ -176,7 +182,17 @@ function EntityWithRelatedRow({
       filters: { and: [{ field: "id", id: "name", header_name: "Full name", value: related, operator: "in" }] },
     },
     entity_type,
-    { enabled: !!related?.length, queryKeyConcat: related }
+    { enabled: !!related?.length && entity_type !== "images", queryKeyConcat: related }
+  );
+
+  const { data: images } = useGetImages(
+    project_id as string,
+    "images",
+    {
+      fields: ["id as value", "title as label"],
+      filters: { and: [{ field: "id", id: "name", header_name: "Full name", value: related, operator: "in" }] },
+    },
+    { enabled: !!related.length && entity_type === "images" }
   );
 
   const { data: parent } = useGetEntity(
@@ -188,7 +204,6 @@ function EntityWithRelatedRow({
     },
     { enabled: !!blueprint_id || !!map_id || !!calendar_id || !!dictionary_id }
   );
-
   useLayoutEffect(() => {
     if (!isRandomized) {
       if (relatedEntities?.data)
@@ -203,6 +218,22 @@ function EntityWithRelatedRow({
         );
     }
   }, [relatedEntities, related]);
+  useLayoutEffect(() => {
+    if (related.length) {
+      if (images?.data)
+        setSelectedEntities(
+          // @ts-expect-error ts can't correctly infer this
+          (images?.data || []) as {
+            label: string;
+            value: string;
+            image: string | null;
+            icon: string | null;
+          }[]
+        );
+    } else {
+      setSelectedEntities([]);
+    }
+  }, [images, related]);
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -304,7 +335,7 @@ function EntityWithRelatedRow({
                 </div>
               ) : null}
               {!isRandomized ? (
-                <div className="flex-1">
+                <div className="flex flex-1 flex-col gap-y-2">
                   <Search
                     isAutofocused
                     isDisabled={!!isRandomized || !parent?.data?.id}
@@ -326,20 +357,71 @@ function EntityWithRelatedRow({
           </>
         ) : null}
         {EntitiesWithRelated.includes(entity_type) && !EntitiesWithParents.includes(entity_type) ? (
-          <Search
-            isAutofocused
-            isDisabled={!!isRandomized}
-            isMultiple
-            label="Replace with"
-            name={`template_fields[${idx}].related`}
-            onChange={({ value: newValue }) => {
-              if (related.includes(newValue))
-                handleChange({ name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) });
-              else handleChange({ name: `template_fields[${idx}].related`, value: related.concat(newValue) });
-            }}
-            searchEntity={entity_type as EntitiesWithRelatedType}
-            value={related}
-          />
+          <div className="flex w-full flex-col gap-y-2">
+            {entity_type === "images" ? (
+              <div className="grid grid-cols-2">
+                <Input
+                  helperText={additional_data?.width ? "" : "Images must have a width"}
+                  label="Width"
+                  max={5000}
+                  min={0}
+                  name={`template_fields[${idx}].additional_data.width`}
+                  onChange={(e) => {
+                    handleChange({ name: e.name, value: Number(e.value || 50) });
+                  }}
+                  type="number"
+                  value={additional_data?.width || 0}
+                  variant={additional_data?.width ? "primary" : "error"}
+                />
+                <Input
+                  helperText={additional_data?.height ? "" : "Images must have a height"}
+                  label="Height"
+                  max={5000}
+                  min={0}
+                  name={`template_fields[${idx}].additional_data.height`}
+                  onChange={(e) => {
+                    handleChange({ name: e.name, value: Number(e.value || 50) });
+                  }}
+                  type="number"
+                  value={additional_data?.height || 0}
+                  variant={additional_data?.height ? "primary" : "error"}
+                />
+              </div>
+            ) : null}
+            <Search
+              isAutofocused
+              isDisabled={!!isRandomized}
+              isMultiple
+              label="Replace with"
+              name={`template_fields[${idx}].related`}
+              onChange={({ value: newValue, label }) => {
+                if (related.includes(newValue))
+                  handleChange([
+                    { name: `template_fields[${idx}].related`, value: related.filter((v) => v !== newValue) },
+                    { name: `template_fields[${idx}].additional_data`, value: null },
+                  ]);
+                else if (entity_type === "images") {
+                  handleChange([
+                    { name: `template_fields[${idx}].related`, value: [newValue] },
+                    {
+                      name: `template_fields[${idx}].additional_data.title`,
+                      value: label,
+                    },
+                  ]);
+                } else {
+                  handleChange([
+                    { name: `template_fields[${idx}].related`, value: related.concat(newValue) },
+                    {
+                      name: `template_fields[${idx}].additional_data.title`,
+                      value: label,
+                    },
+                  ]);
+                }
+              }}
+              searchEntity={entity_type as EntitiesWithRelatedType}
+              value={entity_type === "images" ? related?.[0] : related}
+            />
+          </div>
         ) : null}
         {isRandomized ? null : (
           <div className="flex w-full flex-col gap-y-2">
@@ -350,7 +432,7 @@ function EntityWithRelatedRow({
                 }
                 icon={ent.icon || parent?.data?.icon || ""}
                 id={ent.value}
-                image_id={ent.image}
+                image_id={entity_type === "images" ? ent.value : ent.image}
                 key={ent.value}
                 title={ent.label}
                 type={entity_type as AvailableEntityType}
@@ -380,6 +462,7 @@ export function MatchField({
   derive_formula,
   derive_from,
   random_count,
+  additional_data,
   handleChange,
 }: {
   allMatches: DocumentType["template_fields"];
@@ -401,6 +484,7 @@ export function MatchField({
   | "related"
   | "is_randomized"
   | "random_count"
+  | "additional_data"
 >) {
   useLayoutEffect(() => {
     if (entity_type) {
@@ -426,10 +510,10 @@ export function MatchField({
       }
     }
   }, [derive_formula, derivedParentValue]);
-  console.log(related);
   if (EntitiesWithRelated.includes(entity_type))
     return (
       <EntityWithRelatedRow
+        additional_data={additional_data}
         blueprint_id={blueprint_id}
         calendar_id={calendar_id}
         dictionary_id={dictionary_id}
