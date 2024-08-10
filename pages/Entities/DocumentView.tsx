@@ -17,6 +17,7 @@ import {
   baseURLS,
   breadcrumbsAtom,
   contextMenuAtom,
+  CustomAnnotation,
   DefaultEditorExtensions,
   DefaultTagColor,
   Dice,
@@ -200,7 +201,7 @@ function DocumentViewEditor({
     mutationKey: ["document_view", "update"],
   });
 
-  const [uiOptions, setUIOptions] = useState({ outline: true, comments: false });
+  const [uiOptions, setUIOptions] = useState({ outline: false, comments: false });
 
   const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
   const { manager, state, getContext } = useRemirror({
@@ -364,7 +365,8 @@ function DocumentViewEditor({
 
   useEffect(() => {
     if (!drawer.type) {
-      getContext()?.commands.setAnnotations([]);
+      const annotations = (getContext()?.helpers?.getAnnotations() || []).filter((a: CustomAnnotation) => a.type !== "mention");
+      getContext()?.commands.setAnnotations(annotations);
     }
   }, [drawer.type]);
 
@@ -482,7 +484,16 @@ function DocumentViewEditor({
           </div>
         </Remirror>
       </div>
-      <div className="w-1/5"></div>
+      <div
+        className={`hidden h-[calc(100%-3rem)] flex-col gap-y-2 rounded-r p-2 lg:flex ${uiOptions.comments ? "w-1/3 bg-zinc-900" : "w-1/6"} transition-all`}>
+        <div className="ml-auto w-fit">
+          <Button
+            icon={IconEnum?.conversation}
+            isIconOnly
+            onClick={() => setUIOptions((prev) => ({ ...prev, comments: !prev.comments }))}
+          />
+        </div>
+      </div>
     </div>
   );
 }

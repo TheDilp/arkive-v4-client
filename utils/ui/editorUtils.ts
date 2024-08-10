@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 import { AnyExtension, EditorState, InvalidContentHandlerProps } from "remirror";
 import {
+  Annotation,
   AnnotationExtension,
   BlockquoteExtension,
   BoldExtension,
@@ -39,6 +40,10 @@ import { ConversationType, DocumentType, MessageKindType, NotificationType, slas
 import { mentionDropdownAtom } from "../atoms";
 import { IconEnum } from "../enums";
 import { Dice, DiceRollParser, DiceRollRegex } from "./diceRollerUtils";
+
+export interface CustomAnnotation extends Annotation {
+  type: "mention" | "comment";
+}
 
 const defaultMatchers = [
   {
@@ -132,7 +137,7 @@ export function DefaultEditorExtensions(
   });
   return [
     new MarkdownExtension({}),
-    new AnnotationExtension({}),
+    new AnnotationExtension<CustomAnnotation>({}),
     new SecretExtension({
       secret: true,
     }),

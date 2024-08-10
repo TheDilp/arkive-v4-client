@@ -13,6 +13,7 @@ import {
   AvailableIcons,
   baseURLS,
   createMentions,
+  CustomAnnotation,
   drawerAtom,
   FetchFunction,
   getElementPosition,
@@ -114,13 +115,17 @@ export function AutomentionDrawer({ data }: Props) {
 
   const [ranges, setRanges] = useState<matchResult[]>([]);
   useLayoutEffect(() => {
-    data.getContext.commands.setAnnotations([]);
+    const annotations = ((data.getContext?.helpers?.getAnnotations() as CustomAnnotation[]) || []).filter(
+      (a: CustomAnnotation) => a.type !== "mention"
+    );
+
+    data.getContext.commands.setAnnotations(annotations);
     setRanges([]);
   }, [selectedEntity]);
 
   useEffect(() => {
     if (selectedLinks.length) {
-      const selectedItemsAnnotations = [];
+      const selectedItemsAnnotations: CustomAnnotation[] = [];
       for (let index = 0; index < selectedLinks.length; index += 1) {
         const selectedIdx = ranges.findIndex((r) => `${r.from}-${r.id}-${r.to}` === selectedLinks[index]);
         if (selectedIdx > -1) {
@@ -130,10 +135,16 @@ export function AutomentionDrawer({ data }: Props) {
             from: ranges[selectedIdx].from,
             to: ranges[selectedIdx].to,
             className: "selectedAnnotation",
+            text: "",
+            // @ts-ignore
+            type: "mention",
           });
         }
       }
-      data.getContext.commands.setAnnotations(selectedItemsAnnotations);
+      const commentAnnotations = ((data.getContext?.helpers?.getAnnotations() as CustomAnnotation[]) || []).filter(
+        (a: CustomAnnotation) => a.type !== "mention"
+      );
+      data.getContext.commands.setAnnotations(selectedItemsAnnotations.concat(commentAnnotations || []));
     }
   }, [selectedLinks, selectedEntity, ranges]);
 
@@ -180,6 +191,8 @@ export function AutomentionDrawer({ data }: Props) {
                           from: potentialMatch.from,
                           to: potentialMatch.to,
                           className: "annotation",
+                          // @ts-ignore
+                          type: "mention",
                         },
                       ]);
                     const domN = findElementAtPosition(potentialMatch.from, data.getContext.view);
