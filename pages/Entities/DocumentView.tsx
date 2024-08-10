@@ -242,7 +242,7 @@ function DocumentViewEditor({
       event: e,
       items: [
         {
-          id: "1",
+          id: "create_entity",
           title: "Create entity from text",
           icon: IconEnum.add,
           subItems: [
@@ -322,7 +322,7 @@ function DocumentViewEditor({
           ],
         },
         {
-          id: "2",
+          id: "send_to_discord",
           title: "Send text to Discord",
           icon: IconEnum.discord,
           subItems: (webhooks?.data || []).map((webhook) => ({
@@ -386,8 +386,8 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="flex h-[calc(100%-3rem)] w-full items-start justify-start">
-      <div className={"h-[calc(100%-3rem)] w-1/5"}>
+    <div className="grid h-[calc(100%-4rem)] w-full grid-cols-6 items-start justify-start">
+      <div className={"col-span-1 h-full max-h-full"}>
         <ul
           className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} transition-all`}>
           <li className="relative mb-2 mr-auto flex w-full items-center justify-between">
@@ -418,80 +418,72 @@ function DocumentViewEditor({
           ))}
         </ul>
       </div>
-      <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded-t bg-zinc-800 lg:max-w-5xl">
-        {mentionPosition ? (
-          <div
-            className={`fade-in-30 absolute ${
-              mentionPosition === "above" ? "top-48" : "bottom-10"
-            } left-1/2 animate-bounce text-green-400 duration-700`}>
-            <Icon
-              fontSize={48}
-              icon={mentionPosition === "above" ? IconEnum.chevron_up : IconEnum.chevron_down}
-              thickness="bold"
-            />
-          </div>
-        ) : null}
-
-        <Remirror
-          editable={can_update}
-          hooks={documentEditorHooks(changedData, resetChanges, refetch)}
-          initialContent={state}
-          manager={manager}
-          onChange={(params) => {
-            if (params.firstRender) {
-              return;
-            }
-            if (params?.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
-              handleChange({ name: "content", value: params.state.toJSON()?.doc });
-          }}>
-          <SlashMenu />
-
-          <div
-            className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
-            id="editor">
-            {can_update ? (
-              <Menubar
-                hasChanges={!!changedData}
-                icon={icon ?? undefined}
-                id={id || ""}
-                isMutating={isMutating}
-                isTemplate={!!is_template}
-                size="md"
-                title={title || ""}
-              />
-            ) : null}
+      <div className="col-span-4 h-full max-h-full overflow-hidden">
+        <div className="h-full w-full rounded-t bg-zinc-800">
+          {mentionPosition ? (
             <div
-              className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
-              onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
-              onDrop={
-                can_update
-                  ? (e) => {
-                      const stringData = e.dataTransfer.getData("Text");
-                      if (!stringData) return;
-                      if (stringData) {
-                        const data: { index: number; title: string; description?: string } = JSON.parse(
-                          e.dataTransfer.getData("Text")
-                        );
-                        if (!data) return;
-                        getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
-                      }
-                    }
-                  : undefined
-              }>
-              <EditorComponent />
-              <MentionDropdownComponent />
+              className={`fade-in-30 absolute ${
+                mentionPosition === "above" ? "top-48" : "bottom-10"
+              } left-1/2 animate-bounce text-green-400 duration-700`}>
+              <Icon
+                fontSize={48}
+                icon={mentionPosition === "above" ? IconEnum.chevron_up : IconEnum.chevron_down}
+                thickness="bold"
+              />
             </div>
-          </div>
-        </Remirror>
-      </div>
-      <div
-        className={`hidden h-[calc(100%-3rem)] flex-col gap-y-2 rounded-r p-2 lg:flex ${uiOptions.comments ? "w-1/3 bg-zinc-900" : "w-1/6"} transition-all`}>
-        <div className="ml-auto w-fit">
-          <Button
-            icon={IconEnum?.conversation}
-            isIconOnly
-            onClick={() => setUIOptions((prev) => ({ ...prev, comments: !prev.comments }))}
-          />
+          ) : null}
+
+          <Remirror
+            editable={can_update}
+            hooks={documentEditorHooks(changedData, resetChanges, refetch)}
+            initialContent={state}
+            manager={manager}
+            onChange={(params) => {
+              if (params.firstRender) {
+                return;
+              }
+              if (params?.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
+                handleChange({ name: "content", value: params.state.toJSON()?.doc });
+            }}>
+            <SlashMenu />
+
+            <div
+              className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
+              id="editor">
+              {can_update ? (
+                <Menubar
+                  hasChanges={!!changedData}
+                  icon={icon ?? undefined}
+                  id={id || ""}
+                  isMutating={isMutating}
+                  isTemplate={!!is_template}
+                  size="md"
+                  title={title || ""}
+                />
+              ) : null}
+              <div
+                className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
+                onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
+                onDrop={
+                  can_update
+                    ? (e) => {
+                        const stringData = e.dataTransfer.getData("Text");
+                        if (!stringData) return;
+                        if (stringData) {
+                          const data: { index: number; title: string; description?: string } = JSON.parse(
+                            e.dataTransfer.getData("Text")
+                          );
+                          if (!data) return;
+                          getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
+                        }
+                      }
+                    : undefined
+                }>
+                <EditorComponent />
+                <MentionDropdownComponent />
+              </div>
+            </div>
+          </Remirror>
         </div>
       </div>
     </div>
