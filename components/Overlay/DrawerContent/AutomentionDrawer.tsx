@@ -234,7 +234,7 @@ export function AutomentionDrawer({ data }: Props) {
                         // mention.from is equal to the mentions pos
                         const domN = findElementAtPosition(potentialMatch.from, data.getContext.view);
                         if (domN) {
-                          domN.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+                          domN.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
                           setMentionPosition(null);
                         }
                       }}

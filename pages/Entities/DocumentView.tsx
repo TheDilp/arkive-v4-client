@@ -386,7 +386,7 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="flex h-full w-full items-start justify-start">
+    <div className="flex h-[calc(100%-3rem)] w-full items-start justify-start">
       <div className={"h-[calc(100%-3rem)] w-1/5"}>
         <ul
           className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} transition-all`}>
