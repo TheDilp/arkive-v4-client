@@ -306,62 +306,28 @@ function createColumns(
                       })),
                     },
                     {
-                      id: "gateway_access",
+                      id: "grant_access",
                       title: "Grant gateway access",
                       icon: IconEnum.gateway,
-                      subItems: [
-                        {
-                          id: "create_access",
-                          title: "Create character access",
-                          icon: IconEnum.add,
-                          isDisabled: true,
-
-                          // !hasActionPermission(
-                          //   isProjectOwner,
-                          //   user_id === row.original.owner_id,
-                          //   permissions,
-                          //   row.original?.permissions || [],
-                          //   "create_characters",
-                          //   user_role_id
-                          // )
-
-                          onClick: () =>
-                            setDrawer((prev) => ({
-                              ...prev,
-                              size: "half",
-                              title: "Grant create access",
-                              data: {
-                                entity_id: row.original.id,
-                                type: "characters",
-                              },
-                              type: "gateway_access",
-                            })),
-                        },
-                        {
-                          id: "edit_access",
-                          title: "Edit character access",
-                          icon: IconEnum.edit,
-                          isDisabled: !hasActionPermission(
-                            isProjectOwner,
-                            user_id === row.original.owner_id,
-                            permissions,
-                            row.original?.permissions || [],
-                            "update_characters",
-                            user_role_id
-                          ),
-                          onClick: () =>
-                            setDrawer((prev) => ({
-                              ...prev,
-                              size: "half",
-                              title: "Grant edit access",
-                              data: {
-                                entity_id: row.original.id,
-                                type: "characters",
-                              },
-                              type: "gateway_access",
-                            })),
-                        },
-                      ],
+                      isDisabled: !hasActionPermission(
+                        isProjectOwner,
+                        user_id === row.original.owner_id,
+                        permissions,
+                        row.original?.permissions || [],
+                        "update_characters",
+                        user_role_id
+                      ),
+                      onClick: () =>
+                        setDrawer((prev) => ({
+                          ...prev,
+                          size: "half",
+                          title: "Grant edit access",
+                          data: {
+                            entity_id: row.original.id,
+                            type: "characters",
+                          },
+                          type: "gateway_access",
+                        })),
                     },
                     {
                       id: "view_public",
