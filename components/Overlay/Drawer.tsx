@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { tv } from "tailwind-variants";
 
-import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
 import { FolderDrawer, GraphDrawer } from "..";
+import { dialogAtom, drawerAtom, hasChangedDataAtom, IconEnum } from "../../utils";
 import { Button } from "../Form";
 import {
   AutomentionDrawer,
@@ -25,7 +25,6 @@ import {
   DictionaryDrawer,
   DocumentDrawer,
   DocumentFromTemplate,
-  DocumentOutlineDrawer,
   EdgeDrawer,
   EditMessageDrawer,
   EditTagDrawer,
@@ -245,7 +244,6 @@ export function Drawer() {
                 {drawer.type === "entity_preview" ? <EntityPreviewDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_tags" ? <BulkTagsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_folder" ? <BulkFolderDrawer data={drawer?.data} /> : null}
-                {drawer.type === "document_outline" ? <DocumentOutlineDrawer data={drawer?.data} /> : null}
                 {drawer.type === "roles" ? <RolesAndPermissionsDrawer data={drawer?.data} /> : null}
                 {drawer.type === "bulk_access" ? <BulkAccessDrawer data={drawer?.data} /> : null}
                 {drawer.type === "games" ? <GameDrawer data={drawer?.data} /> : null}

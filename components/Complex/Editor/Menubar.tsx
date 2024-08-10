@@ -408,29 +408,6 @@ function menuBarItems({
   if (!isEditorMenubar && !IS_GATEWAY) {
     options.push(
       {
-        id: "outline",
-        // @ts-ignore
-        icon: IconEnum.document_outline,
-        onClick: () => {
-          const headings: { id: string; title: string; level: number }[] = [];
-          getContext.view.state.doc.forEach((n) => {
-            if (n.type.name === "heading" && n.textContent) {
-              headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
-            }
-          });
-          if (headings.length)
-            setDrawer((prev) => ({
-              ...prev,
-              title: "Document outline",
-              data: { headings },
-              type: "document_outline",
-              size: "lg",
-            }));
-        },
-        tooltip: "Outline",
-      },
-
-      {
         id: "show_mentioned",
         icon: IconEnum.mentioned_in_document,
         tooltip: "Show entities mentioned in this document",

@@ -9,7 +9,7 @@ import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { Navigate, useBlocker, useParams } from "react-router-dom";
 import { RemirrorJSON } from "remirror";
 
-import { Icon, MentionDropdownComponent, Menubar, Skeleton, SlashMenu } from "../../components";
+import { Button, Icon, MentionDropdownComponent, Menubar, Skeleton, SlashMenu } from "../../components";
 import { useGetEntities, useGetEntity, useHandleChange, useHasPermissions, useNavbarTitle, useUpdateEntity } from "../../hooks";
 import { DocumentType, WebhookType } from "../../types";
 import {
@@ -147,6 +147,7 @@ export function DocumentView({ editable }: { editable: boolean }) {
   if (currentDocument?.data?.is_folder) {
     return <Navigate to={`../folder/${currentDocument?.data?.id}`} />;
   }
+
   if (currentDocument?.data)
     return (
       <DocumentViewEditor
@@ -199,13 +200,21 @@ function DocumentViewEditor({
     mutationKey: ["document_view", "update"],
   });
 
-  const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
+  const [uiOptions, setUIOptions] = useState({ outline: true, comments: false });
 
+  const [editorData, setEditorData] = useState<RemirrorJSON>({ content: content as RemirrorJSON[] | undefined, type: "doc" });
   const { manager, state, getContext } = useRemirror({
     extensions: () => DefaultEditorExtensions(createNotification),
     selection: "start",
     onError,
     content,
+  });
+
+  const headings: { id: string; title: string; level: number }[] = [];
+  state.doc.forEach((n) => {
+    if (n.type.name === "heading" && n.textContent) {
+      headings.push({ id: n.attrs.id, title: n.textContent, level: n.attrs.level });
+    }
   });
 
   const { changedData, resetChanges, handleChange } = useHandleChange({ data: editorData, setData: setEditorData });
@@ -375,71 +384,105 @@ function DocumentViewEditor({
   }, [editorData]);
 
   return (
-    <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded bg-zinc-800 lg:max-w-5xl">
-      {mentionPosition ? (
-        <div
-          className={`fade-in-30 absolute ${
-            mentionPosition === "above" ? "top-48" : "bottom-10"
-          } left-1/2 animate-bounce text-green-400 duration-700`}>
-          <Icon
-            fontSize={48}
-            icon={mentionPosition === "above" ? IconEnum.chevron_up : IconEnum.chevron_down}
-            thickness="bold"
-          />
-        </div>
-      ) : null}
-
-      <Remirror
-        editable={can_update}
-        hooks={documentEditorHooks(changedData, resetChanges, refetch)}
-        initialContent={state}
-        manager={manager}
-        onChange={(params) => {
-          if (params.firstRender) {
-            return;
-          }
-          if (params?.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
-            handleChange({ name: "content", value: params.state.toJSON()?.doc });
-        }}>
-        <SlashMenu />
-
-        <div
-          className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
-          id="editor">
-          {can_update ? (
-            <Menubar
-              hasChanges={!!changedData}
-              icon={icon ?? undefined}
-              id={id || ""}
-              isMutating={isMutating}
-              isTemplate={!!is_template}
-              size="md"
-              title={title || ""}
-            />
-          ) : null}
+    <div className="flex h-full w-full items-start justify-start">
+      <div className={"h-[calc(100%-3rem)] w-1/5"}>
+        <ul
+          className={`h-full rounded-l p-2 ${uiOptions.outline ? "bg-zinc-900" : "w-[4.5rem] overflow-hidden rounded-r"} transition-all`}>
+          <li className="relative mb-2 mr-auto flex w-full items-center justify-between">
+            <div className="absolute top-0 w-14">
+              <Button
+                icon={uiOptions.outline ? IconEnum.chevron_left : IconEnum.chevron_right}
+                onClick={() => setUIOptions((prev) => ({ ...prev, outline: !prev.outline }))}
+              />
+            </div>
+            <h2 className={`mx-auto text-lg font-semibold ${uiOptions?.outline ? "" : "hidden"}`}>Outline</h2>
+          </li>
+          {headings.map((h) => (
+            <li
+              className={`cursor-pointer hover:text-blue-400 ${uiOptions.outline ? "" : "hidden"}`}
+              key={h.id}
+              onClick={() => {
+                const el = document.getElementById(h.id);
+                if (el) {
+                  const editor = document.getElementById("editor");
+                  if (editor) editor.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+                }
+              }}
+              style={{
+                paddingLeft: `${0.45 * (h.level - 1)}rem`,
+              }}>
+              {h.title}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="mx-auto h-[calc(100%-3rem)] max-h-full w-full max-w-full rounded-t bg-zinc-800 lg:max-w-5xl">
+        {mentionPosition ? (
           <div
-            className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
-            onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
-            onDrop={
-              can_update
-                ? (e) => {
-                    const stringData = e.dataTransfer.getData("Text");
-                    if (!stringData) return;
-                    if (stringData) {
-                      const data: { index: number; title: string; description?: string } = JSON.parse(
-                        e.dataTransfer.getData("Text")
-                      );
-                      if (!data) return;
-                      getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
-                    }
-                  }
-                : undefined
-            }>
-            <EditorComponent />
-            <MentionDropdownComponent />
+            className={`fade-in-30 absolute ${
+              mentionPosition === "above" ? "top-48" : "bottom-10"
+            } left-1/2 animate-bounce text-green-400 duration-700`}>
+            <Icon
+              fontSize={48}
+              icon={mentionPosition === "above" ? IconEnum.chevron_up : IconEnum.chevron_down}
+              thickness="bold"
+            />
           </div>
-        </div>
-      </Remirror>
+        ) : null}
+
+        <Remirror
+          editable={can_update}
+          hooks={documentEditorHooks(changedData, resetChanges, refetch)}
+          initialContent={state}
+          manager={manager}
+          onChange={(params) => {
+            if (params.firstRender) {
+              return;
+            }
+            if (params?.tr?.docChanged && !params.tr.getMeta("tableColumnResizing$1") && !params.tr.getMeta("commands$1"))
+              handleChange({ name: "content", value: params.state.toJSON()?.doc });
+          }}>
+          <SlashMenu />
+
+          <div
+            className="relative flex h-full max-w-full flex-1 flex-col overflow-y-auto rounded border border-zinc-800 py-0"
+            id="editor">
+            {can_update ? (
+              <Menubar
+                hasChanges={!!changedData}
+                icon={icon ?? undefined}
+                id={id || ""}
+                isMutating={isMutating}
+                isTemplate={!!is_template}
+                size="md"
+                title={title || ""}
+              />
+            ) : null}
+            <div
+              className="relative flex h-full w-full max-w-full flex-col content-start focus-visible:outline-none"
+              onContextMenu={can_update ? (e) => getContextActions(e) : undefined}
+              onDrop={
+                can_update
+                  ? (e) => {
+                      const stringData = e.dataTransfer.getData("Text");
+                      if (!stringData) return;
+                      if (stringData) {
+                        const data: { index: number; title: string; description?: string } = JSON.parse(
+                          e.dataTransfer.getData("Text")
+                        );
+                        if (!data) return;
+                        getContext()?.commands.insertText(`${data.title}: ${data?.description}`);
+                      }
+                    }
+                  : undefined
+              }>
+              <EditorComponent />
+              <MentionDropdownComponent />
+            </div>
+          </div>
+        </Remirror>
+      </div>
+      <div className="w-1/5"></div>
     </div>
   );
 }
