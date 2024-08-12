@@ -659,21 +659,33 @@ function CharacterViewHeader({
         />
       </div>
       <div className="lg:w-52">
-        <Button
-          icon={IconEnum.add}
-          isDisabled={!permissions?.create_characters}
-          label="Create new character"
-          onClick={() =>
-            setDrawer((prev) => ({
-              ...prev,
-              data: { project_id },
+        <Dropdown
+          allowedPlacements={["bottom-end"]}
+          items={[
+            {
+              id: "new",
               title: "Create new character",
-              type: "characters",
-              size: "2xl",
-            }))
-          }
-          tooltip={isMd ? undefined : "Create new character"}
-        />
+              icon: IconEnum.add,
+              onClick: () =>
+                setDrawer((prev) => ({
+                  ...prev,
+                  data: { project_id },
+                  title: "Create new character",
+                  type: "characters",
+                  size: "2xl",
+                })),
+            },
+            { id: "gateway", title: "Create gateway access", icon: IconEnum.gateway },
+          ]}>
+          
+          <Button
+            icon={IconEnum.add}
+            isDisabled={!permissions?.create_characters}
+            label="Create new character"
+            onClick={undefined}
+            tooltip={isMd ? undefined : "Create new character"}
+          />
+        </Dropdown>
       </div>
     </div>
   );
