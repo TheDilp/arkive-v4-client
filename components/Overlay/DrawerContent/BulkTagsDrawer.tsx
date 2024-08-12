@@ -91,7 +91,7 @@ export function BulkTagsDrawer({ data }: Props) {
       <div>
         <Button
           icon={IconEnum.tags}
-          isDisabled={!tagsToAdd.length && !tagsToRemove.length}
+          isDisabled={(!tagsToAdd.length && !tagsToRemove.length) || isMutating}
           isLoading={isMutating}
           label="Update"
           onClick={handleSave}
