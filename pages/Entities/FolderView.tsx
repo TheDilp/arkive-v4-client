@@ -587,7 +587,7 @@ function getSelectedActions(
                 if (EntitiesWithTags.includes(type as AvailableEntityType)) {
                   const ids = Object.values(selection || {}).flatMap((id) => id);
                   const charactersWithTags = (data || [])
-                    ?.filter((e) => ids.includes(e.id))
+                    ?.filter((e) => ids.includes(e.id) && !e.is_folder)
                     .map((e) => ({
                       id: e.id,
                       tags: "tags" in e ? ((e.tags as TagType[]) || []).map((t) => t.id) : [],
